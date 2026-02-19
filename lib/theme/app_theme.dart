@@ -24,22 +24,20 @@ class AppThemeController {
   static void setTheme(AppThemeKey key) {
     _notifier.value = _v25Html;
   }
-  // Buzlu bej + kırmızı benekli (mottled) tema
+  // Koyu mavi taban + dairesel kırmızı geçiş teması
   static const AppThemeData _v25Html = AppThemeData(
     bgGradient: LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        Color(0xFFEDD5CC), // Açık kırmızımsı bej
-        Color(0xFFD9A898), // Sıcak kırmızı-bej
-        Color(0xFFCC8878), // Terra cotta
-        Color(0xFFBF7060), // Kırmızı
-        Color(0xFFD49888), // Gül kırmızısı
-        Color(0xFFC47868), // Sıcak kırmızı
-        Color(0xFFD8A090), // Kırmızımsı bej
-        Color(0xFFBB6858), // Derin kırmızı
+        Color(0xFF0A1A1F), // Derin teal-siyah
+        Color(0xFF0D2129), // Koyu teal
+        Color(0xFF0F1F2A), // Gece mavisi
+        Color(0xFF1A1A2E), // Koyu lacivert
+        Color(0xFF1E1E3A), // Derin mor-mavi
+        Color(0xFF252550), // Gece moru
       ],
-      stops: [0.0, 0.14, 0.28, 0.42, 0.56, 0.70, 0.85, 1.0],
+      stops: [0.0, 0.25, 0.4, 0.6, 0.75, 1.0],
     ),
     cardBackground: Color(0x1AFFFFFF), // ~10% beyaz cam
     cardBackgroundAlt: Color(0x26FFFFFF), // ~15% beyaz cam
