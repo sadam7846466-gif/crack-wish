@@ -1253,13 +1253,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             ),
           ),
 
-
-          // ── Statik dairesel renk geçişi (ana sayfa stili) ──
+          // ── Üst dağınık toz bulutu parçacıkları (CustomPainter) ──
           Positioned.fill(
             child: IgnorePointer(
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: _TarotMottledPainter(),
+              child: AnimatedBuilder(
+                animation: _fogCtrl,
+                builder: (_, __) => CustomPaint(
+                  size: Size.infinite,
+                  painter: _TopDustPainter(t: _fogCtrl.value),
+                ),
               ),
             ),
           ),
@@ -1386,7 +1388,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             ),
           ),
 
-
+          // ── Alt gerçekçi toz bulutu (CustomPainter) ──
+          Positioned.fill(
+            child: IgnorePointer(
+              child: AnimatedBuilder(
+                animation: _fogCtrl,
+                builder: (_, __) => CustomPaint(
+                  size: Size.infinite,
+                  painter: _BottomDustPainter(t: _fogCtrl.value),
+                ),
+              ),
+            ),
+          ),
 
           // ── Noise/grain overlay ──
           IgnorePointer(
@@ -2462,56 +2475,138 @@ class _NoisePainter extends CustomPainter {
 }
 
 // ── Alt kısımda yoğunlaşan gerçekçi toz bulutu ──
-/// Tarot arka planı için statik dairesel renk geçişi
-/// Ana sayfadaki _MottledPainter ile aynı mantık, mor tonlarla
-class _TarotMottledPainter extends CustomPainter {
+class _BottomDustPainter extends CustomPainter {
+  final double t;
+  _BottomDustPainter({required this.t});
+
+  // 3 renk: lavanta, erik moru, mor-mavi
+  static const _colors = [
+    [180, 160, 210], // Lavanta (bej→mor)
+    [150, 64, 100],  // Erik moru (kırmızı→mor)
+    [42, 55, 108],   // Mor-mavi (mavi→mor)
+    [120, 55, 110],  // Koyu mor nebula
+    [160, 140, 190], // Açık lavanta
+    [85, 55, 140],   // Derin mor
+  ];
+
   @override
   void paint(Canvas canvas, Size size) {
-    final rng = Random(55);
+    final rng = Random(77);
+    final paint = Paint()..style = PaintingStyle.fill;
 
-    // Mor tonlu 3 renk ailesi: lavanta, erik moru, mor-mavi
-    final allColors = [
-      // Lavanta tonları (bej→mor)
-      const Color(0xFFB4A0D2), // Lavanta
-      const Color(0xFFA090C0), // Orta lavanta
-      const Color(0xFFC8B8E0), // Açık lavanta
-      // Erik moru tonları (kırmızı→mor)
-      const Color(0xFF964064), // Erik moru
-      const Color(0xFF7A3055), // Koyu erik
-      const Color(0xFF80486E), // Sıcak erik
-      const Color(0xFF6E285A), // Derin erik
-      // Mor-mavi tonları (mavi→mor)
-      const Color(0xFF2A376C), // Mor-mavi
-      const Color(0xFF3A4580), // Orta mor-mavi
-      const Color(0xFF1E2A55), // Koyu mor-mavi
-    ];
+    for (int i = 0; i < 35; i++) {
+      final xBase = rng.nextDouble() * size.width;
+      final yBase = size.height * (0.60 + rng.nextDouble() * 0.42);
 
-    for (int i = 0; i < 22; i++) {
-      final color = allColors[rng.nextInt(allColors.length)];
-      final opacity = 0.25 + rng.nextDouble() * 0.28;
-      final radius = 80.0 + rng.nextDouble() * 180.0;
-      final x = rng.nextDouble() * size.width;
-      final y = rng.nextDouble() * size.height;
+      final phase = i * 0.8;
+      final speed = 1 + (i % 3);
+      final dx = sin(t * pi * 2 * speed + phase) * 50.0;
+      final dy = cos(t * pi * 2 * speed + phase * 0.7) * 25.0;
+      final cx = xBase + dx;
+      final cy = yBase + dy;
 
-      final paint = Paint()
-        ..shader = ui.Gradient.radial(
-          Offset(x, y),
-          radius,
-          [
-            color.withOpacity(opacity),
-            color.withOpacity(opacity * 0.65),
-            color.withOpacity(opacity * 0.2),
-            color.withOpacity(0),
-          ],
-          [0.0, 0.40, 0.70, 1.0],
-        );
+      final baseW = size.width * (0.08 + rng.nextDouble() * 0.18);
+      final baseH = baseW * (0.15 + rng.nextDouble() * 0.25); // İnce çizgi/stripe oranı
+      final pulse = 0.90 + 0.10 * sin(t * pi * 2 * speed + phase * 1.3);
+      final w = baseW * pulse;
+      final h = baseH * pulse;
+      final angle = (rng.nextDouble() - 0.5) * 1.2 + sin(t * pi * 2 * speed + phase) * 0.15;
 
-      canvas.drawCircle(Offset(x, y), radius, paint);
+      final c = _colors[i % _colors.length];
+      final baseOpacity = 0.12 + rng.nextDouble() * 0.18;
+
+      paint.shader = ui.Gradient.linear(
+        Offset(cx - w / 2, cy),
+        Offset(cx + w / 2, cy),
+        [
+          Color.fromRGBO(c[0], c[1], c[2], 0.0),
+          Color.fromRGBO(c[0], c[1], c[2], baseOpacity),
+          Color.fromRGBO(c[0], c[1], c[2], baseOpacity * 0.8),
+          Color.fromRGBO(c[0], c[1], c[2], 0.0),
+        ],
+        [0.0, 0.3, 0.7, 1.0],
+      );
+
+      canvas.save();
+      canvas.translate(cx, cy);
+      canvas.rotate(angle);
+      final rrect = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: w, height: h),
+        Radius.circular(h / 2),
+      );
+      canvas.drawRRect(rrect, paint);
+      canvas.restore();
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _BottomDustPainter old) => old.t != t;
 }
 
+// ── Üst kısımda dağınık çizgili toz parçacıkları ──
+class _TopDustPainter extends CustomPainter {
+  final double t;
+  _TopDustPainter({required this.t});
+
+  static const _colors = [
+    [180, 160, 210], // Lavanta
+    [150, 64, 100],  // Erik moru
+    [42, 55, 108],   // Mor-mavi
+    [160, 140, 190], // Açık lavanta
+    [120, 55, 110],  // Koyu mor
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = Random(33);
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 25; i++) {
+      final xBase = rng.nextDouble() * size.width;
+      final yBase = size.height * (rng.nextDouble() * 0.45);
+
+      final phase = i * 0.95;
+      final speed = 1 + (i % 3);
+      final dx = sin(t * pi * 2 * speed + phase) * 40.0;
+      final dy = cos(t * pi * 2 * speed + phase * 0.6) * 20.0;
+      final cx = xBase + dx;
+      final cy = yBase + dy;
+
+      final baseW = size.width * (0.05 + rng.nextDouble() * 0.12);
+      final baseH = baseW * (0.12 + rng.nextDouble() * 0.20); // Çizgi oranı
+      final pulse = 0.90 + 0.10 * sin(t * pi * 2 * speed + phase * 1.4);
+      final w = baseW * pulse;
+      final h = baseH * pulse;
+      final angle = (rng.nextDouble() - 0.5) * 1.5 + sin(t * pi * 2 * speed + phase) * 0.2;
+
+      final c = _colors[i % _colors.length];
+      final baseOpacity = 0.08 + rng.nextDouble() * 0.12;
+
+      paint.shader = ui.Gradient.linear(
+        Offset(cx - w / 2, cy),
+        Offset(cx + w / 2, cy),
+        [
+          Color.fromRGBO(c[0], c[1], c[2], 0.0),
+          Color.fromRGBO(c[0], c[1], c[2], baseOpacity),
+          Color.fromRGBO(c[0], c[1], c[2], baseOpacity * 0.7),
+          Color.fromRGBO(c[0], c[1], c[2], 0.0),
+        ],
+        [0.0, 0.25, 0.75, 1.0],
+      );
+
+      canvas.save();
+      canvas.translate(cx, cy);
+      canvas.rotate(angle);
+      final rrect = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: w, height: h),
+        Radius.circular(h / 2),
+      );
+      canvas.drawRRect(rrect, paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TopDustPainter old) => old.t != t;
+}
 

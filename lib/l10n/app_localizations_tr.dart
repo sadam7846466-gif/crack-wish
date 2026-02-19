@@ -106,10 +106,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get statMood => 'Ruh Hali';
 
   @override
-  String get statTheme => 'Bugün...';
+  String get statTheme => 'Günün Teması';
 
   @override
-  String get statCollection => 'Kurabiyem';
+  String get statCollection => 'Koleksiyon';
 
   @override
   String get statTalisman => 'Tılsım';
@@ -413,10 +413,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get bentoDreamBadge => 'YENİ';
 
   @override
-  String get bentoMotivationTitle => 'Mod';
+  String get bentoMotivationTitle => 'Motivasyon';
 
   @override
-  String get bentoMotivationDesc => 'Ruh halini keşfet';
+  String get bentoMotivationDesc => 'Gücünü keşfet';
 
   @override
   String get bentoMotivationBadge => 'GÜNLÜK';

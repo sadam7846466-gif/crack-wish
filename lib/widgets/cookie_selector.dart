@@ -13,11 +13,15 @@ class CookieSelector extends StatefulWidget {
     this.initialSelectedIndex,
   });
 
+  /// İlk ücretli kurabiyenin index'i
+  static int get lockedStartIndex =>
+      CookieSelectorState._cookieTypes.indexWhere((c) => c['isPaid'] == true);
+
   @override
-  State<CookieSelector> createState() => _CookieSelectorState();
+  State<CookieSelector> createState() => CookieSelectorState();
 }
 
-class _CookieSelectorState extends State<CookieSelector> {
+class CookieSelectorState extends State<CookieSelector> {
   late int _selectedIndex;
   final AudioPlayer _audioPlayer = AudioPlayer();
   late ScrollController _scrollController;
@@ -98,6 +102,23 @@ class _CookieSelectorState extends State<CookieSelector> {
     _scrollController.dispose();
     _audioPlayer.dispose();
     super.dispose();
+  }
+
+  /// Kilitli kurabiyeye scroll et (dışarıdan çağırılabilir)
+  void scrollToLockedCookie() {
+    final lockedIndex = _cookieTypes.indexWhere((c) => c['isPaid'] == true);
+    if (lockedIndex < 0) return;
+    setState(() {
+      _selectedIndex = lockedIndex;
+    });
+    _scrollToSelected();
+    // Küçük bir gecikmeyle kilitli dialog'ı göster
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        _showLockedDialog(context, _cookieLabel(l10n, _cookieTypes[lockedIndex]['key'] as String));
+      }
+    });
   }
 
   void _scrollToSelected() {
@@ -196,9 +217,11 @@ class _CookieSelectorState extends State<CookieSelector> {
                         isPaid: _cookieTypes[index]['isPaid'] as bool,
                         accentColor: _cookieTypes[index]['color'] as Color,
                         onTap: () {
-                          // Kilitli kurabiyeler de dahil olmak üzere seçimi güncelle
-                          // Böylece büyük kurabiye ekranda gösterilir (kilitliyse bulanık + kilit ikonu ile)
-                          // Satın al paneli büyük kurabiyeye tıklandığında açılır
+                          final isPaid = _cookieTypes[index]['isPaid'] as bool;
+                          if (isPaid) {
+                            _showLockedDialog(context, _cookieLabel(l10n, _cookieTypes[index]['key'] as String));
+                            return;
+                          }
                           setState(() => _selectedIndex = index);
                           _playSelectSound();
                           widget.onCookieSelected?.call(
@@ -416,21 +439,24 @@ class _CookieSelectorItem extends StatelessWidget {
                         ],
                 ),
                 child: Center(
-                child: ImageFiltered(
-                  imageFilter: isPaid
-                      ? ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0)
-                      : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                  child: Image.asset(
-                    imagePath,
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Text('🥠', style: TextStyle(fontSize: 22));
-                    },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(imageSize / 2),
+                    child: ImageFiltered(
+                      imageFilter: isPaid
+                          ? ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0)
+                          : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                      child: Image.asset(
+                        imagePath,
+                        width: imageSize,
+                        height: imageSize,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Text('🥠', style: TextStyle(fontSize: 22));
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
               ),
               // Ücretli kurabiye kilit ikonu
               if (isPaid)

@@ -40,8 +40,13 @@ class BottomNav extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(tabs.length, (i) {
                 final selected = i == currentIndex;
-                // Bej + Kırmızı + Mavi karışımı — tek renk
-                const activeColor = Color(0xFFC09498);
+                // Her tab kendi rengini alıyor: Bej, Kırmızı, Mavi
+                const tabColors = [
+                  Color(0xFFE8CBB0), // Home — parlak bej
+                  Color(0xFFD06058), // Collection — parlak kırmızı
+                  Color(0xFF5C8AB8), // Profile — parlak mavi
+                ];
+                final activeColor = tabColors[i];
                 return Expanded(
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,

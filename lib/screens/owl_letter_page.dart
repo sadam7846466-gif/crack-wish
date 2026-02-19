@@ -1121,9 +1121,11 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
   late AnimationController _sendCtrl;
   late Animation<double> _pullAnim;
 
-  // Katlama
+  // Katlama ve Zarf
   late AnimationController _foldCtrl;
+  late AnimationController _envelopeCtrl;
   bool _isFolding = false;
+  bool _isEnveloping = false;
 
   // Kurabiye ekleme
   List<CookieCard> _ownedCookies = [];
@@ -1195,6 +1197,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
     _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
+    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
     _cookieFlyCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
     _loadCookies();
   }
@@ -1216,6 +1219,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     _textCtrl.dispose();
     _sendCtrl.dispose();
     _foldCtrl.dispose();
+    _envelopeCtrl.dispose();
     _cookieFlyCtrl.dispose();
     _flyingCookieEntry?.remove();
     super.dispose();
@@ -1252,7 +1256,12 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     await _foldCtrl.forward().orCancel;
     if (!mounted) return;
 
-    // Adım 2: Baykuşa uçuş
+    // Adım 2: Zarf belirir ve mektup içine girer
+    setState(() => _isEnveloping = true);
+    await _envelopeCtrl.forward().orCancel;
+    if (!mounted) return;
+
+    // Adım 3: Baykuşa uçuş
     _sendCtrl.forward().then((_) {
       if (mounted) Navigator.pop(context);
     });
@@ -1500,6 +1509,173 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     );
   }
 
+  // ==== ZARF ANİMASYONU BİLEŞENİ ====
+  Widget _buildEnvelopedPaper(double paperW, double paperH) {
+    const envColorDark = Color(0xFFC4A47C);  // Zarf içi karanlık
+    const envColorBack = Color(0xFFD6B58F);  // Zarf dış arka
+    const envColorFront = Color(0xFFE2C4A3); // Zarf ön dış
+    const flapColor = Color(0xFFDAB996);     // Üst kapak
+    
+    final envW = paperW * 1.1;
+    final envH = paperW * 0.7; // Geniş yatay zarf
+
+    return AnimatedBuilder(
+      animation: _envelopeCtrl,
+      builder: (context, _) {
+        final t = _envelopeCtrl.value;
+        // Zarf belirme ve kağıt içeri kayma (0.0 - 0.4)
+        final fSlide = (t / 0.4).clamp(0.0, 1.0);
+        // Kısa bekleme (0.4 - 0.5)
+        // Kapak kapanma (0.5 - 0.8)
+        final fFlap = Curves.easeOutBack.transform(((t - 0.5) / 0.3).clamp(0.0, 1.0));
+        // Kapanış ve mühür (0.8 - 1.0)
+        final fSeal = ((t - 0.8) / 0.2).clamp(0.0, 1.0);
+
+        // Kağıt animasyonu: Küçülüp zarf hizasına iniyor ve Y ekseninde (aşağı) zarfın içine dalıyor
+        final paperTranslateY = Curves.easeInOutCubic.transform(fSlide) * (envH * 0.6);
+        final paperScale = 1.0 - (0.2 * fSlide);
+        final paperOpacity = 1.0 - fSlide; // Zarfın içine girince görünmez olmaya başlar
+
+        return SizedBox(
+          width: envW,
+          height: envH * 1.5, // Kapak açılış alanı için ekstra yükseklik
+          child: Stack(
+            alignment: Alignment.bottomCenter, // Zarf altta durur
+            clipBehavior: Clip.none,
+            children: [
+              // 1. ZARF ARKA YÜZÜ (İç Kısım)
+              Positioned(
+                bottom: 0,
+                child: Opacity(
+                  opacity: fSlide > 0.1 ? 1.0 : fSlide * 10,
+                  child: Container(
+                    width: envW, height: envH,
+                    decoration: BoxDecoration(
+                      color: envColorDark,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 5))],
+                    ),
+                    // Zarfın dışının arka kısmı
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 15), // İç derinlik hissi
+                      decoration: BoxDecoration(color: envColorBack, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8))),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 2. KATLANMIŞ KAĞIDIN KENDİSİ
+              Positioned(
+                bottom: envH * 0.4, // Zarfın üstünden başlar
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()
+                    ..translate(0.0, paperTranslateY)
+                    ..scale(paperScale),
+                  child: Opacity(
+                    opacity: 1.0, // Kağıdın kendisini tamamen silmiyoruz (önde olan zarf onu kesecek)
+                    // Önceki metodun final halini çağırıyoruz
+                    child: ClipRect(
+                      // Zarfın içine girince kesilmesi için clip yapıyoruz
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        heightFactor: 1.0 - Curves.easeIn.transform(fSlide) * 0.8,
+                        child: _buildFoldingPaper(paperW, paperH),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 3. ZARF ÖN CEPLERİ (Kağıdı örten kısım)
+              Positioned(
+                bottom: 0,
+                child: Opacity(
+                  opacity: fSlide > 0.1 ? 1.0 : fSlide * 10,
+                  child: SizedBox(
+                    width: envW, height: envH,
+                    child: Stack(
+                      children: [
+                        // Sol Kanat
+                        ClipPath(
+                          clipper: _EnvelopeSideClipper(isLeft: true),
+                          child: Container(color: envColorFront.withBlue(160)),
+                        ),
+                        // Sağ Kanat
+                        ClipPath(
+                          clipper: _EnvelopeSideClipper(isLeft: false),
+                          child: Container(color: envColorFront.withBlue(165)),
+                        ),
+                        // Alt Cep
+                        ClipPath(
+                          clipper: _EnvelopeBottomClipper(),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: envColorFront,
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, -2))]
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // 4. ZARF ÜST KAPAĞI (Aşağı doğru katlanır)
+              Positioned(
+                bottom: envH - 2, // Zarfın tepe hizası
+                child: Opacity(
+                  opacity: fSlide > 0.1 ? 1.0 : fSlide * 10,
+                  child: Transform(
+                    alignment: Alignment.bottomCenter,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001)
+                      ..rotateX(math.pi * fFlap), // 0 -> 180 derece kapanır
+                    child: ClipPath(
+                      clipper: _EnvelopeFlapClipper(),
+                      child: Container(
+                        width: envW, height: envH * 0.6,
+                        decoration: BoxDecoration(
+                          color: fFlap > 0.5 ? flapColor : envColorBack, // Kapanınca ön renk olur
+                          boxShadow: fFlap > 0.5 ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3))] : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 5. MUM MÜHÜRÜ (En son belirir)
+              if (fSeal > 0)
+                Positioned(
+                  bottom: envH * 0.55 - 20, // Kapağın ucu kapandıktan sonra
+                  child: Transform.scale(
+                    scale: Curves.easeOutBack.transform(fSeal),
+                    child: Opacity(
+                      opacity: fSeal,
+                      child: Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFFC02C2C), // Kırmızı mum rengi
+                          border: Border.all(color: const Color(0xFF8A1717), width: 2),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 2))],
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.favorite, color: Color(0xFF8A1717), size: 18), // Mum ortasında kalp
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _deductCookie(String cookieId) async {
     await StorageService.deductCookieCard(cookieId);
   }
@@ -1664,8 +1840,17 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
           child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Kağıt, Katlama
-            if (_isFolding) ...[
+            // Kağıt, Katlama ve Zarf
+            if (_isEnveloping) ...[
+              SizedBox(
+                key: _paperKey,
+                width: double.infinity,
+                height: screenHeight * 0.45,
+                child: Center(
+                  child: _buildEnvelopedPaper(screenWidth * 0.85, 176),
+                ),
+              ),
+            ] else if (_isFolding) ...[
               SizedBox(
                 key: _paperKey,
                 width: double.infinity,
@@ -2121,4 +2306,54 @@ class _DrawingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DrawingPainter oldDelegate) => true;
+}
+// ==== ZARF KESİM SINIFLARI ====
+class _EnvelopeSideClipper extends CustomClipper<Path> {
+  final bool isLeft;
+  _EnvelopeSideClipper({required this.isLeft});
+  @override
+  Path getClip(Size size) {
+    final p = Path();
+    if (isLeft) {
+      p.moveTo(0, 0);                 // Sol üst
+      p.lineTo(size.width * 0.45, size.height * 0.45); // Ortaya doğru
+      p.lineTo(0, size.height);       // Sol alt
+    } else {
+      p.moveTo(size.width, 0);        // Sağ üst
+      p.lineTo(size.width * 0.55, size.height * 0.45); // Ortaya doğru
+      p.lineTo(size.width, size.height); // Sağ alt
+    }
+    p.close();
+    return p;
+  }
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class _EnvelopeBottomClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final p = Path();
+    p.moveTo(0, size.height);            // Sol alt
+    p.lineTo(size.width * 0.5, size.height * 0.35); // Ortaya yukarı
+    p.lineTo(size.width, size.height);   // Sağ alt
+    p.close();
+    return p;
+  }
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class _EnvelopeFlapClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final p = Path();
+    p.moveTo(0, 0);                      // Üst kapak sol
+    p.lineTo(size.width, 0);             // Üst kapak sağ
+    p.lineTo(size.width * 0.5, size.height); // Üst kapak ucu
+    p.close();
+    return p;
+  }
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

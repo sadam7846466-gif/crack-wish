@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/red_glass_background.dart';
 import 'home_page.dart';
 import 'collection_page.dart';
 import 'profile_page.dart';
@@ -36,9 +37,7 @@ class _RootShellState extends State<RootShell> {
       valueListenable: AppThemeController.notifier,
       builder: (context, palette, _) {
         return LiquidGlassScope.stack(
-          background: Container(
-            decoration: BoxDecoration(gradient: palette.bgGradient),
-          ),
+          background: const RedGlassBackground(child: SizedBox.expand()),
           content: Scaffold(
             extendBody: true,
             backgroundColor: Colors.transparent,

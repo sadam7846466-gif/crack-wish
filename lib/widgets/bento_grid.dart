@@ -1,12 +1,15 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../screens/tarot_page.dart';
 import '../screens/dream_page.dart';
 import '../screens/zodiac_page.dart';
+import '../screens/motivation_page.dart';
 import '../services/storage_service.dart';
+import '../widgets/fade_page_route.dart';
 import '../widgets/windy_nazar.dart';
 import '../widgets/floating_astronaut1.dart';
 import '../widgets/floating_astronaut2.dart';
@@ -57,70 +60,72 @@ class _BentoGridState extends State<BentoGrid>
               Expanded(
                 flex: 2,
                 child: SizedBox.expand(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      _BentoCard(
-                        compact: true,
-                        contentBottom: false,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TarotPage(),
-                            ),
-                          );
-                        },
-                        icon: '🎴', // Tarot simgesi
-                        title: l10n.bentoTarotTitle,
-                        desc: l10n.bentoTarotDesc,
-                        accent: const Color(0xFF9C6BFF), // Derin mor-lila
-                        accentSoft: const Color(0xFF4B3A87), // Gölge moru
-                        badgeText: l10n.bentoTarotBadge,
-                        badgeHidden: true,
-                        overlayImageAsset:
-                            'assets/images/tarot/tarotbutonucember.png',
-                        overlayPositioned: true,
-                        overlayRight: -95,
-                        overlayTop: 30,
-                        overlayWidth: 410,
-                        overlayHeight: 410,
-                        overlayClipToCard: true,
-                        overlayRotate: true,
-                        overlayRotateClockwise: true,
-                        overlayImageDraggable: false,
-                        overlayDragOffset: Offset.zero,
-                      ),
-                      Positioned(
-                        right: -20,
-                        top: 95,
-                        child: IgnorePointer(
-                          child: AnimatedBuilder(
-                            animation: _tarotFloatController,
-                            builder: (context, child) {
-                              final floatY =
-                                  math.sin(
-                                    _tarotFloatController.value * math.pi * 2,
-                                  ) *
-                                  6;
-                              return Transform.translate(
-                                offset: Offset(0, floatY),
-                                child: child!,
-                              );
-                            },
-                            child: Transform.rotate(
-                              angle: -0.08,
-                              child: Image.asset(
-                                'assets/images/tarot/tarotbuton_büyüktarot.webp',
-                                width: 258,
-                                height: 258,
-                                fit: BoxFit.contain,
+                  child: _PressableCardWrapper(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        FadePageRoute(
+                          page: const TarotPage(),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        _BentoCard(
+                          compact: true,
+                          contentBottom: false,
+                          icon: '🎴', // Tarot simgesi
+                          title: l10n.bentoTarotTitle,
+                          desc: l10n.bentoTarotDesc,
+                          accent: const Color(0xFF9C6BFF), // Derin mor-lila
+                          accentSoft: const Color(0xFF4B3A87), // Gölge moru
+                          badgeText: l10n.bentoTarotBadge,
+                          badgeHidden: true,
+                          overlayImageAsset:
+                              'assets/images/tarot/tarotbutonucember.png',
+                          overlayPositioned: true,
+                          overlayRight: -95,
+                          overlayTop: 30,
+                          overlayWidth: 410,
+                          overlayHeight: 410,
+                          overlayClipToCard: true,
+                          overlayRotate: true,
+                          overlayRotateClockwise: true,
+                          overlayImageDraggable: false,
+                          overlayDragOffset: Offset.zero,
+                        ),
+                        Positioned(
+                          right: -20,
+                          top: 95,
+                          child: IgnorePointer(
+                            child: AnimatedBuilder(
+                              animation: _tarotFloatController,
+                              builder: (context, child) {
+                                final floatY =
+                                    math.sin(
+                                      _tarotFloatController.value * math.pi * 2,
+                                    ) *
+                                    6;
+                                return Transform.translate(
+                                  offset: Offset(0, floatY),
+                                  child: child!,
+                                );
+                              },
+                              child: Transform.rotate(
+                                angle: -0.08,
+                                child: Image.asset(
+                                  'assets/images/tarot/tarotbuton_büyüktarot.png',
+                                  width: 258,
+                                  height: 258,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -129,19 +134,20 @@ class _BentoGridState extends State<BentoGrid>
                 flex: 2,
                 child: Column(
                   children: [
-                    Stack(
+                    _PressableCardWrapper(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          FadePageRoute(
+                            page: const DreamPage(),
+                          ),
+                        );
+                      },
+                      child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         _BentoCard(
                           compact: true,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DreamPage(),
-                              ),
-                            );
-                          },
                           icon: '☁️', // Rüya simgesi
                           title: l10n.bentoDreamTitle,
                           desc: l10n.bentoDreamDesc,
@@ -175,9 +181,19 @@ class _BentoGridState extends State<BentoGrid>
                         ),
                       ],
                     ),
+                    ),
                     const SizedBox(height: 8),
                     // Motivasyon kartı - dış Stack (gezegen taşabilir)
-                    Stack(
+                    _PressableCardWrapper(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          _SwipeBackRoute(
+                            builder: (_) => const MotivationPage(),
+                          ),
+                        );
+                      },
+                      child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         // İç ClipRRect (roket, astronotlar içeride kalır)
@@ -188,9 +204,6 @@ class _BentoGridState extends State<BentoGrid>
                             children: [
                               _BentoCard(
                                 compact: true,
-                                onTap: () {
-                                  // Motivasyon akışı henüz yok
-                                },
                                 icon: '💪',
                                 title: l10n.bentoMotivationTitle,
                                 desc: l10n.bentoMotivationDesc,
@@ -275,21 +288,23 @@ class _BentoGridState extends State<BentoGrid>
                         ),
                       ],
                     ),
+                    ),
                     const SizedBox(height: 8),
                     // Burç kartı - zodyak görseli ile
-                    Stack(
+                    _PressableCardWrapper(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          FadePageRoute(
+                            page: const ZodiacPage(),
+                          ),
+                        );
+                      },
+                      child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         _BentoCard(
                           compact: true,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ZodiacPage(),
-                              ),
-                            );
-                          },
                           icon: '⭐',
                           title: l10n.bentoZodiacTitle,
                           desc: l10n.bentoZodiacDesc,
@@ -314,6 +329,7 @@ class _BentoGridState extends State<BentoGrid>
                           ),
                         ),
                       ],
+                    ),
                     ),
                   ],
                 ),
@@ -749,12 +765,21 @@ class _InteractiveCardState extends State<_InteractiveCard>
     final rotationTurns = _overlayRotateController.drive(
       Tween(begin: 0.0, end: widget.overlayRotateClockwise ? 1.0 : -1.0),
     );
+    final hasTap = widget.onTap != null;
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTapDown: (_) => widget.onPressedChange(true),
-      onTapCancel: () => widget.onPressedChange(false),
-      onTapUp: (_) => widget.onPressedChange(false),
-      onTap: widget.onTap,
+      onTapDown: hasTap ? (_) => widget.onPressedChange(true) : null,
+      onTapCancel: hasTap ? () => widget.onPressedChange(false) : null,
+      onTapUp: hasTap ? (_) {} : null,
+      onTap: hasTap ? () {
+        widget.onPressedChange(true);
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (mounted) {
+            widget.onPressedChange(false);
+            widget.onTap?.call();
+          }
+        });
+      } : null,
       onPanUpdate: widget.overlayImageDraggable && widget.overlayPositioned
           ? (details) {
               setState(() {
@@ -771,10 +796,11 @@ class _InteractiveCardState extends State<_InteractiveCard>
           : null,
       child: AnimatedScale(
         duration: const Duration(milliseconds: 120),
-        scale: pressed ? 0.98 : 1.0,
+        scale: pressed ? 0.94 : 1.0,
+        curve: pressed ? Curves.easeInCubic : Curves.easeOutCubic,
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 120),
-          opacity: pressed ? 0.95 : 1.0,
+          opacity: pressed ? 0.85 : 1.0,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -956,7 +982,11 @@ class _InteractiveCardState extends State<_InteractiveCard>
               if (widget.overlayImageAsset != null && widget.overlayPositioned)
                 (widget.overlayClipToCard
                     ? Positioned.fill(
-                        child: ClipRRect(
+                        child: AnimatedSlide(
+                          duration: const Duration(milliseconds: 150),
+                          offset: pressed ? const Offset(0, -0.12) : Offset.zero,
+                          curve: pressed ? Curves.easeOutCubic : Curves.easeInOutCubic,
+                          child: ClipRRect(
                           borderRadius: BorderRadius.circular(18),
                           child: Stack(
                             clipBehavior: Clip.hardEdge,
@@ -1016,6 +1046,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                             ],
                           ),
                         ),
+                        ),
                       )
                     : Positioned(
                         right: widget.overlayRight + effectiveOverlayOffset.dx,
@@ -1025,7 +1056,11 @@ class _InteractiveCardState extends State<_InteractiveCard>
                         bottom: widget.overlayUseBottom
                             ? widget.overlayBottom + effectiveOverlayOffset.dy
                             : null,
-                        child: GestureDetector(
+                        child: AnimatedSlide(
+                          duration: const Duration(milliseconds: 150),
+                          offset: pressed ? const Offset(0, -0.12) : Offset.zero,
+                          curve: pressed ? Curves.easeOutCubic : Curves.easeInOutCubic,
+                          child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onPanUpdate: widget.overlayImageDraggable
                               ? (details) {
@@ -1063,10 +1098,15 @@ class _InteractiveCardState extends State<_InteractiveCard>
                                   ),
                           ),
                         ),
+                        ),
                       ))
               else if (widget.overlayImageAsset != null)
                 Positioned.fill(
-                  child: LayoutBuilder(
+                  child: AnimatedSlide(
+                    duration: const Duration(milliseconds: 150),
+                    offset: pressed ? const Offset(0, -0.12) : Offset.zero,
+                    curve: pressed ? Curves.easeOutCubic : Curves.easeInOutCubic,
+                    child: LayoutBuilder(
                     builder: (context, constraints) {
                       final size = Size(
                         constraints.maxWidth,
@@ -1174,6 +1214,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                       );
                     },
                   ),
+                  ),
                 ),
             ],
           ),
@@ -1263,6 +1304,94 @@ class _FloatingWidgetState extends State<_FloatingWidget>
         return Transform.translate(offset: Offset(0, offset), child: child);
       },
       child: widget.child,
+    );
+  }
+}
+
+/// Tüm kartı (görsel + arka plan) basınca küçülten wrapper
+class _PressableCardWrapper extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _PressableCardWrapper({
+    required this.child,
+    this.onTap,
+  });
+
+  @override
+  State<_PressableCardWrapper> createState() => _PressableCardWrapperState();
+}
+
+class _PressableCardWrapperState extends State<_PressableCardWrapper> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) {},
+      onTap: () {
+        setState(() => _pressed = true);
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (mounted) {
+            setState(() => _pressed = false);
+            widget.onTap?.call();
+          }
+        });
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.94 : 1.0,
+        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 120),
+          opacity: _pressed ? 0.85 : 1.0,
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+class _SwipeBackRoute<T> extends CupertinoPageRoute<T> {
+  _SwipeBackRoute({required WidgetBuilder builder})
+      : super(builder: builder);
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final slide = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    ));
+
+    final scale = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+    );
+
+    final fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: animation, curve: const Interval(0.0, 0.5)),
+    );
+
+    return SlideTransition(
+      position: slide,
+      child: ScaleTransition(
+        scale: scale,
+        child: FadeTransition(
+          opacity: fade,
+          child: child,
+        ),
+      ),
     );
   }
 }

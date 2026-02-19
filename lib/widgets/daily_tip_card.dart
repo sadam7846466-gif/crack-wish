@@ -1,4 +1,4 @@
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
@@ -6,7 +6,6 @@ import '../screens/dream_page.dart';
 import '../screens/tarot_page.dart';
 import '../screens/zodiac_page.dart';
 import '../services/storage_service.dart';
-import '../widgets/fade_page_route.dart';
 
 class DailyTipCard extends StatefulWidget {
   const DailyTipCard({super.key});
@@ -51,19 +50,19 @@ class _DailyTipCardState extends State<DailyTipCard> {
       case _SuggestionType.dream:
         Navigator.push(
           context,
-          FadePageRoute(page: const DreamPage()),
+          MaterialPageRoute(builder: (context) => const DreamPage()),
         );
         break;
       case _SuggestionType.tarot:
         Navigator.push(
           context,
-          FadePageRoute(page: const TarotPage()),
+          MaterialPageRoute(builder: (context) => const TarotPage()),
         );
         break;
       case _SuggestionType.zodiac:
         Navigator.push(
           context,
-          FadePageRoute(page: const ZodiacPage()),
+          MaterialPageRoute(builder: (context) => const ZodiacPage()),
         );
         break;
       case _SuggestionType.allDone:
@@ -104,88 +103,96 @@ class _DailyTipCardState extends State<DailyTipCard> {
           opacity: _pressed ? 0.93 : 1.0,
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryOrange.withOpacity(0.3),
-                  AppColors.primaryOrange.withOpacity(0.15),
-                ],
-              ),
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppColors.orangeGradient,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryOrange.withOpacity(0.42),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primaryOrange.withOpacity(0.3),
+                        AppColors.primaryOrange.withOpacity(0.15),
                       ],
                     ),
-                    child: const Icon(Icons.star_rounded, color: Colors.white, size: 24),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
                       children: [
-                        Text(
-                          l10n.discoverDailySuggestionTitle,
-                          style: TextStyle(
-                            color: AppColors.textWhite.withOpacity(0.75),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppColors.orangeGradient,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryOrange.withOpacity(0.42),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(Icons.star_rounded, color: Colors.white, size: 24),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.discoverDailySuggestionTitle,
+                                style: TextStyle(
+                                  color: AppColors.textWhite.withOpacity(0.75),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                headline,
+                                style: TextStyle(
+                                  color: AppColors.textWhite,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                subtitle,
+                                style: TextStyle(
+                                  color: AppColors.textWhite70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          headline,
-                          style: TextStyle(
-                            color: AppColors.textWhite,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: AppColors.textWhite70,
-                            fontSize: 12,
-                          ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppColors.textWhite50,
+                          size: 18,
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: AppColors.textWhite50,
-                    size: 18,
-                  ),
-                ],
+                ),
               ),
             ),
           ),

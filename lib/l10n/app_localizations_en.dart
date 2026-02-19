@@ -107,10 +107,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statMood => 'Mood';
 
   @override
-  String get statTheme => 'Today...';
+  String get statTheme => 'Today\'s Theme';
 
   @override
-  String get statCollection => 'My Cookie';
+  String get statCollection => 'Collection';
 
   @override
   String get statTalisman => 'Talisman';
@@ -420,10 +420,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bentoDreamBadge => 'NEW';
 
   @override
-  String get bentoMotivationTitle => 'Mood';
+  String get bentoMotivationTitle => 'Motivation';
 
   @override
-  String get bentoMotivationDesc => 'Discover your mood';
+  String get bentoMotivationDesc => 'Discover your strength';
 
   @override
   String get bentoMotivationBadge => 'DAILY';

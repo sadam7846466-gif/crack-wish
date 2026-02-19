@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'constants/theme.dart';
-import 'screens/root_shell.dart';
+import 'screens/splash_screen.dart';
 import 'services/locale_controller.dart';
 
 Future<void> main() async {
@@ -30,8 +30,10 @@ class MyApp extends StatelessWidget {
             onGenerateTitle: (context) =>
                 AppLocalizations.of(context)!.appTitle,
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.darkTheme,
-            home: const RootShell(),
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.system,
+            home: const SplashScreen(),
             locale: controller.locale,
             supportedLocales: LocaleController.supportedLocales,
             localizationsDelegates: [

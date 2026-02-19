@@ -190,26 +190,26 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
   }
 
   static const Map<String, String> _cookieImageMap = {
-    'spring_wreath': 'assets/images/cookies/spring_wreath.webp',
-    'lucky_clover': 'assets/images/cookies/lucky_clover.webp',
-    'royal_hearts': 'assets/images/cookies/royal_hearts.webp',
-    'evil_eye': 'assets/images/cookies/evil_eye.webp',
-    'pizza_party': 'assets/images/cookies/pizza_party.webp',
-    'sakura_bloom': 'assets/images/cookies/sakura_bloom.webp',
-    'blue_porcelain': 'assets/images/cookies/blue_porcelain.webp',
-    'pink_blossom': 'assets/images/cookies/pink_blossom.webp',
-    'fortune_cat': 'assets/images/cookies/fortune_cat.webp',
-    'wildflower': 'assets/images/cookies/wildflower.webp',
-    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.webp',
-    'panda_bamboo': 'assets/images/cookies/panda_bamboo.webp',
-    'ramadan_cute': 'assets/images/cookies/ramadan_cute.webp',
-    'enchanted_forest': 'assets/images/cookies/enchanted_forest.webp',
-    'golden_arabesque': 'assets/images/cookies/golden_arabesque.webp',
-    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.webp',
-    'pearl_lace': 'assets/images/cookies/pearl_lace.webp',
-    'golden_sakura': 'assets/images/cookies/golden_sakura.webp',
-    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.webp',
-    'gold_beasts': 'assets/images/cookies/gold_beasts.webp',
+    'spring_wreath': 'assets/images/cookies/spring_wreath.png',
+    'lucky_clover': 'assets/images/cookies/lucky_clover.png',
+    'royal_hearts': 'assets/images/cookies/royal_hearts.png',
+    'evil_eye': 'assets/images/cookies/evil_eye.png',
+    'pizza_party': 'assets/images/cookies/pizza_party.png',
+    'sakura_bloom': 'assets/images/cookies/sakura_bloom.png',
+    'blue_porcelain': 'assets/images/cookies/blue_porcelain.png',
+    'pink_blossom': 'assets/images/cookies/pink_blossom.png',
+    'fortune_cat': 'assets/images/cookies/fortune_cat.png',
+    'wildflower': 'assets/images/cookies/wildflower.png',
+    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.png',
+    'panda_bamboo': 'assets/images/cookies/panda_bamboo.png',
+    'ramadan_cute': 'assets/images/cookies/ramadan_cute.png',
+    'enchanted_forest': 'assets/images/cookies/enchanted_forest.png',
+    'golden_arabesque': 'assets/images/cookies/golden_arabesque.png',
+    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.png',
+    'pearl_lace': 'assets/images/cookies/pearl_lace.png',
+    'golden_sakura': 'assets/images/cookies/golden_sakura.png',
+    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.png',
+    'gold_beasts': 'assets/images/cookies/gold_beasts.png',
   };
 
   @override
@@ -500,88 +500,94 @@ class _MiniStatCardState extends State<_MiniStatCard>
           scale: _scaleAnim.value,
           child: child,
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.25),
-              width: 0.5,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            child: hasValue
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(
-                          child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              widget.value!,
-                              maxLines: 1,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.25),
+                  width: 0.5,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                child: hasValue
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: Center(
+                              child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  widget.value!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.textWhite,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.1,
+                                  ),
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  widget.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppColors.textGrey,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: Center(
+                              child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              widget.label,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: AppColors.textWhite,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                height: 1.1,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
                               ),
                             ),
-                            const SizedBox(height: 1),
-                            Text(
-                              widget.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.textGrey,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(
-                          child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          widget.label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textWhite,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+              ),
+            ),
           ),
         ),
       ),
@@ -620,26 +626,26 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
   bool _loading = true;
 
   static const Map<String, String> _cookieImageMap = {
-    'spring_wreath': 'assets/images/cookies/spring_wreath.webp',
-    'lucky_clover': 'assets/images/cookies/lucky_clover.webp',
-    'royal_hearts': 'assets/images/cookies/royal_hearts.webp',
-    'evil_eye': 'assets/images/cookies/evil_eye.webp',
-    'pizza_party': 'assets/images/cookies/pizza_party.webp',
-    'sakura_bloom': 'assets/images/cookies/sakura_bloom.webp',
-    'blue_porcelain': 'assets/images/cookies/blue_porcelain.webp',
-    'pink_blossom': 'assets/images/cookies/pink_blossom.webp',
-    'fortune_cat': 'assets/images/cookies/fortune_cat.webp',
-    'wildflower': 'assets/images/cookies/wildflower.webp',
-    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.webp',
-    'panda_bamboo': 'assets/images/cookies/panda_bamboo.webp',
-    'ramadan_cute': 'assets/images/cookies/ramadan_cute.webp',
-    'enchanted_forest': 'assets/images/cookies/enchanted_forest.webp',
-    'golden_arabesque': 'assets/images/cookies/golden_arabesque.webp',
-    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.webp',
-    'pearl_lace': 'assets/images/cookies/pearl_lace.webp',
-    'golden_sakura': 'assets/images/cookies/golden_sakura.webp',
-    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.webp',
-    'gold_beasts': 'assets/images/cookies/gold_beasts.webp',
+    'spring_wreath': 'assets/images/cookies/spring_wreath.png',
+    'lucky_clover': 'assets/images/cookies/lucky_clover.png',
+    'royal_hearts': 'assets/images/cookies/royal_hearts.png',
+    'evil_eye': 'assets/images/cookies/evil_eye.png',
+    'pizza_party': 'assets/images/cookies/pizza_party.png',
+    'sakura_bloom': 'assets/images/cookies/sakura_bloom.png',
+    'blue_porcelain': 'assets/images/cookies/blue_porcelain.png',
+    'pink_blossom': 'assets/images/cookies/pink_blossom.png',
+    'fortune_cat': 'assets/images/cookies/fortune_cat.png',
+    'wildflower': 'assets/images/cookies/wildflower.png',
+    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.png',
+    'panda_bamboo': 'assets/images/cookies/panda_bamboo.png',
+    'ramadan_cute': 'assets/images/cookies/ramadan_cute.png',
+    'enchanted_forest': 'assets/images/cookies/enchanted_forest.png',
+    'golden_arabesque': 'assets/images/cookies/golden_arabesque.png',
+    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.png',
+    'pearl_lace': 'assets/images/cookies/pearl_lace.png',
+    'golden_sakura': 'assets/images/cookies/golden_sakura.png',
+    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.png',
+    'gold_beasts': 'assets/images/cookies/gold_beasts.png',
   };
 
   static const Set<String> _paidCookieIds = {

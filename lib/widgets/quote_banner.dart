@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
@@ -10,71 +11,79 @@ class QuoteBanner extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primaryOrange.withOpacity(0.3),
-            AppColors.primaryOrange.withOpacity(0.15),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Stack(
-          children: [
-            Positioned(
-              top: -4,
-              left: 0,
-              child: Text(
-                '"',
-                style: TextStyle(
-                  fontSize: 28,
-                  color: Colors.white.withOpacity(0.2),
-                  fontFamily: 'Georgia',
-                ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryOrange.withOpacity(0.25),
+                  AppColors.primaryOrange.withOpacity(0.10),
+                ],
               ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.25),
+                width: 0.8,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Stack(
                 children: [
-                  Text(
-                    l10n.quoteOfDayText,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      height: 1.5,
+                  Positioned(
+                    top: -4,
+                    left: 0,
+                    child: Text(
+                      '"',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white.withOpacity(0.2),
+                        fontFamily: 'Georgia',
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.quoteOfDaySource,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.quoteOfDayText,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.quoteOfDaySource,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

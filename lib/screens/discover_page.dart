@@ -392,13 +392,20 @@ class _CategoryCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withOpacity(0.55),
+              color.withOpacity(0.30),
+            ],
+          ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+          border: Border.all(color: color.withOpacity(0.60), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
+              color: color.withOpacity(0.40),
+              blurRadius: 16,
               offset: const Offset(0, 4),
             ),
           ],
@@ -412,9 +419,15 @@ class _CategoryCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.3),
+                  color: color.withOpacity(0.45),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.4), width: 1),
+                  border: Border.all(color: color.withOpacity(0.65), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.35),
+                      blurRadius: 10,
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Text(icon, style: const TextStyle(fontSize: 28)),
@@ -433,7 +446,7 @@ class _CategoryCard extends StatelessWidget {
               Text(
                 desc,
                 style: TextStyle(
-                  color: AppColors.textWhite50,
+                  color: AppColors.textWhite70,
                   fontSize: 12,
                   height: 1.4,
                 ),
