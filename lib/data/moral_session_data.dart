@@ -1,145 +1,145 @@
 import 'dart:math';
 
-/// "Bugün Hangi Karakter Modundasın?" seansı veri havuzları
+/// "BugÃ¼n Hangi Karakter ModundasÄ±n?" seansÄ± veri havuzlarÄ±
 class KarakterModuData {
   static final _rng = Random();
 
-  // ─── KART 2: GÜÇ SEÇENEKLERİ (her seansta 3 tanesi gösterilir) ───
-  static const guçler = [
-    {'emoji': '🧠', 'ad': 'Zihin Susturucu', 'açıklama': '30 dk sessizlik'},
-    {'emoji': '🧲', 'ad': 'Şans Mıknatısı', 'açıklama': 'Minik şanslar'},
-    {'emoji': '🛡️', 'ad': 'Drama Kalkanı', 'açıklama': 'Saçma şeyleri umursamaz'},
-    {'emoji': '⏸️', 'ad': 'Duraklatıcı', 'açıklama': 'Zamanı yavaşlatır'},
-    {'emoji': '🔋', 'ad': 'Sonsuz Enerji', 'açıklama': 'Yorgunluk nedir bilmez'},
-    {'emoji': '🎯', 'ad': 'Odak Lazeri', 'açıklama': 'Dikkat dağılmaz'},
-    {'emoji': '💎', 'ad': 'Özgüven Zırhı', 'açıklama': 'Herkes seni alkışlar'},
-    {'emoji': '🌀', 'ad': 'Sakinlik Girdabı', 'açıklama': 'Stres yok olur'},
-    {'emoji': '🦸', 'ad': 'Görünmezlik Pelerini', 'açıklama': 'İstediğin zaman kaybol'},
-    {'emoji': '🎪', 'ad': 'Eğlence Bombası', 'açıklama': 'Her an komik olur'},
-    {'emoji': '🌟', 'ad': 'Karizma Patlaması', 'açıklama': 'Herkes etkilenir'},
-    {'emoji': '🧘', 'ad': 'İç Huzur Kalkanı', 'açıklama': 'Hiçbir şey dokunmaz'},
-    {'emoji': '🚀', 'ad': 'Motivasyon Roketi', 'açıklama': 'Hemen harekete geçer'},
-    {'emoji': '🎵', 'ad': 'Müzik Alanı', 'açıklama': 'Her yerde müzik çalar'},
-    {'emoji': '🍀', 'ad': 'Mega Şans', 'açıklama': 'Bugün her şey yolunda'},
-    {'emoji': '⚡', 'ad': 'Anlık Çözüm', 'açıklama': 'Her sorun 5 dk\'da çözülür'},
-    {'emoji': '🫂', 'ad': 'Empati Gücü', 'açıklama': 'Herkesi anlarsın'},
-    {'emoji': '🧃', 'ad': 'Çocukluk Enerjisi', 'açıklama': 'Her şey heyecanlı'},
-    {'emoji': '🎭', 'ad': 'Mizah Ustası', 'açıklama': 'Her cümlen espri'},
-    {'emoji': '💤', 'ad': 'Uyku Bankası', 'açıklama': '10 dk uyusan 8 saat etkisi'},
+  // âââ KART 2: GÃÃ SEÃENEKLERÄ° (her seansta 3 tanesi gÃ¶sterilir) âââ
+  static const guÃ§ler = [
+    {'emoji': 'ðð§ ', 'ad': 'Zihin Susturucu', 'aÃ§Ä±klama': '30 dk sessizlik'},
+    {'emoji': 'ðð§²', 'ad': 'Åans MÄ±knatÄ±sÄ±', 'aÃ§Ä±klama': 'Minik Åanslar'},
+    {'emoji': 'ðð¡ï¸', 'ad': 'Drama KalkanÄ±', 'aÃ§Ä±klama': 'SaÃ§ma Åeyleri umursamaz'},
+    {'emoji': 'â¸ï¸', 'ad': 'DuraklatÄ±cÄ±', 'aÃ§Ä±klama': 'ZamanÄ± yavaÅlatÄ±r'},
+    {'emoji': 'ðð', 'ad': 'Sonsuz Enerji', 'aÃ§Ä±klama': 'Yorgunluk nedir bilmez'},
+    {'emoji': 'ðð¯', 'ad': 'Odak Lazeri', 'aÃ§Ä±klama': 'Dikkat daÄÄ±lmaz'},
+    {'emoji': 'ðð', 'ad': 'ÃzgÃ¼ven ZÄ±rhÄ±', 'aÃ§Ä±klama': 'Herkes seni alkÄ±Ålar'},
+    {'emoji': 'ðð', 'ad': 'Sakinlik GirdabÄ±', 'aÃ§Ä±klama': 'Stres yok olur'},
+    {'emoji': 'ðð¦¸', 'ad': 'GÃ¶rÃ¼nmezlik Pelerini', 'aÃ§Ä±klama': 'Ä°stediÄin zaman kaybol'},
+    {'emoji': 'ððª', 'ad': 'EÄlence BombasÄ±', 'aÃ§Ä±klama': 'Her an komik olur'},
+    {'emoji': 'ðð', 'ad': 'Karizma PatlamasÄ±', 'aÃ§Ä±klama': 'Herkes etkilenir'},
+    {'emoji': 'ðð§', 'ad': 'Ä°Ã§ Huzur KalkanÄ±', 'aÃ§Ä±klama': 'HiÃ§bir Åey dokunmaz'},
+    {'emoji': 'ðð', 'ad': 'Motivasyon Roketi', 'aÃ§Ä±klama': 'Hemen harekete geÃ§er'},
+    {'emoji': 'ððµ', 'ad': 'MÃ¼zik AlanÄ±', 'aÃ§Ä±klama': 'Her yerde mÃ¼zik Ã§alar'},
+    {'emoji': 'ðð', 'ad': 'Mega Åans', 'aÃ§Ä±klama': 'BugÃ¼n her Åey yolunda'},
+    {'emoji': 'â¡', 'ad': 'AnlÄ±k ÃÃ¶zÃ¼m', 'aÃ§Ä±klama': 'Her sorun 5 dk\'da Ã§Ã¶zÃ¼lÃ¼r'},
+    {'emoji': 'ðð«', 'ad': 'Empati GÃ¼cÃ¼', 'aÃ§Ä±klama': 'Herkesi anlarsÄ±n'},
+    {'emoji': 'ðð§', 'ad': 'Ãocukluk Enerjisi', 'aÃ§Ä±klama': 'Her Åey heyecanlÄ±'},
+    {'emoji': 'ðð­', 'ad': 'Mizah UstasÄ±', 'aÃ§Ä±klama': 'Her cÃ¼mlen espri'},
+    {'emoji': 'ðð¤', 'ad': 'Uyku BankasÄ±', 'aÃ§Ä±klama': '10 dk uyusan 8 saat etkisi'},
   ];
 
-  // ─── KART 5: ABSÜRT SEÇİMLER (her seansta 1 tanesi gösterilir) ───
-  static const absürtler = [
-    {'a': 'Kahveyi soğutup içen sabır ustası ☕', 'b': 'Kahveyi unutup tekrar yapan hafıza sihirbazı 🧠'},
-    {'a': 'Asansörde yabancıyla konuşan cesaret abidesi 🗣️', 'b': 'Merdivenlerden çıkan antisoyal kahraman 🏃'},
-    {'a': 'Alarmı ilk çalışta kapatan disiplin tanrısı ⏰', 'b': '14 kez erteleten uyku ustası 😴'},
-    {'a': 'Her şeyi listeleten organizasyon dehası 📝', 'b': 'Akışına bırakan kaos yöneticisi 🌊'},
-    {'a': 'Son lokmasını paylaşan fedakâr savaşçı 🍕', 'b': 'Son lokmaya "benimdir" diyen sahip çıkıcı 🛡️'},
-    {'a': 'Yağmurda dans eden romantik ruh 🌧️', 'b': 'Şemsiyesiz çıkmaya ASLA razı olmayan plancı ☂️'},
-    {'a': 'Mesajı hemen cevaplayan güvenilir dost 💬', 'b': 'Mesajı görüp "sonra yazarım" diyen gizemli tip 👻'},
-    {'a': 'Bulaşıkları hemen yıkayan ninja 🍽️', 'b': 'Lavaboda dağ oluşturan stratejist 🏔️'},
-    {'a': 'Fotoğrafı ilk çekimde beğenen özgüvenli 📸', 'b': '47 selfie çekip hepsini silen mükemmeliyetçi 🤳'},
-    {'a': 'Spoiler yiyen ve umursamayan zen ustası 🧘', 'b': 'Spoiler duyunca krize giren drama kralı/kraliçesi 😱'},
-    {'a': 'Market listesiyle gidip sadece listedekileri alan robot 🤖', 'b': 'Listeye bakmadan 20 ürün alan maceracı 🛒'},
-    {'a': 'Filmi sessizce izleyen saygılı seyirci 🎬', 'b': 'Her sahneye yorum yapan canlı anlatıcı 🎙️'},
-    {'a': 'Ayakkabılarını düzgün dizen tertipli ruh 👟', 'b': 'Ayakkabıyı fırlatan özgür ruh 🦶'},
-    {'a': 'GPS\'e güvenen modern gezgin 📍', 'b': '"Ben yolu bilirim" diyen maceracı kaybolmuş 🗺️'},
-    {'a': 'Şarjı %100\'den çıkaran plancı 🔋', 'b': '%3\'le "yeter" diyen risk uzmanı ⚠️'},
-    {'a': 'Yemeği tarifle yapan şef 👨‍🍳', 'b': '"Gözümden" yapan deney uzmanı 🧪'},
-    {'a': 'Toplantıda not alan başarılı çalışan 📋', 'b': 'Toplantıda kafa sallayıp hiç dinlemeyen artist 🎭'},
-    {'a': 'Tatili 3 ay önceden planlayan stratejist ✈️', 'b': '"Yarın gidelim" diyen spontane ruh 🎒'},
-    {'a': 'Ütüsüz çıkmayan şık insan 👔', 'b': '"Üstüme oturunca düzelir" diyen pratik deha 🧠'},
-    {'a': 'Kitabı bitirmeden yenisine başlamayan sadık okur 📖', 'b': '5 kitabı aynı anda okuyan multitasker 📚'},
-    {'a': 'Erken yatıp erken kalkan sağlıklı birey 🌅', 'b': 'Gece 3\'te TikTok izleyen gece kuşu 🦉'},
-    {'a': 'Buzdolabını organize tutan düzenli 🧊', 'b': 'Buzdolabında arkeoloji yapan kaşif 🔍'},
-    {'a': 'Kışın kalın giyinen akıllı 🧥', 'b': '"Üşümem ben" diyen ve üşüyen inatçı 🥶'},
-    {'a': 'Navigasyona "sağa dön" denince dönen kurallı 📱', 'b': '"Kestirmeden giderim" diyen ve kaybolmuş 🤷'},
-    {'a': 'Çayı 3 dakika demleyen sabırlı 🍵', 'b': '"Olmuştur artık" diyen 30 saniyeci ⚡'},
-    {'a': 'Parayla plan yapan ekonomist 💰', 'b': '"Para gelir gider" diyen filozof 🧘'},
-    {'a': 'Düzenli spor yapan disiplinli 🏋️', 'b': 'Uzaktan kumandayı almayı spor sayan yaratıcı 📺'},
-    {'a': 'Sabah duş alan enerjik 🚿', 'b': 'Akşam duş alan huzurlu 🌙'},
-    {'a': 'WiFi şifresini ezbere bilen teknolojik 📶', 'b': '"Şifre ne?" diye her seferinde soran unutkan 🤔'},
-    {'a': 'Düğün davetini hemen cevaplayan sorumluluk sahibi 💌', 'b': 'Son gün "gelirim herhalde" diyen spontane 🎉'},
+  // âââ KART 5: ABSÃRT SEÃÄ°MLER (her seansta 1 tanesi gÃ¶sterilir) âââ
+  static const absÃ¼rtler = [
+    {'a': 'Kahveyi soÄutup iÃ§en sabÄ±r ustasÄ± â', 'b': 'Kahveyi unutup tekrar yapan hafÄ±za sihirbazÄ± ðð§ '},
+    {'a': 'AsansÃ¶rde yabancÄ±yla konuÅan cesaret abidesi ðð£ï¸', 'b': 'Merdivenlerden Ã§Ä±kan antisoyal kahraman ðð'},
+    {'a': 'AlarmÄ± ilk Ã§alÄ±Åta kapatan disiplin tanrÄ±sÄ± â°', 'b': '14 kez erteleten uyku ustasÄ± ðð´'},
+    {'a': 'Her Åeyi listeleten organizasyon dehasÄ± ðð', 'b': 'AkÄ±ÅÄ±na bÄ±rakan kaos yÃ¶neticisi ðð'},
+    {'a': 'Son lokmasÄ±nÄ± paylaÅan fedakÃ¢r savaÅÃ§Ä± ðð', 'b': 'Son lokmaya "benimdir" diyen sahip Ã§Ä±kÄ±cÄ± ðð¡ï¸'},
+    {'a': 'YaÄmurda dans eden romantik ruh ðð§ï¸', 'b': 'Åemsiyesiz Ã§Ä±kmaya ASLA razÄ± olmayan plancÄ± âï¸'},
+    {'a': 'MesajÄ± hemen cevaplayan gÃ¼venilir dost ðð¬', 'b': 'MesajÄ± gÃ¶rÃ¼p "sonra yazarÄ±m" diyen gizemli tip ðð»'},
+    {'a': 'BulaÅÄ±klarÄ± hemen yÄ±kayan ninja ðð½ï¸', 'b': 'Lavaboda daÄ oluÅturan stratejist ððï¸'},
+    {'a': 'FotoÄrafÄ± ilk Ã§ekimde beÄenen Ã¶zgÃ¼venli ðð¸', 'b': '47 selfie Ã§ekip hepsini silen mÃ¼kemmeliyetÃ§i ðð¤³'},
+    {'a': 'Spoiler yiyen ve umursamayan zen ustasÄ± ðð§', 'b': 'Spoiler duyunca krize giren drama kralÄ±/kraliÃ§esi ðð±'},
+    {'a': 'Market listesiyle gidip sadece listedekileri alan robot ðð¤', 'b': 'Listeye bakmadan 20 Ã¼rÃ¼n alan maceracÄ± ðð'},
+    {'a': 'Filmi sessizce izleyen saygÄ±lÄ± seyirci ðð¬', 'b': 'Her sahneye yorum yapan canlÄ± anlatÄ±cÄ± ððï¸'},
+    {'a': 'AyakkabÄ±larÄ±nÄ± dÃ¼zgÃ¼n dizen tertipli ruh ðð', 'b': 'AyakkabÄ±yÄ± fÄ±rlatan Ã¶zgÃ¼r ruh ðð¦¶'},
+    {'a': 'GPS\'e gÃ¼venen modern gezgin ðð', 'b': '"Ben yolu bilirim" diyen maceracÄ± kaybolmuÅ ððºï¸'},
+    {'a': 'ÅarjÄ± %100\'den Ã§Ä±karan plancÄ± ðð', 'b': '%3\'le "yeter" diyen risk uzmanÄ± â ï¸'},
+    {'a': 'YemeÄi tarifle yapan Åef ðð¨âðð³', 'b': '"GÃ¶zÃ¼mden" yapan deney uzmanÄ± ðð§ª'},
+    {'a': 'ToplantÄ±da not alan baÅarÄ±lÄ± Ã§alÄ±Åan ðð', 'b': 'ToplantÄ±da kafa sallayÄ±p hiÃ§ dinlemeyen artist ðð­'},
+    {'a': 'Tatili 3 ay Ã¶nceden planlayan stratejist âï¸', 'b': '"YarÄ±n gidelim" diyen spontane ruh ðð'},
+    {'a': 'ÃtÃ¼sÃ¼z Ã§Ä±kmayan ÅÄ±k insan ðð', 'b': '"ÃstÃ¼me oturunca dÃ¼zelir" diyen pratik deha ðð§ '},
+    {'a': 'KitabÄ± bitirmeden yenisine baÅlamayan sadÄ±k okur ðð', 'b': '5 kitabÄ± aynÄ± anda okuyan multitasker ðð'},
+    {'a': 'Erken yatÄ±p erken kalkan saÄlÄ±klÄ± birey ðð', 'b': 'Gece 3\'te TikTok izleyen gece kuÅu ðð¦'},
+    {'a': 'BuzdolabÄ±nÄ± organize tutan dÃ¼zenli ðð§', 'b': 'BuzdolabÄ±nda arkeoloji yapan kaÅif ðð'},
+    {'a': 'KÄ±ÅÄ±n kalÄ±n giyinen akÄ±llÄ± ðð§¥', 'b': '"ÃÅÃ¼mem ben" diyen ve Ã¼ÅÃ¼yen inatÃ§Ä± ðð¥¶'},
+    {'a': 'Navigasyona "saÄa dÃ¶n" denince dÃ¶nen kurallÄ± ðð±', 'b': '"Kestirmeden giderim" diyen ve kaybolmuÅ ðð¤·'},
+    {'a': 'ÃayÄ± 3 dakika demleyen sabÄ±rlÄ± ððµ', 'b': '"OlmuÅtur artÄ±k" diyen 30 saniyeci â¡'},
+    {'a': 'Parayla plan yapan ekonomist ðð°', 'b': '"Para gelir gider" diyen filozof ðð§'},
+    {'a': 'DÃ¼zenli spor yapan disiplinli ððï¸', 'b': 'Uzaktan kumandayÄ± almayÄ± spor sayan yaratÄ±cÄ± ððº'},
+    {'a': 'Sabah duÅ alan enerjik ðð¿', 'b': 'AkÅam duÅ alan huzurlu ðð'},
+    {'a': 'WiFi Åifresini ezbere bilen teknolojik ðð¶', 'b': '"Åifre ne?" diye her seferinde soran unutkan ðð¤'},
+    {'a': 'DÃ¼ÄÃ¼n davetini hemen cevaplayan sorumluluk sahibi ðð', 'b': 'Son gÃ¼n "gelirim herhalde" diyen spontane ðð'},
   ];
 
-  // ─── KART 7: KARAKTER SONUÇLARI ───
+  // âââ KART 7: KARAKTER SONUÃLARI âââ
   static const karakterler = [
-    {'ad': 'Tatlı Kaos Yöneticisi', 'emoji': '😄'},
-    {'ad': 'Sabır Ninja\'sı', 'emoji': '🥷'},
-    {'ad': 'Drama Kalkanlı Kahraman', 'emoji': '🛡️'},
-    {'ad': 'Sessiz Fırtına', 'emoji': '🌪️'},
-    {'ad': 'Pozitif Enerji Bombası', 'emoji': '💥'},
-    {'ad': 'Gizli Deha', 'emoji': '🧠'},
-    {'ad': 'Rahat Kaptan', 'emoji': '⛵'},
-    {'ad': 'Stratejik Tembel', 'emoji': '🦥'},
-    {'ad': 'Duygusal Tank', 'emoji': '🪖'},
-    {'ad': 'Güler Yüzlü Savaşçı', 'emoji': '😊'},
-    {'ad': 'Kahve Enerjili Robot', 'emoji': '🤖'},
-    {'ad': 'Hayalperest Aksiyon Kahramanı', 'emoji': '🦸'},
-    {'ad': 'Sakin Kasırga', 'emoji': '🌀'},
-    {'ad': 'Mini Mutluluk Avcısı', 'emoji': '🎯'},
-    {'ad': 'Spontane Stratejist', 'emoji': '🎲'},
-    {'ad': 'Gece Kuşu Savaşçısı', 'emoji': '🦉'},
-    {'ad': 'Empati Şampiyonu', 'emoji': '🫂'},
-    {'ad': 'Mizah Tankı', 'emoji': '😂'},
-    {'ad': 'Pratik Çözüm Makinesi', 'emoji': '⚙️'},
-    {'ad': 'Rüzgâr Gibi Geçen', 'emoji': '💨'},
+    {'ad': 'TatlÄ± Kaos YÃ¶neticisi', 'emoji': 'ðð'},
+    {'ad': 'SabÄ±r Ninja\'sÄ±', 'emoji': 'ðð¥·'},
+    {'ad': 'Drama KalkanlÄ± Kahraman', 'emoji': 'ðð¡ï¸'},
+    {'ad': 'Sessiz FÄ±rtÄ±na', 'emoji': 'ððªï¸'},
+    {'ad': 'Pozitif Enerji BombasÄ±', 'emoji': 'ðð¥'},
+    {'ad': 'Gizli Deha', 'emoji': 'ðð§ '},
+    {'ad': 'Rahat Kaptan', 'emoji': 'âµ'},
+    {'ad': 'Stratejik Tembel', 'emoji': 'ðð¦¥'},
+    {'ad': 'Duygusal Tank', 'emoji': 'ððª'},
+    {'ad': 'GÃ¼ler YÃ¼zlÃ¼ SavaÅÃ§Ä±', 'emoji': 'ðð'},
+    {'ad': 'Kahve Enerjili Robot', 'emoji': 'ðð¤'},
+    {'ad': 'Hayalperest Aksiyon KahramanÄ±', 'emoji': 'ðð¦¸'},
+    {'ad': 'Sakin KasÄ±rga', 'emoji': 'ðð'},
+    {'ad': 'Mini Mutluluk AvcÄ±sÄ±', 'emoji': 'ðð¯'},
+    {'ad': 'Spontane Stratejist', 'emoji': 'ðð²'},
+    {'ad': 'Gece KuÅu SavaÅÃ§Ä±sÄ±', 'emoji': 'ðð¦'},
+    {'ad': 'Empati Åampiyonu', 'emoji': 'ðð«'},
+    {'ad': 'Mizah TankÄ±', 'emoji': 'ðð'},
+    {'ad': 'Pratik ÃÃ¶zÃ¼m Makinesi', 'emoji': 'âï¸'},
+    {'ad': 'RÃ¼zgÃ¢r Gibi GeÃ§en', 'emoji': 'ðð¨'},
   ];
 
-  // ─── KART 3 SONUÇ CÜMLELERİ (seçime göre) ───
-  static const sonuçCümleleri = {
+  // âââ KART 3 SONUÃ CÃMLELERÄ° (seÃ§ime gÃ¶re) âââ
+  static const sonuÃ§CÃ¼mleleri = {
     'insanlar': [
-      'Bugün sınır koymak = süper güç.',
-      'Herkesi mutlu etmek senin işin değil.',
-      'Bazen en iyi iletişim, sessizliktir.',
+      'BugÃ¼n sÄ±nÄ±r koymak = sÃ¼per gÃ¼Ã§.',
+      'Herkesi mutlu etmek senin iÅin deÄil.',
+      'Bazen en iyi iletiÅim, sessizliktir.',
     ],
     'para': [
-      'Küçük adımlar, büyük değişimler yaratır.',
-      'Bugün endişe yerine 1 aksiyon al.',
-      'Para gelir gider, sen kalırsın.',
+      'KÃ¼Ã§Ã¼k adÄ±mlar, bÃ¼yÃ¼k deÄiÅimler yaratÄ±r.',
+      'BugÃ¼n endiÅe yerine 1 aksiyon al.',
+      'Para gelir gider, sen kalÄ±rsÄ±n.',
     ],
     'yorgunluk': [
-      'Azıcık toparlan, kalanını yarına bırak.',
-      'Dinlenmek de üretkenlik.',
-      'Bugün az yap ama kendine iyi bak.',
+      'AzÄ±cÄ±k toparlan, kalanÄ±nÄ± yarÄ±na bÄ±rak.',
+      'Dinlenmek de Ã¼retkenlik.',
+      'BugÃ¼n az yap ama kendine iyi bak.',
     ],
     'kafa': [
-      'Düşünce spam\'ini kapat: tek adıma dön.',
-      'Kafan karışıksa, en basit şeyle başla.',
-      'Her şeyi çözmek zorunda değilsin.',
+      'DÃ¼ÅÃ¼nce spam\'ini kapat: tek adÄ±ma dÃ¶n.',
+      'Kafan karÄ±ÅÄ±ksa, en basit Åeyle baÅla.',
+      'Her Åeyi Ã§Ã¶zmek zorunda deÄilsin.',
     ],
   };
 
-  // ─── KART 4: MİKRO GÖREVLER (her seansta 1 tanesi) ───
-  static const görevler = [
-    {'başlık': 'Gülümseme Hilesi', 'metin': '10 saniye sahte gülümse, sonra gerçek gülümse.', 'süre': 10},
-    {'başlık': 'Nefes Sihirbazı', 'metin': '4 sn nefes al, 4 sn tut, 4 sn ver.', 'süre': 12},
-    {'başlık': 'Omuz Silkeleme', 'metin': 'Omuzlarını kulaklarına çek, 5 sn tut, bırak. 3 kez tekrarla.', 'süre': 15},
-    {'başlık': 'Mini Dans', 'metin': 'Yerinde 10 saniye dans et. Kimse görmüyor!', 'süre': 10},
-    {'başlık': 'Güç Pozu', 'metin': 'Superman pozu yap, 15 sn tut. Ciddi ciddi.', 'süre': 15},
+  // âââ KART 4: MÄ°KRO GÃREVLER (her seansta 1 tanesi) âââ
+  static const gÃ¶revler = [
+    {'baÅlÄ±k': 'GÃ¼lÃ¼mseme Hilesi', 'metin': '10 saniye sahte gÃ¼lÃ¼mse, sonra gerÃ§ek gÃ¼lÃ¼mse.', 'sÃ¼re': 10},
+    {'baÅlÄ±k': 'Nefes SihirbazÄ±', 'metin': '4 sn nefes al, 4 sn tut, 4 sn ver.', 'sÃ¼re': 12},
+    {'baÅlÄ±k': 'Omuz Silkeleme', 'metin': 'OmuzlarÄ±nÄ± kulaklarÄ±na Ã§ek, 5 sn tut, bÄ±rak. 3 kez tekrarla.', 'sÃ¼re': 15},
+    {'baÅlÄ±k': 'Mini Dans', 'metin': 'Yerinde 10 saniye dans et. Kimse gÃ¶rmÃ¼yor!', 'sÃ¼re': 10},
+    {'baÅlÄ±k': 'GÃ¼Ã§ Pozu', 'metin': 'Superman pozu yap, 15 sn tut. Ciddi ciddi.', 'sÃ¼re': 15},
   ];
 
-  // ─── YARDIMCI METODLAR ───
-  static List<Map<String, dynamic>> rastgeleGüçler(int adet) {
-    final kopya = List<Map<String, dynamic>>.from(guçler);
+  // âââ YARDIMCI METODLAR âââ
+  static List<Map<String, dynamic>> rastgeleGÃ¼Ã§ler(int adet) {
+    final kopya = List<Map<String, dynamic>>.from(guÃ§ler);
     kopya.shuffle(_rng);
     return kopya.take(adet).toList();
   }
 
-  static Map<String, dynamic> rastgeleAbsürt() {
-    return absürtler[_rng.nextInt(absürtler.length)];
+  static Map<String, dynamic> rastgeleAbsÃ¼rt() {
+    return absÃ¼rtler[_rng.nextInt(absÃ¼rtler.length)];
   }
 
   static Map<String, dynamic> rastgeleKarakter() {
     return karakterler[_rng.nextInt(karakterler.length)];
   }
 
-  static Map<String, dynamic> rastgeleGörev() {
-    return görevler[_rng.nextInt(görevler.length)];
+  static Map<String, dynamic> rastgeleGÃ¶rev() {
+    return gÃ¶revler[_rng.nextInt(gÃ¶revler.length)];
   }
 
-  static String rastgeleSonuçCümlesi(String kategori) {
-    final liste = sonuçCümleleri[kategori] ?? sonuçCümleleri['kafa']!;
+  static String rastgeleSonuÃ§CÃ¼mlesi(String kategori) {
+    final liste = sonuÃ§CÃ¼mleleri[kategori] ?? sonuÃ§CÃ¼mleleri['kafa']!;
     return liste[_rng.nextInt(liste.length)];
   }
 }
