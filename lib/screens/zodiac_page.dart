@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
@@ -16,36 +15,25 @@ class ZodiacPage extends StatefulWidget {
 
 class _ZodiacPageState extends State<ZodiacPage> {
   int _currentNavIndex = 0;
-  String? _selectedZodiacId;
+  String? _selectedZodiac;
 
   final List<Map<String, String>> _zodiacs = [
-    {'id': 'aries', 'emoji': '♈', 'nameTr': 'Koç', 'nameEn': 'Aries'},
-    {'id': 'taurus', 'emoji': '♉', 'nameTr': 'Boğa', 'nameEn': 'Taurus'},
-    {'id': 'gemini', 'emoji': '♊', 'nameTr': 'İkizler', 'nameEn': 'Gemini'},
-    {'id': 'cancer', 'emoji': '♋', 'nameTr': 'Yengeç', 'nameEn': 'Cancer'},
-    {'id': 'leo', 'emoji': '♌', 'nameTr': 'Aslan', 'nameEn': 'Leo'},
-    {'id': 'virgo', 'emoji': '♍', 'nameTr': 'Başak', 'nameEn': 'Virgo'},
-    {'id': 'libra', 'emoji': '♎', 'nameTr': 'Terazi', 'nameEn': 'Libra'},
-    {'id': 'scorpio', 'emoji': '♏', 'nameTr': 'Akrep', 'nameEn': 'Scorpio'},
-    {'id': 'sagittarius', 'emoji': '♐', 'nameTr': 'Yay', 'nameEn': 'Sagittarius'},
-    {'id': 'capricorn', 'emoji': '♑', 'nameTr': 'Oğlak', 'nameEn': 'Capricorn'},
-    {'id': 'aquarius', 'emoji': '♒', 'nameTr': 'Kova', 'nameEn': 'Aquarius'},
-    {'id': 'pisces', 'emoji': '♓', 'nameTr': 'Balık', 'nameEn': 'Pisces'},
+    {'emoji': '♈', 'name': 'Koç'},
+    {'emoji': '♉', 'name': 'Boğa'},
+    {'emoji': '♊', 'name': 'İkizler'},
+    {'emoji': '♋', 'name': 'Yengeç'},
+    {'emoji': '♌', 'name': 'Aslan'},
+    {'emoji': '♍', 'name': 'Başak'},
+    {'emoji': '♎', 'name': 'Terazi'},
+    {'emoji': '♏', 'name': 'Akrep'},
+    {'emoji': '♐', 'name': 'Yay'},
+    {'emoji': '♑', 'name': 'Oğlak'},
+    {'emoji': '♒', 'name': 'Kova'},
+    {'emoji': '♓', 'name': 'Balık'},
   ];
-
-  String _zodiacName(Map<String, String> zodiac, String languageCode) {
-    return languageCode == 'tr' ? zodiac['nameTr']! : zodiac['nameEn']!;
-  }
-
-  String _selectedZodiacName(String languageCode) {
-    final selected = _zodiacs.firstWhere((z) => z['id'] == _selectedZodiacId);
-    return _zodiacName(selected, languageCode);
-  }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       extendBody: true,
       body: Container(
@@ -66,8 +54,8 @@ class _ZodiacPageState extends State<ZodiacPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      l10n.zodiacTitle,
+                    const Text(
+                      '⭐ Burç Yorumu',
                       style: TextStyle(
                         color: AppColors.textWhite,
                         fontSize: 24,
@@ -97,15 +85,12 @@ class _ZodiacPageState extends State<ZodiacPage> {
                         itemCount: _zodiacs.length,
                         itemBuilder: (context, index) {
                           final zodiac = _zodiacs[index];
-                          final isSelected =
-                              _selectedZodiacId == zodiac['id'];
-                          final name =
-                              _zodiacName(zodiac, languageCode);
+                          final isSelected = _selectedZodiac == zodiac['name'];
 
                           return GestureDetector(
                             onTap: () {
                               setState(() {
-                                _selectedZodiacId = zodiac['id'];
+                                _selectedZodiac = zodiac['name'];
                               });
                             },
                             child: AnimatedContainer(
@@ -168,7 +153,7 @@ class _ZodiacPageState extends State<ZodiacPage> {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        name,
+                                        zodiac['name']!,
                                         style: TextStyle(
                                           color: isSelected
                                               ? AppColors.primaryOrange
@@ -186,9 +171,9 @@ class _ZodiacPageState extends State<ZodiacPage> {
                         },
                       ),
                       // Result
-                      if (_selectedZodiacId != null) ...[
+                      if (_selectedZodiac != null) ...[
                         const SizedBox(height: 30),
-                        _buildResult(l10n, languageCode),
+                        _buildResult(),
                       ],
                     ],
                   ),
@@ -222,7 +207,7 @@ class _ZodiacPageState extends State<ZodiacPage> {
     );
   }
 
-  Widget _buildResult(AppLocalizations l10n, String languageCode) {
+  Widget _buildResult() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -241,9 +226,7 @@ class _ZodiacPageState extends State<ZodiacPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.zodiacDailyTitle(
-              _selectedZodiacName(languageCode),
-            ),
+            '$_selectedZodiac Burcu - Günlük Yorum',
             style: const TextStyle(
               color: AppColors.primaryOrange,
               fontSize: 20,
@@ -252,7 +235,7 @@ class _ZodiacPageState extends State<ZodiacPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            l10n.zodiacDailyBody,
+            'Bu hafta aşk konusunda şanslısın! Kariyer fırsatları kapında, gözlerini aç. Enerjin yüksek, bunu değerlendir. Yeni projeler için mükemmel bir zaman. İletişim becerilerin zirvede, bunu kullan.',
             style: TextStyle(
               color: AppColors.textWhite70,
               fontSize: 14,
@@ -263,32 +246,19 @@ class _ZodiacPageState extends State<ZodiacPage> {
           Row(
             children: [
               Expanded(
-                child:
-                    _StatBox(emoji: '💕', label: l10n.zodiacLove, value: 0.85),
+                child: _StatBox(emoji: '💕', label: 'Aşk', value: 0.85),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _StatBox(
-                  emoji: '💼',
-                  label: l10n.zodiacCareer,
-                  value: 0.9,
-                ),
+                child: _StatBox(emoji: '💼', label: 'Kariyer', value: 0.9),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _StatBox(
-                  emoji: '💰',
-                  label: l10n.zodiacMoney,
-                  value: 0.75,
-                ),
+                child: _StatBox(emoji: '💰', label: 'Para', value: 0.75),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _StatBox(
-                  emoji: '🌿',
-                  label: l10n.zodiacHealth,
-                  value: 0.8,
-                ),
+                child: _StatBox(emoji: '🌿', label: 'Sağlık', value: 0.8),
               ),
             ],
           ),

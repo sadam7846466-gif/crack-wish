@@ -8,13 +8,13 @@ class AppColors {
   static const Color primaryTeal = Color(0xFF25F4EE);
   static const Color primaryPink = Color(0xFFEC4899);
 
-  // Koyu v25 HTML arka plan tonları
-  static const Color bgDark1 = Color(0xFF0A1A1F);
-  static const Color bgDark2 = Color(0xFF0D2129);
-  static const Color bgDark3 = Color(0xFF0F1F2A);
-  static const Color bgDark4 = Color(0xFF1A1A2E);
-  static const Color bgDark5 = Color(0xFF1E1E3A);
-  static const Color bgDark6 = Color(0xFF252550);
+  // Koyu mavi taban + dairesel kırmızı geçiş arka plan tonları
+  static const Color bgDark1 = Color(0xFF0A1A1F); // Derin teal-siyah
+  static const Color bgDark2 = Color(0xFF0D2129); // Koyu teal
+  static const Color bgDark3 = Color(0xFF0F1F2A); // Gece mavisi
+  static const Color bgDark4 = Color(0xFF1A1A2E); // Koyu lacivert
+  static const Color bgDark5 = Color(0xFF1E1E3A); // Derin mor-mavi
+  static const Color bgDark6 = Color(0xFF252550); // Gece moru
 
   // Kart Renkleri (v25 cam yüzeyler)
   static const Color cardBackground = Color(0x1AFFFFFF); // ~10% beyaz cam
@@ -33,7 +33,7 @@ class AppColors {
   // Seçili Cookie Rengi
   static const Color selectedCookieGlow = Color(0xFFFF8A3D);
 
-  // v25 HTML Gradient
+  // Koyu mavi taban Gradient
   static const LinearGradient bgGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

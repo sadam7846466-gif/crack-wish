@@ -106,8 +106,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const TarotPage(),
+                                FadePageRoute(
+                                  page: const TarotPage(),
                                 ),
                               );
                             },
@@ -120,8 +120,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const DreamPage(),
+                                FadePageRoute(
+                                  page: const DreamPage(),
                                 ),
                               );
                             },
@@ -134,8 +134,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ZodiacPage(),
+                                FadePageRoute(
+                                  page: const ZodiacPage(),
                                 ),
                               );
                             },
@@ -154,8 +154,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const DreamPage(),
+                            FadePageRoute(
+                              page: const DreamPage(),
                             ),
                           );
                         },
@@ -165,18 +165,18 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                AppColors.primaryOrange.withOpacity(0.6),
-                                AppColors.primaryOrange.withOpacity(0.3),
+                                const Color(0xFF964040).withOpacity(0.30),
+                                const Color(0xFFD4B8A0).withOpacity(0.15),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withOpacity(0.15),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryOrange.withOpacity(0.3),
+                                color: const Color(0xFF964040).withOpacity(0.15),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -331,7 +331,7 @@ class _FeaturedCard extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const TarotPage()),
+                  FadePageRoute(page: const TarotPage()),
                 );
               },
               child: Container(

@@ -367,6 +367,38 @@ class Fortune {
     );
   }
 
+  /// Anında fortune döndürür - storage beklemez
+  static Fortune getRandomFortuneInstant({
+    required String languageCode,
+  }) {
+    final fortunes = _localizedFortunes(languageCode);
+    fortunes.shuffle(Random());
+
+    final selected = fortunes[Random().nextInt(fortunes.length)];
+
+    final luckyNumber = Random().nextInt(99) + 1;
+    final colors = languageCode == 'tr'
+        ? ['Altın', 'Gümüş', 'Mavi', 'Kırmızı', 'Yeşil', 'Mor', 'Turuncu', 'Pembe']
+        : ['Gold', 'Silver', 'Blue', 'Red', 'Green', 'Purple', 'Orange', 'Pink'];
+    final luckyColor = colors[Random().nextInt(colors.length)];
+    final luckPercent = 50 + Random().nextInt(51);
+
+    // Storage'ı arka planda güncelle
+    StorageService.addSeenFortuneId(selected.id);
+
+    return Fortune(
+      id: selected.id,
+      name: selected.name,
+      emoji: selected.emoji,
+      meaning: _shortenMeaning(selected.meaning),
+      length: selected.length,
+      stats: selected.stats,
+      luckyNumber: luckyNumber,
+      luckyColor: luckyColor,
+      luckPercent: luckPercent,
+    );
+  }
+
   // Çok uzun anlamları kısalt (daha etkili, 2 satır civarı)
   static String _shortenMeaning(String text) {
     const int maxChars = 110; // daha kısa, ~2 satır

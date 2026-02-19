@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Şans Kurabiyesi'**
+  /// **'Crack&Wish'**
   String get appTitle;
 
   /// No description provided for @language.
@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// **'Şans'**
   String get luckLabel;
 
+  /// No description provided for @todayFortune.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün Şansı'**
+  String get todayFortune;
+
   /// No description provided for @shareButton.
   ///
   /// In tr, this message translates to:
@@ -266,6 +272,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Ruh Hali'**
   String get statMood;
+
+  /// No description provided for @statTheme.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün...'**
+  String get statTheme;
+
+  /// No description provided for @statCollection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurabiyem'**
+  String get statCollection;
+
+  /// No description provided for @statTalisman.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tılsım'**
+  String get statTalisman;
 
   /// No description provided for @moodGood.
   ///
@@ -681,6 +705,54 @@ abstract class AppLocalizations {
   /// **'Hemen yorumla, anlamını öğren!'**
   String get discoverDailySuggestionSubtitle;
 
+  /// No description provided for @dailySuggestionDreamHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dün gece bir rüya gördün mü?'**
+  String get dailySuggestionDreamHeadline;
+
+  /// No description provided for @dailySuggestionDreamSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hemen yorumla, anlamını öğren!'**
+  String get dailySuggestionDreamSubtitle;
+
+  /// No description provided for @dailySuggestionTarotHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün tarot falına baktın mı?'**
+  String get dailySuggestionTarotHeadline;
+
+  /// No description provided for @dailySuggestionTarotSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 kart seç, günlük mesajını gör!'**
+  String get dailySuggestionTarotSubtitle;
+
+  /// No description provided for @dailySuggestionZodiacHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burç yorumunu kontrol ettin mi?'**
+  String get dailySuggestionZodiacHeadline;
+
+  /// No description provided for @dailySuggestionZodiacSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün enerjisini hemen öğren!'**
+  String get dailySuggestionZodiacSubtitle;
+
+  /// No description provided for @dailySuggestionAllDoneHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün ritüelleri tamam!'**
+  String get dailySuggestionAllDoneHeadline;
+
+  /// No description provided for @dailySuggestionAllDoneSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarın için geri gel, yeni içerikler gelecek.'**
+  String get dailySuggestionAllDoneSubtitle;
+
   /// No description provided for @discoverFeaturedTag.
   ///
   /// In tr, this message translates to:
@@ -792,13 +864,13 @@ abstract class AppLocalizations {
   /// No description provided for @bentoMotivationTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Motivasyon'**
+  /// **'Mod'**
   String get bentoMotivationTitle;
 
   /// No description provided for @bentoMotivationDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Gücünü keşfet'**
+  /// **'Ruh halini keşfet'**
   String get bentoMotivationDesc;
 
   /// No description provided for @bentoMotivationBadge.
@@ -1055,119 +1127,125 @@ abstract class AppLocalizations {
   /// **'Rüyayı Kaydet'**
   String get scientificSaveButton;
 
-  /// No description provided for @cookieClassic.
+  /// No description provided for @cookieSpringWreath.
   ///
   /// In tr, this message translates to:
-  /// **'Klasik'**
-  String get cookieClassic;
+  /// **'Bahar Çelengi'**
+  String get cookieSpringWreath;
 
-  /// No description provided for @cookieHalloween.
+  /// No description provided for @cookieLuckyClover.
   ///
   /// In tr, this message translates to:
-  /// **'Halloween'**
-  String get cookieHalloween;
+  /// **'Şanslı Yonca'**
+  String get cookieLuckyClover;
 
-  /// No description provided for @cookiePlain.
+  /// No description provided for @cookieRoyalHearts.
   ///
   /// In tr, this message translates to:
-  /// **'Sade'**
-  String get cookiePlain;
+  /// **'Kraliyet Kalpleri'**
+  String get cookieRoyalHearts;
 
-  /// No description provided for @cookieChocolate.
+  /// No description provided for @cookieEvilEye.
   ///
   /// In tr, this message translates to:
-  /// **'Çikolata'**
-  String get cookieChocolate;
+  /// **'Nazar'**
+  String get cookieEvilEye;
 
-  /// No description provided for @cookieStar.
+  /// No description provided for @cookiePizzaParty.
   ///
   /// In tr, this message translates to:
-  /// **'Yıldız'**
-  String get cookieStar;
+  /// **'Pizza Partisi'**
+  String get cookiePizzaParty;
 
-  /// No description provided for @cookieMystic.
+  /// No description provided for @cookieSakuraBloom.
   ///
   /// In tr, this message translates to:
-  /// **'Mistik'**
-  String get cookieMystic;
+  /// **'Sakura'**
+  String get cookieSakuraBloom;
 
-  /// No description provided for @cookieDragon.
+  /// No description provided for @cookieBluePorcelain.
   ///
   /// In tr, this message translates to:
-  /// **'Ejder'**
-  String get cookieDragon;
+  /// **'Mavi Porselen'**
+  String get cookieBluePorcelain;
 
-  /// No description provided for @cookieButterfly.
+  /// No description provided for @cookiePinkBlossom.
   ///
   /// In tr, this message translates to:
-  /// **'Kelebek'**
-  String get cookieButterfly;
+  /// **'Pembe Çiçek'**
+  String get cookiePinkBlossom;
 
-  /// No description provided for @cookieTheater.
+  /// No description provided for @cookieFortuneCat.
   ///
   /// In tr, this message translates to:
-  /// **'Tiyatro'**
-  String get cookieTheater;
+  /// **'Şans Kedisi'**
+  String get cookieFortuneCat;
 
-  /// No description provided for @cookieLucky.
+  /// No description provided for @cookieWildflower.
   ///
   /// In tr, this message translates to:
-  /// **'Şans'**
-  String get cookieLucky;
+  /// **'Kır Çiçeği'**
+  String get cookieWildflower;
 
-  /// No description provided for @cookieDiamond.
+  /// No description provided for @cookieCupidRibbon.
   ///
   /// In tr, this message translates to:
-  /// **'Elmas'**
-  String get cookieDiamond;
+  /// **'Aşk Kurdelesi'**
+  String get cookieCupidRibbon;
 
-  /// No description provided for @cookieFire.
+  /// No description provided for @cookiePandaBamboo.
   ///
   /// In tr, this message translates to:
-  /// **'Ateş'**
-  String get cookieFire;
+  /// **'Panda'**
+  String get cookiePandaBamboo;
 
-  /// No description provided for @cookieLightning.
+  /// No description provided for @cookieRamadanCute.
   ///
   /// In tr, this message translates to:
-  /// **'Yıldırım'**
-  String get cookieLightning;
+  /// **'Ramazan'**
+  String get cookieRamadanCute;
 
-  /// No description provided for @cookieRainbow.
+  /// No description provided for @cookieEnchantedForest.
   ///
   /// In tr, this message translates to:
-  /// **'Gökkuşağı'**
-  String get cookieRainbow;
+  /// **'Büyülü Orman'**
+  String get cookieEnchantedForest;
 
-  /// No description provided for @cookieEye.
+  /// No description provided for @cookieGoldenArabesque.
   ///
   /// In tr, this message translates to:
-  /// **'Göz'**
-  String get cookieEye;
+  /// **'Altın Arabesk'**
+  String get cookieGoldenArabesque;
 
-  /// No description provided for @cookieCircus.
+  /// No description provided for @cookieMidnightMosaic.
   ///
   /// In tr, this message translates to:
-  /// **'Sirk'**
-  String get cookieCircus;
+  /// **'Gece Mozaiği'**
+  String get cookieMidnightMosaic;
 
-  /// No description provided for @cookieUnicorn.
+  /// No description provided for @cookiePearlLace.
   ///
   /// In tr, this message translates to:
-  /// **'Tekboynuz'**
-  String get cookieUnicorn;
+  /// **'İnci Dantel'**
+  String get cookiePearlLace;
 
-  /// No description provided for @cookieCat.
+  /// No description provided for @cookieGoldenSakura.
   ///
   /// In tr, this message translates to:
-  /// **'Kedi'**
-  String get cookieCat;
+  /// **'Altın Sakura'**
+  String get cookieGoldenSakura;
 
-  /// No description provided for @cookieFlower.
+  /// No description provided for @cookieDragonPhoenix.
   ///
   /// In tr, this message translates to:
-  /// **'Çiçek'**
-  String get cookieFlower;
+  /// **'Ejderha & Anka'**
+  String get cookieDragonPhoenix;
+
+  /// No description provided for @cookieGoldBeasts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Altın Canavarlar'**
+  String get cookieGoldBeasts;
 
   /// No description provided for @emotionAnxiety.
   ///

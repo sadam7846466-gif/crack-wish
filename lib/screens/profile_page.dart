@@ -451,8 +451,8 @@ class _ProfileCard extends StatelessWidget {
                 color: AppColors.primaryOrange.withOpacity(0.4),
                 border: Border.all(color: Colors.white.withOpacity(0.1)),
               ),
-              child: const Center(
-                child: Text('🦉', style: TextStyle(fontSize: 38)),
+              child: Center(
+                child: Image.asset('assets/images/owl.png', width: 42, height: 42),
               ),
             ),
             const SizedBox(width: 14),

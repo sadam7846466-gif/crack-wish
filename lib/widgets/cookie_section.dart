@@ -11,11 +11,13 @@ import '../services/storage_service.dart';
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
   final String? selectedCookieEmoji;
+  final bool hideLabels;
 
   const CookieSection({
     super.key,
     this.onCookieTapped,
     this.selectedCookieEmoji,
+    this.hideLabels = false,
   });
 
   @override
@@ -28,8 +30,10 @@ class _CookieSectionState extends State<CookieSection>
   bool _isPressed = false;
   bool _showFortune = false;
   Fortune? _currentFortune;
-  late AnimationController _animationController;
-  late Animation<double> _floatAnimation;
+  
+  // Ticker yerine AnimationController.unbounded kullanıyoruz - En temiz çözüm
+  late AnimationController _animationController; 
+
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
   late AnimationController _shakeController;
@@ -51,14 +55,23 @@ class _CookieSectionState extends State<CookieSection>
   @override
   void initState() {
     super.initState();
+    
+    // Bounded Animation: 0'dan 2*pi'ye sürekli döngü
+    // Sinüs/Kosinüs fonksiyonları 2*pi periyodunda tekrar ettiği için
+    // 0 ile 2*pi arasında repeat yapmak "sonsuz" ve "kesintisiz" bir döngü oluşturur.
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(seconds: 4), // Bir tam tur süresi (yavaş salınım için)
+      upperBound: 2 * math.pi, // Loop noktası
     );
-    _floatAnimation = Tween<double>(begin: 0, end: 14).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    _animationController.repeat(reverse: true);
+    
+    // Sürekli tekrar et
+    _animationController.repeat();
+
+    // Glow animasyonu (2s, easeInOut, ileri-geri) -> Bunu değiştirmiyoruz
+
+
+
 
     // Glow animasyonu (2s, easeInOut, ileri-geri)
     _glowController = AnimationController(
@@ -76,11 +89,14 @@ class _CookieSectionState extends State<CookieSection>
       duration: const Duration(milliseconds: 500),
     );
 
-    // Crack animasyonu
+    // Crack animasyonu - Daha hızlı ve vurucu (Snap etkisi)
     _crackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 350), // 800ms -> 350ms (daha ani)
     );
+
+    // ... (diğer controllerlar aynı kalabilir)
+
 
     // Sparkle animasyonu
     _sparkleController = AnimationController(
@@ -91,7 +107,7 @@ class _CookieSectionState extends State<CookieSection>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController.dispose(); // Unbounded controller dispose ediliyor
     _glowController.dispose();
     _shakeController.dispose();
     _crackController.dispose();
@@ -108,22 +124,24 @@ class _CookieSectionState extends State<CookieSection>
 
   // Cookie görseli veya emoji göster
   Widget _buildCookieDisplay(String emoji) {
-    // Görsel olan cookie'ler için asset kullan
     final imageMap = _cookieImageMap;
-    // Eğer görsel varsa göster, yoksa emoji göster
     final imagePath = imageMap[emoji];
+    final isPaid = _paidCookieIds.contains(emoji);
+
+    Widget cookieWidget;
+
     if (imagePath != null) {
-      return Image.asset(
+      cookieWidget = Image.asset(
         imagePath,
         width: _cookieSize,
         height: _cookieSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          // Görsel yoksa emoji göster
           return Text(
             emoji,
             style: TextStyle(
               fontSize: 92,
+              color: Colors.white,
               shadows: [
                 Shadow(
                   color: const Color(0xFFF7941D).withOpacity(0.5),
@@ -135,22 +153,56 @@ class _CookieSectionState extends State<CookieSection>
           );
         },
       );
+    } else {
+      cookieWidget = Text(
+        emoji,
+        style: TextStyle(
+          fontSize: 92,
+          color: Colors.white,
+          shadows: [
+            Shadow(
+              color: const Color(0xFFF7941D).withOpacity(0.5),
+              blurRadius: 15,
+              offset: Offset.zero,
+            ),
+          ],
+        ),
+      );
     }
 
-    // Emoji göster
-    return Text(
-      emoji,
-      style: TextStyle(
-        fontSize: 92, // HTML: cookie-emoji font-size: 85px
-        // HTML: filter: drop-shadow(0 0 15px rgba(247,148,29,0.5))
-        shadows: [
-          Shadow(
-            color: const Color(0xFFF7941D).withOpacity(0.5),
-            blurRadius: 15,
-            offset: Offset.zero,
+    if (!isPaid) return cookieWidget;
+
+    // Ücretli kurabiye: bulanık + kilit ikonu
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+          child: cookieWidget,
+        ),
+        // Kilit overlay
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.black.withOpacity(0.3),
+            border: Border.all(
+              color: const Color(0xFFFFD700).withOpacity(0.5),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFFD700).withOpacity(0.2),
+                blurRadius: 12,
+              ),
+            ],
           ),
-        ],
-      ),
+          child: const Center(
+            child: Icon(Icons.lock_rounded, color: Color(0xFFFFD700), size: 22),
+          ),
+        ),
+      ],
     );
   }
 
@@ -159,75 +211,100 @@ class _CookieSectionState extends State<CookieSection>
   }
 
   static const Map<String, String> _cookieImageMap = {
-    '🏯': 'assets/images/cookie_torii.png',
-    '🎃': 'assets/images/cookie_halloween.png',
-    'ramazan': 'assets/images/cookie_ramazan.png',
-    'noel': 'assets/images/cookie_noel.png',
-    'anne': 'assets/images/cookie_anne.png',
+    'spring_wreath': 'assets/images/cookies/spring_wreath.png',
+    'lucky_clover': 'assets/images/cookies/lucky_clover.png',
+    'royal_hearts': 'assets/images/cookies/royal_hearts.png',
+    'evil_eye': 'assets/images/cookies/evil_eye.png',
+    'pizza_party': 'assets/images/cookies/pizza_party.png',
+    'sakura_bloom': 'assets/images/cookies/sakura_bloom.png',
+    'blue_porcelain': 'assets/images/cookies/blue_porcelain.png',
+    'pink_blossom': 'assets/images/cookies/pink_blossom.png',
+    'fortune_cat': 'assets/images/cookies/fortune_cat.png',
+    'wildflower': 'assets/images/cookies/wildflower.png',
+    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.png',
+    'panda_bamboo': 'assets/images/cookies/panda_bamboo.png',
+    'ramadan_cute': 'assets/images/cookies/ramadan_cute.png',
+    'enchanted_forest': 'assets/images/cookies/enchanted_forest.png',
+    'golden_arabesque': 'assets/images/cookies/golden_arabesque.png',
+    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.png',
+    'pearl_lace': 'assets/images/cookies/pearl_lace.png',
+    'golden_sakura': 'assets/images/cookies/golden_sakura.png',
+    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.png',
+    'gold_beasts': 'assets/images/cookies/gold_beasts.png',
   };
 
-  void _onCookieTap() async {
-    // Eğer paper zaten açıksa yeni mesaj çıkmasın
-    if (_showFortune) {
+  static const Set<String> _paidCookieIds = {
+    'golden_arabesque',
+    'midnight_mosaic',
+    'pearl_lace',
+    'golden_sakura',
+    'dragon_phoenix',
+    'gold_beasts',
+  };
+
+  void _onCookieTap() {
+    if (_showFortune) return;
+
+    // Ücretli kurabiye kontrolü
+    final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
+    if (_paidCookieIds.contains(cookieId)) {
+      _showPremiumDialog();
       return;
     }
 
-    // Önce basılı hali göster
-    setState(() {
-      _isPressed = true;
-    });
+    setState(() => _isPressed = true);
 
-    // Benzersiz falı al (async)
-    final fortune = await Fortune.getRandomFortune(
+    // Fortune ANINDA oluştur (beklemeden!)
+    final fortune = Fortune.getRandomFortuneInstant(
       languageCode: Localizations.localeOf(context).languageCode,
     );
 
-    setState(() {
-      _currentFortune = fortune;
-    });
-
-    // Cookie'ye tıklama sesi
     _playSound('cookie_tap.mp3');
 
     // Crack animasyonu başlat
     setState(() => _isCracking = true);
     _crackController.forward(from: 0);
 
-    // Kırılma sesi
     Future.delayed(const Duration(milliseconds: 200), () {
       _playSound('cookie_crack.mp3');
     });
-    // Parlama sesi
     Future.delayed(const Duration(milliseconds: 400), () {
       _playSound('cookie_sparkle.mp3');
     });
 
-    // Cookie sayısını ve koleksiyon kartını artır
-    await StorageService.incrementCookieCount();
-    await StorageService.incrementCookieCard(widget.selectedCookieEmoji ?? '🏯');
+    StorageService.incrementCookieCount();
+    StorageService.incrementCookieCard(cookieId);
 
-    // Stats'ı güncelle - ama setState çağırma! Bu tüm sayfayı rebuild eder
-    // widget.onCookieTapped?.call(); // Kaldırıldı - bu tüm sayfayı rebuild ediyor ve cookie selector'ı etkiliyor
-    // Arka plan hiçbir şey değişmemeli - sadece fortune paper ortaya çıkmalı
-
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (mounted) {
-        setState(() {
-          _isPressed = false;
-          _isCracking = false;
-        });
-      }
+    // Kağıt HEMEN çıksın — kurabiyenin arkasında, kırılınca görünecek
+    setState(() {
+      _currentFortune = fortune;
+      _isPressed = false;
+      _showFortune = true;
     });
 
-    // Paper'ın daha hızlı çıkması için gecikmeyi azalt (HTML'deki gibi ama daha dramatik)
-    Future.delayed(const Duration(milliseconds: 400), () {
-      // 800ms -> 400ms (daha hızlı)
+    // Kırılma animasyonu bitsin
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
-        setState(() {
-          _showFortune = true; // Paper hemen görünür ve animasyon başlar
-        });
+        setState(() => _isCracking = false);
       }
     });
+  }
+
+  void _showPremiumDialog() {
+    final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
+    final imagePath = _cookieImageMap[cookieId];
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        pageBuilder: (context, _, __) => _PremiumCookieOverlay(
+          cookieId: cookieId,
+          imagePath: imagePath,
+        ),
+      ),
+    );
   }
 
   @override
@@ -254,174 +331,133 @@ class _CookieSectionState extends State<CookieSection>
                   alignment: Alignment.center,
                   clipBehavior: Clip.none, // Paper'ın kesilmemesi için
                   children: [
-                    // ÖNEMLİ: Stack'te sıralama - ÖNCE cookie (arkada), SONRA fortune paper (üstte)
-                    // Işık halkası (HTML'deki glow efekti) - cookie ile birlikte
-                    if (_isPressed)
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 800),
-                        width: 230,
-                        height: 230,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              const Color(
-                                0xFFF7941D,
-                              ).withOpacity(0.4), // HTML: rgba(247,148,29,0.4)
-                              const Color(0xFFF7941D).withOpacity(0.2),
-                              Colors.transparent,
-                            ],
-                            stops: const [0.0, 0.4, 0.7],
+                    // 1. KAĞIT — kurabiyenin ARKASINDA (kırılınca arasından çıkar)
+                    if (_showFortune && _currentFortune != null)
+                      OverflowBox(
+                        maxHeight: MediaQuery.of(context).size.height * 0.9,
+                        alignment: Alignment.center,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight:
+                                MediaQuery.of(context).size.height * 0.55,
+                          ),
+                          child: _FortunePaper(
+                            fortune: _currentFortune!,
+                            cookieEmoji:
+                                widget.selectedCookieEmoji ?? 'spring_wreath',
+                            onAnimationComplete: () {},
                           ),
                         ),
                       ),
-                    // Crack animasyonu (HTML'deki gibi) - cookie ile birlikte
-                    if (_isCracking)
-                      AnimatedBuilder(
-                        animation: _crackController,
-                        builder: (context, child) {
-                          return Stack(
-                            children: [
-                              // Sol crack çizgisi
-                              Positioned(
-                                left: 50,
-                                top: 50,
-                                child: Transform.rotate(
-                                  angle: -0.3 * _crackController.value,
-                                  child: Opacity(
-                                    opacity: _crackController.value,
-                                    child: Container(
-                                      width: 60,
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.white.withOpacity(0.8),
-                                            Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Sağ crack çizgisi
-                              Positioned(
-                                right: 50,
-                                top: 50,
-                                child: Transform.rotate(
-                                  angle: 0.3 * _crackController.value,
-                                  child: Opacity(
-                                    opacity: _crackController.value,
-                                    child: Container(
-                                      width: 60,
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.white.withOpacity(0.8),
-                                            Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    // Kurabiye butonu (HTML: cookie-img 190x190px, cookie-emoji font-size: 85px)
-                    // ÖNEMLİ: Cookie ÖNCE ekleniyor (ARKADA kalacak) - fortune paper SONRA eklenecek (ÜSTTE olacak)
-                    // Paper çıktığında cookie ARKADA KALMALI ve tıklanmamalı (GİZLENMEMELİ!)
+
+                    // 2. KURABİYE — kağıdın ÜSTÜNDE
                     IgnorePointer(
                       ignoring:
                           _showFortune, // Paper çıktığında cookie tıklanamaz ama görünür kalır
                       child: AnimatedBuilder(
                         animation: Listenable.merge([
-                          _floatAnimation,
                           _glowAnimation,
                           _shakeController,
+                          _crackController,
                         ]),
                         builder: (context, child) {
-                          // Shake animasyonu - HTML'deki gibi
-                          const shakeOffset = 0.0; // Şimdilik titreşim kapalı
-                          final floatOffset = _floatAnimation.value;
-                          // Glow pulsation (sadece silüet maskesine uygulanıyor)
+                          const shakeOffset = 0.0;
+                          
+                          // Glow pulsation
                           final glowT = _glowAnimation.value;
-                          final glowOpacity =
-                              0.28 + (0.20 * glowT); // 0.28 → 0.48 (daha soluk)
-                          final glowBlur =
-                              14.0 +
-                              (10.0 * glowT); // 14 → 24 (biraz daha geniş)
+                          final glowOpacity = 0.28 + (0.20 * glowT); 
+                          final glowBlur = 14.0 + (10.0 * glowT); 
 
                           return Transform.translate(
-                            offset: Offset(
-                              shakeOffset,
-                              _isPressed ? 0 : -floatOffset,
-                            ),
-                            child: GestureDetector(
-                              onTapDown: (_) {
-                                if (!_showFortune) {
-                                  setState(() => _isPressed = true);
-                                }
+                            offset: Offset(shakeOffset, 0),
+                            child: AnimatedBuilder(
+                              animation: _animationController, // Unbounded controller
+                              builder: (context, child) {
+                                // "value" sürekli artıyor (saniyede 1.0 artacak şekilde ayarlandı)
+                                // Sinüs/Kosinüs kullanarak sonsuz döngü elde ediyoruz.
+                                final double t = _animationController.value; 
+
+                                // 1. Dikey Hareket: Sinüs (-12px ... +12px) - BELİRGİN YUKARI AŞAĞI
+                                final verticalOffset = 12.0 * math.sin(t); 
+
+                                // 2. Yatay Salınım: Kosinüs (-3px ... +3px) - HAFİF YAN SALINIM
+                                // Faz farkı (pi/2) doğal olarak var -> Elips hareket
+                                final horizontalOffset = 3.0 * math.cos(t); 
+
+                                // 3. Hafif Dönme (Tilt): Sinüs (Faz farkı ekleyelim)
+                                final rotationTilt = 0.02 * math.sin(t + 1.0); 
+
+                                return Transform(
+                                  transform: Matrix4.identity()
+                                    ..translate(
+                                      horizontalOffset,
+                                      _isPressed ? 0.0 : verticalOffset,
+                                    )
+                                    ..rotateZ(_isPressed ? 0.0 : rotationTilt),
+                                  alignment: Alignment.center,
+                                  child: child,
+                                );
                               },
-                              onTapUp: (_) {
-                                if (!_showFortune) {
-                                  _onCookieTap();
-                                }
-                              },
-                              onTapCancel: () {
-                                if (!_showFortune) {
-                                  setState(() => _isPressed = false);
-                                }
-                              },
-                              child: AnimatedScale(
-                                scale: _isPressed ? 1.1 : 1.0,
-                                duration: const Duration(milliseconds: 150),
-                                child: Container(
-                                  width: _cookieSize,
-                                  height: _cookieSize,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.transparent,
-                                  ),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      if (!_isCracking && !_showFortune)
-                                        _CookieGlow(
-                                          imagePath: _getCookieImagePath(
-                                            widget.selectedCookieEmoji ?? '🏯',
-                                          ),
-                                          emoji:
-                                              widget.selectedCookieEmoji ??
-                                              '🏯',
-                                          size: _cookieSize,
-                                          opacity: glowOpacity.clamp(0.0, 1.0),
-                                          blurSigma: glowBlur,
-                                        ),
-                                      Center(
-                                        child: (_isCracking || _showFortune)
-                                            ? _CrackingCookie(
-                                                size: _cookieSize,
-                                                progress: _showFortune
-                                                    ? 1.0
-                                                    : _crackController.value,
-                                                builder: (emoji) =>
-                                                    _buildCookieDisplay(emoji),
-                                                emoji:
-                                                    widget
-                                                        .selectedCookieEmoji ??
-                                                    '🏯',
-                                              )
-                                            : _buildCookieDisplay(
+                              child: GestureDetector(
+                                onTapDown: (_) {
+                                  if (!_showFortune) {
+                                    setState(() => _isPressed = true);
+                                  }
+                                },
+                                onTapUp: (_) {
+                                  if (!_showFortune) {
+                                    _onCookieTap();
+                                  }
+                                },
+                                onTapCancel: () {
+                                  if (!_showFortune) {
+                                    setState(() => _isPressed = false);
+                                  }
+                                },
+                                child: AnimatedScale(
+                                  scale: _isPressed ? 1.1 : 1.0,
+                                  duration: const Duration(milliseconds: 150),
+                                  child: Container(
+                                    width: _cookieSize,
+                                    height: _cookieSize,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        if (!_isCracking && !_showFortune)
+                                          _CookieGlow(
+                                            imagePath: _getCookieImagePath(
+                                              widget.selectedCookieEmoji ?? 'spring_wreath',
+                                            ),
+                                            emoji:
                                                 widget.selectedCookieEmoji ??
-                                                    '🏯',
-                                              ),
-                                      ),
-                                    ],
+                                                'spring_wreath',
+                                            size: _cookieSize,
+                                            opacity: glowOpacity.clamp(0.0, 1.0),
+                                            blurSigma: glowBlur,
+                                          ),
+                                        Center(
+                                          child: (_isCracking || _showFortune)
+                                              ? _CrackingCookie(
+                                              size: _cookieSize,
+                                                  progress: _crackController.value,
+                                                  builder: (emoji) =>
+                                                      _buildCookieDisplay(emoji),
+                                                  emoji:
+                                                      widget
+                                                          .selectedCookieEmoji ??
+                                                      'spring_wreath',
+                                                )
+                                              : _buildCookieDisplay(
+                                                  widget.selectedCookieEmoji ??
+                                                      'spring_wreath',
+                                                ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -430,10 +466,8 @@ class _CookieSectionState extends State<CookieSection>
                         },
                       ),
                     ),
-                    // Fortune Paper - EN SON ekleniyor (ÜSTTE görünecek, cookie ARKADA kalacak)
-                    // Paper yalnızca dışarı tıklayınca kapanmalı; mesajın kendisine tıklayınca kapanmamalı
-                    if (_showFortune && _currentFortune != null) ...[
-                      // Dışına tıklayınca kapatan şeffaf alan
+                    // 3. Dışına tıklayınca kapatan alan (en üstte)
+                    if (_showFortune && _currentFortune != null)
                       Positioned.fill(
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
@@ -445,56 +479,31 @@ class _CookieSectionState extends State<CookieSection>
                           },
                         ),
                       ),
-                      // Mesaj kartı (tıklayınca kapanmaz) - overflow engelle
-                      OverflowBox(
-                        maxHeight: MediaQuery.of(context).size.height * 0.9,
-                        alignment: Alignment.center,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight:
-                                MediaQuery.of(context).size.height * 0.55,
-                            maxWidth: 250,
-                          ),
-                          child: _FortunePaper(
-                            fortune: _currentFortune!,
-                            cookieEmoji:
-                                widget.selectedCookieEmoji ??
-                                '🏯', // Seçili cookie emojisi
-                            onAnimationComplete: () {
-                              // Animasyon tamamlandı - otomatik kaybolma yok, sadece dış tıklama ile kaybolur
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
-              const SizedBox(height: 10), // Daha da az dikey boşluk
-              // Text'ler her zaman görünür (paper çıkınca da arkada kalır)
-              // HTML: cookie-label font-size: 18px, font-weight: 700 - tam ortada
+              if (!widget.hideLabels) ...[
+              const SizedBox(height: 10),
               Text(
                 l10n.dailyCookieTitle,
-                textAlign: TextAlign.center, // Tam ortalama
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.textWhite,
-                  fontSize: 18, // HTML: 18px
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 6), // HTML: margin-top: 6px
-              // HTML: cookie-sub font-size: 13px, color: rgba(255,255,255,0.6) - tam ortada
+              const SizedBox(height: 6),
               Text(
                 l10n.dailyCookieSubtitle,
-                textAlign: TextAlign.center, // Tam ortalama
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppColors.textWhite.withOpacity(
-                    0.6,
-                  ), // HTML: rgba(255,255,255,0.6)
-                  fontSize: 13, // HTML: 13px
+                  color: AppColors.textWhite.withOpacity(0.6),
+                  fontSize: 13,
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              ],
             ],
           ),
         ),
@@ -530,32 +539,78 @@ class _CrackingCookie extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Halves translate dışa doğru, hafif döner
-    final leftOffset = Offset(-24 * progress, 6 * progress);
-    final rightOffset = Offset(24 * progress, 6 * progress);
-    final leftRotation = -0.15 * progress;
-    final rightRotation = 0.15 * progress;
+    // HTML Referansı (crackLeftAnim / crackRightAnim):
+    // 100% { transform: translateX(-40px) rotate(-20deg) translateY(30px); opacity: 0; }
+    
+    // Sol parça: Sola açıl, aşağı düş, sola dön ve kaybol
+    final leftOffset = Offset(
+      -75 * progress, // Daha fazla sola (40 -> 75)
+      30 * progress, 
+    );
+    final leftRotation = -25 * (math.pi / 180) * progress; // -25 derece (daha fazla dönüş)
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        _CookieHalf(
-          size: size,
-          emoji: emoji,
-          builder: builder,
-          alignment: Alignment.centerLeft,
-          offset: leftOffset,
-          rotation: leftRotation,
+    // Sağ parça: Sağa açıl, aşağı düş, sağa dön ve kaybol
+    final rightOffset = Offset(
+      75 * progress, // Daha fazla sağa (40 -> 75)
+      30 * progress, 
+    );
+    final rightRotation = 25 * (math.pi / 180) * progress; // 25 derece (daha fazla dönüş)
+
+    // Opaklık: Sonlara doğru sıfıra düşsün
+    final opacity = (1.0 - (progress * 1.5)).clamp(0.0, 1.0);
+
+    return Opacity(
+      opacity: opacity,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+
+      
+          _CookieHalf(
+            size: size,
+            emoji: emoji,
+            builder: builder,
+            alignment: Alignment.centerLeft,
+            offset: leftOffset,
+            rotation: leftRotation,
+          ),
+          _CookieHalf(
+            size: size,
+            emoji: emoji,
+            builder: builder,
+            alignment: Alignment.centerRight,
+            offset: rightOffset,
+            rotation: rightRotation,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCrumb({
+    required double angle, 
+    required double distance, 
+    required double size,
+    required Color color,
+  }) {
+    final rad = angle; 
+    final dist = distance * progress;
+    final dx = dist * math.sin(rad);
+    final dy = dist * -math.cos(rad) + (40 * progress * progress); // Daha fazla yerçekimi
+    
+    return Positioned(
+      child: Transform.translate(
+        offset: Offset(dx, dy),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
         ),
-        _CookieHalf(
-          size: size,
-          emoji: emoji,
-          builder: builder,
-          alignment: Alignment.centerRight,
-          offset: rightOffset,
-          rotation: rightRotation,
-        ),
-      ],
+      ),
     );
   }
 }
@@ -650,23 +705,87 @@ class _CookieHalf extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine if this is the left half based on alignment
+    final isLeft = alignment == Alignment.centerLeft;
+
     return Align(
       alignment: alignment,
       child: Transform.translate(
         offset: offset,
         child: Transform.rotate(
           angle: rotation,
-          child: ClipRect(
-            child: Align(
-              alignment: alignment,
-              widthFactor: 0.5,
-              child: SizedBox(width: size, height: size, child: builder(emoji)),
+          child: ClipPath(
+            clipper: _CookieCrackClipper(isLeft: isLeft),
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Center(child: builder(emoji)),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _CookieCrackClipper extends CustomClipper<Path> {
+  final bool isLeft;
+
+  _CookieCrackClipper({required this.isLeft});
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+
+    // Çapraz kırık: üstte sağdan başlayıp alta doğru sola gidiyor
+    // Her noktada çapraz eksen + zikzak sapması var
+    // Çapraz kayma: üstte +12px sağ, altta -12px sol
+    double diagAt(double t) => cx + 12 - (24 * t); // t: 0..1 arası yüzde
+
+    if (isLeft) {
+      path.moveTo(0, 0);
+      path.lineTo(diagAt(0) + 3, 0); // Üst: sağdan başla
+
+      // Zikzaklı çapraz kırık hattı
+      path.lineTo(diagAt(0.12) - 5, h * 0.12);
+      path.lineTo(diagAt(0.25) + 7, h * 0.25);
+      path.lineTo(diagAt(0.38) - 4, h * 0.38);
+      path.lineTo(diagAt(0.50) + 6, h * 0.50);
+      path.lineTo(diagAt(0.62) - 6, h * 0.62);
+      path.lineTo(diagAt(0.75) + 5, h * 0.75);
+      path.lineTo(diagAt(0.88) - 3, h * 0.88);
+      path.lineTo(diagAt(1.0) - 2, h); // Alt: soldan bitir
+
+      path.lineTo(0, h);
+      path.lineTo(0, 0);
+      path.close();
+    } else {
+      path.moveTo(w, 0);
+      path.lineTo(diagAt(0) + 3, 0);
+
+      // Sol ile aynı hattı izlemeli (boşluksuz kapanması için)
+      path.lineTo(diagAt(0.12) - 5, h * 0.12);
+      path.lineTo(diagAt(0.25) + 7, h * 0.25);
+      path.lineTo(diagAt(0.38) - 4, h * 0.38);
+      path.lineTo(diagAt(0.50) + 6, h * 0.50);
+      path.lineTo(diagAt(0.62) - 6, h * 0.62);
+      path.lineTo(diagAt(0.75) + 5, h * 0.75);
+      path.lineTo(diagAt(0.88) - 3, h * 0.88);
+      path.lineTo(diagAt(1.0) - 2, h);
+
+      path.lineTo(w, h);
+      path.lineTo(w, 0);
+      path.close();
+    }
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
 class _FortunePaper extends StatefulWidget {
@@ -686,261 +805,84 @@ class _FortunePaper extends StatefulWidget {
 
 class _FortunePaperState extends State<_FortunePaper>
     with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _textController;
-  late AnimationController _luckyController;
-  late AnimationController _glowController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _rotateAnimation; // HTML'deki rotate animasyonu
-  late Animation<double> _iconOpacityAnimation; // Icon opacity animasyonu
-  late Animation<double>
-  _textOpacityAnimation; // Text opacity animasyonu (blur ile)
-  late Animation<double> _textBlurAnimation; // Text blur animasyonu
-  late Animation<double>
-  _luckyOpacityAnimation; // Lucky section opacity animasyonu
-  late Animation<double> _glowAnimation; // Paper glow animasyonu
+  late AnimationController _anim;
+  late AnimationController _wave;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // Fortune paper sesi
-  Future<void> _playFortuneSound() async {
-    // Şimdilik tüm sesler kapalı
-    return;
+  static const Map<String, String> _cookieImageMap = {
+    'spring_wreath': 'assets/images/cookies/spring_wreath.png',
+    'lucky_clover': 'assets/images/cookies/lucky_clover.png',
+    'royal_hearts': 'assets/images/cookies/royal_hearts.png',
+    'evil_eye': 'assets/images/cookies/evil_eye.png',
+    'pizza_party': 'assets/images/cookies/pizza_party.png',
+    'sakura_bloom': 'assets/images/cookies/sakura_bloom.png',
+    'blue_porcelain': 'assets/images/cookies/blue_porcelain.png',
+    'pink_blossom': 'assets/images/cookies/pink_blossom.png',
+    'fortune_cat': 'assets/images/cookies/fortune_cat.png',
+    'wildflower': 'assets/images/cookies/wildflower.png',
+    'cupid_ribbon': 'assets/images/cookies/cupid_ribbon.png',
+    'panda_bamboo': 'assets/images/cookies/panda_bamboo.png',
+    'ramadan_cute': 'assets/images/cookies/ramadan_cute.png',
+    'enchanted_forest': 'assets/images/cookies/enchanted_forest.png',
+    'golden_arabesque': 'assets/images/cookies/golden_arabesque.png',
+    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.png',
+    'pearl_lace': 'assets/images/cookies/pearl_lace.png',
+    'golden_sakura': 'assets/images/cookies/golden_sakura.png',
+    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.png',
+    'gold_beasts': 'assets/images/cookies/gold_beasts.png',
+  };
+
+  static String _cookieNameForPaper(String id, String lang) {
+    const tr = {
+      'spring_wreath': 'Bahar Çelengi', 'lucky_clover': 'Şanslı Yonca',
+      'royal_hearts': 'Kraliyet Kalpleri', 'evil_eye': 'Nazar',
+      'pizza_party': 'Pizza Partisi', 'sakura_bloom': 'Sakura',
+      'blue_porcelain': 'Mavi Porselen', 'pink_blossom': 'Pembe Çiçek',
+      'fortune_cat': 'Şans Kedisi', 'wildflower': 'Kır Çiçeği',
+      'cupid_ribbon': 'Aşk Kurdelesi', 'panda_bamboo': 'Panda',
+      'ramadan_cute': 'Ramazan', 'enchanted_forest': 'Büyülü Orman',
+      'golden_arabesque': 'Altın Arabesk', 'midnight_mosaic': 'Gece Mozaiği',
+      'pearl_lace': 'İnci Dantel', 'golden_sakura': 'Altın Sakura',
+      'dragon_phoenix': 'Ejderha & Anka', 'gold_beasts': 'Altın Canavarlar',
+    };
+    const en = {
+      'spring_wreath': 'Spring Wreath', 'lucky_clover': 'Lucky Clover',
+      'royal_hearts': 'Royal Hearts', 'evil_eye': 'Evil Eye',
+      'pizza_party': 'Pizza Party', 'sakura_bloom': 'Sakura Bloom',
+      'blue_porcelain': 'Blue Porcelain', 'pink_blossom': 'Pink Blossom',
+      'fortune_cat': 'Fortune Cat', 'wildflower': 'Wildflower',
+      'cupid_ribbon': 'Cupid Ribbon', 'panda_bamboo': 'Panda Bamboo',
+      'ramadan_cute': 'Ramadan', 'enchanted_forest': 'Enchanted Forest',
+      'golden_arabesque': 'Golden Arabesque', 'midnight_mosaic': 'Midnight Mosaic',
+      'pearl_lace': 'Pearl Lace', 'golden_sakura': 'Golden Sakura',
+      'dragon_phoenix': 'Dragon Phoenix', 'gold_beasts': 'Gold Beasts',
+    };
+    return (lang == 'tr' ? tr : en)[id] ?? id;
   }
 
   @override
   void initState() {
     super.initState();
-
-    // Ana paper animasyonu (daha hızlı ve dramatik - 0.6s)
-    _controller = AnimationController(
+    _anim = AnimationController(
       vsync: this,
-      duration: const Duration(
-        milliseconds: 600,
-      ), // 800ms -> 600ms (daha hızlı "şııp" efekti)
+      duration: const Duration(milliseconds: 1100),
     );
-
-    // Text reveal animasyonu (0.8s gecikme ile, 2.5s süre)
-    _textController = AnimationController(
+    _wave = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 3000),
     );
-
-    // Lucky section animasyonu (3s gecikme ile, 1.5s süre)
-    _luckyController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    // Paper glow animasyonu (sonsuz döngü) - sadece fortune paper görünürken başlatılacak
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-
-    // HTML'deki paper-fly-up animasyonu - daha dramatik: scale, translateY, rotate birlikte
-    // 0%: scale(0.1) translateY(80px) rotate(-10deg)
-    // 40%: scale(0.7) translateY(-30px) rotate(5deg)
-    // 70%: scale(1.05) translateY(5px) rotate(-2deg)
-    // 100%: scale(1) translateY(0) rotate(0)
-
-    // Scale animasyonu (HTML'deki gibi - daha dramatik başlangıç)
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween:
-            Tween<double>(
-                  begin: 0.05,
-                  end: 0.7,
-                ) // 0% -> 40% (0.1'den 0.05'e - daha küçük başlangıç)
-                .chain(
-                  CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1)),
-                ), // Bounce efekti için
-        weight: 0.4,
-      ),
-      TweenSequenceItem(
-        tween:
-            Tween<double>(
-                  begin: 0.7,
-                  end: 1.08,
-                ) // 40% -> 70% (1.05'ten 1.08'e - daha fazla bounce)
-                .chain(CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1))),
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween:
-            Tween<double>(
-                  begin: 1.08,
-                  end: 1.0,
-                ) // 70% -> 100% (daha fazla bounce)
-                .chain(CurveTween(curve: Curves.elasticOut)), // Elastic efekti
-        weight: 0.3,
-      ),
-    ]).animate(_controller);
-
-    // Opacity animasyonu (40%'ta 1 olmalı - HTML'deki gibi)
-    _opacityAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween:
-            Tween<double>(begin: 0.0, end: 1.0) // 0% -> 40%
-                .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 0.4,
-      ),
-      TweenSequenceItem(
-        tween:
-            Tween<double>(begin: 1.0, end: 1.0) // 40% -> 100% (1'de kal)
-                .chain(CurveTween(curve: Curves.linear)),
-        weight: 0.6,
-      ),
-    ]).animate(_controller);
-
-    // Slide animasyonu - Cookie'nin içinden/altından çıkacak (HTML'deki gibi)
-    // Cookie 190px, paper cookie'nin altından çıkacak, yani cookie'nin yarısından (95px) başlamalı
-    _slideAnimation = TweenSequence<Offset>([
-      TweenSequenceItem(
-        tween:
-            Tween<Offset>(
-              begin: const Offset(
-                0,
-                0.45,
-              ), // Cookie'nin içinden/altından başla (190px/2 = 95px, ~0.45)
-              end: const Offset(0, -0.3), // Yukarı çık (bounce up)
-            ).chain(
-              CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1)),
-            ), // Bounce efekti
-        weight: 0.4,
-      ),
-      TweenSequenceItem(
-        tween: Tween<Offset>(
-          begin: const Offset(0, -0.3),
-          end: const Offset(0, 0.03), // Biraz aşağı (bounce down)
-        ).chain(CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1))),
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<Offset>(
-          begin: const Offset(0, 0.03),
-          end: const Offset(
-            0,
-            -0.12,
-          ), // Cookie'nin hemen üstünde konumlan (cookie arkada görünür)
-        ).chain(CurveTween(curve: Curves.easeOut)), // Smooth bitiş
-        weight: 0.3,
-      ),
-    ]).animate(_controller);
-
-    // Rotate animasyonu (HTML'deki gibi)
-    _rotateAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: -10 * math.pi / 180, // -10deg
-          end: 5 * math.pi / 180, // 5deg
-        ).chain(CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1))),
-        weight: 0.4,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 5 * math.pi / 180,
-          end: -2 * math.pi / 180, // -2deg
-        ).chain(CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1))),
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: -2 * math.pi / 180,
-          end: 0, // 0deg
-        ).chain(CurveTween(curve: const Cubic(0.34, 1.56, 0.64, 1))),
-        weight: 0.3,
-      ),
-    ]).animate(_controller);
-
-    // Icon opacity animasyonu (paper ile birlikte)
-    _iconOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
-      ),
-    );
-
-    // Text reveal animasyonu (0.8s gecikme ile, blur efekti ile)
-    _textOpacityAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: 0.3), // 0% -> 30%
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.3, end: 0.6), // 30% -> 60%
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.6, end: 1.0), // 60% -> 100%
-        weight: 0.4,
-      ),
-    ]).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
-
-    _textBlurAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 8.0, end: 5.0), // 0% -> 30%
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 5.0, end: 2.0), // 30% -> 60%
-        weight: 0.3,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 2.0, end: 0.0), // 60% -> 100%
-        weight: 0.4,
-      ),
-    ]).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
-
-    // Lucky section animasyonu (3s gecikme ile)
-    _luckyOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _luckyController, curve: Curves.easeOut));
-
-    // Paper glow animasyonu (sonsuz döngü)
-    _glowAnimation = Tween<double>(begin: 0.3, end: 0.4).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-
-    // Animasyonları başlat - mounted kontrolü ekle (dispose hatası önlemek için)
-    _controller.forward().then((_) {
-      if (!mounted) return; // Widget dispose edilmişse devam etme
-
-      // Glow animasyonunu başlat (sonsuz döngü) - sadece fortune paper görünürken
+    _anim.forward().then((_) {
       if (mounted) {
-        _glowController.repeat(reverse: true);
+        widget.onAnimationComplete();
+        _wave.repeat();
       }
-
-      // Fortune paper açılma sesi
-      _playFortuneSound();
-
-      // Text animasyonunu başlat (0.8s gecikme ile)
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return; // Widget dispose edilmişse devam etme
-        _textController.forward();
-      });
-
-      // Lucky section animasyonunu başlat (3s gecikme ile)
-      Future.delayed(const Duration(milliseconds: 3000), () {
-        if (!mounted) return; // Widget dispose edilmişse devam etme
-        _luckyController.forward();
-      });
-
-      widget.onAnimationComplete();
     });
   }
 
   @override
   void dispose() {
-    // Glow controller'ı önce durdur (repeat() çalışıyor olabilir)
-    _glowController.stop();
-    _glowController.dispose();
-    // Diğer controller'ları dispose et
-    _controller.dispose();
-    _textController.dispose();
-    _luckyController.dispose();
+    _anim.dispose();
+    _wave.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -948,243 +890,181 @@ class _FortunePaperState extends State<_FortunePaper>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _controller,
-        _textController,
-        _luckyController,
-        _glowController,
-      ]),
-      builder: (context, child) {
-        // Paper glow animasyonu (HTML'deki gibi)
-        final glowOpacity = 0.3 + (_glowAnimation.value * 0.1); // 0.3 -> 0.4
+    final screenWidth = MediaQuery.of(context).size.width;
 
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: Transform.rotate(
-                angle: _rotateAnimation.value,
-                child: Container(
-                  width: 250,
-                  constraints: const BoxConstraints(maxWidth: 250),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 22,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFfffef8),
-                        Color(0xFFf5f0e5),
-                        Color(0xFFebe5d8),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 60,
-                        offset: const Offset(0, 20),
+    return AnimatedBuilder(
+      animation: Listenable.merge([_anim, _wave]),
+      builder: (context, _) {
+        final t = _anim.value;
+        if (t == 0) return const SizedBox();
+
+        // Yumuşak fazlar — birbirine yumuşakça akar
+        final riseT = Curves.easeOutQuart.transform((t / 0.35).clamp(0.0, 1.0));
+        final unfoldT = Curves.easeInOutQuart.transform(((t - 0.2) / 0.55).clamp(0.0, 1.0));
+        final contentT = Curves.easeOutCubic.transform(((t - 0.5) / 0.5).clamp(0.0, 1.0));
+
+        // Boyut: küçük parça → tam boyut (yumuşak geçiş)
+        final paperWidth = 24.0 + (unfoldT * (screenWidth * 0.85 - 24.0));
+        final paperHeight = 16.0 + (unfoldT * 160.0);
+        // Scale: 0.15 → 1.0 (çok küçükten başlar)
+        final scale = 0.15 + (riseT * 0.85);
+        // Y pozisyonu: yumuşak yükseliş
+        final yOffset = 35.0 * (1.0 - riseT);
+        // Çok hafif sallanma
+        final wobble = math.sin(t * math.pi * 1.5) * 1.5 * (1.0 - unfoldT);
+        // Opacity: yumuşak belirir
+        final opacity = Curves.easeOut.transform((t / 0.15).clamp(0.0, 1.0));
+
+        // Dalgalanma
+        final waveT = _wave.value;
+        final waveX = math.sin(waveT * math.pi * 2) * 1.5;
+        final waveY = math.cos(waveT * math.pi * 2) * 0.8;
+        final waveRotate = math.sin(waveT * math.pi * 2) * 0.005;
+
+        return Transform.translate(
+          offset: Offset(wobble + waveX, yOffset + waveY),
+          child: Transform.scale(
+            scale: scale,
+            child: Transform.rotate(
+              angle: waveRotate,
+              child: Opacity(
+                opacity: opacity,
+                child: Center(
+                child: SizedBox(
+                  width: paperWidth,
+                  height: paperHeight,
+                  child: Stack(
+                    children: [
+                      // Gölge (kağıdın arkası)
+                      Positioned.fill(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 2, left: 1),
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2 * opacity),
+                                blurRadius: 18,
+                                offset: const Offset(0, 6),
+                                spreadRadius: -2,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      BoxShadow(
-                        color: const Color(
-                          0xFF8B5A2B,
-                        ).withOpacity(glowOpacity * 0.4),
-                        blurRadius: 40,
-                        offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: const Color(
-                          0xFFFFD700,
-                        ).withOpacity(glowOpacity * 0.3),
-                        blurRadius: 40,
-                        offset: const Offset(0, 0),
+                      // Kağıt — yırtık kenarlarla
+                      Positioned.fill(
+                        child: ClipPath(
+                          clipper: _TornPaperClipper(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            color: const Color(0xFFF2E8D5),
+                            child: Stack(
+                              children: [
+                                // Hafif buruşukluk
+                                Positioned(
+                                  right: 22, top: 14,
+                                  child: Transform.rotate(
+                                    angle: 0.3,
+                                    child: Container(width: 14, height: 0.3, color: Colors.black.withOpacity(0.04)),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 28, bottom: 22,
+                                  child: Transform.rotate(
+                                    angle: -0.15,
+                                    child: Container(width: 16, height: 0.3, color: Colors.black.withOpacity(0.03)),
+                                  ),
+                                ),
+                                // İçerik
+                                Positioned.fill(
+                                  child: Opacity(
+                                    opacity: contentT,
+                                    child: SingleChildScrollView(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Kurabiye görseli
+                                          Builder(
+                                            builder: (context) {
+                                              final imagePath = _cookieImageMap[widget.cookieEmoji];
+                                              if (imagePath != null) {
+                                                return Image.asset(
+                                                  imagePath,
+                                                  width: 28,
+                                                  height: 28,
+                                                  fit: BoxFit.contain,
+                                                  errorBuilder: (_, __, ___) =>
+                                                      Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13),
+                                                );
+                                              }
+                                              return Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13);
+                                            },
+                                          ),
+                                          const SizedBox(height: 2),
+                                          // Kurabiye adı (lokalize)
+                                          Text(
+                                            _cookieNameForPaper(widget.cookieEmoji, Localizations.localeOf(context).languageCode),
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Color(0xFF5A3D28),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 0.3,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Container(
+                                            width: 20, height: 0.5,
+                                            color: const Color(0xFFCBB98A).withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            widget.fortune.meaning,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Color(0xFF4A3928),
+                                              fontSize: 11.5,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: 'Roboto',
+                                              height: 1.3,
+                                              letterSpacing: 0.1,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE8DCC6).withOpacity(0.5),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                _LuckyItem(label: l10n.luckyNumber, value: '${widget.fortune.luckyNumber}', icon: Icons.confirmation_number_outlined, compact: true),
+                                                Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
+                                                _LuckyItem(label: l10n.luckyColor, value: widget.fortune.luckyColor, icon: Icons.palette_outlined, compact: true),
+                                                Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
+                                                _LuckyItem(label: l10n.luckLabel, value: '${widget.fortune.luckPercent}%', icon: Icons.show_chart, compact: true),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.7,
-                    ),
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Opacity(
-                            opacity: _iconOpacityAnimation.value,
-                            child: Text(
-                              widget.cookieEmoji,
-                              style: const TextStyle(fontSize: 32),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            width: 60,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF7C4DFF).withOpacity(0.18),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFF7C4DFF,
-                                  ).withOpacity(0.28),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          AnimatedBuilder(
-                            animation: _textController,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textOpacityAnimation.value,
-                                child: Transform.translate(
-                                  offset: Offset(
-                                    0,
-                                    10 * (1 - _textOpacityAnimation.value),
-                                  ),
-                                  child: Text(
-                                    widget.fortune.meaning,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: const Color(0xFF3d2a5e),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FontStyle.italic,
-                                      height: 1.4,
-                                      shadows: [
-                                        Shadow(
-                                          color: const Color(0xFF3d2a5e)
-                                              .withOpacity(
-                                                _textBlurAnimation.value / 10,
-                                              ),
-                                          blurRadius:
-                                              _textBlurAnimation.value * 2,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          Opacity(
-                            opacity: _luckyOpacityAnimation.value,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  child: CustomPaint(
-                                    size: const Size(double.infinity, 1),
-                                    painter: _DashedLinePainter(
-                                      color: const Color(
-                                        0xFF8B5CF6,
-                                      ).withOpacity(0.25),
-                                      strokeWidth: 1,
-                                      dashLength: 4,
-                                      dashSpace: 4,
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    _LuckyItem(
-                                      label: l10n.luckyNumber,
-                                      value: '${widget.fortune.luckyNumber}',
-                                    ),
-                                    _LuckyItem(
-                                      label: l10n.luckyColor,
-                                      value: widget.fortune.luckyColor,
-                                    ),
-                                    _LuckyItem(
-                                      label: l10n.luckLabel,
-                                      value: '${widget.fortune.luckPercent}%',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: 108,
-                            height: 32,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Color(0xFFF7941D),
-                                    Color(0xFFFF6B35),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFFF7941D,
-                                    ).withOpacity(0.30),
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: TextButton(
-                                onPressed: () async {
-                                  final shareText = l10n.fortuneShareText(
-                                    widget.cookieEmoji,
-                                    widget.fortune.name,
-                                    widget.fortune.meaning,
-                                    widget.fortune.luckyNumber,
-                                    widget.fortune.luckyColor,
-                                    widget.fortune.luckPercent,
-                                  );
-                                  await Share.share(shareText);
-                                },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Text(
-                                  l10n.shareButton,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ),
             ),
+          ),
           ),
         );
       },
@@ -1195,33 +1075,53 @@ class _FortunePaperState extends State<_FortunePaper>
 class _LuckyItem extends StatelessWidget {
   final String label;
   final String value;
+  final IconData? icon;
+  final bool compact;
 
-  const _LuckyItem({required this.label, required this.value});
+  const _LuckyItem({
+    required this.label,
+    required this.value,
+    this.icon,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // HTML'deki gibi: lucky-label ve lucky-value
+    // Compact mod için boyut ayarları
+    final double iconSize = compact ? 12 : 20;
+    final double labelSize = compact ? 6 : 8;
+    final double valueSize = compact ? 8 : 11;
+    final double spacing = compact ? 1 : 4;
+
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (icon != null) ...[
+            Icon(
+              icon,
+              size: iconSize,
+              color: const Color(0xFFD4AF37), // Altın ikon
+            ),
+            SizedBox(height: spacing),
+          ],
           Text(
-            label.toUpperCase(), // HTML: text-transform: uppercase
+            label.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: const Color(0xFF8b7aa8), // HTML: #8b7aa8
-              fontSize: 8, // HTML: font-size: 8px
+              color: const Color(0xFF8b7aa8),
+              fontSize: labelSize,
               fontWeight: FontWeight.w400,
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: compact ? 1 : 2),
           Text(
             value,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: const Color(0xFF5a3db0), // HTML: #5a3db0
-              fontSize: 11, // HTML: font-size: 11px
+              color: const Color(0xFF5a3db0),
+              fontSize: valueSize,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1265,4 +1165,423 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Yırtık kağıt kenar efekti
+class _TornPaperClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    // Üst kenar
+    path.moveTo(0, 0);
+    for (double x = 0; x <= w; x += 1) {
+      final y = math.sin(x * 0.12) * 0.4 + math.sin(x * 0.35) * 0.2;
+      path.lineTo(x, y + 0.6);
+    }
+
+    // Sağ kenar
+    for (double y = 0; y <= h; y += 1) {
+      final x = w - 0.6 + math.sin(y * 0.15) * 0.4 + math.sin(y * 0.4) * 0.2;
+      path.lineTo(x, y);
+    }
+
+    // Alt kenar
+    for (double x = w; x >= 0; x -= 1) {
+      final y = h - 0.6 + math.sin(x * 0.14) * 0.5 + math.sin(x * 0.38) * 0.2;
+      path.lineTo(x, y);
+    }
+
+    // Sol kenar
+    for (double y = h; y >= 0; y -= 1) {
+      final x = 0.6 + math.sin(y * 0.16) * 0.4 + math.sin(y * 0.42) * 0.2;
+      path.lineTo(x, y);
+    }
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+// ── Premium Kurabiye Buzlu Cam Paneli ──
+class _PremiumCookieOverlay extends StatefulWidget {
+  final String cookieId;
+  final String? imagePath;
+
+  const _PremiumCookieOverlay({
+    required this.cookieId,
+    this.imagePath,
+  });
+
+  @override
+  State<_PremiumCookieOverlay> createState() => _PremiumCookieOverlayState();
+}
+
+class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fadeAnim;
+  late final Animation<double> _slideAnim;
+  late final Animation<double> _scaleAnim;
+
+  // Kurabiye bilgileri
+  static const Map<String, Map<String, String>> _cookieInfo = {
+    'golden_arabesque': {
+      'tr': 'Altın Arabesk',
+      'en': 'Golden Arabesque',
+      'rarity': 'rare',
+    },
+    'midnight_mosaic': {
+      'tr': 'Gece Mozaiği',
+      'en': 'Midnight Mosaic',
+      'rarity': 'rare',
+    },
+    'pearl_lace': {
+      'tr': 'İnci Dantel',
+      'en': 'Pearl Lace',
+      'rarity': 'rare',
+    },
+    'golden_sakura': {
+      'tr': 'Altın Sakura',
+      'en': 'Golden Sakura',
+      'rarity': 'legendary',
+    },
+    'dragon_phoenix': {
+      'tr': 'Ejderha & Anka',
+      'en': 'Dragon & Phoenix',
+      'rarity': 'legendary',
+    },
+    'gold_beasts': {
+      'tr': 'Altın Canavarlar',
+      'en': 'Gold Beasts',
+      'rarity': 'legendary',
+    },
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _fadeAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _slideAnim = Tween<double>(begin: 80, end: 0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic),
+    );
+    _scaleAnim = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic),
+    );
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  bool _closing = false;
+
+  void _close() {
+    if (_closing) return;
+    _closing = true;
+    _ctrl.reverse().then((_) {
+      if (mounted) Navigator.pop(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _close,
+      child: Material(
+        color: Colors.transparent,
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.45 * _fadeAnim.value),
+                  ),
+                ),
+                Center(
+                  child: FadeTransition(
+                    opacity: _fadeAnim,
+                    child: Transform.translate(
+                      offset: Offset(0, _slideAnim.value),
+                      child: Transform.scale(
+                        scale: _scaleAnim.value,
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: _buildGlassPanel(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassPanel() {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final info = _cookieInfo[widget.cookieId] ?? _cookieInfo['golden_arabesque']!;
+    final cookieName = isTr ? info['tr']! : info['en']!;
+    final isLegendary = info['rarity'] == 'legendary';
+    final rarityLabel = isLegendary
+        ? (isTr ? 'Efsanevi' : 'Legendary')
+        : (isTr ? 'Nadir' : 'Rare');
+    final rarityColor = isLegendary
+        ? const Color(0xFFE8A0FF) // Mor-lila
+        : const Color(0xFF7DD4FF); // Açık mavi
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 28),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.35),
+                width: 0.8,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ── Kurabiye görseli + nadirlik badge ──
+                Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Kurabiye görseli — hafif bulanık
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.12),
+                            Colors.white.withOpacity(0.04),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.20),
+                          width: 0.6,
+                        ),
+                      ),
+                      child: Center(
+                        child: widget.imagePath != null
+                            ? ImageFiltered(
+                                imageFilter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+                                child: Image.asset(
+                                  widget.imagePath!,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.contain,
+                                ),
+                              )
+                            : const Text('🥠', style: TextStyle(fontSize: 36)),
+                      ),
+                    ),
+                    // Kilit ikonu
+                    Positioned(
+                      bottom: -2,
+                      right: -2,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black.withOpacity(0.4),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.25),
+                            width: 0.6,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text('🔒', style: TextStyle(fontSize: 13)),
+                        ),
+                      ),
+                    ),
+                    // Nadirlik badge — sağ üstte
+                    Positioned(
+                      top: -4,
+                      right: -24,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: rarityColor.withOpacity(0.20),
+                          border: Border.all(
+                            color: rarityColor.withOpacity(0.40),
+                            width: 0.6,
+                          ),
+                        ),
+                        child: Text(
+                          rarityLabel,
+                          style: TextStyle(
+                            color: rarityColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // ── Kurabiye adı ──
+                Text(
+                  cookieName,
+                  style: const TextStyle(
+                    color: Color(0xFFF5EDE4),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  isTr ? 'Premium Koleksiyon' : 'Premium Collection',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.45),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // ── Özellik listesi ──
+                _buildFeatureRow(
+                  '✨',
+                  isTr ? 'Özel şans mesajları' : 'Exclusive fortune messages',
+                ),
+                const SizedBox(height: 10),
+                _buildFeatureRow(
+                  '🎭',
+                  isTr ? 'Benzersiz kırılma animasyonu' : 'Unique cracking animation',
+                ),
+                const SizedBox(height: 10),
+                _buildFeatureRow(
+                  '⭐',
+                  isTr ? '3x koleksiyon puanı' : '3x collection points',
+                ),
+                const SizedBox(height: 22),
+                // ── Fiyat + Satın Al Butonu ──
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Satın alma işlemi (App Store / Google Play)
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(0.20),
+                          Colors.white.withOpacity(0.10),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.30),
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        isTr ? 'Yakında Satışa Çıkacak ✨' : 'Coming Soon ✨',
+                        style: const TextStyle(
+                          color: Color(0xFFF5EDE4),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // ── Kapat ipucu ──
+                Text(
+                  isTr ? 'Kapatmak için dışına dokun' : 'Tap outside to close',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.30),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureRow(String icon, String text) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white.withOpacity(0.08),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.12),
+              width: 0.5,
+            ),
+          ),
+          child: Center(
+            child: Text(icon, style: const TextStyle(fontSize: 15)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.75),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

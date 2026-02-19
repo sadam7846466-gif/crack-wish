@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 
@@ -13,57 +13,81 @@ class BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final tabs = [
+      _TabItem(icon: Icons.home_rounded, label: l10n.navHome),
+      _TabItem(icon: Icons.apps_rounded, label: l10n.navCollection),
+      _TabItem(icon: Icons.person_rounded, label: l10n.navProfile),
+    ];
+
     return Padding(
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      child: GlassBottomBar(
-        tabs: [
-          GlassBottomBarTab(
-            label: l10n.navHome,
-            icon: Icons.home_rounded,
-            glowColor: AppColors.primaryOrange,
+      padding: EdgeInsets.only(bottom: bottomPadding + 8, left: 16, right: 16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.25),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(tabs.length, (i) {
+                final selected = i == currentIndex;
+                // Bej + Kırmızı + Mavi karışımı — tek renk
+                const activeColor = Color(0xFFC09498);
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onTap(i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            tabs[i].icon,
+                            size: 22,
+                            color: selected
+                                ? activeColor
+                                : AppColors.textWhite50,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tabs[i].label,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight:
+                                  selected ? FontWeight.w700 : FontWeight.w500,
+                              color: selected
+                                  ? activeColor
+                                  : AppColors.textWhite50,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
           ),
-          GlassBottomBarTab(
-            label: l10n.navCollection,
-            icon: Icons.apps_rounded,
-            glowColor: AppColors.primaryOrange,
-          ),
-          GlassBottomBarTab(
-            label: l10n.navProfile,
-            icon: Icons.person_rounded,
-            glowColor: AppColors.primaryOrange,
-          ),
-        ],
-        selectedIndex: currentIndex,
-        onTabSelected: onTap,
-        barHeight: 64,
-        barBorderRadius: 32,
-        horizontalPadding: 16,
-        verticalPadding: 8,
-        tabPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        selectedIconColor: AppColors.primaryOrange,
-        unselectedIconColor: AppColors.textWhite50,
-        iconSize: 22,
-        glassSettings: const LiquidGlassSettings(
-          thickness: 18,
-          blur: 2,
-          glassColor: AppColors.cardBackground,
-          chromaticAberration: 0.15,
-          lightIntensity: 0.45,
-          ambientStrength: 0.6,
-          refractiveIndex: 1.4,
-          saturation: 0.8,
         ),
-        indicatorSettings: const LiquidGlassSettings(
-          thickness: 14,
-          blur: 0.6,
-          glassColor: AppColors.cardBackgroundAlt,
-          chromaticAberration: 0.2,
-          lightIntensity: 0.65,
-          refractiveIndex: 1.3,
-          saturation: 0.9,
-        ),
-        maskingQuality: MaskingQuality.high,
       ),
     );
   }
+}
+
+class _TabItem {
+  final IconData icon;
+  final String label;
+  const _TabItem({required this.icon, required this.label});
 }

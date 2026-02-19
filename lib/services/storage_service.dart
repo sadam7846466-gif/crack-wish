@@ -1,7 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:ui';
 import '../models/cookie_card.dart';
+import '../models/owl_letter.dart';
 
 class StorageService {
   static const String _keyCookieCount = 'cookie_count';
@@ -20,6 +22,9 @@ class StorageService {
   static const String _keyTarotDone = 'tarot_done';
   static const String _keyDreamDone = 'dream_done';
   static const String _keyZodiacDone = 'zodiac_done';
+  static const String _keyTarotDoneDate = 'tarot_done_date';
+  static const String _keyDreamDoneDate = 'dream_done_date';
+  static const String _keyZodiacDoneDate = 'zodiac_done_date';
   static const String _keyZodiacOverlayDx = 'zodiac_overlay_dx';
   static const String _keyZodiacOverlayDy = 'zodiac_overlay_dy';
   static const String _keyTarotOverlayDx = 'tarot_overlay_dx';
@@ -33,6 +38,18 @@ class StorageService {
   static const String _keySeenFortunes = 'seen_fortune_ids';
   static const String _keyCookieCollection = 'cookie_collection';
   static const String _keyLocale = 'app_locale';
+  static const String _keySelectedCookie = 'selected_cookie';
+
+  // ── Seçili kurabiye (kalıcı) ──
+  static Future<String> getSelectedCookie() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySelectedCookie) ?? 'spring_wreath';
+  }
+
+  static Future<void> setSelectedCookie(String cookieId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySelectedCookie, cookieId);
+  }
 
   static Future<Locale?> getAppLocale() async {
     final prefs = await SharedPreferences.getInstance();
@@ -113,6 +130,42 @@ class StorageService {
   static Future<void> setZodiacSign(String sign) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyZodiacSign, sign);
+  }
+
+  static String _todayKey() =>
+      DateTime.now().toIso8601String().split('T')[0];
+
+  static Future<bool> isTarotDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyTarotDoneDate) == _todayKey();
+  }
+
+  static Future<bool> isDreamDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyDreamDoneDate) == _todayKey();
+  }
+
+  static Future<bool> isZodiacDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyZodiacDoneDate) == _todayKey();
+  }
+
+  static Future<void> setTarotDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyTarotDoneDate, _todayKey());
+    await prefs.setBool(_keyTarotDone, true);
+  }
+
+  static Future<void> setDreamDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyDreamDoneDate, _todayKey());
+    await prefs.setBool(_keyDreamDone, true);
+  }
+
+  static Future<void> setZodiacDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyZodiacDoneDate, _todayKey());
+    await prefs.setBool(_keyZodiacDone, true);
   }
 
   static Future<String?> getCurrentMood() async {
@@ -338,43 +391,51 @@ class StorageService {
 
   // --- Cookie Collection ---
   static List<CookieCard> _baseCookieCards() {
-    // 19 mevcut emoji için temel kartlar; rarity sabit.
-    const rareIds = ['🎃', '🔮', '🐉', '💎', '🔥', '🌺'];
-    const legendaryIds = ['👁️', '🎪', '🦄'];
+    // 20 görsel kurabiye: 14 ücretsiz (common) + 6 ücretli (rare/legendary)
+    const paidIds = [
+      'golden_arabesque',
+      'midnight_mosaic',
+      'pearl_lace',
+      'golden_sakura',
+      'dragon_phoenix',
+      'gold_beasts',
+    ];
+    const legendaryIds = ['dragon_phoenix', 'gold_beasts'];
 
     String rarityFor(String id) {
       if (legendaryIds.contains(id)) return 'legendary';
-      if (rareIds.contains(id)) return 'rare';
+      if (paidIds.contains(id)) return 'rare';
       return 'common';
     }
 
     final names = {
-      '🏯': 'Klasik Kurabiye',
-      '🎃': 'Cadı Kurabiyesi',
-      '🥠': 'Sade Kurabiye',
-      '🍪': 'Çikolata Kurabiyesi',
-      '⭐': 'Yıldız Kurabiye',
-      '🔮': 'Mistik Kurabiye',
-      '🐉': 'Ejder Kurabiyesi',
-      '🦋': 'Kelebek Kurabiyesi',
-      '🎭': 'Tiyatro Kurabiyesi',
-      '🍀': 'Şans Kurabiyesi',
-      '💎': 'Elmas Kurabiyesi',
-      '🔥': 'Ateş Kurabiyesi',
-      '⚡': 'Yıldırım Kurabiyesi',
-      '🌈': 'Gökkuşağı Kurabiyesi',
-      '👁️': 'Göz Kurabiyesi',
-      '🎪': 'Sirk Kurabiyesi',
-      '🦄': 'Tekboynuz Kurabiyesi',
-      '🐱': 'Kedi Kurabiyesi',
-      '🌺': 'Çiçek Kurabiyesi',
+      'spring_wreath': 'Bahar Çelengi',
+      'lucky_clover': 'Şanslı Yonca',
+      'royal_hearts': 'Kraliyet Kalpleri',
+      'evil_eye': 'Nazar',
+      'pizza_party': 'Pizza Partisi',
+      'sakura_bloom': 'Sakura',
+      'blue_porcelain': 'Mavi Porselen',
+      'pink_blossom': 'Pembe Çiçek',
+      'fortune_cat': 'Şans Kedisi',
+      'wildflower': 'Kır Çiçeği',
+      'cupid_ribbon': 'Aşk Kurdelesi',
+      'panda_bamboo': 'Panda',
+      'ramadan_cute': 'Ramazan',
+      'enchanted_forest': 'Büyülü Orman',
+      'golden_arabesque': 'Altın Arabesk',
+      'midnight_mosaic': 'Gece Mozaiği',
+      'pearl_lace': 'İnci Dantel',
+      'golden_sakura': 'Altın Sakura',
+      'dragon_phoenix': 'Ejderha & Anka',
+      'gold_beasts': 'Altın Canavarlar',
     };
 
     return names.entries
         .map(
           (e) => CookieCard(
             id: e.key,
-            emoji: e.key,
+            emoji: e.key, // Artık emoji yerine ID kullanıyoruz
             name: e.value,
             rarity: rarityFor(e.key),
           ),
@@ -392,10 +453,13 @@ class StorageService {
       final stored = decoded
           .map((e) => CookieCard.fromJson(e as Map<String, dynamic>))
           .toList();
-      // Merge base with stored to ensure new cards are present
+      // Bilinen kurabiye ID'leri — eski emoji ID'leri filtrele
+      final validIds = base.map((c) => c.id).toSet();
       final Map<String, CookieCard> map = {for (final c in base) c.id: c};
       for (final c in stored) {
-        map[c.id] = c;
+        if (validIds.contains(c.id)) {
+          map[c.id] = c;
+        }
       }
       return map.values.toList();
     } catch (_) {
@@ -433,6 +497,22 @@ class StorageService {
     await _saveCookieCollection(updated);
   }
 
+  /// Mektupla gelen kurabiyeyi koleksiyona ekle (sayısını +1 artır)
+  static Future<void> addCookieToCollection(String cookieId) async {
+    await incrementCookieCard(cookieId);
+  }
+
+  /// Kurabiye koleksiyonundan 1 adet düş (mektupla gönderirken)
+  static Future<void> deductCookieCard(String cookieId) async {
+    final cards = await getCookieCollection();
+    final updated = cards.map((c) {
+      if (c.id != cookieId) return c;
+      final newCount = (c.countObtained - 1).clamp(0, 999);
+      return c.copyWith(countObtained: newCount);
+    }).toList();
+    await _saveCookieCollection(updated);
+  }
+
   // --- Fortune seen list ---
   static Future<List<String>> getSeenFortuneIds() async {
     final prefs = await SharedPreferences.getInstance();
@@ -450,5 +530,289 @@ class StorageService {
   static Future<void> clearSeenFortunes() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keySeenFortunes);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MOTIVATION
+  // ═══════════════════════════════════════════════════════════════
+
+  static const String _keySeenMotivCards = 'seen_motiv_cards';
+  static const String _keyMotivStreak = 'motiv_streak';
+  static const String _keyMotivLastDate = 'motiv_last_date';
+  static const String _keyMotivDoneDate = 'motiv_done_date';
+  static const String _keyJournalEntries = 'journal_entries';
+  static const String _keyUsedWheelTasks = 'used_wheel_tasks';
+  static const String _keyUsedWheelDate = 'used_wheel_date';
+  static const String _keyMotivLikedCards = 'motiv_liked_cards';
+
+  /// Görülen motivasyon kart ID'leri
+  static Future<List<String>> getSeenMotivationCardIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_keySeenMotivCards) ?? [];
+  }
+
+  static Future<void> addSeenMotivationCardId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getStringList(_keySeenMotivCards) ?? [];
+    if (!current.contains(id)) {
+      current.add(id);
+      await prefs.setStringList(_keySeenMotivCards, current);
+    }
+  }
+
+  static Future<void> addSeenMotivationCardIds(List<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getStringList(_keySeenMotivCards) ?? [];
+    for (final id in ids) {
+      if (!current.contains(id)) current.add(id);
+    }
+    await prefs.setStringList(_keySeenMotivCards, current);
+  }
+
+  /// Beğenilen kart ID'leri
+  static Future<List<String>> getLikedMotivationCardIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_keyMotivLikedCards) ?? [];
+  }
+
+  static Future<void> addLikedMotivationCardId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getStringList(_keyMotivLikedCards) ?? [];
+    if (!current.contains(id)) {
+      current.add(id);
+      await prefs.setStringList(_keyMotivLikedCards, current);
+    }
+  }
+
+  /// Motivasyon streak
+  static Future<int> getMotivationStreak() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Streak'i kontrol et — son tarih dün veya bugün mü?
+    final lastDate = prefs.getString(_keyMotivLastDate);
+    final today = _todayKey();
+    final yesterday = DateTime.now()
+        .subtract(const Duration(days: 1))
+        .toIso8601String()
+        .split('T')[0];
+
+    if (lastDate == today || lastDate == yesterday) {
+      return prefs.getInt(_keyMotivStreak) ?? 0;
+    }
+    // Streak kırıldı
+    return 0;
+  }
+
+  static Future<int> updateMotivationStreak() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastDate = prefs.getString(_keyMotivLastDate);
+    final today = _todayKey();
+
+    if (lastDate == today) {
+      return prefs.getInt(_keyMotivStreak) ?? 1;
+    }
+
+    final yesterday = DateTime.now()
+        .subtract(const Duration(days: 1))
+        .toIso8601String()
+        .split('T')[0];
+    
+    int newStreak;
+    if (lastDate == yesterday) {
+      newStreak = (prefs.getInt(_keyMotivStreak) ?? 0) + 1;
+    } else {
+      newStreak = 1;
+    }
+
+    await prefs.setInt(_keyMotivStreak, newStreak);
+    await prefs.setString(_keyMotivLastDate, today);
+    return newStreak;
+  }
+
+  /// Bugün motivasyon tamamlandı mı?
+  static Future<bool> isMotivationDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyMotivDoneDate) == _todayKey();
+  }
+
+  static Future<void> setMotivationDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyMotivDoneDate, _todayKey());
+  }
+
+  /// Günlük girişleri
+  static Future<void> saveJournalEntry(String text) async {
+    final prefs = await SharedPreferences.getInstance();
+    final entriesJson = prefs.getString(_keyJournalEntries);
+    List<Map<String, dynamic>> entries = [];
+    if (entriesJson != null) {
+      try {
+        entries = (jsonDecode(entriesJson) as List)
+            .cast<Map<String, dynamic>>();
+      } catch (_) {}
+    }
+    entries.insert(0, {
+      'text': text,
+      'date': _todayKey(),
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+    await prefs.setString(_keyJournalEntries, jsonEncode(entries));
+  }
+
+  static Future<List<Map<String, dynamic>>> getJournalEntries() async {
+    final prefs = await SharedPreferences.getInstance();
+    final entriesJson = prefs.getString(_keyJournalEntries);
+    if (entriesJson == null) return [];
+    try {
+      return (jsonDecode(entriesJson) as List)
+          .cast<Map<String, dynamic>>();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Bugün kullanılan çark görevleri
+  static Future<List<String>> getUsedWheelTasksToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final date = prefs.getString(_keyUsedWheelDate);
+    if (date != _todayKey()) return []; // yeni gün, sıfır
+    return prefs.getStringList(_keyUsedWheelTasks) ?? [];
+  }
+
+  static Future<void> addUsedWheelTask(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    final date = prefs.getString(_keyUsedWheelDate);
+    
+    List<String> used;
+    if (date == today) {
+      used = prefs.getStringList(_keyUsedWheelTasks) ?? [];
+    } else {
+      used = [];
+      await prefs.setString(_keyUsedWheelDate, today);
+    }
+    
+    if (!used.contains(id)) used.add(id);
+    await prefs.setStringList(_keyUsedWheelTasks, used);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // OWL LETTERS (Baykuş Mektupları)
+  // ═══════════════════════════════════════════════════════════════
+
+  static const String _keyOwlLetters = 'owl_letters';
+  static const String _keyOwlLastDelivered = 'owl_last_delivered_date';
+  static const String _keyOwlDeliveredIds = 'owl_delivered_ids';
+
+  /// Tüm mektupları getir (baykuştan gelen + kullanıcının yazdığı)
+  static Future<List<OwlLetter>> getOwlLetters() async {
+    final prefs = await SharedPreferences.getInstance();
+    final json = prefs.getString(_keyOwlLetters);
+    if (json == null) return [];
+    try {
+      final List decoded = jsonDecode(json) as List;
+      return decoded
+          .map((e) => OwlLetter.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Mektup kaydet
+  static Future<void> saveOwlLetter(OwlLetter letter) async {
+    final prefs = await SharedPreferences.getInstance();
+    final letters = await getOwlLetters();
+    letters.insert(0, letter);
+    await prefs.setString(
+      _keyOwlLetters,
+      jsonEncode(letters.map((l) => l.toJson()).toList()),
+    );
+  }
+
+  /// Mektubu okundu olarak işaretle
+  static Future<void> markOwlLetterRead(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final letters = await getOwlLetters();
+    final updated = letters.map((l) {
+      if (l.id == id) return l.copyWith(isRead: true);
+      return l;
+    }).toList();
+    await prefs.setString(
+      _keyOwlLetters,
+      jsonEncode(updated.map((l) => l.toJson()).toList()),
+    );
+  }
+
+  /// Mektup sil
+  static Future<void> deleteOwlLetter(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final letters = await getOwlLetters();
+    letters.removeWhere((l) => l.id == id);
+    await prefs.setString(
+      _keyOwlLetters,
+      jsonEncode(letters.map((l) => l.toJson()).toList()),
+    );
+  }
+
+  /// Okunmamış mektup sayısı
+  static Future<int> getUnreadOwlLetterCount() async {
+    final letters = await getOwlLetters();
+    final now = DateTime.now();
+    return letters.where((l) {
+      if (l.isRead) return false;
+      // Geleceğe mektup henüz açılmamışsa sayma
+      if (!l.fromOwl && l.openAt != null && l.openAt!.isAfter(now)) {
+        return false;
+      }
+      return true;
+    }).length;
+  }
+
+  /// Bugün baykuş mektup getirdi mi? Getirmediyse havuzdan birini seç ve kaydet.
+  static Future<OwlLetter?> getOrDeliverDailyOwlLetter() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    final lastDelivered = prefs.getString(_keyOwlLastDelivered);
+
+    if (lastDelivered == today) return null; // bugün zaten geldi
+
+    // Daha önce teslim edilen ID'ler
+    final deliveredIds = prefs.getStringList(_keyOwlDeliveredIds) ?? [];
+
+    // Havuzdan henüz gelmemiş bir mektup seç
+    final pool = OwlLetterPool.letters;
+    final available = <int>[];
+    for (int i = 0; i < pool.length; i++) {
+      if (!deliveredIds.contains('owl_$i')) {
+        available.add(i);
+      }
+    }
+
+    // Hepsi geldiyse sıfırla
+    if (available.isEmpty) {
+      deliveredIds.clear();
+      for (int i = 0; i < pool.length; i++) {
+        available.add(i);
+      }
+    }
+
+    final rng = Random();
+    final idx = available[rng.nextInt(available.length)];
+    final entry = pool[idx];
+
+    final letter = OwlLetter(
+      id: 'owl_${today}_$idx',
+      contentTr: entry['tr']!,
+      contentEn: entry['en']!,
+      fromOwl: true,
+      createdAt: DateTime.now(),
+    );
+
+    await saveOwlLetter(letter);
+    deliveredIds.add('owl_$idx');
+    await prefs.setStringList(_keyOwlDeliveredIds, deliveredIds);
+    await prefs.setString(_keyOwlLastDelivered, today);
+
+    return letter;
   }
 }

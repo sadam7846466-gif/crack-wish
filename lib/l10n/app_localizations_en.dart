@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Fortune Cookie';
+  String get appTitle => 'Crack&Wish';
 
   @override
   String get language => 'Language';
@@ -59,6 +59,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luckLabel => 'Luck';
 
   @override
+  String get todayFortune => 'Today\'s Fortune';
+
+  @override
   String get shareButton => '📸 Share';
 
   @override
@@ -102,6 +105,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statMood => 'Mood';
+
+  @override
+  String get statTheme => 'Today...';
+
+  @override
+  String get statCollection => 'My Cookie';
+
+  @override
+  String get statTalisman => 'Talisman';
 
   @override
   String get moodGood => 'Good';
@@ -322,6 +334,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'Interpret it now and learn its meaning!';
 
   @override
+  String get dailySuggestionDreamHeadline => 'Did you have a dream last night?';
+
+  @override
+  String get dailySuggestionDreamSubtitle =>
+      'Interpret it now and learn its meaning!';
+
+  @override
+  String get dailySuggestionTarotHeadline =>
+      'Have you checked your tarot today?';
+
+  @override
+  String get dailySuggestionTarotSubtitle =>
+      'Pick 3 cards and see your message!';
+
+  @override
+  String get dailySuggestionZodiacHeadline =>
+      'Checked your zodiac reading yet?';
+
+  @override
+  String get dailySuggestionZodiacSubtitle => 'See today\'s energy right away!';
+
+  @override
+  String get dailySuggestionAllDoneHeadline => 'Today\'s rituals are complete!';
+
+  @override
+  String get dailySuggestionAllDoneSubtitle =>
+      'Come back tomorrow for new content.';
+
+  @override
   String get discoverFeaturedTag => 'FEATURED';
 
   @override
@@ -379,10 +420,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bentoDreamBadge => 'NEW';
 
   @override
-  String get bentoMotivationTitle => 'Motivation';
+  String get bentoMotivationTitle => 'Mood';
 
   @override
-  String get bentoMotivationDesc => 'Discover your strength';
+  String get bentoMotivationDesc => 'Discover your mood';
 
   @override
   String get bentoMotivationBadge => 'DAILY';
@@ -524,61 +565,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scientificSaveButton => 'Save Dream';
 
   @override
-  String get cookieClassic => 'Classic';
+  String get cookieSpringWreath => 'Spring Wreath';
 
   @override
-  String get cookieHalloween => 'Halloween';
+  String get cookieLuckyClover => 'Lucky Clover';
 
   @override
-  String get cookiePlain => 'Plain';
+  String get cookieRoyalHearts => 'Royal Hearts';
 
   @override
-  String get cookieChocolate => 'Chocolate';
+  String get cookieEvilEye => 'Evil Eye';
 
   @override
-  String get cookieStar => 'Star';
+  String get cookiePizzaParty => 'Pizza Party';
 
   @override
-  String get cookieMystic => 'Mystic';
+  String get cookieSakuraBloom => 'Sakura Bloom';
 
   @override
-  String get cookieDragon => 'Dragon';
+  String get cookieBluePorcelain => 'Blue Porcelain';
 
   @override
-  String get cookieButterfly => 'Butterfly';
+  String get cookiePinkBlossom => 'Pink Blossom';
 
   @override
-  String get cookieTheater => 'Theater';
+  String get cookieFortuneCat => 'Fortune Cat';
 
   @override
-  String get cookieLucky => 'Lucky';
+  String get cookieWildflower => 'Wildflower';
 
   @override
-  String get cookieDiamond => 'Diamond';
+  String get cookieCupidRibbon => 'Cupid Ribbon';
 
   @override
-  String get cookieFire => 'Fire';
+  String get cookiePandaBamboo => 'Panda Bamboo';
 
   @override
-  String get cookieLightning => 'Lightning';
+  String get cookieRamadanCute => 'Ramadan';
 
   @override
-  String get cookieRainbow => 'Rainbow';
+  String get cookieEnchantedForest => 'Enchanted Forest';
 
   @override
-  String get cookieEye => 'Eye';
+  String get cookieGoldenArabesque => 'Golden Arabesque';
 
   @override
-  String get cookieCircus => 'Circus';
+  String get cookieMidnightMosaic => 'Midnight Mosaic';
 
   @override
-  String get cookieUnicorn => 'Unicorn';
+  String get cookiePearlLace => 'Pearl Lace';
 
   @override
-  String get cookieCat => 'Cat';
+  String get cookieGoldenSakura => 'Golden Sakura';
 
   @override
-  String get cookieFlower => 'Flower';
+  String get cookieDragonPhoenix => 'Dragon Phoenix';
+
+  @override
+  String get cookieGoldBeasts => 'Gold Beasts';
 
   @override
   String get emotionAnxiety => 'Anxious';

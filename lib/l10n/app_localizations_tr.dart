@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'Şans Kurabiyesi';
+  String get appTitle => 'Crack&Wish';
 
   @override
   String get language => 'Dil';
@@ -59,6 +59,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get luckLabel => 'Şans';
 
   @override
+  String get todayFortune => 'Bugünün Şansı';
+
+  @override
   String get shareButton => '📸 Paylaş';
 
   @override
@@ -101,6 +104,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get statMood => 'Ruh Hali';
+
+  @override
+  String get statTheme => 'Bugün...';
+
+  @override
+  String get statCollection => 'Kurabiyem';
+
+  @override
+  String get statTalisman => 'Tılsım';
 
   @override
   String get moodGood => 'İyi';
@@ -320,6 +332,31 @@ class AppLocalizationsTr extends AppLocalizations {
       'Hemen yorumla, anlamını öğren!';
 
   @override
+  String get dailySuggestionDreamHeadline => 'Dün gece bir rüya gördün mü?';
+
+  @override
+  String get dailySuggestionDreamSubtitle => 'Hemen yorumla, anlamını öğren!';
+
+  @override
+  String get dailySuggestionTarotHeadline => 'Bugün tarot falına baktın mı?';
+
+  @override
+  String get dailySuggestionTarotSubtitle => '3 kart seç, günlük mesajını gör!';
+
+  @override
+  String get dailySuggestionZodiacHeadline => 'Burç yorumunu kontrol ettin mi?';
+
+  @override
+  String get dailySuggestionZodiacSubtitle => 'Günün enerjisini hemen öğren!';
+
+  @override
+  String get dailySuggestionAllDoneHeadline => 'Bugünün ritüelleri tamam!';
+
+  @override
+  String get dailySuggestionAllDoneSubtitle =>
+      'Yarın için geri gel, yeni içerikler gelecek.';
+
+  @override
   String get discoverFeaturedTag => 'ÖNE ÇIKAN';
 
   @override
@@ -376,10 +413,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get bentoDreamBadge => 'YENİ';
 
   @override
-  String get bentoMotivationTitle => 'Motivasyon';
+  String get bentoMotivationTitle => 'Mod';
 
   @override
-  String get bentoMotivationDesc => 'Gücünü keşfet';
+  String get bentoMotivationDesc => 'Ruh halini keşfet';
 
   @override
   String get bentoMotivationBadge => 'GÜNLÜK';
@@ -518,61 +555,64 @@ class AppLocalizationsTr extends AppLocalizations {
   String get scientificSaveButton => 'Rüyayı Kaydet';
 
   @override
-  String get cookieClassic => 'Klasik';
+  String get cookieSpringWreath => 'Bahar Çelengi';
 
   @override
-  String get cookieHalloween => 'Halloween';
+  String get cookieLuckyClover => 'Şanslı Yonca';
 
   @override
-  String get cookiePlain => 'Sade';
+  String get cookieRoyalHearts => 'Kraliyet Kalpleri';
 
   @override
-  String get cookieChocolate => 'Çikolata';
+  String get cookieEvilEye => 'Nazar';
 
   @override
-  String get cookieStar => 'Yıldız';
+  String get cookiePizzaParty => 'Pizza Partisi';
 
   @override
-  String get cookieMystic => 'Mistik';
+  String get cookieSakuraBloom => 'Sakura';
 
   @override
-  String get cookieDragon => 'Ejder';
+  String get cookieBluePorcelain => 'Mavi Porselen';
 
   @override
-  String get cookieButterfly => 'Kelebek';
+  String get cookiePinkBlossom => 'Pembe Çiçek';
 
   @override
-  String get cookieTheater => 'Tiyatro';
+  String get cookieFortuneCat => 'Şans Kedisi';
 
   @override
-  String get cookieLucky => 'Şans';
+  String get cookieWildflower => 'Kır Çiçeği';
 
   @override
-  String get cookieDiamond => 'Elmas';
+  String get cookieCupidRibbon => 'Aşk Kurdelesi';
 
   @override
-  String get cookieFire => 'Ateş';
+  String get cookiePandaBamboo => 'Panda';
 
   @override
-  String get cookieLightning => 'Yıldırım';
+  String get cookieRamadanCute => 'Ramazan';
 
   @override
-  String get cookieRainbow => 'Gökkuşağı';
+  String get cookieEnchantedForest => 'Büyülü Orman';
 
   @override
-  String get cookieEye => 'Göz';
+  String get cookieGoldenArabesque => 'Altın Arabesk';
 
   @override
-  String get cookieCircus => 'Sirk';
+  String get cookieMidnightMosaic => 'Gece Mozaiği';
 
   @override
-  String get cookieUnicorn => 'Tekboynuz';
+  String get cookiePearlLace => 'İnci Dantel';
 
   @override
-  String get cookieCat => 'Kedi';
+  String get cookieGoldenSakura => 'Altın Sakura';
 
   @override
-  String get cookieFlower => 'Çiçek';
+  String get cookieDragonPhoenix => 'Ejderha & Anka';
+
+  @override
+  String get cookieGoldBeasts => 'Altın Canavarlar';
 
   @override
   String get emotionAnxiety => 'Kaygılı';

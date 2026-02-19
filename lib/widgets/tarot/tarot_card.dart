@@ -1,10 +1,11 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:async';
 
-/// Premium Tarot Card Widget with Shimmer, Flip Animation, and Gyroscope Effects
+/// Premium Tarot Card Widget – Frosted Glass iOS Style
 class TarotCard extends StatefulWidget {
   final String? frontAsset;
   final String backAsset;
@@ -43,7 +44,6 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
   // Hover/Press animation
   late AnimationController _hoverController;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _elevationAnimation;
 
   // Shimmer animation
   late AnimationController _shimmerController;
@@ -65,7 +65,6 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
   }
 
   void _initAnimations() {
-    // Flip animation
     _flipController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -74,7 +73,6 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
       CurvedAnimation(parent: _flipController, curve: Curves.easeInOutCubic),
     );
 
-    // Hover animation
     _hoverController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
@@ -82,17 +80,12 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _hoverController, curve: Curves.easeOutCubic),
     );
-    _elevationAnimation = Tween<double>(begin: 8, end: 20).animate(
-      CurvedAnimation(parent: _hoverController, curve: Curves.easeOutCubic),
-    );
 
-    // Shimmer animation (continuous)
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat();
 
-    // Set initial flip state
     if (widget.isFlipped) {
       _flipController.value = 1.0;
     }
@@ -175,72 +168,108 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001) // perspective
+                ..setEntry(3, 2, 0.001)
                 ..rotateY(_flipAnimation.value),
-              child: Container(
-                width: widget.width,
-                height: widget.height,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    // Gold glow for selected cards
-                    if (widget.isSelected)
-                      BoxShadow(
-                        color: const Color(0xFFD4AF37).withOpacity(0.5),
-                        blurRadius: 25,
-                        spreadRadius: 5,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    width: widget.width,
+                    height: widget.height,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(0.20),
+                          Colors.white.withOpacity(0.08),
+                          Colors.white.withOpacity(0.04),
+                        ],
                       ),
-                    // Main shadow
-                    BoxShadow(
-                      color: Colors.black.withOpacity(_isPressed ? 0.6 : 0.4),
-                      blurRadius: _elevationAnimation.value,
-                      offset: Offset(0, _elevationAnimation.value / 2),
-                      spreadRadius: _isPressed ? 2 : 0,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Stack(
-                    children: [
-                      // Card face
-                      Positioned.fill(
-                        child: showFront
-                            ? Transform(
-                                alignment: Alignment.center,
-                                transform: Matrix4.identity()..rotateY(pi),
-                                child: _buildCardFace(
-                                  widget.frontAsset ?? widget.backAsset,
-                                  isFront: true,
-                                ),
-                              )
-                            : _buildCardFace(widget.backAsset, isFront: false),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(
+                          widget.isSelected ? 0.5 : 0.25,
+                        ),
+                        width: widget.isSelected ? 1.5 : 0.8,
                       ),
-
-                      // Shimmer overlay (only on front face when enabled)
-                      if (widget.enableShimmer && showFront)
-                        Positioned.fill(
-                          child: Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()..rotateY(pi),
-                            child: _buildShimmerOverlay(),
+                      boxShadow: [
+                        if (widget.isSelected)
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.12),
+                            blurRadius: 24,
+                            spreadRadius: 2,
                           ),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(
+                            _isPressed ? 0.35 : 0.20,
+                          ),
+                          blurRadius: _isPressed ? 20 : 14,
+                          offset: Offset(0, _isPressed ? 10 : 6),
+                        ),
+                        BoxShadow(
+                          color: const Color(0xFF9C6BFF).withOpacity(0.06),
+                          blurRadius: 20,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Card face content
+                        Positioned.fill(
+                          child: showFront
+                              ? Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.identity()..rotateY(pi),
+                                  child: _buildCardFace(
+                                    widget.frontAsset ?? widget.backAsset,
+                                    isFront: true,
+                                  ),
+                                )
+                              : _buildCardFace(
+                                  widget.backAsset,
+                                  isFront: false,
+                                ),
                         ),
 
-                      // Selection glow border
-                      if (widget.isSelected)
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: const Color(0xFFD4AF37),
-                                width: 2,
+                        // Shimmer overlay
+                        if (widget.enableShimmer && showFront)
+                          Positioned.fill(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(pi),
+                              child: _buildShimmerOverlay(),
+                            ),
+                          ),
+
+                        // Top highlight (glass reflection)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: widget.height * 0.35,
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(18),
+                                ),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withOpacity(0.12),
+                                    Colors.white.withOpacity(0.0),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -254,7 +283,7 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
   Widget _buildCardFace(String asset, {required bool isFront}) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Image.asset(
         asset,
@@ -262,25 +291,25 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
         errorBuilder: (context, error, stackTrace) {
           return Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isFront
                     ? [
-                        const Color(0xFF2D1B4E),
-                        const Color(0xFF1A0A2E),
+                        Colors.white.withOpacity(0.15),
+                        Colors.white.withOpacity(0.06),
                       ]
                     : [
-                        const Color(0xFF1A1A2E),
-                        const Color(0xFF0F0F1A),
+                        Colors.white.withOpacity(0.12),
+                        Colors.white.withOpacity(0.04),
                       ],
               ),
             ),
             child: Center(
               child: Icon(
                 Icons.auto_awesome,
-                color: const Color(0xFFD4AF37).withOpacity(0.5),
+                color: Colors.white.withOpacity(0.35),
                 size: 40,
               ),
             ),
@@ -291,22 +320,21 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
   }
 
   Widget _buildShimmerOverlay() {
-    // Calculate shimmer position based on gyroscope
     final shimmerX = (_gyroX / 10.0 + _shimmerController.value * 2) % 2 - 0.5;
     final shimmerY = (_gyroY / 10.0 + _shimmerController.value) % 2 - 0.5;
 
     return IgnorePointer(
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           gradient: LinearGradient(
             begin: Alignment(shimmerX - 0.5, shimmerY - 0.5),
             end: Alignment(shimmerX + 0.5, shimmerY + 0.5),
             colors: [
               Colors.transparent,
-              const Color(0xFFD4AF37).withOpacity(0.15),
-              const Color(0xFFFFFFFF).withOpacity(0.25),
-              const Color(0xFFD4AF37).withOpacity(0.15),
+              Colors.white.withOpacity(0.10),
+              Colors.white.withOpacity(0.22),
+              Colors.white.withOpacity(0.10),
               Colors.transparent,
             ],
             stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
@@ -317,7 +345,7 @@ class _TarotCardState extends State<TarotCard> with TickerProviderStateMixin {
   }
 }
 
-/// A card that shows just the back (for deck display)
+/// A card that shows just the back (for deck display) – Frosted Glass style
 class TarotBackCard extends StatelessWidget {
   final String backAsset;
   final double width;
@@ -340,24 +368,74 @@ class TarotBackCard extends StatelessWidget {
       offset: offset,
       child: Transform.rotate(
         angle: rotation,
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              width: width,
+              height: height,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.18),
+                    Colors.white.withOpacity(0.08),
+                    Colors.white.withOpacity(0.04),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.25),
+                  width: 0.8,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFF9C6BFF).withOpacity(0.06),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              backAsset,
-              fit: BoxFit.cover,
+              child: Stack(
+                children: [
+                  // Card image
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(backAsset, fit: BoxFit.cover),
+                    ),
+                  ),
+                  // Glass reflection highlight
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: height * 0.3,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.12),
+                            Colors.white.withOpacity(0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

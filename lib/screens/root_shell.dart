@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import 'home_page.dart';
 import 'collection_page.dart';
@@ -30,13 +32,24 @@ class _RootShellState extends State<RootShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: IndexedStack(index: _currentIndex, children: _tabs),
-      bottomNavigationBar: BottomNav(
-        currentIndex: _currentIndex,
-        onTap: _handleNavTap,
-      ),
+    return ValueListenableBuilder<AppThemeData>(
+      valueListenable: AppThemeController.notifier,
+      builder: (context, palette, _) {
+        return LiquidGlassScope.stack(
+          background: Container(
+            decoration: BoxDecoration(gradient: palette.bgGradient),
+          ),
+          content: Scaffold(
+            extendBody: true,
+            backgroundColor: Colors.transparent,
+            body: IndexedStack(index: _currentIndex, children: _tabs),
+            bottomNavigationBar: BottomNav(
+              currentIndex: _currentIndex,
+              onTap: _handleNavTap,
+            ),
+          ),
+        );
+      },
     );
   }
 }

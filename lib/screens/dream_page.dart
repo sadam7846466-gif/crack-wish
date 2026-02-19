@@ -624,7 +624,7 @@ class _DreamPageState extends State<DreamPage>
         'clarification': clarificationAnswers.map((e) => e.toJson()).toList(),
     });
 
-    await StorageService.setDreamDone(true);
+    await StorageService.setDreamDoneToday();
 
     if (mounted) {
       // Önce analiz içeriğini kapat (boş geçiş), sonra yorum aç
@@ -804,8 +804,9 @@ class _DreamPageState extends State<DreamPage>
 
     return Scaffold(
       extendBody: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF0F162B),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           Positioned.fill(
             child: IgnorePointer(
