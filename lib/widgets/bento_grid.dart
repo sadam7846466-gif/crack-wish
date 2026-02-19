@@ -116,7 +116,7 @@ class _BentoGridState extends State<BentoGrid>
                               child: Transform.rotate(
                                 angle: -0.08,
                                 child: Image.asset(
-                                  'assets/images/tarot/tarotbuton_büyüktarot.webp',
+                                  'assets/images/tarot/tarotbuton_buyuktarot.webp',
                                   width: 258,
                                   height: 258,
                                   fit: BoxFit.contain,
