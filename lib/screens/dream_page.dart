@@ -29,7 +29,7 @@ class DreamPage extends StatefulWidget {
 }
 
 class _DreamPageState extends State<DreamPage>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
   bool get _isTr => Localizations.localeOf(context).languageCode == 'tr';
 
@@ -343,7 +343,6 @@ class _DreamPageState extends State<DreamPage>
   final DreamAnalysisService _analysisService = DreamAnalysisService();
   String? _lastLocaleCode;
   bool _localizedSeedsReady = false;
-  late final AnimationController _entranceController;
 
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
@@ -398,13 +397,6 @@ class _DreamPageState extends State<DreamPage>
     _scrollController.addListener(_onScroll);
     _emotionOrder = List<Emotion>.from(Emotion.values);
     _emotionOrder.shuffle(math.Random());
-    
-    // Sayfa giriş animasyonu
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1100),
-    );
-    _entranceController.forward();
   }
 
   @override
@@ -496,7 +488,6 @@ class _DreamPageState extends State<DreamPage>
     _dreamFocusNode.removeListener(_onFocusChanged);
     _dreamFocusNode.dispose();
     _hasDreamTextNotifier.dispose();
-    _entranceController.dispose();
     super.dispose();
   }
 
@@ -813,8 +804,9 @@ class _DreamPageState extends State<DreamPage>
 
     return Scaffold(
       extendBody: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF0F162B),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           Positioned.fill(
             child: IgnorePointer(
@@ -879,71 +871,56 @@ class _DreamPageState extends State<DreamPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header — ilk belirir
-                  _EntranceItem(
-                    controller: _entranceController,
-                    beginInterval: 0.0,
-                    endInterval: 0.5,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back,
-                                color: AppColors.textWhite,
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ),
-                          Text(
-                            _l10n.dreamTitle,
-                            style: TextStyle(
-                              color: AppColors.textWhite,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Tabs — biraz sonra
-                  _EntranceItem(
-                    controller: _entranceController,
-                    beginInterval: 0.15,
-                    endInterval: 0.65,
-                    child: Row(
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Expanded(
-                          child: _TabButton(
-                            label: _l10n.dreamTabNew,
-                            isActive: _currentTab == 0,
-                            onTap: () => setState(() => _currentTab = 0),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.textWhite,
+                            ),
+                            onPressed: () => Navigator.pop(context),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _TabButton(
-                            label: _l10n.dreamTabHistory,
-                            isActive: _currentTab == 1,
-                            onTap: () => setState(() => _currentTab = 1),
+                        Text(
+                          _l10n.dreamTitle,
+                          style: TextStyle(
+                            color: AppColors.textWhite,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  // Content — en son
-                  _EntranceItem(
-                    controller: _entranceController,
-                    beginInterval: 0.3,
-                    endInterval: 0.85,
-                    child: _currentTab == 0 ? _buildNewDreamTab() : _buildHistoryTab(),
+                  // Tabs
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _TabButton(
+                          label: _l10n.dreamTabNew,
+                          isActive: _currentTab == 0,
+                          onTap: () => setState(() => _currentTab = 0),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _TabButton(
+                          label: _l10n.dreamTabHistory,
+                          isActive: _currentTab == 1,
+                          onTap: () => setState(() => _currentTab = 1),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 20),
+                  // Content
+                  _currentTab == 0 ? _buildNewDreamTab() : _buildHistoryTab(),
                 ],
               ),
             ),
@@ -4365,44 +4342,6 @@ class _GradientSpinnerState extends State<_GradientSpinner>
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Sayfa açılışında kademeli (staggered) giriş animasyonu
-/// Her child farklı bir interval'de fade-in + slide-up yapar
-class _EntranceItem extends StatelessWidget {
-  final AnimationController controller;
-  final double beginInterval;
-  final double endInterval;
-  final Widget child;
-
-  const _EntranceItem({
-    required this.controller,
-    required this.beginInterval,
-    required this.endInterval,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final curvedAnimation = CurvedAnimation(
-      parent: controller,
-      curve: Interval(beginInterval, endInterval, curve: Curves.easeOutQuart),
-    );
-
-    return AnimatedBuilder(
-      animation: curvedAnimation,
-      builder: (context, child) {
-        return Opacity(
-          opacity: curvedAnimation.value,
-          child: Transform.translate(
-            offset: Offset(0, 16 * (1 - curvedAnimation.value)),
-            child: child,
-          ),
-        );
-      },
-      child: child,
     );
   }
 }

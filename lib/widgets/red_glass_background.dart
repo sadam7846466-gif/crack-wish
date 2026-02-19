@@ -9,40 +9,40 @@ class RedGlassBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Base gradient — daha açık ve yumuşak
+        // Base gradient
         Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF3D1520), // yumuşak bordo
-                Color(0xFF7A2235), // açık cherry rose
-                Color(0xFF1A0D12), // koyu siyah-kırmızı
+                Color(0xFF2A0B12), // deep burgundy
+                Color(0xFF5A0F1D), // cherry
+                Color(0xFF0B0B0D), // near-black
               ],
-              stops: [0.0, 0.50, 1.0],
+              stops: [0.0, 0.55, 1.0],
             ),
           ),
         ),
 
-        // Büyük bulanık blob'lar — daha soft ve daha fazla blur
+        // Blobs
         Positioned(
-          top: -100,
-          right: -100,
-          child: _BlurBlob(color: const Color(0xFFFF4466), size: 380, blur: 80, opacity: 0.22),
-        ),
-        Positioned(
-          top: MediaQuery.of(context).size.height * 0.35,
-          left: -160,
-          child: _BlurBlob(color: const Color(0xFFE83050), size: 400, blur: 90, opacity: 0.16),
-        ),
-        Positioned(
-          bottom: -140,
+          top: -120,
           right: -120,
-          child: _BlurBlob(color: const Color(0xFFC41830), size: 450, blur: 100, opacity: 0.14),
+          child: _BlurBlob(color: const Color(0xFFFF2D55), size: 320, blur: 40, opacity: 0.30),
+        ),
+        Positioned(
+          bottom: 120,
+          left: -140,
+          child: _BlurBlob(color: const Color(0xFFFF3B30), size: 360, blur: 55, opacity: 0.22),
+        ),
+        Positioned(
+          bottom: -160,
+          right: -140,
+          child: _BlurBlob(color: const Color(0xFFB0122A), size: 420, blur: 70, opacity: 0.18),
         ),
 
-        // Vignette — kenarları yumuşak koyulaştır
+        // Optional vignette (kenarları koyulaştırır)
         Container(
           decoration: BoxDecoration(
             gradient: RadialGradient(
@@ -50,9 +50,9 @@ class RedGlassBackground extends StatelessWidget {
               radius: 1.2,
               colors: [
                 Colors.transparent,
-                Colors.black.withOpacity(0.30),
+                Colors.black.withOpacity(0.35),
               ],
-              stops: const [0.5, 1.0],
+              stops: const [0.55, 1.0],
             ),
           ),
         ),
@@ -91,4 +91,3 @@ class _BlurBlob extends StatelessWidget {
     );
   }
 }
-

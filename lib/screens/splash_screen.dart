@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'root_shell.dart';
 
@@ -141,8 +140,8 @@ class _SplashScreenState extends State<SplashScreen>
         _navigating = true;
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const RootShell(),
-            transitionsBuilder: (_, anim, __, child) => child,
+            pageBuilder: (_, a, b) => const RootShell(),
+            transitionsBuilder: (_, anim, sa, child) => child,
             transitionDuration: Duration.zero,
           ),
         );

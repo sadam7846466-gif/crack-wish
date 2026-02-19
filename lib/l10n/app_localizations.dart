@@ -276,13 +276,13 @@ abstract class AppLocalizations {
   /// No description provided for @statTheme.
   ///
   /// In tr, this message translates to:
-  /// **'Günün Teması'**
+  /// **'Bugün...'**
   String get statTheme;
 
   /// No description provided for @statCollection.
   ///
   /// In tr, this message translates to:
-  /// **'Koleksiyon'**
+  /// **'Kurabiyem'**
   String get statCollection;
 
   /// No description provided for @statTalisman.
@@ -864,13 +864,13 @@ abstract class AppLocalizations {
   /// No description provided for @bentoMotivationTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Motivasyon'**
+  /// **'Mod'**
   String get bentoMotivationTitle;
 
   /// No description provided for @bentoMotivationDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Gücünü keşfet'**
+  /// **'Ruh halini keşfet'**
   String get bentoMotivationDesc;
 
   /// No description provided for @bentoMotivationBadge.

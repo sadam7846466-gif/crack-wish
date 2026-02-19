@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
@@ -453,7 +452,7 @@ class _ProfileCard extends StatelessWidget {
                 border: Border.all(color: Colors.white.withOpacity(0.1)),
               ),
               child: Center(
-                child: Image.asset('assets/images/owl.webp', width: 42, height: 42),
+                child: Image.asset('assets/images/owl.png', width: 42, height: 42),
               ),
             ),
             const SizedBox(width: 14),
@@ -542,41 +541,33 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.25),
-              width: 0.5,
+    final palette = AppThemeController.current;
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Column(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 24)),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                color: AppColors.textWhite,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Column(
-              children: [
-                Text(icon, style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 8),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: AppColors.textWhite,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
-                ),
-              ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
             ),
-          ),
+          ],
         ),
       ),
     );

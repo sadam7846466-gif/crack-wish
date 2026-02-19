@@ -60,7 +60,7 @@ class _MotivationPageState extends State<MotivationPage>
 
     _selectCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 350),
     );
     _selectCtrl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -208,64 +208,6 @@ class _MotivationPageState extends State<MotivationPage>
                   letterSpacing: 0.5,
                 ),
               ),
-            ),
-          ),
-          // Center pulsing nebula glow + animated 3D ? icon
-          Center(
-            child: AnimatedBuilder(
-              animation: Listenable.merge([_starsCtrl, _selectCtrl]),
-              builder: (ctx, _) {
-                final pulse = 0.7 + 0.3 * math.sin(_starsCtrl.value * math.pi * 6);
-                final float = math.sin(_starsCtrl.value * math.pi * 12) * 12;
-                final rotY = math.sin(_starsCtrl.value * math.pi * 8) * 0.5;
-                final hideT = _selectedIndex != null ? _selectCtrl.value : 0.0;
-                return Opacity(
-                  opacity: 1.0 - hideT,
-                  child: Container(
-                    width: 130 * pulse,
-                    height: 130 * pulse,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.2 * pulse),
-                          Colors.white.withValues(alpha: 0.08),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.5, 1.0],
-                      ),
-                    ),
-                    child: Center(
-                      child: Transform(
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.002)
-                          ..rotateY(rotY)
-                          ..translate(0.0, float),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '?',
-                          style: TextStyle(
-                            color: const Color(0xFFE53935).withValues(alpha: 0.8 * pulse),
-                            fontSize: 44,
-                            fontWeight: FontWeight.w700,
-                            shadows: [
-                              Shadow(
-                                color: const Color(0xFFE53935).withValues(alpha: 0.5),
-                                blurRadius: 24,
-                              ),
-                              Shadow(
-                                color: Colors.black.withValues(alpha: 0.4),
-                                blurRadius: 4,
-                                offset: const Offset(2, 3),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
             ),
           ),
           // 12 interactive glass frames
@@ -662,7 +604,7 @@ class _CosmicBgPainter extends CustomPainter {
 
     // Base: dusty blue-gray, blended with mood color
     final baseColor = moodColor != null
-        ? Color.lerp(const Color(0xFF3A4D68), Color.lerp(const Color(0xFF1A1A2E), moodColor!, 0.3)!, moodBlend)!
+        ? Color.lerp(const Color(0xFF3A4D68), Color.lerp(const Color(0xFF2E1420), moodColor!, 0.3)!, moodBlend)!
         : const Color(0xFF3A4D68);
     canvas.drawRect(
       Rect.fromLTWH(0, 0, w, h),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../screens/tarot_page.dart';
 import '../screens/dream_page.dart';
 import '../screens/zodiac_page.dart';
@@ -75,15 +76,15 @@ class _BentoGridState extends State<BentoGrid>
                         _BentoCard(
                           compact: true,
                           contentBottom: false,
-                          icon: '🎴', // Tarot simgesi
+                          iconWidget: Image.asset('assets/images/tarot/taroticon.png', width: 28, height: 28),
                           title: l10n.bentoTarotTitle,
                           desc: l10n.bentoTarotDesc,
-                          accent: const Color(0xFF9C6BFF), // Derin mor-lila
-                          accentSoft: const Color(0xFF4B3A87), // Gölge moru
+                          accent: const Color(0xFFC48DFF), // Parlak canlı mor-lila
+                          accentSoft: const Color(0xFF8040CC), // Doygun koyu mor
                           badgeText: l10n.bentoTarotBadge,
                           badgeHidden: true,
                           overlayImageAsset:
-                              'assets/images/tarot/tarotbutonucember.png',
+                              'assets/images/tarot/tarotbutonucember.webp',
                           overlayPositioned: true,
                           overlayRight: -95,
                           overlayTop: 30,
@@ -115,7 +116,7 @@ class _BentoGridState extends State<BentoGrid>
                               child: Transform.rotate(
                                 angle: -0.08,
                                 child: Image.asset(
-                                  'assets/images/tarot/tarotbuton_buyuktarot.png',
+                                  'assets/images/tarot/tarotbuton_büyüktarot.webp',
                                   width: 258,
                                   height: 258,
                                   fit: BoxFit.contain,
@@ -151,8 +152,8 @@ class _BentoGridState extends State<BentoGrid>
                           icon: '☁️', // Rüya simgesi
                           title: l10n.bentoDreamTitle,
                           desc: l10n.bentoDreamDesc,
-                          accent: const Color(0xFF40C9FF), // Parlak cam mavi
-                          accentSoft: const Color(0xFF164D73), // Gece mavisi
+                          accent: const Color(0xFF60E0FF), // Parlak neon mavi
+                          accentSoft: const Color(0xFF2080C0), // Doygun derin mavi
                           badgeText: l10n.bentoDreamBadge,
                           badgeHidden: true,
                         ),
@@ -161,7 +162,7 @@ class _BentoGridState extends State<BentoGrid>
                           top: 6,
                           child: IgnorePointer(
                             child: Image.asset(
-                              'assets/images/ruyabulut.png',
+                              'assets/images/ruyabulut.webp',
                               width: 175,
                               height: 102,
                               fit: BoxFit.contain,
@@ -173,7 +174,7 @@ class _BentoGridState extends State<BentoGrid>
                           top: 68,
                           child: IgnorePointer(
                             child: WindyNazar(
-                              imagePath: 'assets/images/NAZAR.png',
+                              imagePath: 'assets/images/NAZAR.webp',
                               width: 68,
                               height: 68,
                             ),
@@ -188,8 +189,8 @@ class _BentoGridState extends State<BentoGrid>
                       onTap: () {
                         Navigator.push(
                           context,
-                          _SwipeBackRoute(
-                            builder: (_) => const MotivationPage(),
+                          FadePageRoute(
+                            page: const MotivationPage(),
                           ),
                         );
                       },
@@ -204,11 +205,11 @@ class _BentoGridState extends State<BentoGrid>
                             children: [
                               _BentoCard(
                                 compact: true,
-                                icon: '💪',
+                                icon: '🌈',
                                 title: l10n.bentoMotivationTitle,
                                 desc: l10n.bentoMotivationDesc,
-                                accent: const Color(0xFF5ED39C),
-                                accentSoft: const Color(0xFF1F5B3E),
+                                accent: const Color(0xFF50F0A0), // Parlak neon yeşil
+                                accentSoft: const Color(0xFF208050), // Doygun koyu yeşil
                                 badgeText: l10n.bentoMotivationBadge,
                                 badgeHidden: true,
                               ),
@@ -218,7 +219,7 @@ class _BentoGridState extends State<BentoGrid>
                                 top: -20 * scale,
                                 child: IgnorePointer(
                                   child: Image.asset(
-                                    'assets/images/motiveroket.png',
+                                    'assets/images/motiveroket.webp',
                                     width: 185 * scale,
                                     height: 185 * scale,
                                     fit: BoxFit.contain,
@@ -232,7 +233,7 @@ class _BentoGridState extends State<BentoGrid>
                                 child: IgnorePointer(
                                   child: FloatingAstronaut2(
                                     child: Image.asset(
-                                      'assets/images/motiveastronot2.png',
+                                      'assets/images/motiveastronot2.webp',
                                       width: 160 * scale,
                                       height: 160 * scale,
                                       fit: BoxFit.contain,
@@ -247,7 +248,7 @@ class _BentoGridState extends State<BentoGrid>
                                 child: IgnorePointer(
                                   child: FloatingAstronaut1(
                                     child: Image.asset(
-                                      'assets/images/motiveastronot1.png',
+                                      'assets/images/motiveastronot1.webp',
                                       width: 180 * scale,
                                       height: 180 * scale,
                                       fit: BoxFit.contain,
@@ -265,7 +266,7 @@ class _BentoGridState extends State<BentoGrid>
                           child: IgnorePointer(
                             child: _FloatingWidget(
                               child: Image.asset(
-                                'assets/images/motivegezegen.png',
+                                'assets/images/motivegezegen.webp',
                                 width: 160 * scale,
                                 height: 160 * scale,
                                 fit: BoxFit.contain,
@@ -279,7 +280,7 @@ class _BentoGridState extends State<BentoGrid>
                           top: 37 * scale,
                           child: IgnorePointer(
                             child: Image.asset(
-                              'assets/images/motiveYILDIZ.png',
+                              'assets/images/motiveYILDIZ.webp',
                               width: 80 * scale,
                               height: 80 * scale,
                               fit: BoxFit.contain,
@@ -308,8 +309,8 @@ class _BentoGridState extends State<BentoGrid>
                           icon: '⭐',
                           title: l10n.bentoZodiacTitle,
                           desc: l10n.bentoZodiacDesc,
-                          accent: const Color(0xFFFFB347),
-                          accentSoft: const Color(0xFF6B4A1A),
+                          accent: const Color(0xFFFFD060), // Parlak altın sarısı
+                          accentSoft: const Color(0xFFB07020), // Doygun koyu altın
                           badgeText: l10n.bentoZodiacBadge,
                           badgeHidden: true,
                         ),
@@ -320,7 +321,7 @@ class _BentoGridState extends State<BentoGrid>
                           child: IgnorePointer(
                             child: _SlowRotatingWidget(
                               child: Image.asset(
-                                'assets/images/zodiac.png',
+                                'assets/images/zodiac.webp',
                                 width: 120 * scale,
                                 height: 120 * scale,
                                 fit: BoxFit.contain,
@@ -397,11 +398,7 @@ class _MoodCardState extends State<_MoodCard> {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Row(
+      child: Row(
             children: [
               Expanded(
                 child: Text(
@@ -452,8 +449,6 @@ class _MoodCardState extends State<_MoodCard> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }
@@ -473,11 +468,7 @@ class _MoodEmojiButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: AnimatedContainer(
+      child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             width: 34,
             height: 34,
@@ -518,14 +509,13 @@ class _MoodEmojiButton extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }
 
 class _BentoCard extends StatefulWidget {
   final String icon;
+  final Widget? iconWidget;
   final String title;
   final String desc;
   final Color accent;
@@ -558,7 +548,8 @@ class _BentoCard extends StatefulWidget {
   final VoidCallback? overlayDragEnd;
 
   const _BentoCard({
-    required this.icon,
+    this.icon = '',
+    this.iconWidget,
     required this.title,
     required this.desc,
     required this.accent,
@@ -610,6 +601,7 @@ class _BentoCardState extends State<_BentoCard> {
           badgeText: widget.badgeText,
           badgeHidden: widget.badgeHidden,
           icon: widget.icon,
+          iconWidget: widget.iconWidget,
           title: widget.title,
           desc: widget.desc,
           compact: widget.compact,
@@ -646,6 +638,7 @@ class _BentoCardState extends State<_BentoCard> {
 
 class _InteractiveCard extends StatefulWidget {
   final String icon;
+  final Widget? iconWidget;
   final String title;
   final String desc;
   final Color accent;
@@ -682,6 +675,7 @@ class _InteractiveCard extends StatefulWidget {
 
   const _InteractiveCard({
     required this.icon,
+    this.iconWidget,
     required this.title,
     required this.desc,
     required this.accent,
@@ -756,7 +750,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
     final iconBox = compact ? 34.0 : 50.0;
     final iconRadius = compact ? 10.0 : 14.0;
     final iconFont = compact ? 14.0 : 20.0;
-    final titleFont = compact ? 13.0 : 16.0;
+    final titleFont = compact ? 15.0 : 18.0;
     final descFont = compact ? 10.0 : 12.0;
     final gapAfterBadge = compact ? 3.0 : 6.0;
     final gapAfterIcon = compact ? 6.0 : 12.0;
@@ -838,10 +832,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                         ),
                       ),
                     Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Container(color: Colors.white.withOpacity(0.05)),
-                      ),
+                      child: Container(color: Colors.white.withOpacity(0.05)),
                     ),
                     Container(
                       padding: EdgeInsets.all(edgePadding),
@@ -853,13 +844,13 @@ class _InteractiveCardState extends State<_InteractiveCard>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: pressed ? 8 : 7,
+                            color: Colors.black.withOpacity(0.10),
+                            blurRadius: pressed ? 10 : 8,
                             offset: const Offset(0, 4),
                           ),
                           BoxShadow(
-                            color: widget.accent.withOpacity(0.14),
-                            blurRadius: 14,
+                            color: widget.accent.withOpacity(0.30),
+                            blurRadius: 20,
                             offset: const Offset(0, 6),
                           ),
                         ],
@@ -867,9 +858,9 @@ class _InteractiveCardState extends State<_InteractiveCard>
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            widget.accent.withOpacity(pressed ? 0.60 : 0.50),
+                            widget.accent.withOpacity(pressed ? 1.0 : 1.0),
                             widget.accentSoft.withOpacity(
-                              pressed ? 0.44 : 0.34,
+                              pressed ? 1.0 : 1.0,
                             ),
                           ],
                         ),
@@ -947,7 +938,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                                   ),
                                 ),
                                 child: Center(
-                                  child: Text(
+                                  child: widget.iconWidget ?? Text(
                                     widget.icon,
                                     style: TextStyle(fontSize: iconFont),
                                   ),
@@ -958,10 +949,10 @@ class _InteractiveCardState extends State<_InteractiveCard>
                           SizedBox(height: gapAfterIcon),
                           Text(
                             widget.title,
-                            style: TextStyle(
+                            style: GoogleFonts.quicksand(
                               color: AppColors.textWhite,
                               fontSize: titleFont,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -1349,47 +1340,6 @@ class _PressableCardWrapperState extends State<_PressableCardWrapper> {
           duration: const Duration(milliseconds: 120),
           opacity: _pressed ? 0.85 : 1.0,
           child: widget.child,
-        ),
-      ),
-    );
-  }
-}
-
-class _SwipeBackRoute<T> extends CupertinoPageRoute<T> {
-  _SwipeBackRoute({required WidgetBuilder builder})
-      : super(builder: builder);
-
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    final slide = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
-    ));
-
-    final scale = Tween<double>(begin: 0.92, end: 1.0).animate(
-      CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-    );
-
-    final fade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: animation, curve: const Interval(0.0, 0.5)),
-    );
-
-    return SlideTransition(
-      position: slide,
-      child: ScaleTransition(
-        scale: scale,
-        child: FadeTransition(
-          opacity: fade,
-          child: child,
         ),
       ),
     );
