@@ -1113,6 +1113,7 @@ class _LetterPaper extends StatefulWidget {
 
 class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixin {
   final _textCtrl = TextEditingController();
+  final _textFocusNode = FocusNode();
   final List<List<Offset>> _strokes = [];
   List<Offset> _currentStroke = [];
   bool _hasText = false;
@@ -1229,6 +1230,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
   @override
   void dispose() {
     _textCtrl.dispose();
+    _textFocusNode.dispose();
     _sendCtrl.dispose();
     _foldCtrl.dispose();
     _envelopeCtrl.dispose();
@@ -1939,7 +1941,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                               Positioned.fill(
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-                                child: Column(
+                                child: GestureDetector(
+                                  onTap: () => _textFocusNode.requestFocus(),
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Column(
                                   children: [
                                     Row(
                                       children: [
@@ -1969,6 +1974,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                           // Yazı alanı — ortadan başlar, yazdıkça yukarı çıkar
                                           Center(
                                             child: TextField(
+                                              focusNode: _textFocusNode,
                                               controller: _textCtrl,
                                               maxLength: 150,
                                               maxLines: 5,
@@ -2007,6 +2013,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                       ),
                                     ),
                                   ],
+                                ),
                                 ),
                               ),
                             ),
