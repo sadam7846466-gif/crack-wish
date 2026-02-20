@@ -1199,8 +1199,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     });
     _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
-    _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
-    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
     _flapAnimation = Tween<double>(begin: 0, end: -math.pi).animate(
       CurvedAnimation(parent: _envelopeCtrl, curve: const Interval(0.0, 0.5, curve: Curves.easeInOut)),
     );
@@ -1268,8 +1268,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     await _foldCtrl.forward().orCancel;
     if (!mounted) return;
 
-    // Kısa bekleme — yumuşak geçiş
-    await Future.delayed(const Duration(milliseconds: 200));
+    // Kısa bekleme — daha akıcı ve hızlı geçiş
+    await Future.delayed(const Duration(milliseconds: 50));
     if (!mounted) return;
 
     // Adım 2: Mektup zarfa girer, kapak kapanır
