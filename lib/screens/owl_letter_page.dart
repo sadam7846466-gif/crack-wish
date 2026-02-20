@@ -1857,7 +1857,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final dy = t * (owlCenter.dy - paperCenterY);
         final scale = 1.0 - t * 0.92;
         final rotation = t * 0.12;
-        final opacity = (1.0 - t * 1.3).clamp(0.0, 1.0);
+        // Zarfın yarı yolda kaybolmasını engelleyelim, sadece son %20'lik kısımda küçülerek şeffaflaşsın
+        final opacity = t > 0.8 ? (1.0 - ((t - 0.8) / 0.2)).clamp(0.0, 1.0) : 1.0;
 
         final mainDialog = Dialog(
           backgroundColor: Colors.transparent,
