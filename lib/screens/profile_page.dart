@@ -452,7 +452,7 @@ class _ProfileCard extends StatelessWidget {
                 border: Border.all(color: Colors.white.withOpacity(0.1)),
               ),
               child: Center(
-                child: Image.asset('assets/images/owl.png', width: 42, height: 42),
+                child: Image.asset('assets/images/owl.webp', width: 42, height: 42),
               ),
             ),
             const SizedBox(width: 14),
