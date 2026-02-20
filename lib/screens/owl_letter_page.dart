@@ -1624,7 +1624,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
 
         return SizedBox(
           width: paperW,
-          height: envH + flapH + paperH,
+          height: envH + flapH + 40, // Merkezlemeyi düzgün yapabilmesi için yüksekliği zarfa göre kıstık
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
@@ -1855,7 +1855,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
               SizedBox(
                 key: _paperKey,
                 width: double.infinity,
-                height: screenHeight * 0.45,
+                height: screenHeight * 0.55, // Biraz daha geniş ve ortalanmış hissettirsin
                 child: Center(
                   child: _buildUnifiedAnimation(screenWidth * 0.85, 176),
                 ),
