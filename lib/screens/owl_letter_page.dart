@@ -1855,10 +1855,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final paperCenterY = (screenHeight / 2) - (screenHeight * 0.55 * 0.125); 
         final dx = t * (owlCenter.dx - paperCenterX);
         final dy = t * (owlCenter.dy - paperCenterY);
-        final scale = 1.0 - t * 0.92;
+        final scale = 1.0 - t * 0.80; // Son %20 boyutuna kadar küçülsün, yok olmasın
         final rotation = t * 0.12;
-        // Zarfın yarı yolda kaybolmasını engelleyelim, sadece son %8'lik kısımda küçülerek şeffaflaşsın
-        final opacity = t > 0.92 ? (1.0 - ((t - 0.92) / 0.08)).clamp(0.0, 1.0) : 1.0;
+        // Tam hedefin merkezine girdiği ana kadar (%96) sapa sağlam (opacity = 1.0) kalsın!
+        final opacity = t > 0.96 ? (1.0 - ((t - 0.96) / 0.04)).clamp(0.0, 1.0) : 1.0;
 
         final mainDialog = Dialog(
           backgroundColor: Colors.transparent,
