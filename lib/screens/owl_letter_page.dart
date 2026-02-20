@@ -1520,323 +1520,165 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     );
   }
 
-  // ==== KATLAMA SIRASINDA GÖRÜNEN STATİK ZARF ====
-  Widget _buildEnvelopeOnly(double paperW) {
-    final envW = paperW * 0.58;
-    final envH = envW * 0.58;
-    final flapH = envH * 0.78;
-
-    return SizedBox(
-      width: envW,
-      height: envH + flapH,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Zarfın arka iç yüzeyi
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              width: envW,
-              height: envH,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
-                ),
-                boxShadow: [
-                  BoxShadow(color: Colors.black26, blurRadius: 15, offset: const Offset(0, 10))
-                ],
-              ),
-            ),
-          ),
-          // Zarfın ön alt cebi
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              width: envW,
-              height: envH,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)],
-                ),
-                boxShadow: [
-                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, -2))
-                ],
-              ),
-            ),
-          ),
-          // Kapak (açık durumda, üçgen yukarı bakıyor)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Transform.flip(
-              flipY: true,
-              child: ClipPath(
-                clipper: _EnvelopeFlapClipper(),
-                child: Container(
-                  width: envW,
-                  height: flapH,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Color(0xFF6D4C41), Color(0xFF5D4037)],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ==== ZARF ANİMASYON OVERLAY (mektup girme + kapak kapanma) ====
-  List<Widget> _buildEnvelopeAnimOverlay(double paperW) {
-    final envW = paperW * 0.58;
-    final envH = envW * 0.58;
-    final flapH = envH * 0.78;
-
-    final t = _envelopeCtrl.value;
-    // Mektup zarfa girme (0.0 - 0.4)
-    final fSlide = Curves.easeInOutCubic.transform((t / 0.4).clamp(0.0, 1.0));
-    // Kapak kapanma (0.55 - 1.0)
-    final fFlap = Curves.easeInOutCubic.transform(((t - 0.55) / 0.45).clamp(0.0, 1.0));
-
-    final paperSlide = fSlide * (envH * 0.6);
-    final paperOpacity = fSlide > 0.75 ? (1.0 - ((fSlide - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
-
-    return [
-      // Mektup kağıdı — zarfın tepesinde, aşağı kayar
-      AnimatedBuilder(
-        animation: _envelopeCtrl,
-        builder: (context, _) {
-          final t2 = _envelopeCtrl.value;
-          final fSlide2 = Curves.easeInOutCubic.transform((t2 / 0.4).clamp(0.0, 1.0));
-          final slide2 = fSlide2 * (envH * 0.6);
-          final opacity2 = fSlide2 > 0.75 ? (1.0 - ((fSlide2 - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
-          return Transform.translate(
-            offset: Offset(0, slide2 - (envH * 0.3)),
-            child: Opacity(
-              opacity: opacity2,
-              child: Container(
-                width: envW * 0.6,
-                height: envW * 0.38,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5EDDA),
-                  borderRadius: BorderRadius.circular(3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-
-      // Kapak kapanma animasyonu
-      AnimatedBuilder(
-        animation: _envelopeCtrl,
-        builder: (context, _) {
-          final t2 = _envelopeCtrl.value;
-          final fFlap2 = Curves.easeInOutCubic.transform(((t2 - 0.55) / 0.45).clamp(0.0, 1.0));
-          if (fFlap2 <= 0) return const SizedBox.shrink();
-          return Transform.translate(
-            offset: Offset(0, -(envH * 0.5) + (flapH * 0.5)),
-            child: Transform(
-              alignment: Alignment.topCenter,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.002)
-                ..rotateX(math.pi * (1.0 - fFlap2)),
-              child: ClipPath(
-                clipper: _EnvelopeFlapClipper(),
-                child: Container(
-                  width: envW,
-                  height: flapH,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: fFlap2 > 0.5
-                          ? [const Color(0xFFFAFAFA), const Color(0xFFEFEBE9)]
-                          : [const Color(0xFF6D4C41), const Color(0xFF5D4037)],
-                    ),
-                    boxShadow: fFlap2 > 0.3
-                        ? [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 4))]
-                        : null,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    ];
-  }
-
-  // ==== YENİ 3D ZARF ANİMASYONU ====
-  Widget _buildEnvelopedPaper(double paperW, double paperH) {
+  // ==== YENİ 3D BİRLEŞTİRİLMİŞ ZARF VE KAĞIT ANİMASYONU (KESİNTİSİZ) ====
+  Widget _buildUnifiedAnimation(double paperW, double paperH) {
     final envW = paperW * 0.58;
     final envH = envW * 0.58;
     final flapH = envH * 0.78;
 
     return AnimatedBuilder(
-      animation: _envelopeCtrl,
+      animation: Listenable.merge([_foldCtrl, _envelopeCtrl]),
       builder: (context, _) {
-        final t = _envelopeCtrl.value;
+        final tFold = _foldCtrl.value;
+        final tEnv = _envelopeCtrl.value;
 
-        // Mektup zarfa girme (0.0 - 0.4)
-        final fSlide = Curves.easeInOutCubic.transform((t / 0.4).clamp(0.0, 1.0));
-        // Kapak kapanma (0.55 - 1.0)
-        final fFlap = Curves.easeInOutCubic.transform(((t - 0.55) / 0.45).clamp(0.0, 1.0));
+        // Mektup zarfa girme hızı (0.0 - 0.4)
+        final fSlide = Curves.easeInOutCubic.transform((tEnv / 0.4).clamp(0.0, 1.0));
+        // Kapak kapanma hızı (0.55 - 1.0)
+        final fFlap = Curves.easeInOutCubic.transform(((tEnv - 0.55) / 0.45).clamp(0.0, 1.0));
 
-        // Kağıt hareketi
-        final paperSlide = fSlide * (envH * 0.6);
-        final paperOpacity = fSlide > 0.75 ? (1.0 - ((fSlide - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
+        // Kağıt yukarı doğru hareket ederken hedefine ulaşır: Zarfa gireceği sınır `envH`
+        // Katlama bittiğinde bottom = 20.0 + envH + 2 (Tam cebin üstünde)
+        final paperBottom = 20.0 + (envH + 2.0) * tFold - (envH * 0.8) * fSlide;
+        // Zarfın içinde kaybolma efekti için opacity
+        final paperOpacity = fSlide > 0.85 ? (1.0 - ((fSlide - 0.85) / 0.15)).clamp(0.0, 1.0) : 1.0;
+
+        final isPaperInFront = tEnv == 0.0; // Zarf kapanma başlayınca arkaya geçer
+
+        final envelopeBack = Container(
+          width: envW,
+          height: envH,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
+            ),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0, 10))],
+          ),
+        );
+
+        final envelopeFlapOpen = Opacity(
+          opacity: 1.0 - fFlap,
+          child: Transform.flip(
+            flipY: true,
+            child: ClipPath(
+              clipper: _EnvelopeFlapClipper(),
+              child: Container(
+                width: envW,
+                height: flapH,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Color(0xFF6D4C41), Color(0xFF5D4037)],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final envelopeFrontPocket = Container(
+          width: envW,
+          height: envH,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)],
+            ),
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+          ),
+        );
+
+        final envelopeFlapClosed = fFlap > 0
+            ? Transform(
+                alignment: Alignment.topCenter,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.002)
+                  ..rotateX(math.pi * (1.0 - fFlap)),
+                child: ClipPath(
+                  clipper: _EnvelopeFlapClipper(),
+                  child: Container(
+                    width: envW,
+                    height: flapH,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: fFlap > 0.5
+                            ? const [Color(0xFFFAFAFA), Color(0xFFEFEBE9)]
+                            : const [Color(0xFF6D4C41), Color(0xFF5D4037)],
+                      ),
+                      boxShadow: fFlap > 0.3
+                          ? [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 4))]
+                          : null,
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink();
 
         return SizedBox(
-          width: envW + 40,
-          height: envH + flapH + 60,
+          width: paperW,
+          height: envH + flapH + paperH,
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
             children: [
-              // KATMAN 1: Arka iç yüzey
+              // ARKA ZARF VE AÇIK KAPAK
               Positioned(
-                bottom: 0,
-                child: Container(
+                bottom: 20,
+                child: SizedBox(
                   width: envW,
-                  height: envH,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
-                    ),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 15, offset: const Offset(0, 10))
+                  height: envH + flapH,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(bottom: 0, left: 0, right: 0, child: envelopeBack),
+                      Positioned(top: 0, left: 0, right: 0, child: envelopeFlapOpen),
                     ],
                   ),
                 ),
               ),
 
-              // KATMAN 1.5: Açık kapak (mektubun ARKASINDA)
+              // ÖN CEP (KAĞIT ÖNDEYSE BURADA CİZİLİR)
+              if (isPaperInFront)
+                Positioned(
+                  bottom: 20,
+                  child: envelopeFrontPocket,
+                ),
+
+              // KATLANAN KAĞIT
               Positioned(
-                bottom: envH,
+                bottom: paperBottom,
                 child: Opacity(
-                  opacity: 1.0 - fFlap,
-                  child: Transform.flip(
-                    flipY: true,
-                    child: ClipPath(
-                      clipper: _EnvelopeFlapClipper(),
-                      child: Container(
-                        width: envW,
-                        height: flapH,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [Color(0xFF6D4C41), Color(0xFF5D4037)],
-                          ),
-                        ),
-                      ),
+                  opacity: paperOpacity,
+                  child: SizedBox(
+                    width: paperW,
+                    height: paperH,
+                    child: Center(
+                      child: _buildFoldingPaper(paperW, paperH),
                     ),
                   ),
                 ),
               ),
 
-              // KATMAN 2: Mektup kağıdı — zarfın tepesinde başlar, aşağı kayar
-              Positioned(
-                bottom: envH,
-                child: Transform.translate(
-                  offset: Offset(0, paperSlide),
-                  child: Opacity(
-                    opacity: paperOpacity,
-                    child: Container(
-                      width: envW * 0.6,
-                      height: envW * 0.38,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5EDDA),
-                        borderRadius: BorderRadius.circular(3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+              // ÖN CEP (KAĞIT ZARFA GİRERKEN ÖNE GEÇER)
+              if (!isPaperInFront)
+                Positioned(
+                  bottom: 20,
+                  child: envelopeFrontPocket,
                 ),
-              ),
 
-              // KATMAN 3: Ön panel — mektubun önünde
-              Positioned(
-                bottom: 0,
-                child: Container(
-                  width: envW,
-                  height: envH,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)],
-                    ),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, -2))
-                    ],
-                  ),
-                ),
-              ),
-
-              // KATMAN 4: Kapak kapanma (sadece kapanırken görünür)
+              // KAPANAN KAPAK
               if (fFlap > 0)
                 Positioned(
-                  bottom: envH - flapH,
-                  child: Transform(
-                    alignment: Alignment.topCenter,
-                    transform: Matrix4.identity()
-                      ..setEntry(3, 2, 0.002)
-                      ..rotateX(math.pi * (1.0 - fFlap)),
-                    child: ClipPath(
-                      clipper: _EnvelopeFlapClipper(),
-                      child: Container(
-                        width: envW,
-                        height: flapH,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: fFlap > 0.5
-                                ? [const Color(0xFFFAFAFA), const Color(0xFFEFEBE9)]
-                                : [const Color(0xFF6D4C41), const Color(0xFF5D4037)],
-                          ),
-                          boxShadow: fFlap > 0.3
-                              ? [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 4))]
-                              : null,
-                        ),
-                      ),
-                    ),
-                  ),
+                  bottom: 20 + envH - flapH,
+                  child: envelopeFlapClosed,
                 ),
             ],
           ),
@@ -2014,23 +1856,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                 key: _paperKey,
                 width: double.infinity,
                 height: screenHeight * 0.45,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: _isEnveloping
-                      ? Center(
-                          key: const ValueKey('envelope'),
-                          child: _buildEnvelopedPaper(screenWidth * 0.85, 176),
-                        )
-                      : Stack(
-                          key: const ValueKey('folding'),
-                          alignment: Alignment.center,
-                          children: [
-                            _buildEnvelopeOnly(screenWidth * 0.85),
-                            Center(
-                              child: _buildFoldingPaper(screenWidth * 0.85, 176),
-                            ),
-                          ],
-                        ),
+                child: Center(
+                  child: _buildUnifiedAnimation(screenWidth * 0.85, 176),
                 ),
               ),
             ] else ...[
