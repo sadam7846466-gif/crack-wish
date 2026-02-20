@@ -2265,8 +2265,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final targetGlowEffect = Transform.scale(
           scale: scaleGlow,
           child: Container(
+            width: widget.owlButtonRect.width,
+            height: widget.owlButtonRect.height,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFD4B8A0), // Bej
+                  Color(0xFF964040), // Kırmızı
+                  Color(0xFF2A4A6C), // Mavi
+                ],
+              ),
               border: Border.all(
                 color: Colors.white.withOpacity(0.9 * glowOpacity), 
                 width: 2.5 * glowOpacity
@@ -2283,6 +2294,33 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   spreadRadius: 15 * glowOpacity,
                 ),
               ]
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 6,
+                    right: 6,
+                    top: 6,
+                    height: 12,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.4),
+                            Colors.white.withOpacity(0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(child: Image.asset('assets/images/owl.webp', width: 52, height: 52)),
+                ],
+              ),
             ),
           ),
         );
