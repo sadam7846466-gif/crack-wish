@@ -1199,8 +1199,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     });
     _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
-    _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+    _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     _flapAnimation = Tween<double>(begin: 0, end: -math.pi).animate(
       CurvedAnimation(parent: _envelopeCtrl, curve: const Interval(0.0, 0.5, curve: Curves.easeInOut)),
     );
