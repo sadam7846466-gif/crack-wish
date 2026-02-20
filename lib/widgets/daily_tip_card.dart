@@ -1,5 +1,7 @@
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../screens/dream_page.dart';
@@ -102,30 +104,41 @@ class _DailyTipCardState extends State<DailyTipCard> {
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOut,
           opacity: _pressed ? 0.93 : 1.0,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryOrange.withOpacity(0.3),
-                  AppColors.primaryOrange.withOpacity(0.15),
-                ],
-              ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: GlassContainer(
+                  useOwnLayer: true,
+                  height: null,
+                  settings: const LiquidGlassSettings(
+                    thickness: 16,
+                    blur: 2,
+                    glassColor: Colors.transparent,
+                    chromaticAberration: 0.1,
+                    lightIntensity: 0.7,
+                    ambientStrength: 0.6,
+                    refractiveIndex: 1.2,
+                    saturation: 1.0,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.primaryOrange.withOpacity(0.25),
+                          AppColors.primaryOrange.withOpacity(0.10),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.25),
+                        width: 0.8,
+                      ),
+                    ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -186,6 +199,10 @@ class _DailyTipCardState extends State<DailyTipCard> {
                     size: 18,
                   ),
                 ],
+              ),
+            ),
+            ),
+          ),
               ),
             ),
           ),

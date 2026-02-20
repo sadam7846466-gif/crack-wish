@@ -1121,6 +1121,15 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
   late AnimationController _sendCtrl;
   late Animation<double> _pullAnim;
 
+  // Katlama ve Zarf
+  late AnimationController _foldCtrl;
+  late AnimationController _envelopeCtrl;
+  late Animation<double> _flapAnimation;
+  late Animation<double> _letterTranslateAnimation;
+  late Animation<double> _letterScaleAnimation;
+  bool _isFolding = false;
+  bool _isEnveloping = false;
+
   // Kurabiye ekleme
   List<CookieCard> _ownedCookies = [];
   String? _selectedCookieId;
@@ -1188,8 +1197,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
       final has = _textCtrl.text.trim().isNotEmpty;
       if (has != _hasText) setState(() => _hasText = has);
     });
-    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 3000));
+    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
+    _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
+    _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _flapAnimation = Tween<double>(begin: 0, end: -math.pi).animate(
+      CurvedAnimation(parent: _envelopeCtrl, curve: const Interval(0.0, 0.5, curve: Curves.easeInOut)),
+    );
+    _letterTranslateAnimation = Tween<double>(begin: 0, end: -110).animate(
+      CurvedAnimation(parent: _envelopeCtrl, curve: const Interval(0.4, 1.0, curve: Curves.easeOutBack)),
+    );
+    _letterScaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _envelopeCtrl, curve: const Interval(0.4, 1.0, curve: Curves.easeOut)),
+    );
     _cookieFlyCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
     _loadCookies();
   }
@@ -1210,6 +1230,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
   void dispose() {
     _textCtrl.dispose();
     _sendCtrl.dispose();
+    _foldCtrl.dispose();
+    _envelopeCtrl.dispose();
     _cookieFlyCtrl.dispose();
     _flyingCookieEntry?.remove();
     super.dispose();
@@ -1220,16 +1242,14 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     FocusScope.of(context).unfocus();
     setState(() {
       _isSending = true;
-      _showCookiePicker = false;
+      _isFolding = true;
     });
 
-    // Mock servise mektup gönder
     if (widget.friend != null) {
       final service = MockOwlService();
       final cookieName = _selectedCookieId != null
           ? _ownedCookies.firstWhere((c) => c.id == _selectedCookieId, orElse: () => _ownedCookies.first).name
           : null;
-
       service.sendLetter(
         toFriend: widget.friend!,
         message: _textCtrl.text.trim(),
@@ -1239,17 +1259,590 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         attachedCookieId: _selectedCookieId,
         attachedCookieName: cookieName,
       );
-
       if (_selectedCookieId != null) {
         await _deductCookie(_selectedCookieId!);
       }
     }
 
-    _sendCtrl.forward().then((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) Navigator.pop(context);
-      });
-    });
+    // Adım 1: Muhteşem origami katlama başlar
+    await _foldCtrl.forward().orCancel;
+    if (!mounted) return;
+
+    // Kısa bekleme — yumuşak geçiş
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (!mounted) return;
+
+    // Adım 2: Mektup zarfa girer, kapak kapanır
+    setState(() => _isEnveloping = true);
+    await _envelopeCtrl.forward().orCancel;
+    // Burada duruyoruz
+  }
+
+  // Kullanıcının yazdığı içeriğin birebir kopyası (katlama animasyonunda gösterilecek yüzeyler için)
+  Widget _buildPaperInnerContent() {
+    return Stack(
+      children: [
+        Positioned(
+          right: 30, top: 20,
+          child: Transform.rotate(angle: 0.3, child: Container(width: 18, height: 0.3, color: Colors.black.withOpacity(0.04))),
+        ),
+        Positioned(
+          left: 40, bottom: 60,
+          child: Transform.rotate(angle: -0.15, child: Container(width: 22, height: 0.3, color: Colors.black.withOpacity(0.03))),
+        ),
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Spacer(),
+                    Column(
+                      children: [
+                        Text(widget.recipientEmoji, style: const TextStyle(fontSize: 16)),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.recipientName,
+                          style: const TextStyle(color: Color(0xFF4A3928), fontSize: 8, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Text(
+                          _textCtrl.text,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF4A3928),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Roboto',
+                            height: 1.6,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _DrawingPainter(strokes: _strokes, currentStroke: _currentStroke),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_selectedCookieId != null)
+          Positioned(
+            right: 10, bottom: 8,
+            child: Transform.scale(
+              scale: 1.0,
+              child: Container(
+                width: 44, height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.15),
+                  border: Border.all(color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.7), width: 1.5),
+                ),
+                child: Center(
+                  child: _cookieImageMap[_selectedCookieId] != null
+                      ? Image.asset(_cookieImageMap[_selectedCookieId]!, width: 32, height: 32, fit: BoxFit.contain)
+                      : const Text('🥠', style: TextStyle(fontSize: 18)),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // Kağıdın belirli bir parçasını kesip alan yardımcı metod
+  Widget _buildPaperSlice(double paperW, double paperH, double sliceX, double sliceY, double sliceW, double sliceH) {
+    return ClipRect(
+      child: SizedBox(
+        width: sliceW,
+        height: sliceH,
+        child: Stack(
+          children: [
+            Positioned(
+              left: -sliceX,
+              top: -sliceY,
+              child: SizedBox(
+                width: paperW,
+                height: paperH,
+                child: _buildPaperInnerContent(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFoldingPaper(double paperW, double paperH) {
+    const frontColor = Color(0xFFF2E8D5);
+    const backColor = Color(0xFFE0D0B8);
+    final quarterW = paperW / 4;
+    final centerW = paperW / 2;
+    final halfH = paperH / 2;
+
+    return AnimatedBuilder(
+      animation: _foldCtrl,
+      builder: (context, _) {
+        final t = _foldCtrl.value;
+        final fLift = (t / 0.15).clamp(0.0, 1.0);
+        final fLeft = Curves.easeOutBack.transform(((t - 0.1) / 0.35).clamp(0.0, 1.0));
+        final fRight = Curves.easeOutBack.transform(((t - 0.25) / 0.35).clamp(0.0, 1.0));
+        final fTop = Curves.easeOutBack.transform(((t - 0.55) / 0.35).clamp(0.0, 1.0));
+        final fDrop = Curves.easeInOutCubic.transform(((t - 0.85) / 0.15).clamp(0.0, 1.0));
+
+        final scale = 1.0 - (0.08 * fLift) - (0.05 * fTop) + (0.13 * fDrop);
+        final tiltX = (math.pi / 16) * fLift * (1 - fDrop);
+        final tiltY = -(math.pi / 24) * fLift * (1 - fDrop);
+        final elevation = 25.0 * fLift * (1 - fDrop) + 5.0;
+
+        Widget buildSideFlap(double f, bool isLeft, double sliceY) {
+          final isBack = f > 0.5;
+          final sliceX = isLeft ? 0.0 : paperW - quarterW;
+          return Transform(
+            alignment: isLeft ? Alignment.centerRight : Alignment.centerLeft,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.0015)
+              ..rotateY(isLeft ? f * math.pi : -f * math.pi),
+            child: Container(
+              width: quarterW,
+              height: halfH,
+              decoration: BoxDecoration(
+                color: isBack ? backColor : frontColor,
+                boxShadow: [
+                  if (f < 0.1) BoxShadow(color: Colors.black.withOpacity(0.2 * (1 - f * 10)), blurRadius: elevation, offset: Offset(0, elevation)),
+                  if (f > 0.01 && f < 0.99) BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 15 * (1 - f).abs(), offset: Offset(isLeft ? 5 : -5, 0)),
+                ],
+              ),
+              child: Stack(
+                fit: StackFit.passthrough,
+                children: [
+                  if (!isBack) _buildPaperSlice(paperW, paperH, sliceX, sliceY, quarterW, halfH),
+                  if (f > 0 && f < 0.5) Container(color: Colors.white.withOpacity(f * 0.3)),
+                  if (isBack) Container(color: Colors.black.withOpacity((f - 0.5) * 0.15)),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..scale(scale)
+            ..rotateX(tiltX)
+            ..rotateZ(tiltY * 0.3)
+            ..rotateY(tiltY),
+          child: SizedBox(
+            width: paperW,
+            height: paperH,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // ── ALT YARI (SABİT ZEMİN) ──
+                Positioned(
+                  left: quarterW, top: halfH, width: centerW, height: halfH,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(color: frontColor, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: elevation, offset: Offset(0, elevation))]),
+                        child: Stack(
+                          fit: StackFit.passthrough,
+                          children: [
+                            _buildPaperSlice(paperW, paperH, quarterW, halfH, centerW, halfH),
+                            if (fTop > 0) Container(color: Colors.black.withOpacity(fTop * 0.3)), // Üst katlanırken altı gölgeler
+                          ]
+                        ),
+                      ),
+                      Positioned(right: centerW, top: 0, child: buildSideFlap(fLeft, true, halfH)),
+                      Positioned(left: centerW, top: 0, child: buildSideFlap(fRight, false, halfH)),
+                      if (fLeft > 0) Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.black.withOpacity(0.15 * fLeft), Colors.transparent], begin: Alignment.centerLeft, end: Alignment.centerRight))),
+                      if (fRight > 0) Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.black.withOpacity(0.15 * fRight), Colors.transparent], begin: Alignment.centerRight, end: Alignment.centerLeft))),
+                    ],
+                  ),
+                ),
+
+                // ── ÜST YARI (AŞAĞI DOĞRU KAPAK GİBİ KAPANIR) ──
+                Positioned(
+                  left: quarterW, top: 0, width: centerW, height: halfH,
+                  child: Transform(
+                    alignment: Alignment.bottomCenter,
+                    transform: Matrix4.identity()..setEntry(3, 2, 0.0015)..rotateX(-fTop * math.pi),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: fTop > 0.5 ? backColor : frontColor,
+                            boxShadow: [
+                              if (fTop < 0.1) BoxShadow(color: Colors.black.withOpacity(0.2 * (1 - fTop * 10)), blurRadius: elevation, offset: Offset(0, elevation)),
+                              if (fTop > 0.01 && fTop < 0.99) BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20 * (1 - fTop).abs(), offset: const Offset(0, 10))
+                            ]
+                          ),
+                          child: Stack(
+                            fit: StackFit.passthrough,
+                            children: [
+                              if (fTop < 0.5) _buildPaperSlice(paperW, paperH, quarterW, 0, centerW, halfH),
+                              if (fTop > 0 && fTop < 0.5) Container(color: Colors.white.withOpacity(fTop * 0.2)),
+                              if (fTop >= 0.5) Container(color: Colors.black.withOpacity((fTop - 0.5) * 0.15)),
+                            ]
+                          ),
+                        ),
+                        Positioned(right: centerW, top: 0, child: buildSideFlap(fLeft, true, 0)),
+                        Positioned(left: centerW, top: 0, child: buildSideFlap(fRight, false, 0)),
+                        if (fLeft > 0 && fTop < 0.5) Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.black.withOpacity(0.15 * fLeft), Colors.transparent], begin: Alignment.centerLeft, end: Alignment.centerRight))),
+                        if (fRight > 0 && fTop < 0.5) Container(decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.black.withOpacity(0.15 * fRight), Colors.transparent], begin: Alignment.centerRight, end: Alignment.centerLeft))),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ==== KATLAMA SIRASINDA GÖRÜNEN STATİK ZARF ====
+  Widget _buildEnvelopeOnly(double paperW) {
+    final envW = paperW * 0.58;
+    final envH = envW * 0.58;
+    final flapH = envH * 0.78;
+
+    return SizedBox(
+      width: envW,
+      height: envH + flapH,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Zarfın arka iç yüzeyi
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: envW,
+              height: envH,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
+                ),
+                boxShadow: [
+                  BoxShadow(color: Colors.black26, blurRadius: 15, offset: const Offset(0, 10))
+                ],
+              ),
+            ),
+          ),
+          // Zarfın ön alt cebi
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: envW,
+              height: envH,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)],
+                ),
+                boxShadow: [
+                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, -2))
+                ],
+              ),
+            ),
+          ),
+          // Kapak (açık durumda, üçgen yukarı bakıyor)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Transform.flip(
+              flipY: true,
+              child: ClipPath(
+                clipper: _EnvelopeFlapClipper(),
+                child: Container(
+                  width: envW,
+                  height: flapH,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Color(0xFF6D4C41), Color(0xFF5D4037)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==== ZARF ANİMASYON OVERLAY (mektup girme + kapak kapanma) ====
+  List<Widget> _buildEnvelopeAnimOverlay(double paperW) {
+    final envW = paperW * 0.58;
+    final envH = envW * 0.58;
+    final flapH = envH * 0.78;
+
+    final t = _envelopeCtrl.value;
+    // Mektup zarfa girme (0.0 - 0.4)
+    final fSlide = Curves.easeInOutCubic.transform((t / 0.4).clamp(0.0, 1.0));
+    // Kapak kapanma (0.55 - 1.0)
+    final fFlap = Curves.easeInOutCubic.transform(((t - 0.55) / 0.45).clamp(0.0, 1.0));
+
+    final paperSlide = fSlide * (envH * 0.6);
+    final paperOpacity = fSlide > 0.75 ? (1.0 - ((fSlide - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
+
+    return [
+      // Mektup kağıdı — zarfın tepesinde, aşağı kayar
+      AnimatedBuilder(
+        animation: _envelopeCtrl,
+        builder: (context, _) {
+          final t2 = _envelopeCtrl.value;
+          final fSlide2 = Curves.easeInOutCubic.transform((t2 / 0.4).clamp(0.0, 1.0));
+          final slide2 = fSlide2 * (envH * 0.6);
+          final opacity2 = fSlide2 > 0.75 ? (1.0 - ((fSlide2 - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
+          return Transform.translate(
+            offset: Offset(0, slide2 - (envH * 0.3)),
+            child: Opacity(
+              opacity: opacity2,
+              child: Container(
+                width: envW * 0.6,
+                height: envW * 0.38,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5EDDA),
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+
+      // Kapak kapanma animasyonu
+      AnimatedBuilder(
+        animation: _envelopeCtrl,
+        builder: (context, _) {
+          final t2 = _envelopeCtrl.value;
+          final fFlap2 = Curves.easeInOutCubic.transform(((t2 - 0.55) / 0.45).clamp(0.0, 1.0));
+          if (fFlap2 <= 0) return const SizedBox.shrink();
+          return Transform.translate(
+            offset: Offset(0, -(envH * 0.5) + (flapH * 0.5)),
+            child: Transform(
+              alignment: Alignment.topCenter,
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.002)
+                ..rotateX(math.pi * (1.0 - fFlap2)),
+              child: ClipPath(
+                clipper: _EnvelopeFlapClipper(),
+                child: Container(
+                  width: envW,
+                  height: flapH,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: fFlap2 > 0.5
+                          ? [const Color(0xFFFAFAFA), const Color(0xFFEFEBE9)]
+                          : [const Color(0xFF6D4C41), const Color(0xFF5D4037)],
+                    ),
+                    boxShadow: fFlap2 > 0.3
+                        ? [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 4))]
+                        : null,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    ];
+  }
+
+  // ==== YENİ 3D ZARF ANİMASYONU ====
+  Widget _buildEnvelopedPaper(double paperW, double paperH) {
+    final envW = paperW * 0.58;
+    final envH = envW * 0.58;
+    final flapH = envH * 0.78;
+
+    return AnimatedBuilder(
+      animation: _envelopeCtrl,
+      builder: (context, _) {
+        final t = _envelopeCtrl.value;
+
+        // Mektup zarfa girme (0.0 - 0.4)
+        final fSlide = Curves.easeInOutCubic.transform((t / 0.4).clamp(0.0, 1.0));
+        // Kapak kapanma (0.55 - 1.0)
+        final fFlap = Curves.easeInOutCubic.transform(((t - 0.55) / 0.45).clamp(0.0, 1.0));
+
+        // Kağıt hareketi
+        final paperSlide = fSlide * (envH * 0.6);
+        final paperOpacity = fSlide > 0.75 ? (1.0 - ((fSlide - 0.75) / 0.25)).clamp(0.0, 1.0) : 1.0;
+
+        return SizedBox(
+          width: envW + 40,
+          height: envH + flapH + 60,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              // KATMAN 1: Arka iç yüzey
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  width: envW,
+                  height: envH,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF8D6E63), Color(0xFF4E342E)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black26, blurRadius: 15, offset: const Offset(0, 10))
+                    ],
+                  ),
+                ),
+              ),
+
+              // KATMAN 1.5: Açık kapak (mektubun ARKASINDA)
+              Positioned(
+                bottom: envH,
+                child: Opacity(
+                  opacity: 1.0 - fFlap,
+                  child: Transform.flip(
+                    flipY: true,
+                    child: ClipPath(
+                      clipper: _EnvelopeFlapClipper(),
+                      child: Container(
+                        width: envW,
+                        height: flapH,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [Color(0xFF6D4C41), Color(0xFF5D4037)],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // KATMAN 2: Mektup kağıdı — zarfın tepesinde başlar, aşağı kayar
+              Positioned(
+                bottom: envH,
+                child: Transform.translate(
+                  offset: Offset(0, paperSlide),
+                  child: Opacity(
+                    opacity: paperOpacity,
+                    child: Container(
+                      width: envW * 0.6,
+                      height: envW * 0.38,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5EDDA),
+                        borderRadius: BorderRadius.circular(3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // KATMAN 3: Ön panel — mektubun önünde
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  width: envW,
+                  height: envH,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, -2))
+                    ],
+                  ),
+                ),
+              ),
+
+              // KATMAN 4: Kapak kapanma (sadece kapanırken görünür)
+              if (fFlap > 0)
+                Positioned(
+                  bottom: envH - flapH,
+                  child: Transform(
+                    alignment: Alignment.topCenter,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.002)
+                      ..rotateX(math.pi * (1.0 - fFlap)),
+                    child: ClipPath(
+                      clipper: _EnvelopeFlapClipper(),
+                      child: Container(
+                        width: envW,
+                        height: flapH,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: fFlap > 0.5
+                                ? [const Color(0xFFFAFAFA), const Color(0xFFEFEBE9)]
+                                : [const Color(0xFF6D4C41), const Color(0xFF5D4037)],
+                          ),
+                          boxShadow: fFlap > 0.3
+                              ? [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 6, offset: const Offset(0, 4))]
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _deductCookie(String cookieId) async {
@@ -1386,245 +1979,246 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     return AnimatedBuilder(
       animation: _sendCtrl,
       builder: (context, _) {
+        final t = _pullAnim.value;
+        // Baykuş butonunun tam merkezine doğru uç
+        final owlCenter = widget.owlButtonRect.center;
+        final paperCenterX = screenWidth / 2;
+        final paperCenterY = screenHeight / 2;
+        final dx = t * (owlCenter.dx - paperCenterX);
+        final dy = t * (owlCenter.dy - paperCenterY);
+        final scale = 1.0 - t * 0.92;
+        final rotation = t * 0.12;
+        final opacity = (1.0 - t * 1.3).clamp(0.0, 1.0);
+
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
-          child: SizedBox(
-              width: screenWidth * 0.85,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // ══════════════ ANA ALAN ══════════════
-                    if (_isSending) ...[
-                      // Gönderirken: Zarfı göster
-                      SizedBox(
-                        width: screenWidth * 0.75,
-                        height: screenWidth * 0.75 * 0.55,
-                        child: Stack(
+          child: Transform.translate(
+            offset: Offset(dx, dy),
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topRight,
+              child: Transform.rotate(
+                angle: rotation,
+                alignment: Alignment.topRight,
+                child: Opacity(
+                  opacity: opacity,
+                  child: SizedBox(
+                    width: screenWidth * 0.85,
+        child: SingleChildScrollView(
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isFolding || _isEnveloping) ...[
+              SizedBox(
+                key: _paperKey,
+                width: double.infinity,
+                height: screenHeight * 0.45,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: _isEnveloping
+                      ? Center(
+                          key: const ValueKey('envelope'),
+                          child: _buildEnvelopedPaper(screenWidth * 0.85, 176),
+                        )
+                      : Stack(
+                          key: const ValueKey('folding'),
                           alignment: Alignment.center,
-                          clipBehavior: Clip.none,
                           children: [
-                            // Arka gövde
-                            Positioned.fill(
-                              child: Image.asset(
-                                'assets/images/envelope/envelope_back.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                            // Ön V yüzü
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: SizedBox(
-                                height: screenWidth * 0.75 * 0.25,
-                                child: Image.asset(
-                                  'assets/images/envelope/envelope_front.png',
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
-                            // Kapak (üstte, kapalı)
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: SizedBox(
-                                height: screenWidth * 0.75 * 0.30,
-                                child: Image.asset(
-                                  'assets/images/envelope/envelope_flap.png',
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
+                            _buildEnvelopeOnly(screenWidth * 0.85),
+                            Center(
+                              child: _buildFoldingPaper(screenWidth * 0.85, 176),
                             ),
                           ],
                         ),
+                ),
+              ),
+            ] else ...[
+            SizedBox(
+              key: _paperKey,
+              width: double.infinity,
+              height: 176,
+              child: Stack(
+                children: [
+                  // Gölge
+                  Positioned.fill(
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 2, left: 1),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                            spreadRadius: -2,
+                          ),
+                        ],
                       ),
-                    ] else ...[
-                      // Normal: Kağıdı göster
-                      SizedBox(
-                        key: _paperKey,
-                        width: double.infinity,
-                        height: 176,
+                    ),
+                  ),
+                  // Yırtık kenarlı kağıt
+                  Positioned.fill(
+                    child: ClipPath(
+                      clipper: _LetterTornClipper(),
+                      child: Container(
+                        color: const Color(0xFFF2E8D5),
                         child: Stack(
                           children: [
-                            // Gölge
-                            Positioned.fill(
-                              child: Container(
-                                margin: const EdgeInsets.only(top: 2, left: 1),
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.25),
-                                      blurRadius: 24,
-                                      offset: const Offset(0, 8),
-                                      spreadRadius: -2,
+                            Positioned(
+                              right: 30, top: 20,
+                              child: Transform.rotate(
+                                angle: 0.3,
+                                child: Container(width: 18, height: 0.3, color: Colors.black.withOpacity(0.04)),
+                              ),
+                            ),
+                            Positioned(
+                              left: 40, bottom: 60,
+                              child: Transform.rotate(
+                                angle: -0.15,
+                                child: Container(width: 22, height: 0.3, color: Colors.black.withOpacity(0.03)),
+                              ),
+                            ),
+                            // İçerik — sadece göndermiyorken
+                            if (!_isSending)
+                              Positioned.fill(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Spacer(),
+                                        Column(
+                                          children: [
+                                            Text(widget.recipientEmoji, style: const TextStyle(fontSize: 16)),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              widget.recipientName,
+                                              style: const TextStyle(
+                                                color: Color(0xFF4A3928),
+                                                fontSize: 8,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    // Yazı + Çizim alanı — ikisi aynı anda
+                                    Expanded(
+                                      child: Stack(
+                                        children: [
+                                          // Yazı alanı — ortadan başlar, yazdıkça yukarı çıkar
+                                          Center(
+                                            child: TextField(
+                                              controller: _textCtrl,
+                                              maxLength: 150,
+                                              maxLines: 5,
+                                              minLines: 1,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Color(0xFF4A3928),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: 'Roboto',
+                                                height: 1.6,
+                                                letterSpacing: 0.1,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                hintText: 'Mektubunu yaz...',
+                                                hintStyle: TextStyle(
+                                                  color: Color(0xFFB0A484),
+                                                  fontSize: 13,
+                                                ),
+                                                border: InputBorder.none,
+                                                isDense: true,
+                                                contentPadding: EdgeInsets.zero,
+                                                counterText: '',
+                                              ),
+                                            ),
+                                          ),
+                                          // Çizim katmanı
+                                          Positioned.fill(
+                                            child: IgnorePointer(
+                                              child: CustomPaint(
+                                                painter: _DrawingPainter(strokes: _strokes, currentStroke: _currentStroke),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            // Yırtık kenarlı kağıt
-                            Positioned.fill(
-                              child: ClipPath(
-                                clipper: _LetterTornClipper(),
-                                child: Container(
-                                  color: const Color(0xFFF2E8D5),
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        right: 30, top: 20,
-                                        child: Transform.rotate(
-                                          angle: 0.3,
-                                          child: Container(width: 18, height: 0.3, color: Colors.black.withOpacity(0.04)),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 40, bottom: 60,
-                                        child: Transform.rotate(
-                                          angle: -0.15,
-                                          child: Container(width: 22, height: 0.3, color: Colors.black.withOpacity(0.03)),
-                                        ),
-                                      ),
-                                      // İçerik
-                                      Positioned.fill(
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const Spacer(),
-                                                  Column(
-                                                    children: [
-                                                      Text(widget.recipientEmoji, style: const TextStyle(fontSize: 16)),
-                                                      const SizedBox(height: 2),
-                                                      Text(
-                                                        widget.recipientName,
-                                                        style: const TextStyle(
-                                                          color: Color(0xFF4A3928),
-                                                          fontSize: 8,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const Spacer(),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Expanded(
-                                                child: Stack(
-                                                  children: [
-                                                    Center(
-                                                      child: TextField(
-                                                        controller: _textCtrl,
-                                                        maxLength: 150,
-                                                        maxLines: 5,
-                                                        minLines: 1,
-                                                        textAlign: TextAlign.center,
-                                                        style: const TextStyle(
-                                                          color: Color(0xFF4A3928),
-                                                          fontSize: 13,
-                                                          fontWeight: FontWeight.w500,
-                                                          fontFamily: 'Roboto',
-                                                          height: 1.6,
-                                                          letterSpacing: 0.1,
-                                                        ),
-                                                        decoration: const InputDecoration(
-                                                          hintText: 'Mektubunu yaz...',
-                                                          hintStyle: TextStyle(
-                                                            color: Color(0xFFB0A484),
-                                                            fontSize: 13,
-                                                          ),
-                                                          border: InputBorder.none,
-                                                          isDense: true,
-                                                          contentPadding: EdgeInsets.zero,
-                                                          counterText: '',
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Positioned.fill(
-                                                      child: IgnorePointer(
-                                                        child: CustomPaint(
-                                                          painter: _DrawingPainter(strokes: _strokes, currentStroke: _currentStroke),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      // Kurabiye mühür
-                                      if (_selectedCookieId != null)
-                                        Builder(
-                                          builder: (context) {
-                                            final stampColor = _cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574);
-                                            return Positioned(
-                                              right: 10,
-                                              bottom: 8,
-                                              child: TweenAnimationBuilder<double>(
-                                                tween: Tween(begin: 0.0, end: 1.0),
-                                                duration: const Duration(milliseconds: 350),
-                                                curve: Curves.easeOutCubic,
-                                                builder: (context, value, child) {
-                                                  return Opacity(
-                                                    opacity: value,
-                                                    child: Transform.scale(
-                                                      scale: 0.6 + 0.4 * value,
-                                                      child: child,
-                                                    ),
-                                                  );
-                                                },
-                                                child: GestureDetector(
-                                                  onTap: () => setState(() => _selectedCookieId = null),
-                                                  child: Container(
-                                                    width: 44,
-                                                    height: 44,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: stampColor.withOpacity(0.15),
-                                                      border: Border.all(
-                                                        color: stampColor.withOpacity(0.7),
-                                                        width: 1.5,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: stampColor.withOpacity(0.25),
-                                                          blurRadius: 6,
-                                                          offset: const Offset(0, 2),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Center(
-                                                      child: _cookieImageMap[_selectedCookieId] != null
-                                                          ? Image.asset(
-                                                              _cookieImageMap[_selectedCookieId]!,
-                                                              width: 32,
-                                                              height: 32,
-                                                              fit: BoxFit.contain,
-                                                            )
-                                                          : const Text('🥠', style: TextStyle(fontSize: 18)),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+            // Kurabiye mühür — seçilmişse kağıdın sağ alt köşesinde
+            if (_selectedCookieId != null && !_isSending)
+              Builder(
+                builder: (context) {
+                  final stampColor = _cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574);
+                  return Positioned(
+                right: 10,
+                bottom: 8,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.scale(
+                        scale: 0.6 + 0.4 * value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedCookieId = null),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: stampColor.withOpacity(0.15),
+                        border: Border.all(
+                          color: stampColor.withOpacity(0.7),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: stampColor.withOpacity(0.25),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: _cookieImageMap[_selectedCookieId] != null
+                            ? Image.asset(
+                                _cookieImageMap[_selectedCookieId]!,
+                                width: 32,
+                                height: 32,
+                                fit: BoxFit.contain,
+                              )
+                            : const Text('🥠', style: TextStyle(fontSize: 18)),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+                },
+              ),
+                           ],
                         ),
                       ),
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // Butonlar yan yana: sol Baykuşa Ver, sağ Kurabiye Ekle
             if (!_isSending) ...[
               const SizedBox(height: 24),
@@ -1795,11 +2389,16 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                     : const SizedBox.shrink(),
               ),
             ],
+            ], // else (normal kağıt)
           ],
         ),
-      ),
-    ),
-  );
+        ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -1881,4 +2480,30 @@ class _DrawingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DrawingPainter oldDelegate) => true;
+}
+
+// ==== ZARF KAPAK KESİM SINIFI ====
+class _EnvelopeFlapClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    const double r = 8.0;
+
+    path.moveTo(r, 0);
+    path.lineTo(size.width - r, 0);
+    path.quadraticBezierTo(size.width, 0, size.width, r);
+    path.lineTo(size.width * 0.58, size.height * 0.82);
+    path.quadraticBezierTo(
+      size.width * 0.5, size.height,
+      size.width * 0.42, size.height * 0.82,
+    );
+    path.lineTo(0, r);
+    path.quadraticBezierTo(0, 0, r, 0);
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

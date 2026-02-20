@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../services/storage_service.dart';
@@ -48,27 +49,147 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
 
   // Tılsımlar
   static const _talismans = [
-    {'emoji': '🧿', 'tr': 'Nazar Boncuğu', 'en': 'Evil Eye',
+    {'emoji': '🧿', 'image': 'assets/images/talismans/talisman_01.webp', 'tr': 'Nazar Boncuğu', 'en': 'Evil Eye Bead',
      'descTr': 'Negatif enerjilere karşı güçlü bir kalkan. Bugün seni kötü gözlerden koruyacak.',
      'descEn': 'A powerful shield against negative energy. It will protect you from the evil eye today.'},
-    {'emoji': '🔴', 'tr': 'Kırmızı İplik', 'en': 'Red String',
-     'descTr': 'Kader bağın güçlü. Bugün doğru insanlarla karşılaşabilirsin.',
-     'descEn': 'Your fate bond is strong. You may meet the right people today.'},
-    {'emoji': '🧲', 'tr': 'At Nalı', 'en': 'Horseshoe',
+    {'emoji': '🍀', 'image': 'assets/images/talismans/talisman_02.webp', 'tr': 'Dört Yaprak Yonca', 'en': 'Four Leaf Clover',
+     'descTr': 'Nadir bulunan bu şans simgesi bugün seninle. Her adımında şans var.',
+     'descEn': 'This rare luck symbol is with you today. Luck is in every step you take.'},
+    {'emoji': '🧲', 'image': 'assets/images/talismans/talisman_03.webp', 'tr': 'At Nalı', 'en': 'Horseshoe',
      'descTr': 'Şans kapında! Beklenmedik güzel sürprizlere hazır ol.',
      'descEn': 'Luck is at your door! Be ready for unexpected pleasant surprises.'},
-    {'emoji': '🍀', 'tr': 'Dört Yaprak', 'en': 'Four Leaf',
-     'descTr': 'Nadir bulunan bu şans simgesi bugün seninle. Her adımında şans var.',
-     'descEn': 'This rare luck symbol is with you today. Luck is in every step.'},
-    {'emoji': '✨', 'tr': 'Yıldız Tozu', 'en': 'Stardust',
-     'descTr': 'Kozmik enerji seninle. Dileklerin gerçekleşmeye daha yakın.',
-     'descEn': 'Cosmic energy is with you. Your wishes are closer to coming true.'},
-    {'emoji': '🌙', 'tr': 'Ay Işığı', 'en': 'Moonlight',
-     'descTr': 'İç huzur ve sezgilerin güçleniyor. Bugün duygularına güven.',
-     'descEn': 'Inner peace and intuition are strengthening. Trust your feelings today.'},
-    {'emoji': '💎', 'tr': 'Göz Taşı', 'en': 'Eye Stone',
-     'descTr': 'Berraklık ve odak günün. Doğru kararlar vereceksin.',
-     'descEn': 'Clarity and focus are your day. You will make the right decisions.'},
+    {'emoji': '🤚', 'image': 'assets/images/talismans/talisman_04.webp', 'tr': 'Hamsa Eli', 'en': 'Hand of Fatima',
+     'descTr': 'Koruyucu el bugün üzerinde. Kötülüklerden ve nazardan seni uzak tutacak.',
+     'descEn': 'The protective hand watches over you today. It shields you from harm and the evil eye.'},
+    {'emoji': '🐱', 'image': 'assets/images/talismans/talisman_05.webp', 'tr': 'Maneki Neko', 'en': 'Lucky Cat',
+     'descTr': 'Şans kedisi bolluk ve bereket getiriyor. Bugün maddi şansın yüksek.',
+     'descEn': 'The lucky cat brings abundance and prosperity. Your financial luck is high today.'},
+    {'emoji': '🪲', 'image': 'assets/images/talismans/talisman_06.webp', 'tr': 'Skarab', 'en': 'Scarab Beetle',
+     'descTr': 'Yeniden doğuş ve dönüşüm enerjisi seninle. Bugün yeni başlangıçlar için ideal.',
+     'descEn': 'The energy of rebirth and transformation is with you. Today is ideal for new beginnings.'},
+    {'emoji': '☯️', 'image': 'assets/images/talismans/talisman_07.webp', 'tr': 'Yin Yang', 'en': 'Yin Yang',
+     'descTr': 'Denge ve uyum enerjisi çevreni sarıyor. İç huzuru bugün bulacaksın.',
+     'descEn': 'Balance and harmony surround you. You will find inner peace today.'},
+    {'emoji': '☥', 'image': 'assets/images/talismans/talisman_08.webp', 'tr': 'Ankh', 'en': 'Ankh',
+     'descTr': 'Yaşam enerjisi ve sonsuzluk simgesi. Bugün hayat gücün dorukta.',
+     'descEn': 'Symbol of life energy and eternity. Your vitality peaks today.'},
+    {'emoji': '𓂀', 'image': 'assets/images/talismans/talisman_09.webp', 'tr': 'Horus\'un Gözü', 'en': 'Eye of Horus',
+     'descTr': 'Bilgelik ve koruma gözü üzerinde. Gerçekleri bugün daha net göreceksin.',
+     'descEn': 'The eye of wisdom and protection watches over you. You will see truths more clearly today.'},
+    {'emoji': '🐞', 'image': 'assets/images/talismans/talisman_10.webp', 'tr': 'Uğur Böceği', 'en': 'Ladybug',
+     'descTr': 'Küçük mucizeler yakınında. Bugün şans seni beklenmedik yerlerde bulacak.',
+     'descEn': 'Small miracles are near. Luck will find you in unexpected places today.'},
+    {'emoji': '🪨', 'image': 'assets/images/talismans/talisman_11.webp', 'tr': 'Rün Taşları', 'en': 'Rune Stones',
+     'descTr': 'Kadim bilgelik sana yol gösteriyor. Bugün sezgilerine güven, işaretleri oku.',
+     'descEn': 'Ancient wisdom guides your path. Trust your intuition and read the signs today.'},
+    {'emoji': '🌀', 'image': 'assets/images/talismans/talisman_12.webp', 'tr': 'Triskelion', 'en': 'Triskelion',
+     'descTr': 'Üçlü sarmal enerjisi ile ilerleme, dönüşüm ve büyüme seninle.',
+     'descEn': 'With triple spiral energy, progress, transformation, and growth are with you.'},
+    {'emoji': '🔨', 'image': 'assets/images/talismans/talisman_13.webp', 'tr': 'Mjolnir', 'en': 'Mjolnir',
+     'descTr': 'Thor\'un çekici güç ve cesaret veriyor. Bugün hiçbir engel seni durduramaz.',
+     'descEn': 'Thor\'s hammer grants strength and courage. No obstacle can stop you today.'},
+    {'emoji': '🫐', 'image': 'assets/images/talismans/talisman_14.webp', 'tr': 'Nar', 'en': 'Pomegranate',
+     'descTr': 'Bereket ve bolluk simgesi. Bugün hayatına güzellikler akacak.',
+     'descEn': 'Symbol of fertility and abundance. Beautiful things will flow into your life today.'},
+    {'emoji': '🐟', 'image': 'assets/images/talismans/talisman_15.webp', 'tr': 'Altın Balık', 'en': 'Golden Fish',
+     'descTr': 'Bolluk ve özgürlük simgesi. Bugün dileklerin suya yazılıp gerçekleşecek.',
+     'descEn': 'Symbol of abundance and freedom. Your wishes will come true like words written on water.'},
+    {'emoji': '🪷', 'image': 'assets/images/talismans/talisman_16.webp', 'tr': 'Lotus Çiçeği', 'en': 'Lotus Flower',
+     'descTr': 'Aydınlanma ve arınma enerjisi seninle. Bugün ruhun çiçek açacak.',
+     'descEn': 'Energy of enlightenment and purification is with you. Your soul will bloom today.'},
+    {'emoji': '🔥', 'image': 'assets/images/talismans/talisman_17.webp', 'tr': 'Anka Kuşu', 'en': 'Phoenix',
+     'descTr': 'Küllerinden yeniden doğuş zamanı. Bugün her zorluğun üstesinden geleceksin.',
+     'descEn': 'Time to rise from the ashes. You will overcome every challenge today.'},
+    {'emoji': '🦷', 'image': 'assets/images/talismans/talisman_18.webp', 'tr': 'Kurt Dişi', 'en': 'Wolf Fang',
+     'descTr': 'Cesaret ve güç tılsımı. Bugün vahşi doğanın enerjisi seninle.',
+     'descEn': 'Talisman of courage and strength. The energy of wild nature is with you today.'},
+    {'emoji': '💰', 'image': 'assets/images/talismans/talisman_19.webp', 'tr': 'Ekeko', 'en': 'Ekeko',
+     'descTr': 'Bolluk ve zenginlik tanrısı yanında. Bugün maddi fırsatlar kapında.',
+     'descEn': 'God of abundance walks with you. Material opportunities await at your door today.'},
+    {'emoji': '🪲', 'image': 'assets/images/talismans/talisman_20.webp', 'tr': 'Altın Skarab', 'en': 'Golden Scarab',
+     'descTr': 'Güneş tanrısının koruyucu sembolü. Bugün ışık ve güç seninle.',
+     'descEn': 'Protective symbol of the sun god. Light and power are with you today.'},
+    {'emoji': '✊', 'image': 'assets/images/talismans/talisman_21.webp', 'tr': 'Figa Eli', 'en': 'Figa Hand',
+     'descTr': 'Kıskançlık ve kötü niyete karşı güçlü koruma. Bugün enerjin korunuyor.',
+     'descEn': 'Powerful protection against jealousy and ill will. Your energy is shielded today.'},
+    {'emoji': '👜', 'image': 'assets/images/talismans/talisman_22.webp', 'tr': 'Tılsım Kesesi', 'en': 'Mojo Bag',
+     'descTr': 'Büyülü otların ve taşların gücü seninle. Bugün gizli güçler seni destekliyor.',
+     'descEn': 'The power of magical herbs and stones is with you. Hidden forces support you today.'},
+    {'emoji': '📜', 'image': 'assets/images/talismans/talisman_23.webp', 'tr': 'Muska', 'en': 'Amulet Scroll',
+     'descTr': 'Kadim duaların koruması altındasın. Bugün manevi kalkanın çok güçlü.',
+     'descEn': 'You are under the protection of ancient prayers. Your spiritual shield is very strong today.'},
+    {'emoji': '☀️', 'image': 'assets/images/talismans/talisman_24.webp', 'tr': 'Aztek Güneş Taşı', 'en': 'Aztec Sun Stone',
+     'descTr': 'Kozmik güçlerin rehberliğinde yeni bir döngü başlıyor. Büyük değişimler kapıda.',
+     'descEn': 'A new cycle begins under cosmic guidance. Great changes are at your doorstep.'},
+    {'emoji': '🗿', 'image': 'assets/images/talismans/talisman_25.webp', 'tr': 'Totem Direği', 'en': 'Totem Pole',
+     'descTr': 'Atalarının bilgeliği seni yönlendiriyor. Bugün ruh rehberlerin aktif.',
+     'descEn': 'The wisdom of your ancestors guides you. Your spirit guides are active today.'},
+    {'emoji': '🐈', 'image': 'assets/images/talismans/talisman_26.webp', 'tr': 'Kedi Gözü Taşı', 'en': 'Cat\'s Eye Stone',
+     'descTr': 'Sezgi ve öngörü gücü artıyor. Bugün tehlikelerden korunacaksın.',
+     'descEn': 'Intuition and foresight are growing stronger. You will be protected from dangers today.'},
+    {'emoji': '🪺', 'image': 'assets/images/talismans/talisman_27.webp', 'tr': 'Eriço Gülü', 'en': 'Rose of Jericho',
+     'descTr': 'Diriliş ve yenilenme bitkisi seninle. Zor dönemler sona eriyor.',
+     'descEn': 'The resurrection plant is with you. Difficult times are coming to an end.'},
+    {'emoji': '💎', 'image': 'assets/images/talismans/talisman_28.webp', 'tr': 'Ametist Kristal', 'en': 'Amethyst Crystal',
+     'descTr': 'Huzur ve dengeleme kristali. Bugün stresten arınacak, berraklık bulacaksın.',
+     'descEn': 'Crystal of peace and balance. You will release stress and find clarity today.'},
+    {'emoji': '🌞', 'image': 'assets/images/talismans/talisman_29.webp', 'tr': 'Güneş Çarkı', 'en': 'Sun Cross',
+     'descTr': 'Güneşin koruyucu gücü seninle. Bugün yolun aydınlık, enerjin yüksek.',
+     'descEn': 'The protective power of the sun is with you. Your path is bright and energy high today.'},
+    {'emoji': '🏺', 'image': 'assets/images/talismans/talisman_30.webp', 'tr': 'Bereket Boynuzu', 'en': 'Cornucopia',
+     'descTr': 'Bolluk ve bereket boynuzu taşıyor. Bugün hayatın her alanında zenginlik var.',
+     'descEn': 'The horn of plenty overflows. There is richness in every area of your life today.'},
+    {'emoji': '🦚', 'image': 'assets/images/talismans/talisman_31.webp', 'tr': 'Tavus Kuşu Tüyü', 'en': 'Peacock Feather',
+     'descTr': 'Güzellik, koruma ve uyanış tüyü. Bugün göz alıcı bir enerji yayıyorsun.',
+     'descEn': 'Feather of beauty, protection, and awakening. You radiate a dazzling energy today.'},
+    {'emoji': '☘️', 'image': 'assets/images/talismans/talisman_32.webp', 'tr': 'Kelt Düğümü', 'en': 'Celtic Knot',
+     'descTr': 'Sonsuzluk ve bağlılık simgesi. Bugün ilişkilerin ve bağların güçleniyor.',
+     'descEn': 'Symbol of eternity and devotion. Your relationships and bonds grow stronger today.'},
+    {'emoji': '🐘', 'image': 'assets/images/talismans/talisman_33.webp', 'tr': 'Altın Fil', 'en': 'Golden Elephant',
+     'descTr': 'Bilgelik, güç ve şans getiren fil. Bugün engeller önünden kalkacak.',
+     'descEn': 'The elephant brings wisdom, strength, and luck. Obstacles will be removed from your path today.'},
+    {'emoji': '🐴', 'image': 'assets/images/talismans/talisman_34.webp', 'tr': 'Dala Atı', 'en': 'Dala Horse',
+     'descTr': 'İskandinav şans sembolü. Bugün güç, cesaret ve sadakat enerjisi seninle.',
+     'descEn': 'Scandinavian luck symbol. Energy of strength, courage, and loyalty is with you today.'},
+    {'emoji': '🐉', 'image': 'assets/images/talismans/talisman_35.webp', 'tr': 'Pixiu', 'en': 'Pixiu Dragon',
+     'descTr': 'Zenginlik koruyucusu ve servet çeken ejderha. Bugün finansal şansın parlak.',
+     'descEn': 'Wealth guardian and fortune-attracting dragon. Your financial luck shines bright today.'},
+    {'emoji': '✡️', 'image': 'assets/images/talismans/talisman_36.webp', 'tr': 'Yaşam Çiçeği', 'en': 'Flower of Life',
+     'descTr': 'Kutsal geometrinin gücü seninle. Evrenin sırları bugün sana açılıyor.',
+     'descEn': 'The power of sacred geometry is with you. The secrets of the universe open to you today.'},
+    {'emoji': '🌶️', 'image': 'assets/images/talismans/talisman_37.webp', 'tr': 'Cornicello', 'en': 'Cornicello',
+     'descTr': 'İtalyan şans boynuzu kötü gözden koruyor. Bugün negatif enerji sana yaklaşamaz.',
+     'descEn': 'Italian lucky horn protects from evil eye. Negative energy cannot reach you today.'},
+    {'emoji': '🎀', 'image': 'assets/images/talismans/talisman_38.webp', 'tr': 'Çin Düğümü', 'en': 'Chinese Knot',
+     'descTr': 'Şans ve uzun ömür düğümü. Bugün hayatında güzel bağlar kuracaksın.',
+     'descEn': 'Knot of luck and longevity. You will form beautiful connections in your life today.'},
+    {'emoji': '⛩️', 'image': 'assets/images/talismans/talisman_39.webp', 'tr': 'Omamori', 'en': 'Omamori',
+     'descTr': 'Japon koruma muskası. Bugün kutsal enerji seni her yerde koruyacak.',
+     'descEn': 'Japanese protection charm. Sacred energy will protect you everywhere today.'},
+    {'emoji': '⚕️', 'image': 'assets/images/talismans/talisman_40.webp', 'tr': 'Hermes Asası', 'en': 'Caduceus',
+     'descTr': 'Şifa ve denge asası seninle. Bugün sağlık enerjin güçlü, iyileşme hızlı.',
+     'descEn': 'The staff of healing and balance is with you. Your health energy is strong today.'},
+    {'emoji': '🌰', 'image': 'assets/images/talismans/talisman_41.webp', 'tr': 'Altın Meşe Palamudu', 'en': 'Golden Acorn',
+     'descTr': 'Küçük başlangıçlardan büyük başarılar doğacak. Bugün attığın tohumlar meyve verecek.',
+     'descEn': 'Great successes will grow from small beginnings. Seeds you plant today will bear fruit.'},
+    {'emoji': '🐍', 'image': 'assets/images/talismans/talisman_42.webp', 'tr': 'Ouroboros', 'en': 'Ouroboros',
+     'descTr': 'Sonsuz döngü ve yenilenme sembolü. Bugün bir döngü kapanıp yenisi açılıyor.',
+     'descEn': 'Symbol of infinite cycle and renewal. One cycle closes and another opens today.'},
+    {'emoji': '🦎', 'image': 'assets/images/talismans/talisman_43.webp', 'tr': 'Şans Kertenkelesi', 'en': 'Lucky Lizard',
+     'descTr': 'Adaptasyon ve dönüşüm gücü. Bugün her duruma uyum sağlayacaksın.',
+     'descEn': 'Power of adaptation and transformation. You will adapt to any situation today.'},
+    {'emoji': '🎎', 'image': 'assets/images/talismans/talisman_44.webp', 'tr': 'Daruma', 'en': 'Daruma',
+     'descTr': 'Azim ve kararlılık bebeği. Bugün hedeflerine ulaşmak için güçlü bir irade var.',
+     'descEn': 'Doll of perseverance and determination. Strong willpower to reach your goals today.'},
+    {'emoji': '🧭', 'image': 'assets/images/talismans/talisman_45.webp', 'tr': 'Vegvísir', 'en': 'Vegvísir',
+     'descTr': 'Viking pusula tılsımı yolunu aydınlatıyor. Bugün kaybolmayacak, doğru yolu bulacaksın.',
+     'descEn': 'Viking compass talisman lights your way. You will not be lost and will find the right path today.'},
+    {'emoji': '🕸️', 'image': 'assets/images/talismans/talisman_46.webp', 'tr': 'Düş Kapanı', 'en': 'Dreamcatcher',
+     'descTr': 'Kötü rüyaları filtreler, iyi enerjileri toplar. Bugün huzurlu bir gece seni bekliyor.',
+     'descEn': 'Filters bad dreams and collects good energy. A peaceful night awaits you today.'},
+    {'emoji': '🗡️', 'image': 'assets/images/talismans/talisman_47.webp', 'tr': 'Tumi', 'en': 'Tumi',
+     'descTr': 'İnka kutsal bıçağı güç ve koruma sağlıyor. Bugün cesaret ve kararlılık seninle.',
+     'descEn': 'Inca sacred blade provides power and protection. Courage and determination are with you today.'},
   ];
 
   late int _themeIndex;
@@ -102,7 +223,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     final daySeed = now.year * 10000 + now.month * 100 + now.day;
     final rng = Random(daySeed);
     _themeIndex = rng.nextInt(_themes.length);
-    _talismanIndex = rng.nextInt(_talismans.length);
+    _talismanIndex = Random().nextInt(_talismans.length);
   }
 
   Future<void> _loadStats() async {
@@ -139,6 +260,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     final isTr = l10n.localeName == 'tr';
 
     String emoji, title, desc;
+    String? imagePath;
     if (index == 0) {
       final t = _themes[_themeIndex];
       emoji = t['emoji']!;
@@ -168,6 +290,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     } else {
       final t = _talismans[_talismanIndex];
       emoji = t['emoji']!;
+      imagePath = t['image'];
       title = isTr ? t['tr']! : t['en']!;
       desc = isTr ? t['descTr']! : t['descEn']!;
     }
@@ -182,6 +305,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
           topY: topY,
           btnCenterX: btnCenterX,
           emoji: emoji,
+          imagePath: imagePath,
           title: title,
           description: desc,
         ),
@@ -231,6 +355,22 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
       );
     }
 
+    // Tılsım görseli
+    final talismanImagePath = talisman['image'];
+    Widget? talismanIconWidget;
+    if (talismanImagePath != null) {
+      talismanIconWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.asset(
+          talismanImagePath,
+          width: 26,
+          height: 26,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Text(talisman['emoji']!, style: const TextStyle(fontSize: 16)),
+        ),
+      );
+    }
+
     return Row(
       key: _rowKey,
       children: [
@@ -257,6 +397,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
           child: _MiniStatCard(
             key: _key2,
             icon: talisman['emoji']!,
+            iconWidget: talismanIconWidget,
             label: l10n.statTalisman,
             onTap: () => _openOverlay(2),
           ),
@@ -271,6 +412,7 @@ class _StatOverlay extends StatefulWidget {
   final double topY;
   final double btnCenterX;
   final String emoji;
+  final String? imagePath;
   final String title;
   final String description;
 
@@ -278,6 +420,7 @@ class _StatOverlay extends StatefulWidget {
     required this.topY,
     required this.btnCenterX,
     required this.emoji,
+    this.imagePath,
     required this.title,
     required this.description,
   });
@@ -382,31 +525,55 @@ class _StatOverlayState extends State<_StatOverlay>
 
   Widget _buildPanel() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-        child: Container(
-          height: 260,
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.35),
-              width: 0.8,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.10),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
+        child: GlassContainer(
+          useOwnLayer: true,
+          settings: const LiquidGlassSettings(
+            thickness: 18,
+            blur: 2,
+            glassColor: Colors.transparent,
+            chromaticAberration: 0.1,
+            lightIntensity: 0.7,
+            ambientStrength: 0.6,
+            refractiveIndex: 1.2,
+            saturation: 1.0,
           ),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(28, 14, 28, 36),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.14),
+                  Colors.white.withOpacity(0.06),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.35),
+                width: 0.8,
+              ),
+            ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(widget.emoji, style: const TextStyle(fontSize: 52)),
+              if (widget.imagePath != null)
+                SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset(
+                    widget.imagePath!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 52)),
+                  ),
+                )
+              else
+                Text(widget.emoji, style: const TextStyle(fontSize: 52)),
               const SizedBox(height: 14),
               Text(
                 widget.title,
@@ -417,7 +584,7 @@ class _StatOverlayState extends State<_StatOverlay>
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 6),
               Text(
                 widget.description,
                 textAlign: TextAlign.center,
@@ -431,6 +598,7 @@ class _StatOverlayState extends State<_StatOverlay>
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -500,88 +668,109 @@ class _MiniStatCardState extends State<_MiniStatCard>
           scale: _scaleAnim.value,
           child: child,
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.25),
-              width: 0.5,
-            ),
+        child: GlassContainer(
+          useOwnLayer: true,
+          height: 42,
+          settings: const LiquidGlassSettings(
+            thickness: 14,
+            blur: 2,
+            glassColor: Colors.transparent,
+            chromaticAberration: 0.08,
+            lightIntensity: 0.6,
+            ambientStrength: 0.5,
+            refractiveIndex: 1.15,
+            saturation: 1.0,
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            child: hasValue
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(
-                          child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              widget.value!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppColors.textWhite,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                height: 1.1,
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              widget.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.textGrey,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(
-                          child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          widget.label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textWhite,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.14),
+                  Colors.white.withOpacity(0.06),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.30),
+                width: 0.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              child: hasValue
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Center(
+                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.value!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: AppColors.textWhite,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.1,
+                                ),
+                              ),
+                              const SizedBox(height: 1),
+                              Text(
+                                widget.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.textGrey,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Center(
+                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            widget.label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
@@ -1004,26 +1193,38 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
 
   Widget _buildPanel(bool isTr, String languageCode, double maxH) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-        child: Container(
+        child: GlassContainer(
+          useOwnLayer: true,
           height: 260,
+          settings: const LiquidGlassSettings(
+            thickness: 18,
+            blur: 2,
+            glassColor: Colors.transparent,
+            chromaticAberration: 0.1,
+            lightIntensity: 0.7,
+            ambientStrength: 0.6,
+            refractiveIndex: 1.2,
+            saturation: 1.0,
+          ),
+          child: Container(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
             borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.14),
+                Colors.white.withOpacity(0.06),
+              ],
+            ),
             border: Border.all(
               color: Colors.white.withOpacity(0.35),
               width: 0.8,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.10),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1162,6 +1363,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
             ],
           ),
         ),
+      ),
       ),
     );
   }

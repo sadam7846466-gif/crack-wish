@@ -39,6 +39,18 @@ class StorageService {
   static const String _keyCookieCollection = 'cookie_collection';
   static const String _keyLocale = 'app_locale';
   static const String _keySelectedCookie = 'selected_cookie';
+  static const String _keyInstallId = 'install_id';
+
+  // ── Cihaza özel benzersiz ID (ilk kurulumda oluşturulur) ──
+  static Future<int> getInstallId() async {
+    final prefs = await SharedPreferences.getInstance();
+    var id = prefs.getInt(_keyInstallId);
+    if (id == null) {
+      id = Random().nextInt(999999999);
+      await prefs.setInt(_keyInstallId, id);
+    }
+    return id;
+  }
 
   // ── Seçili kurabiye (kalıcı) ──
   static Future<String> getSelectedCookie() async {
