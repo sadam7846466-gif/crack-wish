@@ -1624,13 +1624,16 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
               )
             : const SizedBox.shrink();
 
-        // Zarfa ekstra bir uçma/süzülme (hover) efekti verelim
-        // Mevcut controller değerlerini kullanarak bir dalga fonksiyonu elde edebiliriz
-        // tEnv (0.0 to 1.0) üzerinden veya tFold üzerinden. Daha organik olması için ikisini birleştirelim.
-        final floatY = math.sin((tFold + tEnv) * math.pi * 2) * 5.0; // 5 piksel yukarı aşağı yumuşak süzülme
+        // Zarfa ekstra uçma/süzülme (hover) efekti
+        // Havada gerçekten süzülüyor gibi çok daha tatlı ve belirgin olsun.
+        final floatY = math.sin((tFold + tEnv) * math.pi * 3) * 12.0; // Daha yukarı-aşağı, belirgin süzülme
+        final floatRot = math.sin((tFold + tEnv) * math.pi * 1.5) * 0.04; // Hafif bir yalpaza/sağa sola yatma efekti
 
-        return Transform.translate(
-          offset: Offset(0, floatY),
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..translate(0.0, floatY) // Ekranda yukarı aşağı gitme
+            ..rotateZ(floatRot), // Sağ-sol hafif süzülme gibi yatma
           child: SizedBox(
             width: paperW,
             height: envH + flapH + 40, // Merkezlemeyi düzgün yapabilmesi için yüksekliği zarfa göre kıstık
