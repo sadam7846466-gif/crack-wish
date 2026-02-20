@@ -1851,7 +1851,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         // Baykuş butonunun tam merkezine doğru uç
         final owlCenter = widget.owlButtonRect.center;
         final paperCenterX = screenWidth / 2;
-        final paperCenterY = screenHeight / 2;
+        // Mektubun görsel olarak başladığı tam koordinatını bulalım (Alignment(0, -0.25) sebebiyle yukarıda)
+        final paperCenterY = (screenHeight / 2) - (screenHeight * 0.55 * 0.125); 
         final dx = t * (owlCenter.dx - paperCenterX);
         final dy = t * (owlCenter.dy - paperCenterY);
         final scale = 1.0 - t * 0.92;
@@ -1865,10 +1866,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
             offset: Offset(dx, dy),
             child: Transform.scale(
               scale: scale,
-              alignment: Alignment.topRight,
+              alignment: Alignment.center,
               child: Transform.rotate(
                 angle: rotation,
-                alignment: Alignment.topRight,
+                alignment: Alignment.center,
                 child: Opacity(
                   opacity: opacity,
                   child: SizedBox(
