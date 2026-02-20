@@ -525,11 +525,12 @@ class _StatOverlayState extends State<_StatOverlay>
 
   Widget _buildPanel() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
         child: GlassContainer(
           useOwnLayer: true,
+          height: 245,
           settings: const LiquidGlassSettings(
             thickness: 18,
             blur: 2,
@@ -541,9 +542,9 @@ class _StatOverlayState extends State<_StatOverlay>
             saturation: 1.0,
           ),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(28, 14, 28, 36),
+            padding: const EdgeInsets.fromLTRB(26, 14, 26, 28),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -564,35 +565,35 @@ class _StatOverlayState extends State<_StatOverlay>
             children: [
               if (widget.imagePath != null)
                 SizedBox(
-                  width: 100,
-                  height: 100,
+                  width: 84,
+                  height: 84,
                   child: Image.asset(
                     widget.imagePath!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 52)),
+                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 40)),
                   ),
                 )
               else
-                Text(widget.emoji, style: const TextStyle(fontSize: 52)),
-              const SizedBox(height: 14),
+                Text(widget.emoji, style: const TextStyle(fontSize: 44)),
+              const SizedBox(height: 12),
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
               Text(
                 widget.description,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.75),
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  height: 1.5,
+                  height: 1.45,
                 ),
               ),
             ],
@@ -1193,12 +1194,12 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
 
   Widget _buildPanel(bool isTr, String languageCode, double maxH) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
         child: GlassContainer(
           useOwnLayer: true,
-          height: 260,
+          height: 245,
           settings: const LiquidGlassSettings(
             thickness: 18,
             blur: 2,
@@ -1299,7 +1300,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                           Colors.white,
                           Colors.transparent,
                         ],
-                        stops: [0.0, 0.12, 0.85, 1.0],
+                        stops: [0.0, 0.14, 0.85, 1.0],
                       ).createShader(bounds);
                     },
                     blendMode: BlendMode.dstIn,
@@ -1307,7 +1308,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                       physics: _menuActive
                           ? const NeverScrollableScrollPhysics()
                           : null,
-                      padding: const EdgeInsets.only(top: 4, bottom: 18),
+                      padding: const EdgeInsets.only(top: 10, bottom: 18),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
