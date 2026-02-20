@@ -1856,7 +1856,8 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                 key: _paperKey,
                 width: double.infinity,
                 height: screenHeight * 0.55, // Biraz daha geniş ve ortalanmış hissettirsin
-                child: Center(
+                child: Container(
+                  alignment: const Alignment(0, -0.25), // Tam ortadan hafif yukarı hizalayarak mektubun daha güzel gözükmesini sağla
                   child: _buildUnifiedAnimation(screenWidth * 0.85, 176),
                 ),
               ),
