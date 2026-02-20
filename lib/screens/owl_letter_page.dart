@@ -1400,14 +1400,16 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
       builder: (context, _) {
         final t = _foldCtrl.value;
         final fLift = (t / 0.15).clamp(0.0, 1.0);
-        final fLeft = Curves.easeOutBack.transform(((t - 0.1) / 0.35).clamp(0.0, 1.0));
-        final fRight = Curves.easeOutBack.transform(((t - 0.25) / 0.35).clamp(0.0, 1.0));
-        final fTop = Curves.easeOutBack.transform(((t - 0.55) / 0.35).clamp(0.0, 1.0));
-        final fDrop = Curves.easeInOutCubic.transform(((t - 0.85) / 0.15).clamp(0.0, 1.0));
+        
+        // Daha yumuşak ve esnek katlama hissi için fastOutSlowIn veya easeOutBack kullanıyoruz
+        final fLeft = Curves.easeOutBack.transform(((t - 0.05) / 0.40).clamp(0.0, 1.0));
+        final fRight = Curves.easeOutBack.transform(((t - 0.20) / 0.40).clamp(0.0, 1.0));
+        final fTop = Curves.easeOutBack.transform(((t - 0.45) / 0.45).clamp(0.0, 1.0));
+        final fDrop = Curves.easeInOutCubic.transform(((t - 0.75) / 0.25).clamp(0.0, 1.0));
 
-        final scale = 1.0 - (0.08 * fLift) - (0.05 * fTop) + (0.13 * fDrop);
-        final tiltX = (math.pi / 16) * fLift * (1 - fDrop);
-        final tiltY = -(math.pi / 24) * fLift * (1 - fDrop);
+        final scale = 1.0 - (0.05 * fLift) - (0.05 * fTop) + (0.10 * fDrop);
+        final tiltX = (math.pi / 12) * fLift * (1 - fDrop); // Daha belirgin eğilme
+        final tiltY = -(math.pi / 18) * fLift * (1 - fDrop);
         final elevation = 25.0 * fLift * (1 - fDrop) + 5.0;
 
         Widget buildSideFlap(double f, bool isLeft, double sliceY) {
@@ -1416,7 +1418,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
           return Transform(
             alignment: isLeft ? Alignment.centerRight : Alignment.centerLeft,
             transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.0015)
+              ..setEntry(3, 2, 0.0025) // 3D derinliği arttırıldı
               ..rotateY(isLeft ? f * math.pi : -f * math.pi),
             child: Container(
               width: quarterW,
@@ -1443,11 +1445,11 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
+            ..setEntry(3, 2, 0.0015) // Havalanırken olan derinlik
             ..scale(scale)
             ..rotateX(tiltX)
-            ..rotateZ(tiltY * 0.3)
-            ..rotateY(tiltY),
+            ..rotateZ(tiltY * 0.4)
+            ..rotateY(tiltY * 1.2),
           child: SizedBox(
             width: paperW,
             height: paperH,
@@ -1483,7 +1485,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   left: quarterW, top: 0, width: centerW, height: halfH,
                   child: Transform(
                     alignment: Alignment.bottomCenter,
-                    transform: Matrix4.identity()..setEntry(3, 2, 0.0015)..rotateX(-fTop * math.pi),
+                    transform: Matrix4.identity()..setEntry(3, 2, 0.0025)..rotateX(-fTop * math.pi),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -1532,10 +1534,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final tFold = _foldCtrl.value;
         final tEnv = _envelopeCtrl.value;
 
-        // Mektup zarfa girme hızı (0.0 - 0.4)
-        final fSlide = Curves.easeInOutCubic.transform((tEnv / 0.4).clamp(0.0, 1.0));
-        // Kapak kapanma hızı (0.55 - 1.0)
-        final fFlap = Curves.easeInOutCubic.transform(((tEnv - 0.55) / 0.45).clamp(0.0, 1.0));
+        // Mektup zarfa girme hızı (0.0 - 0.4) -> Hızlı ve zarif süzülüş
+        final fSlide = Curves.fastOutSlowIn.transform((tEnv / 0.45).clamp(0.0, 1.0));
+        // Kapak kapanma hızı (0.50 - 1.0) -> Yumuşak kapanış
+        final fFlap = Curves.fastOutSlowIn.transform(((tEnv - 0.50) / 0.50).clamp(0.0, 1.0));
 
         // Kağıt yukarı doğru hareket ederken hedefine ulaşır: Zarfa gireceği sınır `envH`
         // Katlama bittiğinde bottom = 20.0 + envH + 2 (Tam cebin üstünde)
@@ -1598,7 +1600,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
             ? Transform(
                 alignment: Alignment.topCenter,
                 transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.002)
+                  ..setEntry(3, 2, 0.003) // Kapak kapanırken daha da belirgin 3D derinlik
                   ..rotateX(math.pi * (1.0 - fFlap)),
                 child: ClipPath(
                   clipper: _EnvelopeFlapClipper(),
