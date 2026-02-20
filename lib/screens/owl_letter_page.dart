@@ -2333,7 +2333,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
               mainDialog,
               Positioned(
                 left: widget.owlButtonRect.left,
-                top: widget.owlButtonRect.top - 24, // Dialog insetPadding vertical 24 offet'i düzelttik
+                top: widget.owlButtonRect.top, // Tam olarak küresel (global) konuma hizaladık, ekstra offsete gerek yok
                 width: widget.owlButtonRect.width,
                 height: widget.owlButtonRect.height,
                 child: IgnorePointer(
