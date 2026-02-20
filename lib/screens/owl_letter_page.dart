@@ -2260,9 +2260,80 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         // t değeri 0'dan 1'e gittikçe parlaklık yavaşça artıp söner.
         // Parıltıyı buton alanının üstüne yerleştiriyoruz.
         final glowOpacity = math.sin(t * math.pi); // Sine curve 0 -> 1 -> 0
-        final targetGlowEffect = CustomPaint(
-          size: Size(widget.owlButtonRect.width, widget.owlButtonRect.height),
-          painter: _GlowPainter(glowOpacity),
+        // Arka plandaki karanlık katmanın üstüne, baykuş butonunun birebir kopyasını çıkarıyoruz.
+        // t > 0 olunca yavaşça belirir, kabarır (zarfı alır) ve sona doğru kaybolur.
+        final btnOpacity = (math.sin(t * math.pi) * 1.5).clamp(0.0, 1.0); // 0 -> 1 -> 0 (başta belirir, sonda kaybolur)
+        final btnScale = 1.0 + (glowOpacity * 0.15); // Zarf gelirken hafifçe büyür, kabarır
+
+        final targetGlowEffect = Opacity(
+          opacity: btnOpacity,
+          child: Transform.scale(
+            scale: btnScale,
+            child: Container(
+              width: widget.owlButtonRect.width,
+              height: widget.owlButtonRect.height,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFD4B8A0), // Bej
+                    Color(0xFF964040), // Kırmızı
+                    Color(0xFF2A4A6C), // Mavi
+                  ],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.45 + (0.55 * glowOpacity)),
+                  width: 1.0 + (1.5 * glowOpacity),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF964040).withOpacity(0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                  if (glowOpacity > 0.05)
+                    BoxShadow(
+                      color: const Color(0xFFFFAB00).withOpacity(0.7 * glowOpacity),
+                      blurRadius: 20 * glowOpacity,
+                      spreadRadius: 4 * glowOpacity,
+                    ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 6,
+                      right: 6,
+                      top: 6,
+                      height: 12,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withOpacity(0.4),
+                              Colors.white.withOpacity(0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(child: Image.asset('assets/images/owl.webp', width: 52, height: 52, fit: BoxFit.contain)),
+                    if (glowOpacity > 0.05)
+                      Container(
+                        color: Colors.white.withOpacity(0.2 * glowOpacity),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         );
 
         return Material(
@@ -2390,35 +2461,4 @@ class _EnvelopeFlapClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class _GlowPainter extends CustomPainter {
-  final double glowOpacity;
-  const _GlowPainter(this.glowOpacity);
-  
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (glowOpacity <= 0) return;
-    final rrect = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14));
-    
-    // Outer glow (sadece dışarı yansır, içi boştur)
-    final paintGlow = Paint()
-      ..color = const Color(0xFFFFAB00).withOpacity(0.9 * glowOpacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10.0 * glowOpacity
-      ..maskFilter = MaskFilter.blur(BlurStyle.outer, 18.0 * glowOpacity);
-      
-    canvas.drawRRect(rrect, paintGlow);
-    
-    // Bright outline (tam butonun kenarında ışıklı ince çerçeve)
-    final outlinePaint = Paint()
-      ..color = Colors.white.withOpacity(0.7 * glowOpacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0 * glowOpacity;
-      
-    canvas.drawRRect(rrect, outlinePaint);
-  }
-  
-  @override
-  bool shouldRepaint(covariant _GlowPainter old) => old.glowOpacity != glowOpacity;
 }
