@@ -1858,7 +1858,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final rotation = t * 0.12;
         final opacity = (1.0 - t * 1.3).clamp(0.0, 1.0);
 
-        return Dialog(
+        final mainDialog = Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
           child: Transform.translate(
@@ -2251,6 +2251,58 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                 ),
               ),
             ),
+          ),
+        );
+
+        if (t == 0.0) return mainDialog;
+
+        // Uçuş anında, baykuş butonunda emilim/parlama efekti (glow and absorb) oluşur.
+        // t değeri 0'dan 1'e gittikçe parlaklık yavaşça artıp söner.
+        // Parıltıyı buton alanının üstüne yerleştiriyoruz.
+        final glowOpacity = math.sin(t * math.pi); // Sine curve 0 -> 1 -> 0
+        final scaleGlow = 1.0 + (glowOpacity * 0.2);
+        
+        final targetGlowEffect = Transform.scale(
+          scale: scaleGlow,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.9 * glowOpacity), 
+                width: 2.5 * glowOpacity
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFFAB00).withOpacity(0.7 * glowOpacity), // Altın/Sıcak Sarı
+                  blurRadius: 20 * glowOpacity,
+                  spreadRadius: 6 * glowOpacity,
+                ),
+                BoxShadow(
+                  color: const Color(0xFFFFFFFF).withOpacity(0.4 * glowOpacity),
+                  blurRadius: 35 * glowOpacity,
+                  spreadRadius: 15 * glowOpacity,
+                ),
+              ]
+            ),
+          ),
+        );
+
+        return Material(
+          type: MaterialType.transparency,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              mainDialog,
+              Positioned(
+                left: widget.owlButtonRect.left,
+                top: widget.owlButtonRect.top - 24, // Dialog insetPadding vertical 24 offet'i düzelttik
+                width: widget.owlButtonRect.width,
+                height: widget.owlButtonRect.height,
+                child: IgnorePointer(
+                  child: targetGlowEffect,
+                ),
+              ),
+            ],
           ),
         );
       },
