@@ -1625,9 +1625,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
             : const SizedBox.shrink();
 
         // Zarfa ekstra uçma/süzülme (hover) efekti
-        // Havada gerçekten süzülüyor gibi çok daha tatlı ve belirgin olsun.
-        final floatY = math.sin((tFold + tEnv) * math.pi * 3) * 12.0; // Daha yukarı-aşağı, belirgin süzülme
-        final floatRot = math.sin((tFold + tEnv) * math.pi * 1.5) * 0.04; // Hafif bir yalpaza/sağa sola yatma efekti
+        // Hızlandırılmış animasyonda aşırı titreme olmaması için dalga frekansını çok düşürdük
+        // ("yavaşça süzülüş / yelpazelenme" hissini geri getirmek için)
+        final floatY = math.sin((tFold + tEnv) * math.pi * 1.2) * 12.0; // Çok yavaş ve yumuşak yukarı-aşağı salınım
+        final floatRot = math.sin((tFold + tEnv) * math.pi * 0.8) * 0.035; // Çok daha yavaş bir hafif yalpama (rotation)
 
         return Transform(
           alignment: Alignment.center,
