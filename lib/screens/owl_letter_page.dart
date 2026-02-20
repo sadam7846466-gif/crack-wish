@@ -1275,7 +1275,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     // Adım 2: Mektup zarfa girer, kapak kapanır
     setState(() => _isEnveloping = true);
     await _envelopeCtrl.forward().orCancel;
-    // Burada duruyoruz
+    if (!mounted) return;
+
+    // Adım 3: Zarf havada çok kısa asılı kalır ve sonra baykuşa uçar
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
+    
+    HapticFeedback.mediumImpact(); // Uçuşa geçerken hafif titreşim
+    await _sendCtrl.forward().orCancel;
+
+    // Animasyon tamamlandığında paneli kapatıp mektup göndermeyi bitir
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   // Kullanıcının yazdığı içeriğin birebir kopyası (katlama animasyonunda gösterilecek yüzeyler için)
