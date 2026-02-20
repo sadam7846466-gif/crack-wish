@@ -1624,65 +1624,73 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
               )
             : const SizedBox.shrink();
 
-        return SizedBox(
-          width: paperW,
-          height: envH + flapH + 40, // Merkezlemeyi düzgün yapabilmesi için yüksekliği zarfa göre kıstık
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomCenter,
-            children: [
-              // ARKA ZARF VE AÇIK KAPAK
-              Positioned(
-                bottom: 20,
-                child: SizedBox(
-                  width: envW,
-                  height: envH + flapH,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(bottom: 0, left: 0, right: 0, child: envelopeBack),
-                      Positioned(top: 0, left: 0, right: 0, child: envelopeFlapOpen),
-                    ],
-                  ),
-                ),
-              ),
+        // Zarfa ekstra bir uçma/süzülme (hover) efekti verelim
+        // Mevcut controller değerlerini kullanarak bir dalga fonksiyonu elde edebiliriz
+        // tEnv (0.0 to 1.0) üzerinden veya tFold üzerinden. Daha organik olması için ikisini birleştirelim.
+        final floatY = math.sin((tFold + tEnv) * math.pi * 2) * 5.0; // 5 piksel yukarı aşağı yumuşak süzülme
 
-              // ÖN CEP (KAĞIT ÖNDEYSE BURADA CİZİLİR)
-              if (isPaperInFront)
+        return Transform.translate(
+          offset: Offset(0, floatY),
+          child: SizedBox(
+            width: paperW,
+            height: envH + flapH + 40, // Merkezlemeyi düzgün yapabilmesi için yüksekliği zarfa göre kıstık
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
+              children: [
+                // ARKA ZARF VE AÇIK KAPAK
                 Positioned(
                   bottom: 20,
-                  child: envelopeFrontPocket,
-                ),
-
-              // KATLANAN KAĞIT
-              Positioned(
-                bottom: paperBottom,
-                child: Opacity(
-                  opacity: paperOpacity,
                   child: SizedBox(
-                    width: paperW,
-                    height: paperH,
-                    child: Center(
-                      child: _buildFoldingPaper(paperW, paperH),
+                    width: envW,
+                    height: envH + flapH,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(bottom: 0, left: 0, right: 0, child: envelopeBack),
+                        Positioned(top: 0, left: 0, right: 0, child: envelopeFlapOpen),
+                      ],
                     ),
                   ),
                 ),
-              ),
 
-              // ÖN CEP (KAĞIT ZARFA GİRERKEN ÖNE GEÇER)
-              if (!isPaperInFront)
+                // ÖN CEP (KAĞIT ÖNDEYSE BURADA CİZİLİR)
+                if (isPaperInFront)
+                  Positioned(
+                    bottom: 20,
+                    child: envelopeFrontPocket,
+                  ),
+
+                // KATLANAN KAĞIT
                 Positioned(
-                  bottom: 20,
-                  child: envelopeFrontPocket,
+                  bottom: paperBottom,
+                  child: Opacity(
+                    opacity: paperOpacity,
+                    child: SizedBox(
+                      width: paperW,
+                      height: paperH,
+                      child: Center(
+                        child: _buildFoldingPaper(paperW, paperH),
+                      ),
+                    ),
+                  ),
                 ),
 
-              // KAPANAN KAPAK
-              if (fFlap > 0)
-                Positioned(
-                  bottom: 20 + envH - flapH,
-                  child: envelopeFlapClosed,
-                ),
-            ],
+                // ÖN CEP (KAĞIT ZARFA GİRERKEN ÖNE GEÇER)
+                if (!isPaperInFront)
+                  Positioned(
+                    bottom: 20,
+                    child: envelopeFrontPocket,
+                  ),
+
+                // KAPANAN KAPAK
+                if (fFlap > 0)
+                  Positioned(
+                    bottom: 20 + envH - flapH,
+                    child: envelopeFlapClosed,
+                  ),
+              ],
+            ),
           ),
         );
       },
