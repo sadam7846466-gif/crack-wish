@@ -2260,68 +2260,26 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         // t değeri 0'dan 1'e gittikçe parlaklık yavaşça artıp söner.
         // Parıltıyı buton alanının üstüne yerleştiriyoruz.
         final glowOpacity = math.sin(t * math.pi); // Sine curve 0 -> 1 -> 0
-        final scaleGlow = 1.0 + (glowOpacity * 0.2);
-        
-        final targetGlowEffect = Transform.scale(
-          scale: scaleGlow,
-          child: Container(
-            width: widget.owlButtonRect.width,
-            height: widget.owlButtonRect.height,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFD4B8A0), // Bej
-                  Color(0xFF964040), // Kırmızı
-                  Color(0xFF2A4A6C), // Mavi
-                ],
+        final targetGlowEffect = Container(
+          width: widget.owlButtonRect.width,
+          height: widget.owlButtonRect.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            // Butonun üstünde beyaz yumuşak bir ışık katmanı oluşturur
+            color: Colors.white.withOpacity(0.5 * glowOpacity),
+            boxShadow: [
+              // Butonun dışına doğru yayılan sıcak altın sarısı ışık
+              BoxShadow(
+                color: const Color(0xFFFFAB00).withOpacity(0.8 * glowOpacity),
+                blurRadius: 25 * glowOpacity,
+                spreadRadius: 8 * glowOpacity,
               ),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.9 * glowOpacity), 
-                width: 2.5 * glowOpacity
+              BoxShadow(
+                color: Colors.white.withOpacity(0.5 * glowOpacity),
+                blurRadius: 15 * glowOpacity,
+                spreadRadius: 4 * glowOpacity,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFAB00).withOpacity(0.7 * glowOpacity), // Altın/Sıcak Sarı
-                  blurRadius: 20 * glowOpacity,
-                  spreadRadius: 6 * glowOpacity,
-                ),
-                BoxShadow(
-                  color: const Color(0xFFFFFFFF).withOpacity(0.4 * glowOpacity),
-                  blurRadius: 35 * glowOpacity,
-                  spreadRadius: 15 * glowOpacity,
-                ),
-              ]
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 6,
-                    right: 6,
-                    top: 6,
-                    height: 12,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.white.withOpacity(0.4),
-                            Colors.white.withOpacity(0.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Center(child: Image.asset('assets/images/owl.webp', width: 52, height: 52)),
-                ],
-              ),
-            ),
+            ]
           ),
         );
 
