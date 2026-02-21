@@ -420,34 +420,17 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              Stack(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.05),
-                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                    ),
-                    child: Center(
-                      child: Text(req.from.emoji, style: const TextStyle(fontSize: 22)),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 2,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF2E1420), width: 2),
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.05),
+                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                ),
+                child: Center(
+                  child: Text(req.from.emoji, style: const TextStyle(fontSize: 22)),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -462,14 +445,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text('5d önce aktifti', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-                        const SizedBox(width: 6),
-                        Container(width: 5, height: 5, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF6DE8B8))),
-                      ],
                     ),
                   ],
                 ),
@@ -728,7 +703,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           ],
         ],
         ...letters.map((letter) {
-          final isOnline = letter.from.name.length.isEven;
           return Column(
             children: [
               GestureDetector(
@@ -741,34 +715,17 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
-                      Stack(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.05),
-                              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                            ),
-                            child: Center(
-                              child: Text(letter.from.emoji, style: const TextStyle(fontSize: 22)),
-                            ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 2,
-                            child: Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: isOnline ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF2E1420), width: 2),
-                              ),
-                            ),
-                          ),
-                        ],
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.05),
+                          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                        ),
+                        child: Center(
+                          child: Text(letter.from.emoji, style: const TextStyle(fontSize: 22)),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1320,44 +1277,23 @@ class _ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tasarıma uygun mockup durumları simüle etmek
-    final isOnline = name.length.isEven;
-    final lastActiveTime = '${(name.length % 5) + 2}${name.length.isOdd ? 'd' : 's'} önce aktifti';
-
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              Stack(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.05),
-                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                    ),
-                    child: Center(
-                      child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 2,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: isOnline ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF2E1420), width: 2),
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.05),
+                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                ),
+                child: Center(
+                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1372,18 +1308,6 @@ class _ContactItem extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        if (isOnline) ...[
-                          Container(width: 5, height: 5, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF6DE8B8))),
-                          const SizedBox(width: 4),
-                          Text('Çevrimiçi', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-                        ] else ...[
-                          Text(lastActiveTime, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-                        ],
-                      ],
                     ),
                   ],
                 ),
