@@ -243,74 +243,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
-class _AnimatedMenuItem extends StatefulWidget {
-  final String label;
-  final VoidCallback onTap;
-  final bool isSelected;
-
-  const _AnimatedMenuItem({
-    required this.label,
-    required this.onTap,
-    this.isSelected = false,
-  });
-
-  @override
-  State<_AnimatedMenuItem> createState() => _AnimatedMenuItemState();
-}
-
-class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        HapticFeedback.lightImpact();
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            // Seçili olmayan durum: Biraz daha belirgin yarı saydam bir beyaz alan (0.05 vs. yerine 0.08 gibi)
-            color: widget.isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
-            border: Border.all(
-              // Çizgiyi de bir tık daha az soluk yapalım
-              color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
-              width: widget.isSelected ? 1.0 : 0.6,
-            ),
-            boxShadow: widget.isSelected
-                ? [
-                    BoxShadow(color: Colors.white.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 0))
-                  ]
-                : [],
-          ),
-          child: Text(
-            widget.label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              // Yazıyı da 0.6 yerine daha aydınlık 0.75'e çektim ki sönük kalmasın
-              color: widget.isSelected ? Colors.white : Colors.white.withOpacity(0.75),
-              fontSize: 12,
-              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
   Widget _buildContactsTab(Rect br) {
     return Column(
@@ -1129,6 +1061,72 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedMenuItem extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+  final bool isSelected;
+
+  const _AnimatedMenuItem({
+    required this.label,
+    required this.onTap,
+    this.isSelected = false,
+  });
+
+  @override
+  State<_AnimatedMenuItem> createState() => _AnimatedMenuItemState();
+}
+
+class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: widget.isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
+            border: Border.all(
+              color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
+              width: widget.isSelected ? 1.0 : 0.6,
+            ),
+            boxShadow: widget.isSelected
+                ? [
+                    BoxShadow(color: Colors.white.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 0))
+                  ]
+                : [],
+          ),
+          child: Text(
+            widget.label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: widget.isSelected ? Colors.white : Colors.white.withOpacity(0.75),
+              fontSize: 12,
+              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+              letterSpacing: 0.3,
+            ),
+          ),
         ),
       ),
     );
