@@ -727,66 +727,109 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             const SizedBox(height: 6),
           ],
         ],
-        ...letters.map((letter) => GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                _service.markAsRead(letter.id);
-                _showReceivedLetter(context, letter, br);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Text(letter.from.emoji, style: const TextStyle(fontSize: 20)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        ...letters.map((letter) {
+          final isOnline = letter.from.name.length.isEven;
+          return Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _service.markAsRead(letter.id);
+                  _showReceivedLetter(context, letter, br);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Stack(
                         children: [
-                          Text(
-                            letter.from.name,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 12,
-                              fontWeight: letter.isRead ? FontWeight.w400 : FontWeight.w700,
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.05),
+                              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                            ),
+                            child: Center(
+                              child: Text(letter.from.emoji, style: const TextStyle(fontSize: 22)),
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            letter.message,
-                            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Positioned(
+                            right: 0,
+                            bottom: 2,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: isOnline ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color(0xFF2E1420), width: 2),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    if (letter.attachedCookieId != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Text(
-                          '🥠',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: letter.cookieClaimed
-                                ? Colors.white.withOpacity(0.3)
-                                : null,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              letter.from.name,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.95),
+                                fontSize: 14,
+                                fontWeight: letter.isRead ? FontWeight.w500 : FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              letter.message,
+                              style: TextStyle(
+                                color: letter.isRead ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.8), 
+                                fontSize: 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (letter.attachedCookieId != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            '🥠',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: letter.cookieClaimed
+                                  ? Colors.white.withOpacity(0.3)
+                                  : null,
+                            ),
                           ),
                         ),
-                      ),
-                    if (!letter.isRead)
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.amber[400],
+                      if (!letter.isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.amber[400],
+                            boxShadow: [
+                              BoxShadow(color: Colors.amber.withOpacity(0.4), blurRadius: 4, offset: Offset.zero),
+                            ],
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            )),
+              Divider(color: Colors.white.withOpacity(0.05), height: 1),
+            ],
+          );
+        }),
       ],
     );
   }
