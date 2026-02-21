@@ -418,19 +418,19 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _service.acceptRequest(req.id);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFF4CAF50).withOpacity(0.85),
+                borderRadius: BorderRadius.circular(16),
+                color: const Color(0xFF6D9A8D).withOpacity(0.95), // Ekrandaki "Kabul" butonundaki mat/pastel yeşil
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4CAF50).withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: const Color(0xFF6D9A8D).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 0),
                   ),
                 ],
               ),
-              child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+              child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
             ),
           ),
           const SizedBox(width: 4),
@@ -440,13 +440,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _service.rejectRequest(req.id);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 color: Colors.transparent,
-                border: Border.all(color: Colors.white.withOpacity(0.15)),
+                border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
               ),
-              child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600)),
+              child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w400, letterSpacing: 0.3)),
             ),
           ),
         ],
@@ -1124,24 +1124,19 @@ class _ContactItem extends StatelessWidget {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                gradient: isAppUser
-                    ? const LinearGradient(colors: [Color(0xFFFF9A55), Color(0xFFFF7A22)])
-                    : null,
-                color: isAppUser ? null : Colors.white.withOpacity(0.06),
-                boxShadow: isAppUser
-                    ? [BoxShadow(color: const Color(0xFFFF8A3D).withOpacity(0.4), blurRadius: 6, offset: const Offset(0, 2))]
-                    : [],
-                border: isAppUser ? null : Border.all(color: Colors.white.withOpacity(0.1)),
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.transparent, // Resimdeki gibi şeffaf
+                border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.6), // Saydam beyaz çerçeve
               ),
               child: Text(
                 isAppUser ? 'Gönder' : 'Davet Et',
                 style: TextStyle(
-                  color: isAppUser ? Colors.white : Colors.white.withOpacity(0.6),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withOpacity(0.9), // Parlak beyaz metin
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400, // Daha soft font weight
+                  letterSpacing: 0.3,
                 ),
               ),
             ),
