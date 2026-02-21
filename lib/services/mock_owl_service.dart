@@ -250,10 +250,10 @@ class MockOwlService {
       ),
       for (var i = 1; i <= 11; i++)
         OwlLetter(
-          id: 'letter_mock_ahmet_\$i',
+          id: 'letter_mock_ahmet_$i',
           from: _friends[1].user, // Ahmet Kaya
           to: currentUser,
-          message: 'Ahmet\\'ten gelen test mektubu #\$i',
+          message: "Ahmet'ten gelen test mektubu #$i",
           sentAt: DateTime.now().subtract(Duration(minutes: 10 + i * 2)),
           deliveredAt: DateTime.now().subtract(Duration(minutes: 5 + i)),
         ),
