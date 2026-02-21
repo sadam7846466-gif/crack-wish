@@ -1878,9 +1878,9 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final dy = t * (owlCenter.dy - blockCenterY + (offset - floatY) * targetScaleAtT1);
         
         final rotation = t * 0.12;
-        // Zarfın hedef butona yaklaştığı son %15'lik kısmında (0.85) yavaşça eriyip/şeffaflaşıp kaybolmasını sağla
-        // Bu sayede butonun parlaması ile zarfın kaybolması birbirinin içine geçen daha yumuşak bir akış oluşturur.
-        final opacity = t > 0.85 ? (1.0 - ((t - 0.85) / 0.15)).clamp(0.0, 1.0) : 1.0;
+        // Zarfın butonla temas etmesine daha çok (son %8'lik, 0.92) varken şeffaflaşıp kaybolmasını sağla
+        // Bu sayede hedef butona gerçekten değdiği görünür ve sadece işin son anında yumuşakça yok olur.
+        final opacity = t > 0.92 ? (1.0 - ((t - 0.92) / 0.08)).clamp(0.0, 1.0) : 1.0;
 
         final mainDialog = Dialog(
           backgroundColor: Colors.transparent,
