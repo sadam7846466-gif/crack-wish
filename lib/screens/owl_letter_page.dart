@@ -856,41 +856,47 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       ),
                                     ),
                                     child: Row(
+                                      mainAxisAlignment: l.isRead ? MainAxisAlignment.start : MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
                                           color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
-                                          size: 20
+                                          size: l.isRead ? 20 : 26
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            l.isRead ? l.message : 'Kapalı Zarf',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: l.isRead ? Colors.white.withOpacity(0.5) : const Color(0xFFFF8A3D),
-                                              fontSize: 12,
-                                              fontWeight: l.isRead ? FontWeight.w500 : FontWeight.w600,
+                                        if (l.isRead) ...[
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              l.message,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.5),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          '${l.sentAt.day.toString().padLeft(2, '0')}/${l.sentAt.month.toString().padLeft(2, '0')} ${l.sentAt.hour.toString().padLeft(2, '0')}:${l.sentAt.minute.toString().padLeft(2, '0')}',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.3),
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                        if (l.attachedCookieId != null)
+                                          const SizedBox(width: 8),
                                           Text(
-                                            '🥠',
+                                            '${l.sentAt.day.toString().padLeft(2, '0')}/${l.sentAt.month.toString().padLeft(2, '0')} ${l.sentAt.hour.toString().padLeft(2, '0')}:${l.sentAt.minute.toString().padLeft(2, '0')}',
                                             style: TextStyle(
-                                              fontSize: 14,
-                                              color: l.cookieClaimed
-                                                  ? Colors.white.withOpacity(0.3)
-                                                  : null,
+                                              color: Colors.white.withOpacity(0.3),
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                        if (l.attachedCookieId != null)
+                                          Padding(
+                                            padding: EdgeInsets.only(left: l.isRead ? 6.0 : 8.0),
+                                            child: Text(
+                                              '🥠',
+                                              style: TextStyle(
+                                                fontSize: l.isRead ? 14 : 18,
+                                                color: l.cookieClaimed
+                                                    ? Colors.white.withOpacity(0.3)
+                                                    : null,
+                                              ),
                                             ),
                                           ),
                                       ],
