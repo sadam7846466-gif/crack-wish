@@ -1325,16 +1325,16 @@ class _ContactItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: isAppUser 
-                        ? const Color(0xFF4A7A6A).withOpacity(0.4) // Pastel yeşil mat zemin
+                        ? const Color(0xFF4A7A6A).withOpacity(0.15) // Daha soluk zemin
                         : Colors.white.withOpacity(0.04),
                     border: Border.all(
-                      color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.7) : Colors.white.withOpacity(0.2), 
+                      color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Daha soluk çerçeve
                       width: 0.8
                     ),
                     boxShadow: isAppUser
                         ? [
                             BoxShadow(
-                              color: const Color(0xFF6DE8B8).withOpacity(0.15),
+                              color: const Color(0xFF6DE8B8).withOpacity(0.05), // Daha az parlama
                               blurRadius: 10,
                               offset: const Offset(0, 0),
                             )
