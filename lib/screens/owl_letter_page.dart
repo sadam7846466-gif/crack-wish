@@ -803,13 +803,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF8A3D).withOpacity(0.15),
+                            color: const Color(0xFF6DAEE8).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFFF8A3D).withOpacity(0.35)),
+                            border: Border.all(color: const Color(0xFF6DAEE8).withOpacity(0.35)),
                           ),
                           child: Text(
                             '$unreadCount Yeni',
-                            style: const TextStyle(color: Color(0xFFFF8A3D), fontSize: 10, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: Color(0xFF6DAEE8), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
                       const SizedBox(width: 8),
@@ -846,23 +846,23 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                 child: BackdropFilter(
                                   filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                                   child: Container(
-                                    width: 48,
-                                    height: 48,
+                                    width: 40,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: l.isRead 
                                           ? Colors.white.withOpacity(0.04) 
-                                          : const Color(0xFFFF8A3D).withOpacity(0.12),
+                                          : const Color(0xFF4A6A8A).withOpacity(0.15),
                                       border: Border.all(
-                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
+                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
                                         width: 0.8
                                       ),
                                     ),
                                     child: Center(
                                       child: Icon(
                                         l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
-                                        size: l.isRead ? 20 : 24,
+                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
+                                        size: l.isRead ? 18 : 20,
                                       ),
                                     ),
                                   ),
