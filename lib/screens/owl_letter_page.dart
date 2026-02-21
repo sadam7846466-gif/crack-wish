@@ -484,10 +484,10 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.white.withOpacity(0.04),
-                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8),
+                        color: const Color(0xFF9A4A4A).withOpacity(0.15), // Pastel kırmızımsı mat zemin
+                        border: Border.all(color: const Color(0xFFE86D6D).withOpacity(0.35), width: 1.0), // Parlak pastel kırmızı çerçeve
                       ),
-                      child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                      child: const Text('Red', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
                     ),
                   ),
                 ),
