@@ -33,9 +33,9 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 380),
+      duration: const Duration(milliseconds: 450),
     );
-    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuart);
     _ctrl.forward();
     _pageCtrl = PageController(initialPage: _selectedTab);
     _service.loadMockData();
@@ -157,9 +157,15 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         child: ClipRect(
                           child: Opacity(
                             opacity: t.clamp(0.0, 1.0),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                              child: Column(
+                            child: OverflowBox(
+                              alignment: Alignment.center,
+                              minWidth: panelW,
+                              maxWidth: panelW,
+                              minHeight: panelH,
+                              maxHeight: panelH,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                child: Column(
                                 children: [
                                   // Baykuş
                                   Image.asset('assets/images/owl.webp', width: 48, height: 48),
@@ -230,6 +236,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             ),
                           ),
                         ),
+                      ),
                       ),
                     ),
                   ),
