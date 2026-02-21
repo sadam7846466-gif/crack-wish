@@ -1260,10 +1260,10 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.reply_rounded, color: Colors.white.withOpacity(0.9), size: 16),
+                        Icon(Icons.edit_rounded, color: Colors.white.withOpacity(0.9), size: 16),
                         const SizedBox(width: 8),
                         Text(
-                          'Yanıtla',
+                          'Mektup Yaz',
                           style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
                         ),
                       ],
