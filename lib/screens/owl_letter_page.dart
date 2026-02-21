@@ -865,12 +865,22 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            l.isRead ? 'Okunmuş Mektup' : 'Yeni Mektup!',
+                                            l.isRead ? l.message : 'Kapalı Zarf',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               color: l.isRead ? Colors.white.withOpacity(0.5) : const Color(0xFFFF8A3D),
                                               fontSize: 12,
                                               fontWeight: l.isRead ? FontWeight.w500 : FontWeight.w600,
                                             ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '${l.sentAt.day.toString().padLeft(2, '0')}/${l.sentAt.month.toString().padLeft(2, '0')} ${l.sentAt.hour.toString().padLeft(2, '0')}:${l.sentAt.minute.toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.3),
+                                            fontSize: 10,
                                           ),
                                         ),
                                         if (l.attachedCookieId != null)
