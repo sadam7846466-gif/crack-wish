@@ -901,6 +901,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   void _showReceivedLetter(BuildContext context, OwlLetter letter, Rect owlButtonRect) {
+    setState(() => _showingLetter = true);
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -968,7 +969,9 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           ),
         );
       },
-    );
+    ).then((_) {
+      if (mounted) setState(() => _showingLetter = false);
+    });
   }
 }
 
