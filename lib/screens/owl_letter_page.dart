@@ -146,38 +146,48 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                   // Baykuş
                                   Image.asset('assets/images/owl.webp', width: 48, height: 48),
                                   const SizedBox(height: 10),
-                                  // Arkadaşlarım ve Gelen Mektup yan yana
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _menuItem(
-                                          icon: Icons.people_rounded,
-                                          label: 'Arkadaşlarım',
-                                          isSelected: _selectedTab == 0,
-                                          onTap: () => setState(() => _selectedTab = 0),
-                                        ),
+                                  // Arkadaşlarım ve Gelen Mektup yan yana (Sleek Pill Tab)
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.06),
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.08),
+                                        width: 0.5,
                                       ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: _menuItem(
-                                          icon: Icons.mail_rounded,
-                                          label: 'Gelen Mektup',
-                                          isSelected: _selectedTab == 1,
-                                          onTap: () => setState(() => _selectedTab = 1),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: _menuItem(
+                                            icon: Icons.people_rounded,
+                                            label: 'Arkadaşlarım',
+                                            isSelected: _selectedTab == 0,
+                                            onTap: () => setState(() => _selectedTab = 0),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Expanded(
+                                          child: _menuItem(
+                                            icon: Icons.mail_rounded,
+                                            label: 'Gelen Mektup',
+                                            isSelected: _selectedTab == 1,
+                                            onTap: () => setState(() => _selectedTab = 1),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(height: 10),
-                                  // Arama alanı (sadece Arkadaşlarım sekmesinde)
                                   if (_selectedTab == 0)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                      margin: const EdgeInsets.only(top: 10),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(30),
+                                        color: Colors.black.withOpacity(0.25),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(0.1),
+                                          color: Colors.white.withOpacity(0.05),
                                           width: 0.5,
                                         ),
                                       ),
@@ -263,33 +273,37 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         onTap();
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(25),
           color: isSelected
-              ? Colors.white.withOpacity(0.18)
-              : Colors.white.withOpacity(0.06),
-          border: Border.all(
-            color: isSelected
-                ? Colors.white.withOpacity(0.25)
-                : Colors.white.withOpacity(0.08),
-            width: 0.5,
-          ),
+              ? Colors.white.withOpacity(0.15)
+              : Colors.transparent,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : [],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white.withOpacity(isSelected ? 1.0 : 0.6), size: 16),
-            const SizedBox(height: 3),
+            Icon(icon, color: Colors.white.withOpacity(isSelected ? 1.0 : 0.5), size: 14),
+            const SizedBox(width: 6),
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(isSelected ? 1.0 : 0.7),
+                color: Colors.white.withOpacity(isSelected ? 1.0 : 0.6),
                 fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],
@@ -363,7 +377,23 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
-          Text(req.from.emoji, style: const TextStyle(fontSize: 18)),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFF4CAF50).withOpacity(0.2),
+                  const Color(0xFF4CAF50).withOpacity(0.05),
+                ],
+              ),
+              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3), width: 1.5),
+            ),
+            child: Center(
+              child: Text(req.from.emoji, style: const TextStyle(fontSize: 18)),
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -377,12 +407,19 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _service.acceptRequest(req.id);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: const Color(0xFF4CAF50).withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFF4CAF50).withOpacity(0.85),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4CAF50).withOpacity(0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Text('Kabul', style: TextStyle(color: Colors.green[200], fontSize: 9, fontWeight: FontWeight.w600)),
+              child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
             ),
           ),
           const SizedBox(width: 4),
@@ -392,12 +429,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _service.rejectRequest(req.id);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: Colors.white.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.transparent,
+                border: Border.all(color: Colors.white.withOpacity(0.15)),
               ),
-              child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9)),
+              child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -409,20 +447,27 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     return GestureDetector(
       onTap: () => _showAddFriendDialog(),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
-          color: Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.black.withOpacity(0.15),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.5), size: 14),
-            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+              child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.8), size: 12),
+            ),
+            const SizedBox(width: 8),
             Text(
               'Arkadaş Ekle',
-              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w500),
+              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -1031,14 +1076,20 @@ class _ContactItem extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.1),
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFFFF8A3D).withOpacity(0.2),
+                  const Color(0xFFFF8A3D).withOpacity(0.05),
+                ],
+              ),
+              border: Border.all(color: const Color(0xFFFF8A3D).withOpacity(0.3), width: 1.5),
             ),
             child: Center(
-              child: Text(emoji, style: const TextStyle(fontSize: 16)),
+              child: Text(emoji, style: const TextStyle(fontSize: 18)),
             ),
           ),
           const SizedBox(width: 10),
@@ -1062,27 +1113,24 @@ class _ContactItem extends StatelessWidget {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: isAppUser
-                    ? const Color(0xFFFF8A3D).withOpacity(0.2)
-                    : Colors.white.withOpacity(0.08),
-                border: Border.all(
-                  color: isAppUser
-                      ? const Color(0xFFFF8A3D).withOpacity(0.4)
-                      : Colors.white.withOpacity(0.15),
-                  width: 0.5,
-                ),
+                borderRadius: BorderRadius.circular(20),
+                gradient: isAppUser
+                    ? const LinearGradient(colors: [Color(0xFFFF9A55), Color(0xFFFF7A22)])
+                    : null,
+                color: isAppUser ? null : Colors.white.withOpacity(0.06),
+                boxShadow: isAppUser
+                    ? [BoxShadow(color: const Color(0xFFFF8A3D).withOpacity(0.4), blurRadius: 6, offset: const Offset(0, 2))]
+                    : [],
+                border: isAppUser ? null : Border.all(color: Colors.white.withOpacity(0.1)),
               ),
               child: Text(
                 isAppUser ? 'Gönder' : 'Davet Et',
                 style: TextStyle(
-                  color: isAppUser
-                      ? const Color(0xFFFF8A3D)
-                      : Colors.white.withOpacity(0.5),
+                  color: isAppUser ? Colors.white : Colors.white.withOpacity(0.6),
                   fontSize: 10,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
