@@ -66,13 +66,13 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // ======================
   // ASSET YOLLARI
   // ======================
-  final String _cardBackAsset = 'assets/images/tarot/tarot_back.png';
+  final String _cardBackAsset = 'assets/images/tarot/tarot/card_back.png';
   final List<TarotCardDef> _allCards = [
     TarotCardDef(
       id: 0,
       nameTr: 'Deli',
       nameEn: 'The Fool',
-      frontAsset: 'assets/images/tarot/tarot/The Fool.png',
+      frontAsset: 'assets/images/tarot/tarot/The Fool.jpeg',
     ),
     TarotCardDef(
       id: 1,
@@ -84,121 +84,121 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 2,
       nameTr: 'Başrahibe',
       nameEn: 'The High Priestess',
-      frontAsset: 'assets/images/tarot/(The High Priestess).png',
+      frontAsset: 'assets/images/tarot/tarot/The High Priestess.png',
     ),
     TarotCardDef(
       id: 3,
       nameTr: 'İmparatoriçe',
       nameEn: 'The Empress',
-      frontAsset: 'assets/images/tarot/(The Empress).png',
+      frontAsset: 'assets/images/tarot/tarot/The Empress.png',
     ),
     TarotCardDef(
       id: 4,
       nameTr: 'İmparator',
       nameEn: 'The Emperor',
-      frontAsset: 'assets/images/tarot/(The Emperor).png',
+      frontAsset: 'assets/images/tarot/tarot/The Emperor.png',
     ),
     TarotCardDef(
       id: 5,
       nameTr: 'Aziz',
       nameEn: 'The Hierophant',
-      frontAsset: 'assets/images/tarot/(The Hierophant).png',
+      frontAsset: 'assets/images/tarot/tarot/The Hierophant.png',
     ),
     TarotCardDef(
       id: 6,
       nameTr: 'Aşıklar',
       nameEn: 'The Lovers',
-      frontAsset: 'assets/images/tarot/(The Lovers).png',
+      frontAsset: 'assets/images/tarot/tarot/The Lovers.png',
     ),
     TarotCardDef(
       id: 7,
       nameTr: 'Savaş Arabası',
       nameEn: 'The Chariot',
-      frontAsset: 'assets/images/tarot/(The Chariot).png',
+      frontAsset: 'assets/images/tarot/tarot/The Chariot.png',
     ),
     TarotCardDef(
       id: 8,
       nameTr: 'Güç',
       nameEn: 'Strength',
-      frontAsset: 'assets/images/tarot/(Strength).png',
+      frontAsset: 'assets/images/tarot/tarot/Strength.png',
     ),
     TarotCardDef(
       id: 9,
       nameTr: 'Ermiş',
       nameEn: 'The Hermit',
-      frontAsset: 'assets/images/tarot/(The Hermit).png',
+      frontAsset: 'assets/images/tarot/tarot/The Hermit.png',
     ),
     TarotCardDef(
       id: 10,
       nameTr: 'Kader Çarkı',
       nameEn: 'Wheel of Fortune',
-      frontAsset: 'assets/images/tarot/(Wheel of Fortune).png',
+      frontAsset: 'assets/images/tarot/tarot/Wheel of Fortune.png',
     ),
     TarotCardDef(
       id: 11,
       nameTr: 'Adalet',
       nameEn: 'Justice',
-      frontAsset: 'assets/images/tarot/(Justice).png',
+      frontAsset: 'assets/images/tarot/tarot/Justice.png',
     ),
     TarotCardDef(
       id: 12,
       nameTr: 'Asılan Adam',
       nameEn: 'The Hanged Man',
-      frontAsset: 'assets/images/tarot/(The Hanged Man).png',
+      frontAsset: 'assets/images/tarot/tarot/The Hanged Man.png',
     ),
     TarotCardDef(
       id: 13,
       nameTr: 'Ölüm',
       nameEn: 'Death',
-      frontAsset: 'assets/images/tarot/(Death).png',
+      frontAsset: 'assets/images/tarot/tarot/Death.png',
     ),
     TarotCardDef(
       id: 14,
       nameTr: 'Denge',
       nameEn: 'Temperance',
-      frontAsset: 'assets/images/tarot/(Temperance).png',
+      frontAsset: 'assets/images/tarot/tarot/Temperance.png',
     ),
     TarotCardDef(
       id: 15,
       nameTr: 'Şeytan',
       nameEn: 'The Devil',
-      frontAsset: 'assets/images/tarot/(The Devil).png',
+      frontAsset: 'assets/images/tarot/tarot/The Devil.png',
     ),
     TarotCardDef(
       id: 16,
       nameTr: 'Kule',
       nameEn: 'The Tower',
-      frontAsset: 'assets/images/tarot/(The Tower).png',
+      frontAsset: 'assets/images/tarot/tarot/The Tower.png',
     ),
     TarotCardDef(
       id: 17,
       nameTr: 'Yıldız',
       nameEn: 'The Star',
-      frontAsset: 'assets/images/tarot/(The Star).png',
+      frontAsset: 'assets/images/tarot/tarot/The Star.png',
     ),
     TarotCardDef(
       id: 18,
       nameTr: 'Ay',
       nameEn: 'The Moon',
-      frontAsset: 'assets/images/tarot/(The Moon).png',
+      frontAsset: 'assets/images/tarot/tarot/The Moon.png',
     ),
     TarotCardDef(
       id: 19,
       nameTr: 'Güneş',
       nameEn: 'The Sun',
-      frontAsset: 'assets/images/tarot/(The Sun).png',
+      frontAsset: 'assets/images/tarot/tarot/The Sun.png',
     ),
     TarotCardDef(
       id: 20,
       nameTr: 'Yargı',
       nameEn: 'Judgement',
-      frontAsset: 'assets/images/tarot/(Judgement).png',
+      frontAsset: 'assets/images/tarot/tarot/Judgement.png',
     ),
     TarotCardDef(
       id: 21,
       nameTr: 'Dünya',
       nameEn: 'The World',
-      frontAsset: 'assets/images/tarot/(The World).png',
+      frontAsset: 'assets/images/tarot/tarot/The World.png',
     ),
   ];
   // ======================
@@ -1114,38 +1114,23 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       width: 88,
       height: 138,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.25),
-          width: 0.8,
-        ),
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.20),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: ImageFiltered(
-          imageFilter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFAA7BD8),
-                  Color(0xFF8B5FC7),
-                  Color(0xFF6B3FA7),
-                  Color(0xFF8B5FC7),
-                  Color(0xFFAA7BD8),
-                ],
-                stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-              ),
-            ),
+        borderRadius: BorderRadius.circular(4),
+        child: Image.asset(
+          _cardBackAsset,
+          fit: BoxFit.fill,
+          cacheWidth: 200,
+          errorBuilder: (context, error, stackTrace) => const Center(
+            child: Icon(Icons.error, color: Colors.red),
           ),
         ),
       ),
@@ -1765,11 +1750,12 @@ class _CardImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(6),
       child: Image.asset(
         asset,
         width: width,
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
+        cacheWidth: 300,
         errorBuilder: (_, __, ___) {
           return Container(
             width: width,
@@ -1947,17 +1933,19 @@ class _ShareCard extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(4),
                   child: Image.asset(
                     a,
                     width: 40,
                     height: 62,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
+                    cacheWidth: 200,
                     errorBuilder: (_, __, ___) => Image.asset(
                       backAsset,
                       width: 40,
                       height: 62,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
+                      cacheWidth: 200,
                     ),
                   ),
                 ),
@@ -2036,17 +2024,19 @@ class _DetailBlock extends StatelessWidget {
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             child: Image.asset(
               cardAsset,
               width: 50,
               height: 78,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
+              cacheWidth: 200,
               errorBuilder: (_, __, ___) => Image.asset(
                 backAsset,
                 width: 50,
                 height: 78,
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
+                cacheWidth: 200,
               ),
             ),
           ),
