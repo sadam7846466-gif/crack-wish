@@ -503,30 +503,36 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   Widget _addFriendButton() {
     return GestureDetector(
       onTap: () => _showAddFriendDialog(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.black.withOpacity(0.15),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
-              child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.8), size: 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.04), // Tamamen siyah yerine çok şeffaf beyaz buz
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
-            const SizedBox(width: 8),
-            Text(
-              'Arkadaş Ekle',
-              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                  child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.8), size: 12),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Arkadaş Ekle',
+                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -2390,28 +2396,34 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   // Baykuşa Ver butonu (sol)
                   GestureDetector(
                     onTap: _hasText ? _send : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: _hasText
-                            ? const Color(0xFFFF8A3D).withOpacity(0.2)
-                            : Colors.white.withOpacity(0.06),
-                        border: Border.all(
-                          color: _hasText
-                              ? const Color(0xFFFF8A3D).withOpacity(0.4)
-                              : Colors.white.withOpacity(0.1),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Text(
-                        _selectedCookieId != null ? '🦉 Baykuşa Ver 🥠' : '🦉 Baykuşa Ver',
-                        style: TextStyle(
-                          color: _hasText
-                              ? const Color(0xFFFF8A3D)
-                              : Colors.white.withOpacity(0.3),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: _hasText
+                                ? const Color(0xFFFF8A3D).withOpacity(0.15)
+                                : Colors.white.withOpacity(0.04),
+                            border: Border.all(
+                              color: _hasText
+                                  ? const Color(0xFFFF8A3D).withOpacity(0.35)
+                                  : Colors.white.withOpacity(0.1),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            _selectedCookieId != null ? '🦉 Baykuşa Ver 🥠' : '🦉 Baykuşa Ver',
+                            style: TextStyle(
+                              color: _hasText
+                                  ? const Color(0xFFFF8A3D)
+                                  : Colors.white.withOpacity(0.3),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -2428,45 +2440,51 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         final selColor = _selectedCookieId != null
                             ? (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFFF8A3D))
                             : const Color(0xFFFF8A3D);
-                        return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: _selectedCookieId != null
-                            ? selColor.withOpacity(0.2)
-                            : Colors.white.withOpacity(0.1),
-                        border: Border.all(
-                          color: _selectedCookieId != null
-                              ? selColor.withOpacity(0.4)
-                              : Colors.white.withOpacity(0.15),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _selectedCookieId != null ? '🥠 Eklendi' : '🥠 Kurabiye Ekle',
-                            style: TextStyle(
-                              color: _selectedCookieId != null
-                                  ? Colors.white
-                                  : Colors.white.withOpacity(0.6),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          if (_showCookiePicker)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: Icon(
-                                Icons.keyboard_arrow_up_rounded,
-                                color: Colors.white.withOpacity(0.4),
-                                size: 14,
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: _selectedCookieId != null
+                                    ? selColor.withOpacity(0.15)
+                                    : Colors.white.withOpacity(0.04),
+                                border: Border.all(
+                                  color: _selectedCookieId != null
+                                      ? selColor.withOpacity(0.35)
+                                      : Colors.white.withOpacity(0.15),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _selectedCookieId != null ? '🥠 Eklendi' : '🥠 Kurabiye Ekle',
+                                    style: TextStyle(
+                                      color: _selectedCookieId != null
+                                          ? Colors.white
+                                          : Colors.white.withOpacity(0.6),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (_showCookiePicker)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: Icon(
+                                        Icons.keyboard_arrow_up_rounded,
+                                        color: Colors.white.withOpacity(0.4),
+                                        size: 14,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
-                        ],
-                      ),
-                    );
+                          ),
+                        );
                       },
                     ),
                   ),
