@@ -1324,15 +1324,29 @@ class _ContactItem extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: Colors.white.withOpacity(0.04), // Resimdeki gibi yarım mat zemin
-                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8), // Saydam beyaz çerçeve
+                    color: isAppUser 
+                        ? const Color(0xFFFF8A3D).withOpacity(0.12) // Sıcak turuncu (amber) hafif ton 
+                        : Colors.white.withOpacity(0.04),
+                    border: Border.all(
+                      color: isAppUser ? const Color(0xFFFF8A3D).withOpacity(0.4) : Colors.white.withOpacity(0.2), 
+                      width: 0.8
+                    ),
+                    boxShadow: isAppUser
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFFFF8A3D).withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 0),
+                            )
+                          ]
+                        : [],
                   ),
                   child: Text(
                     isAppUser ? 'Mektup Gönder' : 'Davet Et',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9), // Parlak beyaz metin
+                      color: isAppUser ? const Color(0xFFFFECCC) : Colors.white.withOpacity(0.9), // Mektup gönderdeyken hafif altın/sarımtırak beyaz
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
                       letterSpacing: 0.3,
                     ),
                   ),
