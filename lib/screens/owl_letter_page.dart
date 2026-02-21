@@ -746,7 +746,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
+              _BouncingNode(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   setState(() {
@@ -851,7 +851,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             children: senderLetters.map((l) {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 12), // Öğeler arası yatay boşluk
-                                child: GestureDetector(
+                                child: _BouncingNode(
                                   onTap: () {
                                     HapticFeedback.lightImpact();
                                     _service.markAsRead(l.id);
@@ -1426,7 +1426,7 @@ class _ContactItem extends StatelessWidget {
                   ],
                 ),
               ),
-              GestureDetector(
+              _BouncingNode(
                 onTap: () {
                   if (isAppUser) {
                     _showLetterPaper(context);
@@ -2880,4 +2880,50 @@ class _EnvelopeFlapClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+// ==== YAYLANAN (BOUNCING) TIKLAMA WIDGET'I ====
+class _BouncingNode extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _BouncingNode({required this.child, required this.onTap});
+
+  @override
+  State<_BouncingNode> createState() => _BouncingNodeState();
+}
+
+class _BouncingNodeState extends State<_BouncingNode> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scale = Tween<double>(begin: 1.0, end: 0.94).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuad));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => _ctrl.forward(),
+      onTapUp: (_) {
+        _ctrl.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _ctrl.reverse(),
+      child: ScaleTransition(
+        scale: _scale,
+        child: widget.child,
+      ),
+    );
+  }
 }
