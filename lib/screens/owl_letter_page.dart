@@ -179,68 +179,83 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  if (_selectedTab == 0)
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 10),
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: Colors.black.withOpacity(0.25),
-                                        border: Border.all(
-                                          color: Colors.white.withOpacity(0.05),
-                                          width: 0.5,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.search_rounded,
-                                            color: Colors.white.withOpacity(0.4),
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _searchCtrl,
-                                              onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.9),
-                                                fontSize: 12,
-                                              ),
-                                              decoration: InputDecoration(
-                                                hintText: 'Arkadaş ara...',
-                                                hintStyle: TextStyle(
-                                                  color: Colors.white.withOpacity(0.35),
-                                                  fontSize: 12,
-                                                ),
-                                                border: InputBorder.none,
-                                                isDense: true,
-                                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                                              ),
-                                            ),
-                                          ),
-                                          if (_searchQuery.isNotEmpty)
-                                            GestureDetector(
-                                              onTap: () {
-                                                _searchCtrl.clear();
-                                                setState(() => _searchQuery = '');
-                                              },
-                                              child: Icon(
-                                                Icons.close_rounded,
-                                                color: Colors.white.withOpacity(0.4),
-                                                size: 14,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  if (_selectedTab == 0)
-                                    const SizedBox(height: 10),
-                                  // İçerik
-                                  Expanded(
+                                  // Arama alanı (sadece Arkadaşlarım sekmesinde) - Pürüzsüz geçiş
+                                  AnimatedSize(
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOutCubic,
                                     child: _selectedTab == 0
-                                        ? _buildContactsList(br)
-                                        : _buildInbox(),
+                                        ? Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                margin: const EdgeInsets.only(top: 10),
+                                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(30),
+                                                  color: Colors.black.withOpacity(0.25),
+                                                  border: Border.all(
+                                                    color: Colors.white.withOpacity(0.05),
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.search_rounded,
+                                                      color: Colors.white.withOpacity(0.4),
+                                                      size: 16,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        controller: _searchCtrl,
+                                                        onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                                                        style: TextStyle(
+                                                          color: Colors.white.withOpacity(0.9),
+                                                          fontSize: 12,
+                                                        ),
+                                                        decoration: InputDecoration(
+                                                          hintText: 'Arkadaş ara...',
+                                                          hintStyle: TextStyle(
+                                                            color: Colors.white.withOpacity(0.35),
+                                                            fontSize: 12,
+                                                          ),
+                                                          border: InputBorder.none,
+                                                          isDense: true,
+                                                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (_searchQuery.isNotEmpty)
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _searchCtrl.clear();
+                                                          setState(() => _searchQuery = '');
+                                                        },
+                                                        child: Icon(
+                                                          Icons.close_rounded,
+                                                          color: Colors.white.withOpacity(0.4),
+                                                          size: 14,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                  // İçerik - Pürüzsüz Fade Geçişi
+                                  Expanded(
+                                    child: AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 350),
+                                      switchInCurve: Curves.easeOutCubic,
+                                      switchOutCurve: Curves.easeInCubic,
+                                      child: _selectedTab == 0
+                                          ? Container(key: const ValueKey('tab0'), child: _buildContactsList(br))
+                                          : Container(key: const ValueKey('tab1'), child: _buildInbox()),
+                                    ),
                                   ),
                                 ],
                               ),
