@@ -830,7 +830,10 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 child: isExpanded
                     ? Padding(
                         padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 8),
-                        child: Column(
+                        child: Wrap(
+                          spacing: 12, // Düğmeler arası yatay boşluk
+                          runSpacing: 12, // Düğmeler arası dikey boşluk
+                          alignment: WrapAlignment.start,
                           children: senderLetters.map((l) {
                             return GestureDetector(
                               onTap: () {
@@ -838,73 +841,29 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                 _service.markAsRead(l.id);
                                 _showReceivedLetter(context, l, br);
                               },
-                              child: Align(
-                                alignment: l.isRead ? Alignment.center : Alignment.centerLeft, // Açılmamış zarfları sola veya ortaya alabiliriz, default sola koyalım ki diğerleriyle hizalı başlasın
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(40),
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                    child: Container(
-                                      margin: const EdgeInsets.only(bottom: 8),
-                                      padding: l.isRead 
-                                          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) // Dikey padding hafif kısıldı ki çok şişman (kalın) kapsül olmasın
-                                          : const EdgeInsets.all(12), // Açılmamış zarfta eşit kenar payı
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(40),
-                                        color: l.isRead 
-                                            ? Colors.white.withOpacity(0.04) 
-                                            : const Color(0xFFFF8A3D).withOpacity(0.12),
-                                        border: Border.all(
-                                          color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
-                                          width: 0.8
-                                        ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: l.isRead 
+                                          ? Colors.white.withOpacity(0.04) 
+                                          : const Color(0xFFFF8A3D).withOpacity(0.12),
+                                      border: Border.all(
+                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
+                                        width: 0.8
                                       ),
-                                      child: Row(
-                                        mainAxisSize: l.isRead ? MainAxisSize.max : MainAxisSize.min, // Açılmamışsa sadece gerektiği kadar genişlesin
-                                        children: [
-                                        Icon(
-                                          l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                          color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
-                                          size: l.isRead ? 20 : 26
-                                        ),
-                                        if (l.isRead) ...[
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Text(
-                                              l.message,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.5),
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            '${l.sentAt.day.toString().padLeft(2, '0')}/${l.sentAt.month.toString().padLeft(2, '0')} ${l.sentAt.hour.toString().padLeft(2, '0')}:${l.sentAt.minute.toString().padLeft(2, '0')}',
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.3),
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                        ],
-                                        if (l.isRead && l.attachedCookieId != null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 6.0),
-                                            child: Text(
-                                              '🥠',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: l.cookieClaimed
-                                                    ? Colors.white.withOpacity(0.3)
-                                                    : null,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
                                     ),
+                                    child: Center(
+                                      child: Icon(
+                                        l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
+                                        size: l.isRead ? 20 : 24,
+                                      ),
                                     ),
                                   ),
                                 ),
