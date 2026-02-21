@@ -220,7 +220,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       children: [
                                         _buildContactsTab(br),
                                         _buildDiscoverTab(br),
-                                        _buildInboxTab(),
+                                        _buildInboxTab(br),
                                       ],
                                     ),
                                   ),
@@ -354,8 +354,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
-  Widget _buildInboxTab() {
-    return _buildInbox();
+  Widget _buildInboxTab(Rect br) {
+    return _buildInbox(br);
   }
 
   Widget _buildContactsList(Rect br) {
@@ -649,7 +649,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
-  Widget _buildInbox() {
+  Widget _buildInbox(Rect br) {
     final letters = _service.inbox;
     final pending = _service.pendingLetters;
 
@@ -699,7 +699,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               onTap: () {
                 HapticFeedback.lightImpact();
                 _service.markAsRead(letter.id);
-                _showReceivedLetter(context, letter);
+                _showReceivedLetter(context, letter, br);
               },
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -759,7 +759,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
-  void _showReceivedLetter(BuildContext context, OwlLetter letter) {
+  void _showReceivedLetter(BuildContext context, OwlLetter letter, Rect owlButtonRect) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -787,6 +787,42 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 }
                 if (mounted) setState(() {});
               },
+              onReply: () {
+                Navigator.pop(ctx); // Önce mektubu kapat
+                
+                // Mektup okuma penceresi kapandıktan hemen sonra (hafif gecikme ile) Mektup Yazma arayüzünü aç
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (!mounted) return;
+                  final friend = _service.searchFriends('').where((f) => f.user.id == letter.from.id).firstOrNull;
+                  
+                  setState(() => _showingLetter = true);
+                  showGeneralDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    barrierLabel: 'Close',
+                    barrierColor: Colors.black54,
+                    transitionDuration: const Duration(milliseconds: 350),
+                    pageBuilder: (c, a1, a2) => const SizedBox.shrink(),
+                    transitionBuilder: (c, a1, a2, child) {
+                      final cCurve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
+                      return Transform.scale(
+                        scale: 0.8 + 0.2 * cCurve.value,
+                        child: Opacity(
+                          opacity: a1.value,
+                          child: _LetterPaper(
+                            recipientName: letter.from.name,
+                            recipientEmoji: letter.from.emoji,
+                            owlButtonRect: owlButtonRect,
+                            friend: friend,
+                          ),
+                        ),
+                      );
+                    },
+                  ).then((_) {
+                    if (mounted) setState(() => _showingLetter = false);
+                  });
+                });
+              },
             ),
           ),
         );
@@ -804,6 +840,7 @@ class _ReceivedLetterView extends StatefulWidget {
   final String? cookieName;
   final bool cookieClaimed;
   final VoidCallback? onClaimCookie;
+  final VoidCallback? onReply;
 
   const _ReceivedLetterView({
     required this.senderName,
@@ -813,6 +850,7 @@ class _ReceivedLetterView extends StatefulWidget {
     this.cookieName,
     this.cookieClaimed = false,
     this.onClaimCookie,
+    this.onReply,
   });
 
   @override
@@ -1060,6 +1098,33 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                 ],
               ),
             ],
+            // Yanıtla Butonu (Herkeste çıkmalı)
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                widget.onReply?.call();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.reply_rounded, color: Colors.white.withOpacity(0.9), size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Yanıtla',
+                      style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
