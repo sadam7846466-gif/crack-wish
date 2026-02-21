@@ -1328,7 +1328,7 @@ class _ContactItem extends StatelessWidget {
                     border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8), // Saydam beyaz çerçeve
                   ),
                   child: Text(
-                    isAppUser ? 'Gönder' : 'Davet Et',
+                    isAppUser ? 'Mektup Gönder' : 'Davet Et',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.9), // Parlak beyaz metin
                       fontSize: 12,
