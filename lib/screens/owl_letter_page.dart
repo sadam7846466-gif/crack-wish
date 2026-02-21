@@ -2285,13 +2285,12 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         if (t == 0.0) return mainDialog;
 
         // Uçuş anında, baykuş butonunda emilim/parlama efekti (glow and absorb) oluşur.
-        // t değeri 0'dan 1'e gittikçe parlaklık yavaşça artıp söner.
-        // Parıltıyı buton alanının üstüne yerleştiriyoruz.
-        final glowOpacity = math.sin(t * math.pi); // Sine curve 0 -> 1 -> 0
-        // Arka plandaki karanlık katmanın üstüne, baykuş butonunun birebir kopyasını çıkarıyoruz.
-        // t > 0 olunca yavaşça belirir, kabarır (zarfı alır) ve sona doğru kaybolur.
-        final btnOpacity = (math.sin(t * math.pi) * 1.5).clamp(0.0, 1.0); // 0 -> 1 -> 0 (başta belirir, sonda kaybolur)
-        final btnScale = 1.0 + (glowOpacity * 0.15); // Zarf gelirken hafifçe büyür, kabarır
+        // Zarf sadece hedefe çok yaklaştığında (t > 0.75) parlama ortaya çıkar,
+        // temas gerçekleşirken kabarır ve tam temas anında (t = 1.0) kaybolur.
+        final effectT = t > 0.75 ? (t - 0.75) / 0.25 : 0.0;
+        final glowOpacity = math.sin(effectT * math.pi); // Sine curve 0 -> 1 -> 0
+        final btnOpacity = (math.sin(effectT * math.pi) * 1.5).clamp(0.0, 1.0); 
+        final btnScale = 1.0 + (glowOpacity * 0.15); // Zarf gelirken butonu biraz şişir
 
         final targetGlowEffect = Opacity(
           opacity: btnOpacity,
