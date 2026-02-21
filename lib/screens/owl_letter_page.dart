@@ -1357,12 +1357,11 @@ class _ContactItem extends StatelessWidget {
                         ),
                       ),
                       child: isAppUser
-                          ? Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: Icon(
-                                Icons.history_edu, 
-                                color: Colors.white.withOpacity(0.95), 
-                                size: 18, // Sadece ikon olunca boyu biraz daha büyük olmalı
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Text(
+                                '🪶', 
+                                style: TextStyle(fontSize: 16), // Renkli emoji olduğu için color vermeye gerek yok
                               ),
                             )
                           : Text(
