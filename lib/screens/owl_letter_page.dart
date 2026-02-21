@@ -1111,11 +1111,13 @@ class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
               color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
               width: widget.isSelected ? 1.0 : 0.6,
             ),
-            boxShadow: widget.isSelected
-                ? [
-                    BoxShadow(color: Colors.white.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 0))
-                  ]
-                : [],
+            boxShadow: [
+              BoxShadow(
+                color: widget.isSelected ? Colors.white.withOpacity(0.07) : Colors.transparent,
+                blurRadius: 10,
+                offset: const Offset(0, 0),
+              )
+            ],
           ),
           child: Text(
             widget.label,
