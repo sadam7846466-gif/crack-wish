@@ -1852,12 +1852,31 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final t = _pullAnim.value;
         // Baykuş butonunun tam merkezine doğru uç
         final owlCenter = widget.owlButtonRect.center;
-        final paperCenterX = screenWidth / 2;
-        // Mektubun görsel olarak başladığı tam koordinatını bulalım (Alignment(0, -0.25) sebebiyle yukarıda)
-        final paperCenterY = (screenHeight / 2) - (screenHeight * 0.55 * 0.125); 
-        final dx = t * (owlCenter.dx - paperCenterX);
-        final dy = t * (owlCenter.dy - paperCenterY);
-        final scale = 1.0 - t * 0.80; // Son %20 boyutuna kadar küçülsün, yok olmasın
+        
+        final blockCenterX = screenWidth / 2;
+        final blockCenterY = screenHeight / 2;
+        
+        final paperW = screenWidth * 0.85;
+        final envW = paperW * 0.58;
+        final envH = envW * 0.58;
+        final flapH = envH * 0.78;
+        final childHeight = envH + flapH + 40;
+        final parentHeight = screenHeight * 0.55;
+        
+        // Mektubun görsel olarak başladığı yer: Alignment(0, -0.25) sebebiyle parent merkezinden biraz yukarıdadır
+        final offset = 0.125 * (parentHeight - childHeight);
+        
+        // Zarf animasyonu bittiğinde üzerindeki süzülme efekti (floatY) yaklaşık 11.4 piksel aşağı itmiş durumdadır:
+        final floatY = math.sin(2.4 * math.pi) * 12.0; 
+        
+        // Son anında %20 boyutuna inecek
+        final targetScaleAtT1 = 0.20; 
+        final scale = 1.0 - t * (1.0 - targetScaleAtT1); 
+        
+        // Scale ve ekstra offset'ler hesaba katılarak mektubun tam hedefin merkezine girmesini sağlayan matematik:
+        final dx = t * (owlCenter.dx - blockCenterX);
+        final dy = t * (owlCenter.dy - blockCenterY + (offset - floatY) * targetScaleAtT1);
+        
         final rotation = t * 0.12;
         // Tam hedefin merkezine girdiği ana kadar (%96) sapa sağlam (opacity = 1.0) kalsın!
         final opacity = t > 0.96 ? (1.0 - ((t - 0.96) / 0.04)).clamp(0.0, 1.0) : 1.0;
