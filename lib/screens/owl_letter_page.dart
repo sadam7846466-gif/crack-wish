@@ -25,6 +25,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   late PageController _pageCtrl;
   final _searchCtrl = TextEditingController();
   String _searchQuery = '';
+  String? _expandedSenderId;
   final _service = MockOwlService();
 
   @override
@@ -691,6 +692,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       );
     }
 
+    // Mektupları gönderen kişiye göre grupla
+    final Map<String, List<OwlLetter>> groupedLetters = {};
+    for (final l in letters) {
+      groupedLetters.putIfAbsent(l.from.id, () => []).add(l);
+    }
+    
+    // Grupları en son gelen mektup saatine göre sırala
+    final groupedList = groupedLetters.entries.toList();
+    groupedList.sort((a, b) {
+      final aLatest = a.value.map((l) => l.sentAt).reduce((v, curr) => v.isAfter(curr) ? v : curr);
+      final bLatest = b.value.map((l) => l.sentAt).reduce((v, curr) => v.isAfter(curr) ? v : curr);
+      return bLatest.compareTo(aLatest);
+    });
+
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -717,17 +732,34 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             const SizedBox(height: 6),
           ],
         ],
-        ...letters.map((letter) {
+        ...groupedList.map((entry) {
+          final senderId = entry.key;
+          final senderLetters = entry.value;
+          
+          // Kişiye ait mektupları yeniden eskiye sıralama
+          senderLetters.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+          
+          final sender = senderLetters.first.from;
+          final unreadCount = senderLetters.where((l) => !l.isRead).length;
+          final isExpanded = _expandedSenderId == senderId;
+
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  _service.markAsRead(letter.id);
-                  _showReceivedLetter(context, letter, br);
+                  setState(() {
+                    if (isExpanded) {
+                      _expandedSenderId = null;
+                    } else {
+                      _expandedSenderId = senderId;
+                    }
+                  });
                 },
-                child: Padding(
+                child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: Colors.transparent, // Dokunulabilir alan için gerekli
                   child: Row(
                     children: [
                       Container(
@@ -739,7 +771,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                         ),
                         child: Center(
-                          child: Text(letter.from.emoji, style: const TextStyle(fontSize: 22)),
+                          child: Text(sender.emoji, style: const TextStyle(fontSize: 22)),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -749,54 +781,118 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              letter.from.name,
+                              sender.name,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.95),
                                 fontSize: 14,
-                                fontWeight: letter.isRead ? FontWeight.w500 : FontWeight.w700,
+                                fontWeight: unreadCount > 0 ? FontWeight.w700 : FontWeight.w500,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              letter.message,
+                              '${senderLetters.length} adet mektup',
                               style: TextStyle(
-                                color: letter.isRead ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.8), 
+                                color: Colors.white.withOpacity(0.4),
                                 fontSize: 11,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      if (letter.attachedCookieId != null)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Text(
-                            '🥠',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: letter.cookieClaimed
-                                  ? Colors.white.withOpacity(0.3)
-                                  : null,
-                            ),
-                          ),
-                        ),
-                      if (!letter.isRead)
+                      if (unreadCount > 0)
                         Container(
-                          width: 8,
-                          height: 8,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.amber[400],
-                            boxShadow: [
-                              BoxShadow(color: Colors.amber.withOpacity(0.4), blurRadius: 4, offset: Offset.zero),
-                            ],
+                            color: const Color(0xFFFF8A3D).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFFF8A3D).withOpacity(0.35)),
+                          ),
+                          child: Text(
+                            '$unreadCount Yeni',
+                            style: const TextStyle(color: Color(0xFFFF8A3D), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
+                      const SizedBox(width: 8),
+                      // Aç/Kapat yönlendirici oku
+                      AnimatedRotation(
+                        turns: isExpanded ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white.withOpacity(0.3), size: 20),
+                      ),
                     ],
                   ),
                 ),
+              ),
+              // Açıldığında alt tarafta beliren zarf listesi
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                child: isExpanded
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 8),
+                        child: Column(
+                          children: senderLetters.map((l) {
+                            return GestureDetector(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                _service.markAsRead(l.id);
+                                _showReceivedLetter(context, l, br);
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: l.isRead 
+                                          ? Colors.white.withOpacity(0.04) 
+                                          : const Color(0xFFFF8A3D).withOpacity(0.12),
+                                      border: Border.all(
+                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
+                                        width: 0.8
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                          color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
+                                          size: 20
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            l.isRead ? 'Okunmuş Mektup' : 'Yeni Mektup!',
+                                            style: TextStyle(
+                                              color: l.isRead ? Colors.white.withOpacity(0.5) : const Color(0xFFFF8A3D),
+                                              fontSize: 12,
+                                              fontWeight: l.isRead ? FontWeight.w500 : FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        if (l.attachedCookieId != null)
+                                          Text(
+                                            '🥠',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: l.cookieClaimed
+                                                  ? Colors.white.withOpacity(0.3)
+                                                  : null,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
               Divider(color: Colors.white.withOpacity(0.05), height: 1),
             ],
