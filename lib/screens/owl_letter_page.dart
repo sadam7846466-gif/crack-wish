@@ -1181,7 +1181,7 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
             // Kurabiye Al butonu
             if (hasCookie && !_claimed) ...[
               const SizedBox(height: 16),
-              GestureDetector(
+              _BouncingNode(
                 onTap: _claimCookie,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -1241,7 +1241,7 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
             ],
             // Yanıtla Butonu (Herkeste çıkmalı)
             const SizedBox(height: 16),
-            GestureDetector(
+            _BouncingNode(
               onTap: () {
                 HapticFeedback.mediumImpact();
                 widget.onReply?.call();
@@ -2437,7 +2437,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                       ),
                     );
                   },
-                  child: GestureDetector(
+                  child: _BouncingNode(
                     onTap: () => setState(() => _selectedCookieId = null),
                     child: Container(
                       width: 44,
@@ -2488,7 +2488,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Baykuşa Ver butonu (sol)
-                  GestureDetector(
+                  _BouncingNode(
                     onTap: _hasText ? _send : null,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
@@ -2524,7 +2524,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   ),
                   const SizedBox(width: 8),
                   // Kurabiye Ekle butonu (sağ)
-                  GestureDetector(
+                  _BouncingNode(
                     onTap: () {
                       HapticFeedback.lightImpact();
                       setState(() => _showCookiePicker = !_showCookiePicker);
@@ -2885,9 +2885,9 @@ class _EnvelopeFlapClipper extends CustomClipper<Path> {
 // ==== YAYLANAN (BOUNCING) TIKLAMA WIDGET'I ====
 class _BouncingNode extends StatefulWidget {
   final Widget child;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
-  const _BouncingNode({required this.child, required this.onTap});
+  const _BouncingNode({required this.child, this.onTap});
 
   @override
   State<_BouncingNode> createState() => _BouncingNodeState();
@@ -2912,12 +2912,16 @@ class _BouncingNodeState extends State<_BouncingNode> with SingleTickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onTap == null) {
+      return Opacity(opacity: 0.5, child: widget.child);
+    }
+    
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _ctrl.forward(),
       onTapUp: (_) {
         _ctrl.reverse();
-        widget.onTap();
+        widget.onTap!();
       },
       onTapCancel: () => _ctrl.reverse(),
       child: ScaleTransition(
