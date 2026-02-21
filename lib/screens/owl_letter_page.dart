@@ -1349,10 +1349,10 @@ class _ContactItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         color: isAppUser 
-                            ? const Color(0xFF4A7A6A).withOpacity(0.15) // Daha soluk zemin
+                            ? const Color(0xFF4A6A8A).withOpacity(0.15) // Şık buz mavisi mat zemin
                             : Colors.white.withOpacity(0.04),
                         border: Border.all(
-                          color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Daha soluk çerçeve
+                          color: isAppUser ? const Color(0xFF6DAEE8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Parlak buz mavisi çerçeve
                           width: 0.8
                         ),
                       ),
