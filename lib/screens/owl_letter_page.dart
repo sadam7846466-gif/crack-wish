@@ -1356,14 +1356,23 @@ class _ContactItem extends StatelessWidget {
                           width: 0.8
                         ),
                       ),
-                      child: Text(
-                        isAppUser ? 'Mektup Gönder' : 'Davet Et',
-                        style: TextStyle(
-                          color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
-                          fontSize: 11, // Font küçültüldü
-                          fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
-                          letterSpacing: 0.3,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isAppUser) ...[
+                            Icon(Icons.history_edu, color: Colors.white.withOpacity(0.9), size: 14),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            isAppUser ? 'Mektup Yaz' : 'Davet Et',
+                            style: TextStyle(
+                              color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
+                              fontSize: 11,
+                              fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
