@@ -1321,7 +1321,7 @@ class _ContactItem extends StatelessWidget {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: isAppUser 
@@ -1345,7 +1345,7 @@ class _ContactItem extends StatelessWidget {
                     isAppUser ? 'Mektup Gönder' : 'Davet Et',
                     style: TextStyle(
                       color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
-                      fontSize: 12,
+                      fontSize: 11, // Font küçültüldü
                       fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
                       letterSpacing: 0.3,
                     ),
