@@ -248,6 +248,15 @@ class MockOwlService {
         sentAt: DateTime.now().subtract(const Duration(hours: 1)),
         deliveredAt: DateTime.now().subtract(const Duration(minutes: 55)),
       ),
+      for (var i = 1; i <= 11; i++)
+        OwlLetter(
+          id: 'letter_mock_ahmet_\$i',
+          from: _friends[1].user, // Ahmet Kaya
+          to: currentUser,
+          message: 'Ahmet\\'ten gelen test mektubu #\$i',
+          sentAt: DateTime.now().subtract(Duration(minutes: 10 + i * 2)),
+          deliveredAt: DateTime.now().subtract(Duration(minutes: 5 + i)),
+        ),
     ]);
   }
 }
