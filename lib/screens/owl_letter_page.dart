@@ -906,12 +906,12 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       barrierDismissible: true,
       barrierLabel: 'Close',
       barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 350),
+      transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
       transitionBuilder: (ctx, a1, a2, child) {
-        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
+        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOut);
         return Transform.scale(
-          scale: 0.8 + 0.2 * curve.value,
+          scale: 0.9 + 0.1 * curve.value,
           child: Opacity(
             opacity: a1.value,
             child: _ReceivedLetterView(
@@ -2900,8 +2900,8 @@ class _BouncingNodeState extends State<_BouncingNode> with SingleTickerProviderS
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
-    _scale = Tween<double>(begin: 1.0, end: 0.94).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuad));
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 60));
+    _scale = Tween<double>(begin: 1.0, end: 0.94).animate(CurvedAnimation(parent: _ctrl, curve: Curves.linear));
   }
 
   @override
