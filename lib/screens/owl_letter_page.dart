@@ -1198,7 +1198,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
       final has = _textCtrl.text.trim().isNotEmpty;
       if (has != _hasText) setState(() => _hasText = has);
     });
-    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
+    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
     _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
     _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
@@ -1878,8 +1878,9 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         final dy = t * (owlCenter.dy - blockCenterY + (offset - floatY) * targetScaleAtT1);
         
         final rotation = t * 0.12;
-        // Tam hedefin merkezine girdiği ana kadar (%96) sapa sağlam (opacity = 1.0) kalsın!
-        final opacity = t > 0.96 ? (1.0 - ((t - 0.96) / 0.04)).clamp(0.0, 1.0) : 1.0;
+        // Zarfın hedef butona yaklaştığı son %15'lik kısmında (0.85) yavaşça eriyip/şeffaflaşıp kaybolmasını sağla
+        // Bu sayede butonun parlaması ile zarfın kaybolması birbirinin içine geçen daha yumuşak bir akış oluşturur.
+        final opacity = t > 0.85 ? (1.0 - ((t - 0.85) / 0.15)).clamp(0.0, 1.0) : 1.0;
 
         final mainDialog = Dialog(
           backgroundColor: Colors.transparent,
