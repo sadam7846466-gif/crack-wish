@@ -454,17 +454,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   HapticFeedback.mediumImpact();
                   _service.acceptRequest(req.id);
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: const Color(0xFF4A7A6A).withOpacity(0.4),
-                    border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.7), width: 1.0),
-                    boxShadow: [
-                      BoxShadow(color: const Color(0xFF6DE8B8).withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 0)),
-                    ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xFF4A7A6A).withOpacity(0.15),
+                        border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.35), width: 1.0),
+                      ),
+                      child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                    ),
                   ),
-                  child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
                 ),
               ),
               const SizedBox(width: 6),
@@ -473,14 +476,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   HapticFeedback.lightImpact();
                   _service.rejectRequest(req.id);
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.white.withOpacity(0.04),
-                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white.withOpacity(0.04),
+                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8),
+                      ),
+                      child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                    ),
                   ),
-                  child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
                 ),
               ),
             ],
@@ -1137,23 +1146,29 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                 HapticFeedback.mediumImpact();
                 widget.onReply?.call();
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.white.withOpacity(0.1),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.reply_rounded, color: Colors.white.withOpacity(0.9), size: 16),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Yanıtla',
-                      style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.reply_rounded, color: Colors.white.withOpacity(0.9), size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Yanıtla',
+                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1196,34 +1211,33 @@ class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
         scale: _isPressed ? 0.95 : 1.0,
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: widget.isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
-            border: Border.all(
-              color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
-              width: widget.isSelected ? 1.0 : 0.6,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: widget.isSelected ? Colors.white.withOpacity(0.07) : Colors.transparent,
-                blurRadius: 10,
-                offset: const Offset(0, 0),
-              )
-            ],
-          ),
-          child: Text(
-            widget.label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: widget.isSelected ? Colors.white : Colors.white.withOpacity(0.75),
-              fontSize: 12,
-              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
-              letterSpacing: 0.3,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: widget.isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
+                border: Border.all(
+                  color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
+                  width: widget.isSelected ? 1.0 : 0.6,
+                ),
+              ),
+              child: Text(
+                widget.label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: widget.isSelected ? Colors.white : Colors.white.withOpacity(0.75),
+                  fontSize: 12,
+                  fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
+              ),
             ),
           ),
         ),
@@ -1320,34 +1334,31 @@ class _ContactItem extends StatelessWidget {
                     HapticFeedback.lightImpact();
                   }
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: isAppUser 
-                        ? const Color(0xFF4A7A6A).withOpacity(0.15) // Daha soluk zemin
-                        : Colors.white.withOpacity(0.04),
-                    border: Border.all(
-                      color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Daha soluk çerçeve
-                      width: 0.8
-                    ),
-                    boxShadow: isAppUser
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF6DE8B8).withOpacity(0.05), // Daha az parlama
-                              blurRadius: 10,
-                              offset: const Offset(0, 0),
-                            )
-                          ]
-                        : [],
-                  ),
-                  child: Text(
-                    isAppUser ? 'Mektup Gönder' : 'Davet Et',
-                    style: TextStyle(
-                      color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
-                      fontSize: 11, // Font küçültüldü
-                      fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
-                      letterSpacing: 0.3,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: isAppUser 
+                            ? const Color(0xFF4A7A6A).withOpacity(0.15) // Daha soluk zemin
+                            : Colors.white.withOpacity(0.04),
+                        border: Border.all(
+                          color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Daha soluk çerçeve
+                          width: 0.8
+                        ),
+                      ),
+                      child: Text(
+                        isAppUser ? 'Mektup Gönder' : 'Davet Et',
+                        style: TextStyle(
+                          color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
+                          fontSize: 11, // Font küçültüldü
+                          fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
                     ),
                   ),
                 ),
