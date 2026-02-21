@@ -450,7 +450,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   ],
                 ),
               ),
-              GestureDetector(
+              _BouncingNode(
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   _service.acceptRequest(req.id);
@@ -472,7 +472,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 ),
               ),
               const SizedBox(width: 6),
-              GestureDetector(
+              _BouncingNode(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   _service.rejectRequest(req.id);
