@@ -178,15 +178,28 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                           },
                                         ),
                                       ),
-                                      const SizedBox(width: 14),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: _menuItem(
-                                          label: 'Gelen Mektup',
+                                          label: 'Bağlantılar',
                                           isSelected: _selectedTab == 1,
                                           onTap: () {
                                             if (_selectedTab != 1) {
                                               setState(() => _selectedTab = 1);
                                               _pageCtrl.animateToPage(1, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: _menuItem(
+                                          label: 'Gelen Mektup',
+                                          isSelected: _selectedTab == 2,
+                                          onTap: () {
+                                            if (_selectedTab != 2) {
+                                              setState(() => _selectedTab = 2);
+                                              _pageCtrl.animateToPage(2, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
                                             }
                                           },
                                         ),
@@ -206,6 +219,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       },
                                       children: [
                                         _buildContactsTab(br),
+                                        _buildDiscoverTab(br),
                                         _buildInboxTab(),
                                       ],
                                     ),
@@ -319,6 +333,68 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
+  // YENİ SEKMELER: Uygulama içi olmayan/veya rehberden gelenlerin gösterileceği yer.
+  Widget _buildDiscoverTab(Rect br) {
+    return Column(
+      children: [
+        // Bağlantılar için Arama Çubuğu
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.black.withOpacity(0.20),
+            border: Border.all(color: Colors.white.withOpacity(0.05), width: 0.5),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.person_search_rounded, color: Colors.white.withOpacity(0.35), size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
+                  decoration: InputDecoration(
+                    hintText: 'Kişilerini bul veya davet et...',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.contact_phone_rounded, color: Colors.white.withOpacity(0.15), size: 40),
+                const SizedBox(height: 10),
+                Text(
+                  'Rehberine Eriş',
+                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    'Uygulamayı kullananları bul ve kullanmayanlara davet gönder.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _addFriendButton(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildInboxTab() {
     return _buildInbox();
   }
@@ -361,62 +437,19 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
             ),
           ),
+          // ...requests.map((req) => _buildRequestItem(req)),
+          // vs. İsteğe göre istekler burada tutulabilir.
           ...requests.map((req) => _buildRequestItem(req)),
           const SizedBox(height: 12),
-          Divider(color: Colors.white.withOpacity(0.1), height: 1),
-          const SizedBox(height: 12),
-        ],
-        // Arkadaşlarım Başlığı (Eğer hem arama boşsa hem de liste varsa veya sadece görseldeki gibi ayırmak için)
-        if (_searchQuery.isEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Arkadaşlarım',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                // (İsteğe bağlı) Kullanıcı "Ortaya bir buton koy" diyordu, buraya "Tümünü Gör" veya "Tüm Kişiler" minik butonu eklenebilir.
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white.withOpacity(0.06),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    ),
-                    child: Text(
-                      'Kişileri Bul',
-                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
         // Arkadaş listesi
         ...friends.map((f) => _ContactItem(
               name: f.user.name,
               emoji: f.user.emoji,
               isAppUser: true,
-
               owlButtonRect: br,
               friend: f,
             )),
-        // Arkadaş ekle butonu
-        if (_searchQuery.isEmpty) ...[
-          const SizedBox(height: 8),
-          _addFriendButton(),
-        ],
       ],
     );
   }
