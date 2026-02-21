@@ -1356,23 +1356,15 @@ class _ContactItem extends StatelessWidget {
                           width: 0.8
                         ),
                       ),
-                      child: isAppUser
-                          ? const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '🪶', 
-                                style: TextStyle(fontSize: 16), // Renkli emoji olduğu için color vermeye gerek yok
-                              ),
-                            )
-                          : Text(
-                              'Davet Et',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
+                      child: Text(
+                        isAppUser ? 'Mektup Yaz' : 'Davet Et',
+                        style: TextStyle(
+                          color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
+                          fontSize: 11,
+                          fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
                     ),
                   ),
                 ),
