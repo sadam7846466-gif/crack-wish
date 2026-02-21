@@ -134,10 +134,24 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                               Colors.white.withOpacity(0.03 * t),
                             ],
                           ),
+                          // Kenarları parlak renkli cam ışığına dönüştüren muazzam efekt:
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.18 * t),
-                            width: 1,
+                            color: const Color(0xFFAEC4FF).withOpacity(0.3 * t), // Buzlu mavi parlaklık
+                            width: 1.2,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF5A8BFF).withOpacity(0.15 * t), // Dışa dönük mavi aydınlatma
+                              blurRadius: 40,
+                              spreadRadius: -10,
+                            ),
+                            BoxShadow(
+                              color: const Color(0xFFFF8A3D).withOpacity(0.10 * t), // Ters köşeye turuncu sıcaklık
+                              blurRadius: 40,
+                              offset: const Offset(10, 10),
+                              spreadRadius: -5,
+                            ),
+                          ],
                         ),
                         child: ClipRect(
                           child: Opacity(
