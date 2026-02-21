@@ -841,16 +841,16 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                               child: Align(
                                 alignment: l.isRead ? Alignment.center : Alignment.centerLeft, // Açılmamış zarfları sola veya ortaya alabiliriz, default sola koyalım ki diğerleriyle hizalı başlasın
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(l.isRead ? 16 : 40),
+                                  borderRadius: BorderRadius.circular(40),
                                   child: BackdropFilter(
                                     filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                                     child: Container(
                                       margin: const EdgeInsets.only(bottom: 8),
                                       padding: l.isRead 
-                                          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+                                          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) // Dikey padding hafif kısıldı ki çok şişman (kalın) kapsül olmasın
                                           : const EdgeInsets.all(12), // Açılmamış zarfta eşit kenar payı
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(l.isRead ? 16 : 40),
+                                        borderRadius: BorderRadius.circular(40),
                                         color: l.isRead 
                                             ? Colors.white.withOpacity(0.04) 
                                             : const Color(0xFFFF8A3D).withOpacity(0.12),
