@@ -414,73 +414,105 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildRequestItem(FriendRequest req) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  const Color(0xFF4CAF50).withOpacity(0.2),
-                  const Color(0xFF4CAF50).withOpacity(0.05),
-                ],
-              ),
-              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3), width: 1.5),
-            ),
-            child: Center(
-              child: Text(req.from.emoji, style: const TextStyle(fontSize: 18)),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              req.from.name,
-              style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 11),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              _service.acceptRequest(req.id);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: const Color(0xFF6D9A8D).withOpacity(0.95), // Ekrandaki "Kabul" butonundaki mat/pastel yeşil
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF6D9A8D).withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 0),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                    ),
+                    child: Center(
+                      child: Text(req.from.emoji, style: const TextStyle(fontSize: 22)),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 2,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF2E1420), width: 2),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
-            ),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _service.rejectRequest(req.id);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.transparent,
-                border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      req.from.name,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('5d önce aktifti', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                        const SizedBox(width: 6),
+                        Container(width: 5, height: 5, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF6DE8B8))),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w400, letterSpacing: 0.3)),
-            ),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  _service.acceptRequest(req.id);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: const Color(0xFF4A7A6A).withOpacity(0.4),
+                    border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.7), width: 1.0),
+                    boxShadow: [
+                      BoxShadow(color: const Color(0xFF6DE8B8).withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 0)),
+                    ],
+                  ),
+                  child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                ),
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _service.rejectRequest(req.id);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withOpacity(0.04),
+                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8),
+                  ),
+                  child: Text('Red', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        Divider(color: Colors.white.withOpacity(0.05), height: 1),
+      ],
     );
   }
 
@@ -1245,67 +1277,105 @@ class _ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  const Color(0xFFFF8A3D).withOpacity(0.2),
-                  const Color(0xFFFF8A3D).withOpacity(0.05),
+    // Tasarıma uygun mockup durumları simüle etmek
+    final isOnline = name.length.isEven;
+    final lastActiveTime = '${(name.length % 5) + 2}${name.length.isOdd ? 'd' : 's'} önce aktifti';
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                    ),
+                    child: Center(
+                      child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 2,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: isOnline ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF2E1420), width: 2),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              border: Border.all(color: const Color(0xFFFF8A3D).withOpacity(0.3), width: 1.5),
-            ),
-            child: Center(
-              child: Text(emoji, style: const TextStyle(fontSize: 18)),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              name,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              if (isAppUser) {
-                _showLetterPaper(context);
-              } else {
-                HapticFeedback.lightImpact();
-                // TODO: davet et
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.transparent, // Resimdeki gibi şeffaf
-                border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.6), // Saydam beyaz çerçeve
-              ),
-              child: Text(
-                isAppUser ? 'Gönder' : 'Davet Et',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9), // Parlak beyaz metin
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400, // Daha soft font weight
-                  letterSpacing: 0.3,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        if (isOnline) ...[
+                          Container(width: 5, height: 5, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF6DE8B8))),
+                          const SizedBox(width: 4),
+                          Text('Çevrimiçi', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                        ] else ...[
+                          Text(lastActiveTime, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                        ],
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
+              GestureDetector(
+                onTap: () {
+                  if (isAppUser) {
+                    _showLetterPaper(context);
+                  } else {
+                    HapticFeedback.lightImpact();
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withOpacity(0.04), // Resimdeki gibi yarım mat zemin
+                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.8), // Saydam beyaz çerçeve
+                  ),
+                  child: Text(
+                    isAppUser ? 'Gönder' : 'Davet Et',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9), // Parlak beyaz metin
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        Divider(color: Colors.white.withOpacity(0.05), height: 1),
+      ],
     );
   }
 }
