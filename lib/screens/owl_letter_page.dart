@@ -351,7 +351,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         // Gelen istekler
         if (requests.isNotEmpty && _searchQuery.isEmpty) ...[
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               'Arkadaşlık İstekleri',
               style: TextStyle(
@@ -362,15 +362,53 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             ),
           ),
           ...requests.map((req) => _buildRequestItem(req)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Divider(color: Colors.white.withOpacity(0.1), height: 1),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+        ],
+        // Arkadaşlarım Başlığı (Eğer hem arama boşsa hem de liste varsa veya sadece görseldeki gibi ayırmak için)
+        if (_searchQuery.isEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Arkadaşlarım',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                // (İsteğe bağlı) Kullanıcı "Ortaya bir buton koy" diyordu, buraya "Tümünü Gör" veya "Tüm Kişiler" minik butonu eklenebilir.
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white.withOpacity(0.06),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    ),
+                    child: Text(
+                      'Kişileri Bul',
+                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
         // Arkadaş listesi
         ...friends.map((f) => _ContactItem(
               name: f.user.name,
               emoji: f.user.emoji,
               isAppUser: true,
+
               owlButtonRect: br,
               friend: f,
             )),
