@@ -1371,12 +1371,12 @@ class _ContactItem extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'Close',
       barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 350),
+      transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
       transitionBuilder: (ctx, a1, a2, child) {
-        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
+        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOut);
         return Transform.scale(
-          scale: 0.8 + 0.2 * curve.value,
+          scale: 0.9 + 0.1 * curve.value,
           child: Opacity(
             opacity: a1.value,
             child: _LetterPaper(recipientName: name, recipientEmoji: emoji, owlButtonRect: owlButtonRect, friend: friend),
@@ -2920,7 +2920,9 @@ class _BouncingNodeState extends State<_BouncingNode> with SingleTickerProviderS
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _ctrl.forward(),
       onTapUp: (_) {
-        _ctrl.reverse();
+        Future.delayed(const Duration(milliseconds: 60), () {
+          if (mounted) _ctrl.reverse();
+        });
         widget.onTap!();
       },
       onTapCancel: () => _ctrl.reverse(),
