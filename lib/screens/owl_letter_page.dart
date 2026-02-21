@@ -838,26 +838,30 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                 _service.markAsRead(l.id);
                                 _showReceivedLetter(context, l, br);
                               },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      color: l.isRead 
-                                          ? Colors.white.withOpacity(0.04) 
-                                          : const Color(0xFFFF8A3D).withOpacity(0.12),
-                                      border: Border.all(
-                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
-                                        width: 0.8
+                              child: Align(
+                                alignment: l.isRead ? Alignment.center : Alignment.centerLeft, // Açılmamış zarfları sola veya ortaya alabiliriz, default sola koyalım ki diğerleriyle hizalı başlasın
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(l.isRead ? 16 : 40),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      padding: l.isRead 
+                                          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+                                          : const EdgeInsets.all(12), // Açılmamış zarfta eşit kenar payı
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(l.isRead ? 16 : 40),
+                                        color: l.isRead 
+                                            ? Colors.white.withOpacity(0.04) 
+                                            : const Color(0xFFFF8A3D).withOpacity(0.12),
+                                        border: Border.all(
+                                          color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFFFF8A3D).withOpacity(0.35), 
+                                          width: 0.8
+                                        ),
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: l.isRead ? MainAxisAlignment.start : MainAxisAlignment.center,
-                                      children: [
+                                      child: Row(
+                                        mainAxisSize: l.isRead ? MainAxisSize.max : MainAxisSize.min, // Açılmamışsa sadece gerektiği kadar genişlesin
+                                        children: [
                                         Icon(
                                           l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
                                           color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFFFF8A3D), 
