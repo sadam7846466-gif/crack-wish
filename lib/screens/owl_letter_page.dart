@@ -830,46 +830,50 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 child: isExpanded
                     ? Padding(
                         padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 8),
-                        child: Wrap(
-                          spacing: 12, // Düğmeler arası yatay boşluk
-                          runSpacing: 12, // Düğmeler arası dikey boşluk
-                          alignment: WrapAlignment.start,
-                          children: senderLetters.map((l) {
-                            return GestureDetector(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                _service.markAsRead(l.id);
-                                _showReceivedLetter(context, l, br);
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(40),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: l.isRead 
-                                          ? Colors.white.withOpacity(0.04) 
-                                          : const Color(0xFF4A6A8A).withOpacity(0.15),
-                                      border: Border.all(
-                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
-                                        width: 0.8
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
-                                        size: l.isRead ? 18 : 20,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
+                          child: Row(
+                            children: senderLetters.map((l) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 12), // Öğeler arası yatay boşluk
+                                child: GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    _service.markAsRead(l.id);
+                                    _showReceivedLetter(context, l, br);
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(40),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: l.isRead 
+                                              ? Colors.white.withOpacity(0.04) 
+                                              : const Color(0xFF4A6A8A).withOpacity(0.15),
+                                          border: Border.all(
+                                            color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
+                                            width: 0.8
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                            color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
+                                            size: l.isRead ? 18 : 20,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       )
                     : const SizedBox.shrink(),
