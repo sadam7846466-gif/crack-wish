@@ -828,9 +828,23 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
                 child: isExpanded
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 8),
+                    ? ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.transparent,
+                              Colors.white,
+                              Colors.white,
+                              Colors.transparent,
+                            ],
+                            stops: [0.0, 0.15, 0.95, 1.0], // Sol ve sağdan yavaşça silikleşme
+                          ).createShader(bounds);
+                        },
+                        blendMode: BlendMode.dstIn,
                         child: SingleChildScrollView(
+                          padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 16),
                           scrollDirection: Axis.horizontal,
                           physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
                           child: Row(
@@ -871,7 +885,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                     ),
                                   ),
                                 ),
-                              );
                             }).toList(),
                           ),
                         ),
