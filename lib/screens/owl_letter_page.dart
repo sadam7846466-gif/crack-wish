@@ -167,7 +167,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: _menuItem(
+                                        child: _AnimatedMenuItem(
                                           label: 'Arkadaşlarım',
                                           isSelected: _selectedTab == 0,
                                           onTap: () {
@@ -180,7 +180,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: _menuItem(
+                                        child: _AnimatedMenuItem(
                                           label: 'Bağlantılar',
                                           isSelected: _selectedTab == 1,
                                           onTap: () {
@@ -193,7 +193,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: _menuItem(
+                                        child: _AnimatedMenuItem(
                                           label: 'Gelen Mektup',
                                           isSelected: _selectedTab == 2,
                                           onTap: () {
@@ -243,47 +243,74 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
-  Widget _menuItem({
-    required String label,
-    required VoidCallback onTap,
-    bool isSelected = false,
-  }) {
+class _AnimatedMenuItem extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+  final bool isSelected;
+
+  const _AnimatedMenuItem({
+    required this.label,
+    required this.onTap,
+    this.isSelected = false,
+  });
+
+  @override
+  State<_AnimatedMenuItem> createState() => _AnimatedMenuItemState();
+}
+
+class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
         HapticFeedback.lightImpact();
-        onTap();
+        widget.onTap();
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 150),
         curve: Curves.easeOutCubic,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: isSelected ? Colors.white.withOpacity(0.12) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.08),
-            width: isSelected ? 1.0 : 0.5,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            // Seçili olmayan durum: Biraz daha belirgin yarı saydam bir beyaz alan (0.05 vs. yerine 0.08 gibi)
+            color: widget.isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
+            border: Border.all(
+              // Çizgiyi de bir tık daha az soluk yapalım
+              color: widget.isSelected ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.12),
+              width: widget.isSelected ? 1.0 : 0.6,
+            ),
+            boxShadow: widget.isSelected
+                ? [
+                    BoxShadow(color: Colors.white.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 0))
+                  ]
+                : [],
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(color: Colors.white.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 0))
-                ]
-              : [],
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white.withOpacity(isSelected ? 0.95 : 0.6),
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            letterSpacing: 0.3,
+          child: Text(
+            widget.label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              // Yazıyı da 0.6 yerine daha aydınlık 0.75'e çektim ki sönük kalmasın
+              color: widget.isSelected ? Colors.white : Colors.white.withOpacity(0.75),
+              fontSize: 12,
+              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+              letterSpacing: 0.3,
+            ),
           ),
         ),
       ),
     );
   }
+}
 
   Widget _buildContactsTab(Rect br) {
     return Column(
