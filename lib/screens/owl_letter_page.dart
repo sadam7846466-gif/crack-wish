@@ -890,13 +890,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                             ),
                                           ),
                                         ],
-                                        if (l.attachedCookieId != null)
+                                        if (l.isRead && l.attachedCookieId != null)
                                           Padding(
-                                            padding: EdgeInsets.only(left: l.isRead ? 6.0 : 8.0),
+                                            padding: const EdgeInsets.only(left: 6.0),
                                             child: Text(
                                               '🥠',
                                               style: TextStyle(
-                                                fontSize: l.isRead ? 14 : 18,
+                                                fontSize: 14,
                                                 color: l.cookieClaimed
                                                     ? Colors.white.withOpacity(0.3)
                                                     : null,
