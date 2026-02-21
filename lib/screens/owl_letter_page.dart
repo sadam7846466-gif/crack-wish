@@ -1198,7 +1198,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
       final has = _textCtrl.text.trim().isNotEmpty;
       if (has != _hasText) setState(() => _hasText = has);
     });
-    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _sendCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     _pullAnim = CurvedAnimation(parent: _sendCtrl, curve: Curves.easeInOutCubic);
     _foldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
     _envelopeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
