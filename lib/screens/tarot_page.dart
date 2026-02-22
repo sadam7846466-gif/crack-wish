@@ -454,6 +454,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // Gate: daily free + rewarded ad
   // ======================
   Future<bool> _ensureAllowance() async {
+    if (kDebugMode) return true;
     if (!_dailyFreeUsed) return true;
     if (_adCredits > 0) return true;
 
@@ -1487,8 +1488,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                           width: 88,
                                           height: 138,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(16),
-                                            border: Border.all(
+                                            borderRadius: BorderRadius.circular(isFilled ? 4 : 16),
+                                            border: isFilled ? null : Border.all(
                                               color: borderColor,
                                               width: borderWidth,
                                             ),
@@ -1500,18 +1501,26 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                             ] : null,
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius: BorderRadius.circular(isFilled ? 4 : 15),
                                             child: BackdropFilter(
                                               filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
                                               child: Container(
-                                                color: Colors.white.withOpacity(isFilled ? 0.10 : 0.08),
-                                                child: Center(
-                                                  child: Icon(
-                                                    isFilled ? Icons.auto_awesome : Icons.add_rounded,
-                                                    size: isFilled ? 18 : 22,
-                                                    color: Colors.white.withOpacity(isFilled ? 0.4 : 0.20),
-                                                  ),
-                                                ),
+                                                color: Colors.white.withOpacity(isFilled ? 0.0 : 0.08),
+                                                child: isFilled
+                                                    ? Image.asset(
+                                                        (_state == RitualState.revealed || _state == RitualState.revealing) && _revealedCount > i
+                                                            ? _safeFrontAsset(_selectedCardIndexes[i])
+                                                            : _cardBackAsset,
+                                                        fit: BoxFit.fill,
+                                                        cacheWidth: 200,
+                                                      )
+                                                    : Center(
+                                                        child: Icon(
+                                                          Icons.add_rounded,
+                                                          size: 22,
+                                                          color: Colors.white.withOpacity(0.20),
+                                                        ),
+                                                      ),
                                               ),
                                             ),
                                           ),
