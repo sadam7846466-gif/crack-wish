@@ -1,13 +1,19 @@
+import 'dart:math' as math;
+import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/liquid_glass_card.dart';
 import '../widgets/fade_page_route.dart';
 import 'home_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
+import 'notification_settings_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -24,6 +30,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  static final _mottledPainter = _MottledPainter();
   int _currentNavIndex = 2;
 
   void _openLanguagePicker() {
@@ -159,89 +166,179 @@ class _ProfilePageState extends State<ProfilePage> {
           );
           return Container(
             decoration: BoxDecoration(gradient: palette.bgGradient),
-            child: SafeArea(
-              bottom: false,
+            child: Stack(
+              children: [
+                // Same mottled overlay as home page
+                Positioned.fill(
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: _mottledPainter,
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  bottom: false,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _ProfileCard(onSettingsTap: () {}, onEditTap: () {}),
-                    const SizedBox(height: 24),
-                    
-                    // İstatistikler (Bento Kutuları)
-                    Row(
-                      children: [
-                        Expanded(child: _StatTile(label: l10n.statCookies, value: '23', icon: '🥠')),
-                        const SizedBox(width: 12),
-                        Expanded(child: _StatTile(label: l10n.statStreakDays, value: '7', icon: '🔥')),
-                        const SizedBox(width: 12),
-                        Expanded(child: _StatTile(label: l10n.statDreams, value: '12', icon: '🌙')),
-                      ],
+                    _ProfileCard(
+                      onSettingsTap: () {},
+                      onEditTap: () {},
+                      cookieCount: 128,
+                      owlNetworkCount: 14,
                     ),
-                    const SizedBox(height: 12),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        const double spacing = 12;
-                        final double itemWidth = (constraints.maxWidth - spacing) / 2;
-                        return Wrap(
-                          spacing: spacing,
-                          runSpacing: spacing,
-                          children: [
-                            _MiniActionButton(
-                              icon: Icons.auto_awesome_outlined,
-                              label: l10n.shortcutCollection,
-                              width: itemWidth,
-                              color: const Color(0xFF6A5ACD).withOpacity(0.15),
-                            ),
-                            _MiniActionButton(
-                              icon: Icons.people_outline_rounded,
-                              label: 'Baykuş Ağı',
-                              width: itemWidth,
-                              color: const Color(0xFF4A7A6A).withOpacity(0.15),
+                    const SizedBox(height: 24),
+
+                    // — Get Premium Banner
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: Navigate to premium page
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFFFD166),
+                              Color(0xFFFF9A5C),
+                              Color(0xFFFF6B6B),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFFD166).withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
                             ),
                           ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.25),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Center(
+                                child: Text('👑', style: TextStyle(fontSize: 22)),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Premium\'a Geç',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    'Sınırsız kurabiye ve özel özellikler',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.white.withOpacity(0.8),
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // — General
+                    _SectionLabel('Genel'),
+                    const SizedBox(height: 12),
+                    _ProfileMenuItem(
+                      icon: Icons.language_rounded,
+                      iconBgColor: const Color(0xFF5A8BFF),
+                      title: l10n.language,
+                      trailing: l10n.languageValue(languageValue),
+                      onTap: _openLanguagePicker,
+                    ),
+                    const SizedBox(height: 10),
+                    _ProfileMenuItem(
+                      icon: Icons.notifications_none_rounded,
+                      iconBgColor: const Color(0xFFFF6B6B),
+                      title: 'Bildirimler',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          FadePageRoute(page: const NotificationSettingsPage()),
                         );
                       },
                     ),
+                    const SizedBox(height: 10),
+                    _ProfileMenuItem(
+                      icon: Icons.person_outline_rounded,
+                      iconBgColor: const Color(0xFF7B61FF),
+                      title: 'Profil Ayarları',
+                      onTap: () {},
+                    ),
+
                     const SizedBox(height: 28),
-                    _SectionLabel('Tercihler'),
+
+                    // — Share & Support
+                    _SectionLabel('Paylaş & Destek'),
                     const SizedBox(height: 12),
-                    _SettingsTile(
-                      label: l10n.language,
-                      value: l10n.languageValue(languageValue),
-                      onTap: _openLanguagePicker,
-                      leadingIcon: Icons.language_rounded,
+                    _ProfileMenuItem(
+                      icon: Icons.share_rounded,
+                      iconBgColor: const Color(0xFF2DD4BF),
+                      title: 'Arkadaşlarınla Paylaş',
+                      onTap: () {},
                     ),
-                    const SizedBox(height: 8),
-                    _MinimalMenuItem(
-                      icon: Icons.notifications_none_rounded,
-                      title: 'Bildirimler',
-                      subtitle: 'Uyarı ve hatırlatıcılar',
-                    ),
-                    const SizedBox(height: 8),
-                    _MinimalMenuItem(
-                      icon: Icons.tune_rounded,
-                      title: 'Hesap Ayarları',
-                      subtitle: 'Gizlilik ve veriler',
-                    ),
-                    const SizedBox(height: 28),
-                    _SectionLabel('Destek'),
-                    const SizedBox(height: 12),
-                    _MinimalMenuItem(
-                      icon: Icons.favorite_border_rounded,
+                    const SizedBox(height: 10),
+                    _ProfileMenuItem(
+                      icon: Icons.star_border_rounded,
+                      iconBgColor: const Color(0xFFFFD166),
                       title: 'Uygulamayı Değerlendir',
-                      subtitle: 'Vlucky\'i çok sevdik',
+                      onTap: () {},
                     ),
-                    const SizedBox(height: 8),
-                    _MinimalMenuItem(
+                    const SizedBox(height: 10),
+                    _ProfileMenuItem(
                       icon: Icons.help_outline_rounded,
-                      title: 'Yardım ve Destek',
-                      subtitle: 'Bize ulaşın hediye kazanın',
+                      iconBgColor: const Color(0xFFC084FC),
+                      title: 'Yardım Merkezi',
+                      onTap: () {},
                     ),
+
+                    const SizedBox(height: 28),
+
+                    // — Log Out
+                    _ProfileMenuItem(
+                      icon: Icons.logout_rounded,
+                      iconBgColor: const Color(0xFFFF4D4D),
+                      title: 'Çıkış Yap',
+                      isDestructive: true,
+                      onTap: () {},
+                    ),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
+              ),
+              ],
             ),
           );
         },
@@ -256,156 +353,171 @@ class _ProfilePageState extends State<ProfilePage> {
 class _ProfileCard extends StatelessWidget {
   final VoidCallback onSettingsTap;
   final VoidCallback onEditTap;
+  final int cookieCount;
+  final int owlNetworkCount;
 
-  const _ProfileCard({required this.onSettingsTap, required this.onEditTap});
+  const _ProfileCard({
+    required this.onSettingsTap,
+    required this.onEditTap,
+    this.cookieCount = 0,
+    this.owlNetworkCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     final palette = AppThemeController.current;
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.08),
-            Colors.white.withOpacity(0.02),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF5A8BFF).withOpacity(0.08),
-            blurRadius: 30,
-            spreadRadius: -5,
+    return GlassCard(
+      useOwnLayer: true,
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 32),
+      shape: const LiquidRoundedSuperellipse(borderRadius: 28),
+      settings: const LiquidGlassSettings(
+        thickness: 30,
+        blur: 8,
+        glassColor: Colors.transparent,
+        chromaticAberration: 0.15,
+        lightIntensity: 0.8,
+        ambientStrength: 0.7,
+        refractiveIndex: 1.3,
+        saturation: 1.1,
+      ),
+      child: Column(
+        children: [
+          // Avatar with halo + camera badge
+          GestureDetector(
+            onTap: onEditTap,
+            child: Stack(
+              children: [
+                Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFD4B8A0), Color(0xFF964040)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.3),
+                        blurRadius: 24,
+                        spreadRadius: 4,
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.12),
+                        blurRadius: 44,
+                        spreadRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Image.asset('assets/images/owl.webp', width: 60, height: 60),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5A8BFF),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: onEditTap,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  l10n.profileUserTitle,
+                  style: const TextStyle(
+                    color: Color(0xFFFFD166),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.edit_rounded, color: Colors.white.withOpacity(0.5), size: 16),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Mistisizmin yolcusu',
+            style: TextStyle(
+              color: AppColors.textWhite.withOpacity(0.6),
+              fontSize: 13,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _ProfileStat(value: cookieCount, label: 'Kurabiye 🥠'),
+              Container(
+                width: 1,
+                height: 32,
+                color: Colors.white.withOpacity(0.1),
+              ),
+              _ProfileStat(value: owlNetworkCount, label: 'Baykuş Ağı 🦉'),
+            ],
           ),
         ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Row(
-          children: [
-            Container(
-              width: 76,
-              height: 76,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFD4B8A0), Color(0xFF964040)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF964040).withOpacity(0.4),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Image.asset('assets/images/owl.webp', width: 44, height: 44),
-              ),
-            ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        l10n.profileUserTitle,
-                        style: TextStyle(
-                          color: AppColors.textWhite,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Icon(Icons.verified_rounded, color: const Color(0xFF5A8BFF), size: 18),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Mistisizmin yolcusu',
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.6),
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _TagPill(
-                        text: l10n.tagTarot,
-                        icon: Icons.auto_awesome_outlined,
-                      ),
-                      const SizedBox(width: 8),
-                      _TagPill(
-                        text: l10n.tagDream,
-                        icon: Icons.nightlight_round,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
-class _StatTile extends StatelessWidget {
-  final String value;
+class _ProfileStat extends StatelessWidget {
+  final int value;
   final String label;
-  final String icon;
 
-  const _StatTile({
+  const _ProfileStat({
     required this.value,
     required this.label,
-    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
-        child: Column(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 8),
-            Text(
-              value,
+    return Column(
+      children: [
+        TweenAnimationBuilder<int>(
+          tween: IntTween(begin: 0, end: value),
+          duration: const Duration(milliseconds: 1800),
+          curve: Curves.easeOutCubic,
+          builder: (context, val, child) {
+            return Text(
+              val.toString(),
               style: const TextStyle(
                 color: AppColors.textWhite,
-                fontSize: 18,
+                fontSize: 24,
                 fontWeight: FontWeight.w800,
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: AppColors.textWhite.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-          ],
+            );
+          },
         ),
-      ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.textWhite.withOpacity(0.5),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -491,17 +603,21 @@ class _MiniActionButton extends StatelessWidget {
   }
 }
 
-class _SettingsTile extends StatelessWidget {
-  final String label;
-  final String value;
+class _ProfileMenuItem extends StatelessWidget {
+  final IconData icon;
+  final Color iconBgColor;
+  final String title;
+  final String? trailing;
   final VoidCallback onTap;
-  final IconData? leadingIcon;
+  final bool isDestructive;
 
-  const _SettingsTile({
-    required this.label,
-    required this.value,
+  const _ProfileMenuItem({
+    required this.icon,
+    required this.iconBgColor,
+    required this.title,
     required this.onTap,
-    this.leadingIcon,
+    this.trailing,
+    this.isDestructive = false,
   });
 
   @override
@@ -511,139 +627,52 @@ class _SettingsTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.02),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                leadingIcon ?? Icons.palette_outlined,
-                color: AppColors.textWhite.withOpacity(0.8),
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.95),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.5),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: AppColors.textWhite.withOpacity(0.3), size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MinimalMenuItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String? trailing;
-
-  const _MinimalMenuItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(10),
+                color: iconBgColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: Icon(icon, color: AppColors.textWhite.withOpacity(0.8), size: 18),
+                child: Icon(icon, color: iconBgColor, size: 20),
               ),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.95),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.5),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isDestructive
+                      ? const Color(0xFFFF4D4D)
+                      : AppColors.textWhite.withOpacity(0.95),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
-            if (trailing != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  trailing!,
-                  style: const TextStyle(
-                    color: AppColors.textWhite,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11,
-                  ),
+            if (trailing != null) ...[
+              Text(
+                trailing!,
+                style: TextStyle(
+                  color: AppColors.textWhite.withOpacity(0.4),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            if (trailing != null) const SizedBox(width: 8),
+              const SizedBox(width: 4),
+            ],
             Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textWhite.withOpacity(0.3),
-              size: 20,
+              color: AppColors.textWhite.withOpacity(0.25),
+              size: 22,
             ),
           ],
         ),
@@ -659,13 +688,16 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: AppColors.textWhite,
-        fontWeight: FontWeight.w800,
-        fontSize: 14,
-        letterSpacing: 0.2,
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          color: AppColors.textWhite.withOpacity(0.4),
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+          letterSpacing: 1.5,
+        ),
       ),
     );
   }
@@ -852,4 +884,52 @@ class ThemeGalleryPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MottledPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = math.Random(42);
+
+    final allColors = [
+      const Color(0xFFD4B8A0),
+      const Color(0xFFC8A890),
+      const Color(0xFFE0C8B0),
+      const Color(0xFF8B3A3A),
+      const Color(0xFF7A3030),
+      const Color(0xFF964040),
+      const Color(0xFFA04848),
+      const Color(0xFF6E2828),
+      const Color(0xFF883838),
+      const Color(0xFF1A3A5C),
+      const Color(0xFF2A4A6C),
+      const Color(0xFF1E3050),
+    ];
+
+    for (int i = 0; i < 26; i++) {
+      final color = allColors[rng.nextInt(allColors.length)];
+      final opacity = 0.28 + rng.nextDouble() * 0.30;
+      final radius = 80.0 + rng.nextDouble() * 170.0;
+      final x = rng.nextDouble() * size.width;
+      final y = rng.nextDouble() * size.height;
+
+      final paint = Paint()
+        ..shader = ui.Gradient.radial(
+          Offset(x, y),
+          radius,
+          [
+            color.withOpacity(opacity),
+            color.withOpacity(opacity * 0.75),
+            color.withOpacity(opacity * 0.25),
+            color.withOpacity(0),
+          ],
+          [0.0, 0.45, 0.75, 1.0],
+        );
+
+      canvas.drawCircle(Offset(x, y), radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

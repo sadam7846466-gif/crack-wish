@@ -729,21 +729,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   const SizedBox(height: 6),
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(4),
-                                    child: Image.asset(
-                                      assets[i],
+                                    child: SizedBox(
                                       height: 110,
-                                      fit: BoxFit.fill,
-                                      cacheWidth: 200,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    names[i],
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.cormorantGaramond(
-                                      color: Colors.white.withOpacity(0.85),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
+                                      width: 110 * (88 / 138),
+                                      child: _buildCardFront(_selectedCardIndexes[i]),
                                     ),
                                   ),
                                 ],
@@ -949,11 +938,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 child: showFront
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: Image.asset(
-                          frontAsset,
-                          fit: BoxFit.fill,
-                          cacheWidth: 200,
-                        ),
+                        child: _buildCardFront(cardIdx),
                       )
                     : _tarotCard(),
               ),
@@ -973,6 +958,52 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   String _safeFrontAsset(int idx) {
     final a = _allCards[idx].frontAsset;
     return a.isNotEmpty ? a : _cardBackAsset;
+  }
+
+  Widget _buildCardFront(int cardIdx) {
+    final frontAsset = _safeFrontAsset(cardIdx);
+    final name = _cardName(cardIdx);
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          frontAsset,
+          fit: BoxFit.fill,
+          cacheWidth: 200,
+        ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final h = constraints.maxHeight;
+            // Tüm isimlerin BİREBİR AYNI BOYUTTA olması için kartın boyuna (h) göre 
+            // dinamik ama tüm kartlar için eşit kalacak bir font puntosu hesaplıyoruz
+            
+            // FONT BOYUTU BÜYÜTÜLDÜ (0.040 -> 0.052)
+            final uniformFontSize = h * 0.052; 
+            
+            return Align(
+              // 0.92 fazla aşağıdaydı, 0.88 ile tam ortalayalım
+              alignment: const Alignment(0.0, 0.88),
+              child: FractionallySizedBox(
+                widthFactor: 0.85, // İsimlerin tek satıra sığması için daha geniş alan
+                child: Text(
+                  name.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: GoogleFonts.cormorantGaramond(
+                    color: const Color(0xFF2C1E0F).withOpacity(0.95),
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.0,
+                    height: 1.0,
+                    fontSize: uniformFontSize,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   // ======================
@@ -1411,13 +1442,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                           child: isFilled
                                               ? ClipRRect(
                                                   borderRadius: BorderRadius.circular(4),
-                                                  child: Image.asset(
-                                                    _safeFrontAsset(_tableCards[_selectedTablePositions[i]]),
-                                                    width: 88,
-                                                    height: 138,
-                                                    fit: BoxFit.fill,
-                                                    cacheWidth: 200,
-                                                  ),
+                                                  child: _buildCardFront(_tableCards[_selectedTablePositions[i]]),
                                                 )
                                               : ClipRRect(
                                                   borderRadius: BorderRadius.circular(15),
