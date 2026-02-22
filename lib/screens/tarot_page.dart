@@ -20,6 +20,7 @@ import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
 import '../services/storage_service.dart';
 import 'root_shell.dart';
+import 'tarot_meanings.dart';
 
 enum RitualState {
   gateCheck,
@@ -72,49 +73,49 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 0,
       nameTr: 'Deli',
       nameEn: 'The Fool',
-      frontAsset: 'assets/images/tarot/tarot/The Fool.jpeg',
+      frontAsset: 'assets/images/tarot/tarot/The_Fool.png',
     ),
     TarotCardDef(
       id: 1,
       nameTr: 'Büyücü',
       nameEn: 'The Magician',
-      frontAsset: 'assets/images/tarot/tarot/The Magician.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Magician.png',
     ),
     TarotCardDef(
       id: 2,
       nameTr: 'Başrahibe',
       nameEn: 'The High Priestess',
-      frontAsset: 'assets/images/tarot/tarot/The High Priestess.png',
+      frontAsset: 'assets/images/tarot/tarot/The_High_Priestess.png',
     ),
     TarotCardDef(
       id: 3,
       nameTr: 'İmparatoriçe',
       nameEn: 'The Empress',
-      frontAsset: 'assets/images/tarot/tarot/The Empress.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Empress.png',
     ),
     TarotCardDef(
       id: 4,
       nameTr: 'İmparator',
       nameEn: 'The Emperor',
-      frontAsset: 'assets/images/tarot/tarot/The Emperor.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Emperor.png',
     ),
     TarotCardDef(
       id: 5,
       nameTr: 'Aziz',
       nameEn: 'The Hierophant',
-      frontAsset: 'assets/images/tarot/tarot/The Hierophant.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hierophant.png',
     ),
     TarotCardDef(
       id: 6,
       nameTr: 'Aşıklar',
       nameEn: 'The Lovers',
-      frontAsset: 'assets/images/tarot/tarot/The Lovers.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Lovers.png',
     ),
     TarotCardDef(
       id: 7,
       nameTr: 'Savaş Arabası',
       nameEn: 'The Chariot',
-      frontAsset: 'assets/images/tarot/tarot/The Chariot.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Chariot.png',
     ),
     TarotCardDef(
       id: 8,
@@ -126,13 +127,13 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 9,
       nameTr: 'Ermiş',
       nameEn: 'The Hermit',
-      frontAsset: 'assets/images/tarot/tarot/The Hermit.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hermit.png',
     ),
     TarotCardDef(
       id: 10,
       nameTr: 'Kader Çarkı',
       nameEn: 'Wheel of Fortune',
-      frontAsset: 'assets/images/tarot/tarot/Wheel of Fortune.png',
+      frontAsset: 'assets/images/tarot/tarot/Wheel_of_Fortune.png',
     ),
     TarotCardDef(
       id: 11,
@@ -144,7 +145,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 12,
       nameTr: 'Asılan Adam',
       nameEn: 'The Hanged Man',
-      frontAsset: 'assets/images/tarot/tarot/The Hanged Man.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hanged_Man.png',
     ),
     TarotCardDef(
       id: 13,
@@ -162,31 +163,31 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 15,
       nameTr: 'Şeytan',
       nameEn: 'The Devil',
-      frontAsset: 'assets/images/tarot/tarot/The Devil.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Devil.png',
     ),
     TarotCardDef(
       id: 16,
       nameTr: 'Kule',
       nameEn: 'The Tower',
-      frontAsset: 'assets/images/tarot/tarot/The Tower.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Tower.png',
     ),
     TarotCardDef(
       id: 17,
       nameTr: 'Yıldız',
       nameEn: 'The Star',
-      frontAsset: 'assets/images/tarot/tarot/The Star.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Star.png',
     ),
     TarotCardDef(
       id: 18,
       nameTr: 'Ay',
       nameEn: 'The Moon',
-      frontAsset: 'assets/images/tarot/tarot/The Moon.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Moon.png',
     ),
     TarotCardDef(
       id: 19,
       nameTr: 'Güneş',
       nameEn: 'The Sun',
-      frontAsset: 'assets/images/tarot/tarot/The Sun.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Sun.png',
     ),
     TarotCardDef(
       id: 20,
@@ -198,7 +199,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       id: 21,
       nameTr: 'Dünya',
       nameEn: 'The World',
-      frontAsset: 'assets/images/tarot/tarot/The World.png',
+      frontAsset: 'assets/images/tarot/tarot/The_World.png',
     ),
   ];
   // ======================
@@ -561,6 +562,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _updateCtaText();
   }
 
+  /// 3 kart seçildi — yorum ekranını aç
   Future<void> _commitAndReveal() async {
     final allowed = await _ensureAllowance();
     if (!allowed) {
@@ -568,384 +570,288 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       return;
     }
     await _consumeAllowanceOnCommit();
-    await _startReveal();
-  }
 
-  Future<void> _startReveal() async {
     HapticFeedback.mediumImpact();
     _setStateSafe(() {
       _isBusy = true;
-      _state = RitualState.revealing;
-      _revealedCount = 0;
-
       _selectedCardIndexes = _selectedTablePositions
           .map((pos) => _tableCards[pos])
           .toList();
     });
-    _updateCtaText();
 
-    await Future.delayed(const Duration(milliseconds: 450));
-    if (!mounted) return;
-
-    for (int i = 0; i < 3; i++) {
-      HapticFeedback.mediumImpact();
-      _setStateSafe(() => _revealedCount = i + 1);
-      await Future.delayed(const Duration(milliseconds: 420));
-      if (!mounted) return;
-    }
+    // Yorumu üret
+    final reading = generateReading(
+      card1Id: _allCards[_selectedCardIndexes[0]].id,
+      card2Id: _allCards[_selectedCardIndexes[1]].id,
+      card3Id: _allCards[_selectedCardIndexes[2]].id,
+      card1Name: _cardName(_selectedCardIndexes[0]),
+      card2Name: _cardName(_selectedCardIndexes[1]),
+      card3Name: _cardName(_selectedCardIndexes[2]),
+      isTr: _isTr,
+    );
 
     _setStateSafe(() {
       _isBusy = false;
       _state = RitualState.revealed;
     });
     _updateCtaText();
-
     await _updateStreakOnCompleteRead();
     if (!mounted) return;
-    _openReadingSheet();
+    _openReadingSheet(reading);
   }
 
-  // ======================
-  // Reading generation
-  // ======================
-  Map<String, String> _makeReadingText() {
+  void _openReadingSheet(TarotReading reading) {
     final names = _selectedCardIndexes.map(_cardName).toList();
-    final fallback = _t('Kart', 'Card');
-    final a = names.isNotEmpty ? names[0] : fallback;
-    final b = names.length > 1 ? names[1] : fallback;
-    final c = names.length > 2 ? names[2] : fallback;
+    final assets = _selectedCardIndexes.map(_safeFrontAsset).toList();
 
-    String oneLiner;
-    switch (_topic) {
-      case TarotTopic.love:
-        oneLiner = _t(
-          'Kalbin netlik istiyor: $a → $b → $c çizgisinde doğru seçim açılıyor.',
-          'Your heart seeks clarity: the right choice opens along $a → $b → $c.',
-        );
-        break;
-      case TarotTopic.money:
-        oneLiner = _t(
-          'Bugün finansal yönde sadeleş: $a, sonra $b ile güçlen, $c ile sonucu al.',
-          'Simplify finances today: $a, then strengthen with $b, and seal it with $c.',
-        );
-        break;
-      case TarotTopic.career:
-        oneLiner = _t(
-          'Kariyerde anahtar: $a ile hazırlık, $b ile atılım, $c ile görünür başarı.',
-          'Career key: prepare with $a, advance with $b, and gain visibility with $c.',
-        );
-        break;
-      case TarotTopic.general:
-        oneLiner = _t(
-          'Günün mesajı: $a geçmişi kapatır, $b gücü toplar, $c yeni yolu açar.',
-          'Today’s message: $a closes the past, $b gathers strength, $c opens a new path.',
-        );
-        break;
-    }
-
-    final love = _topic == TarotTopic.love
-        ? _t(
-            'Duyguların netleşiyor; acele etme, açık konuş.',
-            'Your feelings are clarifying; do not rush, speak openly.',
-          )
-        : _t(
-            'İlişkide denge: küçük bir adım büyük rahatlama getirir.',
-            'Balance in relationships: a small step brings big relief.',
-          );
-    final money = _topic == TarotTopic.money
-        ? _t(
-            'Harcamayı kıs, tek hedefe odaklan; sabır kazandırır.',
-            'Cut spending, focus on one goal; patience pays.',
-          )
-        : _t(
-            'Parada sade plan: gereksizleri ele, istikrara dön.',
-            'A simple money plan: remove the unnecessary, return to stability.',
-          );
-    final career = _topic == TarotTopic.career
-        ? _t(
-            'Görünür ol: tek işi bitir, sonra bir üst adım.',
-            'Be visible: finish one task, then take the next step up.',
-          )
-        : _t(
-            'İş tarafında netlik: kısa bir karar uzun huzur getirir.',
-            'Clarity at work: a short decision brings long peace.',
-          );
-
-    return {
-      'one': oneLiner,
-      'love': love,
-      'money': money,
-      'career': career,
-      'past': _t(
-        '$a — seni buraya getiren yol. Öğrendiğin dersi unutma.',
-        '$a — the path that brought you here. Do not forget the lesson.',
-      ),
-      'now': _t(
-        '$b — mevcut enerjin. Sakin kal, gücün içeride.',
-        '$b — your current energy. Stay calm, your strength is within.',
-      ),
-      'future': _t(
-        '$c — olasılık. Küçük cesaret büyük kapı açar.',
-        '$c — possibility. Small courage opens a big door.',
-      ),
-    };
-  }
-
-  // ======================
-  // Save / Share
-  // ======================
-  Future<void> _saveToHistory() async {
-    final reading = _makeReadingText();
-    final today = _yyyyMmDd(DateTime.now());
-
-    final item = <String, dynamic>{
-      'ts': DateTime.now().millisecondsSinceEpoch,
-      'date': today,
-      'topic': _topic.name,
-      'cards': _selectedCardIndexes
-          .map((idx) => {'id': _allCards[idx].id, 'name': _cardName(idx)})
-          .toList(),
-      'oneLiner': reading['one'],
-      'love': reading['love'],
-      'money': reading['money'],
-      'career': reading['career'],
-    };
-
-    final raw = _prefs.getString(_kHistory);
-    final List<dynamic> list = raw == null
-        ? []
-        : (jsonDecode(raw) as List<dynamic>);
-    list.insert(0, item);
-
-    if (list.length > 200) {
-      list.removeRange(200, list.length);
-    }
-
-    await _prefs.setString(_kHistory, jsonEncode(list));
-    await StorageService.setTarotDoneToday();
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('✨ Kaydedildi'),
-        backgroundColor: const Color(0xFF1A0E3B),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  Future<void> _shareResultCard() async {
-    try {
-      final boundary =
-          _shareKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) return;
-
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      if (byteData == null) return;
-
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
-      final tempDir = await getTemporaryDirectory();
-      final file = File(
-        '${tempDir.path}/tarot_${DateTime.now().millisecondsSinceEpoch}.png',
-      );
-      await file.writeAsBytes(pngBytes);
-
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: _t('🔮 Bugünün tarot mesajı', '🔮 Today’s tarot message'));
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_t('Paylaşım başarısız', 'Share failed')),
-          backgroundColor: const Color(0xFF1A0E3B),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
-  void _openReadingSheet() {
-    final reading = _makeReadingText();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {
-        return _GlassSheet(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              14,
-              16,
-              16 + MediaQuery.of(ctx).padding.bottom,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Kartların Yorumu',
-                        style: GoogleFonts.unifrakturMaguntia(
-                          color: const Color(0xFFE2C48E),
-                          fontSize: 24,
-                          letterSpacing: 0.8,
+        return SafeArea(
+          top: false,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(ctx).size.height * 0.85,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF101428).withOpacity(0.88),
+                  border: Border(
+                    top: BorderSide(
+                      color: const Color(0xFFE2C48E).withOpacity(0.25),
+                    ),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    20, 18, 20, 20 + MediaQuery.of(ctx).padding.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(ctx),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        alignment: Alignment.center,
+                      const SizedBox(height: 16),
+
+                      // Başlık + Kapat
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _t('Kartların Yorumu', 'Your Reading'),
+                              style: GoogleFonts.unifrakturMaguntia(
+                                color: const Color(0xFFE2C48E),
+                                fontSize: 24,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(ctx),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.12),
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.white.withOpacity(0.75),
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Akış etiketi
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
-                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          reading.flowLabel,
+                          style: GoogleFonts.cormorantGaramond(
+                            color: const Color(0xFFE2C48E).withOpacity(0.85),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 3 kart görseli yan yana
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(3, (i) {
+                          final labels = _isTr
+                              ? ['Geçmiş', 'Şimdi', 'Yön']
+                              : ['Past', 'Present', 'Direction'];
+                          return Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: i == 0 ? 0 : 6,
+                                right: i == 2 ? 0 : 6,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    labels[i],
+                                    style: GoogleFonts.cormorantGaramond(
+                                      color: const Color(0xFFE2C48E).withOpacity(0.7),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Image.asset(
+                                      assets[i],
+                                      height: 110,
+                                      fit: BoxFit.fill,
+                                      cacheWidth: 200,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    names[i],
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.cormorantGaramond(
+                                      color: Colors.white.withOpacity(0.85),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Genel Tema
+                      _ReadingSection(
+                        icon: '🔮',
+                        title: _t('Genel Tema', 'General Theme'),
+                        text: reading.generalTheme,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Geçmiş Etkisi
+                      _ReadingSection(
+                        icon: '🌙',
+                        title: _t('Geçmiş Etkisi', 'Past Influence'),
+                        text: reading.pastInfluence,
+                        cardName: names[0],
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Şu An Enerjisi
+                      _ReadingSection(
+                        icon: '☀️',
+                        title: _t('Şu An Enerjisi', 'Present Energy'),
+                        text: reading.presentEnergy,
+                        cardName: names[1],
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Yakın Yön / Tavsiye
+                      _ReadingSection(
+                        icon: '⭐',
+                        title: _t('Yakın Yön', 'Direction'),
+                        text: reading.directionAdvice,
+                        cardName: names[2],
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Kapanış mesajı
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFE2C48E).withOpacity(0.08),
+                              const Color(0xFFE2C48E).withOpacity(0.03),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.12),
+                            color: const Color(0xFFE2C48E).withOpacity(0.15),
                           ),
                         ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white.withOpacity(0.75),
-                          size: 18,
+                        child: Text(
+                          reading.closingMessage,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.cormorantGaramond(
+                            color: const Color(0xFFE2C48E),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            height: 1.4,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    _t(
-                      'Kartların sana bugün ne söylüyor…',
-                      'What are the cards telling you today…',
-                    ),
-                    style: GoogleFonts.cormorantGaramond(
-                      color: Colors.white.withOpacity(0.70),
-                      fontSize: 15,
-                      fontStyle: FontStyle.italic,
-                    ),
+                      const SizedBox(height: 20),
+
+                      // Tekrar Karıştır butonu
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _resetToIdle();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFE2C48E).withOpacity(0.4),
+                              ),
+                            ),
+                            child: Text(
+                              _t('Tekrar Karıştır', 'Shuffle Again'),
+                              style: GoogleFonts.cormorantGaramond(
+                                color: const Color(0xFFE2C48E),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-
-                RepaintBoundary(
-                  key: _shareKey,
-                  child: _ShareCard(
-                    oneLiner: reading['one']!,
-                    love: reading['love']!,
-                    money: reading['money']!,
-                    career: reading['career']!,
-                    thumbAssets: _selectedCardIndexes
-                        .map((i) => _safeFrontAsset(i))
-                        .toList(),
-                    backAsset: _cardBackAsset,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _saveToHistory,
-                        icon: const Icon(Icons.star_border, size: 18),
-                        label: const Text('Kaydet'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFFE7D6A5),
-                          side: BorderSide(
-                            color: const Color(0xFFE7D6A5).withOpacity(0.5),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _shareResultCard,
-                        icon: const Icon(Icons.ios_share, size: 18),
-                        label: Text(_t('Paylaş', 'Share')),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE7D6A5),
-                          foregroundColor: const Color(0xFF0A0E1A),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                _DetailBlock(
-                  title: _t('Geçmiş', 'Past'),
-                  text: reading['past']!,
-                  cardAsset: _safeFrontAsset(_selectedCardIndexes[0]),
-                  backAsset: _cardBackAsset,
-                  icon: Icons.nights_stay,
-                ),
-                const SizedBox(height: 10),
-                _DetailBlock(
-                  title: _t('Şimdi', 'Now'),
-                  text: reading['now']!,
-                  cardAsset: _safeFrontAsset(_selectedCardIndexes[1]),
-                  backAsset: _cardBackAsset,
-                  icon: Icons.wb_sunny,
-                ),
-                const SizedBox(height: 10),
-                _DetailBlock(
-                  title: 'Gelecek',
-                  text: reading['future']!,
-                  cardAsset: _safeFrontAsset(_selectedCardIndexes[2]),
-                  backAsset: _cardBackAsset,
-                  icon: Icons.auto_awesome,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Tekrar karıştır butonu
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _resetToIdle();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE7D6A5).withOpacity(0.5),
-                      ),
-                    ),
-                    child: Text(
-                      _t('Tekrar Karıştır', 'Shuffle Again'),
-                      style: const TextStyle(
-                        color: Color(0xFFE7D6A5),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -977,7 +883,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     // Hide the card from deck immediately
     setState(() => _hiddenCards.add(index));
     
-    await _animateCardToSlot(cardKey, _slotKeys[slotIndex]);
+    await _animateCardToSlot(cardKey, _slotKeys[slotIndex], index);
 
     if (!mounted) return;
     setState(() {
@@ -993,7 +899,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _animateCardToSlot(GlobalKey fromKey, GlobalKey toKey) async {
+  Future<void> _animateCardToSlot(GlobalKey fromKey, GlobalKey toKey, int tablePosition) async {
     final overlay = Overlay.of(context);
     final fromBox = fromKey.currentContext?.findRenderObject() as RenderBox?;
     final toBox = toKey.currentContext?.findRenderObject() as RenderBox?;
@@ -1003,6 +909,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     final to = toBox.localToGlobal(Offset.zero);
     final fromSize = fromBox.size;
     final toSize = toBox.size;
+    final cardIdx = _tableCards[tablePosition];
+    final frontAsset = _safeFrontAsset(cardIdx);
 
     final controller = AnimationController(
       vsync: this,
@@ -1017,17 +925,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     entry = OverlayEntry(
       builder: (_) {
         final t = curve.value;
-        // Position: smooth lerp from card pos to slot pos
         final dx = ui.lerpDouble(from.dx, to.dx, t) ?? from.dx;
         final dy = ui.lerpDouble(from.dy, to.dy, t) ?? from.dy;
-        // Arc lift: fades out near the end so card settles exactly at slot
         final lift = sin(t * pi) * -20 * (1.0 - t);
-        // Size: interpolate from card size to slot size
         final w = ui.lerpDouble(fromSize.width, toSize.width, t) ?? fromSize.width;
         final h = ui.lerpDouble(fromSize.height, toSize.height, t) ?? fromSize.height;
-        // No scale bounce — ends at exactly 1.0
-        const scale = 1.0;
-        // Flip: starts at 30% of animation
         final flip = t < 0.3 ? 0.0 : ((t - 0.3) / 0.7).clamp(0.0, 1.0);
         final showFront = flip >= 0.5;
         final flipAngle = flip < 0.5 ? flip * pi : (1.0 - flip) * pi;
@@ -1041,13 +943,19 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.001)
                 ..rotateY(flipAngle),
-              child: Transform.scale(
-                scale: scale,
-                child: SizedBox(
-                  width: w,
-                  height: h,
-                  child: showFront ? _selectedCardView() : _tarotCard(),
-                ),
+              child: SizedBox(
+                width: w,
+                height: h,
+                child: showFront
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.asset(
+                          frontAsset,
+                          fit: BoxFit.fill,
+                          cacheWidth: 200,
+                        ),
+                      )
+                    : _tarotCard(),
               ),
             ),
           ),
@@ -1500,30 +1408,33 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                               ),
                                             ] : null,
                                           ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(isFilled ? 4 : 15),
-                                            child: BackdropFilter(
-                                              filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                                              child: Container(
-                                                color: Colors.white.withOpacity(isFilled ? 0.0 : 0.08),
-                                                child: isFilled
-                                                    ? Image.asset(
-                                                        (_state == RitualState.revealed || _state == RitualState.revealing) && _revealedCount > i
-                                                            ? _safeFrontAsset(_selectedCardIndexes[i])
-                                                            : _cardBackAsset,
-                                                        fit: BoxFit.fill,
-                                                        cacheWidth: 200,
-                                                      )
-                                                    : Center(
+                                          child: isFilled
+                                              ? ClipRRect(
+                                                  borderRadius: BorderRadius.circular(4),
+                                                  child: Image.asset(
+                                                    _safeFrontAsset(_tableCards[_selectedTablePositions[i]]),
+                                                    width: 88,
+                                                    height: 138,
+                                                    fit: BoxFit.fill,
+                                                    cacheWidth: 200,
+                                                  ),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius: BorderRadius.circular(15),
+                                                  child: BackdropFilter(
+                                                    filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                                                    child: Container(
+                                                      color: Colors.white.withOpacity(0.08),
+                                                      child: Center(
                                                         child: Icon(
                                                           Icons.add_rounded,
                                                           size: 22,
                                                           color: Colors.white.withOpacity(0.20),
                                                         ),
                                                       ),
-                                              ),
-                                            ),
-                                          ),
+                                                    ),
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                     ),
@@ -1621,17 +1532,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             ),
           ),
 
-          if (_state == RitualState.revealing || _state == RitualState.revealed)
-            _RevealOverlay(
-              backAsset: _cardBackAsset,
-              selectedFrontAssets: _selectedCardIndexes
-                  .map(_safeFrontAsset)
-                  .toList(),
-              selectedNames: _selectedCardIndexes
-                  .map(_cardName)
-                  .toList(),
-              revealedCount: _revealedCount,
-            ),
+
         ],
       );  // Stack
         },  // builder
@@ -1790,301 +1691,6 @@ class _CardImage extends StatelessWidget {
   }
 }
 
-class _RevealOverlay extends StatelessWidget {
-  final String backAsset;
-  final List<String> selectedFrontAssets;
-  final List<String> selectedNames;
-  final int revealedCount;
-
-  const _RevealOverlay({
-    required this.backAsset,
-    required this.selectedFrontAssets,
-    required this.selectedNames,
-    required this.revealedCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final index = (revealedCount.clamp(1, 3) - 1);
-    final showIndex = index < 0 ? 0 : index;
-    final title = selectedNames.isNotEmpty ? selectedNames[showIndex] : '';
-
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(color: Colors.black.withOpacity(0.35)),
-          ),
-        ),
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFC9A24E).withOpacity(0.45),
-                      blurRadius: 40,
-                      spreadRadius: 8,
-                    ),
-                  ],
-                ),
-                child: _CardImage(
-                  asset: selectedFrontAssets.isNotEmpty
-                      ? selectedFrontAssets[showIndex]
-                      : backAsset,
-                  width: 190,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: GoogleFonts.unifrakturMaguntia(
-                  color: const Color(0xFFE2C48E),
-                  fontSize: 28,
-                  letterSpacing: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _GlassSheet extends StatelessWidget {
-  final Widget child;
-  const _GlassSheet({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF101428).withOpacity(0.82),
-              border: Border(
-                top: BorderSide(
-                  color: const Color(0xFFE2C48E).withOpacity(0.2),
-                ),
-              ),
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ShareCard extends StatelessWidget {
-  final String oneLiner;
-  final String love;
-  final String money;
-  final String career;
-  final List<String> thumbAssets;
-  final String backAsset;
-
-  const _ShareCard({
-    required this.oneLiner,
-    required this.love,
-    required this.money,
-    required this.career,
-    required this.thumbAssets,
-    required this.backAsset,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    String t(String tr, String en) =>
-        Localizations.localeOf(context).languageCode == 'tr' ? tr : en;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2C48E).withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            t('Bugünün ana mesajı:', 'Today’s main message:'),
-            style: GoogleFonts.cormorantGaramond(
-              color: Colors.white.withOpacity(0.60),
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            oneLiner,
-            style: GoogleFonts.cormorantGaramond(
-              color: const Color(0xFFE2C48E),
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              height: 1.3,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _MiniLine(label: t('Aşk', 'Love'), text: love),
-          _MiniLine(label: t('Para', 'Money'), text: money),
-          _MiniLine(label: t('Kariyer', 'Career'), text: career),
-          const SizedBox(height: 12),
-          Row(
-            children: thumbAssets.take(3).map((a) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.asset(
-                    a,
-                    width: 40,
-                    height: 62,
-                    fit: BoxFit.fill,
-                    cacheWidth: 200,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      backAsset,
-                      width: 40,
-                      height: 62,
-                      fit: BoxFit.fill,
-                      cacheWidth: 200,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniLine extends StatelessWidget {
-  final String label;
-  final String text;
-  const _MiniLine({required this.label, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 50,
-            child: Text(
-              label,
-              style: GoogleFonts.cormorantGaramond(
-                color: const Color(0xFFE2C48E),
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.cormorantGaramond(
-                color: Colors.white.withOpacity(0.75),
-                height: 1.25,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DetailBlock extends StatelessWidget {
-  final String title;
-  final String text;
-  final String cardAsset;
-  final String backAsset;
-  final IconData icon;
-
-  const _DetailBlock({
-    required this.title,
-    required this.text,
-    required this.cardAsset,
-    required this.backAsset,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: Image.asset(
-              cardAsset,
-              width: 50,
-              height: 78,
-              fit: BoxFit.fill,
-              cacheWidth: 200,
-              errorBuilder: (_, __, ___) => Image.asset(
-                backAsset,
-                width: 50,
-                height: 78,
-                fit: BoxFit.fill,
-                cacheWidth: 200,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(icon, color: const Color(0xFFE2C48E), size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      title,
-                      style: GoogleFonts.cormorantGaramond(
-                        color: const Color(0xFFE2C48E),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  text,
-                  style: GoogleFonts.cormorantGaramond(
-                    color: Colors.white.withOpacity(0.70),
-                    height: 1.35,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _FloatingTarotDeck extends StatefulWidget {
   final Future<void> Function(int index, GlobalKey key) onCardTap;
@@ -2513,4 +2119,74 @@ class _TarotMottledPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+// ============================================================
+// Yorum bölümü widget'ı
+// ============================================================
+class _ReadingSection extends StatelessWidget {
+  final String icon;
+  final String title;
+  final String text;
+  final String? cardName;
 
+  const _ReadingSection({
+    required this.icon,
+    required this.title,
+    required this.text,
+    this.cardName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: GoogleFonts.cormorantGaramond(
+                  color: const Color(0xFFE2C48E),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              if (cardName != null) ...[
+                const Spacer(),
+                Text(
+                  cardName!,
+                  style: GoogleFonts.cormorantGaramond(
+                    color: Colors.white.withOpacity(0.45),
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            text,
+            style: GoogleFonts.cormorantGaramond(
+              color: Colors.white.withOpacity(0.80),
+              fontSize: 14,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
