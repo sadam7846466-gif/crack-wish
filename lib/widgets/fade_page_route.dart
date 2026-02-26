@@ -44,6 +44,12 @@ class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
       : super(builder: (_) => page);
 
   @override
+  bool get popGestureEnabled => true;
+
+  @override
+  bool get maintainState => true;
+
+  @override
   Duration get transitionDuration => const Duration(milliseconds: 480);
 
   @override
@@ -53,39 +59,24 @@ class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // Geri kaydırma sırasında (user gesture): iOS sağa slide
-    if (navigator?.userGestureInProgress ?? false) {
-      return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
-        this, context, animation, secondaryAnimation, child,
-      );
-    }
+    // Always use Cupertino transitions (includes back gesture detector)
+    final cupertinoChild = super.buildTransitions(
+      context, animation, secondaryAnimation, child,
+    );
 
-    // Geri tuşu / pop: fade out
-    if (animation.status == AnimationStatus.reverse) {
+    // On forward animation (opening): add fade effect on top
+    if (animation.status == AnimationStatus.forward) {
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutQuart,
+      );
       return FadeTransition(
-        opacity: animation,
-        child: child,
+        opacity: curvedAnimation,
+        child: cupertinoChild,
       );
     }
 
-    // İleri açılış: fade + hafif slide up (FadePageRoute ile aynı)
-    final curvedAnimation = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutQuart,
-      reverseCurve: Curves.easeInCubic,
-    );
-
-    final slideUp = Tween<Offset>(
-      begin: const Offset(0, 0.03),
-      end: Offset.zero,
-    ).animate(curvedAnimation);
-
-    return FadeTransition(
-      opacity: curvedAnimation,
-      child: SlideTransition(
-        position: slideUp,
-        child: child,
-      ),
-    );
+    return cupertinoChild;
   }
 }
+

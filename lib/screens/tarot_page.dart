@@ -312,7 +312,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
     _starsCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 48),
+      duration: const Duration(seconds: 20),
     )..repeat();
     _slotGlowControllers = List.generate(5, (_) => AnimationController(
       vsync: this,
@@ -477,7 +477,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // Gate: daily free + rewarded ad
   // ======================
   Future<bool> _ensureAllowance() async {
-    if (kDebugMode) return true;
+    // if (kDebugMode) return true; // TEST: disabled to test ad popup
     if (!_dailyFreeUsed) return true;
     if (_adCredits > 0) return true;
 
@@ -497,6 +497,137 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       _adCredits -= 1;
       await _prefs.setInt(_kAdCredits, _adCredits);
     }
+  }
+
+  // ======================
+  // Ad Popup (Rewarded Ad Gate)
+  // ======================
+  Future<bool> _showAdPopup() async {
+    if (!mounted) return false;
+    final result = await showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'ad_popup',
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 400),
+      transitionBuilder: (context, a1, a2, child) {
+        return FadeTransition(
+          opacity: a1,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: a1, curve: Curves.easeOutBack),
+            child: child,
+          ),
+        );
+      },
+      pageBuilder: (context, _, __) {
+        return Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1030).withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.12),
+                    width: 0.8,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF6C3FA0).withOpacity(0.3),
+                      blurRadius: 40,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            const Color(0xFFE2C48E).withOpacity(0.25),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome,
+                        color: const Color(0xFFE2C48E).withOpacity(0.8),
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      _t('Bugünlük Ücretsiz Hakkın Bitti', 'Daily Free Reading Used'),
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cormorantGaramond(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Subtitle
+                    Text(
+                      _t(
+                        'Kısa bir reklam izleyerek yeni bir okuma hakkı kazanabilirsin.',
+                        'Watch a short ad to earn another reading.',
+                      ),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Watch Ad Button
+                    _AdWatchButton(
+                      label: _t('Reklam İzle  ▶', 'Watch Ad  ▶'),
+                      onComplete: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    // Close
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(false),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          _t('Vazgeç', 'Cancel'),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.35),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (result == true) {
+      // Grant ad credit
+      _adCredits += 1;
+      await _prefs.setInt(_kAdCredits, _adCredits);
+      return true;
+    }
+    return false;
   }
 
   // ======================
@@ -636,8 +767,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   Future<void> _commitAndReveal() async {
     final allowed = await _ensureAllowance();
     if (!allowed) {
-      _setMiniStatus(_t('Bugünlük hakkın bitti', 'Daily limit reached'), ms: 900);
-      return;
+      // Show ad popup instead of just mini status
+      final granted = await _showAdPopup();
+      if (!granted) return;
     }
     await _consumeAllowanceOnCommit();
 
@@ -1040,17 +1172,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001)
-                ..rotateY(flipAngle),
+                ..scale(cos(flipAngle).abs().clamp(0.01, 1.0), 1.0, 1.0),
               child: SizedBox(
                 width: w,
                 height: h,
                 child: showFront
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(12),
                         child: _buildCardFront(cardIdx),
                       )
-                    : _tarotCard(),
+                    : _tarotCard(0, 22),
               ),
             ),
           ),
@@ -1325,206 +1456,17 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   }
 
   Widget _buildCardFront(int cardIdx) {
-    final id = _allCards[cardIdx].id;
-    final name = _cardName(cardIdx);
-    final gradColors = _cardGradient(id);
-    final accent = _cardAccent(id);
-    final roman = _romanNumeral(id);
+    final frontAsset = _safeFrontAsset(cardIdx);
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: gradColors,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.hardEdge,
+      child: Transform.scale(
+        scale: 1.12,
+        child: Image.asset(
+          frontAsset,
+          fit: BoxFit.cover,
         ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // ── Subtle radial glow ──
-          Center(
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    accent.withOpacity(0.12),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // ── Inner golden frame ──
-          Positioned.fill(
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                border: Border.all(
-                  color: accent.withOpacity(0.3),
-                  width: 0.5,
-                ),
-              ),
-            ),
-          ),
-          // ── Top glass highlight ──
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: Container(
-              height: 25,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withOpacity(0.10),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // ── Roman numeral at top ──
-          Positioned(
-            top: 8, left: 0, right: 0,
-            child: Text(
-              roman,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.cormorantGaramond(
-                color: accent.withOpacity(0.7),
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-          // ── Small ornament line under numeral ──
-          Positioned(
-            top: 22, left: 0, right: 0,
-            child: Center(
-              child: Container(
-                width: 14,
-                height: 0.5,
-                color: accent.withOpacity(0.25),
-              ),
-            ),
-          ),
-          // ── Center symbol ──
-          Center(
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: CustomPaint(
-                painter: _TarotSymbolPainter(id: id, color: accent),
-              ),
-            ),
-          ),
-          // ── Small ornament line above name ──
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final h = constraints.maxHeight;
-              final fontSize = h * 0.048;
-              return Stack(
-                children: [
-                  Positioned(
-                    bottom: h * 0.16, left: 0, right: 0,
-                    child: Center(
-                      child: Container(
-                        width: 14,
-                        height: 0.5,
-                        color: accent.withOpacity(0.25),
-                      ),
-                    ),
-                  ),
-                  // ── Card name at bottom ──
-                  Align(
-                    alignment: const Alignment(0.0, 0.88),
-                    child: FractionallySizedBox(
-                      widthFactor: 0.88,
-                      child: Text(
-                        name.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.cormorantGaramond(
-                          color: accent.withOpacity(0.85),
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                          height: 1.0,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-          // ── Corner dots ──
-          Positioned(top: 7, left: 7, child: _accentDot(accent)),
-          Positioned(top: 7, right: 7, child: _accentDot(accent)),
-          Positioned(bottom: 7, left: 7, child: _accentDot(accent)),
-          Positioned(bottom: 7, right: 7, child: _accentDot(accent)),
-          // ── Second inner frame (double border) ──
-          Positioned.fill(
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(1),
-                border: Border.all(
-                  color: accent.withOpacity(0.12),
-                  width: 0.3,
-                ),
-              ),
-            ),
-          ),
-          // ── Corner flourish arcs ──
-          Positioned(
-            top: 4, left: 4,
-            child: CustomPaint(size: const Size(14, 14), painter: _CornerArcPainter(accent, 0)),
-          ),
-          Positioned(
-            top: 4, right: 4,
-            child: CustomPaint(size: const Size(14, 14), painter: _CornerArcPainter(accent, 1)),
-          ),
-          Positioned(
-            bottom: 4, left: 4,
-            child: CustomPaint(size: const Size(14, 14), painter: _CornerArcPainter(accent, 2)),
-          ),
-          Positioned(
-            bottom: 4, right: 4,
-            child: CustomPaint(size: const Size(14, 14), painter: _CornerArcPainter(accent, 3)),
-          ),
-          // ── Side dots (midpoints) ──
-          Positioned(top: 0, bottom: 0, left: 5, child: Center(child: _accentDot(accent))),
-          Positioned(top: 0, bottom: 0, right: 5, child: Center(child: _accentDot(accent))),
-          // ── Diamond above name ──
-          Positioned(
-            bottom: 26, left: 0, right: 0,
-            child: Center(
-              child: Transform.rotate(
-                angle: pi / 4,
-                child: Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: accent.withOpacity(0.35),
-                    borderRadius: BorderRadius.circular(0.5),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1581,7 +1523,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _tarotCard() {
+  Widget _tarotCard([int index = 0, int totalCards = 22]) {
     return Container(
       width: 88,
       height: 138,
@@ -1664,7 +1606,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            // ── Center mystical star ──
             Center(
               child: SizedBox(
                 width: 30,
@@ -2239,15 +2180,86 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      // Spacer to balance the back button
-                      const SizedBox(width: 40),
+                      // Credits indicator (same width as back button to keep title centered)
+                      Transform.translate(
+                        offset: const Offset(-10, 6),
+                        child: SizedBox(
+                        width: 40,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: BackdropFilter(
+                            filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.12),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.auto_awesome,
+                                    size: 11,
+                                    color: (!_dailyFreeUsed || _adCredits > 0)
+                                        ? const Color(0xFFE2C48E).withOpacity(0.8)
+                                        : Colors.white.withOpacity(0.25),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    !_dailyFreeUsed ? '1' : '$_adCredits',
+                                    style: TextStyle(
+                                      color: (!_dailyFreeUsed || _adCredits > 0)
+                                          ? Colors.white.withOpacity(0.85)
+                                          : Colors.white.withOpacity(0.3),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  _t('Kartlarını Seç', 'Pick Your Cards'),
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                AnimatedBuilder(
+                  animation: Listenable.merge([_bgPulseCtrl]),
+                  builder: (_, __) {
+                    final selected = _selectedTablePositions.length;
+                    final max = _maxSlots;
+                    final String subtitle;
+                    if (selected == 0) {
+                      subtitle = _t('Kartlarını Seç', 'Pick Your Cards');
+                    } else if (selected < max) {
+                      subtitle = _t('$selected / $max kart seçildi', '$selected / $max cards selected');
+                    } else {
+                      subtitle = _t('Yorumu Gör ✦', 'View Reading ✦');
+                    }
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 350),
+                      child: Text(
+                        subtitle,
+                        key: ValueKey(subtitle),
+                        style: TextStyle(
+                          color: selected >= max 
+                              ? const Color(0xFFE2C48E) 
+                              : Colors.white70,
+                          fontSize: 14,
+                          fontWeight: selected >= max ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 6),
                 // ── Decorative diamond line ornament ──
@@ -2386,7 +2398,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                       width: cardW,
                                                       height: cardH,
                                                       decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(4),
+                                                        borderRadius: BorderRadius.circular(12),
                                                         boxShadow: totalGlow > 0.05 ? [
                                                           BoxShadow(
                                                             color: const Color(0xFFE7D6A5).withOpacity(0.15 * totalGlow),
@@ -2395,7 +2407,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                         ] : null,
                                                       ),
                                                       child: ClipRRect(
-                                                        borderRadius: BorderRadius.circular(4),
+                                                        borderRadius: BorderRadius.circular(12),
                                                         child: _buildCardFront(_tableCards[_selectedTablePositions[i]]),
                                                       ),
                                                     );
@@ -2491,15 +2503,23 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                   },
                                                 ),
                                               const SizedBox(height: 6),
-                                              Text(
-                                                slotLabels[i],
-                                                style: TextStyle(
-                                                  color: isFilled 
-                                                      ? Colors.white.withOpacity(0.7)
-                                                      : Colors.white.withOpacity(0.35),
-                                                  fontSize: _isBuyukArkana ? 11 : 9,
-                                                  fontWeight: FontWeight.w500,
-                                                  letterSpacing: 0.5,
+                                              AnimatedSwitcher(
+                                                duration: const Duration(milliseconds: 400),
+                                                child: Text(
+                                                  isFilled 
+                                                      ? _cardName(_tableCards[_selectedTablePositions[i]])
+                                                      : slotLabels[i],
+                                                  key: ValueKey(isFilled 
+                                                      ? 'card_${_selectedTablePositions[i]}' 
+                                                      : 'label_$i'),
+                                                  style: TextStyle(
+                                                    color: isFilled 
+                                                        ? Colors.white.withOpacity(0.7)
+                                                        : Colors.white.withOpacity(0.35),
+                                                    fontSize: _isBuyukArkana ? 11 : 9,
+                                                    fontWeight: isFilled ? FontWeight.w600 : FontWeight.w500,
+                                                    letterSpacing: 0.5,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -2565,7 +2585,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                 _FloatingTarotDeck(
                                   key: ValueKey('deck_$_deckRebuildKey'),
                                   onCardTap: _selectCard,
-                                  cardBuilder: _tarotCard,
+                                  cardBuilder: (int idx, int total) => _tarotCard(idx, total),
                                   cardKeys: _cardKeys.sublist(0, _tableCount),
                                   selectedPositions: _selectedTablePositions,
                                   hiddenCards: _hiddenCards,
@@ -2574,22 +2594,23 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                           // ── Guide text ──
                           Transform.translate(
-                            offset: const Offset(0, -20),
+                            offset: const Offset(0, -35),
                             child: AnimatedBuilder(
                             animation: _bgPulseCtrl,
                             builder: (_, __) {
                               final selected = _selectedTablePositions.length;
                               final max = _maxSlots;
                               return Opacity(
-                                opacity: selected < max ? 0.5 : 0.0,
+                                opacity: selected < max ? 0.7 : 0.0,
                                 child: Text(
                                   selected == 0
                                       ? _t('Bir kart seç veya rastgele çek', 'Pick a card or shuffle')
                                       : _t('$selected / $max kart seçildi', '$selected / $max cards selected'),
                                   style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 11,
-                                    letterSpacing: 0.3,
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    letterSpacing: 0.5,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               );
@@ -3112,15 +3133,19 @@ class _StarsEffect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (_, __) {
-          return CustomPaint(
-            painter: _StarsPainter(t: animation.value),
-            size: Size.infinite,
-          );
-        },
+    return RepaintBoundary(
+      child: IgnorePointer(
+        child: AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) {
+            return CustomPaint(
+              painter: _StarsPainter(t: animation.value),
+              size: Size.infinite,
+              isComplex: true,
+              willChange: true,
+            );
+          },
+        ),
       ),
     );
   }
@@ -3137,7 +3162,7 @@ class _StarsPainter extends CustomPainter {
     final glowPaint = Paint()..color = Colors.white;
 
     // Background dust – subtle, spread everywhere
-    for (int i = 0; i < 8000; i++) {
+    for (int i = 0; i < 800; i++) {
       final phase = (i % 97) * 0.18;
       final driftX = sin(t * 2 * pi + phase) * 1.5;
       final driftY = cos(t * 2 * pi + phase) * 1.5;
@@ -3145,13 +3170,13 @@ class _StarsPainter extends CustomPainter {
       final y = random.nextDouble() * size.height + driftY;
       final radius = random.nextDouble() * 0.25 + 0.08;
       final opacity = random.nextDouble() * 0.06 + 0.01;
-      final twinkle = 0.7 + 0.3 * sin((i % 37) * 0.4 + t * 2 * pi);
+      final twinkle = 0.4 + 0.6 * sin((i % 37) * 0.4 + t * 2 * pi * 2.5);
       starPaint.color = Colors.white.withOpacity(opacity * twinkle);
       canvas.drawCircle(Offset(x, y), radius, starPaint);
     }
 
     // Medium stars – clearly visible, with soft glow
-    for (int i = 0; i < 1800; i++) {
+    for (int i = 0; i < 200; i++) {
       final phase = (i % 67) * 0.22;
       final driftX = sin(t * 2 * pi + phase) * 2.5;
       final driftY = cos(t * 2 * pi + phase) * 2.5;
@@ -3159,7 +3184,7 @@ class _StarsPainter extends CustomPainter {
       final y = random.nextDouble() * size.height + driftY;
       final radius = random.nextDouble() * 0.7 + 0.25;
       final opacity = random.nextDouble() * 0.18 + 0.06;
-      final twinkle = 0.6 + 0.4 * sin((i % 29) * 0.6 + t * 2 * pi * 1.3);
+      final twinkle = 0.3 + 0.7 * sin((i % 29) * 0.6 + t * 2 * pi * 2.0);
       final glowRadius = radius * 2.5;
       final glowOpacity = opacity * 0.3 * twinkle;
 
@@ -3171,11 +3196,11 @@ class _StarsPainter extends CustomPainter {
     }
 
     // Bright highlight stars – few but eye-catching
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 30; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
       final radius = random.nextDouble() * 1.2 + 0.6;
-      final twinkle = 0.5 + 0.5 * sin((i % 11) * 1.2 + t * 2 * pi * 0.8);
+      final twinkle = 0.2 + 0.8 * sin((i % 11) * 1.2 + t * 2 * pi * 1.5);
       final glowRadius = radius * 4.0;
 
       // Outer glow
@@ -3238,7 +3263,7 @@ class _CardImage extends StatelessWidget {
 
 class _FloatingTarotDeck extends StatefulWidget {
   final Future<void> Function(int index, GlobalKey key) onCardTap;
-  final Widget Function() cardBuilder;
+  final Widget Function(int index, int totalCards) cardBuilder;
   final List<GlobalKey> cardKeys;
   final List<int> selectedPositions;
   final Set<int> hiddenCards;
@@ -3415,7 +3440,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                           height: cardH,
                           child: KeyedSubtree(
                             key: cardKey,
-                            child: widget.cardBuilder(),
+                            child: widget.cardBuilder(cardIdx, totalCards),
                           ),
                         ),
                       ),
@@ -3499,94 +3524,36 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                             height: 88,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              // Liquid glass base
-                              gradient: LinearGradient(
-                                begin: const Alignment(-0.5, -1.2),
-                                end: const Alignment(0.5, 1.2),
+                              gradient: SweepGradient(
+                                center: Alignment.center,
                                 colors: [
-                                  Colors.white.withOpacity(0.18),
-                                  Colors.white.withOpacity(0.06),
-                                  Colors.white.withOpacity(0.02),
-                                  Colors.white.withOpacity(0.08),
+                                  Color.fromRGBO(160, 100, 255, 0.25),
+                                  Color.fromRGBO(80, 200, 200, 0.20),
+                                  Color.fromRGBO(226, 196, 142, 0.22),
+                                  Color.fromRGBO(160, 100, 255, 0.25),
                                 ],
-                                stops: const [0.0, 0.35, 0.65, 1.0],
+                                stops: const [0.0, 0.33, 0.66, 1.0],
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromRGBO(160, 100, 255, 0.18),
+                                  blurRadius: 16,
+                                  spreadRadius: 2,
+                                ),
+                                BoxShadow(
+                                  color: Color.fromRGBO(80, 200, 200, 0.12),
+                                  blurRadius: 12,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.20),
-                                width: 0.8,
+                                color: const Color(0xFFD4B896).withOpacity(0.30),
+                                width: 1.0,
                               ),
                             ),
                             child: ClipOval(
                               child: Stack(
                               children: [
-                                // ── Colorful mist/smoke inside ──
-                                Positioned.fill(
-                                  child: AnimatedBuilder(
-                                    animation: _controller,
-                                    builder: (context, _) {
-                                      final t = _controller.value;
-                                      return Stack(
-                                        children: [
-                                          // Purple mist
-                                          Positioned(
-                                            left: 10 + sin(t * pi * 2) * 15,
-                                            top: 10 + cos(t * pi * 2) * 12,
-                                            child: Container(
-                                              width: 45,
-                                              height: 45,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                gradient: RadialGradient(
-                                                  colors: [
-                                                    Color.fromRGBO(160, 100, 255, 0.30 + sin(t * pi * 2) * 0.10),
-                                                    Colors.transparent,
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // Teal mist
-                                          Positioned(
-                                            right: 8 + cos(t * pi * 2 + 2) * 12,
-                                            bottom: 12 + sin(t * pi * 2 + 2) * 10,
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                gradient: RadialGradient(
-                                                  colors: [
-                                                    Color.fromRGBO(80, 200, 200, 0.25 + cos(t * pi * 2) * 0.08),
-                                                    Colors.transparent,
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // Gold mist
-                                          Positioned(
-                                            left: 20 + cos(t * pi * 2 + 4) * 14,
-                                            bottom: 15 + sin(t * pi * 2 + 4) * 12,
-                                            child: Container(
-                                              width: 35,
-                                              height: 35,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                gradient: RadialGradient(
-                                                  colors: [
-                                                    Color.fromRGBO(226, 196, 142, 0.22 + sin(t * pi * 2 + 1) * 0.08),
-                                                    Colors.transparent,
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                                // ── Liquid highlight blob ──
                                 Positioned(
                                   top: 6,
                                   left: 10,
@@ -3611,7 +3578,6 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                                     ),
                                   ),
                                 ),
-                                // ── Bottom liquid reflection ──
                                 Positioned(
                                   bottom: 8,
                                   right: 12,
@@ -3630,7 +3596,6 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                                     ),
                                   ),
                                 ),
-                                // ── Text ──
                                 Center(
                                   child: Text(
                                     'Rastgele\nÇek',
@@ -3647,10 +3612,10 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                             ),
                           ),
                           ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                ),
                 ),
               );
 
@@ -4566,11 +4531,14 @@ class _TarotSymbolPainter extends CustomPainter {
 }
 
 class _CardStarPainter extends CustomPainter {
+  final Color color;
+  _CardStarPainter({this.color = const Color(0x4DFFFFFF)});
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final goldColor = Colors.white.withOpacity(0.30);
+    final goldColor = color.withOpacity(0.40);
     
     final paint = Paint()
       ..color = goldColor
@@ -4580,9 +4548,9 @@ class _CardStarPainter extends CustomPainter {
     // Outer circle
     canvas.drawCircle(Offset(cx, cy), size.width * 0.45, paint);
     
-    // Inner circle
+    // Inner circle with glow
     canvas.drawCircle(Offset(cx, cy), size.width * 0.18, 
-      Paint()..color = goldColor.withOpacity(0.3)..style = PaintingStyle.fill);
+      Paint()..color = goldColor.withOpacity(0.25)..style = PaintingStyle.fill);
     canvas.drawCircle(Offset(cx, cy), size.width * 0.18, paint);
     
     // 8-pointed star lines
@@ -4608,7 +4576,7 @@ class _CardStarPainter extends CustomPainter {
   }
   
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CardStarPainter oldDelegate) => oldDelegate.color != color;
 }
 
 // ============================================================
@@ -4729,4 +4697,116 @@ class _CornerArcPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ============================================================
+// Ad Watch Button - Simulated Rewarded Ad
+// ============================================================
+class _AdWatchButton extends StatefulWidget {
+  final String label;
+  final VoidCallback onComplete;
+  const _AdWatchButton({required this.label, required this.onComplete});
+
+  @override
+  State<_AdWatchButton> createState() => _AdWatchButtonState();
+}
+
+class _AdWatchButtonState extends State<_AdWatchButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  bool _watching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _ctrl.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        HapticFeedback.mediumImpact();
+        widget.onComplete();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _startWatching() {
+    if (_watching) return;
+    HapticFeedback.lightImpact();
+    setState(() => _watching = true);
+    _ctrl.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _startWatching,
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (context, _) {
+          return Container(
+            width: double.infinity,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFE2C48E).withOpacity(0.25),
+                  const Color(0xFFD4A853).withOpacity(0.15),
+                ],
+              ),
+              border: Border.all(
+                color: const Color(0xFFE2C48E).withOpacity(0.4),
+                width: 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Stack(
+                children: [
+                  // Progress fill
+                  if (_watching)
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: (MediaQuery.of(context).size.width * 0.7) * _ctrl.value,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFE2C48E).withOpacity(0.3),
+                              const Color(0xFFD4A853).withOpacity(0.15),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  // Label
+                  Center(
+                    child: Text(
+                      _watching ? '⏳ ${(2 - _ctrl.value * 2).toStringAsFixed(0)}s...' : widget.label,
+                      style: TextStyle(
+                        color: const Color(0xFFE2C48E).withOpacity(0.9),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
