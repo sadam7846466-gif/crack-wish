@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'tarot_meanings.dart';
 
@@ -58,139 +59,139 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // ======================
   // ASSET YOLLARI
   // ======================
-  final String _cardBackAsset = 'assets/images/tarot/tarot/card_back.png';
+  final String _cardBackAsset = 'assets/images/tarot/tarot/card_back.webp';
   final List<TarotCardDef> _allCards = [
     TarotCardDef(
       id: 0,
       nameTr: 'Deli',
       nameEn: 'The Fool',
-      frontAsset: 'assets/images/tarot/tarot/The_Fool.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Fool.webp',
     ),
     TarotCardDef(
       id: 1,
       nameTr: 'Büyücü',
       nameEn: 'The Magician',
-      frontAsset: 'assets/images/tarot/tarot/The_Magician.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Magician.webp',
     ),
     TarotCardDef(
       id: 2,
       nameTr: 'Başrahibe',
       nameEn: 'The High Priestess',
-      frontAsset: 'assets/images/tarot/tarot/The_High_Priestess.png',
+      frontAsset: 'assets/images/tarot/tarot/The_High_Priestess.webp',
     ),
     TarotCardDef(
       id: 3,
       nameTr: 'İmparatoriçe',
       nameEn: 'The Empress',
-      frontAsset: 'assets/images/tarot/tarot/The_Empress.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Empress.webp',
     ),
     TarotCardDef(
       id: 4,
       nameTr: 'İmparator',
       nameEn: 'The Emperor',
-      frontAsset: 'assets/images/tarot/tarot/The_Emperor.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Emperor.webp',
     ),
     TarotCardDef(
       id: 5,
       nameTr: 'Aziz',
       nameEn: 'The Hierophant',
-      frontAsset: 'assets/images/tarot/tarot/The_Hierophant.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hierophant.webp',
     ),
     TarotCardDef(
       id: 6,
       nameTr: 'Aşıklar',
       nameEn: 'The Lovers',
-      frontAsset: 'assets/images/tarot/tarot/The_Lovers.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Lovers.webp',
     ),
     TarotCardDef(
       id: 7,
       nameTr: 'Savaş Arabası',
       nameEn: 'The Chariot',
-      frontAsset: 'assets/images/tarot/tarot/The_Chariot.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Chariot.webp',
     ),
     TarotCardDef(
       id: 8,
       nameTr: 'Güç',
       nameEn: 'Strength',
-      frontAsset: 'assets/images/tarot/tarot/Strength.png',
+      frontAsset: 'assets/images/tarot/tarot/Strength.webp',
     ),
     TarotCardDef(
       id: 9,
       nameTr: 'Ermiş',
       nameEn: 'The Hermit',
-      frontAsset: 'assets/images/tarot/tarot/The_Hermit.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hermit.webp',
     ),
     TarotCardDef(
       id: 10,
       nameTr: 'Kader Çarkı',
       nameEn: 'Wheel of Fortune',
-      frontAsset: 'assets/images/tarot/tarot/Wheel_of_Fortune.png',
+      frontAsset: 'assets/images/tarot/tarot/Wheel_of_Fortune.webp',
     ),
     TarotCardDef(
       id: 11,
       nameTr: 'Adalet',
       nameEn: 'Justice',
-      frontAsset: 'assets/images/tarot/tarot/Justice.png',
+      frontAsset: 'assets/images/tarot/tarot/Justice.webp',
     ),
     TarotCardDef(
       id: 12,
       nameTr: 'Asılan Adam',
       nameEn: 'The Hanged Man',
-      frontAsset: 'assets/images/tarot/tarot/The_Hanged_Man.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Hanged_Man.webp',
     ),
     TarotCardDef(
       id: 13,
       nameTr: 'Ölüm',
       nameEn: 'Death',
-      frontAsset: 'assets/images/tarot/tarot/Death.png',
+      frontAsset: 'assets/images/tarot/tarot/Death.webp',
     ),
     TarotCardDef(
       id: 14,
       nameTr: 'Denge',
       nameEn: 'Temperance',
-      frontAsset: 'assets/images/tarot/tarot/Temperance.png',
+      frontAsset: 'assets/images/tarot/tarot/Temperance.webp',
     ),
     TarotCardDef(
       id: 15,
       nameTr: 'Şeytan',
       nameEn: 'The Devil',
-      frontAsset: 'assets/images/tarot/tarot/The_Devil.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Devil.webp',
     ),
     TarotCardDef(
       id: 16,
       nameTr: 'Kule',
       nameEn: 'The Tower',
-      frontAsset: 'assets/images/tarot/tarot/The_Tower.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Tower.webp',
     ),
     TarotCardDef(
       id: 17,
       nameTr: 'Yıldız',
       nameEn: 'The Star',
-      frontAsset: 'assets/images/tarot/tarot/The_Star.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Star.webp',
     ),
     TarotCardDef(
       id: 18,
       nameTr: 'Ay',
       nameEn: 'The Moon',
-      frontAsset: 'assets/images/tarot/tarot/The_Moon.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Moon.webp',
     ),
     TarotCardDef(
       id: 19,
       nameTr: 'Güneş',
       nameEn: 'The Sun',
-      frontAsset: 'assets/images/tarot/tarot/The_Sun.png',
+      frontAsset: 'assets/images/tarot/tarot/The_Sun.webp',
     ),
     TarotCardDef(
       id: 20,
       nameTr: 'Yargı',
       nameEn: 'Judgement',
-      frontAsset: 'assets/images/tarot/tarot/Judgement.png',
+      frontAsset: 'assets/images/tarot/tarot/Judgement.webp',
     ),
     TarotCardDef(
       id: 21,
       nameTr: 'Dünya',
       nameEn: 'The World',
-      frontAsset: 'assets/images/tarot/tarot/The_World.png',
+      frontAsset: 'assets/images/tarot/tarot/The_World.webp',
     ),
   ];
   // ======================
@@ -279,6 +280,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   late AnimationController _fogCtrl;
   late AnimationController _bgPulseCtrl;
   late AnimationController _slotEntranceCtrl;
+  final ScrollController _readingScrollCtrl = ScrollController();
 
   String _ctaText = '';
   String _miniStatusText = '';
@@ -312,21 +314,28 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
     _starsCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
+      duration: const Duration(seconds: 40),
+    );
     _slotGlowControllers = List.generate(5, (_) => AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-      value: 1.0, // Start completed = no glow
+      value: 1.0,
     ));
     _fogCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 18),
-    )..repeat();
+      duration: const Duration(seconds: 36),
+    );
     _bgPulseCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat(reverse: true);
+      duration: const Duration(seconds: 40),
+    );
+    // Arka plan animasyonlarını gecikmeli başlat — sayfa geçişi takılmasın
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      _starsCtrl.repeat();
+      _fogCtrl.repeat();
+      _bgPulseCtrl.repeat(reverse: true);
+    });
 
     _slotEntranceCtrl = AnimationController(
       vsync: this,
@@ -354,6 +363,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _fogCtrl.dispose();
     _bgPulseCtrl.dispose();
     _slotEntranceCtrl.dispose();
+    _readingScrollCtrl.dispose();
     for (final c in _slotGlowControllers) c.dispose();
     _cardFlipPlayer.dispose();
     super.dispose();
@@ -765,6 +775,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   /// 3 kart seçildi — yorum ekranını aç
   Future<void> _commitAndReveal() async {
+    /* 
+    // ŞİMDİLİK İPTAL EDİLDİ - HERKES SINIRSIZ GÖREBİLİR
     final allowed = await _ensureAllowance();
     if (!allowed) {
       // Show ad popup instead of just mini status
@@ -772,6 +784,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       if (!granted) return;
     }
     await _consumeAllowanceOnCommit();
+    */
 
     HapticFeedback.mediumImpact();
     _setStateSafe(() {
@@ -826,6 +839,819 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(12),
           child: _buildCardFront(index),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMysticalDivider(String symbol) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 60,
+          height: 0.8,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                const Color(0xFFE7D6A5).withOpacity(0.4),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            symbol,
+            style: TextStyle(
+              color: const Color(0xFFE7D6A5).withOpacity(0.7),
+              fontSize: 16,
+              shadows: [
+                Shadow(
+                  color: const Color(0xFFE7D6A5).withOpacity(0.5),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: 60,
+          height: 0.8,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFE7D6A5).withOpacity(0.4),
+                Colors.transparent,
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGlowingQuoteCard(String message) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+      child: GlassCard(
+        useOwnLayer: true,
+        padding: EdgeInsets.zero,
+        shape: const LiquidRoundedSuperellipse(borderRadius: 20),
+        settings: const LiquidGlassSettings(
+          thickness: 24,
+          blur: 10, // Daha derin ve puslu bir cam
+          glassColor: Color(0x1AE7D6A5), // Çok hafif sıcak/altın bir renk tonu (%10 opacity)
+          chromaticAberration: 0.15,
+          lightIntensity: 1.2, // Işık yansımasını artırdık, hafif bir parlama yaratıyor
+          ambientStrength: 0.85,
+          refractiveIndex: 1.3,
+          saturation: 1.1, // Arkadaki renkleri daha canlı gösterir
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            // Işıklı İnce Ayraç (Line - Diamond - Line)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.transparent, const Color(0xFFE7D6A5).withOpacity(0.8)],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Transform.rotate(
+                  angle: pi / 4,
+                  child: Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE7D6A5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE7D6A5).withOpacity(0.8),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 60,
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFFE7D6A5).withOpacity(0.8), Colors.transparent],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 0),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(44, 4, 44, 20),
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.lora(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      height: 1.5,
+                      letterSpacing: 0.1,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Sol üst tırnak
+                Positioned(
+                  top: -8,
+                  left: 12,
+                  child: Text(
+                    '\u201c',
+                    style: GoogleFonts.cormorantGaramond(
+                      color: const Color(0xFFE7D6A5).withOpacity(0.85),
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      shadows: [Shadow(color: const Color(0xFFE7D6A5).withOpacity(0.5), blurRadius: 8)],
+                    ),
+                  ),
+                ),
+                // Sağ alt tırnak
+                Positioned(
+                  bottom: -6,
+                  right: 12,
+                  child: Text(
+                    '\u201d',
+                    style: GoogleFonts.cormorantGaramond(
+                      color: const Color(0xFFE7D6A5).withOpacity(0.85),
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      shadows: [Shadow(color: const Color(0xFFE7D6A5).withOpacity(0.5), blurRadius: 8)],
+                    ),
+                  ),
+                ),
+                // Ortadaki alt zarif kavis çizgisi
+                Positioned(
+                  bottom: 6,
+                  left: 0,
+                  right: 0,
+                  child: CustomPaint(
+                    size: const Size(double.infinity, 20),
+                    painter: _BottomSwooshPainter(),
+                  ),
+                ),
+                // Alt merkezdeki belirgin parlayan ışık noktası (BottomSwoosh'un tam ortasında olan büyük parlama)
+                Positioned(
+                  bottom: -2,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.8),
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                          ),
+                          BoxShadow(
+                            color: const Color(0xFFE7D6A5).withOpacity(0.6),
+                            blurRadius: 12,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getIconForPromise(String keyword) {
+    final lower = keyword.toLowerCase();
+    
+    // Yıkım, Kriz, Beklenmedik Değişim (Kule vb.)
+    if (lower.contains('yıkım') || lower.contains('kriz') || lower.contains('kaos') || lower.contains('bela')) return Icons.local_fire_department_outlined;
+    
+    // Seçim, Karar (Aşıklar, İki Kılıç vb.)
+    if (lower.contains('seçim') || lower.contains('karar') || lower.contains('yol ayrımı') || lower.contains('ikilem')) return Icons.alt_route_outlined;
+    
+    // Aşk, Duygu, İlişki
+    if (lower.contains('aşk') || lower.contains('sevgi') || lower.contains('ilişki') || lower.contains('kalp') || lower.contains('love') || lower.contains('duygu')) return Icons.favorite_border;
+    
+    // Enerji, Güç, Hareket, İrade
+    if (lower.contains('enerji') || lower.contains('güç') || lower.contains('cesaret') || lower.contains('irade') || lower.contains('hız') || lower.contains('energy') || lower.contains('power')) return Icons.bolt;
+    
+    // Umut, Büyüme, Şifa, Yenilenme
+    if (lower.contains('umut') || lower.contains('büyüme') || lower.contains('şifa') || lower.contains('yenilenme') || lower.contains('hope') || lower.contains('doğa')) return Icons.eco_outlined;
+    
+    // Başarı, Zafer, Kutlama
+    if (lower.contains('başarı') || lower.contains('zafer') || lower.contains('kutlama') || lower.contains('success') || lower.contains('victory')) return Icons.emoji_events_outlined;
+    
+    // Sezgi, Gizem, İç dünyamıza dönüş
+    if (lower.contains('sezgi') || lower.contains('gizem') || lower.contains('bilgelik') || lower.contains('intuition') || lower.contains('sır') || lower.contains('içe')) return Icons.remove_red_eye_outlined;
+    
+    // Denge, Adalet, Uyum
+    if (lower.contains('denge') || lower.contains('adalet') || lower.contains('uyum') || lower.contains('hakikat')) return Icons.balance_outlined;
+    
+    // Yeni, Başlangıç, Aydınlanma
+    if (lower.contains('yeni') || lower.contains('başlangıç') || lower.contains('aydınlanma') || lower.contains('doğuş')) return Icons.flare_outlined;
+    
+    // Dönüşüm, Bitiş, Ölüm Kartı
+    if (lower.contains('dönüşüm') || lower.contains('bitiş') || lower.contains('son') || lower.contains('veda')) return Icons.change_circle_outlined;
+    
+    // Para, Maddiyat, Zenginlik
+    if (lower.contains('para') || lower.contains('zenginlik') || lower.contains('maddi') || lower.contains('bolluk') || lower.contains('materyal')) return Icons.monetization_on_outlined;
+    
+    // Şans, Kader, Döngü
+    if (lower.contains('şans') || lower.contains('kader') || lower.contains('döngü') || lower.contains('çark')) return Icons.rotate_right_outlined;
+
+    // Bekleyiş, Sabır, Duraklama
+    if (lower.contains('bekleyiş') || lower.contains('sabır') || lower.contains('duraklama') || lower.contains('sessizlik') || lower.contains('fedakar')) return Icons.hourglass_empty_outlined;
+
+    // Mantık, Zihin, Gerçek
+    if (lower.contains('mantık') || lower.contains('zihin') || lower.contains('düşünce') || lower.contains('akıl') || lower.contains('gerçek')) return Icons.psychology_outlined;
+
+    // Standart mistik yıldız (Bulunamazsa)
+    return Icons.auto_awesome;
+  }
+
+  Widget _buildVerticalMisticLine() {
+    return Container(
+      width: 1,
+      height: 28,
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            const Color(0xFFE7D6A5).withOpacity(0.5),
+            Colors.transparent,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPromiseItem(String text, IconData icon, Color glowColor) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 24),
+          const SizedBox(height: 2),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Glow line
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Sağdan ve soldan yavaşça kaybolan çok ince çizgi (fade effect)
+              Container(
+                width: 72,
+                height: 1.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      glowColor,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              // Tam ortalanmış parlayan zarif ufak nokta
+              Container(
+                width: 3.5,
+                height: 3.5,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: glowColor,
+                      blurRadius: 6,
+                      spreadRadius: 2,
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.6),
+                      blurRadius: 2,
+                      spreadRadius: 0.5,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromisesPanel() {
+    if (_selectedCardIndexes.length < 3) return const SizedBox.shrink();
+    
+    // Çekilen 3 kartın "theme" değerinin ilk kelimesini al
+    final m1 = cardMeanings[_selectedCardIndexes[0]]!;
+    final m2 = cardMeanings[_selectedCardIndexes[1]]!;
+    final m3 = cardMeanings[_selectedCardIndexes[2]]!;
+    
+    String p1 = (_isTr ? m1.themeTr : m1.themeEn).split(',').first.trim();
+    String p2 = (_isTr ? m2.themeTr : m2.themeEn).split(',').first.trim();
+    String p3 = (_isTr ? m3.themeTr : m3.themeEn).split(',').first.trim();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: GlassCard(
+        useOwnLayer: true,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        shape: const LiquidRoundedSuperellipse(borderRadius: 20),
+        settings: const LiquidGlassSettings(
+          thickness: 16,
+          blur: 10,
+          glassColor: Color(0x1AE7D6A5), // Mistik altın/sıcak ton
+          chromaticAberration: 0.1,
+          lightIntensity: 1.0,
+          ambientStrength: 0.85,
+          refractiveIndex: 1.25,
+          saturation: 1.1,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildPromiseItem(p1, _getIconForPromise(p1), const Color(0xFFFF4081)), // Pembe/Aşk Enerjisi
+            _buildVerticalMisticLine(),
+            _buildPromiseItem(p2, _getIconForPromise(p2), const Color(0xFFFFCA28)), // Altın/Sıcak Enerji
+            _buildVerticalMisticLine(),
+            _buildPromiseItem(p3, _getIconForPromise(p3), const Color(0xFF40C4FF)), // Mavi/Gelişim Enerjisi
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMagicButton(String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF532491), Color(0xFF9059D2), Color(0xFF6C3FA0)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF9059D2).withOpacity(0.5),
+              blurRadius: 25,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.white.withOpacity(0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+          border: Border.all(
+            color: Colors.white.withOpacity(0.5),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDailyAdviceCard(String title, String advice) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141029).withOpacity(0.6), // dark purple alpha
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFCBA153).withOpacity(0.35),
+          width: 0.8,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFCBA153).withOpacity(0.04),
+            blurRadius: 10,
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.eco_rounded, color: Color(0xFFE7D6A5), size: 16),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            advice,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTarotGuidanceDialog() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'TarotGuidance',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1845).withOpacity(0.95), // Koyu Mistik Mor
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: const Color(0xFFE7D6A5).withOpacity(0.4),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE7D6A5).withOpacity(0.1),
+                    blurRadius: 40,
+                    spreadRadius: -5,
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.auto_awesome,
+                      color: Color(0xFFE7D6A5),
+                      size: 32,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _isTr ? 'Tarot\'un Fısıltısı' : 'Whisper of Tarot',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cormorantGaramond(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 1,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.transparent, const Color(0xFFE7D6A5).withOpacity(0.8), Colors.transparent],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    _buildGuidanceItem(
+                      _isTr ? 'İçsel Bir Ayna' : 'An Inner Mirror',
+                      _isTr 
+                          ? 'Mistik Tarot, kesin bir gelecek söylemek yerine kendi içine tutulan bir aynadır. Zihnindeki karmaşayı, korkularını ve gerçek umutlarını semboller aracılığıyla gün yüzüne çıkarır.'
+                          : 'Mystical Tarot is not a fortune teller, but a mirror reflecting your inner self. It brings your hidden fears, hopes, and confusion to light through symbols.',
+                      Icons.visibility_outlined,
+                    ),
+                    _buildGuidanceItem(
+                      _isTr ? 'Objektif Perspektif' : 'Objective Perspective',
+                      _isTr 
+                          ? 'Olayların içindeyken büyük resmi göremeyiz. Kartlar seni olayın dışına çıkartıp, durumu daha bilge ve tarafsız bir gözle değerlendirmeni sağlar.'
+                          : 'When you are in the middle of events, it is hard to see the big picture. Cards pull you out and let you observe the situation with a wise, objective eye.',
+                      Icons.landscape_outlined,
+                    ),
+                    _buildGuidanceItem(
+                      _isTr ? 'Rehberlik ve Eylem' : 'Guidance and Action',
+                      _isTr
+                          ? 'Tarot seni çaresiz hissettirmez; "Senin elinde ne güç var?" sorusuna odaklanır. Şimdiki durumunu analiz eder ve en doğru eylemi, yönü sana nazikçe fısıldar.'
+                          : 'Tarot never makes you feel helpless; it focuses on "What power do you hold?". It analyzes your present and gently whispers the best action to take.',
+                      Icons.explore_outlined,
+                    ),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE7D6A5).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFE7D6A5).withOpacity(0.5),
+                          ),
+                        ),
+                        child: Text(
+                          _isTr ? 'Anladım' : 'I Understand',
+                          style: const TextStyle(
+                            color: Color(0xFFE7D6A5),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1.0).animate(CurvedAnimation(
+              parent: anim1,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGuidanceItem(String title, String desc, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE7D6A5).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: const Color(0xFFE7D6A5), size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  desc,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.75),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReadingSection({
+    required String title,
+    required String content,
+    required String cardName,
+    required IconData icon,
+    required Color color,
+  }) {
+    return AnimatedBuilder(
+      animation: _bgPulseCtrl,
+      builder: (context, child) {
+        final pulse = sin(_bgPulseCtrl.value * pi * 2);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 14.0, sigmaY: 14.0),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: const Color(0xFFE7D6A5).withOpacity(0.2 + pulse * 0.08),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.06 + pulse * 0.03),
+                    blurRadius: 30,
+                    spreadRadius: -5,
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: color.withOpacity(0.25),
+                    width: 0.8,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.15),
+                      blurRadius: 8,
+                      spreadRadius: -2,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: TextStyle(
+                      color: color.withOpacity(0.9),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    cardName,
+                    style: GoogleFonts.cormorantGaramond(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Altın ince ayıraç çizgi
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFFE7D6A5).withOpacity(0.25),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Estetik, vurgulanmış Insight Text
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Sol Taraftaki Zarif Çizgi (Vurgu İçin)
+              Container(
+                margin: const EdgeInsets.only(top: 4, right: 12),
+                width: 2,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      color.withOpacity(0.8),
+                      color.withOpacity(0.1),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  content,
+                  style: GoogleFonts.lora(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.6,
+                    letterSpacing: 0.2,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -1514,7 +2340,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           },
           blendMode: BlendMode.dstIn,
           child: Image.asset(
-            'assets/images/tarot/ip$num.png',
+            'assets/images/tarot/ip$num.webp',
             height: height,
             fit: BoxFit.contain,
           ),
@@ -1803,10 +2629,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
           // ── Statik dairesel renk geçişi (ana sayfa stili) ──
           Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: _TarotMottledPainter(),
+            child: RepaintBoundary(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: _TarotMottledPainter(),
+                ),
               ),
             ),
           ),
@@ -1948,27 +2776,33 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
           // ── ✨ Aurora + Stars ──
           Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _StarFieldPainter(pulse: bv),
+            child: RepaintBoundary(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _StarFieldPainter(pulse: bv),
+                ),
               ),
             ),
           ),
 
           // ── 🔮 Bokeh Light Orbs ──
           Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _BokehPainter(pulse: bv),
+            child: RepaintBoundary(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _BokehPainter(pulse: bv),
+                ),
               ),
             ),
           ),
 
           // ── ✨ Star Dust (tiny space particles) ──
           Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _StarDustPainter(pulse: bv),
+            child: RepaintBoundary(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _StarDustPainter(pulse: bv),
+                ),
               ),
             ),
           ),
@@ -2119,36 +2953,121 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           ),
 
 
+          // ── TAM EKRAN BLUR EFEKTİ VE NEFES ALAN ARKA PLAN AURASI ──
+          if (_state == RitualState.revealed)
+            Positioned.fill(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 1100),
+                curve: Curves.easeInOut,
+                builder: (context, value, _) {
+                  return Opacity(
+                    opacity: value,
+                    child: Stack(
+                      children: [
+                        // Blur Layer
+                        Positioned.fill(
+                          child: BackdropFilter(
+                            filter: ui.ImageFilter.blur(
+                              sigmaX: 14.0,
+                              sigmaY: 14.0,
+                            ),
+                            child: Container(
+                              color: Colors.black.withOpacity(0.55),
+                            ),
+                          ),
+                        ),
+                        
+                        // Breathable Aura Glow Layer
+                        Positioned.fill(
+                          child: AnimatedBuilder(
+                            animation: _bgPulseCtrl,
+                            builder: (context, child) {
+                              final pulse = sin(_bgPulseCtrl.value * pi * 2) * 0.5 + 0.5;
+                              
+                              // Aura rengi flowType'a veya mistik temaya göre değişebilir,
+                              // şimdilik derin bir büyü / ametist moru + altın karışımı.
+                              final Color auraColor1 = const Color(0xFF6C3FA0).withOpacity(0.15 + pulse * 0.1);
+                              final Color auraColor2 = const Color(0xFFE7D6A5).withOpacity(0.05 + pulse * 0.05);
+
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: const Alignment(0, -0.2), // Ekranın hafif üst merkezinden
+                                    radius: 1.2 + pulse * 0.1, // Nefes alarak büyüyüp küçülen
+                                    colors: [
+                                      auraColor1,
+                                      auraColor2,
+                                      Colors.transparent,
+                                    ],
+                                    stops: const [0.0, 0.4, 1.0],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
           SafeArea(
-            child: Column(
-              children: [
+            child: AnimatedBuilder(
+              animation: _readingScrollCtrl,
+              builder: (context, child) {
+                double offset = 0;
+                if (_readingScrollCtrl.hasClients) {
+                  offset = _readingScrollCtrl.offset.clamp(0.0, double.infinity);
+                }
+                return Transform.translate(
+                  offset: Offset(0, -offset),
+                  child: child,
+                );
+              },
+              child: Column(
+                children: [
                 // Header with back button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
                     children: [
-                      // Back button – frosted glass iOS style
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.10),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.18),
-                                  width: 0.6,
+                      // Back button – frosted glass iOS style (sarmalanarak merkeze eşit itiş sağlandı)
+                      SizedBox(
+                        width: 80,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (_state == RitualState.revealed) {
+                                _resetToIdle();
+                              } else {
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: BackdropFilter(
+                                filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.10),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.18),
+                                      width: 0.6,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    color: Colors.white.withOpacity(0.85),
+                                    size: 18,
+                                  ),
                                 ),
-                              ),
-                              child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                color: Colors.white.withOpacity(0.85),
-                                size: 18,
                               ),
                             ),
                           ),
@@ -2180,53 +3099,84 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      // Credits indicator (same width as back button to keep title centered)
-                      Transform.translate(
-                        offset: const Offset(-10, 6),
-                        child: SizedBox(
-                        width: 40,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.12),
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.auto_awesome,
-                                    size: 11,
-                                    color: (!_dailyFreeUsed || _adCredits > 0)
-                                        ? const Color(0xFFE2C48E).withOpacity(0.8)
-                                        : Colors.white.withOpacity(0.25),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    !_dailyFreeUsed ? '1' : '$_adCredits',
-                                    style: TextStyle(
-                                      color: (!_dailyFreeUsed || _adCredits > 0)
-                                          ? Colors.white.withOpacity(0.85)
-                                          : Colors.white.withOpacity(0.3),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
+                      // Kredi göstergesi ve Rehberlik butonu
+                      SizedBox(
+                        width: 80,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Transform.translate(
+                            offset: const Offset(-4, 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: _showTarotGuidanceDialog,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.08),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFFE7D6A5).withOpacity(0.3),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.menu_book_rounded,
+                                      color: const Color(0xFFE7D6A5).withOpacity(0.9),
+                                      size: 16,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                SizedBox(
+                                  width: 40,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: BackdropFilter(
+                                      filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.08),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(0.12),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.auto_awesome,
+                                              size: 11,
+                                              color: (!_dailyFreeUsed || _adCredits > 0)
+                                                  ? const Color(0xFFE2C48E).withOpacity(0.8)
+                                                  : Colors.white.withOpacity(0.25),
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              !_dailyFreeUsed ? '1' : '$_adCredits',
+                                              style: TextStyle(
+                                                color: (!_dailyFreeUsed || _adCredits > 0)
+                                                    ? Colors.white.withOpacity(0.85)
+                                                    : Colors.white.withOpacity(0.3),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
                       ),
                     ],
                   ),
@@ -2306,19 +3256,23 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
                 // Ana oyun içerikleri (Kart seçimi vb.)
                 Expanded(
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeInOut,
-                    opacity: _state == RitualState.revealed ? 0.0 : 1.0,
-                    child: IgnorePointer(
-                      ignoring: _state == RitualState.revealed,
-                      child: Column(
-                        children: [
-                          // ── Glow behind card slots ──
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
+                  child: Column(
+                    children: [
+                          // ── Glow behind card slots & The Slots ──
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0.0, end: _state == RitualState.revealed ? 1.0 : 0.0),
+                            duration: const Duration(milliseconds: 1100),
+                            curve: Curves.easeInOut,
+                            builder: (context, val, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 40.0 * val),
+                                child: child,
+                              );
+                            },
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
                                 width: 340,
                                 height: 160,
                                 decoration: BoxDecoration(
@@ -2377,41 +3331,60 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   final fadeT = Curves.easeOutQuad.transform(rawT);
                                   final slideY = (1.0 - fadeT) * 12.0; 
   
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: _isBuyukArkana ? 8 : 5),
-                                    child: Transform.translate(
-                                      offset: Offset(0, slideY),
-                                      child: Transform.scale(
-                                        scale: scaleT,
-                                        child: Opacity(
-                                          opacity: fadeT,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              isFilled ? 
-                                                Builder(
-                                                  builder: (context) {
-                                                    final animGlow = 1.0 - _slotGlowControllers[i].value;
-                                                    final totalGlow = (0.2 + animGlow * 0.8).clamp(0.0, 1.0);
-                                                    return Container(
-                                                      key: _slotKeys[i],
-                                                      width: cardW,
-                                                      height: cardH,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(12),
-                                                        boxShadow: totalGlow > 0.05 ? [
-                                                          BoxShadow(
-                                                            color: const Color(0xFFE7D6A5).withOpacity(0.15 * totalGlow),
-                                                            blurRadius: 6 * totalGlow,
-                                                          ),
-                                                        ] : null,
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius: BorderRadius.circular(12),
-                                                        child: _buildCardFront(_tableCards[_selectedTablePositions[i]]),
-                                                      ),
-                                                    );
-                                                  }
+                                  final isRevealed = _state == RitualState.revealed;
+  
+                                  return TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(begin: 0.0, end: isRevealed ? 1.0 : 0.0),
+                                    duration: const Duration(milliseconds: 1100),
+                                    curve: Curves.easeInOut,
+                                    builder: (context, revealT, child) {
+                                      // Yorum paneli açıldığındaki değerler (revealT: 0.0 -> 1.0)
+                                      final currentScale = 1.0 + (0.20 * revealT); // 1.0'dan 1.20'ye
+                                      final currentY = (i != 1) ? 40.0 * revealT : 0.0;
+                                      final basePadding = _isBuyukArkana ? 8.0 : 5.0;
+                                      final maxPadding = _isBuyukArkana ? 16.0 : 12.0;
+                                      final currentPadding = basePadding + ((maxPadding - basePadding) * revealT);
+
+                                      return Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: currentPadding),
+                                        child: Transform.translate(
+                                          offset: Offset(0, slideY),
+                                          child: Transform.scale(
+                                            scale: scaleT,
+                                            child: Opacity(
+                                              opacity: fadeT,
+                                              child: Transform(
+                                                alignment: Alignment.center,
+                                                transform: Matrix4.identity()
+                                                  ..translate(0.0, currentY)
+                                                  ..scale(currentScale, currentScale),
+                                                child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                isFilled ? 
+                                                  Builder(
+                                                    builder: (context) {
+                                                      final animGlow = 1.0 - _slotGlowControllers[i].value;
+                                                      final totalGlow = (0.2 + animGlow * 0.8).clamp(0.0, 1.0);
+                                                      return Container(
+                                                        key: _slotKeys[i],
+                                                        width: cardW,
+                                                        height: cardH,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          boxShadow: totalGlow > 0.05 ? [
+                                                            BoxShadow(
+                                                              color: const Color(0xFFE7D6A5).withOpacity(0.15 * totalGlow),
+                                                              blurRadius: 6 * totalGlow,
+                                                            ),
+                                                          ] : null,
+                                                        ),
+                                                        child: ClipRRect(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          child: _buildCardFront(_tableCards[_selectedTablePositions[i]]),
+                                                        ),
+                                                      );
+                                                    }
                                                 ) : 
                                                 Builder(
                                                   builder: (context) {
@@ -2527,6 +3500,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                         ),
                                       ),
                                     ),
+                                  ),
+                                );
+                                    },
                                   );
                                 }
 
@@ -2551,7 +3527,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                        ),
+                        const SizedBox(height: 8),
+                          // Deck + Guide + Buttons → sadece bunlar fade olacak
+                          Expanded(
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeOut,
+                              opacity: _state == RitualState.revealed ? 0.0 : 1.0,
+                              child: IgnorePointer(
+                                ignoring: _state == RitualState.revealed,
+                                child: Column(
+                                  children: [
                           // ── Mystical glow behind deck ──
                           Stack(
                             alignment: Alignment.center,
@@ -2601,11 +3588,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               final selected = _selectedTablePositions.length;
                               final max = _maxSlots;
                               return Opacity(
-                                opacity: selected < max ? 0.7 : 0.0,
+                                opacity: 0.7,
                                 child: Text(
-                                  selected == 0
-                                      ? _t('Bir kart seç veya rastgele çek', 'Pick a card or shuffle')
-                                      : _t('$selected / $max kart seçildi', '$selected / $max cards selected'),
+                                  _t('Bir kart seç veya rastgele çek', 'Pick a card or shuffle'),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -2817,283 +3802,121 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 8),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                                  ],  // inner Column children
+                                ),  // inner Column
+                              ),  // IgnorePointer
+                            ),  // AnimatedOpacity
+                          ),  // Expanded (deck)
+                    ],  // outer Column children
+                  ),  // outer Column
+                ),  // Expanded (ana)
+              ],  // main Column children
+            ),  // main Column
+            ),  // AnimatedBuilder
+          ),  // SafeArea (body padding)
 
 
-          // ── TAM EKRAN (FULLSCREEN) BLUR EFEKTİ ──
-          if (_state == RitualState.revealed)
+
+          // ── YORUM METİNLERİ (Sadece Yazılar, Kartların Altında) ──
+          if (_state == RitualState.revealed && _latestReading != null)
             Positioned.fill(
               child: TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 600),
-                curve: Curves.easeInOut,
-                builder: (context, value, child) {
-                  return BackdropFilter(
-                    filter: ui.ImageFilter.blur(
-                      sigmaX: 18 * value, 
-                      sigmaY: 18 * value,
-                    ),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.55 * value),
-                      // Tıklamaları engellememesi vs durumu:
-                    ),
-                  );
-                },
-              ),
-            ),
-         
-          // ── TAM EKRAN (FULLSCREEN) YORUM İÇERİĞİ ──
-          if (_state == RitualState.revealed && _latestReading != null)
-            Positioned.fill(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top + 32, // Çentiği(notch) güvenli alana katmak
-                  bottom: MediaQuery.of(context).padding.bottom + 32,
-                  left: 20,
-                  right: 20,
-                ),
-                child: Column(
-                    children: [
-                      // Üst Bar: Kapat Butonu (Sadece kapat butonu kalacak)
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: _resetToIdle,
-                            child: Container(
-                              width: 44, height: 44,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.white.withOpacity(0.15)),
-                              ),
-                              child: Icon(Icons.close_rounded, color: Colors.white.withOpacity(0.8), size: 22),
-                            ),
-                          ),
-                          const Spacer(),
-                          // Dönüşüm Akışı vb yazıyı sildik ("_latestReading!.flowLabel")
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      
-                      // Ana Başlık
-                      Text(
-                        _t('Kaderin Fısıltısı', 'Whisper of Fate'),
-                         style: GoogleFonts.cormorantGaramond(
-                           color: Colors.white,
-                           fontSize: 36, // Küçültüldü (Önceki 44 idi)
-                           fontWeight: FontWeight.w700,
-                           letterSpacing: 1.0,
-                         ),
-                      ),
-                      const SizedBox(height: 48),
-
-                      // Cam Panel + 3 Kart Yelpaze
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.04),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.10),
-                            width: 1.2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF6C3FA0).withOpacity(0.15),
-                              blurRadius: 40,
-                              spreadRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: SizedBox(
-                          height: 220,
-                          child: Stack(
-                            alignment: Alignment.center,
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOut,
+                builder: (context, value, _) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 30 * (1.0 - value)),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: SingleChildScrollView(
+                          controller: _readingScrollCtrl,
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                               // Sol Kart (Geçmiş)
-                               Transform.translate(
-                                  offset: const Offset(-75, 25),
-                                  child: Transform.rotate(
-                                    angle: -0.26,
-                                    child: _buildHeroCardView(_selectedCardIndexes[0], const Color(0xFF4AC8EA), 0.90),
-                                  ),
-                               ),
-                               // Sağ Kart (Yön)
-                               Transform.translate(
-                                  offset: const Offset(75, 25),
-                                  child: Transform.rotate(
-                                    angle: 0.26,
-                                    child: _buildHeroCardView(_selectedCardIndexes[2], const Color(0xFFB35CDA), 0.90),
-                                  ),
-                               ),
-                               // Orta Kart (Şimdi)
-                               _buildHeroCardView(_selectedCardIndexes[1], const Color(0xFFF09A59), 1.10),
+                              // Push content down below original cards
+                              SizedBox(height: MediaQuery.of(context).padding.top + 365),
+                              
+
+                              // Ana Tema cümlesi
+                              _buildGlowingQuoteCard(
+                                _latestReading!.generalTheme,
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Kartların vaat ettiği 3 anahtar kelime
+                              _buildPromisesPanel(),
+                              const SizedBox(height: 32),
+
+                              // Yorum Kartları (Geçmiş, Şimdi, Yön)
+                              _buildReadingSection(
+                                title: _isTr ? 'Geçmiş' : 'Past',
+                                content: _latestReading!.pastInfluence,
+                                cardName: _cardName(_selectedCardIndexes[0]),
+                                icon: Icons.history_edu,
+                                color: const Color(0xFFE7D6A5),
+                              ),
+                              // Mistik Ayıraç 1
+                              _buildMysticalDivider('☽'),
+                              const SizedBox(height: 24),
+                              
+                              _buildReadingSection(
+                                title: _isTr ? 'Şimdi' : 'Present',
+                                content: _latestReading!.presentEnergy,
+                                cardName: _cardName(_selectedCardIndexes[1]),
+                                icon: Icons.visibility,
+                                color: const Color(0xFFE7D6A5),
+                              ),
+                              const SizedBox(height: 24),
+                              
+                              // Mistik Ayıraç 2
+                              _buildMysticalDivider('✦'),
+                              const SizedBox(height: 24),
+                              
+                              _buildReadingSection(
+                                title: _isTr ? 'Yön' : 'Direction',
+                                content: _latestReading!.directionAdvice,
+                                cardName: _cardName(_selectedCardIndexes[2]),
+                                icon: Icons.explore,
+                                color: const Color(0xFFE7D6A5),
+                              ),
+                              const SizedBox(height: 32),
+
+                              // Magic Buton - Yeni Çekim Yap
+                              Center(
+                                child: _buildMagicButton(
+                                  _isTr ? 'Yeni Çekim Yap' : 'Draw Again',
+                                  () {
+                                    HapticFeedback.lightImpact();
+                                    _setStateSafe(() {
+                                      _state = RitualState.idle;
+                                      _latestReading = null;
+                                      _selectedCardIndexes.clear();
+                                      _selectedTablePositions.clear();
+                                      _revealedCount = 0;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              
+                              // Kapanış Mesajı - Günlük Tavsiye Stili
+                              _buildDailyAdviceCard(
+                                _isTr ? 'Günlük Tavsiye' : 'Daily Advice',
+                                _latestReading!.closingMessage,
+                              ),
+                              const SizedBox(height: 60), // En alt boşluk
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 56),
-
-                      // Ana Özeti / Tema
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          _latestReading!.generalTheme,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cormorantGaramond(
-                            color: Colors.white.withOpacity(0.95),
-                            fontSize: 22,
-                            fontStyle: FontStyle.italic,
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 48),
-
-                      // Yorum Blokları
-                      _ReadingBlock(
-                        label: _isTr ? 'Geçmiş' : 'Past',
-                        title: _t('Geçmiş Etki', 'Past Influence'),
-                        cardName: _cardName(_selectedCardIndexes[0]),
-                        text: _latestReading!.pastInfluence,
-                        cardIndex: _selectedCardIndexes[0],
-                        glowColor: const Color(0xFF4AC8EA),
-                        cardFront: _buildCardFront(_selectedCardIndexes[0]),
-                      ),
-                      _ReadingBlock(
-                        label: _isTr ? 'Ders' : 'Lesson',
-                        title: _t('Şu Anın Dersi', 'Present Lesson'),
-                        cardName: _cardName(_selectedCardIndexes[1]),
-                        text: _latestReading!.presentEnergy,
-                        cardIndex: _selectedCardIndexes[1],
-                        glowColor: const Color(0xFFF09A59),
-                        cardFront: _buildCardFront(_selectedCardIndexes[1]),
-                      ),
-                      _ReadingBlock(
-                        label: _isTr ? 'Yön' : 'Direction',
-                        title: _t('Yakın Yön / Tavsiye', 'Direction & Advice'),
-                        cardName: _cardName(_selectedCardIndexes[2]),
-                        text: _latestReading!.directionAdvice,
-                        cardIndex: _selectedCardIndexes[2],
-                        glowColor: const Color(0xFFB35CDA),
-                        cardFront: _buildCardFront(_selectedCardIndexes[2]),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Bonus Bilgiler (Girişim / Gölge / Güç)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.04),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _t('⚠️ Dikkat Et:', '⚠️ Watch Out:'),
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFFFA8B8B),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _latestReading!.directionAdvice,
-                              style: GoogleFonts.cormorantGaramond(
-                                color: Colors.white.withOpacity(0.85),
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _t('🌟 Güçlü Tarafın:', '🌟 Your Strength:'),
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF8BFAAB),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _latestReading!.closingMessage,
-                              style: GoogleFonts.cormorantGaramond(
-                                color: Colors.white.withOpacity(0.85),
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Kapanış Mesajı
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE2C48E).withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFE2C48E).withOpacity(0.2)),
-                        ),
-                        child: Text(
-                          _latestReading!.closingMessage,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cormorantGaramond(
-                            color: const Color(0xFFE2C48E),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 56),
-
-                      // Yeni Okuma Butonu
-                      GestureDetector(
-                        onTap: _resetToIdle,
-                        child: Container(
-                           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 18),
-                           decoration: BoxDecoration(
-                             gradient: const LinearGradient(
-                               colors: [Color(0xFFE2C48E), Color(0xFFC7A563)],
-                             ),
-                             borderRadius: BorderRadius.circular(100),
-                             boxShadow: [
-                               BoxShadow(
-                                 color: const Color(0xFFE2C48E).withOpacity(0.35),
-                                 blurRadius: 20,
-                                 offset: const Offset(0, 8),
-                               ),
-                             ],
-                           ),
-                           child: Text(
-                              _t('Yeniden Rastgele Çek', 'Shuffle Again'),
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF101428),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              ),
-                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                    ].animate(interval: 250.ms).fade(duration: 900.ms).slideY(begin: 0.15, end: 0, curve: Curves.easeOutCubic),
-                  ),
-                ),
+                    ),
+                  );
+                },
+              ),
             ),
          
         ],
@@ -3294,7 +4117,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 14),
+      duration: const Duration(seconds: 24), // 14s → 24s (performans)
     )..repeat();
     
     _entranceController = AnimationController(
@@ -4579,6 +5402,51 @@ class _CardStarPainter extends CustomPainter {
   bool shouldRepaint(covariant _CardStarPainter oldDelegate) => oldDelegate.color != color;
 }
 
+
+// ============================================================
+// Corner Flourish Painter - Decorative corner ornaments
+// ============================================================
+class _CornerFlourishPainter extends CustomPainter {
+  final bool isTopLeft;
+  _CornerFlourishPainter({required this.isTopLeft});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFE7D6A5).withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+
+    if (isTopLeft) {
+      // Sol üst köşe: dikey çizgi + kıvrım
+      path.moveTo(0, size.height * 0.8);
+      path.lineTo(0, size.height * 0.2);
+      path.quadraticBezierTo(0, 0, size.width * 0.2, 0);
+      path.lineTo(size.width * 0.8, 0);
+      // Küçük dekoratif nokta
+      canvas.drawCircle(Offset(size.width * 0.85, 0), 1.5, paint..style = PaintingStyle.fill);
+      paint.style = PaintingStyle.stroke;
+    } else {
+      // Sağ alt köşe: dikey çizgi + kıvrım
+      path.moveTo(size.width, size.height * 0.2);
+      path.lineTo(size.width, size.height * 0.8);
+      path.quadraticBezierTo(size.width, size.height, size.width * 0.8, size.height);
+      path.lineTo(size.width * 0.2, size.height);
+      // Küçük dekoratif nokta
+      canvas.drawCircle(Offset(size.width * 0.15, size.height), 1.5, paint..style = PaintingStyle.fill);
+      paint.style = PaintingStyle.stroke;
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 // ============================================================
 // Wave Diamond Painter - Decorative wave lines with diamond center
 // ============================================================
@@ -4809,4 +5677,24 @@ class _AdWatchButtonState extends State<_AdWatchButton>
       ),
     );
   }
+}
+
+class _BottomSwooshPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFE7D6A5).withOpacity(0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    path.moveTo(size.width * 0.25, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 1.5, size.width * 0.75, size.height * 0.1);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

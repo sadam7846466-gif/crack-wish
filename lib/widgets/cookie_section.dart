@@ -61,7 +61,7 @@ class _CookieSectionState extends State<CookieSection>
     // 0 ile 2*pi arasında repeat yapmak "sonsuz" ve "kesintisiz" bir döngü oluşturur.
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4), // Bir tam tur süresi (yavaş salınım için)
+      duration: const Duration(seconds: 5), // Daha yavaş = daha az GPU yükü
       upperBound: 2 * math.pi, // Loop noktası
     );
     
@@ -76,7 +76,7 @@ class _CookieSectionState extends State<CookieSection>
     // Glow animasyonu (2s, easeInOut, ileri-geri)
     _glowController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 2000), // 1100 → 2000ms (daha az tick)
     )..repeat(reverse: true);
     _glowAnimation = CurvedAnimation(
       parent: _glowController,
@@ -98,11 +98,11 @@ class _CookieSectionState extends State<CookieSection>
     // ... (diğer controllerlar aynı kalabilir)
 
 
-    // Sparkle animasyonu
+    // Sparkle animasyonu - sürekli repeat kaldırıldı (performans)
     _sparkleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
   }
 
   @override
@@ -428,16 +428,18 @@ class _CookieSectionState extends State<CookieSection>
                                       alignment: Alignment.center,
                                       children: [
                                         if (!_isCracking && !_showFortune)
-                                          _CookieGlow(
-                                            imagePath: _getCookieImagePath(
-                                              widget.selectedCookieEmoji ?? 'spring_wreath',
+                                          RepaintBoundary(
+                                            child: _CookieGlow(
+                                              imagePath: _getCookieImagePath(
+                                                widget.selectedCookieEmoji ?? 'spring_wreath',
+                                              ),
+                                              emoji:
+                                                  widget.selectedCookieEmoji ??
+                                                  'spring_wreath',
+                                              size: _cookieSize,
+                                              opacity: glowOpacity.clamp(0.0, 1.0),
+                                              blurSigma: glowBlur,
                                             ),
-                                            emoji:
-                                                widget.selectedCookieEmoji ??
-                                                'spring_wreath',
-                                            size: _cookieSize,
-                                            opacity: glowOpacity.clamp(0.0, 1.0),
-                                            blurSigma: glowBlur,
                                           ),
                                         Center(
                                           child: (_isCracking || _showFortune)
@@ -1353,7 +1355,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
           child: Container(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
             decoration: BoxDecoration(

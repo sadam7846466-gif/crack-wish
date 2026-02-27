@@ -25,7 +25,7 @@ class BottomNav extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // 24 → 12 (performans)
           child: Container(
             height: 64,
             decoration: BoxDecoration(

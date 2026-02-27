@@ -49,7 +49,7 @@ class _MotivationPageState extends State<MotivationPage>
     super.initState();
     _starsCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 60),
+      duration: const Duration(seconds: 30),
     )..repeat();
 
     _spinCtrl = AnimationController(
@@ -165,20 +165,22 @@ class _MotivationPageState extends State<MotivationPage>
       body: Stack(
         children: [
           // Animated cosmic background
-          SizedBox.expand(
-            child: AnimatedBuilder(
-              animation: Listenable.merge([_starsCtrl, _selectCtrl]),
-              builder: (ctx, _) {
-                Color? moodColor;
-                double moodBlend = 0.0;
-                if (_selectedIndex != null) {
-                  moodColor = characters[_selectedIndex!]['color'] as Color;
-                  moodBlend = Curves.easeInOut.transform(_selectCtrl.value);
-                }
-                return CustomPaint(
-                  painter: _CosmicBgPainter(_starsCtrl.value, moodColor: moodColor, moodBlend: moodBlend),
-                );
-              },
+          RepaintBoundary(
+            child: SizedBox.expand(
+              child: AnimatedBuilder(
+                animation: Listenable.merge([_starsCtrl, _selectCtrl]),
+                builder: (ctx, _) {
+                  Color? moodColor;
+                  double moodBlend = 0.0;
+                  if (_selectedIndex != null) {
+                    moodColor = characters[_selectedIndex!]['color'] as Color;
+                    moodBlend = Curves.easeInOut.transform(_selectCtrl.value);
+                  }
+                  return CustomPaint(
+                    painter: _CosmicBgPainter(_starsCtrl.value, moodColor: moodColor, moodBlend: moodBlend),
+                  );
+                },
+              ),
             ),
           ),
           // Back button
@@ -549,7 +551,7 @@ class _CosmicBgPainter extends CustomPainter {
     final h = size.height;
     final list = <_StarData>[];
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1500; i++) {
       // Radial distribution from center — dense in middle, covers full page
       final angle = rng.nextDouble() * math.pi * 2;
       final dist = math.pow(rng.nextDouble(), 0.7) as double;
@@ -616,7 +618,7 @@ class _CosmicBgPainter extends CustomPainter {
       const Color(0x30607090),
       const Color(0x18485870),
       const Color(0x002B3A52),
-    ], blur: 40);
+    ], blur: 20);
 
     // Center glow — blended with mood color
     final glowCore = moodColor != null
@@ -631,7 +633,7 @@ class _CosmicBgPainter extends CustomPainter {
       const Color(0x15D0C0A0),
       const Color(0x08B8A890),
       const Color(0x002B3A52),
-    ], blur: 120);
+    ], blur: 40);
     // Mid spread: very wide, very faint
     _radial(canvas, Offset(w * 0.5, h * 0.49), w * 1.2, [
       const Color(0x20D8C8B0),
@@ -639,13 +641,13 @@ class _CosmicBgPainter extends CustomPainter {
       const Color(0x08A09888),
       const Color(0x04787068),
       const Color(0x002B3A52),
-    ], blur: 150);
+    ], blur: 50);
     // Slight offset for organic feel
     _radial(canvas, Offset(w * 0.47, h * 0.51), w * 0.5, [
       const Color(0x30E8D8C0),
       const Color(0x14D0C0A8),
       const Color(0x002B3A52),
-    ], blur: 100);
+    ], blur: 35);
 
     // (bottom glow removed)
 
@@ -710,5 +712,5 @@ class _CosmicBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _CosmicBgPainter old) => true;
+  bool shouldRepaint(covariant _CosmicBgPainter old) => old.t != t || old.moodColor != moodColor || old.moodBlend != moodBlend;
 }

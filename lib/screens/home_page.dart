@@ -621,62 +621,46 @@ class _SlidingCookieState extends State<_SlidingCookie>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-           // Kayan kurabiyeler - Tüm 3 kurabiye her zaman render edilir
+           // Kayan kurabiyeler - Sadece gerekli olanlar render edilir (performans)
           SizedBox(
             height: 320, // CookieSection'ın sabit yüksekliği
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // Önceki kurabiye (sola sürükleme için)
-                Transform.translate(
-                  offset: Offset(
-                    (!_isTransitioning && sideEmoji != null && sideOffset != null && _dragOffset > 0)
-                        ? sideOffset
-                        : -MediaQuery.of(context).size.width,
-                    0,
-                  ),
-                  child: Opacity(
-                    opacity: (!_isTransitioning && _dragOffset > 0) ? 1.0 : 0.0,
+                // Önceki kurabiye - SADECE sürükleme sırasında oluştur
+                if (!_isTransitioning && _dragOffset > 0 && sideEmoji != null)
+                  Transform.translate(
+                    offset: Offset(sideOffset ?? -screenWidth, 0),
                     child: CookieSection(
                       key: ValueKey('side_prev_$sideEmoji'),
                       onCookieTapped: () {},
-                      selectedCookieEmoji: sideEmoji ?? 'spring_wreath',
+                      selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
                     ),
                   ),
-                ),
-                // Sonraki kurabiye (sağa sürükleme için)  
-                Transform.translate(
-                  offset: Offset(
-                    (!_isTransitioning && sideEmoji != null && sideOffset != null && _dragOffset < 0)
-                        ? sideOffset
-                        : MediaQuery.of(context).size.width,
-                    0,
-                  ),
-                  child: Opacity(
-                    opacity: (!_isTransitioning && _dragOffset < 0) ? 1.0 : 0.0,
+                // Sonraki kurabiye - SADECE sürükleme sırasında oluştur
+                if (!_isTransitioning && _dragOffset < 0 && sideEmoji != null)
+                  Transform.translate(
+                    offset: Offset(sideOffset ?? screenWidth, 0),
                     child: CookieSection(
                       key: ValueKey('side_next_$sideEmoji'),
                       onCookieTapped: () {},
-                      selectedCookieEmoji: sideEmoji ?? 'spring_wreath',
+                      selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
                     ),
                   ),
-                ),
-                // Çıkan kurabiye (geçiş animasyonu)
-                Transform.translate(
-                  offset: Offset(outgoingOffset ?? 0, 0),
-                  child: Opacity(
-                    opacity: (_isTransitioning && _outgoingEmoji != null) ? 1.0 : 0.0,
+                // Çıkan kurabiye - SADECE geçiş animasyonu sırasında oluştur
+                if (_isTransitioning && _outgoingEmoji != null)
+                  Transform.translate(
+                    offset: Offset(outgoingOffset ?? 0, 0),
                     child: CookieSection(
                       key: ValueKey('out_$_outgoingEmoji'),
                       onCookieTapped: () {},
-                      selectedCookieEmoji: _outgoingEmoji ?? 'spring_wreath',
+                      selectedCookieEmoji: _outgoingEmoji!,
                       hideLabels: true,
                     ),
                   ),
-                ),
-                // Mevcut/giren kurabiye
+                // Mevcut/giren kurabiye - HER ZAMAN render
                 Transform.translate(
                   offset: Offset(currentOffset, 0),
                   child: CookieSection(

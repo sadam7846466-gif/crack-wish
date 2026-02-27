@@ -32,7 +32,7 @@ class _WindyNazarState extends State<WindyNazar>
 
     // Ana sallanma - yavas, genis hareket
     _primaryController = AnimationController(
-      duration: const Duration(milliseconds: 2800),
+      duration: const Duration(milliseconds: 4000), // 2800 → 4000 (daha az GPU)
       vsync: this,
     );
     _primarySwing = Tween<double>(begin: -0.07, end: 0.07).animate(
@@ -45,7 +45,7 @@ class _WindyNazarState extends State<WindyNazar>
 
     // Ikincil mikro hareket - hizli, kucuk ruzgar etkisi
     _secondaryController = AnimationController(
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 2000), // 1100 → 2000 (daha az GPU)
       vsync: this,
     );
     _secondarySwing = Tween<double>(begin: -0.02, end: 0.02).animate(
@@ -58,7 +58,7 @@ class _WindyNazarState extends State<WindyNazar>
 
     // Nefes alma efekti - cok yavas, hafif buyuyup kuculme
     _breathController = AnimationController(
-      duration: const Duration(milliseconds: 4000),
+      duration: const Duration(milliseconds: 6000), // 4000 → 6000 (daha az GPU)
       vsync: this,
     );
     _breathAnimation = Tween<double>(begin: 1.0, end: 1.015).animate(
@@ -138,7 +138,7 @@ class _WindyNazarNetworkState extends State<WindyNazarNetwork>
     super.initState();
 
     _primaryController = AnimationController(
-      duration: const Duration(milliseconds: 2800),
+      duration: const Duration(milliseconds: 4000), // 2800 → 4000 (daha az GPU)
       vsync: this,
     );
     _primarySwing = Tween<double>(begin: -0.07, end: 0.07).animate(
@@ -147,7 +147,7 @@ class _WindyNazarNetworkState extends State<WindyNazarNetwork>
     _primaryController.repeat(reverse: true);
 
     _secondaryController = AnimationController(
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 2000), // 1100 → 2000 (daha az GPU)
       vsync: this,
     );
     _secondarySwing = Tween<double>(begin: -0.02, end: 0.02).animate(
@@ -156,7 +156,7 @@ class _WindyNazarNetworkState extends State<WindyNazarNetwork>
     _secondaryController.repeat(reverse: true);
 
     _breathController = AnimationController(
-      duration: const Duration(milliseconds: 4000),
+      duration: const Duration(milliseconds: 6000), // 4000 → 6000 (daha az GPU)
       vsync: this,
     );
     _breathAnimation = Tween<double>(begin: 1.0, end: 1.015).animate(

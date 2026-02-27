@@ -31,7 +31,7 @@ class _BentoGridState extends State<BentoGrid>
     super.initState();
     _tarotFloatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 6800),
+      duration: const Duration(milliseconds: 8000), // 6800 → 8000 (daha az GPU)
     )..repeat();
   }
 
@@ -76,7 +76,7 @@ class _BentoGridState extends State<BentoGrid>
                         _BentoCard(
                           compact: true,
                           contentBottom: false,
-                          iconWidget: Image.asset('assets/images/tarot/taroticon.png', width: 28, height: 28),
+                          iconWidget: Image.asset('assets/images/tarot/taroticon.webp', width: 28, height: 28),
                           title: l10n.bentoTarotTitle,
                           desc: l10n.bentoTarotDesc,
                           accent: const Color(0xFFC48DFF), // Parlak canlı mor-lila
@@ -728,7 +728,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
     _overlayDragOffset = Offset.zero;
     _overlayRotateController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 360),
+      duration: const Duration(seconds: 600), // 360s → 600s (daha yavaş dönüş)
     )..repeat();
   }
 
@@ -1233,7 +1233,7 @@ class _SlowRotatingWidgetState extends State<_SlowRotatingWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 180), // 3 dakikada bir tur
+      duration: const Duration(seconds: 300), // 180s → 300s (daha yavaş dönüş)
     )..repeat();
   }
 
@@ -1276,7 +1276,7 @@ class _FloatingWidgetState extends State<_FloatingWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 15),
+      duration: const Duration(seconds: 20), // 15s → 20s
     )..repeat(reverse: true);
   }
 

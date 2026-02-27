@@ -84,7 +84,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             Positioned.fill(
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
                 child: Container(color: Colors.transparent),
               ),
             ),

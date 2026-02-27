@@ -527,7 +527,7 @@ class _StatOverlayState extends State<_StatOverlay>
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
         child: GlassContainer(
           useOwnLayer: true,
           height: 245,
@@ -995,7 +995,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
               child: Container(
                 width: _menuW,
                 height: _menuH,
@@ -1196,7 +1196,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
         child: GlassContainer(
           useOwnLayer: true,
           height: 245,

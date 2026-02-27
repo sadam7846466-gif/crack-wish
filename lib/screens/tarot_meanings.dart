@@ -490,16 +490,16 @@ String _buildGeneralTheme(
   switch (flow) {
     case FlowType.harmonious:
       return isTr
-          ? '$n1 ile başlayan yolculuğun $n2 enerjisiyle güçleniyor ve $n3 seni parlak bir yöne çağırıyor.'
-          : 'The journey that began with $n1 is strengthened by $n2\'s energy, and $n3 calls you toward a bright direction.';
+          ? '$n1, $n2 ve $n3 birlikte parlıyor. İçindeki ışığı korkusuzca yansıt.'
+          : '$n1, $n2 and $n3 shine together. Reflect your inner light fearlessly.';
     case FlowType.conflicting:
       return isTr
-          ? '$n1 sarsıntısıyla başlayan süreç, $n2 ile yüzleşme gerektiriyor. $n3 çıkış yolunu gösteriyor ama cesaret istiyor.'
-          : 'The process sparked by $n1 demands confrontation through $n2. $n3 shows the way out, but it requires courage.';
+          ? '$n1 sarsıyor, $n2 sınıyor ama $n3 çıkış yolunu gösteriyor.'
+          : '$n1 shakes, $n2 tests, but $n3 reveals the way forward.';
     case FlowType.transformative:
       return isTr
-          ? 'Derin bir dönüşümdesin: $n1 geçmişi kapatıyor, $n2 seni yoğuruyor, $n3 yepyeni bir kapı açıyor.'
-          : 'You are in a deep transformation: $n1 closes the past, $n2 is reshaping you, $n3 opens a brand new door.';
+          ? '$n1 bir kapıyı kapatıyor, $n2 seni dönüştürüyor, $n3 yeni bir başlangıç sunuyor.'
+          : '$n1 closes a door, $n2 transforms you, $n3 offers a fresh start.';
   }
 }
 
@@ -511,15 +511,15 @@ String _buildClosing(
   switch (flow) {
     case FlowType.harmonious:
       return isTr
-          ? '🌟 Kartların uyumu güçlü. Doğru yoldasın; kalbine güven ve ilerlemeye devam et.'
-          : '🌟 Your cards are in strong harmony. You are on the right path; trust your heart and keep moving forward.';
+          ? '🌟 Evrenin kusursuz matematiği şu an seninle hizalanıyor. Kalbindeki o ince sese güven; çünkü adımların şu an gökyüzü tarafından destekleniyor.'
+          : '🌟 The perfect geometry of the universe is aligning with you right now. Trust the subtle voice in your heart, for your steps are supported by the cosmos.';
     case FlowType.conflicting:
       return isTr
-          ? '🔥 Zor bir dönemdesin ama bu yüzleşme seni güçlendirecek. Cesur ol.'
-          : '🔥 You are in a challenging period, but this confrontation will make you stronger. Be brave.';
+          ? '🔥 Fırtınaların ortasında savrulduğunu hissedebilirsin, fakat unutma; en güçlü çelik en harlı ateşte dövülür. Kendi gücüne uyanıyorsun.'
+          : '🔥 You may feel tossed in the midst of storms, but remember; the strongest steel is forged in the fiercest fire. You are awakening to your own power.';
     case FlowType.transformative:
       return isTr
-          ? '🦋 Dönüşüm acı verse de sonunda yepyeni, daha güçlü bir sen doğacak.'
-          : '🦋 Transformation may be painful, but in the end, a brand new, stronger you will emerge.';
+          ? '🦋 Kozanı yırtıp çıkmak acı verebilir; lakin birazdan kanatlarının aslında ne kadar görkemli olduğunu tüm dünya görecek.'
+          : '🦋 Tearing through the cocoon may hurt; but soon, the whole world will witness just how magnificent your wings truly are.';
   }
 }

@@ -10,7 +10,7 @@ class StarsBackground extends StatefulWidget {
 
 class _StarsBackgroundState extends State<StarsBackground>
     with SingleTickerProviderStateMixin {
-  static const double _cycleSeconds = 28;
+  static const double _cycleSeconds = 40;
   late final AnimationController _controller;
   late final List<_Star> _stars;
 
@@ -34,7 +34,7 @@ class _StarsBackgroundState extends State<StarsBackground>
     final random = math.Random(42);
     final stars = <_Star>[];
 
-    for (int i = 0; i < 120; i++) {
+    for (int i = 0; i < 70; i++) {
       stars.add(
         _Star(
           x: random.nextDouble(),
@@ -47,7 +47,7 @@ class _StarsBackgroundState extends State<StarsBackground>
       );
     }
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 20; i++) {
       stars.add(
         _Star(
           x: random.nextDouble(),

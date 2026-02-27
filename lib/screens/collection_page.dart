@@ -661,7 +661,7 @@ class _EmojiBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final obtained = card.firstObtainedDate != null;
-    final imagePath = 'assets/images/cookies/${card.id}.png';
+    final imagePath = 'assets/images/cookies/${card.id}.webp';
     return Container(
       width: size,
       height: size,

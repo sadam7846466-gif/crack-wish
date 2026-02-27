@@ -109,7 +109,7 @@ class _DailyTipCardState extends State<DailyTipCard> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14), // 30 → 14 (performans)
                 child: GlassContainer(
                   useOwnLayer: true,
                   height: null,

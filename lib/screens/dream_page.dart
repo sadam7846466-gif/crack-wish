@@ -3088,7 +3088,7 @@ class _HolographicBrainWidgetState extends State<_HolographicBrainWidget>
     super.initState();
     _waveController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 16), // 10s → 16s (performans)
     )..repeat();
 
     // Çizim animasyonu - soldan sağa çizilme
@@ -4157,7 +4157,7 @@ class _InterpretationCardWidgetState extends State<_InterpretationCardWidget>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14), // 25 → 14 (performans)
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

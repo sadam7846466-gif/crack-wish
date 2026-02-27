@@ -137,7 +137,7 @@ class _ZodiacPageState extends State<ZodiacPage> {
                                     child: Opacity(
                                       opacity: 0.85,
                                       child: Image.asset(
-                                        'assets/images/zodiac.png',
+                                        'assets/images/zodiac.webp',
                                         width: 22,
                                         height: 22,
                                         fit: BoxFit.contain,

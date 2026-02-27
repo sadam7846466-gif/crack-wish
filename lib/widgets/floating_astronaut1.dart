@@ -22,7 +22,7 @@ class _FloatingAstronaut1State extends State<FloatingAstronaut1>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 8000),
+      duration: const Duration(milliseconds: 12000), // 8000 → 12000 (daha az GPU)
       vsync: this,
     )..repeat(reverse: true);
 

@@ -2863,7 +2863,9 @@ class _DrawingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DrawingPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _DrawingPainter oldDelegate) =>
+      oldDelegate.strokes.length != strokes.length ||
+      oldDelegate.currentStroke.length != currentStroke.length;
 }
 
 // ==== ZARF KAPAK KESİM SINIFI ====
