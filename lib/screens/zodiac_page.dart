@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/glass_back_button.dart';
 import '../constants/colors.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
@@ -43,16 +44,10 @@ class _ZodiacPageState extends State<ZodiacPage> {
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(12, 12, 20, 12),
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: AppColors.textWhite,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    GlassBackButton(),
                     const SizedBox(width: 10),
                     const Text(
                       '⭐ Burç Yorumu',
@@ -182,27 +177,6 @@ class _ZodiacPageState extends State<ZodiacPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNav(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          if (index == _currentNavIndex) return;
-          Widget destination;
-          switch (index) {
-            case 0:
-              destination = const HomePage();
-              break;
-            case 1:
-              destination = const CollectionPage();
-              break;
-            case 2:
-              destination = const ProfilePage();
-              break;
-            default:
-              return;
-          }
-          Navigator.pushReplacement(context, FadePageRoute(page: destination));
-        },
       ),
     );
   }

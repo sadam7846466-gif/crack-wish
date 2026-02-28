@@ -11,7 +11,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
-
+import '../widgets/glass_back_button.dart';
 import 'tarot_meanings.dart';
 
 enum RitualState {
@@ -217,6 +217,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   int _adCredits = 0;
   int _streak = 1;
   bool _isBusy = false;
+  bool _magicBtnPressed = false;
 
   // deck
   late List<int> _deckOrder;
@@ -796,7 +797,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
     // --- Saspans (Yorumlama / Bekleme) Hissi ---
     _setMiniStatus(_t('Kaderin fısıltısı dinleniyor...', 'Listening to whispers of fate...'), ms: 800);
-    // 3. kartın yuvasına yerleşmesini görecek kadar (sadece 400ms) bekliyoruz
     await Future.delayed(const Duration(milliseconds: 400));
     if (!mounted) return;
     // -------------------------------------------
@@ -822,7 +822,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     if (!mounted) return;
     
     // Yorum zaten RitualState.revealed ile fullscreen blur üstünde gösteriliyor
-    // _openReadingSheet ayrı BottomSheet açıyor, o yüzden kullanmıyoruz
   }
 
   Widget _buildHeroCardView(int index, Color glowColor, double scale) {
@@ -963,12 +962,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.cormorantGaramond(
                       color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      height: 1.5,
-                      letterSpacing: 0.1,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      height: 1.6,
+                      letterSpacing: 0.2,
                       shadows: [
                         Shadow(
                           color: Colors.black.withOpacity(0.4),
@@ -1053,53 +1052,144 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  IconData _getIconForPromise(String keyword) {
-    final lower = keyword.toLowerCase();
-    
-    // Yıkım, Kriz, Beklenmedik Değişim (Kule vb.)
-    if (lower.contains('yıkım') || lower.contains('kriz') || lower.contains('kaos') || lower.contains('bela')) return Icons.local_fire_department_outlined;
-    
-    // Seçim, Karar (Aşıklar, İki Kılıç vb.)
-    if (lower.contains('seçim') || lower.contains('karar') || lower.contains('yol ayrımı') || lower.contains('ikilem')) return Icons.alt_route_outlined;
-    
-    // Aşk, Duygu, İlişki
-    if (lower.contains('aşk') || lower.contains('sevgi') || lower.contains('ilişki') || lower.contains('kalp') || lower.contains('love') || lower.contains('duygu')) return Icons.favorite_border;
-    
-    // Enerji, Güç, Hareket, İrade
-    if (lower.contains('enerji') || lower.contains('güç') || lower.contains('cesaret') || lower.contains('irade') || lower.contains('hız') || lower.contains('energy') || lower.contains('power')) return Icons.bolt;
-    
-    // Umut, Büyüme, Şifa, Yenilenme
-    if (lower.contains('umut') || lower.contains('büyüme') || lower.contains('şifa') || lower.contains('yenilenme') || lower.contains('hope') || lower.contains('doğa')) return Icons.eco_outlined;
-    
-    // Başarı, Zafer, Kutlama
-    if (lower.contains('başarı') || lower.contains('zafer') || lower.contains('kutlama') || lower.contains('success') || lower.contains('victory')) return Icons.emoji_events_outlined;
-    
-    // Sezgi, Gizem, İç dünyamıza dönüş
-    if (lower.contains('sezgi') || lower.contains('gizem') || lower.contains('bilgelik') || lower.contains('intuition') || lower.contains('sır') || lower.contains('içe')) return Icons.remove_red_eye_outlined;
-    
-    // Denge, Adalet, Uyum
-    if (lower.contains('denge') || lower.contains('adalet') || lower.contains('uyum') || lower.contains('hakikat')) return Icons.balance_outlined;
-    
-    // Yeni, Başlangıç, Aydınlanma
-    if (lower.contains('yeni') || lower.contains('başlangıç') || lower.contains('aydınlanma') || lower.contains('doğuş')) return Icons.flare_outlined;
-    
-    // Dönüşüm, Bitiş, Ölüm Kartı
-    if (lower.contains('dönüşüm') || lower.contains('bitiş') || lower.contains('son') || lower.contains('veda')) return Icons.change_circle_outlined;
-    
-    // Para, Maddiyat, Zenginlik
-    if (lower.contains('para') || lower.contains('zenginlik') || lower.contains('maddi') || lower.contains('bolluk') || lower.contains('materyal')) return Icons.monetization_on_outlined;
-    
-    // Şans, Kader, Döngü
-    if (lower.contains('şans') || lower.contains('kader') || lower.contains('döngü') || lower.contains('çark')) return Icons.rotate_right_outlined;
+  // Görünen kelimeye göre ikon eşleştirme — çok geniş, her kelimeye özel
+  static const Map<String, IconData> _keywordIcons = {
+    // Türkçe
+    'yeni başlangıç': Icons.hiking_outlined,
+    'masumiyet': Icons.child_care_outlined,
+    'cesaret': Icons.bolt,
+    'irade': Icons.auto_fix_high_outlined,
+    'yaratıcılık': Icons.brush_outlined,
+    'ustalık': Icons.architecture_outlined,
+    'sezgi': Icons.remove_red_eye_outlined,
+    'gizem': Icons.lock_outlined,
+    'içsel bilgelik': Icons.self_improvement_outlined,
+    'bereket': Icons.spa_outlined,
+    'doğurganlık': Icons.eco_outlined,
+    'şefkat': Icons.volunteer_activism_outlined,
+    'otorite': Icons.account_balance_outlined,
+    'yapı': Icons.domain_outlined,
+    'düzen': Icons.grid_view_outlined,
+    'gelenek': Icons.menu_book_outlined,
+    'rehberlik': Icons.assistant_navigation,
+    'inanç sistemi': Icons.temple_buddhist_outlined,
+    'seçim': Icons.alt_route_outlined,
+    'ilişki': Icons.favorite_border,
+    'uyum': Icons.handshake_outlined,
+    'zafer': Icons.emoji_events_outlined,
+    'ilerleme': Icons.rocket_launch_outlined,
+    'iç güç': Icons.shield_outlined,
+    'sabır': Icons.access_time_outlined,
+    'içe dönüş': Icons.explore_outlined,
+    'arayış': Icons.travel_explore_outlined,
+    'yalnızlık': Icons.person_outlined,
+    'kader': Icons.rotate_right_outlined,
+    'döngü': Icons.loop_outlined,
+    'dönüm noktası': Icons.swap_vert_circle_outlined,
+    'adalet': Icons.balance_outlined,
+    'denge': Icons.water_drop_outlined,
+    'doğruluk': Icons.verified_outlined,
+    'fedakârlık': Icons.hourglass_empty_outlined,
+    'bekleyiş': Icons.pause_circle_outlined,
+    'farklı bakış açısı': Icons.flip_outlined,
+    'dönüşüm': Icons.change_circle_outlined,
+    'kapanış': Icons.door_sliding_outlined,
+    'yenilenme': Icons.autorenew_outlined,
+    'ılımlılık': Icons.thermostat_outlined,
+    'bağımlılık': Icons.link_off_outlined,
+    'gölge': Icons.dark_mode_outlined,
+    'yüzleşme': Icons.face_retouching_natural_outlined,
+    'yıkım': Icons.local_fire_department_outlined,
+    'kriz': Icons.warning_amber_outlined,
+    'ani değişim': Icons.flash_on_outlined,
+    'umut': Icons.star_outline,
+    'ilham': Icons.lightbulb_outlined,
+    'iyileşme': Icons.healing_outlined,
+    'yanılsama': Icons.visibility_off_outlined,
+    'korku': Icons.nightlight_outlined,
+    'bilinçaltı': Icons.psychology_outlined,
+    'başarı': Icons.wb_sunny_outlined,
+    'canlılık': Icons.local_florist_outlined,
+    'aydınlanma': Icons.flare_outlined,
+    'uyanış': Icons.notifications_active_outlined,
+    'yargı': Icons.gavel_outlined,
+    'çağrı': Icons.campaign_outlined,
+    'tamamlanma': Icons.all_inclusive_rounded,
+    'bütünlük': Icons.public_outlined,
+    // English
+    'new beginning': Icons.hiking_outlined,
+    'innocence': Icons.child_care_outlined,
+    'courage': Icons.bolt,
+    'willpower': Icons.auto_fix_high_outlined,
+    'creativity': Icons.brush_outlined,
+    'mastery': Icons.architecture_outlined,
+    'intuition': Icons.remove_red_eye_outlined,
+    'mystery': Icons.lock_outlined,
+    'inner wisdom': Icons.self_improvement_outlined,
+    'abundance': Icons.spa_outlined,
+    'fertility': Icons.eco_outlined,
+    'nurturing': Icons.volunteer_activism_outlined,
+    'authority': Icons.account_balance_outlined,
+    'structure': Icons.domain_outlined,
+    'order': Icons.grid_view_outlined,
+    'tradition': Icons.menu_book_outlined,
+    'guidance': Icons.assistant_navigation,
+    'belief system': Icons.temple_buddhist_outlined,
+    'choice': Icons.alt_route_outlined,
+    'relationship': Icons.favorite_border,
+    'harmony': Icons.handshake_outlined,
+    'victory': Icons.emoji_events_outlined,
+    'forward movement': Icons.rocket_launch_outlined,
+    'inner strength': Icons.shield_outlined,
+    'patience': Icons.access_time_outlined,
+    'introspection': Icons.explore_outlined,
+    'seeking': Icons.travel_explore_outlined,
+    'solitude': Icons.person_outlined,
+    'fate': Icons.rotate_right_outlined,
+    'cycle': Icons.loop_outlined,
+    'turning point': Icons.swap_vert_circle_outlined,
+    'justice': Icons.balance_outlined,
+    'balance': Icons.water_drop_outlined,
+    'truth': Icons.verified_outlined,
+    'sacrifice': Icons.hourglass_empty_outlined,
+    'waiting': Icons.pause_circle_outlined,
+    'new perspective': Icons.flip_outlined,
+    'transformation': Icons.change_circle_outlined,
+    'ending': Icons.door_sliding_outlined,
+    'renewal': Icons.autorenew_outlined,
+    'moderation': Icons.thermostat_outlined,
+    'attachment': Icons.link_off_outlined,
+    'shadow': Icons.dark_mode_outlined,
+    'confrontation': Icons.face_retouching_natural_outlined,
+    'destruction': Icons.local_fire_department_outlined,
+    'crisis': Icons.warning_amber_outlined,
+    'sudden change': Icons.flash_on_outlined,
+    'hope': Icons.star_outline,
+    'inspiration': Icons.lightbulb_outlined,
+    'healing': Icons.healing_outlined,
+    'illusion': Icons.visibility_off_outlined,
+    'fear': Icons.nightlight_outlined,
+    'subconscious': Icons.psychology_outlined,
+    'success': Icons.wb_sunny_outlined,
+    'vitality': Icons.local_florist_outlined,
+    'enlightenment': Icons.flare_outlined,
+    'awakening': Icons.notifications_active_outlined,
+    'judgement': Icons.gavel_outlined,
+    'calling': Icons.campaign_outlined,
+    'completion': Icons.all_inclusive_rounded,
+    'wholeness': Icons.public_outlined,
+    'triumph': Icons.military_tech_outlined,
+  };
 
-    // Bekleyiş, Sabır, Duraklama
-    if (lower.contains('bekleyiş') || lower.contains('sabır') || lower.contains('duraklama') || lower.contains('sessizlik') || lower.contains('fedakar')) return Icons.hourglass_empty_outlined;
-
-    // Mantık, Zihin, Gerçek
-    if (lower.contains('mantık') || lower.contains('zihin') || lower.contains('düşünce') || lower.contains('akıl') || lower.contains('gerçek')) return Icons.psychology_outlined;
-
-    // Standart mistik yıldız (Bulunamazsa)
-    return Icons.auto_awesome;
+  IconData _getIconForKeyword(String keyword) {
+    final lower = keyword.toLowerCase().trim();
+    // Önce tam eşleşme dene
+    if (_keywordIcons.containsKey(lower)) return _keywordIcons[lower]!;
+    // Sonra kısmi eşleşme
+    for (final entry in _keywordIcons.entries) {
+      if (lower.contains(entry.key) || entry.key.contains(lower)) return entry.value;
+    }
+    return Icons.star_outline;
   }
 
   Widget _buildVerticalMisticLine() {
@@ -1132,23 +1222,22 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
               text,
+              textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.5,
               ),
             ),
           ),
           const SizedBox(height: 4),
-          // Glow line
+          // Parlayan gradient çizgi + dot
           Stack(
             alignment: Alignment.center,
             children: [
-              // Sağdan ve soldan yavaşça kaybolan çok ince çizgi (fade effect)
               Container(
                 width: 72,
                 height: 1.5,
@@ -1162,7 +1251,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              // Tam ortalanmış parlayan zarif ufak nokta
               Container(
                 width: 3.5,
                 height: 3.5,
@@ -1191,16 +1279,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   }
 
   Widget _buildPromisesPanel() {
-    if (_selectedCardIndexes.length < 3) return const SizedBox.shrink();
+    if (_selectedCardIndexes.length < 3 || _latestReading == null) return const SizedBox.shrink();
     
-    // Çekilen 3 kartın "theme" değerinin ilk kelimesini al
-    final m1 = cardMeanings[_selectedCardIndexes[0]]!;
-    final m2 = cardMeanings[_selectedCardIndexes[1]]!;
-    final m3 = cardMeanings[_selectedCardIndexes[2]]!;
-    
-    String p1 = (_isTr ? m1.themeTr : m1.themeEn).split(',').first.trim();
-    String p2 = (_isTr ? m2.themeTr : m2.themeEn).split(',').first.trim();
-    String p3 = (_isTr ? m3.themeTr : m3.themeEn).split(',').first.trim();
+    final p1 = _latestReading!.promises[0];
+    final p2 = _latestReading!.promises[1];
+    final p3 = _latestReading!.promises[2];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -1211,7 +1294,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         settings: const LiquidGlassSettings(
           thickness: 16,
           blur: 10,
-          glassColor: Color(0x1AE7D6A5), // Mistik altın/sıcak ton
+          glassColor: Color(0x1AE7D6A5),
           chromaticAberration: 0.1,
           lightIntensity: 1.0,
           ambientStrength: 0.85,
@@ -1222,11 +1305,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildPromiseItem(p1, _getIconForPromise(p1), const Color(0xFFFF4081)), // Pembe/Aşk Enerjisi
+            _buildPromiseItem(p1, _getIconForKeyword(p1), const Color(0xFFFF4081)),
             _buildVerticalMisticLine(),
-            _buildPromiseItem(p2, _getIconForPromise(p2), const Color(0xFFFFCA28)), // Altın/Sıcak Enerji
+            _buildPromiseItem(p2, _getIconForKeyword(p2), const Color(0xFFFFCA28)),
             _buildVerticalMisticLine(),
-            _buildPromiseItem(p3, _getIconForPromise(p3), const Color(0xFF40C4FF)), // Mavi/Gelişim Enerjisi
+            _buildPromiseItem(p3, _getIconForKeyword(p3), const Color(0xFF40C4FF)),
           ],
         ),
       ),
@@ -1235,97 +1318,118 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   Widget _buildMagicButton(String label, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF532491), Color(0xFF9059D2), Color(0xFF6C3FA0)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF9059D2).withOpacity(0.5),
-              blurRadius: 25,
-              spreadRadius: 2,
+      onTap: () async {
+        _setStateSafe(() => _magicBtnPressed = true);
+        HapticFeedback.lightImpact();
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (!mounted) return;
+        _setStateSafe(() => _magicBtnPressed = false);
+        await Future.delayed(const Duration(milliseconds: 100));
+        onTap();
+      },
+      child: AnimatedScale(
+        scale: _magicBtnPressed ? 0.90 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: _magicBtnPressed 
+                ? const Color(0xFFE7D6A5).withOpacity(0.15)
+                : Colors.white.withOpacity(0.06),
+            border: Border.all(
+              color: _magicBtnPressed
+                  ? const Color(0xFFE7D6A5).withOpacity(0.8)
+                  : const Color(0xFFE7D6A5).withOpacity(0.4),
+              width: 1,
             ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.4),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.white.withOpacity(0.5),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE7D6A5).withOpacity(_magicBtnPressed ? 0.25 : 0.08),
+                blurRadius: _magicBtnPressed ? 35 : 20,
+                spreadRadius: _magicBtnPressed ? 2 : -2,
               ),
-            ),
-            const SizedBox(width: 16),
-            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 22),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.refresh_rounded,
+                color: const Color(0xFFE7D6A5).withOpacity(0.8),
+                size: 18,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: GoogleFonts.cormorantGaramond(
+                  color: const Color(0xFFE7D6A5),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildDailyAdviceCard(String title, String advice) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 32),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141029).withOpacity(0.6), // dark purple alpha
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFCBA153).withOpacity(0.35),
-          width: 0.8,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFCBA153).withOpacity(0.04),
-            blurRadius: 10,
-          )
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.eco_rounded, color: Color(0xFFE7D6A5), size: 16),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                  letterSpacing: 1.2,
-                ),
+          // Üst altın çizgi
+          Container(
+            height: 0.8,
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFFE7D6A5).withOpacity(0.5),
+                  Colors.transparent,
+                ],
               ),
-            ],
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 28),
+          // Sonsuzluk ikonu
+          Icon(
+            Icons.all_inclusive_rounded,
+            color: const Color(0xFFE7D6A5).withOpacity(0.4),
+            size: 24,
+          ),
+          const SizedBox(height: 20),
+          // Mesaj metni - büyük, vurucu
           Text(
             advice,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              height: 1.5,
-              fontWeight: FontWeight.w500,
+            style: GoogleFonts.cormorantGaramond(
+              color: Colors.white.withOpacity(0.95),
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              height: 1.6,
+              letterSpacing: 0.2,
+            ),
+          ),
+          const SizedBox(height: 28),
+          // Alt altın çizgi
+          Container(
+            height: 0.8,
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFFE7D6A5).withOpacity(0.5),
+                  Colors.transparent,
+                ],
+              ),
             ),
           ),
         ],
@@ -1340,108 +1444,73 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       barrierLabel: 'TarotGuidance',
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, anim1, anim2) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.85,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1845).withOpacity(0.95), // Koyu Mistik Mor
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: const Color(0xFFE7D6A5).withOpacity(0.4),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFE7D6A5).withOpacity(0.1),
-                    blurRadius: 40,
-                    spreadRadius: -5,
+        return GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            color: Colors.black.withOpacity(0.4),
+            child: Center(
+            child: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: GlassCard(
+                  useOwnLayer: true,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  shape: const LiquidRoundedSuperellipse(borderRadius: 24),
+                  settings: const LiquidGlassSettings(
+                    thickness: 24,
+                    blur: 15,
+                    glassColor: Color(0x1A1E1845),
+                    chromaticAberration: 0.12,
+                    lightIntensity: 1.0,
+                    ambientStrength: 0.8,
+                    refractiveIndex: 1.3,
+                    saturation: 1.1,
                   ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome,
-                      color: Color(0xFFE7D6A5),
-                      size: 32,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _isTr ? 'Tarot\'un Fısıltısı' : 'Whisper of Tarot',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cormorantGaramond(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      height: 1,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.transparent, const Color(0xFFE7D6A5).withOpacity(0.8), Colors.transparent],
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.auto_awesome,
+                          color: Color(0xFFE7D6A5),
+                          size: 24,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildGuidanceItem(
-                      _isTr ? 'İçsel Bir Ayna' : 'An Inner Mirror',
-                      _isTr 
-                          ? 'Mistik Tarot, kesin bir gelecek söylemek yerine kendi içine tutulan bir aynadır. Zihnindeki karmaşayı, korkularını ve gerçek umutlarını semboller aracılığıyla gün yüzüne çıkarır.'
-                          : 'Mystical Tarot is not a fortune teller, but a mirror reflecting your inner self. It brings your hidden fears, hopes, and confusion to light through symbols.',
-                      Icons.visibility_outlined,
-                    ),
-                    _buildGuidanceItem(
-                      _isTr ? 'Objektif Perspektif' : 'Objective Perspective',
-                      _isTr 
-                          ? 'Olayların içindeyken büyük resmi göremeyiz. Kartlar seni olayın dışına çıkartıp, durumu daha bilge ve tarafsız bir gözle değerlendirmeni sağlar.'
-                          : 'When you are in the middle of events, it is hard to see the big picture. Cards pull you out and let you observe the situation with a wise, objective eye.',
-                      Icons.landscape_outlined,
-                    ),
-                    _buildGuidanceItem(
-                      _isTr ? 'Rehberlik ve Eylem' : 'Guidance and Action',
-                      _isTr
-                          ? 'Tarot seni çaresiz hissettirmez; "Senin elinde ne güç var?" sorusuna odaklanır. Şimdiki durumunu analiz eder ve en doğru eylemi, yönü sana nazikçe fısıldar.'
-                          : 'Tarot never makes you feel helpless; it focuses on "What power do you hold?". It analyzes your present and gently whispers the best action to take.',
-                      Icons.explore_outlined,
-                    ),
-                    const SizedBox(height: 24),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE7D6A5).withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFE7D6A5).withOpacity(0.5),
+                        const SizedBox(height: 10),
+                        Text(
+                          _isTr ? 'Tarot\'un Fısıltısı' : 'Whisper of Tarot',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.cormorantGaramond(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
                           ),
                         ),
-                        child: Text(
-                          _isTr ? 'Anladım' : 'I Understand',
-                          style: const TextStyle(
-                            color: Color(0xFFE7D6A5),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                        const SizedBox(height: 6),
+                        Container(
+                          height: 1,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.transparent, const Color(0xFFE7D6A5).withOpacity(0.8), Colors.transparent],
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 14),
+                        ..._getRandomGuidanceItems(),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
+           ),
           ),
+         ),
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
@@ -1459,21 +1528,91 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
+  List<Widget> _getRandomGuidanceItems() {
+    final allItems = [
+      _buildGuidanceItem(
+        _isTr ? 'İçsel Bir Ayna' : 'An Inner Mirror',
+        _isTr
+            ? 'Mistik Tarot, kesin bir gelecek söylemek yerine kendi içine tutulan bir aynadır. Zihnindeki karmaşayı, korkularını ve gerçek umutlarını semboller aracılığıyla gün yüzüne çıkarır.'
+            : 'Mystical Tarot is a mirror reflecting your inner self. It brings your hidden fears, hopes, and confusion to light through symbols.',
+        Icons.visibility_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Objektif Perspektif' : 'Objective Perspective',
+        _isTr
+            ? 'Olayların içindeyken büyük resmi göremeyiz. Kartlar seni olayın dışına çıkartıp, durumu daha bilge ve tarafsız bir gözle değerlendirmeni sağlar.'
+            : 'When you are in the middle of events, it is hard to see the big picture. Cards pull you out and let you observe with a wise, objective eye.',
+        Icons.landscape_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Rehberlik ve Eylem' : 'Guidance and Action',
+        _isTr
+            ? 'Tarot seni çaresiz hissettirmez; "Senin elinde ne güç var?" sorusuna odaklanır. Şimdiki durumunu analiz eder ve en doğru eylemi sana nazikçe fısıldar.'
+            : 'Tarot focuses on "What power do you hold?". It analyzes your present and gently whispers the best action to take.',
+        Icons.explore_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Bilinçaltının Sesi' : 'Voice of the Subconscious',
+        _isTr
+            ? 'Kartlar, bilinçaltında sakladığın cevapları yüzeye çıkarır. Aslında cevabı zaten biliyorsun; kartlar sadece onu hatırlatır.'
+            : 'Cards bring answers hidden in your subconscious to the surface. You already know the answer; cards simply remind you.',
+        Icons.psychology_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Sembollerin Dili' : 'Language of Symbols',
+        _isTr
+            ? 'Her kart, binlerce yıllık arketipsel bir sembol taşır. Bu semboller evrenseldir ve ruhunun derinliklerine hitap eder.'
+            : 'Each card carries an archetypal symbol thousands of years old. These symbols are universal and speak to the depths of your soul.',
+        Icons.auto_stories_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Zamanın Akışı' : 'Flow of Time',
+        _isTr
+            ? 'Geçmiş seni şekillendirdi, şimdi seni tanımlar, gelecek ise senin ellerinde. Kartlar bu üç zamanın arasındaki köprüyü kurar.'
+            : 'The past shaped you, the present defines you, and the future is in your hands. Cards build the bridge between these three times.',
+        Icons.timeline_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Cesarete Davet' : 'Invitation to Courage',
+        _isTr
+            ? 'Bazen en zor kart, en gerekli mesajı taşır. Rahatsız eden bir yorum, aslında büyümenin kapısını aralıyor olabilir.'
+            : 'Sometimes the hardest card carries the most needed message. An uncomfortable interpretation may be opening the door to growth.',
+        Icons.local_fire_department_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Dönüşüm Gücü' : 'Power of Transformation',
+        _isTr
+            ? 'Her çekim, bir dönüşüm fırsatıdır. Kartlar sana ne olduğunu değil, ne olabileceğini gösterir. Değişim senin içinde başlar.'
+            : 'Every reading is an opportunity for transformation. Cards show not what is, but what can be. Change begins within you.',
+        Icons.change_circle_outlined,
+      ),
+      _buildGuidanceItem(
+        _isTr ? 'Sezgisel Bilgelik' : 'Intuitive Wisdom',
+        _isTr
+            ? 'Mantık sınırlıdır ama sezgi sınırsızdır. Kartları seçerken hissettiğin çekim, bilinçaltının sana yol göstermesidir.'
+            : 'Logic is limited but intuition is boundless. The pull you feel when choosing cards is your subconscious guiding you.',
+        Icons.self_improvement_outlined,
+      ),
+    ];
+    allItems.shuffle(Random());
+    return allItems.take(3).toList();
+  }
+
   Widget _buildGuidanceItem(String title, String desc, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: const Color(0xFFE7D6A5).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFFE7D6A5), size: 20),
+            child: Icon(icon, color: const Color(0xFFE7D6A5), size: 18),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1482,18 +1621,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   desc,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
-                    fontSize: 14,
-                    height: 1.5,
+                    fontSize: 12.5,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -1508,148 +1647,105 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     required String title,
     required String content,
     required String cardName,
+    required String cardAsset,
     required IconData icon,
     required Color color,
   }) {
-    return AnimatedBuilder(
-      animation: _bgPulseCtrl,
-      builder: (context, child) {
-        final pulse = sin(_bgPulseCtrl.value * pi * 2);
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 14.0, sigmaY: 14.0),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: const Color(0xFFE7D6A5).withOpacity(0.2 + pulse * 0.08),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.06 + pulse * 0.03),
-                    blurRadius: 30,
-                    spreadRadius: -5,
-                  ),
-                ],
-              ),
-              child: child,
-            ),
-          ),
-        );
-      },
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: color.withOpacity(0.25),
-                    width: 0.8,
+          // Sol Taraf: Kart Görseli (Ekstra beyaz kenarlıkları kırmak için hafif zoom)
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.4),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: color.withOpacity(0.15),
+                  blurRadius: 15,
+                  spreadRadius: -4,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 80,
+                height: 125,
+                child: Transform.scale(
+                  scale: 1.15, // Resmin kendi içindeki beyaz çerçeveyi kırpar
+                  child: Image.asset(
+                    cardAsset,
+                    fit: BoxFit.cover,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.15),
-                      blurRadius: 8,
-                      spreadRadius: -2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Sağ Taraf: Sadece Kart İsmi ve Anlamı
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 6), // Resmi ortalamak için hafif üst boşluk
+                // Çekilen Kart İsmi
+                Text(
+                  cardName,
+                  style: GoogleFonts.cinzel(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Yorum (Insight) - Sadece Çizgi ve Metin
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // İnce Zarif Accent Çizgi
+                    Container(
+                      margin: const EdgeInsets.only(top: 4, right: 10),
+                      width: 2,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [color.withOpacity(0.8), color.withOpacity(0.0)],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        content,
+                        style: GoogleFonts.lora(
+                          color: Colors.white.withOpacity(0.95),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                          letterSpacing: 0.2,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title.toUpperCase(),
-                    style: TextStyle(
-                      color: color.withOpacity(0.9),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2.0,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    cardName,
-                    style: GoogleFonts.cormorantGaramond(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Altın ince ayıraç çizgi
-          Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  const Color(0xFFE7D6A5).withOpacity(0.25),
-                  Colors.transparent,
-                ],
-              ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          // Estetik, vurgulanmış Insight Text
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Sol Taraftaki Zarif Çizgi (Vurgu İçin)
-              Container(
-                margin: const EdgeInsets.only(top: 4, right: 12),
-                width: 2,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      color.withOpacity(0.8),
-                      color.withOpacity(0.1),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  content,
-                  style: GoogleFonts.lora(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    height: 1.6,
-                    letterSpacing: 0.2,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 2,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -1926,6 +2022,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   Future<void> _selectCard(int index, GlobalKey cardKey) async {
     if (_isBusy) return;
+    // Sayfa kaydırılırken (geri jesti) kart tıklanmasını engelle
+    final route = ModalRoute.of(context);
+    if (route != null && route.animation != null && route.animation!.status == AnimationStatus.reverse) return;
+    if (route != null && route.animation != null && route.animation!.value < 0.95) return;
     final totalReserved = _selectedTablePositions.length + _reservedSlotCount;
     if (totalReserved >= _maxSlots) return;
     if (_selectedTablePositions.contains(index)) return;
@@ -2595,7 +2695,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: _state != RitualState.revealed,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _state == RitualState.revealed) {
+          _resetToIdle();
+        }
+      },
+      child: Scaffold(
       extendBody: true,
       backgroundColor: const Color(0xFF0E0E2A),
       body: AnimatedBuilder(
@@ -2956,6 +3063,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           // ── TAM EKRAN BLUR EFEKTİ VE NEFES ALAN ARKA PLAN AURASI ──
           if (_state == RitualState.revealed)
             Positioned.fill(
+              child: IgnorePointer(
               child: TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0.0, end: 1.0),
                 duration: const Duration(milliseconds: 1100),
@@ -3013,6 +3121,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 },
               ),
             ),
+            ),
 
           SafeArea(
             child: AnimatedBuilder(
@@ -3031,15 +3140,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 children: [
                 // Header with back button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                   child: Row(
                     children: [
-                      // Back button – frosted glass iOS style (sarmalanarak merkeze eşit itiş sağlandı)
+                      // Back button – frosted glass iOS style
                       SizedBox(
                         width: 80,
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: GestureDetector(
+                          child: GlassBackButton(
                             onTap: () {
                               if (_state == RitualState.revealed) {
                                 _resetToIdle();
@@ -3047,29 +3156,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                 Navigator.pop(context);
                               }
                             },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: BackdropFilter(
-                                filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.10),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.18),
-                                      width: 0.6,
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_back_ios_new_rounded,
-                                    color: Colors.white.withOpacity(0.85),
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            ),
                           ),
                         ),
                       ),
@@ -3088,13 +3174,13 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               stops: const [0.0, 0.5, 1.0],
                             ).createShader(bounds);
                           },
-                          child: const Text(
+                          child: Text(
                             'Tarot',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: GoogleFonts.cinzel(
                               color: Colors.white,
                               fontSize: 22,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -3200,12 +3286,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       child: Text(
                         subtitle,
                         key: ValueKey(subtitle),
-                        style: TextStyle(
+                        style: GoogleFonts.cinzel(
                           color: selected >= max 
                               ? const Color(0xFFE2C48E) 
                               : Colors.white70,
-                          fontSize: 14,
-                          fontWeight: selected >= max ? FontWeight.w600 : FontWeight.normal,
+                          fontSize: 13,
+                          fontWeight: selected >= max ? FontWeight.w700 : FontWeight.w500,
                         ),
                       ),
                     );
@@ -3485,12 +3571,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                   key: ValueKey(isFilled 
                                                       ? 'card_${_selectedTablePositions[i]}' 
                                                       : 'label_$i'),
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.cinzel(
                                                     color: isFilled 
                                                         ? Colors.white.withOpacity(0.7)
                                                         : Colors.white.withOpacity(0.35),
-                                                    fontSize: _isBuyukArkana ? 11 : 9,
-                                                    fontWeight: isFilled ? FontWeight.w600 : FontWeight.w500,
+                                                    fontSize: _isBuyukArkana ? 10 : 8,
+                                                    fontWeight: isFilled ? FontWeight.w700 : FontWeight.w500,
                                                     letterSpacing: 0.5,
                                                   ),
                                                 ),
@@ -3844,45 +3930,60 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               // Ana Tema cümlesi
                               _buildGlowingQuoteCard(
                                 _latestReading!.generalTheme,
-                              ),
+                              ).animate()
+                                .fadeIn(duration: 800.ms, delay: 300.ms)
+                                .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 300.ms, curve: Curves.easeOut),
                               const SizedBox(height: 16),
 
-                              // Kartların vaat ettiği 3 anahtar kelime
-                              _buildPromisesPanel(),
-                              const SizedBox(height: 32),
+
 
                               // Yorum Kartları (Geçmiş, Şimdi, Yön)
                               _buildReadingSection(
                                 title: _isTr ? 'Geçmiş' : 'Past',
                                 content: _latestReading!.pastInfluence,
                                 cardName: _cardName(_selectedCardIndexes[0]),
+                                cardAsset: _allCards[_selectedCardIndexes[0]].frontAsset,
                                 icon: Icons.history_edu,
                                 color: const Color(0xFFE7D6A5),
-                              ),
-                              // Mistik Ayıraç 1
-                              _buildMysticalDivider('☽'),
-                              const SizedBox(height: 24),
+                              ).animate()
+                                .fadeIn(duration: 800.ms, delay: 900.ms)
+                                .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 900.ms, curve: Curves.easeOut),
+                              const SizedBox(height: 12),
+                              _buildMysticalDivider('☽').animate()
+                                .fadeIn(duration: 600.ms, delay: 1400.ms),
+                              const SizedBox(height: 12),
                               
                               _buildReadingSection(
                                 title: _isTr ? 'Şimdi' : 'Present',
                                 content: _latestReading!.presentEnergy,
                                 cardName: _cardName(_selectedCardIndexes[1]),
+                                cardAsset: _allCards[_selectedCardIndexes[1]].frontAsset,
                                 icon: Icons.visibility,
                                 color: const Color(0xFFE7D6A5),
-                              ),
-                              const SizedBox(height: 24),
-                              
-                              // Mistik Ayıraç 2
-                              _buildMysticalDivider('✦'),
-                              const SizedBox(height: 24),
+                              ).animate()
+                                .fadeIn(duration: 800.ms, delay: 1800.ms)
+                                .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 1800.ms, curve: Curves.easeOut),
+                              const SizedBox(height: 12),
+                              _buildMysticalDivider('✦').animate()
+                                .fadeIn(duration: 600.ms, delay: 2300.ms),
+                              const SizedBox(height: 12),
                               
                               _buildReadingSection(
                                 title: _isTr ? 'Yön' : 'Direction',
                                 content: _latestReading!.directionAdvice,
                                 cardName: _cardName(_selectedCardIndexes[2]),
+                                cardAsset: _allCards[_selectedCardIndexes[2]].frontAsset,
                                 icon: Icons.explore,
                                 color: const Color(0xFFE7D6A5),
-                              ),
+                              ).animate()
+                                .fadeIn(duration: 800.ms, delay: 2700.ms)
+                                .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 2700.ms, curve: Curves.easeOut),
+                              const SizedBox(height: 24),
+
+                              // Kartların vaat ettiği 3 anahtar kelime
+                              _buildPromisesPanel().animate()
+                                .fadeIn(duration: 800.ms, delay: 3300.ms)
+                                .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 3300.ms, curve: Curves.easeOut),
                               const SizedBox(height: 32),
 
                               // Magic Buton - Yeni Çekim Yap
@@ -3900,14 +4001,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     });
                                   },
                                 ),
-                              ),
+                              ).animate()
+                                .fadeIn(duration: 800.ms, delay: 3900.ms)
+                                .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 3900.ms, curve: Curves.easeOut),
                               const SizedBox(height: 32),
                               
-                              // Kapanış Mesajı - Günlük Tavsiye Stili
+                              // Kartların Gizli Fısıltısı
                               _buildDailyAdviceCard(
-                                _isTr ? 'Günlük Tavsiye' : 'Daily Advice',
+                                _isTr ? 'Kartların Gizli Fısıltısı' : 'Secret Whisper of the Cards',
                                 _latestReading!.closingMessage,
-                              ),
+                              ).animate()
+                                .fadeIn(duration: 1000.ms, delay: 4500.ms)
+                                .slideY(begin: 0.15, end: 0, duration: 1000.ms, delay: 4500.ms, curve: Curves.easeOut),
                               const SizedBox(height: 60), // En alt boşluk
                             ],
                           ),
@@ -3919,11 +4024,39 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               ),
             ),
          
+          // Yorum ekranında sol kenar swipe → kart seçimine dön (pop yerine)
+          if (_state == RitualState.revealed)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              child: GestureDetector(
+                onHorizontalDragEnd: (details) {
+                  if (details.velocity.pixelsPerSecond.dx > 200) {
+                    _resetToIdle();
+                  }
+                },
+                behavior: HitTestBehavior.opaque,
+                child: const SizedBox.expand(),
+              ),
+            ),
+
+          // Yorum ekranında geri butonu — en üstte, her zaman tıklanabilir
+          if (_state == RitualState.revealed)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 12,
+              left: 12,
+              child: GlassBackButton(
+                onTap: _resetToIdle,
+              ),
+            ),
         ],
       );  // Stack
         },  // builder
       ),  // AnimatedBuilder
-    );  // Scaffold
+    ),  // Scaffold
+    );  // PopScope
   }
 }
 
@@ -4974,10 +5107,10 @@ class _ReadingBlock extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 cardName,
-                style: GoogleFonts.cormorantGaramond(
+                style: GoogleFonts.cinzel(
                   color: Colors.white.withOpacity(0.6),
-                  fontSize: 15,
-                  fontStyle: FontStyle.italic,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                   letterSpacing: 0.5,
                 ),
               ),

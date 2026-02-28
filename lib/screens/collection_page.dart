@@ -32,11 +32,11 @@ class _CollectionPageState extends State<CollectionPage> {
       return;
     }
     if (index == 0) {
-      Navigator.pushReplacement(context, FadePageRoute(page: const HomePage()));
+      Navigator.pushReplacement(context, SwipeFadePageRoute(page: const HomePage()));
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        FadePageRoute(page: const ProfilePage()),
+        SwipeFadePageRoute(page: const ProfilePage()),
       );
     } else {
       setState(() {

@@ -136,11 +136,11 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
     if (index == 0) {
-      Navigator.pushReplacement(context, FadePageRoute(page: const HomePage()));
+      Navigator.pushReplacement(context, SwipeFadePageRoute(page: const HomePage()));
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        FadePageRoute(page: const CollectionPage()),
+        SwipeFadePageRoute(page: const CollectionPage()),
       );
     } else {
       setState(() {
@@ -285,7 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          FadePageRoute(page: const NotificationSettingsPage()),
+                          SwipeFadePageRoute(page: const NotificationSettingsPage()),
                         );
                       },
                     ),

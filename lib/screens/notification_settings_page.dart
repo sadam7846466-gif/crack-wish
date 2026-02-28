@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../widgets/glass_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
@@ -95,16 +96,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 children: [
                   // — Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(12, 12, 20, 0),
                     child: Row(
                       children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                          color: AppColors.textWhite,
-                          iconSize: 20,
-                        ),
-                        const SizedBox(width: 4),
+                        GlassBackButton(),
+                        const SizedBox(width: 10),
                         const Text(
                           'Bildirimler',
                           style: TextStyle(

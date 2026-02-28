@@ -36,7 +36,7 @@ class FadePageRoute<T> extends PageRouteBuilder<T> {
       );
 }
 
-/// FadePageRoute ile aynı açılış + sola kaydırarak kapatma desteği
+/// Instagram tarzı sağa kaydırarak kapatma + fade efekti
 class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
   final Widget page;
 
@@ -50,7 +50,7 @@ class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
   bool get maintainState => true;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 480);
+  Duration get transitionDuration => const Duration(milliseconds: 350);
 
   @override
   Widget buildTransitions(
@@ -59,24 +59,24 @@ class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // Always use Cupertino transitions (includes back gesture detector)
+    // Cupertino'nun doğal slide + parallax geçişi
     final cupertinoChild = super.buildTransitions(
       context, animation, secondaryAnimation, child,
     );
 
-    // On forward animation (opening): add fade effect on top
-    if (animation.status == AnimationStatus.forward) {
-      final curvedAnimation = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutQuart,
-      );
-      return FadeTransition(
-        opacity: curvedAnimation,
-        child: cupertinoChild,
-      );
-    }
-
-    return cupertinoChild;
+    // Kaydırırken fade-out efekti: sayfa kayarken aynı anda solar
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        // animation.value: 1.0 = tam görünür, 0.0 = tamamen kaybolmuş
+        // Fade biraz daha hızlı olsun (0.3'ten sonra tamamen şeffaf)
+        final opacity = animation.value.clamp(0.0, 1.0);
+        return Opacity(
+          opacity: opacity,
+          child: cupertinoChild,
+        );
+      },
+    );
   }
 }
 

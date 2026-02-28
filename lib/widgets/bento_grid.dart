@@ -139,7 +139,7 @@ class _BentoGridState extends State<BentoGrid>
                       onTap: () {
                         Navigator.push(
                           context,
-                          FadePageRoute(
+                          SwipeFadePageRoute(
                             page: const DreamPage(),
                           ),
                         );
@@ -189,7 +189,7 @@ class _BentoGridState extends State<BentoGrid>
                       onTap: () {
                         Navigator.push(
                           context,
-                          FadePageRoute(
+                          SwipeFadePageRoute(
                             page: const MotivationPage(),
                           ),
                         );
@@ -296,7 +296,7 @@ class _BentoGridState extends State<BentoGrid>
                       onTap: () {
                         Navigator.push(
                           context,
-                          FadePageRoute(
+                          SwipeFadePageRoute(
                             page: const ZodiacPage(),
                           ),
                         );

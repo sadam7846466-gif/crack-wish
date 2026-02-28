@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../widgets/glass_back_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MotivationPage extends StatefulWidget {
@@ -154,14 +155,7 @@ class _MotivationPageState extends State<MotivationPage>
     final scale = 1.0 - (swipeProgress * 0.08);
     final opacity = 1.0 - (swipeProgress * 0.5);
 
-    return Transform(
-      transform: Matrix4.identity()
-        ..translate(_swipeOffset)
-        ..scale(scale),
-      alignment: Alignment.centerLeft,
-      child: Opacity(
-        opacity: opacity,
-        child: Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
           // Animated cosmic background
@@ -185,12 +179,9 @@ class _MotivationPageState extends State<MotivationPage>
           ),
           // Back button
           Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 8,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70, size: 20),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 12,
+            child: GlassBackButton(),
           ),
           // Title
           Positioned(
@@ -355,38 +346,7 @@ class _MotivationPageState extends State<MotivationPage>
               ),
             ),
           ),
-          // Left-edge swipe-to-dismiss strip
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 24,
-            child: GestureDetector(
-              onHorizontalDragStart: (_) {
-                _isSwiping = true;
-              },
-              onHorizontalDragUpdate: (details) {
-                if (!_isSwiping) return;
-                setState(() {
-                  _swipeOffset = (details.globalPosition.dx).clamp(0.0, screenWidth);
-                });
-              },
-              onHorizontalDragEnd: (details) {
-                if (!_isSwiping) return;
-                _isSwiping = false;
-                if (_swipeOffset > screenWidth * 0.3 ||
-                    details.velocity.pixelsPerSecond.dx > 800) {
-                  Navigator.of(context).pop();
-                } else {
-                  setState(() { _swipeOffset = 0.0; });
-                }
-              },
-              behavior: HitTestBehavior.translucent,
-            ),
-          ),
         ],
-      ),
-      ),
       ),
     );
   }

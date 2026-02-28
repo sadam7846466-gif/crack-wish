@@ -14,7 +14,7 @@ class DailyHoroscopeCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          FadePageRoute(page: const ZodiacPage()),
+          SwipeFadePageRoute(page: const ZodiacPage()),
         );
       },
       child: Container(

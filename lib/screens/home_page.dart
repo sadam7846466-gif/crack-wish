@@ -179,12 +179,12 @@ class _HomePageState extends State<HomePage> {
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        FadePageRoute(page: const CollectionPage()),
+        SwipeFadePageRoute(page: const CollectionPage()),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
         context,
-        FadePageRoute(page: const ProfilePage()),
+        SwipeFadePageRoute(page: const ProfilePage()),
       );
     } else {
       setState(() {

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../widgets/glass_back_button.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -867,25 +868,19 @@ class _DreamPageState extends State<DreamPage>
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
-              padding: EdgeInsets.fromLTRB(20, 40, 20, bottomContentPadding),
+              padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top + 12, 12, bottomContentPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 8, 12),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: AppColors.textWhite,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                          ),
+                          child: GlassBackButton(),
                         ),
                         Text(
                           _l10n.dreamTitle,
@@ -930,27 +925,6 @@ class _DreamPageState extends State<DreamPage>
           if (_activeMetric != null && _overlayContent == 'results')
             Positioned.fill(child: _buildMetricOverlay()),
         ],
-      ),
-      bottomNavigationBar: BottomNav(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          if (index == _currentNavIndex) return;
-          Widget destination;
-          switch (index) {
-            case 0:
-              destination = const HomePage();
-              break;
-            case 1:
-              destination = const CollectionPage();
-              break;
-            case 2:
-              destination = const ProfilePage();
-              break;
-            default:
-              return;
-          }
-          Navigator.pushReplacement(context, FadePageRoute(page: destination));
-        },
       ),
     );
   }

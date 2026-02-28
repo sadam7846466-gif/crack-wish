@@ -1,6 +1,8 @@
 // lib/screens/tarot_meanings.dart
 // 22 Büyük Arkana kartının anlamları ve yorum motoru
 
+import 'dart:math';
+
 /// Kart tonu
 enum CardTone { heavy, soft, decision }
 
@@ -60,12 +62,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.motion,
     phase: CardPhase.beginning,
-    pastTr: 'Cesur bir adım attın, tanıdık düzeni geride bırakarak yolculuğa çıktın.',
-    pastEn: 'You took a bold leap, leaving the familiar behind to begin a new journey.',
-    presentTr: 'Şu an taze bir enerjiyle doluyorsun; bilinmeyene güvenme zamanı.',
-    presentEn: 'You are filled with fresh energy right now; it is time to trust the unknown.',
-    directionTr: 'Korkularını bırak ve kalbinin gösterdiği yöne doğru ilk adımı at.',
-    directionEn: 'Release your fears and take the first step toward where your heart points.',
+    pastTr: 'Karttaki beyaz köpek gibi içgüdülerin seni korudu; uçurumun kenarında olsan bile heybendeki saf niyetle o cesur adımı attın.',
+    pastEn: 'Like the white dog on the card, your instincts protected you; despite the cliff edge, you took that bold leap with pure intentions.',
+    presentTr: 'Deli gibi uçuruma doğru yürüyen o figür sensin. Sırtındaki küçük heybeden başka bir şeye ihtiyacın yok; bilinmeyene güvenme zamanı.',
+    presentEn: 'You are the figure walking toward the cliff. You need nothing but the small pouch on your back; it is time to trust the unknown.',
+    directionTr: 'Ayaklarının altındaki uçuruma aldırma. Köpeğinin havlaması tehlikeyi değil, uyanışı simgeliyor. İlk adımı atmaktan korkma.',
+    directionEn: 'Ignore the cliff beneath your feet. The dog barking symbolizes awakening, not danger. Do not fear taking the first step.',
   ),
   1: CardMeaning(
     id: 1,
@@ -74,12 +76,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.motion,
     phase: CardPhase.neutral,
-    pastTr: 'Elindeki kaynakları bilinçli şekilde kullandın ve bir şeyleri harekete geçirdin.',
-    pastEn: 'You consciously used the resources at hand and set things in motion.',
-    presentTr: 'Tüm araçlar önünde; odaklan ve niyetini netleştir.',
-    presentEn: 'All the tools are before you; focus and clarify your intention.',
-    directionTr: 'Düşünmekten çıkıp eyleme geç. Yaratıcı gücün seni taşıyacak.',
-    directionEn: 'Move from thinking to doing. Your creative power will carry you.',
+    pastTr: 'Masadaki asa, kupa, kılıç ve tılsımı kullandın. Başının üzerindeki sonsuzluk işareti gibi, iradeni potansiyele çevirdin.',
+    pastEn: 'You used the wand, cup, sword, and pentacle on the table. Like the infinity sign above you, you turned will into potential.',
+    presentTr: 'Büyücünün masasındaki tüm elementler önünde duruyor. Bir elin göğü (fikri), diğeri yeri (eylemi) işaret ediyor. Yeteneklerini birleştir.',
+    presentEn: 'All elements on the Magicians table lay before you. With one hand to the sky and one to the earth, merge your skills.',
+    directionTr: 'Masadaki araçları izlemek yerine eline al. Büyücünün sonsuz odaklanmasıyla düşündüklerini gerçeğe dönüştür.',
+    directionEn: 'Pick up the tools instead of just looking at them. Transform your thoughts into reality with the Magicians infinite focus.',
   ),
   2: CardMeaning(
     id: 2,
@@ -88,12 +90,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'İçgüdülerine güvendiğin bir dönemden geçtin; sessizce doğru yolu hissettin.',
-    pastEn: 'You went through a phase of trusting your instincts; you quietly sensed the right path.',
-    presentTr: 'Cevaplar dışarıda değil, içinde. Sessizliğe kulak ver.',
-    presentEn: 'The answers are not outside, they are within. Listen to the silence.',
-    directionTr: 'Sabırlı ol ve sezgilerine güven. Henüz görünmeyenler kendini yakında gösterecek.',
-    directionEn: 'Be patient and trust your intuition. What is unseen will soon reveal itself.',
+    pastTr: 'Karanlık (B) ve aydınlık (J) sütunlar arasında oturdun. Dizindeki parşömen gibi sırlar açığa çıkaran bir evre yaşadın.',
+    pastEn: 'You sat between the dark (B) and light (J) pillars. Like the scroll on his lap, it was a phase where secrets were revealed.',
+    presentTr: 'Arkadaki narlarla süslü perde, henüz bilmediğin gizemleri saklıyor. Ayaklarının altındaki hilal gibi sezgilerine kulak ver.',
+    presentEn: 'The pomegranate-adorned veil behind conceals mysteries you do not yet know. Listen to your intuition like the crescent at her feet.',
+    directionTr: 'O iki siyah ve beyaz sütunun ortasından geç. Perdenin ardına bakmak için mantığı bırakıp kalbinin bilgeliğine güvenmelisin.',
+    directionEn: 'Pass between the black and white pillars. To look behind the veil, leave logic and trust your hearts wisdom.',
   ),
   3: CardMeaning(
     id: 3,
@@ -102,12 +104,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Beslediğin ve emek verdiğin bir dönem seni buraya getirdi.',
-    pastEn: 'A period of nurturing and care brought you to this point.',
-    presentTr: 'Hayatında büyüme ve bolluk enerjisi var. Şefkatle yaklaş.',
-    presentEn: 'There is an energy of growth and abundance in your life. Approach with compassion.',
-    directionTr: 'Kendine ve çevrene sevgiyle bak. Ektiğin tohumlar yakında meyve verecek.',
-    directionEn: 'Look at yourself and your surroundings with love. Seeds you planted will soon bear fruit.',
+    pastTr: 'Başındaki on iki yıldızlı taç gibi, hayata büyük bir değer kattın. Çevrendeki buğday tarlaları ektiğin şefkatin sonucudur.',
+    pastEn: 'Like the twelve-starred crown, you added immense value to life. The wheat fields around you are the result of the compassion you sowed.',
+    presentTr: 'İmparatoriçe gibi rahat bir tahtta, ormanın ve suyun bereketi içindesin. Kendine ve etrafına sevgi ve bolluk enerjisi veriyorsun.',
+    presentEn: 'Like the Empress on a comfortable throne, you are amidst the abundance of forest and water. You radiate love and abundance.',
+    directionTr: 'Önündeki sararan buğdayları hasat etme zamanı. Yaratıcılığının doğurgan akışına izin ver, sevgiyle büyüt.',
+    directionEn: 'It is time to harvest the golden wheat before you. Allow the fertile flow of your creativity to nurture with love.',
   ),
   4: CardMeaning(
     id: 4,
@@ -116,12 +118,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Disiplinli ve kararlı bir tutumla sağlam temeller attın.',
-    pastEn: 'You laid solid foundations with a disciplined and determined attitude.',
-    presentTr: 'Hayatına düzen ve yapı getirme zamanı geldi. Sınırlarını belirle.',
-    presentEn: 'It is time to bring order and structure to your life. Set your boundaries.',
-    directionTr: 'Stratejik düşün, plan yap ve adım adım ilerle. Kontrol sende.',
-    directionEn: 'Think strategically, make a plan, and advance step by step. You are in control.',
+    pastTr: 'Koç başlı taş tahtın üzerindeki İmparator gibi, sınırları sen çizdin ve gri dağlar gibi sarsılmaz bir temel attın.',
+    pastEn: 'Like the Emperor on the ram-headed stone throne, you drew the boundaries and built an unshakable foundation like the gray mountains.',
+    presentTr: 'Üzerindeki kırmızı zırh savaşmaya hazır olduğunu, elindeki küre ise kontrolün sende olduğunu gösteriyor. Düzeni sağla.',
+    presentEn: 'Your red armor shows you are ready to fight, the orb in your hand shows you have control. Establish order.',
+    directionTr: 'Arkadaki çıplak kayaçlar gibi mantıklı ve katı olmalısın. Kuralları sen koy ve krallığını disiplinle yönet.',
+    directionEn: 'Be logical and solid like the barren rocks behind. Set the rules and rule your kingdom with discipline.',
   ),
   5: CardMeaning(
     id: 5,
@@ -130,12 +132,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Bir öğretiden, gelenekten ya da mentordan aldığın dersler seni şekillendirdi.',
-    pastEn: 'Lessons from a teaching, tradition, or mentor shaped who you are.',
-    presentTr: 'Değerlerini sorguluyorsun: hangisi sana ait, hangisi alışkanlık?',
-    presentEn: 'You are questioning your values: which ones are truly yours, and which are just habits?',
-    directionTr: 'Kendi iç rehberliğini bul. Kuralların ötesinde kendi hakikatini keşfet.',
-    directionEn: 'Find your own inner guidance. Discover your truth beyond the rules.',
+    pastTr: 'Önündeki iki rahip gibi, bir bilgenin ya da sistemin rehberliğini dinledin. Çapraz duran iki anahtar sana eski kapıları açtı.',
+    pastEn: 'Like the two priests before him, you listened to the guidance of a wise one or system. The crossed keys opened ancient doors.',
+    presentTr: 'Aziz tahtında oturuyor ve bir eliyle hayır duası veriyor. Mevcut inançların, kuralların veya eğitimin seni şekillendiriyor.',
+    presentEn: 'The Hierophant sits on his throne offering a blessing. Your current beliefs, rules, or education are shaping you.',
+    directionTr: 'Ayaklarının önündeki anahtarları al. Öğrendiğin geleneklerden ders çıkar ama kendi içindeki o yüce inancı da bul.',
+    directionEn: 'Take the keys at his feet. Learn from traditions but also find that supreme belief within yourself.',
   ),
   6: CardMeaning(
     id: 6,
@@ -144,12 +146,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.motion,
     phase: CardPhase.neutral,
-    pastTr: 'Önemli bir seçim yaptın; kalbinle aklın arasında bir denge buldun.',
-    pastEn: 'You made an important choice; you found a balance between heart and mind.',
-    presentTr: 'Bir karar anındasın. Kalbinin sesini dinle ama sonuçlarını da gör.',
-    presentEn: 'You are at a crossroads. Listen to your heart but also see the consequences.',
-    directionTr: 'Değerlerinle uyumlu seçimi yap. Doğru ilişki veya yol kendini gösterecek.',
-    directionEn: 'Make the choice aligned with your values. The right relationship or path will reveal itself.',
+    pastTr: 'Tıpkı Adem ile Havva ve arkalarındaki Bilgi Ağacı ile yılan gibi, masumiyetten çıkıp önemli bir seçim yapmak zorunda kaldın.',
+    pastEn: 'Like Adam and Eve and the Tree of Knowledge with the snake, you stepped out of innocence and had to make an important choice.',
+    presentTr: 'Yukarıdaki dev melek Rafael in kanatları altında, kalbin ve aklın omuz omuza. Bir yanda tutku, diğer yanda doğru değerler var.',
+    presentEn: 'Under the wings of the giant angel Raphael, your heart and mind stand side by side. On one side is passion, the other, true values.',
+    directionTr: 'Meleğin kutsadığı şekilde, sadece kendi ruhunla uyumlu olana yönel. Gözlerini kaçırma ve o gerçek seçimi yap.',
+    directionEn: 'As the angel blesses, turn only to what aligns with your soul. Do not look away; make that true choice.',
   ),
   7: CardMeaning(
     id: 7,
@@ -158,12 +160,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.motion,
     phase: CardPhase.neutral,
-    pastTr: 'Kararlılığınla engelleri aştın; iradeni güçlü kullandın.',
-    pastEn: 'With your determination, you overcame obstacles; you used your willpower strongly.',
-    presentTr: 'Odaklan ve yol al. Engeller var ama iradenle aşabilirsin.',
-    presentEn: 'Focus and move forward. There are obstacles, but you can overcome them with willpower.',
-    directionTr: 'Şimdi durmak yok. Disiplinle ileri git, zafer yakın.',
-    directionEn: 'No stopping now. Move forward with discipline; victory is near.',
+    pastTr: 'Arabayı çeken siyah ve beyaz iki sfenksi dizginledin. Zıt güçleri tek bir hedefe sürerek o zorlu yolu geçtin.',
+    pastEn: 'You harnessed the black and white sphinxes pulling the chariot. You drove opposing forces to a single goal and passed that rocky road.',
+    presentTr: 'Zırhın ve yıldızlı gölgeliğin altındasın. Önündeki sfenksler farklı yönlere gitmek istese de iradenle onları kontrol ediyorsun.',
+    presentEn: 'You are under the armor and starry canopy. The sphinxes want to go different ways, but your will controls them.',
+    directionTr: 'Asanın gücüyle zıtlıkları dengele. Arkandaki şehri bırak, gözünü hedefe dik ve dizginleri sıkı tutarak ilerle.',
+    directionEn: 'Balance contradictions with the power of your wand. Leave the city behind, set your eyes on the goal, and ride forward.',
   ),
   8: CardMeaning(
     id: 8,
@@ -172,12 +174,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Yumuşak ama kararlı bir güçle zorlu bir dönemi atlattın.',
-    pastEn: 'With gentle but firm strength, you weathered a challenging period.',
-    presentTr: 'Savaşmak değil, sakin kalmak gücün. Sabır en büyük silahın.',
-    presentEn: 'Your power is not in fighting, but in staying calm. Patience is your greatest weapon.',
-    directionTr: 'Kendine güven ve yumuşaklıkla ilerle. Gerçek güç korkuyu kabul etmektir.',
-    directionEn: 'Trust yourself and move forward with gentleness. True strength is accepting fear.',
+    pastTr: 'Vahşi bir aslanın çenesini şefkatle okşayan o kadın gibi, en zorlu duygularını veya krizlerini yumuşak bir sabırla yatıştırdın.',
+    pastEn: 'Like the woman gently caressing the fierce lions jaw, you soothed your toughest emotions or crises with soft patience.',
+    presentTr: 'Başının üstünde sonsuzluk işareti parlıyor. Kaba kuvvete ihtiyacın yok; içindeki o vahşi aslan, senin şefkatine boyun eğmiş durumda.',
+    presentEn: 'The infinity sign shines above your head. You need no brute force; the wild lion within has bowed to your compassion.',
+    directionTr: 'Düşmanlarını veya korkularını zorlayarak değil, aslanı evcilleştiren o narin ellerinle sevgi ve cesaretle aşacaksın.',
+    directionEn: 'You will overcome enemies or fears not by forcing them, but with the gentle hands and love that tamed the lion.',
   ),
   9: CardMeaning(
     id: 9,
@@ -186,12 +188,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Bir dönem yalnız kaldın ve kendi içinde cevapları aradın.',
-    pastEn: 'You spent a period alone, searching within yourself for answers.',
-    presentTr: 'Gürültüden uzaklaş. İçsel rehberliğini bulman gereken bir an.',
-    presentEn: 'Step away from the noise. This is a moment to find your inner guidance.',
-    directionTr: 'Biraz geri çekil, düşün ve netleş. Cevap sessizlikte gizli.',
-    directionEn: 'Pull back a little, reflect, and gain clarity. The answer is hidden in silence.',
+    pastTr: 'Karlı ve soğuk dağların zirvesinde tek başına yürüdün. Kalabalıkları geride bırakıp kendi fenerinin ışığına sığındın.',
+    pastEn: 'You walked alone on the snowy, cold mountain peaks. Leaving crowds behind, you sought refuge in the light of your own lantern.',
+    presentTr: 'Gri bir cüppe içinde sarsılmaz bir asaya dayanıyorsun. Elindeki yıldızlı fener, başkalarına değil, sadece senin önünü aydınlatıyor.',
+    presentEn: 'In a gray cloak leaning on an unshakable staff, the starry lantern in your hand illuminates only your own path, no one elses.',
+    directionTr: 'Zirvedeki yalnızlığını koru. Bilgelik dışarıdan gelmeyecek; karanlıkta asana yaslanıp fenerinin içindeki altı köşeli yıldıza bak.',
+    directionEn: 'Maintain your solitude on the peak. Wisdom wont come from outside; lean on your staff in the dark and look at the star in your lantern.',
   ),
   10: CardMeaning(
     id: 10,
@@ -200,12 +202,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.motion,
     phase: CardPhase.neutral,
-    pastTr: 'Hayatında büyük bir dönüş yaşandı; kontrol edemediğin güçler devreye girdi.',
-    pastEn: 'A major turning point occurred; forces beyond your control came into play.',
-    presentTr: 'Değişim kapıda. Direnmek yerine akışa güven.',
-    presentEn: 'Change is at the door. Trust the flow instead of resisting.',
-    directionTr: 'Döngüyü kabul et. Her iniş bir çıkışın habercisi.',
-    directionEn: 'Accept the cycle. Every descent heralds a rise.',
+    pastTr: 'Çarkın üstündeki kılıçlı Sfenks hükmünü verdi, Anubis seni yukarı taşırken Yılan aşağı çekti. Hayatın büyük döngüsü seni buraya getirdi.',
+    pastEn: 'The sword-wielding Sphinx passed judgment, Anubis carried you up while the Snake pulled you down. Lifes great cycle brought you here.',
+    presentTr: 'Burç sembolleriyle dolu dev tekerlek durmaksızın dönüyor. İyi ya da kötü yok; şu an sadece kadersel bir değişimin tam merkezindesin.',
+    presentEn: 'The giant wheel filled with zodiac symbols spins endlessly. There is no good or bad; you are directly at the center of fateful change.',
+    directionTr: 'Çarkın üzerindeki yılan da, Anubis de dönmeye mecburdur. Kontrolü bırak, tekerlek dönerken merkeze odaklan ve değişimi kabul et.',
+    directionEn: 'Both the snake and Anubis must turn with the wheel. Let go of control, focus on the center as it spins, and accept the change.',
   ),
   11: CardMeaning(
     id: 11,
@@ -214,12 +216,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.decision,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Geçmişte verdiğin kararların sonuçlarıyla yüzleşiyorsun.',
-    pastEn: 'You are facing the consequences of decisions made in the past.',
-    presentTr: 'Dürüstlük ve denge zamanı. Doğru olanı yap, sonuç gelecek.',
-    presentEn: 'It is a time for honesty and balance. Do what is right, and the result will come.',
-    directionTr: 'Adaletli ol. Kararlarını mantık ve vicdanla ver.',
-    directionEn: 'Be fair. Make your decisions with logic and conscience.',
+    pastTr: 'İki sütun arasındaki mor perdenin önünde oturan o yargıç gibi, ektiklerinin sonuçlarını tartan terazide kendi geçmişinle hesaplaştın.',
+    pastEn: 'Like the judge sitting before the purple veil between two pillars, you reckoned with your past on the scales that weighed what you sowed.',
+    presentTr: 'Bir elinde karar kılıcı yukarı kalkmış, diğer elindeki terazi kusursuz bir dengede. Gerçekler çıplak ve tüm yanılmalar kesilip atılıyor.',
+    presentEn: 'One hand raises the sword of decision, the other elegantly balances the scales. Truths are bare and all illusions are cut away.',
+    directionTr: 'Gözlerindeki bağı kendin çöz. İki ucu keskin kılıç adaleti sağlasın diye, terazinin ruhunu dinleyerek dürüstçe adım at.',
+    directionEn: 'Untie the blindfold yourself. So the double-edged sword can bring justice, listen to the spirit of the scale and step honestly.',
   ),
   12: CardMeaning(
     id: 12,
@@ -228,12 +230,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Bir şeyden vazgeçtin veya beklemeyi seçtin; bu seni olgunlaştırdı.',
-    pastEn: 'You gave something up or chose to wait; this matured you.',
-    presentTr: 'Durağan görünse de bu an büyük bir iç dönüşüm yaşıyorsun.',
-    presentEn: 'Though it seems stagnant, you are going through a profound inner transformation.',
-    directionTr: 'Kontrolü bırak ve farklı açıdan bak. Teslim olmak bazen en güçlü hamle.',
-    directionEn: 'Let go of control and look from a different angle. Surrendering is sometimes the strongest move.',
+    pastTr: 'T harfi şeklindeki canlı bir ağaca ayağından asıldın ama yüzün acı değil, huzur doluydu. Kendi isteğinle dünyayı baş aşağı gördün.',
+    pastEn: 'You were hung by the foot on a T-shaped living tree, yet your face showed not pain, but peace. You willingly saw the world upside down.',
+    presentTr: 'Başının etrafında asılı dururken bile alev alev yanan bir hale var. Hiçbir yere gitmiyorsun ama zihnin daha önce hiç olmadığı kadar aydınlık.',
+    presentEn: 'There is a blazing halo around your head even as you hang suspended. You are going nowhere, but your mind is more luminous than ever.',
+    directionTr: 'Ayağındaki ipi kesmeye çalışma. Serbest kalacağın o aydınlanma anına kadar dünyayı o farklı ve asılı perspektiften izlemeye devam et.',
+    directionEn: 'Do not try to cut the rope on your foot. Observe the world from this hanging perspective until the enlightenment sets you free.',
   ),
   13: CardMeaning(
     id: 13,
@@ -242,12 +244,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.heavy,
     movement: CardMovement.motion,
     phase: CardPhase.ending,
-    pastTr: 'Bir dönem kesin olarak kapandı. Eski sen artık geride kaldı.',
-    pastEn: 'A chapter has definitively closed. The old you is now left behind.',
-    presentTr: 'Büyük bir dönüşümün ortasındasın. Biten şeylere tutunma.',
-    presentEn: 'You are in the midst of a great transformation. Do not cling to what has ended.',
-    directionTr: 'Eski düzeni bırak, yeniye yer aç. Her bitiş yeni bir doğuşun kapısı.',
-    directionEn: 'Release the old order and make room for the new. Every ending is the door to a new birth.',
+    pastTr: 'Zırhlı bir iskelet beyaz atıyla ezip geçti; o eski kralın tacı düştü ve senin eski alışkanlıklarının hepsi yeryüzünden silindi.',
+    pastEn: 'An armored skeleton rode its white horse over everything; the old kings crown fell and all your former habits were wiped from the earth.',
+    presentTr: 'Ölüm şövalyesi karşında duruyor fakat ufukta iki kule arasından o parlak güneş doğmak üzere. Bu bir bitiş değil, ruhsal bir temizliktir.',
+    presentEn: 'The Death knight stands before you, but on the horizon, a bright sun is rising between the towers. This is not an end, but a spirit purge.',
+    directionTr: 'Atın önünde diz çöken çocuk gibi direnişi bırak. Yeni gün doğarken, ölü topraklarda açacak olan o mistik gülü (bayraktaki gül) kabul et.',
+    directionEn: 'Drop the resistance like the child kneeling before the horse. As the new dawn nears, accept the mystic rose on the black flag.',
   ),
   14: CardMeaning(
     id: 14,
@@ -256,12 +258,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Dengeyi bulmak için çaba gösterdin; aşırılıklardan kaçındın.',
-    pastEn: 'You worked to find balance, avoiding extremes.',
-    presentTr: 'Orta yolu bul. Sabır ve ılımlılık şu anki anahtarın.',
-    presentEn: 'Find the middle path. Patience and moderation are your current keys.',
-    directionTr: 'Aşırıya kaçma. Küçük ve dengeli adımlar seni hedefe taşır.',
-    directionEn: 'Do not go to extremes. Small, balanced steps will carry you to your goal.',
+    pastTr: 'Kızıl kanatlı meleğin bir ayağı suda bir ayağı karadaydı; sen de zıt olan iki kupadaki suyu hiç dökmeden ustalıkla birbirine karıştırdın.',
+    pastEn: 'The red-winged angel had one foot in water, one on land; you masterfully poured water between opposing cups without spilling a drop.',
+    presentTr: 'Göğsünde aydınlık bir üçgen, alnında güneş mühürü olan melek senin yanında. Duygular(su) ile madde(kara) o muazzam ılımlılıkta buluşuyor.',
+    presentEn: 'The angel with a luminous triangle on the chest and a sun symbol on the forehead is beside you. Emotion (water) and matter (earth) meet in grand moderation.',
+    directionTr: 'Kupalar arası akan o mucizevi sıvıyı dökmemek için telaş etme. Arkadaki dağlara giden ince yolu bul, dengeyi bozmadan huzurla adımla.',
+    directionEn: 'Do not rush lest you spill the miraculous liquid flowing between the cups. Find the thin path to the back mountains and walk smoothly.',
   ),
   15: CardMeaning(
     id: 15,
@@ -270,12 +272,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.heavy,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Seni tutan bağlar, korkular veya alışkanlıklar vardı.',
-    pastEn: 'There were bonds, fears, or habits that held you back.',
-    presentTr: 'Gölgenle yüzleş. Seni bağlayan ne ise onu gör.',
-    presentEn: 'Face your shadow. See what binds you.',
-    directionTr: 'Zincirleri kır. Farkındalık ilk adım; bırakmak ikincisi.',
-    directionEn: 'Break the chains. Awareness is the first step; letting go is the second.',
+    pastTr: 'Tahtında oturan boynuzlu ve yarasa kanatlı Şeytan ın tahtına prangalarla bağlandın. Ama zincirler o kadar boldu ki, sadece korkundan kaçmadın.',
+    pastEn: 'You were chained to the throne of the horned, bat-winged Devil. But the chains were so loose, you only stayed bound out of fear.',
+    presentTr: 'Kuyruklarında üzüm ve alev taşıyan kadın-erkek figürleri nefislerine yenilmiş. Karanlığın içinde körü körüne bir bağımlılıkta sıkışıp kalmış gibisin.',
+    presentEn: 'The chained figures carry grapes and flames on their tails, surrendering to base desires. You seem stuck in a blind addiction in the dark.',
+    directionTr: 'Boynundaki o gevşek zinciri ellerinle çıkarabilirsin! Şeytan asasını ne kadar kaldırmış olursa olsun, karanlık gölgende tutsak değilsin.',
+    directionEn: 'You can lift that loose chain off your neck with your bare hands! No matter how high the Devil raises his torch, you are not a prisoner.',
   ),
   16: CardMeaning(
     id: 16,
@@ -284,12 +286,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.heavy,
     movement: CardMovement.motion,
     phase: CardPhase.ending,
-    pastTr: 'Ani bir sarsıntı yaşandı; alışık olduğun yapı çöktü.',
-    pastEn: 'A sudden upheaval occurred; the structure you were used to collapsed.',
-    presentTr: 'Kaos gibi hissedebilir ama bu yıkım, yeniden inşa için gerekli.',
-    presentEn: 'It may feel like chaos, but this destruction is necessary for rebuilding.',
-    directionTr: 'Direnmek yerine bırak. Yıkıntılardan en güçlü yapı yükselir.',
-    directionEn: 'Instead of resisting, let go. The strongest structures rise from the ruins.',
+    pastTr: 'Karanlık gökte çakan o şiddetli şimşek sarı tacı devirdi ve üzerine güvendiğin o yüksek taş kule paramparça alevler içinde çöktü.',
+    pastEn: 'The fierce lightning struck the yellow crown, and the high stone tower you relied on collapsed in flames and shattered ruins.',
+    presentTr: 'İki figür alev alan kuleden tepeüstü aşağı düşüyor. Sahip olduğunu sandığın her inanç, kurduğun her plan büyük bir şokla yerle bir oluyor.',
+    presentEn: 'Two figures are plunging headfirst from the burning tower. Every belief you held, every plan you built is crashing down in shock.',
+    directionTr: 'Kül olan kuleyi kurtarmak için çabalama; yanıp kül olmasına izin ver. O yıldırım senin felaketin değil, yanılsamanı yok eden bir gerçektir.',
+    directionEn: 'Do not fight to save the turning ash; let it burn entirely. That lightning is not your doom, but the truth destroying your illusions.',
   ),
   17: CardMeaning(
     id: 17,
@@ -298,12 +300,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Zor bir dönemin ardından umut ışığı belirdi.',
-    pastEn: 'After a difficult period, a light of hope appeared.',
-    presentTr: 'Yenilenme enerjisi var. İyileşme süreci başladı.',
-    presentEn: 'There is a renewal energy. The healing process has begun.',
-    directionTr: 'Umudunu koru. Evren seni doğru yere yönlendiriyor.',
-    directionEn: 'Hold on to your hope. The universe is guiding you to the right place.',
+    pastTr: 'Gecenin karanlığı dindi. Çıplak kadın figürü bir testiyi sulara, hislerine; diğerini toprağa, gerçeğe dökerek seni yaralarından arındırdı.',
+    pastEn: 'The darkness faded. The naked woman poured one jug into the water (feelings) and one onto the earth (reality), washing your wounds clean.',
+    presentTr: 'Tepede parlayan o devasa sekiz köşeli sarı yıldız, yedi küçük yıldızla birlikte yeryüzünü nuruna boğuyor. İçindeki o saf su nihayet akıyor.',
+    presentEn: 'The giant eight-pointed yellow star above, joined by seven smaller stars, bathes the earth in pure light. Your inner pure water flows at last.',
+    directionTr: 'Arkada ağaçtan uçmaya hazırlanan kutsal kuş İbis gibi ruhunu serbest bırak. Yıldızın ilham veren şifalı havuzundan sonsuza dek beslen.',
+    directionEn: 'Free your soul like the sacred ibis bird preparing to fly from the tree behind. Feed forever from the Stars inspiring, healing pool.',
   ),
   18: CardMeaning(
     id: 18,
@@ -312,12 +314,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.heavy,
     movement: CardMovement.stillness,
     phase: CardPhase.neutral,
-    pastTr: 'Belirsizlik ve korkularla dolu bir dönemden geçtin.',
-    pastEn: 'You went through a period full of uncertainty and fears.',
-    presentTr: 'Her şey göründüğü gibi değil. Yanılsamaları gerçekten ayır.',
-    presentEn: 'Not everything is as it seems. Separate illusions from reality.',
-    directionTr: 'Korkularınla yüzleş. Karanlıktan geçmeden ışığa ulaşamazsın.',
-    directionEn: 'Face your fears. You cannot reach the light without passing through the dark.',
+    pastTr: 'Köpek ve kurt dolunaya doğru uluyordu; zihninin vahşi yanları uykudaydı ve sen karanlık sulardan sürünen kıskaca (kerevite) yenik düştün.',
+    pastEn: 'The dog and wolf howled at the full moon; the wild sides of your mind slept as you succumbed to the crayfish crawling from the dark waters.',
+    presentTr: 'Tam ayın sarı ışıkları altında o iki kule arasındaki yol tekinsiz. Neye inandığına dikkat et, her şey bir gölgeden ibaret olabilir.',
+    presentEn: 'Under the yellow rays of the full moon, the path between the two towers feels eerie. Watch what you believe, everything might be a shadow.',
+    directionTr: 'Suyun derinliklerindeki o ürkütücü kabuklu korkularını temsil eder. O dar, gölgeli yoldan iki kule arasını geçmek için korkularınla yüzleş.',
+    directionEn: 'The creepy crustacean in the depths embodies your fears. To pass that narrow shadow path between the towers, face those fears directly.',
   ),
   19: CardMeaning(
     id: 19,
@@ -326,12 +328,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.motion,
     phase: CardPhase.neutral,
-    pastTr: 'Parlak, enerjik ve başarılı bir dönem yaşadın.',
-    pastEn: 'You experienced a bright, energetic, and successful period.',
-    presentTr: 'Işık üzerinde. Enerji ve neşe seni sarıyor.',
-    presentEn: 'The light is upon you. Energy and joy surround you.',
-    directionTr: 'Parlamaya devam et. Özgüvenle ilerle; başarı senin hakkın.',
-    directionEn: 'Keep shining. Move forward with confidence; success is your right.',
+    pastTr: 'Güneş bütün karanlıkları deldi. Çıplak, neşeli çocuk gri taş duvarın ardından beyaz atının üstünde ellerini açarak kucağına bir lütuf gibi indi.',
+    pastEn: 'The sun pierced all darkness. Experiencing true joy, the naked playful child rode the white horse from behind the wall like a blessing.',
+    presentTr: 'Arkadaki sarı ayçiçekleri sırtını sana değil o muazzam Güneş e dönmüş. Üzerinde hiçbir şey saklamaya gerek kalmayan parlayan bir ışıltı var.',
+    presentEn: 'The yellow sunflowers behind face the magnificent Sun, not you. You are bathed in a shining light that requires hiding absolutely nothing.',
+    directionTr: 'Çocuğun tuttuğu kırmızı zafer bayrağını sen devral. Gökyüzündeki neşeli Güneş gibi adımlarını aydınlat, kalbin ısınsın ve başarıya koş.',
+    directionEn: 'Take the red banner of victory the child holds. Let your steps be illuminated like the joyful Sun, let your heart warm up, and run to success.',
   ),
   20: CardMeaning(
     id: 20,
@@ -340,12 +342,12 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.heavy,
     movement: CardMovement.motion,
     phase: CardPhase.awakening,
-    pastTr: 'Büyük bir uyanış yaşadın; geçmişi değerlendirip ders çıkardın.',
-    pastEn: 'You experienced a great awakening; you evaluated the past and learned lessons.',
-    presentTr: 'İçsel bir çağrı duyuyorsun. Kendini yargılama, affet ve yüksel.',
-    presentEn: 'You hear an inner calling. Do not judge yourself; forgive and rise.',
-    directionTr: 'Geçmişi affet ve kararını ver. Uyanışın seni yeni bir seviyeye taşıyacak.',
-    directionEn: 'Forgive the past and make your decision. Your awakening will carry you to a new level.',
+    pastTr: 'Cebrail (Gabriel) göklerden bulutlar arasında altın trompetini çaldı. Sen o sesi duydun ve geçmişte kapalı kaldığın tabutundan kollarını açıp çıktın.',
+    pastEn: 'Gabriel blew his golden trumpet from the clouds. You heard the call and rose from the coffin where you were trapped in the past with open arms.',
+    presentTr: 'Kollarını göğe doğru uzatmış o solgun bedenler yeniden can buluyor. Kendini yargılamayı bıraktın; şimdi gerçek ruhsal çağrına uyanıyorsun.',
+    presentEn: 'Those pale figures reaching out to the sky are coming alive again. You have stopped judging yourself; now you awaken to your true calling.',
+    directionTr: 'Trompetten sallanan o haçlı kırmızı bayrak senin nihaiDirilişini müjdeliyor. Eskiden öldü sandığın umutlar mezarından fışkıracak.',
+    directionEn: 'The red-crossed flag swinging from the trumpet heralds your ultimate Resurrection. Hopes you thought dead will burst from their graves.',
   ),
   21: CardMeaning(
     id: 21,
@@ -354,14 +356,15 @@ const Map<int, CardMeaning> cardMeanings = {
     tone: CardTone.soft,
     movement: CardMovement.motion,
     phase: CardPhase.completion,
-    pastTr: 'Uzun bir yolculuğu tamamladın; olgunlaşma ve bütünleşme yaşandı.',
-    pastEn: 'You completed a long journey; growth and integration took place.',
-    presentTr: 'Her şey yerli yerine oturuyor. Döngü tamamlanmak üzere.',
-    presentEn: 'Everything is falling into place. The cycle is about to be completed.',
-    directionTr: 'Başardığını kutla. Yeni bir döngü başlamak üzere; hazır ol.',
-    directionEn: 'Celebrate your achievement. A new cycle is about to begin; be ready.',
+    pastTr: 'Ovoil çelenk ve dört köşedeki aslan, boğa, kartal, melek ile dünya döngünü kapattın. O sonsuz dansçı gibi yolculuğu şaheserle noktaladın.',
+    pastEn: 'You closed the cycle with the oval wreath and the lion, ox, eagle, and angel at the corners. Like the infinite dancer, your journey became a masterpiece.',
+    presentTr: 'Yeşil çelenkin tam merkezinde, çıplak kadın iki elinde de denge asası tutarak zarifçe havada süzülüyor. Ruhsal ve maddi olan tam bir kusursuzlukta.',
+    presentEn: 'Floating gracefully inside the green wreath, the naked woman holds wands of balance. The spiritual and physical are in absolute perfection.',
+    directionTr: 'Kozmik dört element senin şahidindir. Çıkış da sensin, varış da. O mor kurdeleye dola ve tamamlanan bu eşsiz başyapıtını doya doya kutla!',
+    directionEn: 'The four cosmic elements are your witnesses. You are the departure and the destination. Wrap in that purple ribbon and celebrate your masterpiece!',
   ),
 };
+
 
 // ============================================================
 // Yorum Motoru
@@ -375,6 +378,7 @@ class TarotReading {
   final String closingMessage;
   final FlowType flowType;
   final String flowLabel;
+  final List<String> promises;
 
   const TarotReading({
     required this.generalTheme,
@@ -384,6 +388,7 @@ class TarotReading {
     required this.closingMessage,
     required this.flowType,
     required this.flowLabel,
+    required this.promises,
   });
 }
 
@@ -409,13 +414,24 @@ TarotReading generateReading({
     m1, m2, m3, card1Name, card2Name, card3Name, flowType, isTr,
   );
 
-  // --- Pozisyon yorumları ---
-  final pastInfluence = isTr ? m1.pastTr : m1.pastEn;
-  final presentEnergy = isTr ? m2.presentTr : m2.presentEn;
-  final directionAdvice = isTr ? m3.directionTr : m3.directionEn;
+  // --- Pozisyon yorumları (her seferinde farklı ek cümle) ---
+  final _posRng = Random();
+  
+  final pastInfluence = _variedPositionText(
+    isTr ? m1.pastTr : m1.pastEn, 'past', flowType, isTr, _posRng,
+  );
+  final presentEnergy = _variedPositionText(
+    isTr ? m2.presentTr : m2.presentEn, 'present', flowType, isTr, _posRng,
+  );
+  final directionAdvice = _variedPositionText(
+    isTr ? m3.directionTr : m3.directionEn, 'direction', flowType, isTr, _posRng,
+  );
 
-  // --- Kapanış mesajı ---
-  final closingMessage = _buildClosing(m1, m2, m3, flowType, isTr);
+  // --- Vaatler / Anahtar kelimeler (bir kere hesapla) ---
+  final promises = _buildPromises(m1, m2, m3, isTr);
+
+  // --- Kapanış mesajı (vaatlerle aynı kelimeleri kullanır) ---
+  final closingMessage = _buildClosing(promises, flowType, isTr);
 
   return TarotReading(
     generalTheme: generalTheme,
@@ -425,7 +441,30 @@ TarotReading generateReading({
     closingMessage: closingMessage,
     flowType: flowType,
     flowLabel: flowLabel,
+    promises: promises,
   );
+}
+
+// --- Vaatler / Anahtar Kelimeler ---
+List<String> _buildPromises(CardMeaning m1, CardMeaning m2, CardMeaning m3, bool isTr) {
+  final rng = Random();
+  final words1 = (isTr ? m1.themeTr : m1.themeEn).split(',').map((s) => s.trim()).toList();
+  final words2 = (isTr ? m2.themeTr : m2.themeEn).split(',').map((s) => s.trim()).toList();
+  final words3 = (isTr ? m3.themeTr : m3.themeEn).split(',').map((s) => s.trim()).toList();
+
+  words1.shuffle(rng);
+  words2.shuffle(rng);
+  words3.shuffle(rng);
+
+  String p1 = words1.first;
+  String p2 = words2.first;
+  String p3 = words3.first;
+
+  if (p2 == p1 && words2.length > 1) p2 = words2[1];
+  if ((p3 == p1 || p3 == p2) && words3.length > 1) p3 = words3[1];
+  if ((p3 == p1 || p3 == p2) && words3.length > 2) p3 = words3[2];
+
+  return [p1, p2, p3];
 }
 
 // --- Akış tespiti ---
@@ -479,47 +518,222 @@ String _flowLabel(FlowType flow, bool isTr) {
   }
 }
 
-// --- Genel tema cümlesi ---
+// --- Genel tema cümlesi (rastgele varyasyonlu) ---
+final _themeRng = Random();
+
 String _buildGeneralTheme(
   CardMeaning m1, CardMeaning m2, CardMeaning m3,
   String n1, String n2, String n3,
   FlowType flow, bool isTr,
 ) {
-  final theme2 = isTr ? m2.themeTr : m2.themeEn;
+  List<String> pool;
 
   switch (flow) {
     case FlowType.harmonious:
-      return isTr
-          ? '$n1, $n2 ve $n3 birlikte parlıyor. İçindeki ışığı korkusuzca yansıt.'
-          : '$n1, $n2 and $n3 shine together. Reflect your inner light fearlessly.';
+      pool = isTr ? [
+        '$n1, $n2 ve $n3 birlikte parlıyor. İçindeki ışığı korkusuzca yansıt.',
+        '$n1 ışığı yakıyor, $n2 büyütüyor, $n3 önüne seriyor. Bu akış sana ait.',
+        'Üç kart tek bir kalp atışı gibi: $n1 nabzı tutuyor, $n2 ritmi veriyor, $n3 şarkıyı söylüyor.',
+        '$n1 toprağı hazırladı, $n2 tohumu ekti, $n3 çiçeği açtırdı. Hasat senin.',
+        '$n1 ile $n2 el ele verdi, $n3 o bağı kutsuyor. Huzurun formülü önünde duruyor.',
+        'Evren $n1 ile fısıldadı, $n2 ile dokundu, $n3 ile kucakladı. Şimdi sen konuş.',
+      ] : [
+        '$n1, $n2 and $n3 shine together. Reflect your inner light fearlessly.',
+        '$n1 lights the spark, $n2 fans the flame, $n3 reveals the path. This flow is yours.',
+        'Three cards beat as one heart: $n1 sets the pulse, $n2 gives the rhythm, $n3 sings the song.',
+        '$n1 prepared the soil, $n2 planted the seed, $n3 bloomed the flower. The harvest is yours.',
+        '$n1 and $n2 join hands, $n3 blesses the bond. The formula of peace stands before you.',
+        'The universe whispered with $n1, touched with $n2, embraced with $n3. Now it is your turn to speak.',
+      ];
+      break;
     case FlowType.conflicting:
-      return isTr
-          ? '$n1 sarsıyor, $n2 sınıyor ama $n3 çıkış yolunu gösteriyor.'
-          : '$n1 shakes, $n2 tests, but $n3 reveals the way forward.';
+      pool = isTr ? [
+        '$n1 sarsıyor, $n2 sınıyor ama $n3 çıkış yolunu gösteriyor.',
+        '$n1 yıkıyor, $n2 sorgulatıyor, ama $n3 küllerin arasından altını buluyor.',
+        '$n1 fırtınayı getirdi, $n2 dengeyi bozdu, $n3 gözünü açıyor. Dikkat et.',
+        'Kartlar çatışıyor: $n1 ateşi, $n2 rüzgârı, $n3 ise o yangından doğacak yeni ormanı temsil ediyor.',
+        '$n1 seni yere çaldı, $n2 yarana tuz bastı, ama $n3 ayağa kalkman gerektiğini hatırlatıyor.',
+        '$n1 acıtıyor, $n2 zorluyorlar ama $n3 sana diyorlar ki: sen bundan büyüksün.',
+      ] : [
+        '$n1 shakes, $n2 tests, but $n3 reveals the way forward.',
+        '$n1 destroys, $n2 questions, but $n3 finds gold among the ashes.',
+        '$n1 brought the storm, $n2 broke the balance, $n3 opens your eyes. Pay attention.',
+        'The cards clash: $n1 is the fire, $n2 is the wind, $n3 is the new forest born from that blaze.',
+        '$n1 knocked you down, $n2 salted the wound, but $n3 reminds you to stand.',
+        '$n1 hurts, $n2 pushes, but $n3 whispers: you are bigger than this.',
+      ];
+      break;
     case FlowType.transformative:
-      return isTr
-          ? '$n1 bir kapıyı kapatıyor, $n2 seni dönüştürüyor, $n3 yeni bir başlangıç sunuyor.'
-          : '$n1 closes a door, $n2 transforms you, $n3 offers a fresh start.';
+      pool = isTr ? [
+        '$n1 bir kapıyı kapatıyor, $n2 seni dönüştürüyor, $n3 yeni bir başlangıç sunuyor.',
+        '$n1 eski seni gömdü, $n2 seni yoğurdu, $n3 seni yeniden doğurdu. Tanışma zamanı.',
+        'Eski sen $n1 ile öldü. $n2 cenaze töreni. $n3 ise yeni hayatın ilk nefesi.',
+        '$n1 sayfayı yırttı, $n2 kalemi eline verdi, $n3 boş sayfayı önüne koydu. Yaz.',
+        '$n1 kozayı ördü, $n2 içinde beklettti, $n3 kanatları açtırdı. Artık uç.',
+        '$n1 geceyi getirdi, $n2 karanlıkta kaldırdı, $n3 şafağı söktürdü. Bu senin dönüşümün.',
+      ] : [
+        '$n1 closes a door, $n2 transforms you, $n3 offers a fresh start.',
+        '$n1 buried the old you, $n2 reshaped you, $n3 birthed you anew. Time to meet yourself.',
+        'The old you died with $n1. $n2 is the funeral. $n3 is the first breath of your new life.',
+        '$n1 tore the page, $n2 handed you the pen, $n3 placed a blank page before you. Write.',
+        '$n1 spun the cocoon, $n2 kept you waiting inside, $n3 unfurled the wings. Now fly.',
+        '$n1 brought the night, $n2 held you in the dark, $n3 broke the dawn. This is your metamorphosis.',
+      ];
+      break;
   }
+
+  return pool[_themeRng.nextInt(pool.length)];
 }
 
-// --- Kapanış mesajı ---
+// --- Pozisyon yorumlarına rastgele ek cümle ---
+String _variedPositionText(
+  String base, String position, FlowType flow, bool isTr, Random rng,
+) {
+  List<String> suffixes;
+
+  if (position == 'past') {
+    suffixes = isTr ? [
+      ' Bu iz hâlâ sende yaşıyor.',
+      ' O anın enerjisi bugün bile hissediliyor.',
+      ' Geçmiş bitti ama dersi bitmedi.',
+      ' O deneyim seni sen yapan parçalardan biri.',
+      ' Geride bıraktığını sanıyorsun ama o seni bırakmadı.',
+      ' Bu hatıra bir pusula gibi yön veriyor.',
+      ' Orada bir şey öğrendin; şimdi hatırla.',
+      ' Geçmişin gölgeleri aydınlığa dönüşmeyi bekliyor.',
+    ] : [
+      ' This mark still lives within you.',
+      ' The energy of that moment is still felt today.',
+      ' The past ended but its lesson did not.',
+      ' That experience is one of the pieces that made you who you are.',
+      ' You think you left it behind, but it never left you.',
+      ' This memory guides you like a compass.',
+      ' You learned something there; now remember.',
+      ' The shadows of the past await their turn to become light.',
+    ];
+  } else if (position == 'present') {
+    suffixes = isTr ? [
+      ' Şu an tam da olman gereken yerdesin.',
+      ' Bu enerji geçici değil; onu kullan.',
+      ' Şimdi karar anı, dikkat et.',
+      ' Bu an sana özel bir mesaj taşıyor.',
+      ' Gözlerini aç, cevap önünde duruyor.',
+      ' Bu enerji bir davet; kabul et ya da reddet.',
+      ' Şimdiki an tek gerçek güç kaynağın.',
+      ' Zamanın durduğu bu noktada, içine bak.',
+    ] : [
+      ' You are exactly where you need to be right now.',
+      ' This energy is not temporary; use it.',
+      ' Now is the moment of decision, pay attention.',
+      ' This moment carries a special message for you.',
+      ' Open your eyes, the answer stands before you.',
+      ' This energy is an invitation; accept or decline.',
+      ' The present moment is your only true source of power.',
+      ' At this point where time stands still, look within.',
+    ];
+  } else {
+    suffixes = isTr ? [
+      ' Cesur ol, yol seni bekliyor.',
+      ' Bu yön tek seçenek değil ama en doğrusu.',
+      ' Adımını at; gerisini evren halledecek.',
+      ' Geleceğin yazılmadı, onu sen yazıyorsun.',
+      ' Bu kapıdan geçersen geri dönüşü olmayabilir. Ama o iyi bir şey.',
+      ' Pusula kalbinde, harita ellerinde.',
+      ' İleriye bak; geçmişe değil.',
+      ' Yolun sonunda seni bekleyen, bugün hayal bile edemeyeceğin bir sen.',
+    ] : [
+      ' Be brave, the path awaits you.',
+      ' This direction is not the only option, but the truest one.',
+      ' Take your step; the universe will handle the rest.',
+      ' Your future is not written, you are writing it.',
+      ' If you pass through this door, there may be no return. But that is a good thing.',
+      ' The compass is in your heart, the map in your hands.',
+      ' Look forward, not backward.',
+      ' At the end of the road awaits a version of you that today you cannot even imagine.',
+    ];
+  }
+
+  return '$base ${suffixes[rng.nextInt(suffixes.length)]}';
+}
+
+// --- Kapanış mesajı (Kartların Gizli Fısıltısı — rastgele varyasyonlu) ---
+final _closingRng = Random();
+
 String _buildClosing(
-  CardMeaning m1, CardMeaning m2, CardMeaning m3,
+  List<String> promises,
   FlowType flow, bool isTr,
 ) {
+  final k1 = promises[0];
+  final k2 = promises[1];
+  final k3 = promises[2];
+
+  List<String> pool;
+
   switch (flow) {
     case FlowType.harmonious:
-      return isTr
-          ? '🌟 Evrenin kusursuz matematiği şu an seninle hizalanıyor. Kalbindeki o ince sese güven; çünkü adımların şu an gökyüzü tarafından destekleniyor.'
-          : '🌟 The perfect geometry of the universe is aligning with you right now. Trust the subtle voice in your heart, for your steps are supported by the cosmos.';
+      pool = isTr ? [
+        '"$k1" seni buraya getirdi.\n"$k3" seni oraya götürecek.\nSadece güven.',
+        '"$k1" bir kapıydı.\n"$k3" arkasındaki oda.\nSen zaten içindesin.',
+        '"$k1" tohumdu.\n"$k2" toprak.\n"$k3" çiçek.\nKokla.',
+        'Evren "$k1" dedi.\nSen "$k2" dedin.\n"$k3" cevap verdi.\nAnlaşma tamam.',
+        '"$k1" sessizce geldi.\n"$k3" sessizce gidecek.\nArada sen varsın.\nVe bu yeterli.',
+        '"$k1" ilk nefesindi.\n"$k2" yürüyüşün.\n"$k3" varış noktası.\nAma yol bitmedi.',
+        'Biri sana "$k1" verdi.\nBiri "$k2" öğretti.\nŞimdi "$k3" sende.\nKullan.',
+        '"$k3" sana bakıyor.\nGözlerinde "$k1" var.\nDudaklarında "$k2".\nDinle.',
+      ] : [
+        '"$k1" brought you here.\n"$k3" will take you there.\nJust trust.',
+        '"$k1" was a door.\n"$k3" is the room behind it.\nYou are already inside.',
+        '"$k1" was the seed.\n"$k2" was the soil.\n"$k3" is the bloom.\nBreathe it in.',
+        'The universe said "$k1."\nYou said "$k2."\n"$k3" answered.\nThe deal is sealed.',
+        '"$k1" came quietly.\n"$k3" will leave quietly.\nIn between, there is you.\nAnd that is enough.',
+        '"$k1" was your first breath.\n"$k2" your walk.\n"$k3" your destination.\nBut the road goes on.',
+        'Someone gave you "$k1."\nSomeone taught you "$k2."\nNow "$k3" is yours.\nUse it.',
+        '"$k3" is watching you.\n"$k1" in its eyes.\n"$k2" on its lips.\nListen.',
+      ];
+      break;
     case FlowType.conflicting:
-      return isTr
-          ? '🔥 Fırtınaların ortasında savrulduğunu hissedebilirsin, fakat unutma; en güçlü çelik en harlı ateşte dövülür. Kendi gücüne uyanıyorsun.'
-          : '🔥 You may feel tossed in the midst of storms, but remember; the strongest steel is forged in the fiercest fire. You are awakening to your own power.';
+      pool = isTr ? [
+        '"$k1" seni kırdı.\nAma "$k3" seni kuracak.\nHer yara bir kapıdır.',
+        '"$k1" acıttı.\n"$k2" sordu: neden?\n"$k3" cevapladı: güçlenmek için.\nŞimdi bil.',
+        'Kırıldın.\n"$k1" parçaladı.\n"$k2" dağıttı.\nAma "$k3" diyor ki:\nKırık yerlerden ışık girer.',
+        '"$k1" bir yumruktu.\n"$k2" bir tokat.\n"$k3" uzanan bir el.\nTut.',
+        'Acı "$k1" ile başladı.\n"$k2" ile derinleşti.\nAma "$k3"...\n"$k3" seni tanımlayacak olan.',
+        '"$k1" geceydi.\n"$k2" fırtına.\nAma "$k3" şafak.\nVe şafak her zaman kazanır.',
+        'Düştün.\n"$k1" itti.\n"$k2" izledi.\nAma "$k3" elini uzattı.\nYakala.',
+        '"$k1" yakıyordu.\n"$k2" küllerdi.\n"$k3" anka kuşu.\nSen de öylesin.',
+      ] : [
+        '"$k1" broke you.\nBut "$k3" will rebuild you.\nEvery wound is a door.',
+        '"$k1" hurt.\n"$k2" asked: why?\n"$k3" answered: to grow stronger.\nNow you know.',
+        'You broke.\n"$k1" shattered.\n"$k2" scattered.\nBut "$k3" says:\nLight enters through the cracks.',
+        '"$k1" was a punch.\n"$k2" was a slap.\n"$k3" is the hand reaching out.\nGrab it.',
+        'Pain began with "$k1."\nDeepened with "$k2."\nBut "$k3"...\n"$k3" is what will define you.',
+        '"$k1" was the night.\n"$k2" was the storm.\nBut "$k3" is the dawn.\nAnd dawn always wins.',
+        'You fell.\n"$k1" pushed.\n"$k2" watched.\nBut "$k3" reached out.\nGrab on.',
+        '"$k1" was burning.\n"$k2" was the ashes.\n"$k3" is the phoenix.\nSo are you.',
+      ];
+      break;
     case FlowType.transformative:
-      return isTr
-          ? '🦋 Kozanı yırtıp çıkmak acı verebilir; lakin birazdan kanatlarının aslında ne kadar görkemli olduğunu tüm dünya görecek.'
-          : '🦋 Tearing through the cocoon may hurt; but soon, the whole world will witness just how magnificent your wings truly are.';
+      pool = isTr ? [
+        '"$k1" öldü.\n"$k3" doğuyor.\nSen de.',
+        '"$k1" bitti.\nAma "$k3" başlıyor.\nFinaller her zaman yeni sezonların ilk sahnesidir.',
+        'Eski sen "$k1" ile gömüldü.\n"$k2" mezar taşıydı.\n"$k3" diriliş.\nKalk.',
+        '"$k1" son nefesiydi.\n"$k2" sessizlik.\n"$k3" ilk çığlık.\nYeniden doğdun.',
+        '"$k1" yıktı.\n"$k2" temizledi.\n"$k3" inşa edecek.\nMimar sensin.',
+        'Tırtıl "$k1" idi.\nKoza "$k2".\nKelebek "$k3".\nArtık uçabilirsin.',
+        '"$k1" seni aldı.\n"$k2" seni değiştirdi.\n"$k3" seni geri verdi.\nAma farklı.\nÇok farklı.',
+        '"$k1" bir vedaydı.\n"$k2" yolculuk.\n"$k3" yeni bir merhaba.\nGülümse.',
+      ] : [
+        '"$k1" died.\n"$k3" is being born.\nSo are you.',
+        '"$k1" ended.\nBut "$k3" begins.\nFinales are always the opening scenes of new seasons.',
+        'The old you was buried with "$k1."\n"$k2" was the tombstone.\n"$k3" is resurrection.\nRise.',
+        '"$k1" was the last breath.\n"$k2" was silence.\n"$k3" is the first cry.\nYou are reborn.',
+        '"$k1" demolished.\n"$k2" cleared the ground.\n"$k3" will build.\nYou are the architect.',
+        'The caterpillar was "$k1."\nThe cocoon was "$k2."\nThe butterfly is "$k3."\nYou can fly now.',
+        '"$k1" took you.\n"$k2" changed you.\n"$k3" gave you back.\nBut different.\nVery different.',
+        '"$k1" was a goodbye.\n"$k2" the journey.\n"$k3" a new hello.\nSmile.',
+      ];
+      break;
   }
+
+  return pool[_closingRng.nextInt(pool.length)];
 }
