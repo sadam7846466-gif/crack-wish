@@ -193,6 +193,74 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       nameEn: 'The World',
       frontAsset: 'assets/images/tarot/tarot/The_World.webp',
     ),
+    // ============================================================
+    // MINOR ARCANA — CUPS (Kâseler) — 14 kart (id: 22–35)
+    // ============================================================
+    TarotCardDef(id: 22, nameTr: 'Kâselerin Ası', nameEn: 'Ace of Cups', frontAsset: 'assets/images/tarot/tarot/Ace_of_Cups.webp'),
+    TarotCardDef(id: 23, nameTr: 'Kâselerin İkisi', nameEn: 'Two of Cups', frontAsset: 'assets/images/tarot/tarot/Two_of_Cups.webp'),
+    TarotCardDef(id: 24, nameTr: 'Kâselerin Üçü', nameEn: 'Three of Cups', frontAsset: 'assets/images/tarot/tarot/Three_of_Cups.webp'),
+    TarotCardDef(id: 25, nameTr: 'Kâselerin Dörtü', nameEn: 'Four of Cups', frontAsset: 'assets/images/tarot/tarot/Four_of_Cups.webp'),
+    TarotCardDef(id: 26, nameTr: 'Kâselerin Beşi', nameEn: 'Five of Cups', frontAsset: 'assets/images/tarot/tarot/Five_of_Cups.webp'),
+    TarotCardDef(id: 27, nameTr: 'Kâselerin Altısı', nameEn: 'Six of Cups', frontAsset: 'assets/images/tarot/tarot/Six_of_Cups.webp'),
+    TarotCardDef(id: 28, nameTr: 'Kâselerin Yedisi', nameEn: 'Seven of Cups', frontAsset: 'assets/images/tarot/tarot/Seven_of_Cups.webp'),
+    TarotCardDef(id: 29, nameTr: 'Kâselerin Sekizi', nameEn: 'Eight of Cups', frontAsset: 'assets/images/tarot/tarot/Eight_of_Cups.webp'),
+    TarotCardDef(id: 30, nameTr: 'Kâselerin Dokuzu', nameEn: 'Nine of Cups', frontAsset: 'assets/images/tarot/tarot/Nine_of_Cups.webp'),
+    TarotCardDef(id: 31, nameTr: 'Kâselerin Onu', nameEn: 'Ten of Cups', frontAsset: 'assets/images/tarot/tarot/Ten_of_Cups.webp'),
+    TarotCardDef(id: 32, nameTr: 'Kâselerin Uşağı', nameEn: 'Page of Cups', frontAsset: 'assets/images/tarot/tarot/Page_of_Cups.webp'),
+    TarotCardDef(id: 33, nameTr: 'Kâselerin Şövalyesi', nameEn: 'Knight of Cups', frontAsset: 'assets/images/tarot/tarot/Knight_of_Cups.webp'),
+    TarotCardDef(id: 34, nameTr: 'Kâselerin Kraliçesi', nameEn: 'Queen of Cups', frontAsset: 'assets/images/tarot/tarot/Queen_of_Cups.webp'),
+    TarotCardDef(id: 35, nameTr: 'Kâselerin Kralı', nameEn: 'King of Cups', frontAsset: 'assets/images/tarot/tarot/King_of_Cups.webp'),
+    // ============================================================
+    // MINOR ARCANA — WANDS (Asalar) — 14 kart (id: 36–49)
+    // ============================================================
+    TarotCardDef(id: 36, nameTr: 'Asaların Ası', nameEn: 'Ace of Wands', frontAsset: 'assets/images/tarot/tarot/Ace_of_Wands.webp'),
+    TarotCardDef(id: 37, nameTr: 'Asaların İkisi', nameEn: 'Two of Wands', frontAsset: 'assets/images/tarot/tarot/Two_of_Wands.webp'),
+    TarotCardDef(id: 38, nameTr: 'Asaların Üçü', nameEn: 'Three of Wands', frontAsset: 'assets/images/tarot/tarot/Three_of_Wands.webp'),
+    TarotCardDef(id: 39, nameTr: 'Asaların Dörtü', nameEn: 'Four of Wands', frontAsset: 'assets/images/tarot/tarot/Four_of_Wands.webp'),
+    TarotCardDef(id: 40, nameTr: 'Asaların Beşi', nameEn: 'Five of Wands', frontAsset: 'assets/images/tarot/tarot/Five_of_Wands.webp'),
+    TarotCardDef(id: 41, nameTr: 'Asaların Altısı', nameEn: 'Six of Wands', frontAsset: 'assets/images/tarot/tarot/Six_of_Wands.webp'),
+    TarotCardDef(id: 42, nameTr: 'Asaların Yedisi', nameEn: 'Seven of Wands', frontAsset: 'assets/images/tarot/tarot/Seven_of_Wands.webp'),
+    TarotCardDef(id: 43, nameTr: 'Asaların Sekizi', nameEn: 'Eight of Wands', frontAsset: 'assets/images/tarot/tarot/Eight_of_Wands.webp'),
+    TarotCardDef(id: 44, nameTr: 'Asaların Dokuzu', nameEn: 'Nine of Wands', frontAsset: 'assets/images/tarot/tarot/Nine_of_Wands.webp'),
+    TarotCardDef(id: 45, nameTr: 'Asaların Onu', nameEn: 'Ten of Wands', frontAsset: 'assets/images/tarot/tarot/Ten_of_Wands.webp'),
+    TarotCardDef(id: 46, nameTr: 'Asaların Uşağı', nameEn: 'Page of Wands', frontAsset: 'assets/images/tarot/tarot/Page_of_Wands.webp'),
+    TarotCardDef(id: 47, nameTr: 'Asaların Şövalyesi', nameEn: 'Knight of Wands', frontAsset: 'assets/images/tarot/tarot/Knight_of_Wands.webp'),
+    TarotCardDef(id: 48, nameTr: 'Asaların Kraliçesi', nameEn: 'Queen of Wands', frontAsset: 'assets/images/tarot/tarot/Queen_of_Wands.webp'),
+    TarotCardDef(id: 49, nameTr: 'Asaların Kralı', nameEn: 'King of Wands', frontAsset: 'assets/images/tarot/tarot/King_of_Wands.webp'),
+    // ============================================================
+    // MINOR ARCANA — SWORDS (Kılıçlar) — 14 kart (id: 50–63)
+    // ============================================================
+    TarotCardDef(id: 50, nameTr: 'Kılıçların Ası', nameEn: 'Ace of Swords', frontAsset: 'assets/images/tarot/tarot/Ace_of_Swords.webp'),
+    TarotCardDef(id: 51, nameTr: 'Kılıçların İkisi', nameEn: 'Two of Swords', frontAsset: 'assets/images/tarot/tarot/Two_of_Swords.webp'),
+    TarotCardDef(id: 52, nameTr: 'Kılıçların Üçü', nameEn: 'Three of Swords', frontAsset: 'assets/images/tarot/tarot/Three_of_Swords.webp'),
+    TarotCardDef(id: 53, nameTr: 'Kılıçların Dörtü', nameEn: 'Four of Swords', frontAsset: 'assets/images/tarot/tarot/Four_of_Swords.webp'),
+    TarotCardDef(id: 54, nameTr: 'Kılıçların Beşi', nameEn: 'Five of Swords', frontAsset: 'assets/images/tarot/tarot/Five_of_Swords.webp'),
+    TarotCardDef(id: 55, nameTr: 'Kılıçların Altısı', nameEn: 'Six of Swords', frontAsset: 'assets/images/tarot/tarot/Six_of_Swords.webp'),
+    TarotCardDef(id: 56, nameTr: 'Kılıçların Yedisi', nameEn: 'Seven of Swords', frontAsset: 'assets/images/tarot/tarot/Seven_of_Swords.webp'),
+    TarotCardDef(id: 57, nameTr: 'Kılıçların Sekizi', nameEn: 'Eight of Swords', frontAsset: 'assets/images/tarot/tarot/Eight_of_Swords.webp'),
+    TarotCardDef(id: 58, nameTr: 'Kılıçların Dokuzu', nameEn: 'Nine of Swords', frontAsset: 'assets/images/tarot/tarot/Nine_of_Swords.webp'),
+    TarotCardDef(id: 59, nameTr: 'Kılıçların Onu', nameEn: 'Ten of Swords', frontAsset: 'assets/images/tarot/tarot/Ten_of_Swords.webp'),
+    TarotCardDef(id: 60, nameTr: 'Kılıçların Uşağı', nameEn: 'Page of Swords', frontAsset: 'assets/images/tarot/tarot/Page_of_Swords.webp'),
+    TarotCardDef(id: 61, nameTr: 'Kılıçların Şövalyesi', nameEn: 'Knight of Swords', frontAsset: 'assets/images/tarot/tarot/Knight_of_Swords.webp'),
+    TarotCardDef(id: 62, nameTr: 'Kılıçların Kraliçesi', nameEn: 'Queen of Swords', frontAsset: 'assets/images/tarot/tarot/Queen_of_Swords.webp'),
+    TarotCardDef(id: 63, nameTr: 'Kılıçların Kralı', nameEn: 'King of Swords', frontAsset: 'assets/images/tarot/tarot/King_of_Swords.webp'),
+    // ============================================================
+    // MINOR ARCANA — PENTACLES (Sikkeler) — 14 kart (id: 64–77)
+    // ============================================================
+    TarotCardDef(id: 64, nameTr: 'Sikkelerin Ası', nameEn: 'Ace of Pentacles', frontAsset: 'assets/images/tarot/tarot/Ace_of_Pentacles.webp'),
+    TarotCardDef(id: 65, nameTr: 'Sikkelerin İkisi', nameEn: 'Two of Pentacles', frontAsset: 'assets/images/tarot/tarot/Two_of_Pentacles.webp'),
+    TarotCardDef(id: 66, nameTr: 'Sikkelerin Üçü', nameEn: 'Three of Pentacles', frontAsset: 'assets/images/tarot/tarot/Three_of_Pentacles.webp'),
+    TarotCardDef(id: 67, nameTr: 'Sikkelerin Dörtü', nameEn: 'Four of Pentacles', frontAsset: 'assets/images/tarot/tarot/Four_of_Pentacles.webp'),
+    TarotCardDef(id: 68, nameTr: 'Sikkelerin Beşi', nameEn: 'Five of Pentacles', frontAsset: 'assets/images/tarot/tarot/Five_of_Pentacles.webp'),
+    TarotCardDef(id: 69, nameTr: 'Sikkelerin Altısı', nameEn: 'Six of Pentacles', frontAsset: 'assets/images/tarot/tarot/Six_of_Pentacles.webp'),
+    TarotCardDef(id: 70, nameTr: 'Sikkelerin Yedisi', nameEn: 'Seven of Pentacles', frontAsset: 'assets/images/tarot/tarot/Seven_of_Pentacles.webp'),
+    TarotCardDef(id: 71, nameTr: 'Sikkelerin Sekizi', nameEn: 'Eight of Pentacles', frontAsset: 'assets/images/tarot/tarot/Eight_of_Pentacles.webp'),
+    TarotCardDef(id: 72, nameTr: 'Sikkelerin Dokuzu', nameEn: 'Nine of Pentacles', frontAsset: 'assets/images/tarot/tarot/Nine_of_Pentacles.webp'),
+    TarotCardDef(id: 73, nameTr: 'Sikkelerin Onu', nameEn: 'Ten of Pentacles', frontAsset: 'assets/images/tarot/tarot/Ten_of_Pentacles.webp'),
+    TarotCardDef(id: 74, nameTr: 'Sikkelerin Uşağı', nameEn: 'Page of Pentacles', frontAsset: 'assets/images/tarot/tarot/Page_of_Pentacles.webp'),
+    TarotCardDef(id: 75, nameTr: 'Sikkelerin Şövalyesi', nameEn: 'Knight of Pentacles', frontAsset: 'assets/images/tarot/tarot/Knight_of_Pentacles.webp'),
+    TarotCardDef(id: 76, nameTr: 'Sikkelerin Kraliçesi', nameEn: 'Queen of Pentacles', frontAsset: 'assets/images/tarot/tarot/Queen_of_Pentacles.webp'),
+    TarotCardDef(id: 77, nameTr: 'Sikkelerin Kralı', nameEn: 'King of Pentacles', frontAsset: 'assets/images/tarot/tarot/King_of_Pentacles.webp'),
   ];
   // ======================
   // Storage keys
@@ -224,8 +292,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   late List<int> _tableCards;
   int get _tableCount {
     if (_isBuyukArkana) return 22;
-    if (_selectedCategory == null) return 0;
-    return _selectedCategory == 0 ? 22 : 14;
+    return 78; // Tam Arkana: tüm kartlar
   }
   int? _selectedCategory; // null = show categories, 0=Major, 1=Cups, 2=Wands, 3=Swords, 4=Pentacles
 
@@ -236,10 +303,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     (_) => GlobalKey(),
   );
   final List<GlobalKey> _slotKeys = List<GlobalKey>.generate(
-    5,
+    7,
     (_) => GlobalKey(),
   );
-  int get _maxSlots => _isBuyukArkana ? 3 : 5;
+  int get _maxSlots => _isBuyukArkana ? 3 : 7;
   int _deckRebuildKey = 0;
   bool _btnStayVisible = false;
   int _reservedSlotCount = 0; // slots reserved but animation not done yet
@@ -317,7 +384,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 40),
     );
-    _slotGlowControllers = List.generate(5, (_) => AnimationController(
+    _slotGlowControllers = List.generate(7, (_) => AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
       value: 1.0,
@@ -381,9 +448,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     if (!mounted) return;
 
     // Deck'i hemen karıştır ve hazırla (animasyon beklemeden)
-    _deckOrder.shuffle(_rng);
-    final count = min(_tableCount, _deckOrder.length);
-    _tableCards = _deckOrder.take(count).toList();
+    List<int> cardPool;
+    if (_isBuyukArkana) {
+      cardPool = List<int>.generate(22, (i) => i);
+    } else {
+      cardPool = List<int>.generate(78, (i) => i);
+    }
+    cardPool.shuffle(_rng);
+    _tableCards = cardPool;
+    _deckOrder = List<int>.generate(_allCards.length, (i) => i)..shuffle(_rng);
 
     _slotEntranceCtrl.forward(from: 0.0);
 
@@ -694,21 +767,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // Flow actions
   // ======================
   void _resetDeck() {
-    if (!_isBuyukArkana && _selectedCategory == null) {
-      // Tam Arkana mode, no category selected - show no cards
-      _tableCards = [];
-      _revealedCount = 0;
-      _selectedCardIndexes = [];
-      _updateCtaText();
-      return;
-    }
-    
     List<int> cardPool;
     if (_isBuyukArkana) {
       cardPool = List<int>.generate(22, (i) => i);
     } else {
-      final range = _categoryCardRange(_selectedCategory!);
-      cardPool = List<int>.generate(range.$2 - range.$1, (i) => range.$1 + i);
+      // Tam Arkana: tüm 78 kart
+      cardPool = List<int>.generate(78, (i) => i);
     }
     cardPool.shuffle(_rng);
     _tableCards = cardPool;
@@ -718,7 +782,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _updateCtaText();
     // Re-play entrance animations
     _slotEntranceCtrl.forward(from: 0.0);
-    _setStateSafe(() => _deckRebuildKey++);
+    _setStateSafe(() {
+      _deckRebuildKey++;
+      _state = RitualState.selecting;
+    });
+    _updateCtaText();
   }
 
   /// Returns (startId, endId) for a category index
@@ -1437,6 +1505,289 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
+  void _showCreditInfoPanel() {
+    final isTr = _isTr;
+    final hasCredit = !_dailyFreeUsed || _adCredits > 0;
+    final creditCount = !_dailyFreeUsed ? 1 : _adCredits;
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'CreditInfo',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              color: Colors.black.withOpacity(0.4),
+              child: Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: GestureDetector(
+                    onTap: () {}, // prevent dismiss on card tap
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: GlassCard(
+                        useOwnLayer: true,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                        shape: const LiquidRoundedSuperellipse(borderRadius: 24),
+                        settings: const LiquidGlassSettings(
+                          thickness: 24,
+                          blur: 15,
+                          glassColor: Color(0x1A1E1845),
+                          chromaticAberration: 0.12,
+                          lightIntensity: 1.0,
+                          ambientStrength: 0.8,
+                          refractiveIndex: 1.3,
+                          saturation: 1.1,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Icon
+                            Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFFE2C48E).withOpacity(0.25),
+                                    const Color(0xFF9C6BFF).withOpacity(0.15),
+                                  ],
+                                ),
+                                border: Border.all(
+                                  color: const Color(0xFFE7D6A5).withOpacity(0.3),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.auto_awesome,
+                                color: hasCredit
+                                    ? const Color(0xFFE2C48E)
+                                    : Colors.white.withOpacity(0.4),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Title
+                            Text(
+                              isTr ? 'Okuma Hakların' : 'Your Reading Credits',
+                              style: GoogleFonts.cinzel(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Credit count
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.auto_awesome,
+                                  color: hasCredit
+                                      ? const Color(0xFFE2C48E)
+                                      : Colors.white.withOpacity(0.3),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  isTr
+                                      ? '$creditCount okuma hakkın var'
+                                      : '$creditCount credits remaining',
+                                  style: TextStyle(
+                                    color: hasCredit
+                                        ? const Color(0xFFE2C48E).withOpacity(0.9)
+                                        : Colors.white.withOpacity(0.4),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            // Info items
+                            _creditInfoRow(
+                              Icons.wb_sunny_outlined,
+                              isTr
+                                  ? 'Her gün 1 ücretsiz okuma hakkın var'
+                                  : 'You get 1 free reading every day',
+                              !_dailyFreeUsed,
+                            ),
+                            const SizedBox(height: 12),
+                            _creditInfoRow(
+                              Icons.play_circle_outline,
+                              isTr
+                                  ? 'Reklam izleyerek ek hak kazan'
+                                  : 'Watch ads to earn extra credits',
+                              true,
+                            ),
+                            const SizedBox(height: 12),
+                            _creditInfoRow(
+                              Icons.refresh_rounded,
+                              isTr
+                                  ? 'Haklar her gece sıfırlanır'
+                                  : 'Credits reset every midnight',
+                              false,
+                            ),
+                            const SizedBox(height: 24),
+                            // Action buttons
+                            Row(
+                              children: [
+                                // Reklam İzle butonu
+                                Expanded(
+                                  child: _TapScaleButton(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      _showAdPopup();
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        color: Colors.white.withOpacity(0.08),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.15),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.play_circle_filled_rounded,
+                                            color: Colors.white.withOpacity(0.7),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isTr ? 'Reklam İzle' : 'Watch Ad',
+                                            style: GoogleFonts.inter(
+                                              color: Colors.white.withOpacity(0.75),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                // Premium butonu
+                                Expanded(
+                                  child: _TapScaleButton(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      // TODO: Premium sayfasına yönlendir
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFFD4A54A),
+                                            Color(0xFFE8C97A),
+                                            Color(0xFFD4A54A),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFFD4A54A).withOpacity(0.3),
+                                            blurRadius: 12,
+                                            spreadRadius: 1,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.workspace_premium_rounded,
+                                            color: Color(0xFF2A1810),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isTr ? 'Premium\'a Geç' : 'Go Premium',
+                                            style: GoogleFonts.inter(
+                                              color: const Color(0xFF2A1810),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, a1, a2, child) {
+        return FadeTransition(
+          opacity: a1,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: a1, curve: Curves.easeOutBack),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _creditInfoRow(IconData icon, String text, bool isActive) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive
+                ? const Color(0xFFE2C48E).withOpacity(0.12)
+                : Colors.white.withOpacity(0.05),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: isActive
+                ? const Color(0xFFE2C48E).withOpacity(0.8)
+                : Colors.white.withOpacity(0.3),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isActive
+                  ? Colors.white.withOpacity(0.75)
+                  : Colors.white.withOpacity(0.4),
+              fontSize: 13,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _showTarotGuidanceDialog() {
     showGeneralDialog(
       context: context,
@@ -1999,14 +2350,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     HapticFeedback.lightImpact();
     _setStateSafe(() {
       _state = RitualState.idle;
+      _latestReading = null;
       _selectedTablePositions.clear();
       _hiddenCards.clear();
       _reservedSlotCount = 0;
       _revealedCount = 0;
       _selectedCardIndexes = [];
-      _tableCards = [];
     });
-    _updateCtaText();
+    _resetDeck();
   }
 
   void _playCardFlipSound() async {
@@ -2166,6 +2517,123 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     final cardInSuit = (id - 22) % 14;
     const ranks = ['A', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'P', 'N', 'Q', 'K'];
     return ranks[cardInSuit];
+  }
+
+  // ── 78 Card Grid for Tam Arkana ──
+  Widget _buildFullArcanaGrid() {
+    const columns = 6;
+    const spacing = 4.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gridWidth = constraints.maxWidth > 0 ? constraints.maxWidth : MediaQuery.of(context).size.width - 48;
+        final cardW = (gridWidth - (columns - 1) * spacing) / columns;
+        final cardH = cardW * 1.5;
+        final rows = (78 / columns).ceil();
+        final gridHeight = rows * (cardH + spacing) - spacing;
+        
+        return SizedBox(
+          height: gridHeight.clamp(0, 380),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: List.generate(78, (i) {
+                  final cardIndex = _tableCards.isNotEmpty && i < _tableCards.length
+                      ? _tableCards[i]
+                      : i;
+                  final isSelected = _selectedTablePositions.contains(i);
+                  final isHidden = _hiddenCards.contains(i);
+
+                  return GestureDetector(
+                    key: _cardKeys[i],
+                    onTap: () {
+                      if (isSelected || isHidden) return;
+                      _selectCard(i, _cardKeys[i]);
+                    },
+                    child: AnimatedScale(
+                      scale: isHidden ? 0.85 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: AnimatedOpacity(
+                        opacity: isHidden ? 0.0 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: SizedBox(
+                          width: cardW,
+                          height: cardH,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFF2A1F4E),
+                                  Color(0xFF1A0F2E),
+                                ],
+                              ),
+                              border: Border.all(
+                                color: const Color(0xFFE7D6A5).withOpacity(0.2),
+                                width: 0.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              children: [
+                                // Card back pattern
+                                Center(
+                                  child: Icon(
+                                    Icons.auto_awesome,
+                                    size: 14,
+                                    color: const Color(0xFFE7D6A5).withOpacity(0.15),
+                                  ),
+                                ),
+                                // Corner decorations
+                                Positioned(
+                                  top: 2,
+                                  left: 2,
+                                  child: Container(
+                                    width: 4,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFFE7D6A5).withOpacity(0.12),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 2,
+                                  right: 2,
+                                  child: Container(
+                                    width: 4,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFFE7D6A5).withOpacity(0.12),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildCategorySelection() {
@@ -3195,7 +3663,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                GestureDetector(
+                                _TapScaleButton(
                                   onTap: _showTarotGuidanceDialog,
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
@@ -3215,45 +3683,48 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 40,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: BackdropFilter(
-                                      filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.08),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: Colors.white.withOpacity(0.12),
-                                            width: 0.5,
+                                _TapScaleButton(
+                                  onTap: _showCreditInfoPanel,
+                                  child: SizedBox(
+                                    width: 40,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: BackdropFilter(
+                                        filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.08),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.12),
+                                              width: 0.5,
+                                            ),
                                           ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.auto_awesome,
-                                              size: 11,
-                                              color: (!_dailyFreeUsed || _adCredits > 0)
-                                                  ? const Color(0xFFE2C48E).withOpacity(0.8)
-                                                  : Colors.white.withOpacity(0.25),
-                                            ),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              !_dailyFreeUsed ? '1' : '$_adCredits',
-                                              style: TextStyle(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.auto_awesome,
+                                                size: 11,
                                                 color: (!_dailyFreeUsed || _adCredits > 0)
-                                                    ? Colors.white.withOpacity(0.85)
-                                                    : Colors.white.withOpacity(0.3),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
+                                                    ? const Color(0xFFE2C48E).withOpacity(0.8)
+                                                    : Colors.white.withOpacity(0.25),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                !_dailyFreeUsed ? '1' : '$_adCredits',
+                                                style: TextStyle(
+                                                  color: (!_dailyFreeUsed || _adCredits > 0)
+                                                      ? Colors.white.withOpacity(0.85)
+                                                      : Colors.white.withOpacity(0.3),
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -3342,7 +3813,276 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
                 // Ana oyun içerikleri (Kart seçimi vb.)
                 Expanded(
-                  child: Column(
+                  child: Stack(
+                    children: [
+                      // ── Deck + Guide + Buttons (altta sabit) ──
+                      Positioned(
+                        left: 0, right: 0, bottom: 0,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOut,
+                          opacity: _state == RitualState.revealed ? 0.0 : 1.0,
+                          child: IgnorePointer(
+                            ignoring: _state == RitualState.revealed,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // ── Mystical glow behind deck ──
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 300,
+                                      height: 220,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: RadialGradient(
+                                          colors: [
+                                            Color.fromRGBO(160, 120, 220, 0.20 + sin(bv * pi * 2) * 0.05),
+                                            Color.fromRGBO(226, 196, 142, 0.10 + sin(bv * pi * 2 + 1) * 0.03),
+                                            Colors.transparent,
+                                          ],
+                                          stops: const [0.0, 0.4, 1.0],
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color.fromRGBO(160, 120, 220, 0.15 + sin(bv * pi * 2) * 0.04),
+                                            blurRadius: 50,
+                                            spreadRadius: 15,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // ── Card Fan ──
+                                    _FloatingTarotDeck(
+                                      key: ValueKey('deck_${_isBuyukArkana ? "b" : "t"}_$_deckRebuildKey'),
+                                      onCardTap: _selectCard,
+                                      cardBuilder: (int idx, int total) => _tarotCard(idx, total),
+                                      cardKeys: _cardKeys.sublist(0, _tableCount),
+                                      selectedPositions: _selectedTablePositions,
+                                      hiddenCards: _hiddenCards,
+                                    ),
+                                  ],
+                                ),
+                                // ── Guide text ──
+                                Transform.translate(
+                                  offset: const Offset(0, -35),
+                                  child: AnimatedBuilder(
+                                    animation: _bgPulseCtrl,
+                                    builder: (_, __) {
+                                      return Opacity(
+                                        opacity: 0.7,
+                                        child: Text(
+                                          _t('Bir kart seç veya rastgele çek', 'Pick a card or shuffle'),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            letterSpacing: 0.5,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                // Büyük Arkana / Tam Arkana buttons
+                                AnimatedBuilder(
+                                  animation: _slotEntranceCtrl,
+                                  builder: (context, child) {
+                                    final t = ((_slotEntranceCtrl.value - 0.4) / 0.6).clamp(0.0, 1.0);
+                                    final curved = Curves.easeOutCubic.transform(t);
+                                    final opacity = _btnStayVisible ? 1.0 : curved;
+                                    final offsetY = _btnStayVisible ? 0.0 : 20 * (1.0 - curved);
+                                    if (curved >= 0.99) _btnStayVisible = true;
+                                    return Opacity(
+                                      opacity: opacity,
+                                      child: Transform.translate(
+                                        offset: Offset(0, offsetY),
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              HapticFeedback.lightImpact();
+                                              _setStateSafe(() {
+                                                _isBuyukArkana = true;
+                                                _selectedTablePositions.clear();
+                                                _reservedSlotCount = 0;
+                                                _hiddenCards.clear();
+                                                _state = RitualState.idle;
+                                              });
+                                              _resetDeck();
+                                            },
+                                            child: AnimatedScale(
+                                              scale: _isBuyukArkana ? 1.0 : 0.97,
+                                              duration: const Duration(milliseconds: 200),
+                                              child: Container(
+                                                height: 44,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  gradient: LinearGradient(
+                                                    begin: const Alignment(-0.5, -1.2),
+                                                    end: const Alignment(0.5, 1.2),
+                                                    colors: [
+                                                      Colors.white.withOpacity(_isBuyukArkana ? 0.18 : 0.10),
+                                                      Colors.white.withOpacity(0.06),
+                                                      Colors.white.withOpacity(0.02),
+                                                      Colors.white.withOpacity(_isBuyukArkana ? 0.10 : 0.06),
+                                                    ],
+                                                    stops: const [0.0, 0.35, 0.65, 1.0],
+                                                  ),
+                                                  border: Border.all(
+                                                    color: _isBuyukArkana
+                                                        ? const Color(0xFFE7D6A5).withOpacity(0.55)
+                                                        : Colors.white.withOpacity(0.14),
+                                                    width: _isBuyukArkana ? 1.2 : 0.8,
+                                                  ),
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    Positioned(
+                                                      top: 2, left: 16, right: 16,
+                                                      child: Container(
+                                                        height: 12,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          gradient: LinearGradient(
+                                                            colors: [
+                                                              Colors.white.withOpacity(0.0),
+                                                              Colors.white.withOpacity(_isBuyukArkana ? 0.14 : 0.08),
+                                                              Colors.white.withOpacity(0.0),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Center(
+                                                      child: Text(
+                                                        'Major Arcana',
+                                                        style: TextStyle(
+                                                          color: _isBuyukArkana ? Colors.white : Colors.white70,
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              HapticFeedback.lightImpact();
+                                              _setStateSafe(() {
+                                                _isBuyukArkana = false;
+                                                _selectedCategory = null;
+                                                _selectedTablePositions.clear();
+                                                _reservedSlotCount = 0;
+                                                _hiddenCards.clear();
+                                                _state = RitualState.idle;
+                                              });
+                                              _resetDeck();
+                                            },
+                                            child: AnimatedScale(
+                                              scale: !_isBuyukArkana ? 1.0 : 0.97,
+                                              duration: const Duration(milliseconds: 200),
+                                              child: Container(
+                                                height: 44,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  gradient: LinearGradient(
+                                                    begin: const Alignment(-0.5, -1.2),
+                                                    end: const Alignment(0.5, 1.2),
+                                                    colors: [
+                                                      Colors.white.withOpacity(!_isBuyukArkana ? 0.18 : 0.10),
+                                                      Colors.white.withOpacity(0.04),
+                                                      Colors.white.withOpacity(0.01),
+                                                      Colors.white.withOpacity(!_isBuyukArkana ? 0.10 : 0.06),
+                                                    ],
+                                                    stops: const [0.0, 0.35, 0.65, 1.0],
+                                                  ),
+                                                  border: Border.all(
+                                                    color: !_isBuyukArkana
+                                                        ? const Color(0xFFE7D6A5).withOpacity(0.55)
+                                                        : Colors.white.withOpacity(0.14),
+                                                    width: !_isBuyukArkana ? 1.2 : 0.8,
+                                                  ),
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    Positioned(
+                                                      top: 2, left: 16, right: 16,
+                                                      child: Container(
+                                                        height: 12,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          gradient: LinearGradient(
+                                                            colors: [
+                                                              Colors.white.withOpacity(0.0),
+                                                              Colors.white.withOpacity(!_isBuyukArkana ? 0.12 : 0.06),
+                                                              Colors.white.withOpacity(0.0),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Center(
+                                                      child: Text(
+                                                        'Full Arcana',
+                                                        style: TextStyle(
+                                                          color: !_isBuyukArkana ? Colors.white : Colors.white70,
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // ── Bottom decorative wave lines with diamond ──
+                                AnimatedBuilder(
+                                  animation: _slotEntranceCtrl,
+                                  builder: (context, child) {
+                                    final t = ((_slotEntranceCtrl.value - 0.5) / 0.5).clamp(0.0, 1.0);
+                                    final curved = Curves.easeOutCubic.transform(t);
+                                    return Opacity(opacity: curved, child: child);
+                                  },
+                                  child: SizedBox(
+                                    width: 200,
+                                    height: 28,
+                                    child: CustomPaint(
+                                      painter: _WaveDiamondPainter(),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // ── Slots (üstte) ──
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
                     children: [
                           // ── Glow behind card slots & The Slots ──
                           TweenAnimationBuilder<double>(
@@ -3383,7 +4123,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                               SizedBox(
                                 width: double.infinity,
-                                height: 175,
+                                height: _isBuyukArkana ? 175 : 290,
                             child: AnimatedBuilder(
                               animation: Listenable.merge([_slotEntranceCtrl, _bgPulseCtrl, ..._slotGlowControllers]),
                               builder: (_, __) {
@@ -3392,25 +4132,29 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   _t('Şimdi', 'Present'),
                                   _t('Gelecek', 'Future'),
                                 ];
-                                final slotLabels5 = [
+                                final slotLabels7 = [
                                   _t('Slot 1', 'Slot 1'),
                                   _t('Slot 2', 'Slot 2'),
                                   _t('Slot 3', 'Slot 3'),
                                   _t('Slot 4', 'Slot 4'),
                                   _t('Slot 5', 'Slot 5'),
+                                  _t('Slot 6', 'Slot 6'),
+                                  _t('Slot 7', 'Slot 7'),
                                 ];
-                                final slotLabels = _isBuyukArkana ? slotLabels3 : slotLabels5;
+                                final slotLabels = _isBuyukArkana ? slotLabels3 : slotLabels7;
                                 final slotSymbols3 = ['☽', '◉', '✦'];
-                                final slotSymbols5 = ['☽', '◉', '✦', '⚝', '⊛'];
-                                final symbols = _isBuyukArkana ? slotSymbols3 : slotSymbols5;
-                                final cardW = _isBuyukArkana ? 88.0 : 52.0;
-                                final cardH = _isBuyukArkana ? 138.0 : 68.0;
-                                final topCount = _isBuyukArkana ? 3 : 3;
-                                final bottomCount = _isBuyukArkana ? 0 : 2;
+                                final slotSymbols7 = ['☽', '◉', '✦', '⚝', '⊛', '☾', '✧'];
+                                final symbols = _isBuyukArkana ? slotSymbols3 : slotSymbols7;
+                                final cardW = _isBuyukArkana ? 88.0 : 70.0;
+                                final cardH = _isBuyukArkana ? 138.0 : 105.0;
+                                final topCount = _isBuyukArkana ? 3 : 4;
+                                final bottomCount = _isBuyukArkana ? 0 : 3;
 
                                 Widget buildSlot(int i) {
                                   final isFilled = _selectedTablePositions.length > i;
-                                  final delay = i * 0.12;
+                                  final totalSlots = topCount + bottomCount;
+                                  final delayPerSlot = totalSlots > 1 ? 0.4 / (totalSlots - 1) : 0.0;
+                                  final delay = i * delayPerSlot;
                                   final duration = 0.6;
                                   final rawT = ((_slotEntranceCtrl.value - delay) / duration).clamp(0.0, 1.0);
                                   final scaleT = Curves.easeOutQuint.transform(rawT); 
@@ -3425,10 +4169,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     curve: Curves.easeInOut,
                                     builder: (context, revealT, child) {
                                       // Yorum paneli açıldığındaki değerler (revealT: 0.0 -> 1.0)
-                                      final currentScale = 1.0 + (0.20 * revealT); // 1.0'dan 1.20'ye
-                                      final currentY = (i != 1) ? 40.0 * revealT : 0.0;
-                                      final basePadding = _isBuyukArkana ? 8.0 : 5.0;
-                                      final maxPadding = _isBuyukArkana ? 16.0 : 12.0;
+                                      final currentScale = 1.0 + ((_isBuyukArkana ? 0.20 : 0.05) * revealT); 
+                                      final currentY = (i != 1) ? (_isBuyukArkana ? 40.0 : 15.0) * revealT : 0.0;
+                                      final basePadding = _isBuyukArkana ? 8.0 : 4.0;
+                                      final maxPadding = _isBuyukArkana ? 16.0 : 6.0;
                                       final currentPadding = basePadding + ((maxPadding - basePadding) * revealT);
 
                                       return Padding(
@@ -3504,9 +4248,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                                 border: Border.all(
                                                                   color: Colors.white.withOpacity(0.08 + pulse * 0.08),
                                                                   width: 0.5,
-                                                                ),
                                                               ),
                                                             ),
+                                                          ),
                                                           ),
                                                           Center(
                                                             child: Text(
@@ -3561,23 +4305,31 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                     );
                                                   },
                                                 ),
-                                              const SizedBox(height: 6),
-                                              AnimatedSwitcher(
-                                                duration: const Duration(milliseconds: 400),
-                                                child: Text(
-                                                  isFilled 
-                                                      ? _cardName(_tableCards[_selectedTablePositions[i]])
-                                                      : slotLabels[i],
-                                                  key: ValueKey(isFilled 
-                                                      ? 'card_${_selectedTablePositions[i]}' 
-                                                      : 'label_$i'),
-                                                  style: GoogleFonts.cinzel(
-                                                    color: isFilled 
-                                                        ? Colors.white.withOpacity(0.7)
-                                                        : Colors.white.withOpacity(0.35),
-                                                    fontSize: _isBuyukArkana ? 10 : 8,
-                                                    fontWeight: isFilled ? FontWeight.w700 : FontWeight.w500,
-                                                    letterSpacing: 0.5,
+                                              const SizedBox(height: 4),
+                                              SizedBox(
+                                                width: cardW + 8,
+                                                height: _isBuyukArkana ? 16 : 22,
+                                                child: AnimatedSwitcher(
+                                                  duration: const Duration(milliseconds: 400),
+                                                  child: Text(
+                                                    isFilled 
+                                                        ? _cardName(_tableCards[_selectedTablePositions[i]])
+                                                        : slotLabels[i],
+                                                    key: ValueKey(isFilled 
+                                                        ? 'card_${_selectedTablePositions[i]}' 
+                                                        : 'label_$i'),
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: GoogleFonts.cinzel(
+                                                      color: isFilled 
+                                                          ? Colors.white.withOpacity(0.7)
+                                                          : Colors.white.withOpacity(0.35),
+                                                      fontSize: _isBuyukArkana ? 10 : 7,
+                                                      fontWeight: isFilled ? FontWeight.w700 : FontWeight.w500,
+                                                      letterSpacing: 0.3,
+                                                      height: 1.1,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -3592,310 +4344,41 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   );
                                 }
 
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: List.generate(topCount, (i) => buildSlot(i)),
+                                return OverflowBox(
+                                  maxHeight: double.infinity,
+                                  maxWidth: double.infinity,
+                                  alignment: _isBuyukArkana ? Alignment.center : Alignment.topCenter,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: 0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: List.generate(topCount, (i) => buildSlot(i)),
+                                        ),
+                                        if (bottomCount > 0) ...[
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: List.generate(bottomCount, (i) => buildSlot(topCount + i)),
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                    if (bottomCount > 0) ...[
-                                      const SizedBox(height: 6),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: List.generate(bottomCount, (i) => buildSlot(topCount + i)),
-                                      ),
-                                    ],
-                                  ],
+                                  ),
                                 );
                               },
                             ),
                           ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                          // Deck + Guide + Buttons → sadece bunlar fade olacak
-                          Expanded(
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeOut,
-                              opacity: _state == RitualState.revealed ? 0.0 : 1.0,
-                              child: IgnorePointer(
-                                ignoring: _state == RitualState.revealed,
-                                child: Column(
-                                  children: [
-                          // ── Mystical glow behind deck ──
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 300,
-                                height: 220,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: RadialGradient(
-                                    colors: [
-                                      Color.fromRGBO(160, 120, 220, 0.20 + sin(bv * pi * 2) * 0.05),
-                                      Color.fromRGBO(226, 196, 142, 0.10 + sin(bv * pi * 2 + 1) * 0.03),
-                                      Colors.transparent,
-                                    ],
-                                    stops: const [0.0, 0.4, 1.0],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color.fromRGBO(160, 120, 220, 0.15 + sin(bv * pi * 2) * 0.04),
-                                      blurRadius: 50,
-                                      spreadRadius: 15,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // ── Card Fan or Category Selection ──
-                              if (!_isBuyukArkana && _selectedCategory == null)
-                                _buildCategorySelection()
-                              else
-                                _FloatingTarotDeck(
-                                  key: ValueKey('deck_$_deckRebuildKey'),
-                                  onCardTap: _selectCard,
-                                  cardBuilder: (int idx, int total) => _tarotCard(idx, total),
-                                  cardKeys: _cardKeys.sublist(0, _tableCount),
-                                  selectedPositions: _selectedTablePositions,
-                                  hiddenCards: _hiddenCards,
-                                ),
-                            ],
-                          ),
-                          // ── Guide text ──
-                          Transform.translate(
-                            offset: const Offset(0, -35),
-                            child: AnimatedBuilder(
-                            animation: _bgPulseCtrl,
-                            builder: (_, __) {
-                              final selected = _selectedTablePositions.length;
-                              final max = _maxSlots;
-                              return Opacity(
-                                opacity: 0.7,
-                                child: Text(
-                                  _t('Bir kart seç veya rastgele çek', 'Pick a card or shuffle'),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    letterSpacing: 0.5,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          ),
-                          const SizedBox(height: 4),
-                          // Büyük Arkana / Tam Arkana buttons - stay visible after first entrance
-                          AnimatedBuilder(
-                            animation: _slotEntranceCtrl,
-                            builder: (context, child) {
-                              final t = ((_slotEntranceCtrl.value - 0.4) / 0.6).clamp(0.0, 1.0);
-                              final curved = Curves.easeOutCubic.transform(t);
-                              final opacity = _btnStayVisible ? 1.0 : curved;
-                              final offsetY = _btnStayVisible ? 0.0 : 20 * (1.0 - curved);
-                              if (curved >= 0.99) _btnStayVisible = true;
-                              return Opacity(
-                                opacity: opacity,
-                                child: Transform.translate(
-                                  offset: Offset(0, offsetY),
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      HapticFeedback.lightImpact();
-                                      _setStateSafe(() {
-                                        _isBuyukArkana = true;
-                                        _selectedTablePositions.clear();
-                                        _reservedSlotCount = 0;
-                                        _hiddenCards.clear();
-                                        _state = RitualState.idle;
-                                      });
-                                      _resetDeck();
-                                    },
-                                    child: AnimatedScale(
-                                      scale: _isBuyukArkana ? 1.0 : 0.97,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: Container(
-                                        height: 44,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
-                                          gradient: LinearGradient(
-                                            begin: const Alignment(-0.5, -1.2),
-                                            end: const Alignment(0.5, 1.2),
-                                            colors: [
-                                              Colors.white.withOpacity(_isBuyukArkana ? 0.18 : 0.10),
-                                              Colors.white.withOpacity(0.06),
-                                              Colors.white.withOpacity(0.02),
-                                              Colors.white.withOpacity(_isBuyukArkana ? 0.10 : 0.06),
-                                            ],
-                                            stops: const [0.0, 0.35, 0.65, 1.0],
-                                          ),
-                                          border: Border.all(
-                                            color: _isBuyukArkana
-                                                ? const Color(0xFFE7D6A5).withOpacity(0.55)
-                                                : Colors.white.withOpacity(0.14),
-                                            width: _isBuyukArkana ? 1.2 : 0.8,
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            // Liquid highlight strip
-                                            Positioned(
-                                              top: 2,
-                                              left: 16,
-                                              right: 16,
-                                              child: Container(
-                                                height: 12,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Colors.white.withOpacity(0.0),
-                                                      Colors.white.withOpacity(_isBuyukArkana ? 0.14 : 0.08),
-                                                      Colors.white.withOpacity(0.0),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                'Büyük Arkana',
-                                                style: TextStyle(
-                                                  color: _isBuyukArkana
-                                                      ? Colors.white
-                                                      : Colors.white70,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      HapticFeedback.lightImpact();
-                                      _setStateSafe(() {
-                                        _isBuyukArkana = false;
-                                        _selectedCategory = null;
-                                        _selectedTablePositions.clear();
-                                        _reservedSlotCount = 0;
-                                        _hiddenCards.clear();
-                                        _state = RitualState.idle;
-                                      });
-                                      _resetDeck();
-                                    },
-                                    child: AnimatedScale(
-                                      scale: !_isBuyukArkana ? 1.0 : 0.97,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: Container(
-                                        height: 44,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
-                                          gradient: LinearGradient(
-                                            begin: const Alignment(-0.5, -1.2),
-                                            end: const Alignment(0.5, 1.2),
-                                            colors: [
-                                              Colors.white.withOpacity(!_isBuyukArkana ? 0.18 : 0.10),
-                                              Colors.white.withOpacity(0.04),
-                                              Colors.white.withOpacity(0.01),
-                                              Colors.white.withOpacity(!_isBuyukArkana ? 0.10 : 0.06),
-                                            ],
-                                            stops: const [0.0, 0.35, 0.65, 1.0],
-                                          ),
-                                          border: Border.all(
-                                            color: !_isBuyukArkana
-                                                ? const Color(0xFFE7D6A5).withOpacity(0.55)
-                                                : Colors.white.withOpacity(0.14),
-                                            width: !_isBuyukArkana ? 1.2 : 0.8,
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            // Liquid highlight strip
-                                            Positioned(
-                                              top: 2,
-                                              left: 16,
-                                              right: 16,
-                                              child: Container(
-                                                height: 12,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Colors.white.withOpacity(0.0),
-                                                      Colors.white.withOpacity(!_isBuyukArkana ? 0.12 : 0.06),
-                                                      Colors.white.withOpacity(0.0),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                'Tam Arkana',
-                                                style: TextStyle(
-                                                  color: !_isBuyukArkana
-                                                      ? Colors.white
-                                                      : Colors.white70,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                          ),
-                          const SizedBox(height: 16),
-                          // ── Bottom decorative wave lines with diamond ──
-                          AnimatedBuilder(
-                            animation: _slotEntranceCtrl,
-                            builder: (context, child) {
-                              final t = ((_slotEntranceCtrl.value - 0.5) / 0.5).clamp(0.0, 1.0);
-                              final curved = Curves.easeOutCubic.transform(t);
-                              return Opacity(opacity: curved, child: child);
-                            },
-                            child: SizedBox(
-                              width: 200,
-                              height: 28,
-                              child: CustomPaint(
-                                painter: _WaveDiamondPainter(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                                  ],  // inner Column children
-                                ),  // inner Column
-                              ),  // IgnorePointer
-                            ),  // AnimatedOpacity
-                          ),  // Expanded (deck)
-                    ],  // outer Column children
-                  ),  // outer Column
-                ),  // Expanded (ana)
+                    ],
+                  ),
+                    ],
+                  ),
+                ),
               ],  // main Column children
             ),  // main Column
             ),  // AnimatedBuilder
@@ -4339,9 +4822,8 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
               final int layerCount = isSmall ? 3 : 2;
               final cardsPerLayer = <int>[];
               if (isSmall) {
-                // 78 cards: ~26 per layer (outer, mid, inner)
-                final perLayer = totalCards ~/ 3;
-                cardsPerLayer.addAll([perLayer, perLayer, totalCards - perLayer * 2]);
+                // 78 cards: outer=34, mid=26, inner=18 (less crowded inside)
+                cardsPerLayer.addAll([34, 26, 18]);
               } else {
                 // 22 cards: 13 outer, 9 inner
                 cardsPerLayer.addAll([13, totalCards - 13]);
@@ -4419,9 +4901,9 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                   if (cardIdx >= totalCards) break;
                   final angleDeg = start + (i * step);
                   final angleRad = angleDeg * (pi / 180);
-                  final floatY = sin(_controller.value * 2 * pi + cardIdx * 0.5) * 4.0
-                      + sin(_controller.value * 2 * pi * 2 + cardIdx * 0.8) * 2.0;
-                  final floatX = cos(_controller.value * 2 * pi + cardIdx * 0.6) * 2.5;
+                  final floatY = isSmall ? 0.0 : sin(_controller.value * 2 * pi + cardIdx * 0.5) * 4.0
+                      + (isSmall ? 0.0 : sin(_controller.value * 2 * pi * 2 + cardIdx * 0.8) * 2.0);
+                  final floatX = isSmall ? 0.0 : cos(_controller.value * 2 * pi + cardIdx * 0.6) * 2.5;
                   
                   final x = centerX + cos(angleRad) * radius - (cardW / 2) + floatX;
                   final y = centerY + sin(angleRad) * radius - (cardH / 2) + floatY;
@@ -4509,6 +4991,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                             ),
                             child: ClipOval(
                               child: Stack(
+                              alignment: Alignment.center,
                               children: [
                                 Positioned(
                                   top: 6,
@@ -4552,15 +5035,33 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                                     ),
                                   ),
                                 ),
-                                Center(
-                                  child: Text(
-                                    'Rastgele\nÇek',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.55),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.3,
+                                SizedBox.expand(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'RASTGELE\nÇEK',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.inter(
+                                            color: Colors.white.withOpacity(0.70),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: 2.5,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Icon(
+                                          Icons.shuffle_rounded,
+                                          color: Colors.white.withOpacity(0.45),
+                                          size: 14,
+                                        ),
+                                      ],
+                                    ),
                                     ),
                                   ),
                                 ),
@@ -5830,4 +6331,63 @@ class _BottomSwooshPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ============================================================
+// Tap Scale Button — Reusable press effect widget
+// ============================================================
+class _TapScaleButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final Widget child;
+  const _TapScaleButton({required this.onTap, required this.child});
+
+  @override
+  State<_TapScaleButton> createState() => _TapScaleButtonState();
+}
+
+class _TapScaleButtonState extends State<_TapScaleButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 200),
+      lowerBound: 0.0,
+      upperBound: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        HapticFeedback.lightImpact();
+        _ctrl.forward();
+      },
+      onTapUp: (_) async {
+        await Future.delayed(const Duration(milliseconds: 60));
+        _ctrl.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _ctrl.reverse(),
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, child) {
+          final scale = 1.0 - (_ctrl.value * 0.15);
+          return Transform.scale(scale: scale, child: child);
+        },
+        child: widget.child,
+      ),
+    );
+  }
 }
