@@ -4886,7 +4886,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                 ),
                                 // ── Guide text ──
                                 Transform.translate(
-                                  offset: const Offset(0, -35),
+                                  offset: const Offset(0, -42),
                                   child: AnimatedBuilder(
                                     animation: _bgPulseCtrl,
                                     builder: (_, __) {
@@ -4906,192 +4906,200 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                // Büyük Arkana / Tam Arkana buttons
-                                AnimatedBuilder(
-                                  animation: _slotEntranceCtrl,
-                                  builder: (context, child) {
-                                    final t = ((_slotEntranceCtrl.value - 0.4) / 0.6).clamp(0.0, 1.0);
-                                    final curved = Curves.easeOutCubic.transform(t);
-                                    final opacity = _btnStayVisible ? 1.0 : curved;
-                                    final offsetY = _btnStayVisible ? 0.0 : 20 * (1.0 - curved);
-                                    if (curved >= 0.99) _btnStayVisible = true;
-                                    return Opacity(
-                                      opacity: opacity,
-                                      child: Transform.translate(
-                                        offset: Offset(0, offsetY),
-                                        child: child,
+                                // Büyük Arkana / Tam Arkana buttons ve altındaki çizgi
+                                Transform.translate(
+                                  offset: const Offset(0, -30),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      AnimatedBuilder(
+                                        animation: _slotEntranceCtrl,
+                                        builder: (context, child) {
+                                          final t = ((_slotEntranceCtrl.value - 0.4) / 0.6).clamp(0.0, 1.0);
+                                          final curved = Curves.easeOutCubic.transform(t);
+                                          final opacity = _btnStayVisible ? 1.0 : curved;
+                                          final offsetY = _btnStayVisible ? 0.0 : 20 * (1.0 - curved);
+                                          if (curved >= 0.99) _btnStayVisible = true;
+                                          return Opacity(
+                                            opacity: opacity,
+                                            child: Transform.translate(
+                                              offset: Offset(0, offsetY),
+                                              child: child,
+                                            ),
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    HapticFeedback.lightImpact();
+                                                    _setStateSafe(() {
+                                                      _isBuyukArkana = true;
+                                                      _selectedTablePositions.clear();
+                                                      _reservedSlotCount = 0;
+                                                      _hiddenCards.clear();
+                                                      _state = RitualState.idle;
+                                                    });
+                                                    _resetDeck();
+                                                  },
+                                                  child: AnimatedScale(
+                                                    scale: _isBuyukArkana ? 1.0 : 0.97,
+                                                    duration: const Duration(milliseconds: 200),
+                                                    child: Container(
+                                                      height: 44,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        gradient: LinearGradient(
+                                                          begin: const Alignment(-0.5, -1.2),
+                                                          end: const Alignment(0.5, 1.2),
+                                                          colors: [
+                                                            Colors.white.withOpacity(_isBuyukArkana ? 0.18 : 0.10),
+                                                            Colors.white.withOpacity(0.06),
+                                                            Colors.white.withOpacity(0.02),
+                                                            Colors.white.withOpacity(_isBuyukArkana ? 0.10 : 0.06),
+                                                          ],
+                                                          stops: const [0.0, 0.35, 0.65, 1.0],
+                                                        ),
+                                                        border: Border.all(
+                                                          color: _isBuyukArkana
+                                                              ? const Color(0xFFE7D6A5).withOpacity(0.55)
+                                                              : Colors.white.withOpacity(0.14),
+                                                          width: _isBuyukArkana ? 1.2 : 0.8,
+                                                        ),
+                                                      ),
+                                                      child: Stack(
+                                                        children: [
+                                                          Positioned(
+                                                            top: 2, left: 16, right: 16,
+                                                            child: Container(
+                                                              height: 12,
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(8),
+                                                                gradient: LinearGradient(
+                                                                  colors: [
+                                                                    Colors.white.withOpacity(0.0),
+                                                                    Colors.white.withOpacity(_isBuyukArkana ? 0.14 : 0.08),
+                                                                    Colors.white.withOpacity(0.0),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Center(
+                                                            child: Text(
+                                                              'Major Arcana',
+                                                              style: TextStyle(
+                                                                color: _isBuyukArkana ? Colors.white : Colors.white70,
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    HapticFeedback.lightImpact();
+                                                    _setStateSafe(() {
+                                                      _isBuyukArkana = false;
+                                                      _selectedCategory = null;
+                                                      _selectedTablePositions.clear();
+                                                      _reservedSlotCount = 0;
+                                                      _hiddenCards.clear();
+                                                      _state = RitualState.idle;
+                                                    });
+                                                    _resetDeck();
+                                                  },
+                                                  child: AnimatedScale(
+                                                    scale: !_isBuyukArkana ? 1.0 : 0.97,
+                                                    duration: const Duration(milliseconds: 200),
+                                                    child: Container(
+                                                      height: 44,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        gradient: LinearGradient(
+                                                          begin: const Alignment(-0.5, -1.2),
+                                                          end: const Alignment(0.5, 1.2),
+                                                          colors: [
+                                                            Colors.white.withOpacity(!_isBuyukArkana ? 0.18 : 0.10),
+                                                            Colors.white.withOpacity(0.04),
+                                                            Colors.white.withOpacity(0.01),
+                                                            Colors.white.withOpacity(!_isBuyukArkana ? 0.10 : 0.06),
+                                                          ],
+                                                          stops: const [0.0, 0.35, 0.65, 1.0],
+                                                        ),
+                                                        border: Border.all(
+                                                          color: !_isBuyukArkana
+                                                              ? const Color(0xFFE7D6A5).withOpacity(0.55)
+                                                              : Colors.white.withOpacity(0.14),
+                                                          width: !_isBuyukArkana ? 1.2 : 0.8,
+                                                        ),
+                                                      ),
+                                                      child: Stack(
+                                                        children: [
+                                                          Positioned(
+                                                            top: 2, left: 16, right: 16,
+                                                            child: Container(
+                                                              height: 12,
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(8),
+                                                                gradient: LinearGradient(
+                                                                  colors: [
+                                                                    Colors.white.withOpacity(0.0),
+                                                                    Colors.white.withOpacity(!_isBuyukArkana ? 0.12 : 0.06),
+                                                                    Colors.white.withOpacity(0.0),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Center(
+                                                            child: Text(
+                                                              'Full Arcana',
+                                                              style: TextStyle(
+                                                                color: !_isBuyukArkana ? Colors.white : Colors.white70,
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              HapticFeedback.lightImpact();
-                                              _setStateSafe(() {
-                                                _isBuyukArkana = true;
-                                                _selectedTablePositions.clear();
-                                                _reservedSlotCount = 0;
-                                                _hiddenCards.clear();
-                                                _state = RitualState.idle;
-                                              });
-                                              _resetDeck();
-                                            },
-                                            child: AnimatedScale(
-                                              scale: _isBuyukArkana ? 1.0 : 0.97,
-                                              duration: const Duration(milliseconds: 200),
-                                              child: Container(
-                                                height: 44,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(16),
-                                                  gradient: LinearGradient(
-                                                    begin: const Alignment(-0.5, -1.2),
-                                                    end: const Alignment(0.5, 1.2),
-                                                    colors: [
-                                                      Colors.white.withOpacity(_isBuyukArkana ? 0.18 : 0.10),
-                                                      Colors.white.withOpacity(0.06),
-                                                      Colors.white.withOpacity(0.02),
-                                                      Colors.white.withOpacity(_isBuyukArkana ? 0.10 : 0.06),
-                                                    ],
-                                                    stops: const [0.0, 0.35, 0.65, 1.0],
-                                                  ),
-                                                  border: Border.all(
-                                                    color: _isBuyukArkana
-                                                        ? const Color(0xFFE7D6A5).withOpacity(0.55)
-                                                        : Colors.white.withOpacity(0.14),
-                                                    width: _isBuyukArkana ? 1.2 : 0.8,
-                                                  ),
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned(
-                                                      top: 2, left: 16, right: 16,
-                                                      child: Container(
-                                                        height: 12,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          gradient: LinearGradient(
-                                                            colors: [
-                                                              Colors.white.withOpacity(0.0),
-                                                              Colors.white.withOpacity(_isBuyukArkana ? 0.14 : 0.08),
-                                                              Colors.white.withOpacity(0.0),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Center(
-                                                      child: Text(
-                                                        'Major Arcana',
-                                                        style: TextStyle(
-                                                          color: _isBuyukArkana ? Colors.white : Colors.white70,
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
+                                      const SizedBox(height: 16),
+                                      // ── Bottom decorative wave lines with diamond ──
+                                      AnimatedBuilder(
+                                        animation: _slotEntranceCtrl,
+                                        builder: (context, child) {
+                                          final t = ((_slotEntranceCtrl.value - 0.5) / 0.5).clamp(0.0, 1.0);
+                                          final curved = Curves.easeOutCubic.transform(t);
+                                          return Opacity(opacity: curved, child: child);
+                                        },
+                                        child: SizedBox(
+                                          width: 200,
+                                          height: 28,
+                                          child: CustomPaint(
+                                            painter: _WaveDiamondPainter(),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              HapticFeedback.lightImpact();
-                                              _setStateSafe(() {
-                                                _isBuyukArkana = false;
-                                                _selectedCategory = null;
-                                                _selectedTablePositions.clear();
-                                                _reservedSlotCount = 0;
-                                                _hiddenCards.clear();
-                                                _state = RitualState.idle;
-                                              });
-                                              _resetDeck();
-                                            },
-                                            child: AnimatedScale(
-                                              scale: !_isBuyukArkana ? 1.0 : 0.97,
-                                              duration: const Duration(milliseconds: 200),
-                                              child: Container(
-                                                height: 44,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(16),
-                                                  gradient: LinearGradient(
-                                                    begin: const Alignment(-0.5, -1.2),
-                                                    end: const Alignment(0.5, 1.2),
-                                                    colors: [
-                                                      Colors.white.withOpacity(!_isBuyukArkana ? 0.18 : 0.10),
-                                                      Colors.white.withOpacity(0.04),
-                                                      Colors.white.withOpacity(0.01),
-                                                      Colors.white.withOpacity(!_isBuyukArkana ? 0.10 : 0.06),
-                                                    ],
-                                                    stops: const [0.0, 0.35, 0.65, 1.0],
-                                                  ),
-                                                  border: Border.all(
-                                                    color: !_isBuyukArkana
-                                                        ? const Color(0xFFE7D6A5).withOpacity(0.55)
-                                                        : Colors.white.withOpacity(0.14),
-                                                    width: !_isBuyukArkana ? 1.2 : 0.8,
-                                                  ),
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    Positioned(
-                                                      top: 2, left: 16, right: 16,
-                                                      child: Container(
-                                                        height: 12,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          gradient: LinearGradient(
-                                                            colors: [
-                                                              Colors.white.withOpacity(0.0),
-                                                              Colors.white.withOpacity(!_isBuyukArkana ? 0.12 : 0.06),
-                                                              Colors.white.withOpacity(0.0),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Center(
-                                                      child: Text(
-                                                        'Full Arcana',
-                                                        style: TextStyle(
-                                                          color: !_isBuyukArkana ? Colors.white : Colors.white70,
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                // ── Bottom decorative wave lines with diamond ──
-                                AnimatedBuilder(
-                                  animation: _slotEntranceCtrl,
-                                  builder: (context, child) {
-                                    final t = ((_slotEntranceCtrl.value - 0.5) / 0.5).clamp(0.0, 1.0);
-                                    final curved = Curves.easeOutCubic.transform(t);
-                                    return Opacity(opacity: curved, child: child);
-                                  },
-                                  child: SizedBox(
-                                    width: 200,
-                                    height: 28,
-                                    child: CustomPaint(
-                                      painter: _WaveDiamondPainter(),
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 8),
