@@ -8,7 +8,6 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
-import '../widgets/liquid_glass_card.dart';
 import '../widgets/fade_page_route.dart';
 import 'home_page.dart';
 import 'collection_page.dart';

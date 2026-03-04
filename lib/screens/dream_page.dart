@@ -9,7 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
-import '../widgets/bottom_nav.dart';
 import '../services/storage_service.dart';
 import '../services/dream_analysis_service.dart';
 import '../models/emotion.dart';
@@ -17,10 +16,6 @@ import '../models/dream_analysis.dart';
 import '../models/dream_input.dart';
 import '../models/clarification_answer.dart';
 import '../widgets/stars_background.dart';
-import '../widgets/fade_page_route.dart';
-import 'home_page.dart';
-import 'collection_page.dart';
-import 'profile_page.dart';
 
 class DreamPage extends StatefulWidget {
   const DreamPage({super.key});

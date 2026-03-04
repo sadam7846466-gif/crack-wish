@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
 import '../constants/colors.dart';
-import '../widgets/bottom_nav.dart';
-import '../widgets/fade_page_route.dart';
-import 'home_page.dart';
-import 'collection_page.dart';
-import 'profile_page.dart';
 
 class ZodiacPage extends StatefulWidget {
   const ZodiacPage({super.key});

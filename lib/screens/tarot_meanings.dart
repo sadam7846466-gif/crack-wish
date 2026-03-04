@@ -737,3 +737,860 @@ String _buildClosing(
 
   return pool[_closingRng.nextInt(pool.length)];
 }
+
+
+// ============================================================
+// Full Arcana — 7 Kart Yorum Motoru (Premium)
+// ============================================================
+
+/// 7 kartlık okumada her pozisyonun bilgisi
+class FullCardReading {
+  final String positionTitle;
+  final String content;
+  final String cardName;
+  final int cardIndex;
+
+  const FullCardReading({
+    required this.positionTitle,
+    required this.content,
+    required this.cardName,
+    required this.cardIndex,
+  });
+}
+
+/// Element analizi sonucu
+class ElementAnalysis {
+  final Map<String, double> elements; // {'Ateş': 0.7, 'Su': 0.2, ...}
+  final String dominantElement;
+  final String dominantEmoji;
+  final String dominantDescriptionTr;
+  final String dominantDescriptionEn;
+
+  const ElementAnalysis({
+    required this.elements,
+    required this.dominantElement,
+    required this.dominantEmoji,
+    required this.dominantDescriptionTr,
+    required this.dominantDescriptionEn,
+  });
+}
+
+/// Kart ilişki analizi
+class CardRelation {
+  final String card1Name;
+  final String card2Name;
+  final String relationTextTr;
+  final String relationTextEn;
+  final String emoji;
+
+  const CardRelation({
+    required this.card1Name,
+    required this.card2Name,
+    required this.relationTextTr,
+    required this.relationTextEn,
+    required this.emoji,
+  });
+}
+
+/// Günlük ritüel önerisi
+class RitualSuggestion {
+  final String titleTr;
+  final String titleEn;
+  final String actionTr;
+  final String actionEn;
+  final String emoji;
+
+  const RitualSuggestion({
+    required this.titleTr,
+    required this.titleEn,
+    required this.actionTr,
+    required this.actionEn,
+    required this.emoji,
+  });
+}
+
+class FullTarotReading {
+  final String generalTheme;
+  final List<FullCardReading> cardReadings; // 7 adet
+  final String adviceParagraph;
+  final String closingMessage;
+  final FlowType flowType;
+  final String flowLabel;
+  final List<String> promises;
+  // Premium özellikler
+  final ElementAnalysis elementAnalysis;
+  final List<CardRelation> cardRelations;
+  final int cosmicScore;
+  final String cosmicLabelTr;
+  final String cosmicLabelEn;
+  final String secretMessageTr;
+  final String secretMessageEn;
+  final RitualSuggestion ritualSuggestion;
+
+  const FullTarotReading({
+    required this.generalTheme,
+    required this.cardReadings,
+    required this.adviceParagraph,
+    required this.closingMessage,
+    required this.flowType,
+    required this.flowLabel,
+    required this.promises,
+    required this.elementAnalysis,
+    required this.cardRelations,
+    required this.cosmicScore,
+    required this.cosmicLabelTr,
+    required this.cosmicLabelEn,
+    required this.secretMessageTr,
+    required this.secretMessageEn,
+    required this.ritualSuggestion,
+  });
+}
+
+/// 7 kart pozisyon başlıkları
+List<String> _fullPositionsTr = [
+  'Geçmiş',
+  'Şimdi',
+  'Gizli Etkiler',
+  'Engeller',
+  'Çevre',
+  'Tavsiye',
+  'Sonuç',
+];
+
+List<String> _fullPositionsEn = [
+  'Past',
+  'Present',
+  'Hidden Influences',
+  'Obstacles',
+  'Environment',
+  'Advice',
+  'Outcome',
+];
+
+/// Pozisyona özgü yorum üretme (7 pozisyon)
+String _fullPositionReading(CardMeaning meaning, int positionIndex, bool isTr, Random rng) {
+  // Her pozisyon için base text + ek cümle
+  String base;
+  List<String> extras;
+
+  switch (positionIndex) {
+    case 0: // Geçmiş
+      base = isTr ? meaning.pastTr : meaning.pastEn;
+      extras = isTr ? [
+        'Bu enerji seni bugüne taşıdı.',
+        'Geçmişin gölgesi hâlâ üzerinde.',
+        'O deneyim bugünkü gücünün kaynağı.',
+        'Geride bıraktığını sandığın ama bırakamadığın bir iz.',
+      ] : [
+        'This energy carried you to today.',
+        'The shadow of the past still lingers.',
+        'That experience is the source of your present strength.',
+        'A mark you thought you left behind, but never truly did.',
+      ];
+      break;
+    case 1: // Şimdi
+      base = isTr ? meaning.presentTr : meaning.presentEn;
+      extras = isTr ? [
+        'Şu an her şey bu kartın enerjisiyle titreşiyor.',
+        'Bu enerji geçici değil, kucakla.',
+        'Tam da olman gereken an burası.',
+        'Şimdinin gücü ellerinde, kullan.',
+      ] : [
+        'Right now, everything vibrates with this cards energy.',
+        'This energy is not fleeting, embrace it.',
+        'This is exactly where you need to be.',
+        'The power of now is in your hands, use it.',
+      ];
+      break;
+    case 2: // Gizli Etkiler
+      base = isTr ? meaning.directionTr : meaning.directionEn;
+      extras = isTr ? [
+        'Farkında olmadığın ama hayatını yönlendiren bir güç bu.',
+        'Bilinçaltın sana bunu fısıldıyor, duymaya hazır ol.',
+        'Görünmeyen iplerle bağlı olduğun bir enerji.',
+        'Bu etki karanlıkta çalışıyor ama sonuçları aydınlıkta.',
+        'Perdenin arkasındaki güç budur.',
+      ] : [
+        'A force you are unaware of, yet it steers your life.',
+        'Your subconscious whispers this, be ready to listen.',
+        'An energy you are invisibly tied to.',
+        'This influence works in the dark, but results show in the light.',
+        'This is the power behind the veil.',
+      ];
+      break;
+    case 3: // Engeller
+      base = isTr ? meaning.presentTr : meaning.presentEn;
+      extras = isTr ? [
+        'Bu engel aşılmak için var, korkma.',
+        'Yolundaki taş, seni durdurmak için değil, güçlendirmek için orada.',
+        'Her engel gizli bir öğretmendir.',
+        'Karşına çıkan bu duvar, aslında bir kapı.',
+        'Bu zorluk, dönüşümünün anahtarı.',
+      ] : [
+        'This obstacle exists to be overcome, do not fear.',
+        'The stone in your path is there not to stop you, but to strengthen you.',
+        'Every obstacle is a hidden teacher.',
+        'The wall before you is actually a door.',
+        'This challenge is the key to your transformation.',
+      ];
+      break;
+    case 4: // Çevre
+      base = isTr ? meaning.pastTr : meaning.pastEn;
+      extras = isTr ? [
+        'Çevrenden gelen bu enerji seni derinden etkiliyor.',
+        'Etrafındaki insanlar bu kartın enerjisini taşıyor.',
+        'Çevrenin sessiz etkisi hafife alınmamalı.',
+        'Yakınlarından gelen bu titreşim, kararlarını şekillendiriyor.',
+        'Dış dünyanın sana gönderdiği bir mesaj bu.',
+      ] : [
+        'This energy from your surroundings deeply affects you.',
+        'People around you carry this cards energy.',
+        'The silent influence of your environment should not be underestimated.',
+        'This vibration from those close to you shapes your decisions.',
+        'This is a message the outer world sends you.',
+      ];
+      break;
+    case 5: // Tavsiye
+      base = isTr ? meaning.directionTr : meaning.directionEn;
+      extras = isTr ? [
+        'Kartlar sana bunu yapmanı söylüyor, dinle.',
+        'Bu tavsiye bir hediye, onu kabul et.',
+        'Evrenin sana sunduğu yol haritası bu.',
+        'Cesur ol ve bu kartın gösterdiği yöne yürü.',
+        'Bu bilgelik doğrudan kaderin ağzından geliyor.',
+      ] : [
+        'The cards urge you to do this, listen.',
+        'This advice is a gift, accept it.',
+        'This is the roadmap the universe offers you.',
+        'Be brave and walk in the direction this card shows.',
+        'This wisdom comes straight from the mouth of destiny.',
+      ];
+      break;
+    default: // Sonuç (6)
+      base = isTr ? meaning.directionTr : meaning.directionEn;
+      extras = isTr ? [
+        'Yolculuğun sonu buraya çıkıyor.',
+        'Kaderin nihai fısıltısı budur.',
+        'Tüm kartlar bu sonuca işaret ediyor.',
+        'Bu sonuç kaçınılmaz değil, seçimlerin belirleyecek.',
+        'Evren sana bu kapıyı açık bırakıyor.',
+      ] : [
+        'Your journey leads to this destination.',
+        'This is the final whisper of fate.',
+        'All cards point to this outcome.',
+        'This outcome is not inevitable, your choices will decide.',
+        'The universe leaves this door open for you.',
+      ];
+      break;
+  }
+
+  final extra = extras[rng.nextInt(extras.length)];
+  return '$base $extra';
+}
+
+/// 7 kart genel tema cümlesi (premium, daha derin)
+String _buildFullGeneralTheme(List<CardMeaning> meanings, List<String> names, FlowType flow, bool isTr) {
+  final rng = Random();
+  final t0 = (isTr ? meanings[0].themeTr : meanings[0].themeEn).split(',').first.trim();
+  final t6 = (isTr ? meanings[6].themeTr : meanings[6].themeEn).split(',').first.trim();
+  List<String> pool;
+
+  switch (flow) {
+    case FlowType.harmonious:
+      pool = isTr ? [
+        'Yedi kart tek bir senfonide buluşuyor. Geçmişinde ${names[0]} bir temel attı, ${names[1]} bu temeli güçlendirdi. ${names[2]} farkında olmadığın bir enerjiyi harekete geçirdi. ${names[3]} yolundaki engelleri yumuşattı, ${names[4]} çevrenden desteği gösteriyor. ${names[5]} sana net bir tavsiye veriyor ve ${names[6]} tüm bu yolculuğun huzurlu bir sonuca ulaşacağını müjdeliyor.',
+        'Kartlar sana huzurun resmini çiziyor. ${names[0]} fırçayı aldı ve $t0 ile başladı. ${names[1]} bugünün renklerini ekledi, ${names[2]} görünmeyen detayları ortaya çıkardı. ${names[3]} sınavı yumuşattı, ${names[4]} çevrendeki uyumu gösterdi. ${names[5]} son fırça darbesini vurdu ve ${names[6]} tabloyu asıyor. Bu sanat eseri senin.',
+        '${names[0]} ışığı yaktı, ${names[1]} alevleri besledi. ${names[2]} karanlıkta saklanan gücü açığa çıkardı. ${names[3]} yolundaki taşları döşedi, ${names[4]} seni destekleyen rüzgâr oldu. ${names[5]} rehber olarak yolunu aydınlattı ve ${names[6]} seni eve götürüyor. $t6 ile taçlanan bu yolculuk kutlu.',
+      ] : [
+        'Seven cards unite in a single symphony. In your past, ${names[0]} laid a foundation and ${names[1]} strengthened it. ${names[2]} set an unseen force in motion. ${names[3]} softened the obstacles, ${names[4]} reveals support from your surroundings. ${names[5]} offers clear advice, and ${names[6]} heralds a peaceful conclusion.',
+        'The cards paint a picture of peace. ${names[0]} took the brush, starting with $t0. ${names[1]} added todays colors, ${names[2]} revealed hidden details. ${names[3]} eased the trial, ${names[4]} showed harmony. ${names[5]} made the final stroke and ${names[6]} hangs the masterpiece. This art is yours.',
+        '${names[0]} lit the light, ${names[1]} fed the flame. ${names[2]} unveiled hidden strength. ${names[3]} paved the way, ${names[4]} became the supporting wind. ${names[5]} illuminated your path and ${names[6]} takes you home. This journey crowned with $t6 is blessed.',
+      ];
+      break;
+    case FlowType.conflicting:
+      pool = isTr ? [
+        'Yedi kart arasında bir fırtına esiyor. ${names[0]} geçmişten gelen şimşeği çaktırdı, ${names[1]} şimdiki gerginliği hissettiriyor. ${names[2]} perdenin arkasındaki çatışmayı ortaya çıkardı. ${names[3]} önüne koyduğu engel zorlu ama ${names[4]} çevrenden gelen güç seni taşıyor. ${names[5]} sana savaş planını veriyor ve ${names[6]} sonunda gökkuşağını vaat ediyor.',
+        'Kartlar çatışıyor ama bir düzen var. ${names[0]} savaşın kökenini gösteriyor, ${names[1]} cepheyi çiziyor. ${names[2]} gizli müttefikleri açığa çıkardı. ${names[3]} asıl engeli işaret ediyor, ${names[4]} stratejik desteği gösteriyor. ${names[5]} son hamleyi fısıldıyor ve ${names[6]} zaferi müjdeliyor.',
+        '${names[0]} bir kapıyı kapattı ama ${names[1]} yenisini açıyor. ${names[2]} göremediğin düşmanı gösterdi, ${names[3]} sınavını koydu. ${names[4]} seni çevreleyen enerji ile sınıyor. Ama ${names[5]} sana silah veriyor ve ${names[6]} seni galip çıkarıyor. Her çatışma bir büyüme fırsatı.',
+      ] : [
+        'A storm blows between seven cards. ${names[0]} struck lightning from the past, ${names[1]} brings present tension. ${names[2]} exposed the conflict behind the curtain. The obstacle ${names[3]} placed is tough, but ${names[4]} shows surrounding strength. ${names[5]} gives you the battle plan and ${names[6]} promises the rainbow.',
+        'The cards clash, but theres an order. ${names[0]} shows the root of battle, ${names[1]} draws the front line. ${names[2]} revealed hidden allies. ${names[3]} marks the real obstacle, ${names[4]} shows strategic support. ${names[5]} whispers the final move and ${names[6]} heralds victory.',
+        '${names[0]} closed a door but ${names[1]} opens a new one. ${names[2]} revealed the unseen enemy, ${names[3]} set the trial. ${names[4]} surrounding energy tests you. But ${names[5]} arms you and ${names[6]} declares you victorious. Every conflict is a growth opportunity.',
+      ];
+      break;
+    case FlowType.transformative:
+      pool = isTr ? [
+        'Yedi kart bir metamorfoz çiziyor. ${names[0]} eski halini gösteriyor — $t0 seninle başladı. ${names[1]} dönüşümün şimdiki anını yansıtıyor. ${names[2]} bilinçaltında başlayan değişimi açığa çıkardı. ${names[3]} kırılma noktasını işaret ediyor, ${names[4]} çevrenin bu dönüşüme tepkisini gösteriyor. ${names[5]} yeni yolun haritasını çiziyor ve ${names[6]} kanatlarını açıyor. Dönüşümün muhteşem.',
+        '${names[0]} eski seni gömdü, ${names[1]} yasını tuttu. ${names[2]} toprağın altında ne olduğunu fısıldadı. ${names[3]} kırılgan anı gösteriyor, ${names[4]} çevreden gelen yeni enerjiyi taşıyor. ${names[5]} kazma verdi ve ${names[6]} hazineyi ortaya çıkarıyor. $t6 artık senin.',
+        'Kartların hikâyesi bir anka kuşu: ${names[0]} yanıyor, ${names[1]} alevleri hissediyor, ${names[2]} duman arasında bir şey parlıyor. ${names[3]} kül oluyor, ${names[4]} rüzgâr esiyor, ${names[5]} ilk kıvılcımı atıyor ve ${names[6]} küllerden yeniden doğuyor. Bu sen!',
+      ] : [
+        'Seven cards draw a metamorphosis. ${names[0]} shows your former self — $t0 began with you. ${names[1]} reflects the present moment. ${names[2]} revealed the subconscious shift. ${names[3]} marks the breaking point, ${names[4]} shows your environments reaction. ${names[5]} maps the new path and ${names[6]} unfurls the wings. Your transformation is magnificent.',
+        '${names[0]} buried the old you, ${names[1]} mourned. ${names[2]} whispered what lies beneath. ${names[3]} shows the fragile moment, ${names[4]} carries new energy. ${names[5]} gave you the shovel and ${names[6]} reveals the treasure. $t6 is now yours.',
+        'The cards tell the story of a phoenix: ${names[0]} burns, ${names[1]} feels the flames, ${names[2]} — something glimmers through the smoke. ${names[3]} becomes ash, ${names[4]} the wind blows, ${names[5]} sparks the first flame and ${names[6]} rises from the ashes. That is you!',
+      ];
+      break;
+  }
+
+  return pool[rng.nextInt(pool.length)];
+}
+
+/// 7 kart tavsiye paragrafı oluşturma
+String _buildFullAdvice(List<CardMeaning> meanings, List<String> names, FlowType flow, bool isTr) {
+  final rng = Random();
+  List<String> pool;
+
+  pool = isTr ? [
+    '${names[5]} kartının tavsiyesini rehber al. ${names[3]} engelinin üstesinden ${names[2]}\'nin gizli bilgeliğiyle gel. ${names[6]} seni bekliyor.',
+    'Geçmişindeki ${names[0]} artık bitti. Şimdiki ${names[1]} sana güç veriyor. ${names[5]}\'in gösterdiği yolu takip et ve ${names[6]}\'e ulaş.',
+    'Çevrenden gelen ${names[4]} enerjisini hafife alma. ${names[5]} sana net bir yol çiziyor. ${names[3]} engelini aşmak için ${names[2]}\'nin sırlarını kullan.',
+    'Bu yedi kart sana şunu söylüyor: ${names[0]}\'dan ders al, ${names[1]}\'i yaşa, ${names[2]}\'nin peşine düş, ${names[3]}\'ü aş, ${names[4]}\'den güç al, ${names[5]}\'e kulak ver ve ${names[6]}\'e yürü.',
+  ] : [
+    'Take ${names[5]}\'s advice as your guide. Overcome ${names[3]}\'s obstacle with ${names[2]}\'s hidden wisdom. ${names[6]} is waiting for you.',
+    'The past of ${names[0]} is done. The present ${names[1]} gives you strength. Follow the path ${names[5]} shows and reach ${names[6]}.',
+    'Don\'t underestimate the energy of ${names[4]} from your surroundings. ${names[5]} draws a clear path for you. Use ${names[2]}\'s secrets to overcome ${names[3]}.',
+    'These seven cards tell you: learn from ${names[0]}, live ${names[1]}, pursue ${names[2]}, overcome ${names[3]}, draw strength from ${names[4]}, listen to ${names[5]}, and walk toward ${names[6]}.',
+  ];
+
+  return pool[rng.nextInt(pool.length)];
+}
+
+/// Full Arcana 7 kart kapanış mesajı
+String _buildFullClosing(List<String> promises, FlowType flow, bool isTr) {
+  final rng = Random();
+  final k1 = promises[0];
+  final k2 = promises[1];
+  final k3 = promises.length > 2 ? promises[2] : k2;
+  final k4 = promises.length > 3 ? promises[3] : k3;
+
+  List<String> pool;
+
+  switch (flow) {
+    case FlowType.harmonious:
+      pool = isTr ? [
+        '"$k1" seni çağırıyor.\n"$k2" seni karşılıyor.\n"$k3" seni sarıyor.\n"$k4" seni tamamlıyor.\nEvren seninle dans ediyor.',
+        'Yedi kartın fısıltısı tek bir kelimeye dönüşüyor:\n"$k1."\nVe bu kelime senin için yazıldı.',
+        '"$k1" başlangıç.\n"$k2" yolculuk.\n"$k3" keşif.\n"$k4" zafer.\nBu hikâye senin.',
+      ] : [
+        '"$k1" calls you.\n"$k2" welcomes you.\n"$k3" embraces you.\n"$k4" completes you.\nThe universe dances with you.',
+        'The whisper of seven cards becomes one word:\n"$k1."\nAnd this word was written for you.',
+        '"$k1" is the beginning.\n"$k2" the journey.\n"$k3" the discovery.\n"$k4" the triumph.\nThis story is yours.',
+      ];
+      break;
+    case FlowType.conflicting:
+      pool = isTr ? [
+        '"$k1" acıttı.\n"$k2" sorguladı.\n"$k3" sınadı.\nAma "$k4" diyor ki:\nHer fırtınadan sonra bir gökkuşağı var.',
+        'Yedi kartın savaşı sona erdi.\n"$k1" yenilmedi.\n"$k2" güçlendi.\n"$k3" direndi.\n"$k4" kazandı.\nSen kazandın.',
+        '"$k1" kırıldı.\n"$k2" döküldü.\nAma "$k3" ve "$k4" seni yeniden inşa ediyor.\nKırık yerlerden altın akar.',
+      ] : [
+        '"$k1" hurt.\n"$k2" questioned.\n"$k3" tested.\nBut "$k4" says:\nAfter every storm, there is a rainbow.',
+        'The battle of seven cards has ended.\n"$k1" didn\'t lose.\n"$k2" grew stronger.\n"$k3" endured.\n"$k4" won.\nYou won.',
+        '"$k1" broke.\n"$k2" spilled.\nBut "$k3" and "$k4" rebuild you.\nGold flows through the cracks.',
+      ];
+      break;
+    case FlowType.transformative:
+      pool = isTr ? [
+        '"$k1" öldü.\n"$k2" gömüldü.\n"$k3" filizlendi.\n"$k4" çiçek açtı.\nBu senin yeniden doğuşun.',
+        'Eski sen "$k1" ile vedalaştı.\n"$k2" yas tuttu.\n"$k3" yeni tohum ekti.\n"$k4" güneşi doğurdu.\nŞimdi yeni seni kutla.',
+        '"$k1" son nefesti.\n"$k2" sessizlik.\n"$k3" ilk hareket.\n"$k4" yeni bir çığlık.\nYeniden doğdun.',
+      ] : [
+        '"$k1" died.\n"$k2" was buried.\n"$k3" sprouted.\n"$k4" bloomed.\nThis is your rebirth.',
+        'The old you said goodbye to "$k1."\n"$k2" mourned.\n"$k3" planted new seeds.\n"$k4" birthed the sun.\nCelebrate the new you.',
+        '"$k1" was the last breath.\n"$k2" silence.\n"$k3" first movement.\n"$k4" a new cry.\nYou are reborn.',
+      ];
+      break;
+  }
+
+  return pool[rng.nextInt(pool.length)];
+}
+
+// ============================================================
+// Premium Analiz Fonksiyonları (Sadece Full Arcana)
+// ============================================================
+
+/// Element analizi — 7 kartın tonuna göre element dağılımı
+ElementAnalysis _analyzeElements(List<CardMeaning> meanings) {
+  int fire = 0, water = 0, air = 0, earth = 0;
+
+  for (final m in meanings) {
+    switch (m.tone) {
+      case CardTone.soft:
+        fire += 2; air += 1;
+        break;
+      case CardTone.heavy:
+        water += 2; earth += 1;
+        break;
+      case CardTone.decision:
+        air += 1; earth += 1;
+        break;
+    }
+    switch (m.movement) {
+      case CardMovement.motion:
+        fire += 1;
+        break;
+      case CardMovement.stillness:
+        earth += 1;
+        break;
+    }
+    switch (m.phase) {
+      case CardPhase.beginning:
+      case CardPhase.awakening:
+        fire += 1; air += 1;
+        break;
+      case CardPhase.ending:
+      case CardPhase.neutral:
+        water += 1; earth += 1;
+        break;
+      case CardPhase.completion:
+        earth += 2;
+        break;
+    }
+  }
+
+  final total = (fire + water + air + earth).toDouble();
+  final elements = {
+    'Ateş': fire / total,
+    'Su': water / total,
+    'Hava': air / total,
+    'Toprak': earth / total,
+  };
+
+  // Baskın element
+  String dominant = 'Ateş';
+  double maxVal = 0;
+  elements.forEach((k, v) { if (v > maxVal) { maxVal = v; dominant = k; } });
+
+  final emojis = {'Ateş': '🔥', 'Su': '💧', 'Hava': '🌬️', 'Toprak': '🌿'};
+  final descTr = {
+    'Ateş': 'Ateş baskın — aksiyon, tutku ve cesaret enerjin yüksek! Harekete geçme zamanı.',
+    'Su': 'Su baskın — duygusal derinlik ve sezgi gücün dorukta. İç sesini dinle.',
+    'Hava': 'Hava baskın — zihinsel berraklık ve iletişim enerjin güçlü. Düşün ve konuş.',
+    'Toprak': 'Toprak baskın — istikrar ve pratiklik enerjin yüksek. Sağlam adımlar at.',
+  };
+  final descEn = {
+    'Ateş': 'Fire dominant — your energy for action, passion and courage is high! Time to move.',
+    'Su': 'Water dominant — your emotional depth and intuition are at their peak. Listen to your inner voice.',
+    'Hava': 'Air dominant — your mental clarity and communication energy is strong. Think and speak.',
+    'Toprak': 'Earth dominant — your stability and practicality energy is high. Take solid steps.',
+  };
+
+  return ElementAnalysis(
+    elements: elements,
+    dominantElement: dominant,
+    dominantEmoji: emojis[dominant]!,
+    dominantDescriptionTr: descTr[dominant]!,
+    dominantDescriptionEn: descEn[dominant]!,
+  );
+}
+
+/// Kart ilişki analizi — En güçlü 2-3 sinerji
+List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String> names, bool isTr) {
+  final relations = <CardRelation>[];
+  final rng = Random();
+
+  // İlişki tipleri
+  final synergies = <Map<String, dynamic>>[];
+  final usedTexts = <String>{};
+
+  for (int i = 0; i < meanings.length; i++) {
+    for (int j = i + 1; j < meanings.length; j++) {
+      final m1 = meanings[i];
+      final m2 = meanings[j];
+      int score = 0;
+      String typeTr = '';
+      String typeEn = '';
+      String emoji = '✨';
+
+      // Aynı ton = güçlendirici
+      if (m1.tone == m2.tone) {
+        score += 3;
+        if (m1.tone == CardTone.soft) {
+          final opts = [
+            {'tr': 'birbirinin ışığını güçlendiriyor — beraber parlıyorlar!', 'en': 'amplify each other\'s light — they shine together!', 'e': '☀️'},
+            {'tr': 'aynı frekansta titreşiyor — güçlü bir rezonans!', 'en': 'vibrate at the same frequency — powerful resonance!', 'e': '💫'},
+            {'tr': 'birlikte umut ve iyimserlik enerjisi taşıyor!', 'en': 'carry hope and optimism energy together!', 'e': '🌟'},
+          ];
+          final pick = opts[rng.nextInt(opts.length)];
+          typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+        } else if (m1.tone == CardTone.heavy) {
+          final opts = [
+            {'tr': 'birlikte gölgelerin derinliğine iniyor — orada bir hazine var!', 'en': 'descend into the depth of shadows together — there\'s treasure there!', 'e': '🌑'},
+            {'tr': 'karanlıkta birbirini buluyor — bu güç yabana atılmaz!', 'en': 'find each other in the dark — this power is not to be underestimated!', 'e': '🔮'},
+            {'tr': 'ağır enerjileri birleştirip dönüştürüyor!', 'en': 'combine heavy energies and transform them!', 'e': '⚗️'},
+          ];
+          final pick = opts[rng.nextInt(opts.length)];
+          typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+        } else {
+          final opts = [
+            {'tr': 'birlikte hassas bir denge kuruyor — uyum!', 'en': 'create a delicate balance together — harmony!', 'e': '⚖️'},
+            {'tr': 'karar anında birbirini destekliyor — net bir yol çiziyor!', 'en': 'support each other at moments of decision — drawing a clear path!', 'e': '🧭'},
+            {'tr': 'birlikte bir kavşak noktası oluşturuyor — seçim zamanı!', 'en': 'form a crossroads together — time to choose!', 'e': '🔀'},
+          ];
+          final pick = opts[rng.nextInt(opts.length)];
+          typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+        }
+      }
+
+      // Zıt hareket = gerilim ama büyüme
+      if (m1.movement != m2.movement) {
+        score += 2;
+        final opts = [
+          {'tr': 'zıt yönlere çekiyor — bu gerilim seni büyütecek!', 'en': 'pull in opposite directions — this tension will grow you!', 'e': '⚡'},
+          {'tr': 'biri ileri itiyor, diğeri bekletiyor — sabır ve cesaret arasında bir dans!', 'en': 'one pushes forward, the other holds still — a dance between patience and courage!', 'e': '🌪️'},
+          {'tr': 'karşıt enerjiler — çatışma değil, denge arayışı!', 'en': 'opposing energies — not conflict, but a search for balance!', 'e': '🔄'},
+          {'tr': 'farklı ritimler — bu kontrast sana yeni bir bakış açısı sunuyor!', 'en': 'different rhythms — this contrast offers you a new perspective!', 'e': '🎭'},
+        ];
+        final pick = opts[rng.nextInt(opts.length)];
+        typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+      }
+
+      // Aynı faz = eş zamanlı enerji
+      if (m1.phase == m2.phase) {
+        score += 2;
+        if (m1.phase == CardPhase.beginning || m1.phase == CardPhase.awakening) {
+          final opts = [
+            {'tr': 'birlikte yeni bir sayfa açıyor — taze enerji!', 'en': 'open a new chapter together — fresh energy!', 'e': '🌅'},
+            {'tr': 'beraber filizleniyor — bu başlangıç çok güçlü!', 'en': 'sprout together — this beginning is very powerful!', 'e': '🌱'},
+          ];
+          final pick = opts[rng.nextInt(opts.length)];
+          typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+        } else if (m1.phase == CardPhase.completion || m1.phase == CardPhase.ending) {
+          final opts = [
+            {'tr': 'birlikte bir döngüyü kapatıyor — kapanan kapılar, açılan pencereler!', 'en': 'close a cycle together — closing doors, opening windows!', 'e': '🌙'},
+            {'tr': 'beraber bir sonuca ulaşıyor — bu final güçlü!', 'en': 'reach a conclusion together — this finale is powerful!', 'e': '🏁'},
+          ];
+          final pick = opts[rng.nextInt(opts.length)];
+          typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
+        }
+      }
+
+      if (score >= 2 && typeTr.isNotEmpty && !usedTexts.contains(typeTr)) {
+        usedTexts.add(typeTr);
+        synergies.add({
+          'i': i, 'j': j, 'score': score,
+          'typeTr': typeTr, 'typeEn': typeEn, 'emoji': emoji,
+        });
+      }
+    }
+  }
+
+  // Skora göre sırala, en iyi 3'ünü al
+  synergies.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+  final top = synergies.take(3);
+
+  for (final s in top) {
+    final i = s['i'] as int;
+    final j = s['j'] as int;
+    relations.add(CardRelation(
+      card1Name: names[i],
+      card2Name: names[j],
+      relationTextTr: '${names[i]} ve ${names[j]} ${s['typeTr']}',
+      relationTextEn: '${names[i]} and ${names[j]} ${s['typeEn']}',
+      emoji: s['emoji'] as String,
+    ));
+  }
+
+  // En az 2 ilişki garanti et
+  if (relations.length < 2) {
+    final fallbackTr = [
+      'birlikte yeni kapılar açıyor!',
+      'sana gizli bir mesaj gönderiyor!',
+      'enerjilerini birleştiriyor!',
+    ];
+    final fallbackEn = [
+      'open new doors together!',
+      'send you a hidden message!',
+      'combine their energies!',
+    ];
+    while (relations.length < 2) {
+      final idx = rng.nextInt(fallbackTr.length);
+      relations.add(CardRelation(
+        card1Name: names[rng.nextInt(3)],
+        card2Name: names[4 + rng.nextInt(3)],
+        relationTextTr: '${names[rng.nextInt(7)]} ve ${names[rng.nextInt(7)]} ${fallbackTr[idx]}',
+        relationTextEn: '${names[rng.nextInt(7)]} and ${names[rng.nextInt(7)]} ${fallbackEn[idx]}',
+        emoji: '✨',
+      ));
+    }
+  }
+
+  return relations;
+}
+
+/// Kozmik uyum skoru (0-100)
+Map<String, dynamic> _calculateCosmicScore(List<CardMeaning> meanings, FlowType flow) {
+  int score = 50; // base
+
+  // FlowType bonusu
+  switch (flow) {
+    case FlowType.harmonious: score += 25; break;
+    case FlowType.transformative: score += 15; break;
+    case FlowType.conflicting: score += 5; break;
+  }
+
+  // Ton tutarlılığı
+  final tones = meanings.map((m) => m.tone).toList();
+  final brightCount = tones.where((t) => t == CardTone.soft).length;
+  if (brightCount >= 5) score += 15;
+  else if (brightCount >= 3) score += 8;
+
+  // Hareket uyumu
+  final forwardCount = meanings.where((m) => m.movement == CardMovement.motion).length;
+  if (forwardCount >= 5) score += 10;
+  else if (forwardCount >= 3) score += 5;
+
+  score = score.clamp(15, 98);
+
+  String labelTr, labelEn;
+  if (score >= 85) { labelTr = 'Muhteşem Uyum'; labelEn = 'Magnificent Harmony'; }
+  else if (score >= 70) { labelTr = 'Güçlü Uyum'; labelEn = 'Strong Harmony'; }
+  else if (score >= 55) { labelTr = 'Dengeli Enerji'; labelEn = 'Balanced Energy'; }
+  else if (score >= 40) { labelTr = 'Karışık Enerji'; labelEn = 'Mixed Energy'; }
+  else { labelTr = 'Çatışmalı Enerji'; labelEn = 'Conflicting Energy'; }
+
+  return {'score': score, 'labelTr': labelTr, 'labelEn': labelEn};
+}
+
+/// Gizli mesaj — 7 karttan çıkan sır
+Map<String, String> _generateSecretMessage(List<CardMeaning> meanings, List<String> names, FlowType flow, bool isTr) {
+  final rng = Random();
+  final t0 = meanings[0].themeTr.split(',').first.trim();
+  final t6 = meanings[6].themeTr.split(',').first.trim();
+  final t0en = meanings[0].themeEn.split(',').first.trim();
+  final t6en = meanings[6].themeEn.split(',').first.trim();
+
+  final poolTr = [
+    'Yedi kartın sessiz anlaşması şu: "$t0" ile başlayan yolculuğun "$t6" ile son bulmayacak — bu sadece bir başlangıç. Asıl hazine, bu iki nokta arasında saklı.',
+    '${names[2]} sana kimsenin söylemediği bir gerçeği fısıldıyor: Engel sandığın şey, aslında seni koruyordu. ${names[6]} bunu kanıtlayacak.',
+    'Kartlar bir sır paylaşıyor: ${names[0]} ile ${names[6]} aynı enerjinin iki yüzü. Biri seni tırtıl yapıyor, diğeri kelebek.',
+    'Yedi kartın gizli mesajı şu: Şu an tam olman gereken yerdesin. ${names[5]} sana bunu hatırlatmak için geldi.',
+    '${names[3]} engel değil, öğretmen. ${names[2]} sana bu dersin sırrını veriyor: "$t0" artık "$t6" olacak.',
+  ];
+
+  final poolEn = [
+    'The silent pact of seven cards: the journey starting with "$t0en" won\'t end at "$t6en" — this is just the beginning. The real treasure is hidden between these two points.',
+    '${names[2]} whispers a truth no one told you: what you thought was an obstacle was actually protecting you. ${names[6]} will prove this.',
+    'The cards share a secret: ${names[0]} and ${names[6]} are two faces of the same energy. One makes you a caterpillar, the other a butterfly.',
+    'The hidden message of seven cards: you are exactly where you need to be right now. ${names[5]} came to remind you of this.',
+    '${names[3]} is not an obstacle, but a teacher. ${names[2]} gives you the secret of this lesson: "$t0en" will become "$t6en".',
+  ];
+
+  final idx = rng.nextInt(poolTr.length);
+  return {'tr': poolTr[idx], 'en': poolEn[idx]};
+}
+
+/// Günlük ritüel önerisi — elementlere ve kartlara göre
+RitualSuggestion _generateRitualSuggestion(ElementAnalysis elements, FlowType flow) {
+  final rng = Random();
+
+  final rituals = <Map<String, String>>[];
+
+  switch (elements.dominantElement) {
+    case 'Ateş':
+      rituals.addAll([
+        {'titleTr': 'Cesaret Ritüeli', 'titleEn': 'Courage Ritual', 'actionTr': 'Bugün bir kırmızı mum yak ve alevine bakarak cesaretini çağır. 3 dakika boyunca korkularını aleve ver.', 'actionEn': 'Light a red candle today and summon your courage by gazing at its flame. Give your fears to the fire for 3 minutes.', 'emoji': '🕯️'},
+        {'titleTr': 'Aksiyon Adımı', 'titleEn': 'Action Step', 'actionTr': 'Bugün ertelediğin bir şeyi yap. Ne kadar küçük olursa olsun, harekete geç. Ateş enerjin seni destekliyor.', 'actionEn': 'Do something you\'ve been postponing today. No matter how small, take action. Your fire energy supports you.', 'emoji': '⚡'},
+      ]);
+      break;
+    case 'Su':
+      rituals.addAll([
+        {'titleTr': 'Duygu Arınması', 'titleEn': 'Emotional Cleanse', 'actionTr': 'Bugün bir bardak suya niyetini fısılda ve yavaşça iç. Her yudumda duygularını temizle.', 'actionEn': 'Whisper your intention into a glass of water today and slowly drink it. Cleanse your emotions with each sip.', 'emoji': '🌊'},
+        {'titleTr': 'İç Ses Meditasyonu', 'titleEn': 'Inner Voice Meditation', 'actionTr': 'Gözlerini kapat, 5 derin nefes al. İç sesinin sana ne söylediğini dinle. Su enerjin sezgilerini güçlendiriyor.', 'actionEn': 'Close your eyes, take 5 deep breaths. Listen to what your inner voice tells you. Your water energy strengthens intuition.', 'emoji': '🧘'},
+      ]);
+      break;
+    case 'Hava':
+      rituals.addAll([
+        {'titleTr': 'Düşünce Temizliği', 'titleEn': 'Thought Cleanse', 'actionTr': 'Bugün 5 dakika pencereyi aç ve temiz havayı ciğerlerine doldur. Her nefeste eski düşünceleri bırak, yenilere yer aç.', 'actionEn': 'Open a window for 5 minutes today and fill your lungs with fresh air. Release old thoughts with each breath, make room for new ones.', 'emoji': '🍃'},
+        {'titleTr': 'Kelime Gücü', 'titleEn': 'Power of Words', 'actionTr': 'Bugün birine söylemek isteyip söyleyemediğin bir şeyi yaz. Göndermek zorunda değilsin, sadece yaz.', 'actionEn': 'Write something today that you wanted to say to someone but couldn\'t. You don\'t have to send it, just write.', 'emoji': '✍️'},
+      ]);
+      break;
+    default: // Toprak
+      rituals.addAll([
+        {'titleTr': 'Topraklama Ritüeli', 'titleEn': 'Grounding Ritual', 'actionTr': 'Bugün çıplak ayaklarınla toprağa veya çimenliğe bas. 3 dakika boyunca ayaklarından yükselen enerjiyi hisset.', 'actionEn': 'Stand barefoot on earth or grass today. Feel the energy rising from your feet for 3 minutes.', 'emoji': '🌱'},
+        {'titleTr': 'Sağlam Adım', 'titleEn': 'Solid Step', 'actionTr': 'Bugün uzun süredir planladığın pratik bir adımı at. Bir listeye yaz, organize et. Toprak enerjin seni destekliyor.', 'actionEn': 'Take a practical step you\'ve been planning for a while. Write a list, organize. Your earth energy supports you.', 'emoji': '📋'},
+      ]);
+      break;
+  }
+
+  final chosen = rituals[rng.nextInt(rituals.length)];
+  return RitualSuggestion(
+    titleTr: chosen['titleTr']!,
+    titleEn: chosen['titleEn']!,
+    actionTr: chosen['actionTr']!,
+    actionEn: chosen['actionEn']!,
+    emoji: chosen['emoji']!,
+  );
+}
+
+/// Ana fonksiyon: 7 kart okuma üret
+FullTarotReading generateFullReading({
+  required List<int> cardIds,  // 7 kart ID
+  required List<String> cardNames,  // 7 kart ismi
+  required bool isTr,
+}) {
+  final rng = Random();
+  
+  // Kartların anlamlarını al (Minor Arcana için fallback)
+  final meanings = cardIds.map((id) {
+    if (cardMeanings.containsKey(id)) return cardMeanings[id]!;
+    // Minor Arcana kartları için varsayılan anlamlar üret
+    return _getMinorArcanaMeaning(id, isTr);
+  }).toList();
+
+  // Akış tipi (ilk 3 karttan belirlenir)
+  final flowType = _detectFlowType(meanings[0], meanings[1], meanings[2]);
+  final flowLabel = _flowLabel(flowType, isTr);
+
+  // Genel tema
+  final generalTheme = _buildFullGeneralTheme(meanings, cardNames, flowType, isTr);
+
+  // 7 kart yorumu
+  final positions = isTr ? _fullPositionsTr : _fullPositionsEn;
+  final cardReadings = <FullCardReading>[];
+  for (int i = 0; i < 7; i++) {
+    cardReadings.add(FullCardReading(
+      positionTitle: positions[i],
+      content: _fullPositionReading(meanings[i], i, isTr, rng),
+      cardName: cardNames[i],
+      cardIndex: cardIds[i],
+    ));
+  }
+
+  // Vaatler / Anahtar kelimeler (7 karttan)
+  final allThemes = meanings.map((m) => (isTr ? m.themeTr : m.themeEn).split(',').map((s) => s.trim()).toList()).toList();
+  allThemes.forEach((l) => l.shuffle(rng));
+  final promises = <String>[];
+  final used = <String>{};
+  for (final themeList in allThemes) {
+    for (final word in themeList) {
+      if (!used.contains(word.toLowerCase())) {
+        promises.add(word);
+        used.add(word.toLowerCase());
+        break;
+      }
+    }
+    if (promises.length >= 5) break;
+  }
+  while (promises.length < 4) promises.add(isTr ? 'dönüşüm' : 'transformation');
+
+  // Tavsiye paragrafı
+  final adviceParagraph = _buildFullAdvice(meanings, cardNames, flowType, isTr);
+
+  // Kapanış mesajı
+  final closingMessage = _buildFullClosing(promises, flowType, isTr);
+
+  // ── Premium analizler ──
+  final elementAnalysis = _analyzeElements(meanings);
+  final cardRelations = _analyzeCardRelations(meanings, cardNames, isTr);
+  final cosmicData = _calculateCosmicScore(meanings, flowType);
+  final secretMsg = _generateSecretMessage(meanings, cardNames, flowType, isTr);
+  final ritual = _generateRitualSuggestion(elementAnalysis, flowType);
+
+  return FullTarotReading(
+    generalTheme: generalTheme,
+    cardReadings: cardReadings,
+    adviceParagraph: adviceParagraph,
+    closingMessage: closingMessage,
+    flowType: flowType,
+    flowLabel: flowLabel,
+    promises: promises,
+    elementAnalysis: elementAnalysis,
+    cardRelations: cardRelations,
+    cosmicScore: cosmicData['score'] as int,
+    cosmicLabelTr: cosmicData['labelTr'] as String,
+    cosmicLabelEn: cosmicData['labelEn'] as String,
+    secretMessageTr: secretMsg['tr']!,
+    secretMessageEn: secretMsg['en']!,
+    ritualSuggestion: ritual,
+  );
+}
+
+// ============================================================
+// Minor Arcana Kart Anlamları (Generic)
+// ============================================================
+
+/// Minor Arcana suit bilgisi
+(String suitTr, String suitEn, CardTone tone, CardMovement mov) _minorSuitInfo(int id) {
+  if (id >= 22 && id < 36) return ('Kupalar', 'Cups', CardTone.soft, CardMovement.stillness);
+  if (id >= 36 && id < 50) return ('Asalar', 'Wands', CardTone.decision, CardMovement.motion);
+  if (id >= 50 && id < 64) return ('Kılıçlar', 'Swords', CardTone.heavy, CardMovement.motion);
+  return ('Sikkeler', 'Pentacles', CardTone.decision, CardMovement.stillness);
+}
+
+/// Minor Arcana rank bilgisi
+(String rankTr, String rankEn) _minorRankInfo(int id) {
+  final inSuit = (id - 22) % 14;
+  switch (inSuit) {
+    case 0: return ('As', 'Ace');
+    case 1: return ('İki', 'Two');
+    case 2: return ('Üç', 'Three');
+    case 3: return ('Dört', 'Four');
+    case 4: return ('Beş', 'Five');
+    case 5: return ('Altı', 'Six');
+    case 6: return ('Yedi', 'Seven');
+    case 7: return ('Sekiz', 'Eight');
+    case 8: return ('Dokuz', 'Nine');
+    case 9: return ('On', 'Ten');
+    case 10: return ('Şövalye', 'Page');
+    case 11: return ('Süvari', 'Knight');
+    case 12: return ('Kraliçe', 'Queen');
+    default: return ('Kral', 'King');
+  }
+}
+
+/// Minor Arcana kartı için otomatik anlam üret
+CardMeaning _getMinorArcanaMeaning(int id, bool isTr) {
+  final (suitTr, suitEn, tone, mov) = _minorSuitInfo(id);
+  final (rankTr, rankEn) = _minorRankInfo(id);
+  final inSuit = (id - 22) % 14;
+
+  // Suit'e göre temel temalar
+  Map<String, List<String>> suitThemesTr = {
+    'Kupalar': ['Duygular, sevgi, ilişkiler', 'İç huzur, empati, bağlılık', 'Sezgi, hayal gücü, şefkat'],
+    'Asalar': ['Tutku, enerji, motivasyon', 'Yaratıcılık, cesaret, girişim', 'İlham, irade, büyüme'],
+    'Kılıçlar': ['Zihin, doğruluk, mücadele', 'Karar, netlik, zorluk', 'Analiz, strateji, yüzleşme'],
+    'Sikkeler': ['Maddi dünya, bolluk, pratiklik', 'Güvenlik, çalışkanlık, başarı', 'Zenginlik, sağlık, istikrar'],
+  };
+  Map<String, List<String>> suitThemesEn = {
+    'Cups': ['Emotions, love, relationships', 'Inner peace, empathy, devotion', 'Intuition, imagination, compassion'],
+    'Wands': ['Passion, energy, motivation', 'Creativity, courage, enterprise', 'Inspiration, willpower, growth'],
+    'Swords': ['Mind, truth, struggle', 'Decision, clarity, challenge', 'Analysis, strategy, confrontation'],
+    'Pentacles': ['Material world, abundance, practicality', 'Security, diligence, achievement', 'Wealth, health, stability'],
+  };
+
+  final rng = Random(id); // Sabit seed ile tutarlı sonuçlar
+  final themeListTr = suitThemesTr[suitTr] ?? ['Enerji, denge, hareket'];
+  final themeListEn = suitThemesEn[suitEn] ?? ['Energy, balance, movement'];
+  final themeTr = themeListTr[rng.nextInt(themeListTr.length)];
+  final themeEn = themeListEn[rng.nextInt(themeListEn.length)];
+
+  // Rank'a göre faz
+  CardPhase phase;
+  if (inSuit == 0) phase = CardPhase.beginning;
+  else if (inSuit == 9) phase = CardPhase.completion;
+  else if (inSuit >= 4 && inSuit <= 6) phase = CardPhase.neutral;
+  else if (inSuit >= 10) phase = CardPhase.awakening;
+  else phase = CardPhase.neutral;
+
+  // Suit + Rank bazlı yorumlar
+  final pastTr = '$rankTr $suitTr geçmişte sana güçlü bir enerji taşıdı. Bu suit\'in özü olan ${themeTr.split(',').first.toLowerCase()} seni derinden etkiledi.';
+  final pastEn = '$rankEn of $suitEn carried powerful energy to your past. The essence of this suit — ${themeEn.split(',').first.toLowerCase()} — deeply influenced you.';
+  final presentTr = 'Şu an $rankTr $suitTr enerjisi seni sarıyor. ${themeTr.split(',').last.trim()} hayatının her alanında kendini hissettiriyor.';
+  final presentEn = 'Right now, the energy of $rankEn of $suitEn surrounds you. ${themeEn.split(',').last.trim()} makes itself felt in every area of your life.';
+  final directionTr = '$rankTr $suitTr sana yol gösteriyor: ${themeTr.split(',')[1].trim().toLowerCase()} ile hareket et. Bu kartın bilgeliği seni doğru yöne çekiyor.';
+  final directionEn = '$rankEn of $suitEn guides your way: move with ${themeEn.split(',')[1].trim().toLowerCase()}. This cards wisdom pulls you in the right direction.';
+
+  return CardMeaning(
+    id: id,
+    themeTr: themeTr,
+    themeEn: themeEn,
+    tone: tone,
+    movement: mov,
+    phase: phase,
+    pastTr: pastTr,
+    pastEn: pastEn,
+    presentTr: presentTr,
+    presentEn: presentEn,
+    directionTr: directionTr,
+    directionEn: directionEn,
+  );
+}

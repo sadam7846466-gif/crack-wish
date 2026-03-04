@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';

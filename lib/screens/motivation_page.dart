@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MotivationPage extends StatefulWidget {
   const MotivationPage({super.key});
