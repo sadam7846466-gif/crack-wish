@@ -320,6 +320,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   TarotReading? _latestReading;
   FullTarotReading? _latestFullReading;
 
+  // Full Arcana card carousel
+  PageController? _fullCardPageCtrl;
+  int _fullCardPageIndex = 0;
+
   // share
   final GlobalKey _shareKey = GlobalKey();
 
@@ -435,6 +439,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _readingScrollCtrl.dispose();
     for (final c in _slotGlowControllers) c.dispose();
     _cardFlipPlayer.dispose();
+    _fullCardPageCtrl?.dispose();
     super.dispose();
   }
 
@@ -1965,86 +1970,393 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  /// Kart İlişkileri widget'ı
+  /// Kart İlişkileri widget'ı — Premium Aurora Glass teması
   Widget _buildCardRelationsPanel(List<CardRelation> relations) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2E1F4A).withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFB08DD4).withValues(alpha: 0.25)),
+    const orchid = Color(0xFFD49BE8);
+    const mysticTeal = Color(0xFF5DD6D6);
+    const deepPlum = Color(0xFF3D1A5C);
+    const softLavender = Color(0xFFE2C8FF);
+    const roseGold = Color(0xFFF0C0C5);
+    const cosmicBlue = Color(0xFF4A7BD4);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          // Güçlü parlak dış glow
+          BoxShadow(
+            color: orchid.withValues(alpha: 0.22),
+            blurRadius: 32,
+            spreadRadius: 1,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Başlık
-              Row(
-                children: [
-                  SizedBox(
-                    width: 22, height: 22,
-                    child: CustomPaint(painter: _ConnectionSymbolPainter()),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _isTr ? 'KART İLİŞKİLERİ' : 'CARD CONNECTIONS',
-                    style: const TextStyle(
-                      color: Color(0xFFB08DD4),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.5,
+          BoxShadow(
+            color: mysticTeal.withValues(alpha: 0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: deepPlum.withValues(alpha: 0.5),
+            blurRadius: 12,
+            spreadRadius: -2,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              // Çok daha opak, belirgin arka plan
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF3A1960).withValues(alpha: 0.75),
+                  const Color(0xFF1E2845).withValues(alpha: 0.65),
+                  const Color(0xFF2D1350).withValues(alpha: 0.72),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+              // Gradient kenarlık efekti — soldan sağa renk geçişi
+              border: Border.all(
+                width: 1.2,
+                color: orchid.withValues(alpha: 0.35),
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Sağ üst köşe glow orb — teal (çok daha parlak)
+                Positioned(
+                  top: -20, right: -20,
+                  child: Container(
+                    width: 100, height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          mysticTeal.withValues(alpha: 0.30),
+                          mysticTeal.withValues(alpha: 0.10),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.4, 1.0],
+                      ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              // Her ilişki kartı
-              ...relations.asMap().entries.map((entry) {
-                final r = entry.value;
-                final suit1 = _detectCardSuit(r.card1Name);
-                final suit2 = _detectCardSuit(r.card2Name);
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFB08DD4).withValues(alpha: 0.12)),
+                ),
+                // Sol alt köşe glow orb — orchid (çok daha parlak)
+                Positioned(
+                  bottom: -15, left: -15,
+                  child: Container(
+                    width: 90, height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          orchid.withValues(alpha: 0.25),
+                          orchid.withValues(alpha: 0.08),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.45, 1.0],
+                      ),
+                    ),
                   ),
-                  child: Row(
+                ),
+                // Orta cosmicBlue glow
+                Positioned(
+                  top: 40, left: 20,
+                  child: Container(
+                    width: 60, height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          cosmicBlue.withValues(alpha: 0.12),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Dekoratif köşe sembolleri (daha parlak)
+                Positioned(top: 8, left: 10,
+                  child: Text('✧', style: TextStyle(color: softLavender.withValues(alpha: 0.45), fontSize: 12))),
+                Positioned(top: 8, right: 10,
+                  child: Text('⊹', style: TextStyle(color: mysticTeal.withValues(alpha: 0.40), fontSize: 11))),
+                Positioned(bottom: 8, left: 10,
+                  child: Text('⊹', style: TextStyle(color: orchid.withValues(alpha: 0.35), fontSize: 10))),
+                Positioned(bottom: 8, right: 10,
+                  child: Text('✧', style: TextStyle(color: roseGold.withValues(alpha: 0.40), fontSize: 12))),
+                // Üst gradient shimmer çizgi (çok daha parlak)
+                Positioned(
+                  top: 0, left: 20, right: 20,
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          mysticTeal.withValues(alpha: 0.6),
+                          orchid.withValues(alpha: 0.7),
+                          roseGold.withValues(alpha: 0.5),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+                // Alt gradient shimmer çizgi
+                Positioned(
+                  bottom: 0, left: 30, right: 30,
+                  child: Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          orchid.withValues(alpha: 0.3),
+                          mysticTeal.withValues(alpha: 0.25),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Ana içerik
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: SizedBox(
-                          width: 26, height: 26,
-                          child: CustomPaint(
-                            painter: _CardPairSymbolPainter(
-                              suit1: suit1,
-                              suit2: suit2,
+                      // Başlık
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  orchid.withValues(alpha: 0.3),
+                                  orchid.withValues(alpha: 0.08),
+                                  Colors.transparent,
+                                ],
+                                stops: const [0.0, 0.5, 1.0],
+                              ),
+                            ),
+                            child: SizedBox(
+                              width: 22, height: 22,
+                              child: CustomPaint(painter: _ConnectionSymbolPainter()),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          _isTr ? r.relationTextTr : r.relationTextEn,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 13,
-                            height: 1.5,
+                          const SizedBox(width: 8),
+                          Text(
+                            _isTr ? 'KART İLİŞKİLERİ' : 'CARD CONNECTIONS',
+                            style: TextStyle(
+                              color: softLavender,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.8,
+                              shadows: [
+                                Shadow(
+                                  color: orchid.withValues(alpha: 0.7),
+                                  blurRadius: 14,
+                                ),
+                                Shadow(
+                                  color: mysticTeal.withValues(alpha: 0.3),
+                                  blurRadius: 20,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
+                      const SizedBox(height: 8),
+                      // Başlık altı dekoratif çizgi
+                      Row(
+                        children: [
+                          const SizedBox(width: 36),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    orchid.withValues(alpha: 0.4),
+                                    mysticTeal.withValues(alpha: 0.3),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text('⟡', style: TextStyle(color: mysticTeal.withValues(alpha: 0.6), fontSize: 8)),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    mysticTeal.withValues(alpha: 0.3),
+                                    orchid.withValues(alpha: 0.4),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 36),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      // Her ilişki kartı — glassmorphic individual cards
+                      ...relations.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final r = entry.value;
+                        final suit1 = _detectCardSuit(r.card1Name);
+                        final suit2 = _detectCardSuit(r.card2Name);
+                        // Her karta farklı bir accent rengi çifti
+                        final cardAccents = [
+                          [orchid, mysticTeal],
+                          [roseGold, cosmicBlue],
+                          [mysticTeal, softLavender],
+                          [softLavender, roseGold],
+                          [cosmicBlue, orchid],
+                        ];
+                        final accent = cardAccents[idx % cardAccents.length];
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            // Belirgin katmanlı arka plan
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                accent[0].withValues(alpha: 0.14),
+                                Colors.white.withValues(alpha: 0.06),
+                                accent[1].withValues(alpha: 0.10),
+                              ],
+                            ),
+                            border: Border.all(
+                              color: accent[0].withValues(alpha: 0.30),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: accent[0].withValues(alpha: 0.10),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                              ),
+                              BoxShadow(
+                                color: accent[1].withValues(alpha: 0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              children: [
+                                // İç glow efekti (daha belirgin)
+                                Positioned(
+                                  top: -8, right: -8,
+                                  child: Container(
+                                    width: 50, height: 50,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: RadialGradient(
+                                        colors: [
+                                          accent[1].withValues(alpha: 0.18),
+                                          accent[1].withValues(alpha: 0.05),
+                                          Colors.transparent,
+                                        ],
+                                        stops: const [0.0, 0.4, 1.0],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Sol kenar accent çizgi
+                                Positioned(
+                                  top: 8, bottom: 8, left: 0,
+                                  child: Container(
+                                    width: 2.5,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(2),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          accent[0].withValues(alpha: 0.6),
+                                          accent[1].withValues(alpha: 0.3),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Kart içeriği
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 2),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: RadialGradient(
+                                              colors: [
+                                                accent[0].withValues(alpha: 0.22),
+                                                accent[0].withValues(alpha: 0.06),
+                                                Colors.transparent,
+                                              ],
+                                              stops: const [0.0, 0.5, 1.0],
+                                            ),
+                                          ),
+                                          child: SizedBox(
+                                            width: 26, height: 26,
+                                            child: CustomPaint(
+                                              painter: _CardPairSymbolPainter(
+                                                suit1: suit1,
+                                                suit2: suit2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          _isTr ? r.relationTextTr : r.relationTextEn,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.92),
+                                            fontSize: 13,
+                                            height: 1.55,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
                     ],
                   ),
-                );
-              }),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -3112,6 +3424,320 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       ),
     );
   }
+
+  /// Full Arcana — 7 Kart Carousel (Yana Kaydırmalı, Sembol Dallanmalı)
+  Widget _buildFullCardCarousel() {
+    if (_latestFullReading == null) return const SizedBox.shrink();
+    final reading = _latestFullReading!;
+
+    // PageController'ı lazy init
+    _fullCardPageCtrl ??= PageController(viewportFraction: 0.92);
+
+    // Her pozisyon için benzersiz renk ve ikon
+    final positionColors = [
+      const Color(0xFF4A9FE5), // Geçmiş — mavi
+      const Color(0xFFE8A07C), // Şimdi — amber
+      const Color(0xFFB08DD4), // Gizli Etkiler — mor
+      const Color(0xFFE06060), // Engeller — kırmızı
+      const Color(0xFF7EC8A0), // Çevre — yeşil
+      const Color(0xFFE7D6A5), // Tavsiye — altın
+      const Color(0xFF5DD6D6), // Sonuç — teal
+    ];
+    final positionIcons = [
+      '⏳', // Geçmiş
+      '👁', // Şimdi
+      '🔮', // Gizli Etkiler
+      '⚔️', // Engeller
+      '🌍', // Çevre
+      '💡', // Tavsiye
+      '⭐', // Sonuç
+    ];
+
+
+    return Column(
+      children: [
+        // ── SABİT POZİSYON YAZISI ──
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: Text(
+            reading.cardReadings[_fullCardPageIndex].positionTitle.toUpperCase(),
+            key: ValueKey(_fullCardPageIndex),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Carousel — tam ekran genişliğinde (parent padding yok)
+        SizedBox(
+          height: 410,
+          child: PageView.builder(
+            controller: _fullCardPageCtrl,
+            itemCount: 7,
+            onPageChanged: (i) => _setStateSafe(() => _fullCardPageIndex = i),
+            itemBuilder: (context, pageIndex) {
+              final cardAsset = _allCards[_selectedCardIndexes[pageIndex]].frontAsset;
+              final cardId = _selectedCardIndexes[pageIndex];
+              final symbols = getCardSymbols(cardId);
+              final symbolCount = getSymbolCountForPosition(pageIndex, symbols.length);
+              final selectedSymbols = symbols.take(symbolCount).toList();
+
+              const cardW = 155.0;
+              const cardH = 240.0;
+              const cardTop = 15.0;
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final stackW = constraints.maxWidth;
+                  final cardLeft = (stackW - cardW) / 2;
+
+                  // ── SOL / SAĞ SEMBOL DAĞILIMI ──
+                  final leftSymbols = <CardSymbol>[];
+                  final rightSymbols = <CardSymbol>[];
+                  for (final s in selectedSymbols) {
+                    if (s.anchorX < 0.45) {
+                      leftSymbols.add(s);
+                    } else if (s.anchorX > 0.55) {
+                      rightSymbols.add(s);
+                    } else {
+                      // Merkez semboller — kısa tarafa ekle
+                      if (leftSymbols.length <= rightSymbols.length) {
+                        leftSymbols.add(s);
+                      } else {
+                        rightSymbols.add(s);
+                      }
+                    }
+                  }
+                  // En az 1 sembol her tarafta olsun (görsel denge)
+                  if (leftSymbols.isEmpty && rightSymbols.length >= 2) {
+                    leftSymbols.add(rightSymbols.removeLast());
+                  } else if (rightSymbols.isEmpty && leftSymbols.length >= 2) {
+                    rightSymbols.add(leftSymbols.removeLast());
+                  }
+                  // Y sırasına göre sırala → çizgi çaprazlanmasını engelle
+                  leftSymbols.sort((a, b) => a.anchorY.compareTo(b.anchorY));
+                  rightSymbols.sort((a, b) => a.anchorY.compareTo(b.anchorY));
+
+                  // ── ÇİZGİ + ETİKET HESAPLAMA ──
+                  final linePoints = <Map<String, double>>[];
+                  final labelWidgets = <Widget>[];
+                  const labelH = 20.0;
+                  const labelGap = 8.0;
+
+                  // Sol taraf etiketler
+                  if (leftSymbols.isNotEmpty) {
+                    final totalH = leftSymbols.length * labelH +
+                        (leftSymbols.length - 1) * labelGap;
+                    final baseY = cardTop + (cardH - totalH) / 2;
+                    for (int i = 0; i < leftSymbols.length; i++) {
+                      final s = leftSymbols[i];
+                      final startX = cardLeft + s.anchorX * cardW;
+                      final startY = cardTop + s.anchorY * cardH;
+                      final labelY = baseY + i * (labelH + labelGap);
+                      final lineY = labelY + labelH / 2;
+                      final leftEndX = cardLeft - 35;
+                      linePoints.add({
+                        'startX': startX, 'startY': startY,
+                        'elbowX': cardLeft - 8,
+                        'endX': leftEndX, 'endY': lineY,
+                      });
+                      labelWidgets.add(Positioned(
+                        left: 0, top: labelY,
+                        width: leftEndX - 4,
+                        child: Text(
+                          '${s.emoji} ${_isTr ? s.nameTr : s.nameEn}',
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ));
+                    }
+                  }
+
+                  // Sağ taraf etiketler
+                  if (rightSymbols.isNotEmpty) {
+                    final totalH = rightSymbols.length * labelH +
+                        (rightSymbols.length - 1) * labelGap;
+                    final baseY = cardTop + (cardH - totalH) / 2;
+                    for (int i = 0; i < rightSymbols.length; i++) {
+                      final s = rightSymbols[i];
+                      final startX = cardLeft + s.anchorX * cardW;
+                      final startY = cardTop + s.anchorY * cardH;
+                      final labelY = baseY + i * (labelH + labelGap);
+                      final lineY = labelY + labelH / 2;
+                      final rightEndX = cardLeft + cardW + 35;
+                      linePoints.add({
+                        'startX': startX, 'startY': startY,
+                        'elbowX': cardLeft + cardW + 8,
+                        'endX': rightEndX, 'endY': lineY,
+                      });
+                      labelWidgets.add(Positioned(
+                        left: rightEndX + 4, top: labelY, right: 0,
+                        child: Text(
+                          '${s.emoji} ${_isTr ? s.nameTr : s.nameEn}',
+                          textAlign: TextAlign.left,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ));
+                    }
+                  }
+
+                  return Container(
+                    alignment: Alignment.topCenter,
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: cardH + 20,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // ── KART ──
+                              Positioned(
+                                top: cardTop,
+                                left: cardLeft,
+                                child: Hero(
+                                  tag: 'reading_card_$pageIndex',
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.5),
+                                          blurRadius: 24,
+                                          spreadRadius: 4,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: SizedBox(
+                                        width: cardW,
+                                        height: cardH,
+                                        child: Transform.scale(
+                                          scale: 1.12,
+                                          child: Image.asset(cardAsset, fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // ── İNFOGRAFİK ÇİZGİLER ──
+                              Positioned.fill(
+                                child: CustomPaint(
+                                  painter: _InfographicLinePainter(linePoints),
+                                ),
+                              ),
+                              // ── SEMBOL ETİKETLERİ ──
+                              ...labelWidgets,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // ── KART İSMİ ──
+                        Text(
+                          reading.cardReadings[pageIndex].cardName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        // ── ETKİLİ YORUM ──
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Text(
+                            reading.cardReadings[pageIndex].content,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 13.5,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Sayfa göstergesi (dot indicators)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(7, (i) {
+            final isActive = i == _fullCardPageIndex;
+            final color = positionColors[i];
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: isActive ? 24 : 10,
+              height: 10,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                // Glass effect: transparan gövde
+                color: isActive ? color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.05),
+                // İnce cam çerçeve
+                border: Border.all(
+                  color: isActive ? color.withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.25),
+                  width: 1,
+                ),
+                boxShadow: isActive ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.5),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ] : null,
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 4),
+        // Kaydırma ipucu
+        Text(
+          _isTr ? '← kaydır →' : '← swipe →',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.30),
+            fontSize: 11,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
 
   void _openReadingSheet(TarotReading reading) {
     final names = _selectedCardIndexes.map(_cardName).toList();
@@ -5437,181 +6063,176 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     child: Transform.translate(
                       offset: Offset(0, 30 * (1.0 - value)),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        // Padding kaldırıldı, Carousel tam ekran genişleyebilsin diye alt elemanlara özel Padding verilecek
                         child: SingleChildScrollView(
                           controller: _readingScrollCtrl,
                           physics: const BouncingScrollPhysics(),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Push content down below original cards
-                              SizedBox(height: MediaQuery.of(context).padding.top + (_isBuyukArkana ? 365 : 440)),
-                              
+                              // ── ÜST KISIM (Tüm yazılar ve paneller Carousel'e kadar) ──
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    SizedBox(height: MediaQuery.of(context).padding.top + (_isBuyukArkana ? 365 : 440)),
 
+                                    // Ana Tema cümlesi (sadece Major Arcana)
+                                    if (_isBuyukArkana)
+                                    _buildGlowingQuoteCard(
+                                      _latestReading?.generalTheme ?? _latestFullReading!.generalTheme,
+                                    ).animate()
+                                      .fadeIn(duration: 800.ms, delay: 300.ms)
+                                      .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 300.ms, curve: Curves.easeOut),
+                                    if (_isBuyukArkana)
+                                    const SizedBox(height: 16),
 
-                              // Ana Tema cümlesi (sadece Major Arcana)
-                              if (_isBuyukArkana)
-                              _buildGlowingQuoteCard(
-                                _latestReading?.generalTheme ?? _latestFullReading!.generalTheme,
-                              ).animate()
-                                .fadeIn(duration: 800.ms, delay: 300.ms)
-                                .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 300.ms, curve: Curves.easeOut),
-                              if (_isBuyukArkana)
-                              const SizedBox(height: 16),
-
-                              // Major Arcana: 3 kart yorumu
-                              if (_latestReading != null) ...[
-                                _buildReadingSection(
-                                  title: _isTr ? 'Geçmiş' : 'Past',
-                                  content: _latestReading!.pastInfluence,
-                                  cardName: _cardName(_selectedCardIndexes[0]),
-                                  cardAsset: _allCards[_selectedCardIndexes[0]].frontAsset,
-                                  icon: Icons.history_edu,
-                                  color: const Color(0xFFE7D6A5),
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: 900.ms)
-                                  .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 900.ms, curve: Curves.easeOut),
-                                const SizedBox(height: 12),
-                                _buildMysticalDivider('☽').animate()
-                                  .fadeIn(duration: 600.ms, delay: 1400.ms),
-                                const SizedBox(height: 12),
-                                
-                                _buildReadingSection(
-                                  title: _isTr ? 'Şimdi' : 'Present',
-                                  content: _latestReading!.presentEnergy,
-                                  cardName: _cardName(_selectedCardIndexes[1]),
-                                  cardAsset: _allCards[_selectedCardIndexes[1]].frontAsset,
-                                  icon: Icons.visibility,
-                                  color: const Color(0xFFE7D6A5),
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: 1800.ms)
-                                  .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 1800.ms, curve: Curves.easeOut),
-                                const SizedBox(height: 12),
-                                _buildMysticalDivider('✦').animate()
-                                  .fadeIn(duration: 600.ms, delay: 2300.ms),
-                                const SizedBox(height: 12),
-                                
-                                _buildReadingSection(
-                                  title: _isTr ? 'Yön' : 'Direction',
-                                  content: _latestReading!.directionAdvice,
-                                  cardName: _cardName(_selectedCardIndexes[2]),
-                                  cardAsset: _allCards[_selectedCardIndexes[2]].frontAsset,
-                                  icon: Icons.explore,
-                                  color: const Color(0xFFE7D6A5),
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: 2700.ms)
-                                  .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 2700.ms, curve: Curves.easeOut),
-                                const SizedBox(height: 24),
-                              ],
-
-                              // Full Arcana: Premium yorum akışı
-                              if (_latestFullReading != null) ...[
-                                const SizedBox(height: 24),
-                                // 1. Kozmik Uyum Skoru
-                                _buildCosmicScorePanel(
-                                  _latestFullReading!.cosmicScore,
-                                  _isTr ? _latestFullReading!.cosmicLabelTr : _latestFullReading!.cosmicLabelEn,
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: 600.ms)
-                                  .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 800.ms, delay: 600.ms, curve: Curves.easeOut),
-                                const SizedBox(height: 16),
-
-                                _buildMysticalDivider('⊹').animate()
-                                  .fadeIn(duration: 600.ms, delay: 1000.ms),
-                                const SizedBox(height: 16),
-
-                                // 2. 7 kart yorumu
-                                ...List.generate(7, (i) {
-                                  final cr = _latestFullReading!.cardReadings[i];
-                                  final icons = [
-                                    Icons.history_edu, Icons.visibility, Icons.psychology,
-                                    Icons.block, Icons.people, Icons.lightbulb, Icons.stars,
-                                  ];
-                                  final delay = 1400 + (i * 500);
-                                  return Column(
-                                    children: [
+                                    // Major Arcana: 3 kart yorumu
+                                    if (_latestReading != null) ...[
                                       _buildReadingSection(
-                                        title: cr.positionTitle,
-                                        content: cr.content,
-                                        cardName: cr.cardName,
-                                        cardAsset: _allCards[_selectedCardIndexes[i]].frontAsset,
-                                        icon: icons[i],
+                                        title: _isTr ? 'Geçmiş' : 'Past',
+                                        content: _latestReading!.pastInfluence,
+                                        cardName: _cardName(_selectedCardIndexes[0]),
+                                        cardAsset: _allCards[_selectedCardIndexes[0]].frontAsset,
+                                        icon: Icons.history_edu,
                                         color: const Color(0xFFE7D6A5),
                                       ).animate()
-                                        .fadeIn(duration: 800.ms, delay: Duration(milliseconds: delay))
-                                        .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: Duration(milliseconds: delay), curve: Curves.easeOut),
-                                      const SizedBox(height: 6),
-                                      if (i < 6)
-                                        _buildMysticalDivider(i.isEven ? '☽' : '✦').animate()
-                                          .fadeIn(duration: 600.ms, delay: Duration(milliseconds: delay + 300)),
-                                      if (i < 6) const SizedBox(height: 6),
+                                        .fadeIn(duration: 800.ms, delay: 900.ms)
+                                        .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 900.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 12),
+                                      _buildMysticalDivider('☽').animate()
+                                        .fadeIn(duration: 600.ms, delay: 1400.ms),
+                                      const SizedBox(height: 12),
+                                      
+                                      _buildReadingSection(
+                                        title: _isTr ? 'Şimdi' : 'Present',
+                                        content: _latestReading!.presentEnergy,
+                                        cardName: _cardName(_selectedCardIndexes[1]),
+                                        cardAsset: _allCards[_selectedCardIndexes[1]].frontAsset,
+                                        icon: Icons.visibility,
+                                        color: const Color(0xFFE7D6A5),
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 1800.ms)
+                                        .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 1800.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 12),
+                                      _buildMysticalDivider('✦').animate()
+                                        .fadeIn(duration: 600.ms, delay: 2300.ms),
+                                      const SizedBox(height: 12),
+                                      
+                                      _buildReadingSection(
+                                        title: _isTr ? 'Yön' : 'Direction',
+                                        content: _latestReading!.directionAdvice,
+                                        cardName: _cardName(_selectedCardIndexes[2]),
+                                        cardAsset: _allCards[_selectedCardIndexes[2]].frontAsset,
+                                        icon: Icons.explore,
+                                        color: const Color(0xFFE7D6A5),
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 2700.ms)
+                                        .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 2700.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 24),
                                     ],
-                                  );
-                                }),
+
+                                    // Full Arcana: Premium yorum akışı (Carousel Öncesi)
+                                    if (_latestFullReading != null) ...[
+                                      const SizedBox(height: 24),
+                                      // 1. Kozmik Uyum Skoru
+                                      _buildCosmicScorePanel(
+                                        _latestFullReading!.cosmicScore,
+                                        _isTr ? _latestFullReading!.cosmicLabelTr : _latestFullReading!.cosmicLabelEn,
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 600.ms)
+                                        .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 800.ms, delay: 600.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 16),
+
+                                      _buildMysticalDivider('⊹').animate()
+                                        .fadeIn(duration: 600.ms, delay: 1000.ms),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ],
+                                ),
+                              ),
+
+                              // ── CAROUSEL BÖLÜMÜ (Padding Yok! Tam kenardan kenara ekranı kaplar) ──
+                              if (_latestFullReading != null) ...[
+                                // 2. 7 kart yorumu — Carousel (Tüm ekran genişliğinde)
+                                _buildFullCardCarousel().animate()
+                                  .fadeIn(duration: 800.ms, delay: 1200.ms)
+                                  .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 1200.ms, curve: Curves.easeOut),
 
                                 const SizedBox(height: 20),
-
-                                // 3. Kart İlişkileri
-                                _buildCardRelationsPanel(
-                                  _latestFullReading!.cardRelations,
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 200))
-                                  .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 200), curve: Curves.easeOut),
-                                const SizedBox(height: 16),
-
-                                // 4. Element Analizi
-                                _buildElementAnalysisPanel(
-                                  _latestFullReading!.elementAnalysis,
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 600))
-                                  .slideX(begin: -0.1, end: 0, duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 600), curve: Curves.easeOut),
-                                const SizedBox(height: 16),
-
-                                // 5. Tavsiye + Gizli Mesaj (birleşik panel)
-                                _buildInsightPanel(
-                                  _latestFullReading!.adviceParagraph,
-                                  _isTr ? _latestFullReading!.secretMessageTr : _latestFullReading!.secretMessageEn,
-                                ).animate()
-                                  .fadeIn(duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 1000))
-                                  .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: Duration(milliseconds: 1400 + 7 * 500 + 1000), curve: Curves.easeOut),
-                                const SizedBox(height: 24),
                               ],
 
-                              // Kartların vaat ettiği anahtar kelimeler
-                              _buildPromisesPanel().animate()
-                                .fadeIn(duration: 800.ms, delay: _latestFullReading != null ? Duration(milliseconds: 900 + 8 * 600) : 3300.ms)
-                                .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: _latestFullReading != null ? Duration(milliseconds: 900 + 8 * 600) : 3300.ms, curve: Curves.easeOut),
-                              const SizedBox(height: 32),
-                              
-                              // Kartların Gizli Fısıltısı
-                              _buildDailyAdviceCard(
-                                _isTr ? 'Kartların Gizli Fısıltısı' : 'Secret Whisper of the Cards',
-                                _latestReading?.closingMessage ?? _latestFullReading!.closingMessage,
-                              ).animate()
-                                .fadeIn(duration: 1000.ms, delay: 4500.ms)
-                                .slideY(begin: 0.15, end: 0, duration: 1000.ms, delay: 4500.ms, curve: Curves.easeOut),
-                              const SizedBox(height: 32),
+                              // ── ALT KISIM (Carousel sonrası paneller tekrar Padding içinde) ──
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (_latestFullReading != null) ...[
+                                      // 3. Kart İlişkileri
+                                      _buildCardRelationsPanel(
+                                        _latestFullReading!.cardRelations,
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 2200.ms)
+                                        .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 2200.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 16),
 
-                              // Magic Buton - Yeni Çekim Yap (en sonda)
-                              Center(
-                                child: _buildMagicButton(
-                                  _isTr ? 'Yeni Çekim Yap' : 'Draw Again',
-                                  () {
-                                    HapticFeedback.lightImpact();
-                                    _setStateSafe(() {
-                                      _state = RitualState.idle;
-                                      _latestReading = null;
-                                      _latestFullReading = null;
-                                      _selectedCardIndexes.clear();
-                                      _selectedTablePositions.clear();
-                                      _revealedCount = 0;
-                                    });
-                                  },
+                                      // 4. Element Analizi
+                                      _buildElementAnalysisPanel(
+                                        _latestFullReading!.elementAnalysis,
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 2800.ms)
+                                        .slideX(begin: -0.1, end: 0, duration: 800.ms, delay: 2800.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 16),
+
+                                      // 5. Tavsiye + Gizli Mesaj (birleşik panel)
+                                      _buildInsightPanel(
+                                        _latestFullReading!.adviceParagraph,
+                                        _isTr ? _latestFullReading!.secretMessageTr : _latestFullReading!.secretMessageEn,
+                                      ).animate()
+                                        .fadeIn(duration: 800.ms, delay: 3400.ms)
+                                        .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 3400.ms, curve: Curves.easeOut),
+                                      const SizedBox(height: 24),
+                                    ],
+
+                                    // Kartların vaat ettiği anahtar kelimeler
+                                    _buildPromisesPanel().animate()
+                                      .fadeIn(duration: 800.ms, delay: _latestFullReading != null ? 4000.ms : 3300.ms)
+                                      .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: _latestFullReading != null ? 4000.ms : 3300.ms, curve: Curves.easeOut),
+                                    const SizedBox(height: 32),
+                                    // Kartların Gizli Fısıltısı
+                                    _buildDailyAdviceCard(
+                                      _isTr ? 'Kartların Gizli Fısıltısı' : 'Secret Whisper of the Cards',
+                                      _latestReading?.closingMessage ?? _latestFullReading!.closingMessage,
+                                    ).animate()
+                                      .fadeIn(duration: 1000.ms, delay: 4500.ms)
+                                      .slideY(begin: 0.15, end: 0, duration: 1000.ms, delay: 4500.ms, curve: Curves.easeOut),
+                                    const SizedBox(height: 32),
+
+                                    // Magic Buton - Yeni Çekim Yap (en sonda)
+                                    Center(
+                                      child: _buildMagicButton(
+                                        _isTr ? 'Yeni Çekim Yap' : 'Draw Again',
+                                        () {
+                                          HapticFeedback.lightImpact();
+                                          _setStateSafe(() {
+                                            _state = RitualState.idle;
+                                            _latestReading = null;
+                                            _latestFullReading = null;
+                                            _selectedCardIndexes.clear();
+                                            _selectedTablePositions.clear();
+                                            _revealedCount = 0;
+                                          });
+                                        },
+                                      ),
+                                    ).animate()
+                                      .fadeIn(duration: 800.ms, delay: 5000.ms)
+                                      .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 5000.ms, curve: Curves.easeOut),
+                                    const SizedBox(height: 60), // En alt boşluk
+                                  ],
                                 ),
-                              ).animate()
-                                .fadeIn(duration: 800.ms, delay: 5000.ms)
-                                .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: 5000.ms, curve: Curves.easeOut),
-                              const SizedBox(height: 60), // En alt boşluk
+                              ),
                             ],
                           ),
                         ),
@@ -8426,5 +9047,56 @@ class _RadialRingChartPainter extends CustomPainter {
       if (values[i] != old.values[i]) return true;
     }
     return false;
+  }
+}
+
+// ── CUSTOM PAINTER FOR INFOGRAPHIC LINES ──
+class _InfographicLinePainter extends CustomPainter {
+  final List<Map<String, double>> points;
+
+  _InfographicLinePainter(this.points);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint linePaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.45)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final Paint dotPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.85)
+      ..style = PaintingStyle.fill;
+
+    final Paint endDotPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.50)
+      ..style = PaintingStyle.fill;
+
+    for (var p in points) {
+      final startX = p['startX']!;
+      final startY = p['startY']!;
+      final elbowX = p['elbowX']!;
+      final endX   = p['endX']!;
+      final endY   = p['endY']!;
+
+      // Kartın içindeki başlangıç noktasına küçük dot
+      canvas.drawCircle(Offset(startX, startY), 2.5, dotPaint);
+
+      // Segment 1: İçeriden dışarıdaki dirseğe diagonal
+      // Segment 2: Dirsekten dışarıya yatay çizgi
+      final path = Path()
+        ..moveTo(startX, startY)
+        ..lineTo(elbowX, endY)    // diagonal → kart dışı dirsek
+        ..lineTo(endX, endY);     // yatay → label'a
+
+      canvas.drawPath(path, linePaint);
+
+      // Uç noktada küçük dot
+      canvas.drawCircle(Offset(endX, endY), 1.5, endDotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _InfographicLinePainter oldDelegate) {
+    return oldDelegate.points != points;
   }
 }
