@@ -323,6 +323,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // Full Arcana card carousel
   PageController? _fullCardPageCtrl;
   int _fullCardPageIndex = 0;
+  AnimationController? _infoRevealCtrl;
 
   // share
   final GlobalKey _shareKey = GlobalKey();
@@ -440,6 +441,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     for (final c in _slotGlowControllers) c.dispose();
     _cardFlipPlayer.dispose();
     _fullCardPageCtrl?.dispose();
+    _infoRevealCtrl?.dispose();
     super.dispose();
   }
 
@@ -1696,25 +1698,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 10),
             ..._harmonyScoreLevels(),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: TextButton.styleFrom(
-                  backgroundColor: gold.withValues(alpha: 0.1),
-                  foregroundColor: gold,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: gold.withValues(alpha: 0.15)),
-                  ),
-                ),
-                child: Text(_isTr ? 'Anladım' : 'Got it',
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -3433,6 +3417,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     // PageController'ı lazy init
     _fullCardPageCtrl ??= PageController(viewportFraction: 1.0);
 
+    // İnfografik açılış animasyonu
+    if (_infoRevealCtrl == null) {
+      _infoRevealCtrl = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 2800),
+      )..forward();
+    }
+
     // Her pozisyon için benzersiz renk ve ikon
     final positionColors = [
       const Color(0xFF4A9FE5), // Geçmiş — mavi
@@ -3474,17 +3466,23 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         const SizedBox(height: 2),
         // Carousel — tam ekran genişliğinde (parent padding yok)
         SizedBox(
-          height: 380,
+          height: 390,
           child: PageView.builder(
             controller: _fullCardPageCtrl,
             itemCount: 7,
-            onPageChanged: (i) => _setStateSafe(() => _fullCardPageIndex = i),
+            onPageChanged: (i) {
+              _setStateSafe(() => _fullCardPageIndex = i);
+              _infoRevealCtrl?.forward(from: 0.0);
+            },
             itemBuilder: (context, pageIndex) {
               final cardAsset = _allCards[_selectedCardIndexes[pageIndex]].frontAsset;
               final cardId = _selectedCardIndexes[pageIndex];
               final symbols = getCardSymbols(cardId);
               final symbolCount = getSymbolCountForPosition(pageIndex, symbols.length);
               final selectedSymbols = symbols.take(symbolCount).toList();
+              final isActivePage = pageIndex == _fullCardPageIndex;
+              // Her oturumda aynı kart için tutarlı ama her oturumda farklı anlamlar
+              final symbolRng = Random(cardId * 1000 + DateTime.now().day * 31 + DateTime.now().hour);
 
               const cardW = 155.0;
               const cardH = 240.0;
@@ -3567,7 +3565,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       labelWidgets.add(Positioned(
                         left: 0, top: labelY,
                         width: leftEndX - 4,
-                        child: Column(
+                        child: AnimatedBuilder(
+                          animation: _infoRevealCtrl!,
+                          builder: (context, _) {
+                            if (!isActivePage) return const SizedBox.shrink();
+                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
+                            final labelOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+                            return Opacity(
+                              opacity: labelOpacity,
+                              child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -3584,7 +3590,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                             ),
                             Text(
-                              _isTr ? s.meaningTr : s.meaningEn,
+                              _isTr ? s.meaningTr(symbolRng) : s.meaningEn(symbolRng),
                               textAlign: TextAlign.right,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -3597,6 +3603,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                             ),
                           ],
+                        ),
+                            );
+                          },
                         ),
                       ));
                     }
@@ -3621,7 +3630,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       });
                       labelWidgets.add(Positioned(
                         left: rightEndX + 4, top: labelY, right: 0,
-                        child: Column(
+                        child: AnimatedBuilder(
+                          animation: _infoRevealCtrl!,
+                          builder: (context, _) {
+                            if (!isActivePage) return const SizedBox.shrink();
+                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
+                            final labelOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+                            return Opacity(
+                              opacity: labelOpacity,
+                              child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -3638,7 +3655,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                             ),
                             Text(
-                              _isTr ? s.meaningTr : s.meaningEn,
+                              _isTr ? s.meaningTr(symbolRng) : s.meaningEn(symbolRng),
                               textAlign: TextAlign.left,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -3651,6 +3668,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                             ),
                           ],
+                        ),
+                            );
+                          },
                         ),
                       ));
                     }
@@ -3726,45 +3746,81 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              // ── İNFOGRAFİK ÇİZGİLER ──
+                              // ── İNFOGRAFİK ÇİZGİLER (animasyonlu) ──
                               Positioned.fill(
                                 child: IgnorePointer(
-                                  child: CustomPaint(
-                                    painter: _InfographicLinePainter(linePoints),
+                                  child: AnimatedBuilder(
+                                    animation: _infoRevealCtrl!,
+                                    builder: (context, child) {
+                                      if (!isActivePage) return const SizedBox.shrink();
+                                      // 0.0-0.6 arası çizgiler büyür
+                                      final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
+                                      final lineProgress = (t / 0.5).clamp(0.0, 1.0);
+                                      return Opacity(
+                                        opacity: lineProgress,
+                                        child: CustomPaint(
+                                          painter: _InfographicLinePainter(linePoints, progress: lineProgress),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
-                              // ── SEMBOL ETİKETLERİ ──
+                              // ── SEMBOL ETİKETLERİ (animasyonlu) ──
                               ...labelWidgets,
                             ],
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // ── KART İSMİ ──
-                        Text(
-                          reading.cardReadings[pageIndex].cardName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                          textAlign: TextAlign.center,
+                        // ── KART İSMİ (animasyonlu) ──
+                        AnimatedBuilder(
+                          animation: _infoRevealCtrl!,
+                          builder: (context, _) {
+                            if (!isActivePage) return const SizedBox.shrink();
+                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
+                            final nameOpacity = ((t - 0.5) / 0.5).clamp(0.0, 1.0);
+                            return Opacity(
+                              opacity: nameOpacity,
+                              child: Text(
+                                reading.cardReadings[pageIndex].cardName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 8),
-                        // ── ETKİLİ YORUM ──
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: Text(
-                            reading.cardReadings[pageIndex].content,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontSize: 13.5,
-                              height: 1.5,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                        // ── ETKİLİ YORUM (animasyonlu) ──
+                        AnimatedBuilder(
+                          animation: _infoRevealCtrl!,
+                          builder: (context, _) {
+                            if (!isActivePage) return const SizedBox.shrink();
+                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
+                            final contentOpacity = ((t - 0.6) / 0.4).clamp(0.0, 1.0);
+                            return Opacity(
+                              opacity: contentOpacity,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Text(
+                                  reading.cardReadings[pageIndex].content,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.75),
+                                    fontSize: 13.5,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
 
                       ],
@@ -3781,7 +3837,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(7, (i) {
             final isActive = i == _fullCardPageIndex;
-            final color = positionColors[i];
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -3789,20 +3844,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               height: 10,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                // Glass effect: transparan gövde
-                color: isActive ? color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.05),
-                // İnce cam çerçeve
+                color: isActive ? Colors.white.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.08),
                 border: Border.all(
-                  color: isActive ? color.withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.25),
+                  color: isActive ? Colors.white.withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.2),
                   width: 1,
                 ),
-                boxShadow: isActive ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.5),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                ] : null,
               ),
             );
           }),
@@ -9138,22 +9184,23 @@ class _RadialRingChartPainter extends CustomPainter {
 // ── CUSTOM PAINTER FOR INFOGRAPHIC LINES ──
 class _InfographicLinePainter extends CustomPainter {
   final List<Map<String, double>> points;
+  final double progress;
 
-  _InfographicLinePainter(this.points);
+  _InfographicLinePainter(this.points, {this.progress = 1.0});
 
   @override
   void paint(Canvas canvas, Size size) {
     final Paint linePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.45)
+      ..color = Colors.white.withValues(alpha: 0.45 * progress)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
     final Paint dotPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.85)
+      ..color = Colors.white.withValues(alpha: 0.85 * progress)
       ..style = PaintingStyle.fill;
 
     final Paint endDotPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.50)
+      ..color = Colors.white.withValues(alpha: 0.50 * progress)
       ..style = PaintingStyle.fill;
 
     for (var p in points) {
@@ -9164,24 +9211,35 @@ class _InfographicLinePainter extends CustomPainter {
       final endY   = p['endY']!;
 
       // Kartın içindeki başlangıç noktasına küçük dot
-      canvas.drawCircle(Offset(startX, startY), 2.5, dotPaint);
+      canvas.drawCircle(Offset(startX, startY), 2.5 * progress, dotPaint);
 
-      // Segment 1: İçeriden dışarıdaki dirseğe diagonal
-      // Segment 2: Dirsekten dışarıya yatay çizgi
-      final path = Path()
+      // Tam path
+      final fullPath = Path()
         ..moveTo(startX, startY)
-        ..lineTo(elbowX, endY)    // diagonal → kart dışı dirsek
-        ..lineTo(endX, endY);     // yatay → label'a
+        ..lineTo(elbowX, endY)
+        ..lineTo(endX, endY);
 
-      canvas.drawPath(path, linePaint);
+      // Progress'e göre path'in bir kısmını çiz
+      final metrics = fullPath.computeMetrics();
+      for (final metric in metrics) {
+        final drawLength = metric.length * progress;
+        final partialPath = metric.extractPath(0, drawLength);
+        canvas.drawPath(partialPath, linePaint);
+      }
 
-      // Uç noktada küçük dot
-      canvas.drawCircle(Offset(endX, endY), 1.5, endDotPaint);
+      // Uç noktada küçük dot (sadece progress tam olduğunda)
+      if (progress > 0.8) {
+        final endDotOpacity = ((progress - 0.8) / 0.2).clamp(0.0, 1.0);
+        final endDot = Paint()
+          ..color = Colors.white.withValues(alpha: 0.50 * endDotOpacity)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(endX, endY), 1.5, endDot);
+      }
     }
   }
 
   @override
   bool shouldRepaint(covariant _InfographicLinePainter oldDelegate) {
-    return oldDelegate.points != points;
+    return oldDelegate.points != points || oldDelegate.progress != progress;
   }
 }
