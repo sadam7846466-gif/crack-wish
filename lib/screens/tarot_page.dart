@@ -3431,7 +3431,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     final reading = _latestFullReading!;
 
     // PageController'ı lazy init
-    _fullCardPageCtrl ??= PageController(viewportFraction: 0.92);
+    _fullCardPageCtrl ??= PageController(viewportFraction: 1.0);
 
     // Her pozisyon için benzersiz renk ve ikon
     final positionColors = [
@@ -3471,10 +3471,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 2),
         // Carousel — tam ekran genişliğinde (parent padding yok)
         SizedBox(
-          height: 410,
+          height: 380,
           child: PageView.builder(
             controller: _fullCardPageCtrl,
             itemCount: 7,
@@ -3490,10 +3490,29 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               const cardH = 240.0;
               const cardTop = 15.0;
 
+              // ── KOORDINAT DÖNÜŞÜM (640x640 → 155x240) ──
+              // All card images are 640x640 (square).
+              // BoxFit.cover renders at 240x240 (match height), then
+              // crops (240-155)/2 = 42.5px from each side horizontally.
+              // Transform.scale(1.12) then zooms 12% from center.
+              const imgRenderedW = 240.0; // square image → rendered width = height
+              const cropX = (imgRenderedW - cardW) / 2; // 42.5
+              const scale = 1.12;
+
               return LayoutBuilder(
                 builder: (context, constraints) {
                   final stackW = constraints.maxWidth;
                   final cardLeft = (stackW - cardW) / 2;
+
+                  // Convert original image coord (0-1) to widget pixel offset
+                  double anchorPxX(double ax) {
+                    final covered = ax * imgRenderedW - cropX;
+                    return cardLeft + cardW / 2 + (covered - cardW / 2) * scale;
+                  }
+                  double anchorPxY(double ay) {
+                    final covered = ay * cardH;
+                    return cardTop + cardH / 2 + (covered - cardH / 2) * scale;
+                  }
 
                   // ── SOL / SAĞ SEMBOL DAĞILIMI ──
                   final leftSymbols = <CardSymbol>[];
@@ -3525,8 +3544,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   // ── ÇİZGİ + ETİKET HESAPLAMA ──
                   final linePoints = <Map<String, double>>[];
                   final labelWidgets = <Widget>[];
-                  const labelH = 20.0;
-                  const labelGap = 8.0;
+                  const labelH = 38.0;
+                  const labelGap = 4.0;
 
                   // Sol taraf etiketler
                   if (leftSymbols.isNotEmpty) {
@@ -3535,8 +3554,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     final baseY = cardTop + (cardH - totalH) / 2;
                     for (int i = 0; i < leftSymbols.length; i++) {
                       final s = leftSymbols[i];
-                      final startX = cardLeft + s.anchorX * cardW;
-                      final startY = cardTop + s.anchorY * cardH;
+                      final startX = anchorPxX(s.anchorX);
+                      final startY = anchorPxY(s.anchorY);
                       final labelY = baseY + i * (labelH + labelGap);
                       final lineY = labelY + labelH / 2;
                       final leftEndX = cardLeft - 35;
@@ -3548,17 +3567,36 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       labelWidgets.add(Positioned(
                         left: 0, top: labelY,
                         width: leftEndX - 4,
-                        child: Text(
-                          '${s.emoji} ${_isTr ? s.nameTr : s.nameEn}',
-                          textAlign: TextAlign.right,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.2,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _isTr ? s.nameTr : s.nameEn,
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            Text(
+                              _isTr ? s.meaningTr : s.meaningEn,
+                              textAlign: TextAlign.right,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: const Color(0xFFE9C46A).withValues(alpha: 0.7),
+                                fontSize: 8,
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.italic,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ));
                     }
@@ -3571,8 +3609,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     final baseY = cardTop + (cardH - totalH) / 2;
                     for (int i = 0; i < rightSymbols.length; i++) {
                       final s = rightSymbols[i];
-                      final startX = cardLeft + s.anchorX * cardW;
-                      final startY = cardTop + s.anchorY * cardH;
+                      final startX = anchorPxX(s.anchorX);
+                      final startY = anchorPxY(s.anchorY);
                       final labelY = baseY + i * (labelH + labelGap);
                       final lineY = labelY + labelH / 2;
                       final rightEndX = cardLeft + cardW + 35;
@@ -3583,17 +3621,36 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       });
                       labelWidgets.add(Positioned(
                         left: rightEndX + 4, top: labelY, right: 0,
-                        child: Text(
-                          '${s.emoji} ${_isTr ? s.nameTr : s.nameEn}',
-                          textAlign: TextAlign.left,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.2,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _isTr ? s.nameTr : s.nameEn,
+                              textAlign: TextAlign.left,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            Text(
+                              _isTr ? s.meaningTr : s.meaningEn,
+                              textAlign: TextAlign.left,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: const Color(0xFFE9C46A).withValues(alpha: 0.7),
+                                fontSize: 8,
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.italic,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ));
                     }
@@ -3632,12 +3689,37 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(14),
                                       clipBehavior: Clip.hardEdge,
-                                      child: SizedBox(
-                                        width: cardW,
-                                        height: cardH,
-                                        child: Transform.scale(
-                                          scale: 1.12,
-                                          child: Image.asset(cardAsset, fit: BoxFit.cover),
+                                      child: GestureDetector(
+                                        onTapUp: (details) {
+                                          final dx = details.localPosition.dx;
+                                          final dy = details.localPosition.dy;
+                                          final scaleX = (dx - cardW / 2) / scale + cardW / 2;
+                                          final scaleY = (dy - cardH / 2) / scale + cardH / 2;
+                                          final coveredX = scaleX + cropX;
+                                          final coveredY = scaleY;
+                                          final ax = coveredX / imgRenderedW;
+                                          final ay = coveredY / cardH;
+                                          
+                                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Card $cardId Koordinat: [${ax.toStringAsFixed(2)}, ${ay.toStringAsFixed(2)}]',
+                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                                              ),
+                                              backgroundColor: Colors.blueAccent.withValues(alpha: 0.9),
+                                              duration: const Duration(seconds: 4),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
+                                        },
+                                        child: SizedBox(
+                                          width: cardW,
+                                          height: cardH,
+                                          child: Transform.scale(
+                                            scale: 1.12,
+                                            child: Image.asset(cardAsset, fit: BoxFit.cover),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -3646,8 +3728,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                               // ── İNFOGRAFİK ÇİZGİLER ──
                               Positioned.fill(
-                                child: CustomPaint(
-                                  painter: _InfographicLinePainter(linePoints),
+                                child: IgnorePointer(
+                                  child: CustomPaint(
+                                    painter: _InfographicLinePainter(linePoints),
+                                  ),
                                 ),
                               ),
                               // ── SEMBOL ETİKETLERİ ──
@@ -3682,6 +3766,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
+
                       ],
                     ),
                   );
