@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'swipe_back_wrapper.dart';
 
 /// Premium Fade + Slide Up geçiş animasyonu
 /// Sayfa hafifçe yukarı kayarak belirir, geri dönerken aşağı kayarak solar
@@ -36,47 +36,58 @@ class FadePageRoute<T> extends PageRouteBuilder<T> {
       );
 }
 
-/// Instagram tarzı sağa kaydırarak kapatma + fade efekti
-class SwipeFadePageRoute<T> extends CupertinoPageRoute<T> {
+/// Instagram/X tarzı sağa kaydırarak kapatma + slide right geçişi
+/// 
+/// Özellikler:
+/// - Açılırken SAĞDAN SOLA kayarak gelir
+/// - HER YERDEN sağa kaydırarak geri dönülebilir
+/// - Hızlı fırlatma desteği
+/// - Kayarken köşeler yuvarlanır + hafif fade
+class SwipeFadePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
 
   SwipeFadePageRoute({required this.page})
-      : super(builder: (_) => page);
+      : super(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              SwipeBackWrapper(child: page),
+          transitionDuration: const Duration(milliseconds: 350),
+          reverseTransitionDuration: const Duration(milliseconds: 250),
+          opaque: false,  // Alttaki sayfa görünsün (swipe sırasında)
+          barrierColor: null,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Açılma: sağdan slide + fade
+            final curvedAnimation = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+              reverseCurve: Curves.easeInCubic,
+            );
+
+            final slideAnimation = Tween<Offset>(
+              begin: const Offset(1.0, 0.0), // Sağdan gelir
+              end: Offset.zero,
+            ).animate(curvedAnimation);
+
+            final fadeAnimation = Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+            ));
+
+            return SlideTransition(
+              position: slideAnimation,
+              child: FadeTransition(
+                opacity: fadeAnimation,
+                child: child,
+              ),
+            );
+          },
+        );
 
   @override
-  bool get popGestureEnabled => true;
+  bool get popGestureEnabled => false; // Kendi swipe wrapper'ımız var
 
   @override
   bool get maintainState => true;
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 350);
-
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    // Cupertino'nun doğal slide + parallax geçişi
-    final cupertinoChild = super.buildTransitions(
-      context, animation, secondaryAnimation, child,
-    );
-
-    // Kaydırırken fade-out efekti: sayfa kayarken aynı anda solar
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, _) {
-        // animation.value: 1.0 = tam görünür, 0.0 = tamamen kaybolmuş
-        // Fade biraz daha hızlı olsun (0.3'ten sonra tamamen şeffaf)
-        final opacity = animation.value.clamp(0.0, 1.0);
-        return Opacity(
-          opacity: opacity,
-          child: cupertinoChild,
-        );
-      },
-    );
-  }
 }
-

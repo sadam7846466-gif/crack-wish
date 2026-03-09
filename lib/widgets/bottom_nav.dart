@@ -22,61 +22,66 @@ class BottomNav extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding + 8, left: 16, right: 16),
-      child: Container(
-        height: 64,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E).withOpacity(0.85),
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.18),
-            width: 0.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(tabs.length, (i) {
-            final selected = i == currentIndex;
-            const activeColor = Color(0xFFC09498);
-            return Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onTap(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        tabs[i].icon,
-                        size: 22,
-                        color: selected
-                            ? activeColor
-                            : AppColors.textWhite50,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        tabs[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight:
-                              selected ? FontWeight.w700 : FontWeight.w500,
-                          color: selected
-                              ? activeColor
-                              : AppColors.textWhite50,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.25),
+                width: 0.5,
               ),
-            );
-          }),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(tabs.length, (i) {
+                final selected = i == currentIndex;
+                const activeColor = Color(0xFFC09498);
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onTap(i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            tabs[i].icon,
+                            size: 22,
+                            color: selected
+                                ? activeColor
+                                : AppColors.textWhite50,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tabs[i].label,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight:
+                                  selected ? FontWeight.w700 : FontWeight.w500,
+                              color: selected
+                                  ? activeColor
+                                  : AppColors.textWhite50,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
         ),
       ),
     );
-
   }
 }
 
