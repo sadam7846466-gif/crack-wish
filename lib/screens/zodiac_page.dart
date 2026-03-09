@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:ui';
 import 'dart:math' as math;
 import '../widgets/glass_back_button.dart';
@@ -17,6 +18,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   late AnimationController _pulse;
   int _selectedIndex = 0; // Varsayılan: Koç
   String? _userName;
+  DateTime _birthDate = DateTime(2000, 1, 1);
 
   static const Color _gold = Color(0xFFFFD060);
   static const Color _goldL = Color(0xFFFFE8A1);
@@ -241,6 +243,115 @@ class _ZodiacPageState extends State<ZodiacPage>
     }
   }
 
+  /// Doğum tarihinden burç indeksini hesapla
+  int _signIndexFromDate(DateTime d) {
+    final m = d.month, day = d.day;
+    if ((m == 3 && day >= 21) || (m == 4 && day <= 19)) return 0;  // Koç
+    if ((m == 4 && day >= 20) || (m == 5 && day <= 20)) return 1;  // Boğa
+    if ((m == 5 && day >= 21) || (m == 6 && day <= 20)) return 2;  // İkizler
+    if ((m == 6 && day >= 21) || (m == 7 && day <= 22)) return 3;  // Yengeç
+    if ((m == 7 && day >= 23) || (m == 8 && day <= 22)) return 4;  // Aslan
+    if ((m == 8 && day >= 23) || (m == 9 && day <= 22)) return 5;  // Başak
+    if ((m == 9 && day >= 23) || (m == 10 && day <= 22)) return 6; // Terazi
+    if ((m == 10 && day >= 23) || (m == 11 && day <= 21)) return 7; // Akrep
+    if ((m == 11 && day >= 22) || (m == 12 && day <= 21)) return 8; // Yay
+    if ((m == 12 && day >= 22) || (m == 1 && day <= 19)) return 9; // Oğlak
+    if ((m == 1 && day >= 20) || (m == 2 && day <= 18)) return 10; // Kova
+    return 11; // Balık
+  }
+
+  void _showDatePicker() {
+    DateTime tempDate = _birthDate;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        height: 360,
+        decoration: BoxDecoration(
+          color: const Color(0xFF141814),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border(top: BorderSide(color: _gold.withOpacity(0.15), width: 0.5)),
+          boxShadow: [BoxShadow(color: _gold.withOpacity(0.05), blurRadius: 30, offset: const Offset(0, -8))],
+        ),
+        child: Column(children: [
+          // Üst tutma çubuğu
+          const SizedBox(height: 10),
+          Container(width: 40, height: 3.5, decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            gradient: LinearGradient(colors: [_gold.withOpacity(0.3), _gold.withOpacity(0.1)]),
+          )),
+          const SizedBox(height: 16),
+          // Başlık satırı
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _gold.withOpacity(0.08),
+                ),
+                child: Icon(Icons.auto_awesome, color: _gold.withOpacity(0.6), size: 18),
+              ),
+              const SizedBox(width: 12),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(colors: [_goldL, _gold]).createShader(b),
+                  child: const Text('Doğum Tarihi', style: TextStyle(
+                    color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                ),
+                const SizedBox(height: 2),
+                Text('Burcunuzu keşfedin', style: TextStyle(
+                  color: Colors.white.withOpacity(0.3), fontSize: 12)),
+              ]),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _birthDate = tempDate;
+                    _selectedIndex = _signIndexFromDate(tempDate);
+                  });
+                  StorageService.setZodiacSign(_signs[_selectedIndex]['name'] as String);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(colors: [_gold.withOpacity(0.15), _gold.withOpacity(0.05)]),
+                    border: Border.all(color: _gold.withOpacity(0.2), width: 0.5),
+                  ),
+                  child: ShaderMask(
+                    shaderCallback: (b) => const LinearGradient(colors: [_goldL, _gold]).createShader(b),
+                    child: const Text('Tamam', style: TextStyle(
+                      color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(height: 0.5, color: _gold.withOpacity(0.08)),
+          ),
+          // Date Picker
+          Expanded(child: CupertinoTheme(
+            data: const CupertinoThemeData(brightness: Brightness.dark),
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: _birthDate,
+              minimumDate: DateTime(1940),
+              maximumDate: DateTime.now(),
+              onDateTimeChanged: (d) => tempDate = d,
+            ),
+          )),
+        ]),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _pulse.dispose();
@@ -297,40 +408,40 @@ class _ZodiacPageState extends State<ZodiacPage>
         SafeArea(bottom: false, child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [SliverToBoxAdapter(child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // ── ÜST BAR ──
               Row(children: [
                 const GlassBackButton(),
               ]),
-              const SizedBox(height: 12),
+              const SizedBox(height: 0),
 
               // ── 🔶 DÖNEN ELMAS ÇERÇEVESİ ──
-              _fadeIn(100, Center(child: SizedBox(
-                width: 280, height: 310,
+              Transform.translate(offset: const Offset(0, -20), child: _fadeIn(100, Center(child: SizedBox(
+                width: 310, height: 340,
                 child: Stack(alignment: Alignment.center, children: [
                   // Dış parıltı
                   Transform.rotate(angle: math.pi / 4,
-                    child: Container(width: 190, height: 190, decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(22),
+                    child: Container(width: 220, height: 220, decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [BoxShadow(color: _gold.withOpacity(0.08), blurRadius: 30, spreadRadius: 8)],
                     )),
                   ),
                   // Dış elmas çerçeve
                   Transform.rotate(angle: math.pi / 4,
-                    child: Container(width: 185, height: 185, decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                    child: Container(width: 215, height: 215, decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: _gold.withOpacity(0.15), width: 0.8),
                     )),
                   ),
                   // İç elmas — illüstrasyon
                   Transform.rotate(angle: math.pi / 4,
-                    child: Container(width: 168, height: 168, decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                    child: Container(width: 200, height: 200, decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: _gold.withOpacity(0.35), width: 1.5),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14.5),
+                      borderRadius: BorderRadius.circular(16.5),
                       child: Transform.rotate(angle: -math.pi / 4,
                         child: Transform.scale(scale: 1.45,
                           child: Image.asset(s['image'] as String, fit: BoxFit.cover)),
@@ -340,10 +451,10 @@ class _ZodiacPageState extends State<ZodiacPage>
                   // Köşe parıltı noktaları (4 köşe)
                   ...List.generate(4, (i) {
                     final angle = i * math.pi / 2 - math.pi / 2;
-                    const dist = 95.0;
+                    const dist = 112.0;
                     return Positioned(
-                      left: 140 + math.cos(angle) * dist - 4,
-                      top: 130 + math.sin(angle) * dist - 4,
+                      left: 155 + math.cos(angle) * dist - 4,
+                      top: 145 + math.sin(angle) * dist - 4,
                       child: Container(width: 8, height: 8, decoration: BoxDecoration(
                         shape: BoxShape.circle, color: _gold.withOpacity(0.6),
                         boxShadow: [BoxShadow(color: _gold.withOpacity(0.3), blurRadius: 8)],
@@ -352,12 +463,6 @@ class _ZodiacPageState extends State<ZodiacPage>
                   }),
                   // İsim — altta
                   Positioned(bottom: 0, child: Column(children: [
-                    ShaderMask(
-                      shaderCallback: (b) => const LinearGradient(colors: [_goldL, _gold]).createShader(b),
-                      child: Text(s['name'] as String, style: const TextStyle(
-                        color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: 3)),
-                    ),
-                    const SizedBox(height: 3),
                     Text(s['nameEn'] as String, style: TextStyle(
                       color: Colors.white.withOpacity(0.3), fontSize: 12, letterSpacing: 4)),
                     const SizedBox(height: 2),
@@ -365,17 +470,49 @@ class _ZodiacPageState extends State<ZodiacPage>
                       color: _gold.withOpacity(0.5), fontSize: 11, letterSpacing: 1)),
                   ])),
                 ]),
+              )))),
+
+              const SizedBox(height: 16),
+
+              // ── ✨ TARİH SEÇİCİ ──
+              _fadeIn(250, Center(child: GestureDetector(
+                onTap: _showDatePicker,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(colors: [
+                      _gold.withOpacity(0.03), _gold.withOpacity(0.06), _gold.withOpacity(0.03),
+                    ]),
+                    border: Border.all(color: _gold.withOpacity(0.15), width: 0.5),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text('✦', style: TextStyle(color: _gold.withOpacity(0.3), fontSize: 7)),
+                    const SizedBox(width: 8),
+                    _dateChip(_birthDate.day.toString().padLeft(2, '0')),
+                    _dateSep(),
+                    _dateChip(_birthDate.month.toString().padLeft(2, '0')),
+                    _dateSep(),
+                    _dateChip(_birthDate.year.toString()),
+                    const SizedBox(width: 8),
+                    Text('✦', style: TextStyle(color: _gold.withOpacity(0.3), fontSize: 7)),
+                  ]),
+                ),
               ))),
 
               const SizedBox(height: 30),
 
               // ── ELEMENT / GEZEGEN / NİTELİK ──
               _fadeIn(400, Row(children: [
-                Expanded(child: _infoBadge(s['elementEmoji'] as String, 'Element', s['element'] as String)),
-                const SizedBox(width: 10),
-                Expanded(child: _infoBadge(s['planetEmoji'] as String, 'Gezegen', s['planet'] as String)),
-                const SizedBox(width: 10),
-                Expanded(child: _infoBadge(s['qualityEmoji'] as String, 'Nitelik', s['quality'] as String)),
+                Expanded(child: _cosmicAttribute(
+                  _ElementSymbolPainter(element: s['element'] as String, color: _gold),
+                  'Element', s['element'] as String)),
+                Expanded(child: _cosmicAttribute(
+                  _PlanetSymbolPainter(planet: s['planet'] as String, color: _gold),
+                  'Gezegen', s['planet'] as String)),
+                Expanded(child: _cosmicAttribute(
+                  _QualitySymbolPainter(quality: s['quality'] as String, color: _gold),
+                  'Modalite', s['quality'] as String)),
               ])),
 
               const SizedBox(height: 28),
@@ -445,6 +582,24 @@ class _ZodiacPageState extends State<ZodiacPage>
   // ═══════════════════════════════════════════
 
 
+  Widget _dateChip(String text) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(6),
+      color: _gold.withOpacity(0.03),
+    ),
+    child: Text(text, style: TextStyle(
+      color: _gold.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.5,
+    )),
+  );
+
+  Widget _dateSep() => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 4),
+    child: Container(width: 2.5, height: 2.5, decoration: BoxDecoration(
+      shape: BoxShape.circle, color: _gold.withOpacity(0.25),
+    )),
+  );
+
   Widget _fadeIn(int delayMs, Widget child) => _FadeSlideIn(delay: Duration(milliseconds: delayMs), child: child);
 
   Widget _topBadge(String symbol, String name) => Container(
@@ -460,19 +615,14 @@ class _ZodiacPageState extends State<ZodiacPage>
     ]),
   );
 
-  Widget _infoBadge(String emoji, String label, String value) => Container(
-    padding: const EdgeInsets.symmetric(vertical: 18),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: _gold.withOpacity(0.12)),
-    ),
-    child: Column(children: [
-      Text(emoji, style: const TextStyle(fontSize: 24)),
+  Widget _cosmicAttribute(CustomPainter painter, String label, String value) => Column(
+    children: [
+      SizedBox(width: 36, height: 36, child: CustomPaint(painter: painter)),
       const SizedBox(height: 8),
-      Text(label, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w500)),
-      const SizedBox(height: 4),
-      Text(value, style: TextStyle(color: _gold, fontSize: 15, fontWeight: FontWeight.w700)),
-    ]),
+      Text(label, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.w400, letterSpacing: 1.5)),
+      const SizedBox(height: 3),
+      Text(value, style: TextStyle(color: _gold.withOpacity(0.85), fontSize: 14, fontWeight: FontWeight.w600)),
+    ],
   );
 
   Widget _glassCard({required Widget child}) => Container(
@@ -815,4 +965,278 @@ class _MandalaPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Element sembol çizici (Organik) ──
+class _ElementSymbolPainter extends CustomPainter {
+  final String element;
+  final Color color;
+  _ElementSymbolPainter({required this.element, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2, cy = size.height / 2;
+    final pen = Paint()
+      ..color = color.withOpacity(0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.3
+      ..strokeCap = StrokeCap.round;
+    final dotP = Paint()..color = color.withOpacity(0.4);
+
+    switch (element) {
+      case 'Ateş':
+        // Klasik stilize alev ikonu (referans görseldeki gibi)
+        // Ana alev gövdesi (S eğrili, yukarı uzanan)
+        final flame = Path();
+        flame.moveTo(cx + 2, cy + 14);
+        flame.cubicTo(cx - 8, cy + 10, cx - 12, cy + 2, cx - 8, cy - 4);
+        flame.cubicTo(cx - 5, cy - 8, cx - 2, cy - 6, cx - 3, cy - 2);
+        flame.cubicTo(cx - 5, cy + 2, cx - 4, cy + 4, cx, cy + 2);
+        flame.cubicTo(cx + 6, cy - 2, cx + 2, cy - 10, cx, cy - 16);
+        flame.cubicTo(cx + 8, cy - 10, cx + 14, cy, cx + 10, cy + 8);
+        flame.cubicTo(cx + 8, cy + 12, cx + 6, cy + 14, cx + 2, cy + 14);
+        canvas.drawPath(flame, pen);
+
+        // İç alev dili (ters S, daha soluk)
+        final inner = Path();
+        inner.moveTo(cx + 1, cy + 12);
+        inner.cubicTo(cx - 4, cy + 10, cx - 6, cy + 4, cx - 3, cy);
+        inner.cubicTo(cx, cy - 4, cx + 2, cy - 2, cx + 1, cy + 2);
+        canvas.drawPath(inner, pen..color = color.withOpacity(0.4));
+
+        // Sağ iç alev (küçük ikinci dil)
+        final r = Path();
+        r.moveTo(cx + 3, cy + 12);
+        r.cubicTo(cx + 8, cy + 8, cx + 8, cy + 2, cx + 4, cy - 4);
+        r.cubicTo(cx + 6, cy, cx + 6, cy + 4, cx + 4, cy + 8);
+        canvas.drawPath(r, pen..color = color.withOpacity(0.35));
+        break;
+      case 'Toprak':
+        // Minimalist ağaç — ince gövde + yuvarlak taç
+        // Gövde
+        canvas.drawLine(Offset(cx, cy + 14), Offset(cx, cy), pen);
+        // Taç (daire)
+        canvas.drawCircle(Offset(cx, cy - 6), 10, pen);
+        // İç dallanma
+        canvas.drawLine(Offset(cx, cy), Offset(cx - 4, cy - 6), pen..color = color.withOpacity(0.3));
+        canvas.drawLine(Offset(cx, cy), Offset(cx + 3, cy - 8), pen..color = color.withOpacity(0.3));
+        // Kök çizgileri
+        canvas.drawLine(Offset(cx, cy + 14), Offset(cx - 5, cy + 16), pen..color = color.withOpacity(0.2));
+        canvas.drawLine(Offset(cx, cy + 14), Offset(cx + 4, cy + 16), pen..color = color.withOpacity(0.2));
+        // Zemin
+        canvas.drawLine(Offset(cx - 8, cy + 14), Offset(cx + 8, cy + 14), pen..color = color.withOpacity(0.15));
+        break;
+      case 'Hava':
+        // Kıvrımlı rüzgar girdapları (Referans görseldeki hava akımları)
+        final w1 = Path();
+        // Üst uzun rüzgar (spiral dönüşlü)
+        w1.moveTo(cx - 14, cy - 4);
+        w1.cubicTo(cx - 6, cy - 4, cx - 4, cy - 12, cx + 4, cy - 12);
+        w1.cubicTo(cx + 12, cy - 12, cx + 12, cy - 2, cx + 6, cy - 2);
+        w1.cubicTo(cx, cy - 2, cx, cy - 8, cx + 5, cy - 8);
+        canvas.drawPath(w1, pen);
+
+        final w2 = Path();
+        // Alt rüzgar (ikinci kıvrım)
+        w2.moveTo(cx - 14, cy + 6);
+        w2.cubicTo(cx - 4, cy + 6, cx - 6, cy + 1, cx, cy + 1);
+        w2.cubicTo(cx + 8, cy + 1, cx + 8, cy + 11, cx + 2, cy + 11);
+        w2.cubicTo(cx - 4, cy + 11, cx - 4, cy + 5, cx + 1, cy + 5);
+        canvas.drawPath(w2, pen..color = color.withOpacity(0.6));
+
+        // Rüzgar akımına kapılan birkaç detay noktası
+        canvas.drawCircle(Offset(cx - 12, cy + 1), 0.8, dotP);
+        canvas.drawCircle(Offset(cx + 10, cy + 4), 1.2, dotP);
+        canvas.drawCircle(Offset(cx - 6, cy - 9), 1.0, dotP);
+        break;
+      case 'Su':
+        // Üç su damlası (büyük merkez, sol üst orta, sağ üst küçük)
+        final fillP = Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.fill;
+        final strokeP = Paint()..color = color.withOpacity(0.7)..style = PaintingStyle.stroke..strokeWidth = 1.0;
+        void drawDrop(double x, double y, double s) {
+          final d = Path();
+          d.moveTo(x, y - 7 * s);
+          d.cubicTo(x + 1.5 * s, y - 3 * s, x + 5 * s, y + 2 * s, x, y + 6 * s);
+          d.cubicTo(x - 5 * s, y + 2 * s, x - 1.5 * s, y - 3 * s, x, y - 7 * s);
+          canvas.drawPath(d, fillP..color = color.withOpacity(0.12 + s * 0.03));
+          canvas.drawPath(d, strokeP..color = color.withOpacity(0.48 + s * 0.06));
+        }
+        drawDrop(cx, cy + 2, 2.0);        // Büyük merkez
+        drawDrop(cx - 9, cy - 6, 1.2);    // Sol üst orta
+        drawDrop(cx + 8, cy - 4, 0.8);    // Sağ üst küçük
+        break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ElementSymbolPainter old) => old.element != element;
+}
+
+// ── Gezegen sembol çizici ──
+class _PlanetSymbolPainter extends CustomPainter {
+  final String planet;
+  final Color color;
+  _PlanetSymbolPainter({required this.planet, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2, cy = size.height / 2;
+    final pen = Paint()
+      ..color = color.withOpacity(0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+    final dotP = Paint()..color = color.withOpacity(0.5);
+
+    switch (planet) {
+      case 'Mars':
+        // Daire + sağ üst ok
+        canvas.drawCircle(Offset(cx - 2, cy + 2), 7, pen);
+        canvas.drawLine(Offset(cx + 3, cy - 3), Offset(cx + 11, cy - 11), pen);
+        canvas.drawLine(Offset(cx + 6, cy - 11), Offset(cx + 11, cy - 11), pen);
+        canvas.drawLine(Offset(cx + 11, cy - 11), Offset(cx + 11, cy - 6), pen);
+        break;
+      case 'Venüs':
+        // Daire + alt haç
+        canvas.drawCircle(Offset(cx, cy - 4), 7, pen);
+        canvas.drawLine(Offset(cx, cy + 3), Offset(cx, cy + 13), pen);
+        canvas.drawLine(Offset(cx - 5, cy + 9), Offset(cx + 5, cy + 9), pen);
+        break;
+      case 'Merkür':
+        // Daire + üst hilal + alt haç
+        canvas.drawCircle(Offset(cx, cy), 6, pen);
+        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy - 8), radius: 5), math.pi * 0.15, math.pi * 0.7, false, pen);
+        canvas.drawLine(Offset(cx, cy + 6), Offset(cx, cy + 13), pen);
+        canvas.drawLine(Offset(cx - 4, cy + 10), Offset(cx + 4, cy + 10), pen);
+        break;
+      case 'Ay':
+        // Hilal
+        final outer = Path()..addOval(Rect.fromCircle(center: Offset(cx, cy), radius: 10));
+        final inner = Path()..addOval(Rect.fromCircle(center: Offset(cx + 6, cy), radius: 9));
+        canvas.drawPath(Path.combine(PathOperation.difference, outer, inner), pen..style = PaintingStyle.fill..color = color.withOpacity(0.15));
+        canvas.drawPath(Path.combine(PathOperation.difference, outer, inner), pen..style = PaintingStyle.stroke..color = color.withOpacity(0.5));
+        break;
+      case 'Güneş':
+        // Daire + merkez nokta + ışınlar
+        canvas.drawCircle(Offset(cx, cy), 7, pen);
+        canvas.drawCircle(Offset(cx, cy), 2, dotP);
+        for (int i = 0; i < 8; i++) {
+          final a = i * math.pi / 4;
+          canvas.drawLine(
+            Offset(cx + math.cos(a) * 9, cy + math.sin(a) * 9),
+            Offset(cx + math.cos(a) * 12, cy + math.sin(a) * 12), pen);
+        }
+        break;
+      case 'Jüpiter':
+        // 2 harfi: yatay çizgi üst, sol dikey, sağda eğri
+        canvas.drawLine(Offset(cx - 4, cy - 6), Offset(cx + 8, cy - 6), pen);
+        canvas.drawLine(Offset(cx + 2, cy - 12), Offset(cx + 2, cy + 10), pen);
+        final arc = Path();
+        arc.moveTo(cx - 8, cy - 2);
+        arc.quadraticBezierTo(cx - 12, cy + 8, cx - 4, cy + 10);
+        canvas.drawPath(arc, pen);
+        break;
+      case 'Satürn':
+        // h harfi: dikey çizgi + eğri kuyruk
+        canvas.drawLine(Offset(cx - 2, cy - 12), Offset(cx - 2, cy + 6), pen);
+        canvas.drawLine(Offset(cx - 6, cy - 9), Offset(cx + 2, cy - 9), pen);
+        final arc = Path();
+        arc.moveTo(cx - 2, cy);
+        arc.quadraticBezierTo(cx + 8, cy - 2, cx + 6, cy + 8);
+        arc.quadraticBezierTo(cx + 4, cy + 14, cx - 4, cy + 12);
+        canvas.drawPath(arc, pen);
+        break;
+      case 'Plüton':
+        // Daire + üst yay + alt haç
+        canvas.drawCircle(Offset(cx, cy - 2), 5, pen);
+        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy - 8), radius: 7), math.pi * 0.15, math.pi * 0.7, false, pen);
+        canvas.drawLine(Offset(cx, cy + 3), Offset(cx, cy + 13), pen);
+        canvas.drawLine(Offset(cx - 5, cy + 9), Offset(cx + 5, cy + 9), pen);
+        break;
+      case 'Uranüs':
+        // Daire + dikey çizgi + üstte yatay anten
+        canvas.drawCircle(Offset(cx, cy + 4), 6, pen);
+        canvas.drawCircle(Offset(cx, cy + 4), 1.5, dotP);
+        canvas.drawLine(Offset(cx, cy - 2), Offset(cx, cy - 14), pen);
+        canvas.drawLine(Offset(cx - 6, cy - 10), Offset(cx + 6, cy - 10), pen);
+        canvas.drawCircle(Offset(cx, cy - 14), 1.8, dotP);
+        break;
+      case 'Neptün':
+        // Trident (üç çatallı yaba)
+        canvas.drawLine(Offset(cx, cy + 12), Offset(cx, cy - 10), pen);
+        canvas.drawLine(Offset(cx - 6, cy + 6), Offset(cx + 6, cy + 6), pen);
+        // Üç çatal
+        canvas.drawLine(Offset(cx - 8, cy - 6), Offset(cx - 8, cy - 12), pen);
+        canvas.drawLine(Offset(cx, cy - 10), Offset(cx, cy - 14), pen);
+        canvas.drawLine(Offset(cx + 8, cy - 6), Offset(cx + 8, cy - 12), pen);
+        // Yay bağlantısı
+        final arc = Path();
+        arc.moveTo(cx - 8, cy - 6);
+        arc.quadraticBezierTo(cx - 4, cy - 2, cx, cy - 10);
+        arc.quadraticBezierTo(cx + 4, cy - 2, cx + 8, cy - 6);
+        canvas.drawPath(arc, pen);
+        // Uç noktaları
+        canvas.drawCircle(Offset(cx - 8, cy - 12), 1.5, dotP);
+        canvas.drawCircle(Offset(cx, cy - 14), 1.5, dotP);
+        canvas.drawCircle(Offset(cx + 8, cy - 12), 1.5, dotP);
+        break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PlanetSymbolPainter old) => old.planet != planet;
+}
+
+// ── Nitelik sembol çizici ──
+class _QualitySymbolPainter extends CustomPainter {
+  final String quality;
+  final Color color;
+  _QualitySymbolPainter({required this.quality, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2, cy = size.height / 2;
+    final pen = Paint()
+      ..color = color.withOpacity(0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    switch (quality) {
+      case 'Öncü': // Kare köşeleri açık — hareket, yön
+        final p = Path();
+        p.moveTo(cx, cy - 12);
+        p.lineTo(cx + 10, cy);
+        p.lineTo(cx, cy + 12);
+        p.lineTo(cx - 10, cy);
+        p.close();
+        canvas.drawPath(p, pen);
+        // İç ok (yukarı)
+        canvas.drawLine(Offset(cx, cy + 5), Offset(cx, cy - 5), pen..color = color.withOpacity(0.4));
+        canvas.drawLine(Offset(cx - 3, cy - 2), Offset(cx, cy - 5), pen);
+        canvas.drawLine(Offset(cx + 3, cy - 2), Offset(cx, cy - 5), pen);
+        break;
+      case 'Sabit': // Kare — stabilite, sağlamlık
+        canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy), width: 20, height: 20), pen);
+        // İç artı
+        canvas.drawLine(Offset(cx - 5, cy), Offset(cx + 5, cy), pen..color = color.withOpacity(0.3));
+        canvas.drawLine(Offset(cx, cy - 5), Offset(cx, cy + 5), pen..color = color.withOpacity(0.3));
+        // Köşe noktaları
+        for (final o in [Offset(cx - 10, cy - 10), Offset(cx + 10, cy - 10), Offset(cx + 10, cy + 10), Offset(cx - 10, cy + 10)]) {
+          canvas.drawCircle(o, 1.5, Paint()..color = color.withOpacity(0.4));
+        }
+        break;
+      case 'Değişken': // Spiral / iki yönlü ok — esneklik
+        // İki yönlü yay
+        canvas.drawArc(Rect.fromCenter(center: Offset(cx, cy - 3), width: 20, height: 16), math.pi, math.pi, false, pen);
+        canvas.drawArc(Rect.fromCenter(center: Offset(cx, cy + 3), width: 20, height: 16), 0, math.pi, false, pen);
+        // Uç noktalarında küçük oklar
+        canvas.drawCircle(Offset(cx - 10, cy - 3), 1.5, Paint()..color = color.withOpacity(0.5));
+        canvas.drawCircle(Offset(cx + 10, cy + 3), 1.5, Paint()..color = color.withOpacity(0.5));
+        break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _QualitySymbolPainter old) => old.quality != quality;
 }
