@@ -6,7 +6,7 @@ import '../constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../screens/tarot_page.dart';
 import '../screens/dream_page.dart';
-import '../screens/zodiac_page.dart';
+import '../screens/zodiac_hub_page.dart';
 import '../screens/motivation_page.dart';
 import '../services/storage_service.dart';
 import '../widgets/fade_page_route.dart';
@@ -30,8 +30,9 @@ class _BentoGridState extends State<BentoGrid>
     super.initState();
     _tarotFloatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 8000), // 6800 → 8000 (daha az GPU)
-    )..repeat();
+      duration: const Duration(milliseconds: 8000),
+      value: 0.25, // Sabit pozisyon
+    );
   }
 
   @override
@@ -296,7 +297,7 @@ class _BentoGridState extends State<BentoGrid>
                         Navigator.push(
                           context,
                           SwipeFadePageRoute(
-                            page: const ZodiacPage(),
+                            page: const ZodiacHubPage(),
                           ),
                         );
                       },
@@ -727,8 +728,9 @@ class _InteractiveCardState extends State<_InteractiveCard>
     _overlayDragOffset = Offset.zero;
     _overlayRotateController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 600), // 360s → 600s (daha yavaş dönüş)
-    )..repeat();
+      duration: const Duration(seconds: 600),
+      value: 0.0, // Sabit pozisyonda dur
+    );
   }
 
   @override
@@ -1215,88 +1217,28 @@ class _InteractiveCardState extends State<_InteractiveCard>
 }
 
 // Yavaş dönen widget (sola doğru)
-class _SlowRotatingWidget extends StatefulWidget {
+class _SlowRotatingWidget extends StatelessWidget {
   final Widget child;
   const _SlowRotatingWidget({required this.child});
 
   @override
-  State<_SlowRotatingWidget> createState() => _SlowRotatingWidgetState();
-}
-
-class _SlowRotatingWidgetState extends State<_SlowRotatingWidget>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 300), // 180s → 300s (daha yavaş dönüş)
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: -_controller.value * 2 * math.pi, // Sola dönüş (negatif)
-          child: child,
-        );
-      },
-      child: widget.child,
-    );
+    return child;
   }
 }
+
 
 // Hafif yüzme hareketi
-class _FloatingWidget extends StatefulWidget {
+class _FloatingWidget extends StatelessWidget {
   final Widget child;
   const _FloatingWidget({required this.child});
 
   @override
-  State<_FloatingWidget> createState() => _FloatingWidgetState();
-}
-
-class _FloatingWidgetState extends State<_FloatingWidget>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20), // 15s → 20s
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final offset = math.sin(_controller.value * math.pi) * 6;
-        return Transform.translate(offset: Offset(0, offset), child: child);
-      },
-      child: widget.child,
-    );
+    return child;
   }
 }
+
 
 /// Tüm kartı (görsel + arka plan) basınca küçülten wrapper
 class _PressableCardWrapper extends StatefulWidget {

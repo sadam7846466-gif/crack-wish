@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
-import '../screens/zodiac_page.dart';
+import '../screens/zodiac_hub_page.dart';
 import '../widgets/fade_page_route.dart';
 
 class DailyHoroscopeCard extends StatelessWidget {
@@ -14,7 +14,7 @@ class DailyHoroscopeCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          SwipeFadePageRoute(page: const ZodiacPage()),
+          SwipeFadePageRoute(page: const ZodiacHubPage()),
         );
       },
       child: Container(

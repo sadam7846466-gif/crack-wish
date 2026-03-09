@@ -75,8 +75,9 @@ class _CookieSectionState extends State<CookieSection>
     // Glow animasyonu (2s, easeInOut, ileri-geri)
     _glowController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000), // 1100 → 2000ms (daha az tick)
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 2000),
+      value: 0.5, // Sabit glow seviyesi
+    );
     _glowAnimation = CurvedAnimation(
       parent: _glowController,
       curve: Curves.easeInOut,

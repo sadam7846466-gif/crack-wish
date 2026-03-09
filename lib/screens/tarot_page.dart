@@ -267,7 +267,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // ======================
   static const _kLastFreeDate = 'tarot_last_free_date_v1';
   static const _kAdCredits = 'tarot_ad_credits_v1';
-  static const _kHistory = 'tarot_history_v1';
+
   static const _kStreak = 'tarot_streak_v1';
   static const _kLastReadDate = 'tarot_last_read_date_v1';
   static const _kFreezeUsedAt = 'tarot_freeze_used_at_v1';
@@ -276,7 +276,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   // State
   // ======================
   RitualState _state = RitualState.gateCheck;
-  TarotTopic _topic = TarotTopic.general;
+
 
   final Random _rng = Random();
   late SharedPreferences _prefs;
@@ -294,7 +294,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     if (_isBuyukArkana) return 22;
     return 78; // Tam Arkana: tüm kartlar
   }
-  int? _selectedCategory; // null = show categories, 0=Major, 1=Cups, 2=Wands, 3=Swords, 4=Pentacles
+  int? _selectedCategory;
+
 
   // selection
   final List<int> _selectedTablePositions = [];
@@ -325,27 +326,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   int _fullCardPageIndex = 0;
   AnimationController? _infoRevealCtrl;
 
-  // share
-  final GlobalKey _shareKey = GlobalKey();
 
-  // Draggable image positions (for development)
-  // Fixed positions for ip images
-  static const double _ip1Top = 104.36;
-  static const double _ip1Left = 55.02;
-  static const double _ip2Top = 70.73;
-  static const double _ip2Left = 82.76;
-  static const double _ip3Top = 94.37;
-  static const double _ip3Left = 122.98;
-  static const double _ip4Top = 89.01;
-  static const double _ip4Left = 264.97;
-  static const double _ip5Top = 53.20;
-  static const double _ip5Left = 155.63;
-  static const double _ip6Top = 96.39;
-  static const double _ip6Left = 187.97;
-  static const double _ip7Top = 72.96;
-  static const double _ip7Left = 294.08;
-  static const double _ip8Top = 70.85;
-  static const double _ip8Left = 228.19;
+
+
 
   // Animations
   late AnimationController _shuffleCtrl;
@@ -360,8 +343,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   String _miniStatusText = '';
   Timer? _miniStatusTimer;
 
-  // Navigation
-  int _currentNavIndex = 0;
+
 
   // Deck selection
   bool _isBuyukArkana = true;
@@ -565,31 +547,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _scrambleTo(next);
   }
 
-  // ======================
-  // Gate: daily free + rewarded ad
-  // ======================
-  Future<bool> _ensureAllowance() async {
-    // if (kDebugMode) return true; // TEST: disabled to test ad popup
-    if (!_dailyFreeUsed) return true;
-    if (_adCredits > 0) return true;
 
-    return false;
-  }
 
-  Future<void> _consumeAllowanceOnCommit() async {
-    final today = _yyyyMmDd(DateTime.now());
-
-    if (!_dailyFreeUsed) {
-      _dailyFreeUsed = true;
-      await _prefs.setString(_kLastFreeDate, today);
-      return;
-    }
-
-    if (_adCredits > 0) {
-      _adCredits -= 1;
-      await _prefs.setInt(_kAdCredits, _adCredits);
-    }
-  }
 
   // ======================
   // Ad Popup (Rewarded Ad Gate)
@@ -797,17 +756,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _updateCtaText();
   }
 
-  /// Returns (startId, endId) for a category index
-  (int, int) _categoryCardRange(int category) {
-    switch (category) {
-      case 0: return (0, 22);    // Major Arcana
-      case 1: return (22, 36);   // Cups
-      case 2: return (36, 50);   // Wands
-      case 3: return (50, 64);   // Swords
-      default: return (64, 78);  // Pentacles
-    }
-  }
-
   void _selectCategory(int category) {
     HapticFeedback.lightImpact();
     _setStateSafe(() {
@@ -817,38 +765,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _resetDeck();
   }
 
-  Future<void> _onShufflePressed() async {
-    if (_isBusy) return;
 
-    HapticFeedback.lightImpact();
-
-    _setStateSafe(() {
-      _isBusy = true;
-      _state = RitualState.shuffling;
-      _selectedTablePositions.clear();
-      _revealedCount = 0;
-      _selectedCardIndexes = [];
-    });
-    _updateCtaText();
-
-    _setMiniStatus(_t('Karıştırılıyor…', 'Shuffling…'), ms: 700);
-
-    _deckOrder.shuffle(_rng);
-
-    final count = min(_tableCount, _deckOrder.length);
-    _tableCards = _deckOrder.take(count).toList();
-
-    _shuffleCtrl.reset();
-    await _shuffleCtrl.forward();
-
-    if (!mounted) return;
-    _setStateSafe(() {
-      _isBusy = false;
-      _state = RitualState.selecting;
-    });
-    _setMiniStatus(_t('Karıştırıldı', 'Shuffled'), ms: 650);
-    _updateCtaText();
-  }
 
   /// 3 kart seçildi — yorum ekranını aç
   Future<void> _commitAndReveal() async {
@@ -2564,72 +2481,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  /// Ritüel Önerisi widget'ı
-  Widget _buildRitualSuggestionPanel(RitualSuggestion ritual) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A2E1A).withValues(alpha: 0.9),
-            const Color(0xFF0F1A0F).withValues(alpha: 0.9),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF88CC88).withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Başlık
-          Row(
-            children: [
-              Text(ritual.emoji, style: const TextStyle(fontSize: 22)),
-              const SizedBox(width: 8),
-              Text(
-                _isTr ? ritual.titleTr.toUpperCase() : ritual.titleEn.toUpperCase(),
-                style: const TextStyle(
-                  color: Color(0xFF88CC88),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _isTr ? '📿 Bugünün Ritüeli' : '📿 Today\'s Ritual',
-            style: TextStyle(
-              color: const Color(0xFF88CC88).withValues(alpha: 0.6),
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 14),
-          // Aksiyon
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF88CC88).withValues(alpha: 0.15)),
-            ),
-            child: Text(
-              _isTr ? ritual.actionTr : ritual.actionEn,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 14,
-                height: 1.6,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 
   Widget _buildPromisesPanel() {
     final promises = _latestReading?.promises ?? _latestFullReading?.promises;
@@ -3421,29 +3274,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     if (_infoRevealCtrl == null) {
       _infoRevealCtrl = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 2800),
+        duration: const Duration(milliseconds: 1200),
       )..forward();
     }
 
     // Her pozisyon için benzersiz renk ve ikon
-    final positionColors = [
-      const Color(0xFF4A9FE5), // Geçmiş — mavi
-      const Color(0xFFE8A07C), // Şimdi — amber
-      const Color(0xFFB08DD4), // Gizli Etkiler — mor
-      const Color(0xFFE06060), // Engeller — kırmızı
-      const Color(0xFF7EC8A0), // Çevre — yeşil
-      const Color(0xFFE7D6A5), // Tavsiye — altın
-      const Color(0xFF5DD6D6), // Sonuç — teal
-    ];
-    final positionIcons = [
-      '⏳', // Geçmiş
-      '👁', // Şimdi
-      '🔮', // Gizli Etkiler
-      '⚔️', // Engeller
-      '🌍', // Çevre
-      '💡', // Tavsiye
-      '⭐', // Sonuç
-    ];
 
 
     return Column(
@@ -3569,8 +3404,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           animation: _infoRevealCtrl!,
                           builder: (context, _) {
                             if (!isActivePage) return const SizedBox.shrink();
-                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
-                            final labelOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+                            final t = Curves.easeOutCubic.transform(_infoRevealCtrl!.value);
+                            final labelOpacity = ((t - 0.25) / 0.75).clamp(0.0, 1.0);
                             return Opacity(
                               opacity: labelOpacity,
                               child: Column(
@@ -3634,8 +3469,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           animation: _infoRevealCtrl!,
                           builder: (context, _) {
                             if (!isActivePage) return const SizedBox.shrink();
-                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
-                            final labelOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
+                            final t = Curves.easeOutCubic.transform(_infoRevealCtrl!.value);
+                            final labelOpacity = ((t - 0.25) / 0.75).clamp(0.0, 1.0);
                             return Opacity(
                               opacity: labelOpacity,
                               child: Column(
@@ -3754,8 +3589,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     builder: (context, child) {
                                       if (!isActivePage) return const SizedBox.shrink();
                                       // 0.0-0.6 arası çizgiler büyür
-                                      final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
-                                      final lineProgress = (t / 0.5).clamp(0.0, 1.0);
+                                      final t = Curves.easeOutCubic.transform(_infoRevealCtrl!.value);
+                                      final lineProgress = (t / 0.35).clamp(0.0, 1.0);
                                       return Opacity(
                                         opacity: lineProgress,
                                         child: CustomPaint(
@@ -3777,8 +3612,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           animation: _infoRevealCtrl!,
                           builder: (context, _) {
                             if (!isActivePage) return const SizedBox.shrink();
-                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
-                            final nameOpacity = ((t - 0.5) / 0.5).clamp(0.0, 1.0);
+                            final t = Curves.easeOutCubic.transform(_infoRevealCtrl!.value);
+                            final nameOpacity = ((t - 0.35) / 0.65).clamp(0.0, 1.0);
                             return Opacity(
                               opacity: nameOpacity,
                               child: Text(
@@ -3800,8 +3635,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           animation: _infoRevealCtrl!,
                           builder: (context, _) {
                             if (!isActivePage) return const SizedBox.shrink();
-                            final t = Curves.decelerate.transform(_infoRevealCtrl!.value);
-                            final contentOpacity = ((t - 0.6) / 0.4).clamp(0.0, 1.0);
+                            final t = Curves.easeOutCubic.transform(_infoRevealCtrl!.value);
+                            final contentOpacity = ((t - 0.45) / 0.55).clamp(0.0, 1.0);
                             return Opacity(
                               opacity: contentOpacity,
                               child: Padding(

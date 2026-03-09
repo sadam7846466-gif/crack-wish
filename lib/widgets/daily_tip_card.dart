@@ -6,7 +6,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../screens/dream_page.dart';
 import '../screens/tarot_page.dart';
-import '../screens/zodiac_page.dart';
+import '../screens/zodiac_hub_page.dart';
 import '../services/storage_service.dart';
 import '../widgets/fade_page_route.dart';
 
@@ -65,7 +65,7 @@ class _DailyTipCardState extends State<DailyTipCard> {
       case _SuggestionType.zodiac:
         Navigator.push(
           context,
-          SwipeFadePageRoute(page: const ZodiacPage()),
+          SwipeFadePageRoute(page: const ZodiacHubPage()),
         );
         break;
       case _SuggestionType.allDone:
