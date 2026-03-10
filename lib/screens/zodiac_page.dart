@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui';
 import 'dart:math' as math;
+import 'package:google_fonts/google_fonts.dart';
 import '../widgets/glass_back_button.dart';
 import '../services/storage_service.dart';
 
@@ -18,7 +19,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   late AnimationController _pulse;
   int _selectedIndex = 0; // Varsayılan: Koç
   String? _userName;
-  DateTime _birthDate = DateTime(2000, 1, 1);
+  DateTime _birthDate = DateTime(1999, 12, 20);
 
   static const Color _gold = Color(0xFFFFD060);
   static const Color _goldL = Color(0xFFFFE8A1);
@@ -231,13 +232,16 @@ class _ZodiacPageState extends State<ZodiacPage>
 
   Future<void> _loadUserData() async {
     final name = await StorageService.getUserName();
-    final sign = await StorageService.getZodiacSign();
+    final savedDate = await StorageService.getBirthDate();
     if (mounted) {
       setState(() {
         _userName = name;
-        if (sign != null) {
-          final idx = _signs.indexWhere((s) => s['name'] == sign);
-          if (idx >= 0) _selectedIndex = idx;
+        if (savedDate != null) {
+          _birthDate = savedDate;
+          _selectedIndex = _signIndexFromDate(savedDate);
+        } else {
+          // Varsayılan tarihten burcu hesapla
+          _selectedIndex = _signIndexFromDate(_birthDate);
         }
       });
     }
@@ -266,77 +270,86 @@ class _ZodiacPageState extends State<ZodiacPage>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => Container(
-        height: 360,
+      builder: (_) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: Container(
+        height: 400,
         decoration: BoxDecoration(
-          color: const Color(0xFF141814),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border(top: BorderSide(color: _gold.withOpacity(0.15), width: 0.5)),
-          boxShadow: [BoxShadow(color: _gold.withOpacity(0.05), blurRadius: 30, offset: const Offset(0, -8))],
+          color: const Color(0xFF0F1210).withOpacity(0.75),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          border: Border(top: BorderSide(color: _gold.withOpacity(0.25), width: 1.0)),
+          boxShadow: [
+            BoxShadow(color: _gold.withOpacity(0.08), blurRadius: 40, offset: const Offset(0, -10)),
+          ],
         ),
         child: Column(children: [
-          // Üst tutma çubuğu
-          const SizedBox(height: 10),
-          Container(width: 40, height: 3.5, decoration: BoxDecoration(
+          // ── Üst tutma çubuğu ──
+          const SizedBox(height: 12),
+          Container(width: 36, height: 3, decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
-            gradient: LinearGradient(colors: [_gold.withOpacity(0.3), _gold.withOpacity(0.1)]),
+            gradient: LinearGradient(colors: [
+              _gold.withOpacity(0.1), _gold.withOpacity(0.4), _gold.withOpacity(0.1),
+            ]),
           )),
-          const SizedBox(height: 16),
-          // Başlık satırı
+          const SizedBox(height: 20),
+
+          // ── Başlık bölümü ──
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 28),
             child: Row(children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _gold.withOpacity(0.08),
-                ),
-                child: Icon(Icons.auto_awesome, color: _gold.withOpacity(0.6), size: 18),
-              ),
-              const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Sol dekoratif çizgi
+              Expanded(child: Container(height: 0.5,
+                decoration: BoxDecoration(gradient: LinearGradient(
+                  colors: [Colors.transparent, _gold.withOpacity(0.3)],
+                )),
+              )),
+              const SizedBox(width: 16),
+              // Merkez başlık
+              Column(children: [
+                Text('✦', style: TextStyle(color: _gold.withOpacity(0.4), fontSize: 8)),
+                const SizedBox(height: 6),
                 ShaderMask(
-                  shaderCallback: (b) => const LinearGradient(colors: [_goldL, _gold]).createShader(b),
-                  child: const Text('Doğum Tarihi', style: TextStyle(
-                    color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                  ).createShader(b),
+                  child: Text('DOĞUM TARİHİ', style: GoogleFonts.cinzel(
+                    color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 4,
+                  )),
                 ),
-                const SizedBox(height: 2),
-                Text('Burcunuzu keşfedin', style: TextStyle(
-                  color: Colors.white.withOpacity(0.3), fontSize: 12)),
+                const SizedBox(height: 4),
+                Text('Yıldızların seni tanısın', style: TextStyle(
+                  color: Colors.white.withOpacity(0.25), fontSize: 11, fontStyle: FontStyle.italic, letterSpacing: 0.5)),
               ]),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _birthDate = tempDate;
-                    _selectedIndex = _signIndexFromDate(tempDate);
-                  });
-                  StorageService.setZodiacSign(_signs[_selectedIndex]['name'] as String);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(colors: [_gold.withOpacity(0.15), _gold.withOpacity(0.05)]),
-                    border: Border.all(color: _gold.withOpacity(0.2), width: 0.5),
-                  ),
-                  child: ShaderMask(
-                    shaderCallback: (b) => const LinearGradient(colors: [_goldL, _gold]).createShader(b),
-                    child: const Text('Tamam', style: TextStyle(
-                      color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-                  ),
-                ),
-              ),
+              const SizedBox(width: 16),
+              // Sağ dekoratif çizgi
+              Expanded(child: Container(height: 0.5,
+                decoration: BoxDecoration(gradient: LinearGradient(
+                  colors: [_gold.withOpacity(0.3), Colors.transparent],
+                )),
+              )),
             ]),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 16),
+
+          // ── İnce ayırıcı ──
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Container(height: 0.5, color: _gold.withOpacity(0.08)),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Row(children: [
+              Expanded(child: Container(height: 0.3, color: _gold.withOpacity(0.1))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(width: 4, height: 4, decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: _gold.withOpacity(0.2),
+                )),
+              ),
+              Expanded(child: Container(height: 0.3, color: _gold.withOpacity(0.1))),
+            ]),
           ),
-          // Date Picker
+
+          // ── Date Picker ──
           Expanded(child: CupertinoTheme(
             data: const CupertinoThemeData(brightness: Brightness.dark),
             child: CupertinoDatePicker(
@@ -347,8 +360,47 @@ class _ZodiacPageState extends State<ZodiacPage>
               onDateTimeChanged: (d) => tempDate = d,
             ),
           )),
+
+          // ── Onay butonu ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 0, 28, 16),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _birthDate = tempDate;
+                  _selectedIndex = _signIndexFromDate(tempDate);
+                });
+                StorageService.setZodiacSign(_signs[_selectedIndex]['name'] as String);
+                StorageService.setBirthDate(tempDate);
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(colors: [
+                    _gold.withOpacity(0.12), _gold.withOpacity(0.06), _gold.withOpacity(0.12),
+                  ]),
+                  border: Border.all(color: _gold.withOpacity(0.2), width: 0.8),
+                ),
+                child: Center(child: ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                  ).createShader(b),
+                  child: Text('ONAYLA', style: GoogleFonts.cinzel(
+                    color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 3,
+                  )),
+                )),
+              ),
+            ),
+          ),
+
+          // Alt güvenli alan
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
         ]),
       ),
+    )),
     );
   }
 
@@ -414,10 +466,9 @@ class _ZodiacPageState extends State<ZodiacPage>
               Row(children: [
                 const GlassBackButton(),
               ]),
-              const SizedBox(height: 0),
 
               // ── 🔶 DÖNEN ELMAS ÇERÇEVESİ ──
-              Transform.translate(offset: const Offset(0, -20), child: _fadeIn(100, Center(child: SizedBox(
+              Transform.translate(offset: const Offset(0, -35), child: _fadeIn(100, Center(child: SizedBox(
                 width: 310, height: 340,
                 child: Stack(alignment: Alignment.center, children: [
                   // Dış parıltı
@@ -459,23 +510,29 @@ class _ZodiacPageState extends State<ZodiacPage>
                         shape: BoxShape.circle, color: _gold.withOpacity(0.6),
                         boxShadow: [BoxShadow(color: _gold.withOpacity(0.3), blurRadius: 8)],
                       )),
-                    );
-                  }),
-                  // İsim — altta
-                  Positioned(bottom: 0, child: Column(children: [
-                    Text(s['nameEn'] as String, style: TextStyle(
-                      color: Colors.white.withOpacity(0.3), fontSize: 12, letterSpacing: 4)),
-                    const SizedBox(height: 2),
-                    Text(s['dates'] as String, style: TextStyle(
-                      color: _gold.withOpacity(0.5), fontSize: 11, letterSpacing: 1)),
-                  ])),
+                   );
+                }),
+                  // İsim — altta (Estetik, premium tasarım)
+                  Positioned(bottom: 2, child: ShaderMask(
+                    shaderCallback: (b) => const LinearGradient(
+                      colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                    ).createShader(b),
+                    child: Text(
+                      (s['nameEn'] as String).toUpperCase(),
+                      style: GoogleFonts.cinzel(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                  )),
                 ]),
               )))),
 
-              const SizedBox(height: 16),
 
               // ── ✨ TARİH SEÇİCİ ──
-              _fadeIn(250, Center(child: GestureDetector(
+              Transform.translate(offset: const Offset(0, -30), child: _fadeIn(250, Center(child: GestureDetector(
                 onTap: _showDatePicker,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -498,9 +555,9 @@ class _ZodiacPageState extends State<ZodiacPage>
                     Text('✦', style: TextStyle(color: _gold.withOpacity(0.3), fontSize: 7)),
                   ]),
                 ),
-              ))),
+              )))),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 14),
 
               // ── ELEMENT / GEZEGEN / NİTELİK ──
               _fadeIn(400, Row(children: [
@@ -517,27 +574,125 @@ class _ZodiacPageState extends State<ZodiacPage>
 
               const SizedBox(height: 28),
 
-              // ── GÜNLÜK YORUM ──
-              _fadeIn(500, _dailyCard(s)),
+              // ── KOZMİK REHBERİN — Günlük Fal + Kişilik Birleşik Kart ──
+              _fadeIn(500, Container(
+                padding: const EdgeInsets.all(0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
+                    Colors.white.withOpacity(0.08), Colors.white.withOpacity(0.03),
+                  ]),
+                  border: Border.all(color: _gold.withOpacity(0.12)),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 8))],
+                ),
+                child: Column(children: [
+                  // ── Üst dekoratif şerit ──
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                      gradient: LinearGradient(colors: [
+                        _gold.withOpacity(0.06), Colors.transparent, _gold.withOpacity(0.06),
+                      ]),
+                    ),
+                    child: Row(children: [
+                      // Custom yıldız ikonu
+                      SizedBox(width: 28, height: 28, child: CustomPaint(painter: _CosmicStarPainter(color: _gold))),
+                      const SizedBox(width: 14),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        ShaderMask(
+                          shaderCallback: (b) => const LinearGradient(
+                            colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                          ).createShader(b),
+                          child: Text('KOZMİK REHBERİN', style: GoogleFonts.cinzel(
+                            color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 2,
+                          )),
+                        ),
+                        const SizedBox(height: 2),
+                        Text('Bugünün mesajı & ruhsal portre', style: TextStyle(
+                          color: Colors.white.withOpacity(0.3), fontSize: 11, letterSpacing: 0.3)),
+                      ])),
+                    ]),
+                  ),
 
-              const SizedBox(height: 28),
+                  // ── Günlük mesaj bölümü ──
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        color: _gold.withOpacity(0.04),
+                        border: Border.all(color: _gold.withOpacity(0.08)),
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(children: [
+                          Container(width: 3, height: 14, decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                              colors: [_gold.withOpacity(0.6), _gold.withOpacity(0.1)],
+                            ),
+                          )),
+                          const SizedBox(width: 10),
+                          Text('Günün Fısıltısı', style: GoogleFonts.cinzel(
+                            color: _gold.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1,
+                          )),
+                        ]),
+                        const SizedBox(height: 12),
+                        Text(s['dailyHoroscope'] as String, style: TextStyle(
+                          color: Colors.white.withOpacity(0.8), fontSize: 14, height: 1.7, fontStyle: FontStyle.italic)),
+                      ]),
+                    ),
+                  ),
 
-              // ── KİŞİLİK ANALİZİ ──
-              _fadeIn(600, _sectionTitle('🧠', 'Kişilik Analizi')),
-              const SizedBox(height: 12),
-              _fadeIn(650, _glassCard(child: Text(
-                s['description'] as String,
-                style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 15, height: 1.7),
-              ))),
+                  // ── İnce dekoratif ayırıcı ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Row(children: [
+                      Expanded(child: Container(height: 0.3, decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [Colors.transparent, _gold.withOpacity(0.2)]),
+                      ))),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: SizedBox(width: 16, height: 16, child: CustomPaint(painter: _CosmicEyePainter(color: _gold))),
+                      ),
+                      Expanded(child: Container(height: 0.3, decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [_gold.withOpacity(0.2), Colors.transparent]),
+                      ))),
+                    ]),
+                  ),
+
+                  // ── Kişilik portresi bölümü ──
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        Container(width: 3, height: 14, decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                            colors: [_gold.withOpacity(0.6), _gold.withOpacity(0.1)],
+                          ),
+                        )),
+                        const SizedBox(width: 10),
+                        Text('Ruhsal Portre', style: GoogleFonts.cinzel(
+                          color: _gold.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1,
+                        )),
+                      ]),
+                      const SizedBox(height: 14),
+                      Text(s['description'] as String, style: TextStyle(
+                        color: Colors.white.withOpacity(0.75), fontSize: 14, height: 1.75)),
+                    ]),
+                  ),
+                ]),
+              )),
 
               const SizedBox(height: 24),
 
-              // ── GÜÇLÜ & ZAYIF YANLAR ──
-              _fadeIn(700, Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(child: _strengthWeakCard('💪', 'Güçlü Yanlar', (s['strengths'] as List<String>), true)),
-                const SizedBox(width: 12),
-                Expanded(child: _strengthWeakCard('⚠️', 'Gelişim Alanları', (s['weaknesses'] as List<String>), false)),
-              ])),
+              // ── ANALİTİK PROFİL — Güçlü Yanlar & Gelişim ──
+              _fadeIn(700, _analyticsCard(s)),
 
               const SizedBox(height: 28),
 
@@ -581,6 +736,181 @@ class _ZodiacPageState extends State<ZodiacPage>
   // YARDIMCI WİDGETLER
   // ═══════════════════════════════════════════
 
+  // ── Analitik Güçlü Yanlar & Gelişim Kartı ──
+  Widget _analyticsCard(Map<String, dynamic> s) {
+    final strengths = s['strengths'] as List<String>;
+    final weaknesses = s['weaknesses'] as List<String>;
+    final traits = s['traits'] as List<String>;
+    final name = s['name'] as String;
+
+    final values = List.generate(traits.length > 6 ? 6 : traits.length, (i) {
+      final h = (traits[i].hashCode ^ (i * 7919)).abs() % 100;
+      return 0.55 + (h % 40) / 100.0;
+    });
+    final displayTraits = traits.take(6).toList();
+
+    const usageHints = <String, String>{
+      'Doğal liderlik': 'Takım kurmada kullan',
+      'Cesaret ve atılganlık': 'Risk alırken avantajın',
+      'Girişimci ruh': 'Yeni projeler başlat',
+      'Kararlılık': 'Uzun vadeli hedefler koy',
+      'Güvenilirlik': 'Güven inşa et',
+      'Sabır': 'Stratejik sabırla büyü',
+      'Çift yönlü bakış': 'Arabuluculukta parla',
+      'İletişim dehası': 'Fikirlerini yay',
+      'Hızlı öğrenme': 'Yeni beceriler edin',
+      'Duygusal zekâ': 'İlişkileri derinleştir',
+      'Koruyucu doğa': 'Güvenli alan yarat',
+      'Sezgisel güç': 'İç sesini dinle',
+      'Doğal karizma': 'İlham kaynağı ol',
+      'Yaratıcı enerji': 'Sanatla ifade et',
+      'Cömertlik': 'Paylaştıkça çoğal',
+      'Analitik zekâ': 'Verileri analiz et',
+      'Düzen ve organizasyon': 'Sistematik ilerle',
+      'Hizmet ruhu': 'Topluma değer kat',
+      'Diplomatik yetenek': 'Köprüler kur',
+      'Estetik anlayış': 'Güzelliği yarat',
+      'Adalet duygusu': 'Dengeyi koru',
+      'Derin sezgi': 'Görünmeyeni gör',
+      'Yeniden doğuş gücü': 'Krizleri fırsata çevir',
+      'Sadakat': 'Derin bağlar kur',
+      'Vizyon genişliği': 'Büyük resmi gör',
+      'Macera ruhu': 'Keşfetmeye devam et',
+      'Felsefi derinlik': 'Bilgeliğini paylaş',
+      'İrade gücü': 'Hedefine odaklan',
+      'Uzun vadeli planlama': 'Geleceğini inşa et',
+      'Sorumluluk bilinci': 'Güvenilir ol',
+      'Özgün düşünce': 'Farklılığını kucakla',
+      'İnsancıl bakış': 'Empatiyle yaklaş',
+      'Devrimci ruh': 'Değişimi başlat',
+      'Sınırsız empati': 'Kalbiyle dinle',
+      'Sanatsal yetenek': 'Yaratıcılığını keşfet',
+      'Ruhani derinlik': 'İçsel yolculuğa çık',
+    };
+
+    const growthTips = <String, String>{
+      'Sabırsızlık': 'Nefes al, sürece güven',
+      'Düşünmeden hareket': 'Dur, düşün, sonra adım at',
+      'Hırslı olma': 'Yolculuğun tadını çıkar',
+      'İnatçılık': 'Farklı bakış açılarına alan aç',
+      'Değişime direnç': 'Küçük değişimlerle başla',
+      'Aşırı sahiplenme': 'Güvenerek bırak',
+      'Kararsızlık': 'Sezgilerine daha çok güven',
+      'Yüzeysellik': 'Bir konuda derinleş',
+      'Huzursuzluk': 'Şimdiki anda kal',
+      'Aşırı hassasiyet': 'Koruyucu sınırlar belirle',
+      'Aşırı korumacılık': 'Güvenmeyi öğren',
+      'Geçmişe takılma': 'Bugüne odaklan',
+      'Ego': 'Alçakgönüllülüğü keşfet',
+      'Diktatörlük': 'Dinleme sanatını geliştir',
+      'Beğenilme ihtiyacı': 'Kendi onayın yeter',
+      'Aşırı eleştirellik': 'Olduğu gibi kabul et',
+      'Mükemmeliyetçilik': 'Yeterli, yeterlidir',
+      'Endişe eğilimi': 'Şükranla düşün',
+      'Kararsız doğa': 'Önceliklendirmeyi öğren',
+      'Başkalarına bağımlılık': 'Kendi gücünü bul',
+      'Çatışmadan kaçma': 'Cesaretle yüzleş',
+      'Kıskançlık': 'Bolluk zihniyetini benimse',
+      'İntikamcılık': 'Bırak gitsin',
+      'Aşırı kontrol': 'Akışa güven',
+      'Sorumsuzluk': 'Küçük sözler ver ve tut',
+      'Aşırı dürüstlük': 'Nazikçe doğruyu söyle',
+      'Taahhüt korkusu': 'Adım adım bağlan',
+      'Aşırı ciddiyet': 'Oyun oyna, gül',
+      'Duygularını bastırma': 'Hissettiklerini yaz',
+      'İş koliklik': 'Dengeyi bul',
+      'Duygusal mesafe': 'Bir adım yaklaş',
+      'Asi tutum': 'Yapıcı isyan öğren',
+      'Gerçeklikten kaçış': 'Ayaklarını yere bas',
+      'Sınır koyamama': 'Hayır demek de sevgidir',
+    };
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
+          Colors.white.withOpacity(0.07), Colors.white.withOpacity(0.02),
+        ]),
+        border: Border.all(color: _gold.withOpacity(0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 16, offset: const Offset(0, 6))],
+      ),
+      child: Column(children: [
+        // ── Başlık ──
+        Container(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 6),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            gradient: LinearGradient(colors: [
+              _gold.withOpacity(0.05), Colors.transparent, _gold.withOpacity(0.05),
+            ]),
+          ),
+          child: Row(children: [
+            SizedBox(width: 24, height: 24, child: CustomPaint(painter: _AnalyticsDiamondPainter(color: _gold))),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ShaderMask(
+                shaderCallback: (b) => const LinearGradient(
+                  colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                ).createShader(b),
+                child: Text('KARAKTERİSTİK ANALİZ', style: GoogleFonts.cinzel(
+                  color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2,
+                )),
+              ),
+              const SizedBox(height: 2),
+              Text('$name burcunun yetenek haritası', style: TextStyle(
+                color: Colors.white.withOpacity(0.3), fontSize: 11)),
+            ])),
+          ]),
+        ),
+
+        // ── RADAR CHART ──
+        const SizedBox(height: 8),
+        SizedBox(
+          width: 310, height: 290,
+          child: CustomPaint(painter: _RadarChartPainter(labels: displayTraits, values: values, color: Colors.white)),
+        ),
+        const SizedBox(height: 8),
+
+        // ── Keşfet Butonu ──
+        Padding(
+          padding: const EdgeInsets.fromLTRB(22, 4, 22, 20),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => _ZodiacDetailPage(sign: s, gold: _gold),
+                transitionsBuilder: (_, a, __, child) => FadeTransition(opacity: a, child: child),
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(colors: [
+                  _gold.withOpacity(0.08), _gold.withOpacity(0.03), _gold.withOpacity(0.08),
+                ]),
+                border: Border.all(color: _gold.withOpacity(0.15)),
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                SizedBox(width: 16, height: 16, child: CustomPaint(painter: _CosmicEyePainter(color: _gold))),
+                const SizedBox(width: 10),
+                ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                  ).createShader(b),
+                  child: Text('KENDİNİ KEŞFET', style: GoogleFonts.cinzel(
+                    color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 2,
+                  )),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.arrow_forward_ios_rounded, size: 12, color: _gold.withOpacity(0.4)),
+              ]),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
 
   Widget _dateChip(String text) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1239,4 +1569,876 @@ class _QualitySymbolPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _QualitySymbolPainter old) => old.quality != quality;
+}
+
+// ── Kozmik Yıldız İkonu (Custom) ──
+class _CosmicStarPainter extends CustomPainter {
+  final Color color;
+  _CosmicStarPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
+    final p = Paint()..color = color.withOpacity(0.8)..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5..strokeCap = StrokeCap.round;
+
+    // 4 ana ışın (uzun, ince)
+    for (int i = 0; i < 4; i++) {
+      final a = i * math.pi / 2;
+      canvas.drawLine(
+        c + Offset(math.cos(a) * r * 0.15, math.sin(a) * r * 0.15),
+        c + Offset(math.cos(a) * r * 0.9, math.sin(a) * r * 0.9), p);
+    }
+    // 4 çapraz ışın (kısa)
+    for (int i = 0; i < 4; i++) {
+      final a = i * math.pi / 2 + math.pi / 4;
+      canvas.drawLine(
+        c + Offset(math.cos(a) * r * 0.1, math.sin(a) * r * 0.1),
+        c + Offset(math.cos(a) * r * 0.5, math.sin(a) * r * 0.5),
+        p..strokeWidth = 1.0..color = color.withOpacity(0.5));
+    }
+    // Merkez parıltı
+    canvas.drawCircle(c, r * 0.12, Paint()..color = color.withOpacity(0.9)..style = PaintingStyle.fill);
+    canvas.drawCircle(c, r * 0.25, Paint()..shader = RadialGradient(
+      colors: [color.withOpacity(0.3), Colors.transparent],
+    ).createShader(Rect.fromCircle(center: c, radius: r * 0.25)));
+  }
+
+  @override
+  bool shouldRepaint(covariant _CosmicStarPainter old) => false;
+}
+
+// ── Mistik Göz İkonu (Custom) ──
+class _CosmicEyePainter extends CustomPainter {
+  final Color color;
+  _CosmicEyePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2..strokeCap = StrokeCap.round;
+
+    // Üst göz kapağı
+    final top = Path()..moveTo(0, c.dy)
+      ..quadraticBezierTo(w * 0.5, -h * 0.15, w, c.dy);
+    canvas.drawPath(top, p);
+    // Alt göz kapağı
+    final bot = Path()..moveTo(0, c.dy)
+      ..quadraticBezierTo(w * 0.5, h * 1.15, w, c.dy);
+    canvas.drawPath(bot, p);
+    // İris
+    canvas.drawCircle(c, w * 0.18, Paint()..color = color.withOpacity(0.7)..style = PaintingStyle.stroke..strokeWidth = 1.0);
+    // Göz bebeği
+    canvas.drawCircle(c, w * 0.08, Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CosmicEyePainter old) => false;
+}
+
+// ── Analitik Elmas İkonu (Custom) ──
+class _AnalyticsDiamondPainter extends CustomPainter {
+  final Color color;
+  _AnalyticsDiamondPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
+    final p = Paint()..color = color.withOpacity(0.7)..style = PaintingStyle.stroke
+      ..strokeWidth = 1.3..strokeCap = StrokeCap.round;
+
+    // Dış elmas (eğik kare)
+    final diamond = Path()
+      ..moveTo(c.dx, c.dy - r * 0.85)
+      ..lineTo(c.dx + r * 0.85, c.dy)
+      ..lineTo(c.dx, c.dy + r * 0.85)
+      ..lineTo(c.dx - r * 0.85, c.dy)
+      ..close();
+    canvas.drawPath(diamond, p);
+
+    // İç çapraz çizgiler
+    final inner = Paint()..color = color.withOpacity(0.3)..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawLine(Offset(c.dx, c.dy - r * 0.4), Offset(c.dx, c.dy + r * 0.4), inner);
+    canvas.drawLine(Offset(c.dx - r * 0.4, c.dy), Offset(c.dx + r * 0.4, c.dy), inner);
+
+    // Merkez parlak nokta
+    canvas.drawCircle(c, r * 0.1, Paint()..color = color.withOpacity(0.8)..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant _AnalyticsDiamondPainter old) => false;
+}
+
+// ── Radar Chart (Örümcek Ağı) Painter ──
+class _RadarChartPainter extends CustomPainter {
+  final List<String> labels;
+  final List<double> values;
+  final Color color;
+
+  _RadarChartPainter({required this.labels, required this.values, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width / 2 - 46;
+    final n = labels.length;
+    final angleStep = 2 * math.pi / n;
+    final startAngle = -math.pi / 2;
+
+    // ── Web grid çizgileri (4 katman: %25, %50, %75, %100) ──
+    const levelLabels = ['25', '50', '75', ''];
+    for (var level = 1; level <= 4; level++) {
+      final lr = r * level / 4;
+      final gridPath = Path();
+      for (var i = 0; i <= n; i++) {
+        final a = startAngle + (i % n) * angleStep;
+        final x = cx + math.cos(a) * lr;
+        final y = cy + math.sin(a) * lr;
+        if (i == 0) gridPath.moveTo(x, y); else gridPath.lineTo(x, y);
+      }
+      canvas.drawPath(gridPath, Paint()
+        ..color = color.withOpacity(level == 4 ? 0.18 : 0.06)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = level == 4 ? 1.0 : 0.6);
+
+      // Seviye etiketi (sağ eksende)
+      if (level < 4) {
+        final ly = cy - lr;
+        final tp = TextPainter(
+          text: TextSpan(text: '${levelLabels[level - 1]}%', style: TextStyle(
+            color: color.withOpacity(0.25), fontSize: 8)),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        tp.paint(canvas, Offset(cx + 4, ly - tp.height / 2));
+      }
+    }
+
+    // ── Eksen çizgileri ──
+    for (var i = 0; i < n; i++) {
+      final a = startAngle + i * angleStep;
+      canvas.drawLine(
+        Offset(cx, cy),
+        Offset(cx + math.cos(a) * r, cy + math.sin(a) * r),
+        Paint()..color = color.withOpacity(0.1)..strokeWidth = 0.6,
+      );
+    }
+
+    // ── Veri poligonu ──
+    final dataPath = Path();
+    final dataPoints = <Offset>[];
+    for (var i = 0; i < n; i++) {
+      final a = startAngle + i * angleStep;
+      final v = i < values.length ? values[i] : 0.5;
+      final x = cx + math.cos(a) * r * v;
+      final y = cy + math.sin(a) * r * v;
+      dataPoints.add(Offset(x, y));
+      if (i == 0) dataPath.moveTo(x, y); else dataPath.lineTo(x, y);
+    }
+    dataPath.close();
+
+    // Dolgu
+    canvas.drawPath(dataPath, Paint()
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        colors: [color.withOpacity(0.18), color.withOpacity(0.04)],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
+      ..style = PaintingStyle.fill);
+
+    // Kenar çizgisi
+    canvas.drawPath(dataPath, Paint()
+      ..color = color.withOpacity(0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeJoin = StrokeJoin.round);
+
+    // Glow
+    canvas.drawPath(dataPath, Paint()
+      ..color = color.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+
+    // ── Köşe noktaları + Yüzdelik göstergeleri ──
+    for (var i = 0; i < dataPoints.length; i++) {
+      final p = dataPoints[i];
+      final v = i < values.length ? values[i] : 0.5;
+      final pct = (v * 100).round();
+
+      // Nokta rengi: Yüksek → parlak altın, düşük → soluk amber
+      final brightness = v > 0.75 ? 0.9 : (v > 0.6 ? 0.6 : 0.4);
+      canvas.drawCircle(p, 5, Paint()..color = color.withOpacity(brightness * 0.3));
+      canvas.drawCircle(p, 3, Paint()..color = color.withOpacity(brightness));
+      canvas.drawCircle(p, 1.5, Paint()..color = Colors.white.withOpacity(0.9));
+
+      // Yüzdelik etiketi (noktanın yanında)
+      final a = startAngle + i * angleStep;
+      final pctX = p.dx + math.cos(a) * 14;
+      final pctY = p.dy + math.sin(a) * 14;
+      final pctTp = TextPainter(
+        text: TextSpan(text: '$pct%', style: TextStyle(
+          color: v > 0.75 ? color.withOpacity(0.9) : color.withOpacity(0.5),
+          fontSize: 9, fontWeight: FontWeight.w700)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      pctTp.paint(canvas, Offset(pctX - pctTp.width / 2, pctY - pctTp.height / 2));
+    }
+
+    // ── Etiketler (trait isimleri) ──
+    const labelGap = 18.0; // Chart kenarından sabit mesafe
+    for (var i = 0; i < n; i++) {
+      final a = startAngle + i * angleStep;
+      final v = i < values.length ? values[i] : 0.5;
+      final edgeX = cx + math.cos(a) * r;
+      final edgeY = cy + math.sin(a) * r;
+      final tp = TextPainter(
+        text: TextSpan(text: labels[i], style: TextStyle(
+          color: v > 0.75
+              ? color.withOpacity(0.85)
+              : color.withOpacity(0.5),
+          fontSize: 10,
+          fontWeight: v > 0.75 ? FontWeight.w700 : FontWeight.w400)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      // Açıya göre anchor offset — etiketin en yakın kenarı chart'a eşit mesafede
+      final cosA = math.cos(a);
+      final sinA = math.sin(a);
+      double dx = edgeX + cosA * labelGap;
+      double dy = edgeY + sinA * labelGap;
+
+      // Sağ taraftakiler: sol kenardan hizala
+      if (cosA > 0.3) {
+        dx = edgeX + labelGap;
+        dy -= tp.height / 2;
+      }
+      // Sol taraftakiler: sağ kenardan hizala
+      else if (cosA < -0.3) {
+        dx = edgeX - labelGap - tp.width;
+        dy -= tp.height / 2;
+      }
+      // Üst/alt: merkezden hizala
+      else {
+        dx -= tp.width / 2;
+        if (sinA < 0) dy = edgeY - labelGap - tp.height;
+        else dy = edgeY + labelGap;
+      }
+
+      tp.paint(canvas, Offset(dx, dy));
+    }
+
+    // ── Merkez nokta ──
+    canvas.drawCircle(Offset(cx, cy), 2, Paint()..color = color.withOpacity(0.15));
+  }
+
+  @override
+  bool shouldRepaint(covariant _RadarChartPainter old) => false;
+}
+
+// ═══════════════════════════════════════════
+// KENDİNİ KEŞFET — DETAY SAYFASI
+// ═══════════════════════════════════════════
+class _ZodiacDetailPage extends StatefulWidget {
+  final Map<String, dynamic> sign;
+  final Color gold;
+  const _ZodiacDetailPage({required this.sign, required this.gold});
+
+  @override
+  State<_ZodiacDetailPage> createState() => _ZodiacDetailPageState();
+}
+
+class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
+  int? _selectedIndex; // Tıklanan trait indeksi (null = hiçbiri)
+
+  Color get gold => widget.gold;
+  static const _goldL = Color(0xFFFFE8A1);
+
+  @override
+  Widget build(BuildContext context) {
+    final sign = widget.sign;
+    final strengths = sign['strengths'] as List<String>;
+    final weaknesses = sign['weaknesses'] as List<String>;
+    final name = sign['name'] as String;
+    final nameEn = sign['nameEn'] as String;
+    final symbol = sign['symbol'] as String;
+
+    const usageHints = <String, String>{
+      'Doğal liderlik': 'Takım kuracak projelerde öne geç ve yönlendirici rol üstlen.',
+      'Cesaret ve atılganlık': 'Risk içeren kararlarda diğerlerinin çekineceği adımları at.',
+      'Girişimci ruh': 'Yeni iş fikirleri geliştir ve öncü projeler başlat.',
+      'Kararlılık': 'Uzun vadeli hedefler koyarak kararlılığını avantaja çevir.',
+      'Güvenilirlik': 'Güven gerektiren görevlerde referans noktası ol.',
+      'Sabır': 'Uzun süreçli projelerde stratejik sabrınla fark yarat.',
+      'Çift yönlü bakış': 'Farklı bakış açılarını harmanlayarak arabuluculuk yap.',
+      'İletişim dehası': 'Fikirlerini etkili ifade ederek çevreni genişlet.',
+      'Hızlı öğrenme': 'Yeni alanları hızla öğrenerek rekabet avantajı kazan.',
+      'Duygusal zekâ': 'İlişkilerde derinlik kurarak güçlü bağlar oluştur.',
+      'Koruyucu doğa': 'Çevrendekiler için güvenli bir ortam yarat.',
+      'Sezgisel güç': 'Sezgilerini dinleyerek doğru zamanda doğru kararlar ver.',
+      'Doğal karizma': 'Etrafındakilere ilham vererek liderlik pozisyonları üstlen.',
+      'Yaratıcı enerji': 'Sanatsal projeler ve tasarım alanlarında kendini ifade et.',
+      'Cömertlik': 'Paylaşımcı yaklaşımınla sosyal çevreni genişlet.',
+      'Analitik zekâ': 'Verileri analiz ederek stratejik kararlar al.',
+      'Düzen ve organizasyon': 'Sistematik yaklaşımınla karmaşık süreçleri basitleştir.',
+      'Hizmet ruhu': 'Topluma değer katacak projelerde gönüllü rol al.',
+      'Diplomatik yetenek': 'Farklı tarafları bir araya getirerek köprüler kur.',
+      'Estetik anlayış': 'Görsel ve tasarım projelerinde fark yaratan işler çıkar.',
+      'Adalet duygusu': 'Etik değerleri ön plana koyarak güvenilir bir figrü ol.',
+      'Derin sezgi': 'Görünmeyen dinamikleri sezgilerinle fark et ve yönlendir.',
+      'Yeniden doğuş gücü': 'Kriz anlarını dönüştürerek fırsata çevir.',
+      'Sadakat': 'Uzun vadeli ilişkiler kurarak güçlü bir destek ağı oluştur.',
+      'Vizyon genişliği': 'Büyük fikirler ve uzun vadeli planlarda öne geçersin.',
+      'Macera ruhu': 'Keşfetme tutkunu girişimcilik ve seyahat alanlarında değerlendir.',
+      'Felsefi derinlik': 'Derin düşünme yeteneğinle başkalarına ilham ver.',
+      'İrade gücü': 'Zorlu hedeflere ulaşmada irade gücün en büyük avantajın.',
+      'Uzun vadeli planlama': 'Geleceğe yönelik stratejik planlarınla öne geç.',
+      'Sorumluluk bilinci': 'Güvenilir ve tutarlı duruşunla liderlik konumu kazan.',
+      'Özgün düşünce': 'Alışılmışın dışında çözümler üreterek fark yarat.',
+      'İnsancıl bakış': 'Empati gücünü sosyal etki alanlarında kullan.',
+      'Devrimci ruh': 'Yenilikçi fikirlerin ile çevrendeki değişimi başlat.',
+      'Sınırsız empati': 'Derin empatin ile insanların yaşamlarına dokunmaya devam et.',
+      'Sanatsal yetenek': 'Yaratıcılığını müzik, sinema veya görsel sanatlarda keşfet.',
+      'Ruhani derinlik': 'İçsel yolculuğunla başkalarına rehberlik edebilirsin.',
+    };
+
+    const growthTips = <String, String>{
+      'Sabırsızlık': 'Süreç takibi alışkanlığı kazanarak sabrını güçlendir.',
+      'Düşünmeden hareket': 'Karar vermeden önce 3 dakika bekle kuralı uygula.',
+      'Hırslı olma': 'Küçük başarıları kutlayarak yolculuğun tadını çıkar.',
+      'İnatçılık': 'Farklı bakış açılarını dinleyerek esnekliğini geliştir.',
+      'Değişime direnç': 'Haftalık bir yenilik deneyerek adaptasyon kaslarını çalıştır.',
+      'Aşırı sahiplenme': 'Kontrolü bırakma pratikleri yaparak güven geliştir.',
+      'Kararsızlık': 'Karar matriksi kullanarak sistemli seçim yapma becerisini kazan.',
+      'Yüzeysellik': 'Bir konuda 30 gün derinleşme challenge başlat.',
+      'Huzursuzluk': 'Günlük 10 dakika mindfulness pratiği ile sakinliği keşfet.',
+      'Aşırı hassasiyet': 'Duygusal sınırlarını belirleyerek enerjini koru.',
+      'Aşırı korumacılık': 'Güven inşa egzersizleri ile kontrol ihtiyacını azalt.',
+      'Geçmişe takılma': 'Günlük şükran listesi tutarak şimdiki ana odaklan.',
+      'Ego': 'Başkalarının başarılarını kutlayarak alçakgönüllülüğü geliştir.',
+      'Diktatörlük': 'Aktif dinleme tekniklerini öğrenerek iletişimini güçlendir.',
+      'Beğenilme ihtiyacı': 'İçsel onay mekanizmalarını geliştirerek özgüvenini artır.',
+      'Aşırı eleştirellik': 'Mükemmeliyetten vazgeçip yeterince iyi kavramını benimse.',
+      'Mükemmeliyetçilik': '80/20 kuralını uygulayarak verimliliğini artır.',
+      'Endişe eğilimi': 'Endişe günlüğü tutarak düşüncelerini somutlaştır.',
+      'Kararsız doğa': 'Önceliklendirme matrisi kullanarak net kararlar al.',
+      'Başkalarına bağımlılık': 'Tek başına aktiviteler planlayarak öz yeterliliğini keşfet.',
+      'Çatışmadan kaçma': 'Assertif iletişim teknikleri öğrenerek sesini duyur.',
+      'Kıskançlık': 'Bolluk zihniyetini benimseyerek güven inşa et.',
+      'İntikamcılık': 'Affetme pratiği yaparak iç huzurunu bul.',
+      'Aşırı kontrol': 'Akışa bırakma egzersizleri ile esnekliğini geliştir.',
+      'Sorumsuzluk': 'Küçük taahhütlerle başlayarak güvenilirliğini inşa et.',
+      'Aşırı dürüstlük': 'Empati filtresinden geçirerek nazikçe doğruyu söyle.',
+      'Taahhüt korkusu': 'Kısa süreli bağlanma adımlarıyla güven oluştur.',
+      'Aşırı ciddiyet': 'Haftalık eğlence rutini oluşturarak hayatın tadını çıkar.',
+      'Duygularını bastırma': 'Günlük duygu günlüğü tutarak iç sesini duyur.',
+      'İş koliklik': 'İş-yaşam dengesi planı yaparak kaliteli zaman ayır.',
+      'Duygusal mesafe': 'Haftalık derin sohbet pratiği ile yakınlık kur.',
+      'Asi tutum': 'Yapıcı eleştiri teknikleri öğrenerek enerjini yönlendir.',
+      'Gerçeklikten kaçış': 'Somut ve ölçülebilir hedefler belirleyerek odaklan.',
+      'Sınır koyamama': 'Hayır deme pratiği yaparak sınırlarını koru.',
+    };
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F1210),
+      body: Stack(children: [
+        // Arka plan gradient
+        Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+          gradient: RadialGradient(center: Alignment.topCenter, radius: 1.2,
+            colors: [gold.withOpacity(0.06), Colors.transparent]),
+        ))),
+
+        CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(child: SafeArea(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const SizedBox(height: 12),
+
+                // ── Geri butonu ve başlık ──
+                Row(children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: gold.withOpacity(0.06),
+                        border: Border.all(color: gold.withOpacity(0.12)),
+                      ),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: gold.withOpacity(0.6)),
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(width: 28, height: 28, child: CustomPaint(painter: _CosmicStarPainter(color: gold))),
+                  const Spacer(),
+                  const SizedBox(width: 36),
+                ]),
+
+                const SizedBox(height: 28),
+
+                // ── Büyük başlık ──
+                Center(child: Column(children: [
+                  ShaderMask(
+                    shaderCallback: (b) => const LinearGradient(
+                      colors: [Color(0xFFE8D5B7), Color(0xFFFFE8A1), Color(0xFFFFD060)],
+                    ).createShader(b),
+                    child: Text(nameEn.toUpperCase(), style: GoogleFonts.cinzel(
+                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: 8,
+                    )),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('Kendini Keşfet', style: GoogleFonts.cinzel(
+                    color: gold.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w400, letterSpacing: 3)),
+                ])),
+
+                const SizedBox(height: 32),
+
+                // ── Dekoratif çizgi ──
+                Row(children: [
+                  Expanded(child: Container(height: 0.3, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.transparent, gold.withOpacity(0.2)])))),
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SizedBox(width: 14, height: 14, child: CustomPaint(painter: _AnalyticsDiamondPainter(color: gold)))),
+                  Expanded(child: Container(height: 0.3, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [gold.withOpacity(0.2), Colors.transparent])))),
+                ]),
+
+                const SizedBox(height: 28),
+
+                // ── KOMBİNE GÜÇ / ZAYIFLIK HARİTASI ──
+                Center(child: ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [Color(0xFFE8D5B7), Color(0xFFF5E6D0), Colors.white],
+                  ).createShader(b),
+                  child: Text('GÜÇ HARİTAN', style: GoogleFonts.cinzel(
+                    color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 3)),
+                )),
+                const SizedBox(height: 6),
+                Center(child: Text('Bir alanı tıklayarak detayları keşfet', style: TextStyle(
+                  color: Colors.white.withOpacity(0.3), fontSize: 11))),
+                const SizedBox(height: 20),
+
+                // Legend
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(width: 10, height: 10, decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: const Color(0xFFFFD060).withOpacity(0.6))),
+                  const SizedBox(width: 6),
+                  Text('Güçlü yanlar', style: TextStyle(
+                    color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                  const SizedBox(width: 20),
+                  Container(width: 10, height: 10, decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: const Color(0xFF8AAFC8).withOpacity(0.6))),
+                  const SizedBox(width: 6),
+                  Text('Gelişim alanları', style: TextStyle(
+                    color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                ]),
+                const SizedBox(height: 16),
+
+                // Kombine Radar Chart
+                Builder(builder: (ctx) {
+                  const warmG = Color(0xFFFFD060);
+                  const coolB = Color(0xFF8AAFC8);
+                  final allTraits = <String>[...strengths, ...weaknesses];
+                  final allPcts = <double>[
+                    for (var i = 0; i < strengths.length; i++)
+                      0.82 + ((strengths[i].hashCode.abs() ^ (i * 3571)) % 14) / 100.0,
+                    for (var i = 0; i < weaknesses.length; i++)
+                      0.40 + ((weaknesses[i].hashCode.abs() ^ (i * 4219)) % 26) / 100.0,
+                  ];
+                  final allColors = <Color>[
+                    for (var i = 0; i < strengths.length; i++) warmG,
+                    for (var i = 0; i < weaknesses.length; i++) coolB,
+                  ];
+                  final allHints = <String>[
+                    for (var s in strengths) usageHints[s] ?? 'Potansiyelini keşfet.',
+                    for (var w in weaknesses) growthTips[w] ?? 'Farkındalık geliştir.',
+                  ];
+                  final allExercises = <String>[
+                    for (var s in strengths) _getExercise(s, true),
+                    for (var w in weaknesses) _getExercise(w, false),
+                  ];
+
+                  return Column(children: [
+                    GestureDetector(
+                      onTapDown: (details) {
+                        final box = ctx.findRenderObject() as RenderBox;
+                        final local = details.localPosition;
+                        final cx = box.size.width / 2;
+                        const cy = 150.0;
+                        const r = 105.0;
+                        int? closest;
+                        double minDist = 55;
+                        for (var i = 0; i < allTraits.length; i++) {
+                          final angle = -math.pi / 2 + (2 * math.pi * i / allTraits.length);
+                          final lx = cx + math.cos(angle) * (r + 32);
+                          final ly = cy + math.sin(angle) * (r + 32);
+                          final d = math.sqrt(math.pow(local.dx - lx, 2) + math.pow(local.dy - ly, 2));
+                          if (d < minDist) { minDist = d; closest = i; }
+                        }
+                        setState(() => _selectedIndex = closest == _selectedIndex ? null : closest);
+                      },
+                      child: SizedBox(height: 310, child: CustomPaint(
+                        size: Size(MediaQuery.of(context).size.width - 48, 310),
+                        painter: _CombinedRadarPainter(
+                          values: allPcts,
+                          labels: allTraits,
+                          colors: allColors,
+                          strengthCount: strengths.length,
+                          selectedIndex: _selectedIndex,
+                        ),
+                      )),
+                    ),
+
+                    // Detay paneli
+                    if (_selectedIndex != null) ...[
+                      const SizedBox(height: 16),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: allColors[_selectedIndex!].withOpacity(0.06),
+                          border: Border.all(color: allColors[_selectedIndex!].withOpacity(0.12)),
+                        ),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Row(children: [
+                            Container(width: 4, height: 20, decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: allColors[_selectedIndex!].withOpacity(0.7))),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(allTraits[_selectedIndex!], style: TextStyle(
+                              color: Colors.white.withOpacity(0.9), fontSize: 16, fontWeight: FontWeight.w600))),
+                            Text('${(allPcts[_selectedIndex!] * 100).round()}%', style: GoogleFonts.cinzel(
+                              color: allColors[_selectedIndex!].withOpacity(0.9), fontSize: 22, fontWeight: FontWeight.w700)),
+                          ]),
+                          const SizedBox(height: 12),
+                          ClipRRect(borderRadius: BorderRadius.circular(4), child: Stack(children: [
+                            Container(height: 6, color: Colors.white.withOpacity(0.04)),
+                            FractionallySizedBox(widthFactor: allPcts[_selectedIndex!],
+                              child: Container(height: 6, decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                gradient: LinearGradient(colors: [
+                                  allColors[_selectedIndex!].withOpacity(0.2),
+                                  allColors[_selectedIndex!].withOpacity(0.6),
+                                  allColors[_selectedIndex!].withOpacity(0.85)]),
+                                boxShadow: [BoxShadow(color: allColors[_selectedIndex!].withOpacity(0.3), blurRadius: 8)],
+                              )),
+                            ),
+                          ])),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: allColors[_selectedIndex!].withOpacity(0.1)),
+                            child: Text(
+                              _selectedIndex! < strengths.length ? '◆  Süper Gücün' : '◇  Gelişim Alanın',
+                              style: TextStyle(
+                                color: allColors[_selectedIndex!].withOpacity(0.8), fontSize: 10,
+                                fontWeight: FontWeight.w600, letterSpacing: 1)),
+                          ),
+                          const SizedBox(height: 14),
+                          Text('ÖNERİ', style: TextStyle(
+                            color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                          const SizedBox(height: 4),
+                          Text(allHints[_selectedIndex!], style: TextStyle(
+                            color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5)),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              color: Colors.white.withOpacity(0.03),
+                              border: Border.all(color: Colors.white.withOpacity(0.05))),
+                            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('✦', style: TextStyle(color: allColors[_selectedIndex!].withOpacity(0.6), fontSize: 14)),
+                              const SizedBox(width: 10),
+                              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('GÜNLÜK ALIŞTIRMA', style: TextStyle(
+                                  color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                                const SizedBox(height: 4),
+                                Text(allExercises[_selectedIndex!], style: TextStyle(
+                                  color: Colors.white.withOpacity(0.55), fontSize: 12, height: 1.5)),
+                              ])),
+                            ]),
+                          ),
+                        ]),
+                      ),
+                    ],
+                  ]);
+                }),
+
+                const SizedBox(height: 60),
+              ]),
+            ))),
+          ],
+        ),
+      ]),
+    );
+  }
+
+  String _getExercise(String trait, bool isStrength) {
+    if (isStrength) {
+      final map = <String, String>{
+        'Vizyon genişliği': 'Bugün 5 dakika gözlerini kapat ve 5 yıl sonraki hayatını hayal et.',
+        'Macera ruhu': 'Bu hafta daha önce hiç gitmediğin bir yere git, küçük de olsa.',
+        'Felsefi derinlik': 'Bugün okuduğun bir cümle hakkında 3 dakika derin düşün ve not al.',
+        'Doğal liderlik': 'Bugün bir gruba öncülük et — toplantıda söz al veya plan yap.',
+        'Cesaret ve atılganlık': 'Bugün ertelediğin bir konuşmayı yap veya zor bir adım at.',
+        'Girişimci ruh': 'Bugün bir iş fikri yaz, ne kadar küçük olursa olsun.',
+        'Kararlılık': 'Bugün bir hedefe 30 dakika kesintisiz odaklan.',
+        'Güvenilirlik': 'Bugün verdiğin bir sözü zamanından önce yerine getir.',
+        'Sabır': 'Bugün sıra beklerken veya trafikte sakin kal ve nefesine odaklan.',
+        'İletişim dehası': 'Bugün birine samimi bir iltifat et veya düşünceni net ifade et.',
+        'Duygusal zekâ': 'Bugün birinin duygusunu sor ve gerçekten dinle.',
+        'Sezgisel güç': 'Bugün bir karar vermeden önce iç sesini dinle, mantık yerine.',
+        'Doğal karizma': 'Bugün odaya girdiğinde gülümse ve göz teması kur.',
+        'Yaratıcı enerji': 'Bugün 10 dakika çiz, yaz veya müzik dinleyerek hayal kur.',
+        'Analitik zekâ': 'Bugün bir problemi adım adım analiz et ve çözüm yaz.',
+      };
+      return map[trait] ?? 'Bugün bu gücünü bilinçli olarak bir durumda kullan.';
+    } else {
+      final map = <String, String>{
+        'Sabırsızlık': 'Bugün bir şey beklerken geri sayımdan 10 saniye önce dur ve nefes al.',
+        'Sorumsuzluk': 'Bugün küçük bir söz ver (mesela mesaj atarım) ve mutlaka tut.',
+        'Aşırı dürüstlük': 'Bugün bir gerçeği söylemeden önce "bu kişi bunu duymak ister mi?" diye düşün.',
+        'Taahhüt korkusu': 'Bugün bir haftalık küçük bir plan yap ve takvime yaz.',
+        'İnatçılık': 'Bugün birinin fikrini sonuna kadar dinle, karşı çıkmadan önce.',
+        'Değişime direnç': 'Bugün rutininde küçük bir şeyi değiştir (farklı yol, farklı yemek).',
+        'Aşırı hassasiyet': 'Bugün seni rahatsız eden bir şey olduğunda 5 saniye bekle.',
+        'Ego': 'Bugün birini samimiyetle takdir et ve teşekkür et.',
+        'Kararsızlık': 'Bugün 2 dakikada bir karar ver, üzerinde fazla düşünme.',
+        'Mükemmeliyetçilik': 'Bugün bir işi %80 bitir ve "yeterli" de.',
+      };
+      return map[trait] ?? 'Bugün bu alandaki farkındalığını artırmak için 5 dakika düşün.';
+    }
+  }
+}
+
+// ── Combined Radar Painter (Kombine Güç Haritası) ──
+class _CombinedRadarPainter extends CustomPainter {
+  final List<double> values;
+  final List<String> labels;
+  final List<Color> colors;
+  final int strengthCount;
+  final int? selectedIndex;
+
+  _CombinedRadarPainter({
+    required this.values, required this.labels, required this.colors,
+    required this.strengthCount, this.selectedIndex,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    const cy = 155.0;
+    const r = 105.0;
+    final n = values.length;
+
+    // Grid çizgileri (4 seviye)
+    for (var level = 1; level <= 4; level++) {
+      final lr = r * level / 4;
+      final path = Path();
+      for (var i = 0; i <= n; i++) {
+        final angle = -math.pi / 2 + (2 * math.pi * (i % n) / n);
+        final x = cx + math.cos(angle) * lr;
+        final y = cy + math.sin(angle) * lr;
+        if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+      }
+      canvas.drawPath(path, Paint()
+        ..color = Colors.white.withOpacity(level == 4 ? 0.08 : 0.04)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.5);
+    }
+
+    // Eksen çizgileri
+    for (var i = 0; i < n; i++) {
+      final angle = -math.pi / 2 + (2 * math.pi * i / n);
+      final x = cx + math.cos(angle) * r;
+      final y = cy + math.sin(angle) * r;
+      canvas.drawLine(Offset(cx, cy), Offset(x, y), Paint()
+        ..color = Colors.white.withOpacity(0.05)
+        ..strokeWidth = 0.5);
+    }
+
+    // Güçlü yanlar polygon (altın)
+    _drawPolygon(canvas, cx, cy, r, n, 0, strengthCount, const Color(0xFFFFD060));
+
+    // Zayıf yanlar polygon (buz mavisi)
+    _drawPolygon(canvas, cx, cy, r, n, strengthCount, n, const Color(0xFF8AAFC8));
+
+    // Nokta + etiketler
+    for (var i = 0; i < n; i++) {
+      final angle = -math.pi / 2 + (2 * math.pi * i / n);
+      final vr = r * values[i];
+      final px = cx + math.cos(angle) * vr;
+      final py = cy + math.sin(angle) * vr;
+      final isSelected = i == selectedIndex;
+      final c = colors[i];
+
+      // Veri noktası
+      canvas.drawCircle(Offset(px, py), isSelected ? 5 : 3.5, Paint()
+        ..color = c.withOpacity(isSelected ? 0.9 : 0.6));
+      if (isSelected) {
+        canvas.drawCircle(Offset(px, py), 8, Paint()
+          ..color = c.withOpacity(0.15)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+      }
+
+      // Etiket konumu
+      final labelR = r + 28;
+      final lx = cx + math.cos(angle) * labelR;
+      final ly = cy + math.sin(angle) * labelR;
+      final pctText = '${(values[i] * 100).round()}%';
+      final labelText = labels[i];
+
+      // Yüzde
+      final ptp = TextPainter(
+        text: TextSpan(text: pctText, style: TextStyle(
+          color: c.withOpacity(isSelected ? 0.95 : 0.6),
+          fontSize: isSelected ? 12 : 10, fontWeight: FontWeight.w700)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      // İsim
+      final ltp = TextPainter(
+        text: TextSpan(text: labelText, style: TextStyle(
+          color: Colors.white.withOpacity(isSelected ? 0.9 : 0.5),
+          fontSize: isSelected ? 11 : 9, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      // Pozisyon ayarla
+      double tx = lx - ltp.width / 2;
+      double ty = ly - ltp.height / 2;
+      if (angle > math.pi / 4 && angle < 3 * math.pi / 4) ty += 4; // alt
+      if (angle < -math.pi / 4 && angle > -3 * math.pi / 4) ty -= 4; // üst
+
+      ltp.paint(canvas, Offset(tx, ty - 7));
+      ptp.paint(canvas, Offset(lx - ptp.width / 2, ty + 7));
+    }
+  }
+
+  void _drawPolygon(Canvas canvas, double cx, double cy, double r, int n, int from, int to, Color c) {
+    final path = Path();
+    for (var i = 0; i < n; i++) {
+      final angle = -math.pi / 2 + (2 * math.pi * i / n);
+      final v = (i >= from && i < to) ? values[i] : 0.0;
+      final x = cx + math.cos(angle) * r * v;
+      final y = cy + math.sin(angle) * r * v;
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    path.close();
+
+    // Fill
+    canvas.drawPath(path, Paint()..color = c.withOpacity(0.08));
+    // Stroke
+    canvas.drawPath(path, Paint()
+      ..color = c.withOpacity(0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5);
+    // Glow
+    canvas.drawPath(path, Paint()
+      ..color = c.withOpacity(0.1)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+  }
+
+  @override
+  bool shouldRepaint(covariant _CombinedRadarPainter old) =>
+    old.selectedIndex != selectedIndex || old.values != values;
+}
+
+class _ArcGaugePainter extends CustomPainter {
+  final double value; // 0.0 – 1.0
+  final Color color;
+  final Color textColor;
+
+  _ArcGaugePainter({required this.value, required this.color, required this.textColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width / 2 - 4;
+    const startAngle = -math.pi * 0.75; // -135°
+    const sweepTotal = math.pi * 1.5; // 270° toplam yay
+
+    final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
+
+    // Arka plan track
+    canvas.drawArc(rect, startAngle, sweepTotal, false, Paint()
+      ..color = color.withOpacity(0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round);
+
+    // Progress arc
+    final sweep = sweepTotal * value;
+    canvas.drawArc(rect, startAngle, sweep, false, Paint()
+      ..color = color.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round);
+
+    // Glow arc
+    canvas.drawArc(rect, startAngle, sweep, false, Paint()
+      ..color = color.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+
+    // Uç nokta parlak daire
+    final endAngle = startAngle + sweep;
+    final px = cx + math.cos(endAngle) * r;
+    final py = cy + math.sin(endAngle) * r;
+    canvas.drawCircle(Offset(px, py), 2.5, Paint()..color = color.withOpacity(0.8));
+
+    // Merkez yüzde yazısı
+    final pct = (value * 100).round();
+    final tp = TextPainter(
+      text: TextSpan(text: '$pct', style: TextStyle(
+        color: textColor.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w700)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(cx - tp.width / 2, cy - tp.height / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArcGaugePainter old) => old.value != value;
+}
+
+// ── Crystal Shard Clipper (Asimetrik Kesim) ──
+class _CrystalShardClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    const cut = 22.0; // sağ üst köşe kesim boyutu
+    const r = 16.0; // diğer köşelerin yuvarlatma yarıçapı
+    final w = size.width;
+    final h = size.height;
+
+    return Path()
+      ..moveTo(r, 0) // sol üst — yuvarlak başlangıç
+      ..lineTo(w - cut, 0) // üst kenar → sağ üst kesim başlangıcı
+      ..lineTo(w, cut) // diagonal kesim aşağı
+      ..lineTo(w, h - r) // sağ kenar aşağı
+      ..quadraticBezierTo(w, h, w - r, h) // sağ alt yuvarlak
+      ..lineTo(r, h) // alt kenar
+      ..quadraticBezierTo(0, h, 0, h - r) // sol alt yuvarlak
+      ..lineTo(0, r) // sol kenar
+      ..quadraticBezierTo(0, 0, r, 0) // sol üst yuvarlak
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

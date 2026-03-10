@@ -13,6 +13,7 @@ class StorageService {
   static const String _keyLongestStreak = 'longest_streak';
   static const String _keyUserName = 'user_name';
   static const String _keyZodiacSign = 'zodiac_sign';
+  static const String _keyBirthDate = 'birth_date';
   static const String _keyCurrentMood = 'current_mood';
   static const String _keyStreakDays = 'streak_days';
   static const String _keyLastCookieDate = 'last_cookie_date';
@@ -142,6 +143,18 @@ class StorageService {
   static Future<void> setZodiacSign(String sign) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyZodiacSign, sign);
+  }
+
+  static Future<DateTime?> getBirthDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString(_keyBirthDate);
+    if (str == null) return null;
+    return DateTime.tryParse(str);
+  }
+
+  static Future<void> setBirthDate(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBirthDate, date.toIso8601String());
   }
 
   static String _todayKey() =>
