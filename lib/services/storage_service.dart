@@ -41,6 +41,7 @@ class StorageService {
   static const String _keyLocale = 'app_locale';
   static const String _keySelectedCookie = 'selected_cookie';
   static const String _keyInstallId = 'install_id';
+  static const String _keyCompletedCosmicTasks = 'completed_cosmic_tasks';
 
   // ── Cihaza özel benzersiz ID (ilk kurulumda oluşturulur) ──
   static Future<int> getInstallId() async {
@@ -839,5 +840,23 @@ class StorageService {
     await prefs.setString(_keyOwlLastDelivered, today);
 
     return letter;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ZODIAC CHALLENGES
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<List<String>> getCompletedCosmicTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_keyCompletedCosmicTasks) ?? [];
+  }
+
+  static Future<void> addCompletedCosmicTask(String task) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getStringList(_keyCompletedCosmicTasks) ?? [];
+    if (!current.contains(task)) {
+      current.add(task);
+      await prefs.setStringList(_keyCompletedCosmicTasks, current);
+    }
   }
 }

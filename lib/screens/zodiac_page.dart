@@ -35,8 +35,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Mars', 'planetEmoji': '♂️',
       'quality': 'Öncü', 'qualityEmoji': '⚡',
       'traits': ['Cesur', 'Enerjik', 'Girişken', 'Tutkulu', 'Kararlı', 'Lider'],
-      'strengths': ['Doğal liderlik', 'Cesaret ve atılganlık', 'Girişimci ruh'],
-      'weaknesses': ['Sabırsızlık', 'Düşünmeden hareket', 'Hırslı olma'],
+      'strengths': ['Doğal liderlik', 'Cesaret ve atılganlık', 'Girişimci ruh', 'Bağımsızlık', 'Yüksek enerji', 'Öz güven'],
+      'weaknesses': ['Sabırsızlık', 'Düşünmeden hareket', 'Hırslı olma', 'Çabuk öfkelenme', 'Bencillik', 'Acelecilik'],
       'description': 'Koç burcu, Zodyak\'ın ilk ve en ateşli başlangıcıdır. Mars\'ın yönetimindeki bu burç, liderlik, cesaret ve eyleme geçme gücünü temsil eder. Koç bireyler doğuştan öncüdür; bilinmeyenden korkmazlar, aksine ona doğru koşarlar. Her yeni durumda ilk adımı atan, enerji ve tutku dolu ruhlardır.',
       'love': 'Aşkta tutkulu ve yoğun. Partnerine sadık ama bağımsızlığına düşkün. İlk adımı her zaman kendisi atar.',
       'career': 'Doğal lider. Girişimcilik, yöneticilik ve rekabete dayalı alanlarda parlıyor.',
@@ -51,8 +51,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Venüs', 'planetEmoji': '♀️',
       'quality': 'Sabit', 'qualityEmoji': '⚓',
       'traits': ['Güvenilir', 'Sabırlı', 'Kararlı', 'Sadık', 'Estetik', 'Pratik'],
-      'strengths': ['Sarsılmaz irade', 'Maddi güvenlik', 'Sanatsal hassasiyet'],
-      'weaknesses': ['İnatçılık', 'Değişime direnç', 'Aşırı sahiplenme'],
+      'strengths': ['Sarsılmaz irade', 'Maddi güvenlik', 'Sanatsal hassasiyet', 'Sadakat', 'Sabır', 'Güvenilirlik'],
+      'weaknesses': ['İnatçılık', 'Değişime direnç', 'Aşırı sahiplenme', 'Maddiyatçılık', 'Üşengeçlik', 'Kıskançlık'],
       'description': 'Boğa, Zodyak\'ın en kararlı ve güvenilir burcudur. Venüs\'ün zarif dokunuşuyla güzellik, konfor ve maddi güvenliğe değer verir. Sabırla hedeflerine ulaşır, sözünde durur ve sevdiklerine sıkıca bağlanır. Doğanın ve sanatın tadını çıkaran, ayakları yere basan bir ruhtur.',
       'love': 'Aşkta sadık ve romantik. Güven ve istikrar arar. Partnerini şımartmayı sever.',
       'career': 'Finans, sanat, gastronomi ve mimarlıkta başarılı. Uzun vadeli planlar yapar.',
@@ -67,8 +67,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Merkür', 'planetEmoji': '☿',
       'quality': 'Değişken', 'qualityEmoji': '🔄',
       'traits': ['Meraklı', 'Zeki', 'Sosyal', 'Esnek', 'İletişimci', 'Çok Yönlü'],
-      'strengths': ['Hızlı öğrenme', 'İletişim becerisi', 'Uyum yeteneği'],
-      'weaknesses': ['Kararsızlık', 'Yüzeysellik', 'Çabuk sıkılma'],
+      'strengths': ['Hızlı öğrenme', 'İletişim becerisi', 'Uyum yeteneği', 'Meraklı doğa', 'Çok yönlülük', 'Esnek düşünce'],
+      'weaknesses': ['Kararsızlık', 'Yüzeysellik', 'Çabuk sıkılma', 'Tutarsızlık', 'Gevşeklik', 'Odak eksikliği'],
       'description': 'İkizler, zihinsel çevikliğin ve iletişimin burcudur. Merkür\'ün hızıyla düşünen bu burç, her konuyla ilgilenir, her ortama uyum sağlar. Sosyal kelebekler olarak tanınırlar; sohbetleri her zaman ilgi çekici ve bilgilendiricidir. İki yüzlü değil, çok yönlüdürler.',
       'love': 'Aşkta eğlenceli ve entelektüel bağ arar. Sıkıcı rutinden kaçınır, zihinsel uyum şarttır.',
       'career': 'Medya, yazarlık, pazarlama ve eğitimde parlıyor. Aynı anda birden fazla projeyi yönetir.',
@@ -83,8 +83,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Ay', 'planetEmoji': '🌙',
       'quality': 'Öncü', 'qualityEmoji': '⚡',
       'traits': ['Duygusal', 'Koruyucu', 'Sezgisel', 'Sadık', 'Şefkatli', 'Empatik'],
-      'strengths': ['Derin empati', 'Aile bağları', 'Güçlü sezgiler'],
-      'weaknesses': ['Aşırı duygusallık', 'Geçmişe takılma', 'Kabuğuna çekilme'],
+      'strengths': ['Derin empati', 'Aile bağları', 'Güçlü sezgiler', 'Koruyucu yapı', 'Şefkat', 'Sadakat'],
+      'weaknesses': ['Aşırı duygusallık', 'Geçmişe takılma', 'Kabuğuna çekilme', 'Alınganlık', 'Karamsarlık', 'Aşırı hassasiyet'],
       'description': 'Yengeç, Zodyak\'ın en duygusal ve koruyucu burcudur. Ay\'ın etkisiyle duyguları derin, sezgileri güçlüdür. Sevdiklerini kabuğunun altında korur, yuvasını bir sığınak gibi yaratır. Gözyaşlarının altında bir okyanus kadar güç taşır.',
       'love': 'Aşkta derin bağlanır. Güven ve sıcaklık arar. Partneri için her şeyi yapar.',
       'career': 'Sağlık, eğitim, psikoloji ve aşçılıkta başarılı. İnsanlara yardım eden alanlarda parlıyor.',
@@ -99,8 +99,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Güneş', 'planetEmoji': '☀️',
       'quality': 'Sabit', 'qualityEmoji': '⚓',
       'traits': ['Özgüvenli', 'Lider Ruhlu', 'Cömert', 'Yaratıcı', 'Tutkulu', 'Sadık'],
-      'strengths': ['Doğal karizma', 'Yaratıcı güç', 'Cömertlik'],
-      'weaknesses': ['Gurur', 'Dikkat beklentisi', 'Otoriter tavır'],
+      'strengths': ['Doğal karizma', 'Yaratıcı güç', 'Cömertlik', 'Liderlik ruhu', 'Özgüven', 'Cesaret'],
+      'weaknesses': ['Gurur', 'Dikkat beklentisi', 'Otoriter tavır', 'Kibir', 'İnatçılık', 'Egoizm'],
       'description': 'Aslan, Zodyak\'ın kralıdır. Güneş\'in ışığını taşıyan bu burç, sahneye çıktığı anda tüm dikkatleri üzerine çeker. Cömert, sadık ve yaratıcı bir ruhtur. Etrafındakilere enerji verir, ilham kaynağı olur. Liderliği doğasında vardır.',
       'love': 'Aşkta tutkulu ve romantik. Hayranlık ve sadakat bekler. Partnerini bir kral gibi korur.',
       'career': 'Sanat, sahne, yöneticilik ve girişimcilikte parlıyor. Spot ışığı altında en iyisi.',
@@ -115,8 +115,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Merkür', 'planetEmoji': '☿',
       'quality': 'Değişken', 'qualityEmoji': '🔄',
       'traits': ['Analitik', 'Düzenli', 'Detaycı', 'Mükemmeliyetçi', 'Yardımsever', 'Pratik'],
-      'strengths': ['Analitik zekâ', 'Düzen ve organizasyon', 'Hizmet ruhu'],
-      'weaknesses': ['Aşırı eleştirellik', 'Mükemmeliyetçilik', 'Endişe eğilimi'],
+      'strengths': ['Analitik zekâ', 'Düzen ve organizasyon', 'Hizmet ruhu', 'Detaycılık', 'Pratiklik', 'Güvenilirlik'],
+      'weaknesses': ['Aşırı eleştirellik', 'Mükemmeliyetçilik', 'Endişe eğilimi', 'Evham', 'Detaylarda boğulma', 'Soğuk görünüm'],
       'description': 'Başak, Zodyak\'ın en analitik ve detaycı burcudur. Merkür\'ün pratik yönüyle her detayı görür, düzeni sever ve çevresini sürekli iyileştirmeye çalışır. Alçakgönüllü ama inanılmaz güçlü bir iç dünyaya sahiptir. Hizmet ruhu en belirgin özelliğidir.',
       'love': 'Aşkta düşünceli ve özenli. Küçük detaylarla sevgisini gösterir. Güvenilir ve sadık.',
       'career': 'Sağlık, analiz, yazılım ve düzenleme alanlarında üstün. Mükemmeliyetçiliği başarı getirir.',
@@ -131,8 +131,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Venüs', 'planetEmoji': '♀️',
       'quality': 'Öncü', 'qualityEmoji': '⚡',
       'traits': ['Diplomatik', 'Estetik', 'Adil', 'Uyumlu', 'Zarif', 'Romantik'],
-      'strengths': ['Adalet duygusu', 'Estetik anlayış', 'Diplomasi'],
-      'weaknesses': ['Kararsızlık', 'Çatışmadan kaçınma', 'Başkalarına bağımlılık'],
+      'strengths': ['Adalet duygusu', 'Estetik anlayış', 'Diplomasi', 'Uyum yeteneği', 'Zarafet', 'Sosyal beceri'],
+      'weaknesses': ['Kararsızlık', 'Çatışmadan kaçınma', 'Başkalarına bağımlılık', 'Yüzeysellik', 'Hayır diyememe', 'Kendinden ödün verme'],
       'description': 'Terazi, denge ve uyumun burcudur. Venüs\'ün zarafetiyle güzelliğe, adalete ve ilişkilere büyük önem verir. Her durumda orta yolu bulmaya çalışır. Estetik anlayışı ve diplomatik yetenekleri onu benzersiz kılar.',
       'love': 'Aşkta romantik ve uyumlu. İlişkide denge ve eşitlik arar. Çatışmadan hoşlanmaz.',
       'career': 'Hukuk, sanat, moda ve diplomaside başarılı. Her alanda estetiği ön plana çıkarır.',
@@ -147,8 +147,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Plüton', 'planetEmoji': '♇',
       'quality': 'Sabit', 'qualityEmoji': '⚓',
       'traits': ['Tutkulu', 'Gizemli', 'Kararlı', 'Derin', 'Manyetik', 'Güçlü'],
-      'strengths': ['Derin sezgi', 'Yeniden doğuş gücü', 'Sadakat'],
-      'weaknesses': ['Kıskançlık', 'İntikamcılık', 'Aşırı kontrol'],
+      'strengths': ['Derin sezgi', 'Yeniden doğuş gücü', 'Sadakat', 'Tutku', 'Kararlılık', 'Stratejik zeka'],
+      'weaknesses': ['Kıskançlık', 'İntikamcılık', 'Aşırı kontrol', 'Şüphecilik', 'Gizemlilik', 'Sahiplenicilik'],
       'description': 'Akrep, Zodyak\'ın en derin ve tutkulu burcudur. Plüton\'un dönüştürücü gücüyle yaşamın en karanlık köşelerine bakmaktan çekinmez. Güçlü sezgileri ve manyetik çekiciliğiyle tanınır. Anka kuşu gibi her krizden daha güçlü doğar.',
       'love': 'Aşkta son derece tutkulu ve yoğun. Tam bağlanır ya da hiç. Güvene büyük önem verir.',
       'career': 'Araştırma, psikoloji, tıp ve dedektiflikte usta. Gizemleri çözmek doğasında var.',
@@ -163,8 +163,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Jüpiter', 'planetEmoji': '♃',
       'quality': 'Değişken', 'qualityEmoji': '🔄',
       'traits': ['Maceracı', 'Özgür', 'Filozof', 'İyimser', 'Dürüst', 'Enerjik'],
-      'strengths': ['Vizyon genişliği', 'Macera ruhu', 'Felsefi derinlik'],
-      'weaknesses': ['Sorumsuzluk', 'Aşırı dürüstlük', 'Taahhüt korkusu'],
+      'strengths': ['Vizyon genişliği', 'Macera ruhu', 'Felsefi derinlik', 'İyimserlik', 'Özgür düşünce', 'Dürüstlük'],
+      'weaknesses': ['Sorumsuzluk', 'Aşırı dürüstlük', 'Taahhüt korkusu', 'Sabırsızlık', 'Patavatsızlık', 'Huzursuzluk'],
       'description': 'Yay, Zodyak\'ın kaşifi ve filozofudur. Jüpiter\'in genişletici enerjisiyle sınırları zorlar, yeni ufuklara yelken açar. Hayata büyük bir iyimserlikle bakar, bilgelik arayışı hiç bitmez. Okçu gibi hedefine doğru uçar.',
       'love': 'Aşkta özgür ve maceracı. Onu kafesleyemezsin. Entelektüel bağ ve ortak maceralar ister.',
       'career': 'Seyahat, eğitim, felsefe ve hukuk alanlarında başarılı. Dünyayı keşfetmek onun işi.',
@@ -179,8 +179,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Satürn', 'planetEmoji': '♄',
       'quality': 'Öncü', 'qualityEmoji': '⚡',
       'traits': ['Disiplinli', 'Hırslı', 'Sorumlu', 'Ciddi', 'Geleneksel', 'Dayanıklı'],
-      'strengths': ['İrade gücü', 'Uzun vadeli planlama', 'Sorumluluk bilinci'],
-      'weaknesses': ['Aşırı ciddiyet', 'Duygularını bastırma', 'İş koliklik'],
+      'strengths': ['İrade gücü', 'Uzun vadeli planlama', 'Sorumluluk bilinci', 'Disiplin', 'Kararlılık', 'Güvenilirlik'],
+      'weaknesses': ['Aşırı ciddiyet', 'Duygularını bastırma', 'İş koliklik', 'Karamsarlık', 'Katı kuralcılık', 'Maddiyatçılık'],
       'description': 'Oğlak, Zodyak\'ın en disiplinli ve hırslı burcudur. Satürn\'ün yapıcı etkisiyle hedeflerine adım adım ilerler. Sabırla dağın zirvesine tırmanır. Sözüne güvenilir, sorumluluklarını asla ihmal etmez. Zamanla daha da güçlenir.',
       'love': 'Aşkta ciddi ve sadık. Uzun vadeli ilişkiler ister. Sevgisini eylemlerle gösterir.',
       'career': 'Yöneticilik, finans, mühendislik ve devlet işlerinde güçlü. Kariyer odaklı.',
@@ -195,8 +195,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Uranüs', 'planetEmoji': '♅',
       'quality': 'Sabit', 'qualityEmoji': '⚓',
       'traits': ['Yenilikçi', 'Bağımsız', 'Hümanist', 'Orijinal', 'Vizyoner', 'Asi'],
-      'strengths': ['Özgün düşünce', 'İnsancıl bakış', 'Devrimci ruh'],
-      'weaknesses': ['Duygusal mesafe', 'İnatçılık', 'Asi tutum'],
+      'strengths': ['Özgün düşünce', 'İnsancıl bakış', 'Devrimci ruh', 'Bağımsızlık', 'Gelecek vizyonu', 'Yenilikçilik'],
+      'weaknesses': ['Duygusal mesafe', 'İnatçılık', 'Asi tutum', 'Bağlanma korkusu', 'Ukalalık', 'Aşırı rasyonalite'],
       'description': 'Kova, Zodyak\'ın yenilikçisi ve devrimcisidir. Uranüs\'ün sıra dışı enerjisiyle kalıpları kırar, geleceği hayal eder. İnsanlığın iyiliği için çalışır. Bireysel özgürlüğe düşkün, orijinal düşünceli vizyonerlerdir.',
       'love': 'Aşkta bağımsız ve arkadaşça. Entelektüel uyum arar. Klişe romantizmden kaçınır.',
       'career': 'Teknoloji, bilim, sosyal girişimcilik ve inovasyonda öncü. Geleceği inşa eder.',
@@ -211,8 +211,8 @@ class _ZodiacPageState extends State<ZodiacPage>
       'planet': 'Neptün', 'planetEmoji': '♆',
       'quality': 'Değişken', 'qualityEmoji': '🔄',
       'traits': ['Hayalperest', 'Empati', 'Sanatsal', 'Sezgisel', 'Şefkatli', 'Gizemli'],
-      'strengths': ['Sınırsız empati', 'Sanatsal yetenek', 'Ruhani derinlik'],
-      'weaknesses': ['Gerçeklikten kaçış', 'Aşırı hassasiyet', 'Sınır koyamama'],
+      'strengths': ['Sınırsız empati', 'Sanatsal yetenek', 'Ruhani derinlik', 'Sezgisel güç', 'Şefkat', 'Fedakarlık'],
+      'weaknesses': ['Gerçeklikten kaçış', 'Aşırı hassasiyet', 'Sınır koyamama', 'Kurban psikolojisi', 'Kararsızlık', 'Aşırı duygusallık'],
       'description': 'Balık, Zodyak\'ın son ve en ruhani burcudur. Neptün\'ün hayalci dünyasıyla sınırları olmayan bir iç evrene sahiptir. Tüm burçların bilgeliğini taşır. Güçlü empatisi ve sanatsal ruhuyla dokunduğu her şeye anlam katar.',
       'love': 'Aşkta romantik ve fedakâr. Ruh ikizini arar. Derin duygusal bağ kurar.',
       'career': 'Sanat, müzik, sinema, terapi ve spiritüel alanlarda doğal yetenek. Hayal gücü sınırsız.',
@@ -457,11 +457,12 @@ class _ZodiacPageState extends State<ZodiacPage>
           ));
         }),
 
-        SafeArea(bottom: false, child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
+        SafeArea(top: false, bottom: false, child: CustomScrollView(
+          physics: const ClampingScrollPhysics(),
           slivers: [SliverToBoxAdapter(child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(height: MediaQuery.of(context).padding.top + 8),
               // ── ÜST BAR ──
               Row(children: [
                 const GlassBackButton(),
@@ -1842,7 +1843,7 @@ class _RadarChartPainter extends CustomPainter {
 }
 
 // ═══════════════════════════════════════════
-// KENDİNİ KEŞFET — DETAY SAYFASI
+// KENDİNİ KEŞFET — DETAY SAYFASI (Zigzag Kart Tasarım)
 // ═══════════════════════════════════════════
 class _ZodiacDetailPage extends StatefulWidget {
   final Map<String, dynamic> sign;
@@ -1854,42 +1855,59 @@ class _ZodiacDetailPage extends StatefulWidget {
 }
 
 class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
-  int? _selectedIndex; // Tıklanan trait indeksi (null = hiçbiri)
-
   Color get gold => widget.gold;
-  static const _goldL = Color(0xFFFFE8A1);
+  static const _warmGold = Color(0xFFFFD060);
+  static const _coolBlue = Color(0xFF8AAFC8);
+
+  late List<String> shuffledStrengths;
+  late List<String> shuffledWeaknesses;
+
+  @override
+  void initState() {
+    super.initState();
+    // Liste her açılışta karıştırılıyor (kullanıcının sıkılmasını ve aynı duty/challenge listesini görmesini engeller)
+    shuffledStrengths = (List<String>.from(widget.sign['strengths'] as List<dynamic>)..shuffle()).take(3).toList();
+    shuffledWeaknesses = (List<String>.from(widget.sign['weaknesses'] as List<dynamic>)..shuffle()).take(3).toList();
+  }
+
+  // Trait için yüzde hesapla
+  int _getPct(String trait, bool isStrength) {
+    // Biraz da rastgeleleşmesini sağlayan gün değişkeni ekleyelim ki skorlar da değişsin
+    final dayRandom = DateTime.now().day;
+    final h = (trait.hashCode.abs() ^ (trait.length * 3571) ^ dayRandom) % 100;
+    if (isStrength) return 80 + (h % 16);
+    return 40 + (h % 26);
+  }
 
   @override
   Widget build(BuildContext context) {
     final sign = widget.sign;
-    final strengths = sign['strengths'] as List<String>;
-    final weaknesses = sign['weaknesses'] as List<String>;
-    final name = sign['name'] as String;
+    final strengths = shuffledStrengths;
+    final weaknesses = shuffledWeaknesses;
     final nameEn = sign['nameEn'] as String;
-    final symbol = sign['symbol'] as String;
 
     const usageHints = <String, String>{
       'Doğal liderlik': 'Takım kuracak projelerde öne geç ve yönlendirici rol üstlen.',
       'Cesaret ve atılganlık': 'Risk içeren kararlarda diğerlerinin çekineceği adımları at.',
       'Girişimci ruh': 'Yeni iş fikirleri geliştir ve öncü projeler başlat.',
-      'Kararlılık': 'Uzun vadeli hedefler koyarak kararlılığını avantaja çevir.',
-      'Güvenilirlik': 'Güven gerektiren görevlerde referans noktası ol.',
-      'Sabır': 'Uzun süreçli projelerde stratejik sabrınla fark yarat.',
-      'Çift yönlü bakış': 'Farklı bakış açılarını harmanlayarak arabuluculuk yap.',
-      'İletişim dehası': 'Fikirlerini etkili ifade ederek çevreni genişlet.',
+      'Sarsılmaz irade': 'Uzun vadeli hedefler koyarak kararlılığını avantaja çevir.',
+      'Maddi güvenlik': 'Finansal stratejilerle güvenli bir gelecek inşa et.',
+      'Sanatsal hassasiyet': 'Estetik alanlarında kendini ifade et ve fark yarat.',
       'Hızlı öğrenme': 'Yeni alanları hızla öğrenerek rekabet avantajı kazan.',
-      'Duygusal zekâ': 'İlişkilerde derinlik kurarak güçlü bağlar oluştur.',
-      'Koruyucu doğa': 'Çevrendekiler için güvenli bir ortam yarat.',
-      'Sezgisel güç': 'Sezgilerini dinleyerek doğru zamanda doğru kararlar ver.',
+      'İletişim becerisi': 'Fikirlerini etkili ifade ederek çevreni genişlet.',
+      'Uyum yeteneği': 'Farklı ortamlara hızla adapte olarak avantaj yakala.',
+      'Derin empati': 'İlişkilerde derinlik kurarak güçlü bağlar oluştur.',
+      'Aile bağları': 'Sevdiklerinle güçlü bağlar kurarak destek ağı oluştur.',
+      'Güçlü sezgiler': 'Sezgilerini dinleyerek doğru zamanda doğru kararlar ver.',
       'Doğal karizma': 'Etrafındakilere ilham vererek liderlik pozisyonları üstlen.',
-      'Yaratıcı enerji': 'Sanatsal projeler ve tasarım alanlarında kendini ifade et.',
+      'Yaratıcı güç': 'Sanatsal projeler ve tasarım alanlarında kendini ifade et.',
       'Cömertlik': 'Paylaşımcı yaklaşımınla sosyal çevreni genişlet.',
       'Analitik zekâ': 'Verileri analiz ederek stratejik kararlar al.',
       'Düzen ve organizasyon': 'Sistematik yaklaşımınla karmaşık süreçleri basitleştir.',
       'Hizmet ruhu': 'Topluma değer katacak projelerde gönüllü rol al.',
-      'Diplomatik yetenek': 'Farklı tarafları bir araya getirerek köprüler kur.',
+      'Adalet duygusu': 'Etik değerleri ön plana koyarak güvenilir bir figür ol.',
       'Estetik anlayış': 'Görsel ve tasarım projelerinde fark yaratan işler çıkar.',
-      'Adalet duygusu': 'Etik değerleri ön plana koyarak güvenilir bir figrü ol.',
+      'Diplomasi': 'Farklı tarafları bir araya getirerek köprüler kur.',
       'Derin sezgi': 'Görünmeyen dinamikleri sezgilerinle fark et ve yönlendir.',
       'Yeniden doğuş gücü': 'Kriz anlarını dönüştürerek fırsata çevir.',
       'Sadakat': 'Uzun vadeli ilişkiler kurarak güçlü bir destek ağı oluştur.',
@@ -1905,6 +1923,16 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       'Sınırsız empati': 'Derin empatin ile insanların yaşamlarına dokunmaya devam et.',
       'Sanatsal yetenek': 'Yaratıcılığını müzik, sinema veya görsel sanatlarda keşfet.',
       'Ruhani derinlik': 'İçsel yolculuğunla başkalarına rehberlik edebilirsin.',
+      'Kararlılık': 'Uzun vadeli hedefler koyarak kararlılığını avantaja çevir.',
+      'Güvenilirlik': 'Güven gerektiren görevlerde referans noktası ol.',
+      'Sabır': 'Uzun süreçli projelerde stratejik sabrınla fark yarat.',
+      'Çift yönlü bakış': 'Farklı bakış açılarını harmanlayarak arabuluculuk yap.',
+      'İletişim dehası': 'Fikirlerini etkili ifade ederek çevreni genişlet.',
+      'Duygusal zekâ': 'İlişkilerde derinlik kurarak güçlü bağlar oluştur.',
+      'Koruyucu doğa': 'Çevrendekiler için güvenli bir ortam yarat.',
+      'Sezgisel güç': 'Sezgilerini dinleyerek doğru zamanda doğru kararlar ver.',
+      'Yaratıcı enerji': 'Sanatsal projeler ve tasarım alanlarında kendini ifade et.',
+      'Diplomatik yetenek': 'Farklı tarafları bir araya getirerek köprüler kur.',
     };
 
     const growthTips = <String, String>{
@@ -1929,6 +1957,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       'Kararsız doğa': 'Önceliklendirme matrisi kullanarak net kararlar al.',
       'Başkalarına bağımlılık': 'Tek başına aktiviteler planlayarak öz yeterliliğini keşfet.',
       'Çatışmadan kaçma': 'Assertif iletişim teknikleri öğrenerek sesini duyur.',
+      'Çatışmadan kaçınma': 'Assertif iletişim teknikleri öğrenerek sesini duyur.',
       'Kıskançlık': 'Bolluk zihniyetini benimseyerek güven inşa et.',
       'İntikamcılık': 'Affetme pratiği yaparak iç huzurunu bul.',
       'Aşırı kontrol': 'Akışa bırakma egzersizleri ile esnekliğini geliştir.',
@@ -1942,6 +1971,12 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       'Asi tutum': 'Yapıcı eleştiri teknikleri öğrenerek enerjini yönlendir.',
       'Gerçeklikten kaçış': 'Somut ve ölçülebilir hedefler belirleyerek odaklan.',
       'Sınır koyamama': 'Hayır deme pratiği yaparak sınırlarını koru.',
+      'Çabuk sıkılma': 'Bir projeye sabırla bağlan, bitirmekten haz duymayı öğren.',
+      'Aşırı duygusallık': 'Duygusal sınırlarını belirleyerek enerjini koru.',
+      'Kabuğuna çekilme': 'Güven inşa ederek sosyal bağlarını güçlendir.',
+      'Gurur': 'Alçakgönüllülüğü keşfet, başkalarının başarılarını kutla.',
+      'Dikkat beklentisi': 'İçsel onay mekanizmalarını geliştirerek özgüvenini artır.',
+      'Otoriter tavır': 'Aktif dinleme tekniklerini öğrenerek iletişimini güçlendir.',
     };
 
     return Scaffold(
@@ -1961,7 +1996,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const SizedBox(height: 12),
 
-                // ── Geri butonu ve başlık ──
+                // ── Geri butonu ──
                 Row(children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
@@ -1982,7 +2017,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
 
                 const SizedBox(height: 28),
 
-                // ── Büyük başlık ──
+                // ── Başlık ──
                 Center(child: Column(children: [
                   ShaderMask(
                     shaderCallback: (b) => const LinearGradient(
@@ -1999,7 +2034,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
 
                 const SizedBox(height: 32),
 
-                // ── Dekoratif çizgi ──
+                // ── Dekoratif elmas çizgi ──
                 Row(children: [
                   Expanded(child: Container(height: 0.3, decoration: BoxDecoration(
                     gradient: LinearGradient(colors: [Colors.transparent, gold.withOpacity(0.2)])))),
@@ -2011,171 +2046,61 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
 
                 const SizedBox(height: 28),
 
-                // ── KOMBİNE GÜÇ / ZAYIFLIK HARİTASI ──
-                Center(child: ShaderMask(
-                  shaderCallback: (b) => const LinearGradient(
-                    colors: [Color(0xFFE8D5B7), Color(0xFFF5E6D0), Colors.white],
-                  ).createShader(b),
-                  child: Text('GÜÇ HARİTAN', style: GoogleFonts.cinzel(
-                    color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 3)),
-                )),
-                const SizedBox(height: 6),
-                Center(child: Text('Bir alanı tıklayarak detayları keşfet', style: TextStyle(
-                  color: Colors.white.withOpacity(0.3), fontSize: 11))),
+                // ═══════════════════════════
+                // | SÜPER GÜÇLERİN
+                // ═══════════════════════════
+                _sectionHeader('SÜPER GÜÇLERİN', _warmGold),
                 const SizedBox(height: 20),
 
-                // Legend
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Container(width: 10, height: 10, decoration: BoxDecoration(
-                    shape: BoxShape.circle, color: const Color(0xFFFFD060).withOpacity(0.6))),
-                  const SizedBox(width: 6),
-                  Text('Güçlü yanlar', style: TextStyle(
-                    color: Colors.white.withOpacity(0.5), fontSize: 11)),
-                  const SizedBox(width: 20),
-                  Container(width: 10, height: 10, decoration: BoxDecoration(
-                    shape: BoxShape.circle, color: const Color(0xFF8AAFC8).withOpacity(0.6))),
-                  const SizedBox(width: 6),
-                  Text('Gelişim alanları', style: TextStyle(
-                    color: Colors.white.withOpacity(0.5), fontSize: 11)),
-                ]),
-                const SizedBox(height: 16),
-
-                // Kombine Radar Chart
-                Builder(builder: (ctx) {
-                  const warmG = Color(0xFFFFD060);
-                  const coolB = Color(0xFF8AAFC8);
-                  final allTraits = <String>[...strengths, ...weaknesses];
-                  final allPcts = <double>[
-                    for (var i = 0; i < strengths.length; i++)
-                      0.82 + ((strengths[i].hashCode.abs() ^ (i * 3571)) % 14) / 100.0,
-                    for (var i = 0; i < weaknesses.length; i++)
-                      0.40 + ((weaknesses[i].hashCode.abs() ^ (i * 4219)) % 26) / 100.0,
-                  ];
-                  final allColors = <Color>[
-                    for (var i = 0; i < strengths.length; i++) warmG,
-                    for (var i = 0; i < weaknesses.length; i++) coolB,
-                  ];
-                  final allHints = <String>[
-                    for (var s in strengths) usageHints[s] ?? 'Potansiyelini keşfet.',
-                    for (var w in weaknesses) growthTips[w] ?? 'Farkındalık geliştir.',
-                  ];
-                  final allExercises = <String>[
-                    for (var s in strengths) _getExercise(s, true),
-                    for (var w in weaknesses) _getExercise(w, false),
-                  ];
-
-                  return Column(children: [
-                    GestureDetector(
-                      onTapDown: (details) {
-                        final box = ctx.findRenderObject() as RenderBox;
-                        final local = details.localPosition;
-                        final cx = box.size.width / 2;
-                        const cy = 150.0;
-                        const r = 105.0;
-                        int? closest;
-                        double minDist = 55;
-                        for (var i = 0; i < allTraits.length; i++) {
-                          final angle = -math.pi / 2 + (2 * math.pi * i / allTraits.length);
-                          final lx = cx + math.cos(angle) * (r + 32);
-                          final ly = cy + math.sin(angle) * (r + 32);
-                          final d = math.sqrt(math.pow(local.dx - lx, 2) + math.pow(local.dy - ly, 2));
-                          if (d < minDist) { minDist = d; closest = i; }
-                        }
-                        setState(() => _selectedIndex = closest == _selectedIndex ? null : closest);
-                      },
-                      child: SizedBox(height: 310, child: CustomPaint(
-                        size: Size(MediaQuery.of(context).size.width - 48, 310),
-                        painter: _CombinedRadarPainter(
-                          values: allPcts,
-                          labels: allTraits,
-                          colors: allColors,
-                          strengthCount: strengths.length,
-                          selectedIndex: _selectedIndex,
-                        ),
-                      )),
-                    ),
-
-                    // Detay paneli
-                    if (_selectedIndex != null) ...[
-                      const SizedBox(height: 16),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOutCubic,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: allColors[_selectedIndex!].withOpacity(0.06),
-                          border: Border.all(color: allColors[_selectedIndex!].withOpacity(0.12)),
-                        ),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Row(children: [
-                            Container(width: 4, height: 20, decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2),
-                              color: allColors[_selectedIndex!].withOpacity(0.7))),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text(allTraits[_selectedIndex!], style: TextStyle(
-                              color: Colors.white.withOpacity(0.9), fontSize: 16, fontWeight: FontWeight.w600))),
-                            Text('${(allPcts[_selectedIndex!] * 100).round()}%', style: GoogleFonts.cinzel(
-                              color: allColors[_selectedIndex!].withOpacity(0.9), fontSize: 22, fontWeight: FontWeight.w700)),
-                          ]),
-                          const SizedBox(height: 12),
-                          ClipRRect(borderRadius: BorderRadius.circular(4), child: Stack(children: [
-                            Container(height: 6, color: Colors.white.withOpacity(0.04)),
-                            FractionallySizedBox(widthFactor: allPcts[_selectedIndex!],
-                              child: Container(height: 6, decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                gradient: LinearGradient(colors: [
-                                  allColors[_selectedIndex!].withOpacity(0.2),
-                                  allColors[_selectedIndex!].withOpacity(0.6),
-                                  allColors[_selectedIndex!].withOpacity(0.85)]),
-                                boxShadow: [BoxShadow(color: allColors[_selectedIndex!].withOpacity(0.3), blurRadius: 8)],
-                              )),
-                            ),
-                          ])),
-                          const SizedBox(height: 14),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: allColors[_selectedIndex!].withOpacity(0.1)),
-                            child: Text(
-                              _selectedIndex! < strengths.length ? '◆  Süper Gücün' : '◇  Gelişim Alanın',
-                              style: TextStyle(
-                                color: allColors[_selectedIndex!].withOpacity(0.8), fontSize: 10,
-                                fontWeight: FontWeight.w600, letterSpacing: 1)),
-                          ),
-                          const SizedBox(height: 14),
-                          Text('ÖNERİ', style: TextStyle(
-                            color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1)),
-                          const SizedBox(height: 4),
-                          Text(allHints[_selectedIndex!], style: TextStyle(
-                            color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5)),
-                          const SizedBox(height: 14),
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              color: Colors.white.withOpacity(0.03),
-                              border: Border.all(color: Colors.white.withOpacity(0.05))),
-                            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('✦', style: TextStyle(color: allColors[_selectedIndex!].withOpacity(0.6), fontSize: 14)),
-                              const SizedBox(width: 10),
-                              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Text('GÜNLÜK ALIŞTIRMA', style: TextStyle(
-                                  color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1)),
-                                const SizedBox(height: 4),
-                                Text(allExercises[_selectedIndex!], style: TextStyle(
-                                  color: Colors.white.withOpacity(0.55), fontSize: 12, height: 1.5)),
-                              ])),
-                            ]),
-                          ),
-                        ]),
-                      ),
-                    ],
-                  ]);
+                // Zigzag layout — güçlü yanlar
+                ...List.generate(strengths.length, (i) {
+                  final trait = strengths[i];
+                  final pct = _getPct(trait, true);
+                  final hint = usageHints[trait] ?? 'Potansiyelini keşfet.';
+                  return _zigzagItem(trait, pct, hint, _warmGold, i, strengths.length);
                 }),
 
-                const SizedBox(height: 60),
+                // ── Göz ayırıcı ──
+                const SizedBox(height: 16), // Üstteki öğenin 24px kendi boşluğu var, toplam 40px
+                Row(children: [
+                  Expanded(child: Container(height: 0.8, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.transparent, Colors.white.withOpacity(0.3)])))),
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: SizedBox(width: 20, height: 20, child: CustomPaint(painter: _CosmicEyePainter(color: gold)))),
+                  Expanded(child: Container(height: 0.8, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.white.withOpacity(0.3), Colors.transparent])))),
+                ]),
+                const SizedBox(height: 40), // Alttaki başlığa olan mesafe de tam 40px
+
+                // ═══════════════════════════
+                // | BÜYÜME ALANLARIN
+                // ═══════════════════════════
+                _sectionHeader('BÜYÜME ALANLARIN', _coolBlue),
+                const SizedBox(height: 20),
+
+                // Zigzag layout — zayıf yanlar
+                ...List.generate(weaknesses.length, (i) {
+                  final trait = weaknesses[i];
+                  final pct = _getPct(trait, false);
+                  final hint = growthTips[trait] ?? 'Farkındalık geliştir.';
+                  return _zigzagItem(trait, pct, hint, _coolBlue, i, weaknesses.length);
+                }),
+
+                const SizedBox(height: 64),
+
+                // ═══════════════════════════
+                // | SANA MEYDAN OKUYORUM (GÖREVLER)
+                // ═══════════════════════════
+                _sectionHeader('SANA MEYDAN OKUYORUM !', _warmGold),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 11),
+                  child: Text('Kişisel farkındalığını artırmak için dönüşüm odaklı bir serüven ✨', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, fontStyle: FontStyle.italic)),
+                ),
+                const SizedBox(height: 24),
+                _buildCosmicQuests(weaknesses),
+
+                const SizedBox(height: 120),
               ]),
             ))),
           ],
@@ -2184,42 +2109,1005 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
     );
   }
 
-  String _getExercise(String trait, bool isStrength) {
-    if (isStrength) {
-      final map = <String, String>{
-        'Vizyon genişliği': 'Bugün 5 dakika gözlerini kapat ve 5 yıl sonraki hayatını hayal et.',
-        'Macera ruhu': 'Bu hafta daha önce hiç gitmediğin bir yere git, küçük de olsa.',
-        'Felsefi derinlik': 'Bugün okuduğun bir cümle hakkında 3 dakika derin düşün ve not al.',
-        'Doğal liderlik': 'Bugün bir gruba öncülük et — toplantıda söz al veya plan yap.',
-        'Cesaret ve atılganlık': 'Bugün ertelediğin bir konuşmayı yap veya zor bir adım at.',
-        'Girişimci ruh': 'Bugün bir iş fikri yaz, ne kadar küçük olursa olsun.',
-        'Kararlılık': 'Bugün bir hedefe 30 dakika kesintisiz odaklan.',
-        'Güvenilirlik': 'Bugün verdiğin bir sözü zamanından önce yerine getir.',
-        'Sabır': 'Bugün sıra beklerken veya trafikte sakin kal ve nefesine odaklan.',
-        'İletişim dehası': 'Bugün birine samimi bir iltifat et veya düşünceni net ifade et.',
-        'Duygusal zekâ': 'Bugün birinin duygusunu sor ve gerçekten dinle.',
-        'Sezgisel güç': 'Bugün bir karar vermeden önce iç sesini dinle, mantık yerine.',
-        'Doğal karizma': 'Bugün odaya girdiğinde gülümse ve göz teması kur.',
-        'Yaratıcı enerji': 'Bugün 10 dakika çiz, yaz veya müzik dinleyerek hayal kur.',
-        'Analitik zekâ': 'Bugün bir problemi adım adım analiz et ve çözüm yaz.',
-      };
-      return map[trait] ?? 'Bugün bu gücünü bilinçli olarak bir durumda kullan.';
+  // ── Bölüm başlığı ──
+  Widget _sectionHeader(String title, Color color) {
+    return Row(children: [
+      Container(width: 3, height: 18, decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(2),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          colors: [color.withOpacity(0.9), color.withOpacity(0.2)],
+        ),
+      )),
+      const SizedBox(width: 12),
+      ShaderMask(
+        shaderCallback: (b) => LinearGradient(
+          colors: [color.withOpacity(0.9), color.withOpacity(0.6)],
+        ).createShader(b),
+        child: Text(title, style: GoogleFonts.cinzel(
+          color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 2.5,
+        )),
+      ),
+    ]);
+  }
+
+  // ── Zigzag Progress Bar Öğesi ──
+  // ── Orijinal Kopuk (Ayrık) Zigzag Tasarımı (Kullanıcının İstediği) ──
+  Widget _zigzagItem(String trait, int pct, String hint, Color color, int index, int totalCount) {
+    final bool isRight = index % 2 == 1;
+
+    // Yüzde Metni (Birleşik)
+    final pctWidget = Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$pct', style: GoogleFonts.cinzel(color: color, fontSize: 26, fontWeight: FontWeight.w700, height: 1.0)),
+        const SizedBox(width: 4),
+        Text('%', style: GoogleFonts.cinzel(color: color.withOpacity(0.5), fontSize: 14, fontWeight: FontWeight.w700, height: 1.0)),
+      ],
+    );
+
+    // İsim Metni için sabit bir widget yapısı kullanmayıp TextAlign'ı duruma göre ayarlayacağız.
+
+    // Progress Bar (Track & Fill)
+    final barWidget = Stack(
+      alignment: isRight ? Alignment.centerLeft : Alignment.centerRight,
+      children: [
+        // Track
+        Container(
+          height: 12, // Daha kalın
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        // Dolu Kısım
+        FractionallySizedBox(
+          widthFactor: pct / 100.0,
+          child: Container(
+            height: 12, // Daha kalın
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              gradient: LinearGradient(
+                // Bar, merkezden (isRight için sol, !isRight için sağ) dışa doğru (uçlara) uzar.
+                begin: isRight ? Alignment.centerLeft : Alignment.centerRight,
+                end: isRight ? Alignment.centerRight : Alignment.centerLeft,
+                colors: [
+                  color, // İç kısımdaki yoğun renk
+                  color.withOpacity(0.8), // Ortalar 
+                  Color.lerp(color, Colors.white, 0.6)! // Uçlarda estetik beyazımsı parlama ve açılma
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+              boxShadow: [
+                BoxShadow(color: color.withOpacity(0.4), blurRadius: 8),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── SOL KISIM ──
+          Expanded(
+            child: !isRight
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: 46, // Sabit yükseklik, iki satıra taşan özellik isimleri (örn: "Düzen ve organizasyon") için genişletildi
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(child: Text(trait, textAlign: TextAlign.left, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700))),
+                            pctWidget,
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      barWidget,
+                      const SizedBox(height: 10),
+                      Text(hint, textAlign: TextAlign.right, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontStyle: FontStyle.normal, height: 1.4)),
+                    ],
+                  )
+                : const SizedBox(),
+          ),
+
+          // ── MERKEZ İŞARETÇİ ──
+          SizedBox(
+            width: 24,
+            child: CustomPaint(painter: _TimelineMarkerPainter(color: color)),
+          ),
+
+          // ── SAĞ KISIM ──
+          Expanded(
+            child: isRight
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 46, // Sol taraf ile aynı yükseklik (çok satırlılar için)
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            pctWidget,
+                            Expanded(child: Text(trait, textAlign: TextAlign.right, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700))),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      barWidget,
+                      const SizedBox(height: 10),
+                      Text(hint, textAlign: TextAlign.left, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontStyle: FontStyle.normal, height: 1.4)),
+                    ],
+                  )
+                : const SizedBox(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Kozmik Görev (Mini Challenge) ──
+  Widget _buildCosmicQuests(List<dynamic> weaknesses) {
+    if (weaknesses.isEmpty) return const SizedBox();
+    final topWeakness = weaknesses.first.toString();
+    final pct = _getPct(topWeakness, false);
+    return _CosmicChallengeCard(
+      key: ValueKey(topWeakness),
+      topWeakness: topWeakness, 
+      baseColor: _warmGold, 
+      initialPct: pct,
+      onJourneyCompleted: () {
+        setState(() {
+          final first = shuffledWeaknesses.removeAt(0);
+          shuffledWeaknesses.add(first);
+        });
+      },
+    );
+  }
+}
+
+class _CosmicChallengeCard extends StatefulWidget {
+  final String topWeakness;
+  final Color baseColor;
+  final int initialPct;
+  final VoidCallback? onJourneyCompleted;
+
+  const _CosmicChallengeCard({super.key, required this.topWeakness, required this.baseColor, required this.initialPct, this.onJourneyCompleted});
+
+  @override
+  State<_CosmicChallengeCard> createState() => _CosmicChallengeCardState();
+}
+
+class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
+  int currentDay = 1;
+  bool isChallengeFinished = false;
+  List<Map<String, dynamic>> days = [];
+  int totalDays = 0;
+  String currentFocusText = '';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initChallenges();
+  }
+
+  Future<void> _initChallenges() async {
+    final w = widget.topWeakness.toLowerCase();
+    
+    List<Map<String, dynamic>> pool = [];
+    
+    // Zayıflık türüne göre dinamik meydan okumalar ve değişen süreler (3 ile 7 gün arası)
+    if (w.contains('sabır') || w.contains('acele') || w.contains('öfke') || w.contains('bencil') || w.contains('düşünmeden') || w.contains('hırs')) {
+      currentFocusText = 'Acelecilik ve tahammülsüzlük dürtülerini kontrol altına almak.';
+      pool = [
+        {"task": "Bir konuşmada karşı taraf bitene kadar sözünü kesmeden, sadece dinle.", "reward": 5},
+        {"task": "Bugün alacağın bir kararı en az 10 dakika durup düşünerek al.", "reward": 5},
+        {"task": "Hızlı yürüdüğünü veya acele iş yaptığını fark ettiğinde dur ve 3 derin nefes al.", "reward": 10},
+        {"task": "Sabrını zorlayan birine karşı anlayışla ve ekstra nezaketle yaklaş.", "reward": 15},
+        {"task": "Beklemen gereken bir sırada (kasa, trafik) telefonuna bakmadan etrafını gözlemle.", "reward": 10},
+        {"task": "Bugün duyduğun ilk olumsuz şeye anında tepki vermek yerine 1 saat bekle.", "reward": 15},
+        {"task": "Bir işi normalden iki kat daha yavaş ve hissederek yapmayı dene.", "reward": 10},
+        {"task": "Kendine zaman sınırı koymadan, sadece o ana odaklanarak bir yemek ye.", "reward": 10},
+        {"task": "Bugün kimseyi hızlandırmaya çalışma, herkesin kendi ritmine saygı duy.", "reward": 20},
+        {"task": "Eğer bir şey beklediğin gibi gitmezse, 'zamanlamanın bir bildiği var' de ve rahatla.", "reward": 15},
+        {"task": "Haklı olduğun bir konuda tartışmayı kazanmak yerine, anı kurtarmayı seç.", "reward": 15},
+      ];
+    } else if (w.contains('lider') || w.contains('pasif') || w.contains('çekingen') || w.contains('gurur') || w.contains('dikkat') || w.contains('otorite') || w.contains('kibir') || w.contains('ego')) {
+      currentFocusText = 'Sağlam bir özgüven ile kibri ayırmak ve şefkatli liderliği güçlendirmek.';
+      pool = [
+        {"task": "Sorumluluk almaktan kaçındığın bir konuda bugün öne çıkarak inisiyatif al.", "reward": 10},
+        {"task": "Çevrenizdekileri motive edecek küçük ama etkili bir övgüde bulun.", "reward": 15},
+        {"task": "Dışarıdan bir onay veya övgü gelmese dahi başardığın bir şeyle içsel gurur duy.", "reward": 15},
+        {"task": "Bugün girdiğin bir tartışmada karşındakine hak verdiğini yüksek sesle söyle.", "reward": 20},
+        {"task": "Kendinden emin bir beden dili (dik duruş, göz teması) pratiği yap.", "reward": 5},
+        {"task": "Senin için çok basit olan bir işi bugün sessizce, kimseye anlatmadan yap.", "reward": 15},
+        {"task": "Kendi konfor alanının dışına çıkacak bir sorumluluğa 'Ben yaparım' de.", "reward": 15},
+        {"task": "Pasif kalan bir arkadaşına cesaret vererek onun fikrini öne çıkarmasını sağla.", "reward": 10},
+        {"task": "Hatırladığın uzak bir hatanda kendi egonu tespit et ve zihninde bundan özgürleş.", "reward": 20},
+      ];
+    } else if (w.contains('iletişim') || w.contains('sessiz') || w.contains('içe') || w.contains('gerçek') || w.contains('kurban') || w.contains('sınır')) {
+      currentFocusText = 'Kendini cesurca ifade etmek ve sağlıklı sınırlar çizerek kendi gerçekliğini kurmak.';
+      pool = [ 
+        {"task": "İçinde tuttuğun güzel bir hissi sevdiğin birine açıkça mesaj at ve belirt.", "reward": 10},
+        {"task": "Seni rahatsız eden bir duruma karşı çok net ve açıklamasız bir şekilde sınır koy.", "reward": 20},
+        {"task": "Bugün eleştiriyi savunmaya geçmeden, sadece ne demek istediklerini dinleyerek karşıla.", "reward": 15},
+        {"task": "Hayal kurmak veya kaçmak yerine bugün bitmesi gereken çok somut bir görevi tamamla.", "reward": 15},
+        {"task": "Asansörde veya markette tanımadığın birine küçük bir iltifat et.", "reward": 20},
+        {"task": "Kendinle ilgili eskiden sakladığın masum bir detayı güvendiğin biriyle paylaş.", "reward": 15},
+        {"task": "Birisi sınırını aştığında şakaya vurmadan doğrudan rahatsızlığını dile getir.", "reward": 20},
+        {"task": "Bugün 'Nasılsın?' diyen birine sadece 'İyiyim' yerine daha detaylı ve dürüst bir cevap ver.", "reward": 15},
+        {"task": "Başkalarının dertlerini dinlemek için harcadığın 1 saati bugün kendi ihtiyaçlarına ayır.", "reward": 15},
+      ];
+    } else if (w.contains('karar') || w.contains('yüzey') || w.contains('sıkıl') || w.contains('tutar') || w.contains('gevşek') || w.contains('odak') || w.contains('dağınık')) {
+      currentFocusText = 'Zihnindeki bulanıklığı dağıtıp şimdiki ana çapalanmak ve bir konuda derinleşmek.';
+      pool = [
+        {"task": "Bugün hiçbir bildirim sesi olmadan, 30 dakika dış dünyadan soyutlanarak çalış.", "reward": 15},
+        {"task": "Yarım bıraktığın ve sürekli aklını kurcalayan çok basit bir okumayı/videoyu bugün kesin bitir.", "reward": 10},
+        {"task": "Bir işi yaparken araya giren başka bir görevi, ilkini bitirmeden kesinlikle reddet.", "reward": 15},
+        {"task": "Meditatif bir sessizlikte, etrafındaki ortamın detaylarını en az 2 dakika incele.", "reward": 10},
+        {"task": "Aynı anda iki iş yaparken kendini yakala ve hemen birini bırak.", "reward": 15},
+        {"task": "Masanda veya çalışma alanında duran gereksiz her şeyi kaldırıp minimalist bir alan yarat.", "reward": 10},
+        {"task": "Karar veremediğin küçük bir konuda mantık yerine doğrudan ilk hissine güvenerek seç.", "reward": 15},
+        {"task": "Telefonun ana ekranından dikkatini dağıtan üç uygulamayı 1 günlüğüne kaldır.", "reward": 20},
+        {"task": "Bugün yürüyüş yaparken kulaklık takmak yerine sadece adımlarına ve an'a odaklan.", "reward": 20},
+      ];
+    } else if (w.contains('kıskanç') || w.contains('intikam') || w.contains('kontrol') || w.contains('şüphe') || w.contains('gizem') || w.contains('sahip')) {
+      currentFocusText = 'Korkularından özgürleşerek evrenin akışına teslim olmak ve güven alanını genişletmek.';
+      pool = [
+        {"task": "Kontrol edemediğin bir durum çıktığında sadece 'olması gereken buymuş' diyerek es geç.", "reward": 10},
+        {"task": "Kaygılandığın birini serbest bırak ve ona olan güvenini açıkça dile getir.", "reward": 10},
+        {"task": "Sana yanlış yapan birine duyduğun gizli öfkeyi bugün affetme niyetiyle serbest bırak.", "reward": 20},
+        {"task": "Yapılacak küçük bir görevin sorumluluğunu tamamen bir başkasına devret ve sonuca karışma.", "reward": 20},
+        {"task": "Bugün sana söylenen güzel bir sözün altında başka bir niyet aramadan safça kabul et.", "reward": 15},
+        {"task": "Her şeyi planlama isteğini bugün ufak bir spontane eylemle tamamen boz.", "reward": 20},
+        {"task": "Birinin senin yolun dışında farklı bir yolla bir işi çözmesine izin ver.", "reward": 10},
+        {"task": "Güçlü bir rekabet veya kıskançlık hissettiğinde içinden o kişiye bolluk ve şans dile.", "reward": 20},
+        {"task": "Gizli tuttuğun ve seni yoran küçük bir sırrı/düşünceyi en inandığın dostunla paylaş.", "reward": 15},
+      ];
+    } else if (w.contains('çatışma') || w.contains('bağım') || w.contains('hayır') || w.contains('ödün')) {
+      currentFocusText = 'Dış onaya olan ihtiyacını yıkıp kendi doğrularını seçmek ve uyumu kendi içinde bulmak.';
+      pool = [
+        {"task": "Önüne çıkan basit bir seçimi (yemek, mekan vs.) kimseden onay almadan ilk hissinle seç.", "reward": 10},
+        {"task": "Kabul etmek istemediğin bir iyilik talebine açık, net ve nezaketli bir 'Hayır' de.", "reward": 15},
+        {"task": "Bugün kendinden ödün vermeni gerektiren her durumu bir adım geri çekilerek gözden geçir.", "reward": 15},
+        {"task": "Ortamı yumuşatmak için gülümsemek zorunda kaldığın bir anı fark et ve o sahte gülüşü bırak.", "reward": 15},
+        {"task": "Başkasının ruh halini düzeltme görevini bir kenara bırakıp kendi enerjine sahip çık.", "reward": 20},
+        {"task": "Bugün fikrin sorulduğunda 'Fark etmez' kelimesini lügatından çıkar ve net bir şey seç.", "reward": 15},
+        {"task": "Zamanını çalan birine veya bir bildirime karşı çok net, sağlıklı bir mesafe koy.", "reward": 20},
+        {"task": "Bugün sadece 'O istiyor diye' yaptığın bir fedakarlığı tespit et ve derhal sonlandır.", "reward": 15},
+        {"task": "Bir konuşmayı sırf ayıp olmasın diye uzatmak yerine nezaketle ve cesurca bitir.", "reward": 15},
+      ];
+    } else if (w.contains('eleştiri') || w.contains('mükemmel') || w.contains('endişe') || w.contains('evham') || w.contains('detay') || w.contains('soğuk')) {
+      currentFocusText = 'Kusurların içindeki güzelliği görmek, detaylardan sıyrılıp bütünü kucaklamak.';
+      pool = [
+        {"task": "Tam olarak içine sinmese bile bir işi, sırf %100 olmadı diye ertelemeden 'Tamamlandı' işaretle.", "reward": 10},
+        {"task": "Karşındakinin canını sıkan ufak bir hatasını bilerek gözardı et ve pozitifine odaklan.", "reward": 15},
+        {"task": "Kendi yaptığın veya yapamadığın bir şey için kendine şefkat göster ve bunu normal kabul et.", "reward": 20},
+        {"task": "Birisine eleştiri getirmeden önce tam 3 kez yutkun ve o eleştiriyi kendine sakla.", "reward": 10},
+        {"task": "Odanı, masanı veya evini bugün bilerek biraz dağınık (kusurlu) bırak ve buna tahammül et.", "reward": 15},
+        {"task": "Ortada hiçbir sebep yokken geleceğe dair kurduğun bir felaket senaryosunu zihninde anında iptal et.", "reward": 20},
+        {"task": "Dışarıdan ne kadar 'soğuk' veya 'mesafeli' görünürsen görün, bugün birine sıcak bir sarılma ver.", "reward": 15},
+        {"task": "Bugün bir şeyin 'mükemmel' olmasını beklemek yerine komik veya salaş bir yönünü kucakla.", "reward": 15},
+        {"task": "Aynaya bak ve fiziksel bir 'kusurunu' düzeltmeye çalışmadan, ona sevgiyle gülümse.", "reward": 20},
+      ];
+    } else if (w.contains('sorumsuz') || w.contains('sorumluluk') || w.contains('dağınık') || w.contains('ertelemek') || w.contains('üşengeç')) {
+      currentFocusText = 'Kaçış mekanizmalarını durdurup kendi hayatının direksiyonuna geçmek.';
+      pool = [
+        {"task": "Sürekli arkaya attığın, seni zihnen yoran o tek küçük problemi şimdi, şu an, anında çöz.", "reward": 10},
+        {"task": "Daha sonra hallederim dediğin 3 parça çöpü veya bulaşığı hiçbir bahane üretmeden şimdi kaldır.", "reward": 5},
+        {"task": "Günlük programına uymak için alarm kur ve ilk çaldığında asla ertelemeden işe başla.", "reward": 10},
+        {"task": "Bugün başkalarının üstlendiği seninle ilgili ufak bir yükün sorumluluğunu bizzat sen al.", "reward": 15},
+        {"task": "Kendine ufak bir 'yapılması zorunlu kural' koy ve bütün gün ona sadık kaldığını kanıtla.", "reward": 20},
+        {"task": "Yarın sabah yapman gereken çok ufak bir hazırlığı (kıyafet vb.) daha bu geceden hazırla.", "reward": 15},
+      ];
+    } else if (w.contains('dürüst') || w.contains('patavatsız')) {
+      currentFocusText = 'İçinden geçenleri daha nazik ve yapıcı bir filtreyle ifade etmeyi öğrenmek.';
+      pool = [
+        {"task": "Aklına gelen ancak gereksiz derecede 'fazla dürüst' (patavatsız) olabilecek o eleştiriyi bugün yut.", "reward": 15},
+        {"task": "Bugün bir şeyin eksikliğini söylemek yerine, iyi olan yönünü bulup onu vurgula.", "reward": 10},
+        {"task": "Karşındakine acımasızca dürüst olmadan önce onun duygularını incitip incitmeyeceğini 3 saniye düşün.", "reward": 15},
+        {"task": "Sivri dilli eleştiriler yerine bugün sadece 'Seni anlıyorum' demeyi pratik et.", "reward": 20},
+      ];
+    } else if (w.contains('taahhüt') || w.contains('bağlanma') || w.contains('korku')) {
+      currentFocusText = 'Bağlılığın gücünü keşfetmek ve aidiyet duygusuna izin vermek.';
+      pool = [
+        {"task": "Bağlanmaktan veya söz vermekten kaçtığın minik bir konuda bugün kesin ve net bir söz ver.", "reward": 20},
+        {"task": "Kaçmak istediğin bir buluşmayı iptal etme, sonuna kadar orada kalarak anı yaşa.", "reward": 15},
+        {"task": "Kendine uzun vadeli küçük bir hedef koy ve bu hedefe ulaşacağına dair kendine güven ver.", "reward": 15},
+      ];
+    } else if (w.contains('huzur')) {
+      currentFocusText = 'İçsel zihinsel karmaşayı durdurmak ve olduğun yerde yavaşlamak.';
+      pool = [
+        {"task": "Bugün hiçbir yere kaçmadan, tamamen sabit kalarak o anki 'sıkıcı' hissi deneyimle ve geçmesini izle.", "reward": 15},
+        {"task": "Sürekli bir şey yapma ihtiyacını fark et ve bilerek 5 dakika boş dur.", "reward": 20},
+        {"task": "Sabırsızca beklediğin bir şeyi düşünmeyi bırak ve şu an odandaki 3 sese odaklan.", "reward": 15},
+      ];
+    } else if (w.contains('inat') || w.contains('değişim') || w.contains('madde') || w.contains('ciddi') || w.contains('bastır') || w.contains('iş kolik') || w.contains('iş') || w.contains('katı') || w.contains('karamsar')) {
+       currentFocusText = 'Direncini kırmak, bedeni harekete geçirmek ve anın içindeki hafifliği yakalamak.';
+       pool = [
+        {"task": "Bugün her zaman gittiğin yolu değiştir veya her zaman yediğin yemeğin dışında yeni bir şey dene.", "reward": 10},
+        {"task": "Haklı olsan bile inatlaşmayı bırakıp 'Belki de senin dediğin gibidir' diyerek geri çekil.", "reward": 15},
+        {"task": "Bugün maddiyata veya eşyalara olan bağlılığını esnet: Eskimiş veya kullanmadığın 2 eşyayı çöpe/ihtiyacı olana ayır.", "reward": 20},
+        {"task": "Ciddiyet maskeni bugün tamamen indir; izlediğin/dinlediğin komik bir şeye sesli bir şekilde kahkaha at.", "reward": 10},
+        {"task": "Bugün 'çalışmak' dışında sadece dinlenmek ve hiçbir şey yapmamak için kendine 1 saat ayır.", "reward": 20},
+        {"task": "Bastırdığın bir hissi (özlem, üzüntü, coşku) bugün yalnızken sesli bir şekilde dile getir.", "reward": 15},
+        {"task": "Kurallarına uymayan bir duruma karşı içinden 'Ne olacaksa olsun' de ve gülümseyip geç.", "reward": 15},
+        {"task": "Karamsar bir düşünce zihnini işgal ettiğinde derhal üç tane minnet duyduğun detay bul.", "reward": 10},
+       ];
+    } else if (w.contains('duygu') || w.contains('geçmiş') || w.contains('kabuk') || w.contains('alın') || w.contains('hassas')) {
+       currentFocusText = 'Geçmişin yüklerinden sıyrılmak ve duygusal dalgalanmaların üstünde durabilmek.';
+       pool = [
+        {"task": "Geçmişte seni üzen bir olayı bugün sadece bir 'tecrübe hikayesi' gibi hiçbir duygu katmadan anımsa.", "reward": 15},
+        {"task": "Alınganlık yaptığın veya kırıldığın ilk cümlede, karşıdakinin niyetinin aslında nötr olduğunu varsay.", "reward": 20},
+        {"task": "Kendini geri çekmek (kabuğuna dönmek) istediğin o an, bilerek ortamda kal ve sürece diren.", "reward": 15},
+        {"task": "Bugün çok sevdiğin nostaljik bir müzik yerine ruh halini şimdiki ana çekecek yepyeni bir ritim dinle.", "reward": 10},
+        {"task": "Aşırı tepki verme ihtiyacı duyduğunda fiziksel olarak ortamdan çık, elini yüzünü yıka ve geri dön.", "reward": 10},
+        {"task": "Geçmişe dair zihnini yoran eski fotoğraflara/mesajlara bakma dürtünü yakala ve telefonu derhal bırak.", "reward": 20},
+        {"task": "Sana söylenen sıradan bir sözü şahsına bir saldırı olarak algıladığın an beynine 'Bu benimle ilgili değil' komutu ver.", "reward": 15},
+        {"task": "Bugün kendi kırılganlığını zırh gibi kuşanıp insanlardan saklanmak yerine, olduğun gibi görünmekten korkma.", "reward": 15},
+       ];
+    } else if (w.contains('mesafe') || w.contains('asi') || w.contains('ukala') || w.contains('rasyonalite')) {
+       currentFocusText = 'Aşırı mantığın duvarlarını yıkıp empatinin ve teslimiyetin gücüyle bağ kurmak.';
+       pool = [
+         {"task": "Her şeyi bir formüle veya mantığa oturtmaya çalıştığın an, dur ve sadece 'hissetmeye' odaklan.", "reward": 15},
+         {"task": "Duygusal bağ kurmaktan korktuğun için araya çektiğin o mesafeyi bugün birilerine sürpriz bir iltifatla kır.", "reward": 20},
+         {"task": "Asi ruhunu dinleyip kurallara karşı çıkmak istediğin anda, 'Sıradan olmanın' da bazen bir güç olduğunu kabul et.", "reward": 10},
+         {"task": "Herkesin katıldığı ama senin 'saçma' veya 'mantıksız' bulduğun bir sohbete eleştirmeden dahil ol.", "reward": 15},
+         {"task": "Bugün duygularını gösteren birine 'Bu rasyonel değil' demek yerine sadece 'Seni anlıyorum' de.", "reward": 20},
+         {"task": "Ukalalık yaparak daha fazlasını bildiğini iddia edeceğin bir ortamda bugün sadece 'Dinleyici' rolüne geç.", "reward": 15},
+         {"task": "Bağımsızlık ihtiyacının insanları senden uzaklaştırmasına izin verme; birine açıkça 'Yardımına ihtiyacım var' de.", "reward": 20},
+         {"task": "Odağını farklı olmaya değil, 'bütünün bir parçası olmaya' yönlendir; topluluğun enerjisine uyumlan.", "reward": 10},
+       ];
     } else {
-      final map = <String, String>{
-        'Sabırsızlık': 'Bugün bir şey beklerken geri sayımdan 10 saniye önce dur ve nefes al.',
-        'Sorumsuzluk': 'Bugün küçük bir söz ver (mesela mesaj atarım) ve mutlaka tut.',
-        'Aşırı dürüstlük': 'Bugün bir gerçeği söylemeden önce "bu kişi bunu duymak ister mi?" diye düşün.',
-        'Taahhüt korkusu': 'Bugün bir haftalık küçük bir plan yap ve takvime yaz.',
-        'İnatçılık': 'Bugün birinin fikrini sonuna kadar dinle, karşı çıkmadan önce.',
-        'Değişime direnç': 'Bugün rutininde küçük bir şeyi değiştir (farklı yol, farklı yemek).',
-        'Aşırı hassasiyet': 'Bugün seni rahatsız eden bir şey olduğunda 5 saniye bekle.',
-        'Ego': 'Bugün birini samimiyetle takdir et ve teşekkür et.',
-        'Kararsızlık': 'Bugün 2 dakikada bir karar ver, üzerinde fazla düşünme.',
-        'Mükemmeliyetçilik': 'Bugün bir işi %80 bitir ve "yeterli" de.',
-      };
-      return map[trait] ?? 'Bugün bu alandaki farkındalığını artırmak için 5 dakika düşün.';
+      currentFocusText = 'Kendi gölgelerinle cesaretle yüzleşmek ve seni kısıtlayan döngüleri farkındalıkla dönüştürmek.';
+      pool = [
+        {"task": "Bugün bu zaafını tetikleyen ilk olayı bir izleyici gibi dışarıdan gözlemle.", "reward": 10},
+        {"task": "Eski otomatik tepkini vermek yerine, tamamen denemediğin, absürt bile olsa yeni bir yaklaşım seç.", "reward": 15},
+        {"task": "Bugün kendine bir mola ver ve neleri aştığını kısa bir an düşünerek kendi sırtını sıvazla.", "reward": 20},
+        {"task": "Tepki vermek yerine önce dur, nefes al, ve sonra kendi iç rehberine danışarak konuş.", "reward": 15},
+        {"task": "Farkına vardığın bu zaafını, bugün şefkatle kabul et ve onunla savaşmak yerine barış.", "reward": 15},
+        {"task": "Negatif bir döngüye girdiğini fark ettiğin an, fiziksel olarak bulunduğun odayı veya mekanı değiştir.", "reward": 10},
+        {"task": "Dışarıdan bir onay veya rıza beklemeden kendi kendini motive edecek o tek bilge cümleyi bul.", "reward": 15},
+        {"task": "Bu durum tam şu an yeniden yaşanıyor olsaydı, film gibi geri sarıp en doğru tepkiyi zihninde uyarla.", "reward": 20},
+      ];
+    }
+
+    // Listeyi karıştır (shuffle)
+    pool.shuffle();
+
+    // Önceden tamamlanan görevleri filtrele
+    final completedCache = await StorageService.getCompletedCosmicTasks();
+    if (completedCache.isNotEmpty) {
+      final filtered = pool.where((e) => !completedCache.contains(e['task'])).toList();
+      // Eğer tamamen tüketirsek, havuzu boşaltmak yerine en az 3 taslaklık yedekle
+      if (filtered.length >= 3) {
+        pool = filtered;
+      }
+    }
+
+    int dynamicTotal = 3 + (DateTime.now().millisecond % 3); // 3, 4 veya 5 günlük görevler verir
+    if (dynamicTotal > pool.length) dynamicTotal = pool.length; // Array'den büyük olmaması için güvenli limit
+    
+    if (mounted) {
+      setState(() {
+        days = pool.sublist(0, dynamicTotal);
+        totalDays = days.length;
+        _isLoading = false;
+      });
     }
   }
+
+  void _showCosmicCelebrationDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Kapat',
+      barrierColor: Colors.black.withOpacity(0.8),
+      transitionDuration: const Duration(milliseconds: 600),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Material(
+          type: MaterialType.transparency,
+          child: Center(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 1500),
+              curve: Curves.elasticOut,
+              builder: (context, val, child) {
+                 return Transform.scale(
+                   scale: val,
+                   child: child,
+                 );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(32),
+                margin: const EdgeInsets.symmetric(horizontal: 32),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141A23),
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: widget.baseColor.withOpacity(0.5), width: 2),
+                  boxShadow: [
+                    BoxShadow(color: widget.baseColor.withOpacity(0.3), blurRadius: 40, spreadRadius: 10),
+                  ]
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 2 * 3.14159),
+                      duration: const Duration(seconds: 15),
+                      builder: (context, rotation, child) {
+                        return Transform.rotate(
+                          angle: rotation,
+                          child: _ProceduralBadge(
+                            seedText: widget.topWeakness,
+                            baseColor: widget.baseColor,
+                            size: 140,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Text('YENİ ROZET\nKAZANILDI', textAlign: TextAlign.center, style: GoogleFonts.cinzel(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2.0, height: 1.3)),
+                    const SizedBox(height: 16),
+                    Text('"${widget.topWeakness} Ustası"', textAlign: TextAlign.center, style: GoogleFonts.cinzel(color: widget.baseColor, fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    Text('Evrenin ritmiyle tamamen uyumlandın.', textAlign: TextAlign.center, style: TextStyle(color: widget.baseColor.withOpacity(0.9), fontSize: 13, height: 1.5)),
+                    const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          gradient: LinearGradient(colors: [widget.baseColor, widget.baseColor.withOpacity(0.7)]),
+                        ),
+                        child: const Text('HARİKA', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      ),
+                    )
+                  ]
+                )
+              ),
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _statRow(String label, String value, Color valueColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$label: ', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14)),
+          Text(value, style: TextStyle(color: valueColor, fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: CircularProgressIndicator(color: widget.baseColor),
+        ),
+      );
+    }
+    
+    if (isChallengeFinished) {
+      final int increase = 12; // Sabit gelişim oranı
+      final int newScore = (widget.initialPct + increase > 100) ? 100 : widget.initialPct + increase;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: widget.baseColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: widget.baseColor.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _ProceduralBadge(seedText: widget.topWeakness, baseColor: widget.baseColor, size: 80),
+            const SizedBox(height: 20),
+            Text('Serüven Tamamlandı', style: GoogleFonts.cinzel(color: widget.baseColor, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            
+            // Etkileyici Yüzde Artış Görseli
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${widget.initialPct}%', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 28, fontWeight: FontWeight.w300, decoration: TextDecoration.lineThrough)),
+                const SizedBox(width: 12),
+                Icon(Icons.arrow_forward_rounded, color: widget.baseColor, size: 24),
+                const SizedBox(width: 12),
+                Text('$newScore%', style: TextStyle(color: const Color(0xFF69F0AE), fontSize: 32, fontWeight: FontWeight.w900)),
+              ]
+            ),
+            const SizedBox(height: 8),
+            Text('${widget.topWeakness} Gelişimi: +$increase%', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13)),
+            
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: widget.baseColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: widget.baseColor.withOpacity(0.5)),
+              ),
+              child: Text('Kazanılan Rozet:\n"${widget.topWeakness} Ustası"', textAlign: TextAlign.center, style: TextStyle(color: widget.baseColor, fontSize: 13, fontWeight: FontWeight.bold, height: 1.4)),
+            ),
+            const SizedBox(height: 32),
+            GestureDetector(
+              onTap: () {
+                if (widget.onJourneyCompleted != null) {
+                  widget.onJourneyCompleted!();
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  gradient: LinearGradient(colors: [widget.baseColor, widget.baseColor.withOpacity(0.7)]),
+                ),
+                child: const Text('YENİ SERÜVENE BAŞLA', style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final currentTask = days[currentDay - 1];
+    final progressPct = (currentDay - 1) / totalDays.toDouble(); // Toplam güne bölüyoruz
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.09),
+            Colors.white.withOpacity(0.01),
+          ],
+        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.2),
+        boxShadow: [
+          BoxShadow(color: widget.baseColor.withOpacity(0.05), blurRadius: 40, spreadRadius: 0),
+          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Başlık Bölümü
+          Row(
+            children: [
+               Container(
+                 padding: const EdgeInsets.all(12),
+                 decoration: BoxDecoration(
+                   color: Colors.white.withOpacity(0.05),
+                   shape: BoxShape.circle,
+                   border: Border.all(color: Colors.white.withOpacity(0.25)),
+                   boxShadow: [BoxShadow(color: Colors.white.withOpacity(0.1), blurRadius: 10)],
+                 ),
+                 child: const Text('✨', style: TextStyle(fontSize: 20)),
+               ),
+               const SizedBox(width: 16),
+               Expanded(
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text('$totalDays GÜNLÜK SERÜVEN', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10, letterSpacing: 2.5, fontWeight: FontWeight.bold)),
+                     const SizedBox(height: 4),
+                     Text('"${widget.topWeakness}" Zaafını Yık', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+                   ],
+                 ),
+               ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Amaç
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: Row(
+              children: [
+                 Icon(Icons.track_changes_rounded, color: widget.baseColor.withOpacity(0.9), size: 22),
+                 const SizedBox(width: 12),
+                   Expanded(
+                     child: Text(
+                       'Odak: $currentFocusText', 
+                       style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontStyle: FontStyle.italic, height: 1.4),
+                     ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 36),
+          
+          // İlerleme Alanı
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+               Text('GÜN $currentDay / $totalDays', style: GoogleFonts.cinzel(color: widget.baseColor, fontSize: 18, fontWeight: FontWeight.bold)),
+               const Spacer(),
+               Text('%${(progressPct * 100).toInt()}', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 1.0)),
+               Text(' TAMAM', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Progress Bar
+          Stack(
+            children: [
+              Container(
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                ),
+              ),
+              FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: progressPct == 0 ? 0.04 : progressPct, 
+                child: Container(
+                  height: 14,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: LinearGradient(colors: [Colors.white.withOpacity(0.4), Colors.white]),
+                    boxShadow: [
+                      BoxShadow(color: Colors.white.withOpacity(0.5), blurRadius: 12),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+          
+          // Günün Görevi Kartı
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Colors.white.withOpacity(0.03),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text('✨ GÜNÜN KEŞFİ ✨', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  currentTask['task'] as String, 
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.5, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 40),
+          
+          // Aksiyon Butonu
+          GestureDetector(
+            onTap: () {
+              final taskToMark = days[currentDay - 1]['task'] as String;
+              StorageService.addCompletedCosmicTask(taskToMark);
+              
+              if (currentDay >= totalDays) {
+                widget.onJourneyCompleted?.call();
+                _showCosmicCelebrationDialog(context);
+                setState(() => isChallengeFinished = true);
+              } else {
+                setState(() => currentDay++);
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: widget.baseColor.withOpacity(0.85),
+                boxShadow: [
+                  BoxShadow(color: widget.baseColor.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 8)),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(currentDay >= totalDays ? Icons.auto_awesome_rounded : Icons.check_circle_outline_rounded, color: Colors.white, size: 22),
+                  const SizedBox(width: 10),
+                  Text(
+                    currentDay >= totalDays ? 'SERÜVENİ TAMAMLA' : 'BUGÜNÜ TAMAMLADIM',
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Klasik Bağımsız İşaretçi (Dikey Çizgi ve Basit Nokta) ──
+class _TimelineMarkerPainter extends CustomPainter {
+  final Color color;
+  _TimelineMarkerPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Barın hizasına ince ayar (TextRow: 46px + SizedBox: 8px => bar center: 46+8+6 = 60px)
+    final c = Offset(size.width / 2, 60.0);
+
+    // Rengi bir tık aç (beyaza 40% daha yakın)
+    final lightColor = Color.lerp(color, Colors.white, 0.4)!;
+
+    // Dikey kısa çizgi (daha ince, biraz daha uzun ve rengi açık)
+    final linePaint = Paint()
+      ..color = lightColor.withOpacity(0.8)
+      ..strokeWidth = 0.6;
+    canvas.drawLine(Offset(c.dx, c.dy - 19), Offset(c.dx, c.dy + 19), linePaint);
+
+    // Ortadaki basit, parlamayan yuvarlak nokta (aynı açık renk)
+    canvas.drawCircle(c, 3.5, Paint()..color = lightColor);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Özgün Geometrik Rozet Tasarımı (Procedural Badge) ──
+class _ProceduralBadge extends StatelessWidget {
+  final String seedText;
+  final Color baseColor;
+  final double size;
+
+  const _ProceduralBadge({
+    Key? key,
+    required this.seedText,
+    required this.baseColor,
+    this.size = 100,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final w = seedText.toLowerCase();
+    int sides = 6;
+    int outerSides = 8;
+    double innerRatio = 0.5;
+    Color accentColor = Colors.white;
+    IconData centerIcon = Icons.star_rounded;
+
+    if (w.contains('sabır') || w.contains('acele')) {
+      sides = 8; outerSides = 12; innerRatio = 1.0; 
+      accentColor = const Color(0xFF00E5FF); // Cyans
+      centerIcon = Icons.hourglass_bottom_rounded;
+    } else if (w.contains('liderlik') || w.contains('pasif') || w.contains('çekingen')) {
+      sides = 5; outerSides = 10; innerRatio = 0.4;
+      accentColor = const Color(0xFFFF9100); // Orange/Gold
+      centerIcon = Icons.local_fire_department_rounded;
+    } else if (w.contains('iletişim') || w.contains('sessiz') || w.contains('içe dönük') || w.contains('içedönük')) {
+      sides = 3; outerSides = 6; innerRatio = 1.0;
+      accentColor = const Color(0xFFE040FB); // Magenta/Pink
+      centerIcon = Icons.graphic_eq_rounded;
+    } else if (w.contains('odak') || w.contains('dağınık') || w.contains('dikkat')) {
+      sides = 4; outerSides = 8; innerRatio = 0.2;
+      accentColor = const Color(0xFF69F0AE); // Neon Green
+      centerIcon = Icons.center_focus_strong_rounded;
+    } else if (w.contains('kontrol') || w.contains('kıskanç') || w.contains('inat')) {
+      sides = 7; outerSides = 14; innerRatio = 0.6;
+      accentColor = const Color(0xFF448AFF); // Deep Blue
+      centerIcon = Icons.water_drop_rounded;
+    } else if (w.contains('kararsız') || w.contains('hayır') || w.contains('sınır')) {
+      sides = 6; outerSides = 6; innerRatio = 0.5;
+      accentColor = const Color(0xFFFF5252); // Red
+      centerIcon = Icons.balance_rounded;
+    } else if (w.contains('mükemmel') || w.contains('eleştirel') || w.contains('detay')) {
+      sides = 9; outerSides = 9; innerRatio = 0.8;
+      accentColor = const Color(0xFFFFD740); // Yellow
+      centerIcon = Icons.spa_rounded;
+    } else if (w.contains('sorumsuz') || w.contains('sorumluluk') || w.contains('ertelemek')) {
+      sides = 4; outerSides = 4; innerRatio = 1.0;
+      accentColor = const Color(0xFFD7CCC8); // Earth tone
+      centerIcon = Icons.landscape_rounded;
+    } else {
+      // Default / Generics
+      int seed = seedText.codeUnits.fold(0, (p, c) => p + c);
+      sides = 4 + (seed % 6);
+      outerSides = 6 + (seed % 7);
+      innerRatio = 0.3 + ((seed % 5) * 0.1);
+      final hues = [const Color(0xFFE040FB), const Color(0xFF00E5FF), const Color(0xFFFF9100), const Color(0xFF69F0AE), Colors.white];
+      accentColor = hues[seed % hues.length];
+      centerIcon = Icons.diamond_rounded;
+    }
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            baseColor.withOpacity(0.2),
+            baseColor.withOpacity(0.0),
+          ],
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Dış Parıltı Gölgeleri (Neon Glow)
+          Container(
+             width: size * 0.7,
+             height: size * 0.7,
+             decoration: BoxDecoration(
+               shape: BoxShape.circle,
+               boxShadow: [
+                 BoxShadow(color: baseColor.withOpacity(0.4), blurRadius: 40, spreadRadius: 5),
+                 BoxShadow(color: accentColor.withOpacity(0.2), blurRadius: 50, spreadRadius: 10),
+               ]
+             ),
+          ),
+          // Dış Çerçeve (Kutsal Geometri / Outer)
+          CustomPaint(
+            size: Size(size * 0.85, size * 0.85),
+            painter: _BadgeGeometryPainter(
+              sides: outerSides,
+              color: Colors.white.withOpacity(0.2),
+              isOutline: true,
+              innerRadiusRatio: 1.0, 
+              strokeWidth: 1.5,
+            ),
+          ),
+          // Orta Çizgiler (Mid Geometry)
+          CustomPaint(
+            size: Size(size * 0.65, size * 0.65),
+            painter: _BadgeGeometryPainter(
+              sides: sides,
+              color: baseColor.withOpacity(0.5),
+              isOutline: true,
+              innerRadiusRatio: 1.0,
+              strokeWidth: 2.0,
+            ),
+          ),
+          // İç Yıldız/Amblem (Inner Star)
+          CustomPaint(
+            size: Size(size * 0.5, size * 0.5),
+            painter: _BadgeGeometryPainter(
+              sides: sides,
+              color: baseColor,
+              isOutline: false,
+              innerRadiusRatio: innerRatio,
+              strokeWidth: 0,
+              glowColor: accentColor,
+            ),
+          ),
+          // Merkez Çekirdek (Thematic Icon)
+          Container(
+            padding: EdgeInsets.all(size * 0.08),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.1),
+              boxShadow: [
+                BoxShadow(color: accentColor.withOpacity(0.5), blurRadius: 20, spreadRadius: 2)
+              ],
+            ),
+            child: Icon(centerIcon, color: Colors.white, size: size * 0.22),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _BadgeGeometryPainter extends CustomPainter {
+  final int sides;
+  final Color color;
+  final bool isOutline;
+  final double innerRadiusRatio;
+  final double strokeWidth;
+  final Color? glowColor;
+
+  _BadgeGeometryPainter({
+    required this.sides,
+    required this.color,
+    required this.isOutline,
+    required this.innerRadiusRatio,
+    this.strokeWidth = 2.0,
+    this.glowColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (glowColor != null) {
+      Paint glowPaint = Paint()
+        ..color = glowColor!.withOpacity(0.6)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
+      _drawShape(canvas, size, glowPaint);
+    }
+
+    Paint paint = Paint()
+      ..color = color
+      ..style = isOutline ? PaintingStyle.stroke : PaintingStyle.fill
+      ..strokeWidth = strokeWidth;
+
+    _drawShape(canvas, size, paint);
+  }
+
+  void _drawShape(Canvas canvas, Size size, Paint paint) {
+    Path path = Path();
+    double cx = size.width / 2;
+    double cy = size.height / 2;
+    double radius = size.width / 2;
+    double angleOffset = -math.pi / 2; // Yukarıdan başla
+    
+    // Yıldız (Star) çizimi
+    if (innerRadiusRatio < 1.0) {
+      double angle = (math.pi * 2) / sides;
+      for (int i = 0; i < sides; i++) {
+        // Dış nokta (Uç)
+        double px = cx + radius * math.cos(angleOffset + (i * angle));
+        double py = cy + radius * math.sin(angleOffset + (i * angle));
+        if (i == 0) path.moveTo(px, py);
+        else path.lineTo(px, py);
+        
+        // İç nokta (Vadi)
+        double rInner = radius * innerRadiusRatio;
+        double pnx = cx + rInner * math.cos(angleOffset + (i * angle) + (angle / 2));
+        double pny = cy + rInner * math.sin(angleOffset + (i * angle) + (angle / 2));
+        path.lineTo(pnx, pny);
+      }
+    } else {
+      // Düz Poligon çizimi
+      double angle = (math.pi * 2) / sides;
+      for (int i = 0; i < sides; i++) {
+        double px = cx + radius * math.cos(angleOffset + (i * angle));
+        double py = cy + radius * math.sin(angleOffset + (i * angle));
+        if (i == 0) path.moveTo(px, py);
+        else path.lineTo(px, py);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ── Combined Radar Painter (Kombine Güç Haritası) ──

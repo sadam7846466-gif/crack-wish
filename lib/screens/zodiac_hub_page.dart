@@ -49,13 +49,16 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
           center: const Alignment(0, -0.6), radius: 1.6,
           colors: [_goldD.withOpacity(0.2), _bg], stops: const [0, 1],
         ))),
-        SafeArea(bottom: false, child: SingleChildScrollView(
+        SafeArea(top: false, bottom: false, child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 40),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 10,
+            bottom: 40,
+          ),
           child: Column(children: [
             // Üst Bar & Başlık Paneli (Aynı hizada, yerden tasarruf)
             _animWrap(_t1, Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
               child: Row(
                 children: [
                   const GlassBackButton(),
