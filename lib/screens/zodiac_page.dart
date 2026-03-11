@@ -6290,7 +6290,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'love',
                           pct: lovePct,
                           iconObj: Icons.favorite_border,
-                          centerIcon: Icons.favorite,
+                          emoji: '❤️',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6299,7 +6299,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'friend',
                           pct: friendPct,
                           iconObj: Icons.people_alt_outlined,
-                          centerIcon: Icons.handshake,
+                          emoji: '🤝',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6308,7 +6308,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'comm',
                           pct: commPct,
                           iconObj: Icons.chat_bubble_outline,
-                          centerIcon: Icons.psychology,
+                          emoji: '🧠',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6317,7 +6317,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'work',
                           pct: workPct,
                           iconObj: Icons.work_outline,
-                          centerIcon: Icons.workspaces,
+                          emoji: '💼',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6326,7 +6326,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'fun',
                           pct: funPct,
                           iconObj: Icons.explore_outlined,
-                          centerIcon: Icons.rocket_launch,
+                          emoji: '🚀',
                           c: _c,
                         ),
 
@@ -6421,7 +6421,7 @@ class _ExpandableCategoryCard extends StatefulWidget {
   final String categoryValue;
   final int pct;
   final IconData iconObj;
-  final IconData centerIcon;
+  final String emoji;
   final AnimationController c;
 
   const _ExpandableCategoryCard({
@@ -6429,7 +6429,7 @@ class _ExpandableCategoryCard extends StatefulWidget {
     required this.categoryValue,
     required this.pct,
     required this.iconObj,
-    required this.centerIcon,
+    required this.emoji,
     required this.c,
   });
 
@@ -6491,20 +6491,13 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 value: (widget.c.value * widget.pct) / 100,
                                 color: Colors.white.withOpacity(0.85),
                                 textColor: Colors
-                                    .transparent, // We use icon instead of text
+                                    .transparent, // We use emoji instead of text
                               ),
                             ),
                           ),
-                          AnimatedBuilder(
-                            animation: widget.c,
-                            builder: (context, child) => Text(
-                              '${(widget.c.value * widget.pct).toInt()}%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
+                          Text(
+                            widget.emoji,
+                            style: const TextStyle(fontSize: 24),
                           ),
                         ],
                       ),
@@ -6536,21 +6529,15 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 ),
                               ),
                               const Spacer(),
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.4),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  widget.centerIcon,
-                                  size: 20,
-                                  color: Colors.white,
+                              AnimatedBuilder(
+                                animation: widget.c,
+                                builder: (context, child) => Text(
+                                  '${(widget.c.value * widget.pct).toInt()}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                             ],
