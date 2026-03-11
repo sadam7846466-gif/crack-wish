@@ -938,6 +938,135 @@ class _ZodiacPageState extends State<ZodiacPage>
     );
   }
 
+  void _showZodiacPickerForCompatibility(Map<String, dynamic> mySign) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.55,
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F1210).withOpacity(0.85),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(32),
+              ),
+              border: Border(
+                top: BorderSide(color: _gold.withOpacity(0.3), width: 1.0),
+              ),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 36,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    gradient: LinearGradient(
+                      colors: [
+                        _gold.withOpacity(0.1),
+                        _gold.withOpacity(0.4),
+                        _gold.withOpacity(0.1),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'BİR BURÇ SEÇİN',
+                  style: GoogleFonts.cinzel(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 2,
+                  ),
+                ),
+                Text(
+                  'Uyum oranınızı görmek için partnerinizi seçin',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 0.85,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                    itemCount: _signs.length,
+                    itemBuilder: (context, index) {
+                      final sign = _signs[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  _CompatibilityResultPage(
+                                    sign1: mySign,
+                                    sign2: sign,
+                                    gold: _gold,
+                                  ),
+                              transitionsBuilder: (_, a, __, child) =>
+                                  FadeTransition(opacity: a, child: child),
+                              transitionDuration: const Duration(
+                                milliseconds: 400,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.04),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _gold.withOpacity(0.15)),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                sign['image'] as String,
+                                width: 45,
+                                height: 45,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                sign['nameEn'].toString().toUpperCase(),
+                                style: GoogleFonts.cinzel(
+                                  color: _gold,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _pulse.dispose();
@@ -1582,12 +1711,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                         const SizedBox(height: 28),
 
                         // ── KOZMİK BAĞLANTILAR — Burç Uyumu ──
-                        _fadeIn(
-                          800,
-                          _compatibilityCard(
-                            s['compatibility'] as Map<String, dynamic>,
-                          ),
-                        ),
+                        _fadeIn(800, _compatibilityCard(s)),
 
                         const SizedBox(height: 100),
                       ],
@@ -1981,269 +2105,157 @@ class _ZodiacPageState extends State<ZodiacPage>
     ],
   );
 
-  Widget _compatibilityCard(Map<String, dynamic> compat) => Container(
-    padding: const EdgeInsets.all(0),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.04),
-      borderRadius: BorderRadius.circular(28),
-      border: Border.all(color: _gold.withOpacity(0.15)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          blurRadius: 15,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-        // ── Üst Başlık ve Konsept ──
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-          decoration: BoxDecoration(
-            color: _goldD.withOpacity(0.1),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border(bottom: BorderSide(color: _gold.withOpacity(0.1))),
+  Widget _compatibilityCard(Map<String, dynamic> currentSignData) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: _gold.withOpacity(0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
-          child: Row(
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 child: CustomPaint(painter: _CosmicEyePainter(color: _gold)),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShaderMask(
-                      shaderCallback: (b) => const LinearGradient(
-                        colors: [
-                          Color(0xFFE8D5B7),
-                          Color(0xFFFFE8A1),
-                          Color(0xFFFFD060),
-                        ],
-                      ).createShader(b),
-                      child: Text(
-                        'NE KADAR UYUMLUSUNUZ?',
-                        style: GoogleFonts.cinzel(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Uyum Sağla ya da Çatış — Aşk & Arkadaşlık',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 11,
-                      ),
-                    ),
+              const SizedBox(width: 10),
+              ShaderMask(
+                shaderCallback: (b) => const LinearGradient(
+                  colors: [
+                    Color(0xFFE8D5B7),
+                    Color(0xFFFFE8A1),
+                    Color(0xFFFFD060),
                   ],
+                ).createShader(b),
+                child: Text(
+                  'KOZMİK UYUMUNU ÖLÇ',
+                  style: GoogleFonts.cinzel(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-
-        // ── Uyum Kartları ──
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: compat.entries.map((e) {
-              final isBest = e.key.contains('En Uyumlu');
-              final isGood = e.key.contains('İyi Uyum');
-              final color = isBest
-                  ? const Color(0xFF4CAF50)
-                  : isGood
-                  ? _gold
-                  : const Color(0xFFE53935);
-              final icon = isBest
-                  ? '🔥'
-                  : isGood
-                  ? '✨'
-                  : '⚔️';
-              final titleText = isBest
-                  ? 'Ruh Eşi / Mükemmel İkili'
-                  : isGood
-                  ? 'Tatlı Bir Frekans'
-                  : 'Kozmik Sınav / Çatışma';
-
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: color.withOpacity(0.04),
-                  border: Border.all(color: color.withOpacity(0.15)),
-                ),
-                child: Row(
+          const SizedBox(height: 6),
+          Text(
+            'Kendi burcunu seç ve yıldızların ne dediğini gör',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _gold.withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _gold.withOpacity(0.1),
+                          blurRadius: 20,
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        currentSignData['image'] as String,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    currentSignData['nameEn'].toString().toUpperCase(),
+                    style: GoogleFonts.cinzel(
+                      color: _gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Icon(
+                Icons.all_inclusive,
+                color: _gold.withOpacity(0.6),
+                size: 28,
+              ),
+              GestureDetector(
+                onTap: () => _showZodiacPickerForCompatibility(currentSignData),
+                child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color.withOpacity(0.1),
-                      ),
-                      child: Text(icon, style: const TextStyle(fontSize: 18)),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                e.key.toUpperCase(),
-                                style: TextStyle(
-                                  color: color.withOpacity(0.9),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                width: 3,
-                                height: 3,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: color.withOpacity(0.5),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  titleText,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.4),
-                                    fontSize: 10,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            e.value.toString(),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
+                      width: 80,
+                      height: 80,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: CustomPaint(
+                        painter: _DashedCirclePainter(color: _gold),
+                        child: Center(
+                          child: Text(
+                            '?',
+                            style: GoogleFonts.cinzel(
+                              color: _gold,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _gold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _gold.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        'BURÇ SEÇ',
+                        style: TextStyle(
+                          color: _gold,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              );
-            }).toList(),
-          ),
-        ),
-
-        // ── Aşk / Arkadaşlık Uyumu Butonları ──
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: Row(
-            children: [
-              // Aşk Uyumu Butonu
-              Expanded(
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFFE53935).withOpacity(0.12),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      border: Border.all(
-                        color: const Color(0xFFE53935).withOpacity(0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.favorite_border_rounded,
-                          color: const Color(0xFFE53935).withOpacity(0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'AŞK UYUMU',
-                          style: TextStyle(
-                            color: const Color(0xFFE53935).withOpacity(0.9),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Arkadaşlık Uyumu Butonu
-              Expanded(
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        colors: [_gold.withOpacity(0.12), Colors.transparent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      border: Border.all(color: _gold.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.people_alt_outlined,
-                          color: _gold.withOpacity(0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'ARKADAŞLIK',
-                          style: TextStyle(
-                            color: _gold.withOpacity(0.9),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 // ── FADE + SLIDE IN ANİMASYONU ──
@@ -6104,4 +6116,331 @@ class _CrystalShardClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+// ── Kesik Çizgili Yuvarlak İşaret ──
+class _DashedCirclePainter extends CustomPainter {
+  final Color color;
+  _DashedCirclePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = color.withOpacity(0.4)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    final radius = size.width / 2;
+    final center = Offset(size.width / 2, size.height / 2);
+
+    const dashWidth = 5.0;
+    const dashSpace = 4.0;
+    final circumference = 2 * math.pi * radius;
+    final dashCount = (circumference / (dashWidth + dashSpace)).floor();
+
+    for (var i = 0; i < dashCount; i++) {
+      final startAngle = (i * (dashWidth + dashSpace)) / radius;
+      final sweepAngle = dashWidth / radius;
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+// ── UYUM SONUÇ SAYFASI ──
+class _CompatibilityResultPage extends StatefulWidget {
+  final Map<String, dynamic> sign1;
+  final Map<String, dynamic> sign2;
+  final Color gold;
+
+  const _CompatibilityResultPage({
+    required this.sign1,
+    required this.sign2,
+    required this.gold,
+  });
+
+  @override
+  State<_CompatibilityResultPage> createState() =>
+      _CompatibilityResultPageState();
+}
+
+class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Basic calculation for demo purposes:
+    final combinedHash =
+        (widget.sign1['name'].hashCode ^ widget.sign2['name'].hashCode).abs();
+
+    final lovePct = 50 + (combinedHash % 45); // 50 to 95
+    final friendPct = 40 + ((combinedHash ~/ 10) % 55); // 40 to 95
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F1210),
+      body: Stack(
+        children: [
+          // Background
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.2),
+                  radius: 1.2,
+                  colors: [
+                    widget.gold.withOpacity(0.15),
+                    const Color(0xFF0F1210),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, top: 10),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: GlassBackButton(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Title
+                ShaderMask(
+                  shaderCallback: (b) => const LinearGradient(
+                    colors: [
+                      Color(0xFFE8D5B7),
+                      Color(0xFFFFE8A1),
+                      Color(0xFFFFD060),
+                    ],
+                  ).createShader(b),
+                  child: Text(
+                    'KOZMİK UYUM',
+                    style: GoogleFonts.cinzel(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+
+                // Avatars
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildAvatar(widget.sign1),
+                    const SizedBox(width: 20),
+                    Icon(
+                      Icons.all_inclusive,
+                      color: widget.gold.withOpacity(0.5),
+                      size: 30,
+                    ),
+                    const SizedBox(width: 20),
+                    _buildAvatar(widget.sign2),
+                  ],
+                ),
+                const SizedBox(height: 60),
+
+                // Percentages
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 40,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.03),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(40),
+                      ),
+                      border: Border(
+                        top: BorderSide(color: widget.gold.withOpacity(0.2)),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildProgressBar(
+                          'AŞK UYUMU',
+                          lovePct,
+                          const Color(0xFFE53935),
+                          Icons.favorite,
+                        ),
+                        const SizedBox(height: 30),
+                        _buildProgressBar(
+                          'ARKADAŞLIK',
+                          friendPct,
+                          widget.gold,
+                          Icons.people_alt,
+                        ),
+
+                        const Spacer(),
+
+                        // Description based on average
+                        _buildAnalysisText(lovePct, friendPct),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(Map<String, dynamic> s) {
+    return Column(
+      children: [
+        Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: widget.gold.withOpacity(0.4), width: 2),
+            boxShadow: [
+              BoxShadow(color: widget.gold.withOpacity(0.1), blurRadius: 20),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(s['image'] as String, fit: BoxFit.cover),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          s['nameEn'].toString().toUpperCase(),
+          style: GoogleFonts.cinzel(
+            color: widget.gold,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressBar(String title, int pct, Color color, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            ),
+            AnimatedBuilder(
+              animation: _c,
+              builder: (context, child) => Text(
+                '${(_c.value * pct).toInt()}%',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: 10,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          alignment: Alignment.centerLeft,
+          child: AnimatedBuilder(
+            animation: _c,
+            builder: (context, child) => FractionallySizedBox(
+              widthFactor: (_c.value * pct) / 100,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: color,
+                  boxShadow: [
+                    BoxShadow(color: color.withOpacity(0.5), blurRadius: 8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAnalysisText(int lovePct, int friendPct) {
+    final avg = (lovePct + friendPct) / 2;
+    String text;
+    if (avg > 80)
+      text =
+          "Bu iki burç arasında güçlü bir çekim ve uyum var. Kozmik enerjiler bir araya geldiğinde durdurulamaz bir bağ yaratıyor.";
+    else if (avg > 60)
+      text =
+          "Farklılıklar birbirini tamamlıyor. Zaman zaman çatışmalar yaşansa da, üzerinde çalışıldığında sağlam bir temel oluşturabilirler.";
+    else
+      text =
+          "Yıldızlar bu ikili için oldukça farklı diller konuşuyor. Birbirinizi anlamak için ekstra çaba göstermeniz gerekebilir.";
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: widget.gold.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: widget.gold.withOpacity(0.1)),
+      ),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.8),
+          fontSize: 13,
+          height: 1.6,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+    );
+  }
 }
