@@ -1581,6 +1581,14 @@ class _ZodiacPageState extends State<ZodiacPage>
 
                         const SizedBox(height: 28),
 
+                        // ── KOZMİK BAĞLANTILAR — Burç Uyumu ──
+                        _fadeIn(
+                          800,
+                          _compatibilityCard(
+                            s['compatibility'] as Map<String, dynamic>,
+                          ),
+                        ),
+
                         const SizedBox(height: 100),
                       ],
                     ),
@@ -1973,7 +1981,7 @@ class _ZodiacPageState extends State<ZodiacPage>
     ],
   );
 
-  Widget _compatibilityCard(Map<String, String> compat) => Container(
+  Widget _compatibilityCard(Map<String, dynamic> compat) => Container(
     padding: const EdgeInsets.all(0),
     decoration: BoxDecoration(
       color: Colors.white.withOpacity(0.04),
@@ -2124,7 +2132,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            e.value,
+                            e.value.toString(),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 15,
@@ -2141,45 +2149,96 @@ class _ZodiacPageState extends State<ZodiacPage>
           ),
         ),
 
-        // ── Uyumunu Gör / Paylaş Butonu ──
+        // ── Aşk / Arkadaşlık Uyumu Butonları ──
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: InkWell(
-            onTap: () {
-              // Şimdilik sadece görsel, sonradan paylaşım ekranı açılabilir.
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  colors: [_gold.withOpacity(0.1), Colors.transparent],
-                ),
-                border: Border.all(color: _gold.withOpacity(0.2)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.people_alt_outlined,
-                    color: _gold.withOpacity(0.8),
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'PARTNERİNLE UYUMUNU GÖR',
-                    style: TextStyle(
-                      color: _gold.withOpacity(0.9),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
+          child: Row(
+            children: [
+              // Aşk Uyumu Butonu
+              Expanded(
+                child: InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFE53935).withOpacity(0.12),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(
+                        color: const Color(0xFFE53935).withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.favorite_border_rounded,
+                          color: const Color(0xFFE53935).withOpacity(0.9),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'AŞK UYUMU',
+                          style: TextStyle(
+                            color: const Color(0xFFE53935).withOpacity(0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              // Arkadaşlık Uyumu Butonu
+              Expanded(
+                child: InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [_gold.withOpacity(0.12), Colors.transparent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(color: _gold.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_alt_outlined,
+                          color: _gold.withOpacity(0.9),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'ARKADAŞLIK',
+                          style: TextStyle(
+                            color: _gold.withOpacity(0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
