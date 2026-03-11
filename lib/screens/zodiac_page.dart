@@ -6276,65 +6276,72 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
 
                 // Percentages
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 40,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(40),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(40),
-                      ),
-                      border: Border(
-                        top: BorderSide(color: widget.gold.withOpacity(0.2)),
-                      ),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildProgressBar(
-                            'AŞK UYUMU',
-                            lovePct,
-                            const Color(0xFFE53935),
-                            Icons.favorite,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 40,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          border: Border(
+                            top: BorderSide(
+                              color: Colors.white.withOpacity(0.15),
+                            ),
                           ),
-                          const SizedBox(height: 24),
-                          _buildProgressBar(
-                            'ARKADAŞLIK',
-                            friendPct,
-                            widget.gold,
-                            Icons.people_alt,
-                          ),
-                          const SizedBox(height: 24),
-                          _buildProgressBar(
-                            'İLETİŞİM & ZİHİN',
-                            commPct,
-                            const Color(0xFF64B5F6),
-                            Icons.chat_bubble_outline,
-                          ),
-                          const SizedBox(height: 24),
-                          _buildProgressBar(
-                            'ORTAK ÇALIŞMA',
-                            workPct,
-                            const Color(0xFF81C784),
-                            Icons.work_outline,
-                          ),
-                          const SizedBox(height: 24),
-                          _buildProgressBar(
-                            'MACERA & EĞLENCE',
-                            funPct,
-                            const Color(0xFFFFB74D),
-                            Icons.explore_outlined,
-                          ),
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildProgressBar(
+                                'AŞK UYUMU',
+                                'Romantik çekim, tutku ve duygusal bağın derinliği.',
+                                lovePct,
+                                Icons.favorite_border,
+                              ),
+                              const SizedBox(height: 32),
+                              _buildProgressBar(
+                                'ARKADAŞLIK',
+                                'Güven, sosyal uyum ve birlikte kaliteli zaman.',
+                                friendPct,
+                                Icons.people_alt_outlined,
+                              ),
+                              const SizedBox(height: 32),
+                              _buildProgressBar(
+                                'İLETİŞİM & ZİHİN',
+                                'Fikir paylaşımları, birbirini anlama ve zihinsel uyum.',
+                                commPct,
+                                Icons.chat_bubble_outline,
+                              ),
+                              const SizedBox(height: 32),
+                              _buildProgressBar(
+                                'ORTAK ÇALIŞMA',
+                                'Hedef ortaklığı, işbirliği ve kriz çözme becerisi.',
+                                workPct,
+                                Icons.work_outline,
+                              ),
+                              const SizedBox(height: 32),
+                              _buildProgressBar(
+                                'MACERA & EĞLENCE',
+                                'Spontanlık, yeni şeyler keşfetme ve birlikte eğlenme.',
+                                funPct,
+                                Icons.explore_outlined,
+                              ),
 
-                          const SizedBox(height: 40),
+                              const SizedBox(height: 40),
 
-                          // Description based on average
-                          _buildAnalysisText(avg),
-                          const SizedBox(height: 40),
-                        ],
+                              // Description based on average
+                              _buildAnalysisText(avg),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -6376,7 +6383,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     );
   }
 
-  Widget _buildProgressBar(String title, int pct, Color color, IconData icon) {
+  Widget _buildProgressBar(String title, String desc, int pct, IconData icon) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -6385,15 +6392,26 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           children: [
             Row(
               children: [
-                Icon(icon, color: color, size: 18),
-                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Colors.white.withOpacity(0.9),
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 14),
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.95),
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ],
@@ -6402,21 +6420,21 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
               animation: _c,
               builder: (context, child) => Text(
                 '${(_c.value * pct).toInt()}%',
-                style: TextStyle(
-                  color: color,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Container(
-          height: 10,
+          height: 6,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(5),
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(3),
           ),
           alignment: Alignment.centerLeft,
           child: AnimatedBuilder(
@@ -6425,14 +6443,26 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
               widthFactor: (_c.value * pct) / 100,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                  color: Colors.white.withOpacity(0.85),
                   boxShadow: [
-                    BoxShadow(color: color.withOpacity(0.5), blurRadius: 8),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.3),
+                      blurRadius: 6,
+                    ),
                   ],
                 ),
               ),
             ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          desc,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.5),
+            fontSize: 11,
+            height: 1.4,
           ),
         ),
       ],
