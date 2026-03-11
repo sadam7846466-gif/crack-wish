@@ -6495,21 +6495,15 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                               ),
                             ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.4),
-                                  blurRadius: 15,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              widget.centerIcon,
-                              size: 28,
-                              color: Colors.white,
+                          AnimatedBuilder(
+                            animation: widget.c,
+                            builder: (context, child) => Text(
+                              '${(widget.c.value * widget.pct).toInt()}%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
                         ],
@@ -6542,15 +6536,21 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 ),
                               ),
                               const Spacer(),
-                              AnimatedBuilder(
-                                animation: widget.c,
-                                builder: (context, child) => Text(
-                                  '${(widget.c.value * widget.pct).toInt()}%',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.4),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  widget.centerIcon,
+                                  size: 20,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
