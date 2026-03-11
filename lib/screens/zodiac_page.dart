@@ -1016,12 +1016,13 @@ class _ZodiacPageState extends State<ZodiacPage>
                           Navigator.push(
                             context,
                             PageRouteBuilder(
-                              pageBuilder: (_, __, ___) =>
-                                  _CompatibilityResultPage(
-                                    sign1: mySign,
-                                    sign2: sign,
-                                    gold: _gold,
-                                  ),
+                              pageBuilder: (_, __, ___) => _CompatibilityResultPage(
+                                sign1: mySign,
+                                sign2: sign,
+                                gold: const Color(
+                                  0xFFD2C4A7,
+                                ), // Muted elegant champagne instead of bright gold
+                              ),
                               transitionsBuilder: (_, a, __, child) =>
                                   FadeTransition(opacity: a, child: child),
                               transitionDuration: const Duration(
@@ -6245,9 +6246,9 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                         ShaderMask(
                           shaderCallback: (b) => const LinearGradient(
                             colors: [
-                              Color(0xFFE8D5B7),
-                              Color(0xFFFFE8A1),
-                              Color(0xFFFFD060),
+                              Color(0xFFEBE3D5), // Soft moonlit white/beige
+                              Color(0xFFDCCDB4), // Champagne
+                              Color(0xFFC7B198), // Muted bronze/gold
                             ],
                           ).createShader(b),
                           child: Text(
