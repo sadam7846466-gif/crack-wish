@@ -6290,7 +6290,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'love',
                           pct: lovePct,
                           iconObj: Icons.favorite_border,
-                          emoji: '❤️',
+                          centerIcon: Icons.favorite,
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6299,7 +6299,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'friend',
                           pct: friendPct,
                           iconObj: Icons.people_alt_outlined,
-                          emoji: '🤝',
+                          centerIcon: Icons.handshake,
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6308,7 +6308,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'comm',
                           pct: commPct,
                           iconObj: Icons.chat_bubble_outline,
-                          emoji: '🧠',
+                          centerIcon: Icons.psychology,
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6317,7 +6317,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'work',
                           pct: workPct,
                           iconObj: Icons.work_outline,
-                          emoji: '💼',
+                          centerIcon: Icons.workspaces,
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6326,7 +6326,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'fun',
                           pct: funPct,
                           iconObj: Icons.explore_outlined,
-                          emoji: '🚀',
+                          centerIcon: Icons.rocket_launch,
                           c: _c,
                         ),
 
@@ -6421,7 +6421,7 @@ class _ExpandableCategoryCard extends StatefulWidget {
   final String categoryValue;
   final int pct;
   final IconData iconObj;
-  final String emoji;
+  final IconData centerIcon;
   final AnimationController c;
 
   const _ExpandableCategoryCard({
@@ -6429,7 +6429,7 @@ class _ExpandableCategoryCard extends StatefulWidget {
     required this.categoryValue,
     required this.pct,
     required this.iconObj,
-    required this.emoji,
+    required this.centerIcon,
     required this.c,
   });
 
@@ -6491,13 +6491,39 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 value: (widget.c.value * widget.pct) / 100,
                                 color: Colors.white.withOpacity(0.85),
                                 textColor: Colors
-                                    .transparent, // We use emoji instead of text
+                                    .transparent, // We use icon instead of text
                               ),
                             ),
                           ),
-                          Text(
-                            widget.emoji,
-                            style: const TextStyle(fontSize: 24),
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFFFD060,
+                                  ).withOpacity(0.15),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFFE8D5B7),
+                                  Color(0xFFFFE8A1),
+                                  Color(0xFFFFD060),
+                                ],
+                              ).createShader(bounds),
+                              child: Icon(
+                                widget.centerIcon,
+                                size: 28,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ],
                       ),
