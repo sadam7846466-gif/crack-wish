@@ -6394,22 +6394,87 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           decoration: BoxDecoration(
             color: widget.gold.withOpacity(0.06),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: widget.gold.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: widget.gold.withOpacity(0.03),
+                blurRadius: 30,
+                spreadRadius: 5,
+              ),
+            ],
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
-              fontSize: 13,
-              height: 1.6,
-              letterSpacing: 0.5,
-              fontStyle: FontStyle.italic,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [
+                    Color(0xFFE8D5B7),
+                    Color(0xFFFFE8A1),
+                    Color(0xFFFFD060),
+                  ],
+                ).createShader(bounds),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  size: 40,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'KOZMİK SON SÖZ',
+                style: GoogleFonts.cinzel(
+                  color: widget.gold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: 60,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      widget.gold.withOpacity(0),
+                      widget.gold.withOpacity(0.7),
+                      widget.gold.withOpacity(0),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
+                  height: 1.6,
+                  letterSpacing: 0.5,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                width: 60,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      widget.gold.withOpacity(0),
+                      widget.gold.withOpacity(0.7),
+                      widget.gold.withOpacity(0),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
