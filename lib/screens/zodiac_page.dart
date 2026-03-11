@@ -6276,73 +6276,55 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
 
                 // Percentages
                 Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(40),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 30,
                     ),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 40,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildCircularMetric(
+                          'AŞK UYUMU',
+                          'Romantik çekim, tutku ve duygusal bağın derinliği.',
+                          lovePct,
+                          Icons.favorite_border,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          border: Border(
-                            top: BorderSide(
-                              color: Colors.white.withOpacity(0.15),
-                            ),
-                          ),
+                        const SizedBox(height: 20),
+                        _buildCircularMetric(
+                          'ARKADAŞLIK',
+                          'Güven, sosyal uyum ve birlikte kaliteli zaman.',
+                          friendPct,
+                          Icons.people_alt_outlined,
                         ),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildCircularMetric(
-                                'AŞK UYUMU',
-                                'Romantik çekim, tutku ve duygusal bağın derinliği.',
-                                lovePct,
-                                Icons.favorite_border,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildCircularMetric(
-                                'ARKADAŞLIK',
-                                'Güven, sosyal uyum ve birlikte kaliteli zaman.',
-                                friendPct,
-                                Icons.people_alt_outlined,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildCircularMetric(
-                                'İLETİŞİM & ZİHİN',
-                                'Fikir paylaşımları, birbirini anlama ve zihinsel uyum.',
-                                commPct,
-                                Icons.chat_bubble_outline,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildCircularMetric(
-                                'ORTAK ÇALIŞMA',
-                                'Hedef ortaklığı, işbirliği ve kriz çözme becerisi.',
-                                workPct,
-                                Icons.work_outline,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildCircularMetric(
-                                'MACERA & EĞLENCE',
-                                'Spontanlık, yeni şeyler keşfetme ve birlikte eğlenme.',
-                                funPct,
-                                Icons.explore_outlined,
-                              ),
+                        const SizedBox(height: 20),
+                        _buildCircularMetric(
+                          'İLETİŞİM & ZİHİN',
+                          'Fikir paylaşımları, birbirini anlama ve zihinsel uyum.',
+                          commPct,
+                          Icons.chat_bubble_outline,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildCircularMetric(
+                          'ORTAK ÇALIŞMA',
+                          'Hedef ortaklığı, işbirliği ve kriz çözme becerisi.',
+                          workPct,
+                          Icons.work_outline,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildCircularMetric(
+                          'MACERA & EĞLENCE',
+                          'Spontanlık, yeni şeyler keşfetme ve birlikte eğlenme.',
+                          funPct,
+                          Icons.explore_outlined,
+                        ),
 
-                              const SizedBox(height: 40),
+                        const SizedBox(height: 40),
 
-                              // Description based on average
-                              _buildAnalysisText(avg),
-                              const SizedBox(height: 40),
-                            ],
-                          ),
-                        ),
-                      ),
+                        // Description based on average
+                        _buildAnalysisText(avg),
+                        const SizedBox(height: 40),
+                      ],
                     ),
                   ),
                 ),
@@ -6389,64 +6371,79 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     int pct,
     IconData icon,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Sol taraf: Yuvarlak gauge
-          SizedBox(
-            width: 70,
-            height: 70,
-            child: AnimatedBuilder(
-              animation: _c,
-              builder: (context, child) => CustomPaint(
-                size: const Size(70, 70),
-                painter: _ArcGaugePainter(
-                  value: (_c.value * pct) / 100,
-                  color: Colors.white.withOpacity(0.85),
-                  textColor: Colors.white,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.15)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Sol taraf: Yuvarlak gauge
+              SizedBox(
+                width: 70,
+                height: 70,
+                child: AnimatedBuilder(
+                  animation: _c,
+                  builder: (context, child) => CustomPaint(
+                    size: const Size(70, 70),
+                    painter: _ArcGaugePainter(
+                      value: (_c.value * pct) / 100,
+                      color: Colors.white.withOpacity(0.85),
+                      textColor: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 24),
-          // Sağ taraf: Metinler
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+              const SizedBox(width: 24),
+              // Sağ taraf: Metinler
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(icon, color: Colors.white.withOpacity(0.6), size: 16),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.95),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
+                    Row(
+                      children: [
+                        Icon(
+                          icon,
+                          color: Colors.white.withOpacity(0.6),
+                          size: 16,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.95),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      desc,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 11,
+                        height: 1.4,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  desc,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 11,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -6463,21 +6460,28 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
       text =
           "Yıldızlar bu ikili için oldukça farklı diller konuşuyor. Birbirinizi anlamak için ekstra çaba göstermeniz gerekebilir.";
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: widget.gold.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: widget.gold.withOpacity(0.1)),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.8),
-          fontSize: 13,
-          height: 1.6,
-          fontStyle: FontStyle.italic,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: widget.gold.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: widget.gold.withOpacity(0.2)),
+          ),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 13,
+              height: 1.6,
+              letterSpacing: 0.5,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ),
       ),
     );
