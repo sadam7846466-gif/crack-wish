@@ -2240,14 +2240,49 @@ class _ZodiacPageState extends State<ZodiacPage>
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _gold.withOpacity(0.3)),
                       ),
-                      child: Text(
-                        'BURÇ SEÇ',
-                        style: TextStyle(
-                          color: _gold,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
+                          const SizedBox(width: 4),
+                          Text(
+                            'BURÇ SEÇ',
+                            style: TextStyle(
+                              color: _gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _gold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _gold.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
+                          const SizedBox(width: 4),
+                          Text(
+                            'ARKADAŞ SEÇ',
+                            style: TextStyle(
+                              color: _gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
