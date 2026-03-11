@@ -6290,7 +6290,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'love',
                           pct: lovePct,
                           iconObj: Icons.favorite_border,
-                          emoji: '❤️',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6299,7 +6298,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'friend',
                           pct: friendPct,
                           iconObj: Icons.people_alt_outlined,
-                          emoji: '🤝',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6308,7 +6306,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'comm',
                           pct: commPct,
                           iconObj: Icons.chat_bubble_outline,
-                          emoji: '🧠',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6317,7 +6314,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'work',
                           pct: workPct,
                           iconObj: Icons.work_outline,
-                          emoji: '💼',
                           c: _c,
                         ),
                         const SizedBox(height: 20),
@@ -6326,7 +6322,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           categoryValue: 'fun',
                           pct: funPct,
                           iconObj: Icons.explore_outlined,
-                          emoji: '🚀',
                           c: _c,
                         ),
 
@@ -6421,7 +6416,6 @@ class _ExpandableCategoryCard extends StatefulWidget {
   final String categoryValue;
   final int pct;
   final IconData iconObj;
-  final String emoji;
   final AnimationController c;
 
   const _ExpandableCategoryCard({
@@ -6429,7 +6423,6 @@ class _ExpandableCategoryCard extends StatefulWidget {
     required this.categoryValue,
     required this.pct,
     required this.iconObj,
-    required this.emoji,
     required this.c,
   });
 
@@ -6491,13 +6484,20 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 value: (widget.c.value * widget.pct) / 100,
                                 color: Colors.white.withOpacity(0.85),
                                 textColor: Colors
-                                    .transparent, // We use emoji instead of text
+                                    .transparent, // We use icon instead of text
                               ),
                             ),
                           ),
-                          Text(
-                            widget.emoji,
-                            style: const TextStyle(fontSize: 24),
+                          AnimatedBuilder(
+                            animation: widget.c,
+                            builder: (context, child) => Text(
+                              '${(widget.c.value * widget.pct).toInt()}%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -6526,18 +6526,6 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                     letterSpacing: 1.2,
                                   ),
                                   overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const Spacer(),
-                              AnimatedBuilder(
-                                animation: widget.c,
-                                builder: (context, child) => Text(
-                                  '${(widget.c.value * widget.pct).toInt()}%',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                  ),
                                 ),
                               ),
                             ],
