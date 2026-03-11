@@ -6500,29 +6500,16 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFE040FB).withOpacity(
-                                    0.2,
-                                  ), // Mystical neon purple glow
-                                  blurRadius: 12,
-                                  spreadRadius: 2,
+                                  color: Colors.white.withOpacity(0.4),
+                                  blurRadius: 15,
+                                  spreadRadius: 1,
                                 ),
                               ],
                             ),
-                            child: ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF00E5FF), // Ethereal Cyan
-                                  Color(0xFF7C4DFF), // Deep Violet
-                                  Color(0xFFE040FB), // Mystic Magenta
-                                ],
-                              ).createShader(bounds),
-                              child: Icon(
-                                widget.centerIcon,
-                                size: 28,
-                                color: Colors.white,
-                              ),
+                            child: Icon(
+                              widget.centerIcon,
+                              size: 28,
+                              color: Colors.white,
                             ),
                           ),
                         ],
