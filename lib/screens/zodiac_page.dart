@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/glass_back_button.dart';
 import '../services/storage_service.dart';
+import 'compatibility_content.dart';
 
 /// Batı Zodyak Sayfası — "Ben nasıl biriyim?"
 /// Psikolojik yorum, kişilik analizi, hayat alanları, uyum
@@ -6284,39 +6285,49 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildCircularMetric(
-                          'AŞK UYUMU',
-                          'Romantik çekim, tutku ve duygusal bağın derinliği.',
-                          lovePct,
-                          Icons.favorite_border,
+                        _ExpandableCategoryCard(
+                          title: 'AŞK UYUMU',
+                          categoryValue: 'love',
+                          pct: lovePct,
+                          iconObj: Icons.favorite_border,
+                          emoji: '❤️',
+                          c: _c,
                         ),
                         const SizedBox(height: 20),
-                        _buildCircularMetric(
-                          'ARKADAŞLIK',
-                          'Güven, sosyal uyum ve birlikte kaliteli zaman.',
-                          friendPct,
-                          Icons.people_alt_outlined,
+                        _ExpandableCategoryCard(
+                          title: 'ARKADAŞLIK',
+                          categoryValue: 'friend',
+                          pct: friendPct,
+                          iconObj: Icons.people_alt_outlined,
+                          emoji: '🤝',
+                          c: _c,
                         ),
                         const SizedBox(height: 20),
-                        _buildCircularMetric(
-                          'İLETİŞİM & ZİHİN',
-                          'Fikir paylaşımları, birbirini anlama ve zihinsel uyum.',
-                          commPct,
-                          Icons.chat_bubble_outline,
+                        _ExpandableCategoryCard(
+                          title: 'İLETİŞİM & ZİHİN',
+                          categoryValue: 'comm',
+                          pct: commPct,
+                          iconObj: Icons.chat_bubble_outline,
+                          emoji: '🧠',
+                          c: _c,
                         ),
                         const SizedBox(height: 20),
-                        _buildCircularMetric(
-                          'ORTAK ÇALIŞMA',
-                          'Hedef ortaklığı, işbirliği ve kriz çözme becerisi.',
-                          workPct,
-                          Icons.work_outline,
+                        _ExpandableCategoryCard(
+                          title: 'ORTAK ÇALIŞMA',
+                          categoryValue: 'work',
+                          pct: workPct,
+                          iconObj: Icons.work_outline,
+                          emoji: '💼',
+                          c: _c,
                         ),
                         const SizedBox(height: 20),
-                        _buildCircularMetric(
-                          'MACERA & EĞLENCE',
-                          'Spontanlık, yeni şeyler keşfetme ve birlikte eğlenme.',
-                          funPct,
-                          Icons.explore_outlined,
+                        _ExpandableCategoryCard(
+                          title: 'MACERA & EĞLENCE',
+                          categoryValue: 'fun',
+                          pct: funPct,
+                          iconObj: Icons.explore_outlined,
+                          emoji: '🚀',
+                          c: _c,
                         ),
 
                         const SizedBox(height: 40),
@@ -6365,89 +6376,6 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     );
   }
 
-  Widget _buildCircularMetric(
-    String title,
-    String desc,
-    int pct,
-    IconData icon,
-  ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.15)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Sol taraf: Yuvarlak gauge
-              SizedBox(
-                width: 70,
-                height: 70,
-                child: AnimatedBuilder(
-                  animation: _c,
-                  builder: (context, child) => CustomPaint(
-                    size: const Size(70, 70),
-                    painter: _ArcGaugePainter(
-                      value: (_c.value * pct) / 100,
-                      color: Colors.white.withOpacity(0.85),
-                      textColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 24),
-              // Sağ taraf: Metinler
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          icon,
-                          color: Colors.white.withOpacity(0.6),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            title,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.95),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      desc,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 11,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildAnalysisText(double avg) {
     String text;
     if (avg > 80)
@@ -6484,6 +6412,224 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ExpandableCategoryCard extends StatefulWidget {
+  final String title;
+  final String categoryValue;
+  final int pct;
+  final IconData iconObj;
+  final String emoji;
+  final AnimationController c;
+
+  const _ExpandableCategoryCard({
+    required this.title,
+    required this.categoryValue,
+    required this.pct,
+    required this.iconObj,
+    required this.emoji,
+    required this.c,
+  });
+
+  @override
+  State<_ExpandableCategoryCard> createState() =>
+      _ExpandableCategoryCardState();
+}
+
+class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = CompatibilityContent.get(widget.categoryValue, widget.pct);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _expanded = !_expanded;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: _expanded
+                  ? Colors.white.withOpacity(0.08)
+                  : Colors.white.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: _expanded
+                    ? Colors.white.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.15),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Sol taraf: Yuvarlak gauge
+                    SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: widget.c,
+                            builder: (context, child) => CustomPaint(
+                              size: const Size(70, 70),
+                              painter: _ArcGaugePainter(
+                                value: (widget.c.value * widget.pct) / 100,
+                                color: Colors.white.withOpacity(0.85),
+                                textColor: Colors
+                                    .transparent, // We use emoji instead of text
+                              ),
+                            ),
+                          ),
+                          Text(
+                            widget.emoji,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    // Sağ taraf: Başlık & Özet
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                widget.iconObj,
+                                color: Colors.white.withOpacity(0.6),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  widget.title,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.95),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.2,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const Spacer(),
+                              AnimatedBuilder(
+                                animation: widget.c,
+                                builder: (context, child) => Text(
+                                  '${(widget.c.value * widget.pct).toInt()}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            content.dynamicText,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                              fontSize: 11,
+                              height: 1.4,
+                            ),
+                            maxLines: _expanded ? null : 2,
+                            overflow: _expanded
+                                ? TextOverflow.visible
+                                : TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                if (_expanded) ...[
+                  const SizedBox(height: 24),
+                  Container(height: 1, color: Colors.white.withOpacity(0.1)),
+                  const SizedBox(height: 20),
+                  _buildDetailRow(
+                    'Avantajlar',
+                    content.pros,
+                    Icons.add_circle_outline,
+                    Colors.greenAccent,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    'Zorluklar',
+                    content.cons,
+                    Icons.remove_circle_outline,
+                    Colors.redAccent,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    'Tavsiye',
+                    content.advice,
+                    Icons.lightbulb_outline,
+                    Colors.amberAccent,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    String title,
+    String text,
+    IconData icon,
+    Color color,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: color, size: 18),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title.toUpperCase(),
+                style: TextStyle(
+                  color: color,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.85),
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
