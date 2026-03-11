@@ -6235,101 +6235,107 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                     child: GlassBackButton(),
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Title
-                ShaderMask(
-                  shaderCallback: (b) => const LinearGradient(
-                    colors: [
-                      Color(0xFFE8D5B7),
-                      Color(0xFFFFE8A1),
-                      Color(0xFFFFD060),
-                    ],
-                  ).createShader(b),
-                  child: Text(
-                    'KOZMİK UYUM',
-                    style: GoogleFonts.cinzel(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 50),
-
-                // Avatars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildAvatar(widget.sign1),
-                    const SizedBox(width: 20),
-                    Icon(
-                      Icons.all_inclusive,
-                      color: widget.gold.withOpacity(0.5),
-                      size: 30,
-                    ),
-                    const SizedBox(width: 20),
-                    _buildAvatar(widget.sign2),
-                  ],
-                ),
-                const SizedBox(height: 60),
-
-                // Percentages
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 30,
-                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _ExpandableCategoryCard(
-                          title: 'AŞK UYUMU',
-                          categoryValue: 'love',
-                          pct: lovePct,
-                          iconObj: Icons.favorite_border,
-                          c: _c,
-                        ),
                         const SizedBox(height: 20),
-                        _ExpandableCategoryCard(
-                          title: 'ARKADAŞLIK',
-                          categoryValue: 'friend',
-                          pct: friendPct,
-                          iconObj: Icons.people_alt_outlined,
-                          c: _c,
-                        ),
-                        const SizedBox(height: 20),
-                        _ExpandableCategoryCard(
-                          title: 'İLETİŞİM & ZİHİN',
-                          categoryValue: 'comm',
-                          pct: commPct,
-                          iconObj: Icons.chat_bubble_outline,
-                          c: _c,
-                        ),
-                        const SizedBox(height: 20),
-                        _ExpandableCategoryCard(
-                          title: 'ORTAK ÇALIŞMA',
-                          categoryValue: 'work',
-                          pct: workPct,
-                          iconObj: Icons.work_outline,
-                          c: _c,
-                        ),
-                        const SizedBox(height: 20),
-                        _ExpandableCategoryCard(
-                          title: 'MACERA & EĞLENCE',
-                          categoryValue: 'fun',
-                          pct: funPct,
-                          iconObj: Icons.explore_outlined,
-                          c: _c,
-                        ),
 
-                        const SizedBox(height: 40),
+                        // Title
+                        ShaderMask(
+                          shaderCallback: (b) => const LinearGradient(
+                            colors: [
+                              Color(0xFFE8D5B7),
+                              Color(0xFFFFE8A1),
+                              Color(0xFFFFD060),
+                            ],
+                          ).createShader(b),
+                          child: Text(
+                            'KOZMİK UYUM',
+                            style: GoogleFonts.cinzel(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 50),
 
-                        // Description based on average
-                        _buildAnalysisText(avg),
-                        const SizedBox(height: 40),
+                        // Avatars
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildAvatar(widget.sign1),
+                            const SizedBox(width: 20),
+                            Icon(
+                              Icons.all_inclusive,
+                              color: widget.gold.withOpacity(0.5),
+                              size: 30,
+                            ),
+                            const SizedBox(width: 20),
+                            _buildAvatar(widget.sign2),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+
+                        // Percentages
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 30,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _ExpandableCategoryCard(
+                                title: 'AŞK UYUMU',
+                                categoryValue: 'love',
+                                pct: lovePct,
+                                iconObj: Icons.favorite_border,
+                                c: _c,
+                              ),
+                              const SizedBox(height: 20),
+                              _ExpandableCategoryCard(
+                                title: 'ARKADAŞLIK',
+                                categoryValue: 'friend',
+                                pct: friendPct,
+                                iconObj: Icons.people_alt_outlined,
+                                c: _c,
+                              ),
+                              const SizedBox(height: 20),
+                              _ExpandableCategoryCard(
+                                title: 'İLETİŞİM & ZİHİN',
+                                categoryValue: 'comm',
+                                pct: commPct,
+                                iconObj: Icons.chat_bubble_outline,
+                                c: _c,
+                              ),
+                              const SizedBox(height: 20),
+                              _ExpandableCategoryCard(
+                                title: 'ORTAK ÇALIŞMA',
+                                categoryValue: 'work',
+                                pct: workPct,
+                                iconObj: Icons.work_outline,
+                                c: _c,
+                              ),
+                              const SizedBox(height: 20),
+                              _ExpandableCategoryCard(
+                                title: 'MACERA & EĞLENCE',
+                                categoryValue: 'fun',
+                                pct: funPct,
+                                iconObj: Icons.explore_outlined,
+                                c: _c,
+                              ),
+
+                              const SizedBox(height: 40),
+
+                              // Description based on average
+                              _buildAnalysisText(avg),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
