@@ -6410,69 +6410,57 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [
-                    Color(0xFFE8D5B7),
-                    Color(0xFFFFE8A1),
-                    Color(0xFFFFD060),
-                  ],
-                ).createShader(bounds),
-                child: Icon(
-                  Icons.format_quote_rounded,
-                  size: 40,
-                  color: Colors.white,
-                ),
+              Icon(
+                Icons.auto_awesome,
+                color: widget.gold.withOpacity(0.5),
+                size: 20,
               ),
               const SizedBox(height: 12),
-              Text(
-                'KOZMİK SON SÖZ',
-                style: GoogleFonts.cinzel(
-                  color: widget.gold,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2,
-                ),
-              ),
-              const SizedBox(height: 16),
               Container(
-                width: 60,
+                width: 80,
                 height: 1,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       widget.gold.withOpacity(0),
-                      widget.gold.withOpacity(0.7),
+                      widget.gold.withOpacity(0.5),
                       widget.gold.withOpacity(0),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
                 text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withOpacity(0.95),
                   fontSize: 14,
                   height: 1.6,
                   letterSpacing: 0.5,
                   fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Container(
-                width: 60,
+                width: 80,
                 height: 1,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       widget.gold.withOpacity(0),
-                      widget.gold.withOpacity(0.7),
+                      widget.gold.withOpacity(0.5),
                       widget.gold.withOpacity(0),
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              Icon(
+                Icons.auto_awesome,
+                color: widget.gold.withOpacity(0.5),
+                size: 20,
               ),
             ],
           ),
