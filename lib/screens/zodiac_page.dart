@@ -2239,12 +2239,17 @@ class _ZodiacPageState extends State<ZodiacPage>
                         color: _gold.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _gold.withOpacity(0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _gold.withOpacity(0.15),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.auto_awesome, color: _gold, size: 12),
-                          const SizedBox(width: 4),
                           Text(
                             'BURÇ SEÇ',
                             style: TextStyle(
@@ -2254,6 +2259,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                               letterSpacing: 1,
                             ),
                           ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
                         ],
                       ),
                     ),
@@ -2267,12 +2274,17 @@ class _ZodiacPageState extends State<ZodiacPage>
                         color: _gold.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _gold.withOpacity(0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _gold.withOpacity(0.15),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.auto_awesome, color: _gold, size: 12),
-                          const SizedBox(width: 4),
                           Text(
                             'ARKADAŞ SEÇ',
                             style: TextStyle(
@@ -2282,6 +2294,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                               letterSpacing: 1,
                             ),
                           ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
                         ],
                       ),
                     ),
