@@ -2231,10 +2231,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                     ),
                     const SizedBox(height: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
+                      width: 110,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       decoration: BoxDecoration(
                         color: _gold.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -2248,7 +2246,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                         ],
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'BURÇ SEÇ',
@@ -2266,10 +2264,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
+                      width: 110,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       decoration: BoxDecoration(
                         color: _gold.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -2283,7 +2279,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                         ],
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'ARKADAŞ SEÇ',
