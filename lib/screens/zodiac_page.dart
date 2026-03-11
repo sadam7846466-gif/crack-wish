@@ -6522,7 +6522,7 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 size: 16,
                               ),
                               const SizedBox(width: 8),
-                              Flexible(
+                              Expanded(
                                 child: Text(
                                   widget.title,
                                   style: TextStyle(
@@ -6532,6 +6532,16 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                     letterSpacing: 1.2,
                                   ),
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              AnimatedRotation(
+                                turns: _expanded ? 0.5 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Colors.white.withOpacity(0.5),
+                                  size: 20,
                                 ),
                               ),
                             ],
