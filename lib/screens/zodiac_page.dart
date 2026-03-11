@@ -6199,6 +6199,11 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
 
     final lovePct = 50 + (combinedHash % 45); // 50 to 95
     final friendPct = 40 + ((combinedHash ~/ 10) % 55); // 40 to 95
+    final commPct = 45 + ((combinedHash ~/ 100) % 50); // 45 to 95
+    final workPct = 35 + ((combinedHash ~/ 3) % 60); // 35 to 95
+    final funPct = 40 + ((combinedHash ~/ 7) % 55); // 40 to 95
+
+    final avg = (lovePct + friendPct + commPct + workPct + funPct) / 5.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F1210),
@@ -6285,29 +6290,52 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                         top: BorderSide(color: widget.gold.withOpacity(0.2)),
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildProgressBar(
-                          'AŞK UYUMU',
-                          lovePct,
-                          const Color(0xFFE53935),
-                          Icons.favorite,
-                        ),
-                        const SizedBox(height: 30),
-                        _buildProgressBar(
-                          'ARKADAŞLIK',
-                          friendPct,
-                          widget.gold,
-                          Icons.people_alt,
-                        ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildProgressBar(
+                            'AŞK UYUMU',
+                            lovePct,
+                            const Color(0xFFE53935),
+                            Icons.favorite,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildProgressBar(
+                            'ARKADAŞLIK',
+                            friendPct,
+                            widget.gold,
+                            Icons.people_alt,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildProgressBar(
+                            'İLETİŞİM & ZİHİN',
+                            commPct,
+                            const Color(0xFF64B5F6),
+                            Icons.chat_bubble_outline,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildProgressBar(
+                            'ORTAK ÇALIŞMA',
+                            workPct,
+                            const Color(0xFF81C784),
+                            Icons.work_outline,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildProgressBar(
+                            'MACERA & EĞLENCE',
+                            funPct,
+                            const Color(0xFFFFB74D),
+                            Icons.explore_outlined,
+                          ),
 
-                        const Spacer(),
+                          const SizedBox(height: 40),
 
-                        // Description based on average
-                        _buildAnalysisText(lovePct, friendPct),
-                        const SizedBox(height: 40),
-                      ],
+                          // Description based on average
+                          _buildAnalysisText(avg),
+                          const SizedBox(height: 40),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -6411,8 +6439,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     );
   }
 
-  Widget _buildAnalysisText(int lovePct, int friendPct) {
-    final avg = (lovePct + friendPct) / 2;
+  Widget _buildAnalysisText(double avg) {
     String text;
     if (avg > 80)
       text =
