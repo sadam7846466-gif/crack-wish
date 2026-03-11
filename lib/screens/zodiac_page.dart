@@ -6299,35 +6299,35 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _buildProgressBar(
+                              _buildCircularMetric(
                                 'AŞK UYUMU',
                                 'Romantik çekim, tutku ve duygusal bağın derinliği.',
                                 lovePct,
                                 Icons.favorite_border,
                               ),
-                              const SizedBox(height: 32),
-                              _buildProgressBar(
+                              const SizedBox(height: 20),
+                              _buildCircularMetric(
                                 'ARKADAŞLIK',
                                 'Güven, sosyal uyum ve birlikte kaliteli zaman.',
                                 friendPct,
                                 Icons.people_alt_outlined,
                               ),
-                              const SizedBox(height: 32),
-                              _buildProgressBar(
+                              const SizedBox(height: 20),
+                              _buildCircularMetric(
                                 'İLETİŞİM & ZİHİN',
                                 'Fikir paylaşımları, birbirini anlama ve zihinsel uyum.',
                                 commPct,
                                 Icons.chat_bubble_outline,
                               ),
-                              const SizedBox(height: 32),
-                              _buildProgressBar(
+                              const SizedBox(height: 20),
+                              _buildCircularMetric(
                                 'ORTAK ÇALIŞMA',
                                 'Hedef ortaklığı, işbirliği ve kriz çözme becerisi.',
                                 workPct,
                                 Icons.work_outline,
                               ),
-                              const SizedBox(height: 32),
-                              _buildProgressBar(
+                              const SizedBox(height: 20),
+                              _buildCircularMetric(
                                 'MACERA & EĞLENCE',
                                 'Spontanlık, yeni şeyler keşfetme ve birlikte eğlenme.',
                                 funPct,
@@ -6383,89 +6383,76 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     );
   }
 
-  Widget _buildProgressBar(String title, String desc, int pct, IconData icon) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white.withOpacity(0.9),
-                    size: 16,
-                  ),
+  Widget _buildCircularMetric(
+    String title,
+    String desc,
+    int pct,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Sol taraf: Yuvarlak gauge
+          SizedBox(
+            width: 70,
+            height: 70,
+            child: AnimatedBuilder(
+              animation: _c,
+              builder: (context, child) => CustomPaint(
+                size: const Size(70, 70),
+                painter: _ArcGaugePainter(
+                  value: (_c.value * pct) / 100,
+                  color: Colors.white.withOpacity(0.85),
+                  textColor: Colors.white,
                 ),
-                const SizedBox(width: 14),
+              ),
+            ),
+          ),
+          const SizedBox(width: 24),
+          // Sağ taraf: Metinler
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, color: Colors.white.withOpacity(0.6), size: 16),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.95),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  title,
+                  desc,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.95),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 11,
+                    height: 1.4,
                   ),
                 ),
               ],
             ),
-            AnimatedBuilder(
-              animation: _c,
-              builder: (context, child) => Text(
-                '${(_c.value * pct).toInt()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          height: 6,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(3),
           ),
-          alignment: Alignment.centerLeft,
-          child: AnimatedBuilder(
-            animation: _c,
-            builder: (context, child) => FractionallySizedBox(
-              widthFactor: (_c.value * pct) / 100,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(3),
-                  color: Colors.white.withOpacity(0.85),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withOpacity(0.3),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          desc,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.5),
-            fontSize: 11,
-            height: 1.4,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
