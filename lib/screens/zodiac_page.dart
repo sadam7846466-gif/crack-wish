@@ -2214,40 +2214,73 @@ class _ZodiacPageState extends State<ZodiacPage>
                     Container(
                       width: 80,
                       height: 80,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: CustomPaint(
-                        painter: _DashedCirclePainter(color: _gold),
-                        child: Center(
-                          child: Text(
-                            '?',
-                            style: GoogleFonts.cinzel(
-                              color: _gold,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w500,
-                            ),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _gold.withOpacity(0.05),
+                        border: Border.all(
+                          color: _gold.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _gold.withOpacity(0.1),
+                            blurRadius: 15,
+                            spreadRadius: 2,
                           ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.add_rounded,
+                          color: _gold.withOpacity(0.9),
+                          size: 32,
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                        horizontal: 14,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: _gold.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _gold.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        'BURÇ SEÇ',
-                        style: TextStyle(
-                          color: _gold,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1,
+                        gradient: LinearGradient(
+                          colors: [
+                            _gold.withOpacity(0.2),
+                            _gold.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: _gold.withOpacity(0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            color: _gold.withOpacity(0.8),
+                            size: 12,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'BURÇ SEÇ',
+                            style: TextStyle(
+                              color: _gold.withOpacity(0.95),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
