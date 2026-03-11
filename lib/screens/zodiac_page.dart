@@ -6500,9 +6500,9 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFFFD060,
-                                  ).withOpacity(0.15),
+                                  color: const Color(0xFFE040FB).withOpacity(
+                                    0.2,
+                                  ), // Mystical neon purple glow
                                   blurRadius: 12,
                                   spreadRadius: 2,
                                 ),
@@ -6513,9 +6513,9 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFFE8D5B7),
-                                  Color(0xFFFFE8A1),
-                                  Color(0xFFFFD060),
+                                  Color(0xFF00E5FF), // Ethereal Cyan
+                                  Color(0xFF7C4DFF), // Deep Violet
+                                  Color(0xFFE040FB), // Mystic Magenta
                                 ],
                               ).createShader(bounds),
                               child: Icon(
