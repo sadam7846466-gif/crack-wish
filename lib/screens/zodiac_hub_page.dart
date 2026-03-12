@@ -40,7 +40,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
-    final wheelSize = w * 0.52;
+    final h = MediaQuery.of(context).size.height;
+    // Çark boyutunu üçü de sığacak şekilde dinamik hesaplıyoruz:
+    final wheelSize = math.min(w * 0.48, h * 0.22);
     return Scaffold(
       backgroundColor: _bg,
       body: Stack(children: [
@@ -56,42 +58,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             bottom: 40,
           ),
           child: Column(children: [
-            // Üst Bar & Başlık Paneli (Aynı hizada, yerden tasarruf)
-            _animWrap(_t1, Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-              child: Row(
-                children: [
-                  const GlassBackButton(),
-                  const Spacer(),
-                  // Başlık Paneli
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _goldD.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: _goldL.withOpacity(0.25), width: 1.0),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('✦', style: TextStyle(color: _gold.withOpacity(0.8), fontSize: 13)),
-                            const SizedBox(width: 10),
-                            ShaderMask(
-                              shaderCallback: (b) => const LinearGradient(colors: [Color(0xFFE8D5B7), _goldL, _gold]).createShader(b),
-                              child: const Text("Ruhun Hangi Döngüye Ait?", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
-                            ),
-                            const SizedBox(width: 10),
-                            Text('✦', style: TextStyle(color: _gold.withOpacity(0.8), fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            // Üst Bar (Geri Butonu)
+            _animWrap(_t1, const Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: GlassBackButton(),
               ),
             )),
             
@@ -101,13 +73,13 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
               painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
               onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacPage())),
             )),
-            const SizedBox(height: 8),
+            const SizedBox(height: 36),
             _animWrap(_t2, _wheelSection(
               wheelSize: wheelSize, label: 'ÇİN ASTROLOJİSİ', 
               painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
               onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacChinesePage())),
             )),
-            const SizedBox(height: 8),
+            const SizedBox(height: 36),
             _animWrap(_t3, _wheelSection(
               wheelSize: wheelSize, label: 'MAYA TAKVİMİ', 
               painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
@@ -127,7 +99,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     required CustomPainter Function(double progress) painter, required VoidCallback onTap}) {
     return Column(children: [
         // Çark Etiketi
-        Text(label, style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 4)),
+        Text(label, style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 3)),
         const SizedBox(height: 6),
         // Çarkın Kendisi - Artık buton (ripple efektli)
         Material(
