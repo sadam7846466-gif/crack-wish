@@ -2230,79 +2230,74 @@ class _ZodiacPageState extends State<ZodiacPage>
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _gold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _gold.withOpacity(0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _gold.withOpacity(0.15),
+                            blurRadius: 10,
+                            spreadRadius: 1,
                           ),
-                          decoration: BoxDecoration(
-                            color: _gold.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _gold.withOpacity(0.3)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: _gold.withOpacity(0.15),
-                                blurRadius: 10,
-                                spreadRadius: 1,
-                              ),
-                            ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'BURÇ SEÇ',
+                            style: TextStyle(
+                              color: _gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'BURÇ SEÇ',
-                                style: TextStyle(
-                                  color: _gold,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.auto_awesome, color: _gold, size: 12),
-                            ],
+                          const SizedBox(width: 4),
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _gold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _gold.withOpacity(0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _gold.withOpacity(0.15),
+                            blurRadius: 10,
+                            spreadRadius: 1,
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'ARKADAŞ SEÇ',
+                            style: TextStyle(
+                              color: _gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: _gold.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _gold.withOpacity(0.3)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: _gold.withOpacity(0.15),
-                                blurRadius: 10,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'ARKADAŞ SEÇ',
-                                style: TextStyle(
-                                  color: _gold,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.auto_awesome, color: _gold, size: 12),
-                            ],
-                          ),
-                        ),
-                      ],
+                          const SizedBox(width: 4),
+                          Icon(Icons.auto_awesome, color: _gold, size: 12),
+                        ],
+                      ),
                     ),
                   ],
                 ),
