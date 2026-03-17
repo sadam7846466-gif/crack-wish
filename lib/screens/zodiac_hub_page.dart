@@ -75,7 +75,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             )),
             const SizedBox(height: 36),
             _animWrap(_t2, _wheelSection(
-              wheelSize: wheelSize, label: 'ÇİN ASTROLOJİSİ', 
+              wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
               painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
               onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacChinesePage())),
             )),
@@ -380,13 +380,8 @@ class _ChineseWheelPainter extends CustomPainter {
     // Sol Alt
     canvas.drawPath(Path()..moveTo(-q+wl, q)..lineTo(-q, q)..lineTo(-q, q-wl), cbPaint);
 
-    // Merkezdeki Mistik Çince Kaligrafi: 十二生肖 (On İki Burç)
-    // Etrafında şık, ince bir parlama
-    final ct = TextPainter(text: TextSpan(text: '十\n二\n生\n肖', style: TextStyle(
-      color: gold.withOpacity(0.9), fontSize: cR * 0.45, fontWeight: FontWeight.bold, height: 1.1, 
-      shadows: [Shadow(color: gold.withOpacity(0.3), blurRadius: 10)])),
-      textDirection: TextDirection.ltr, textAlign: TextAlign.center)..layout();
-    ct.paint(canvas, Offset(-ct.width / 2, -ct.height / 2));
+    // Merkez: Yin-Yang ile Ejderha-Anka Kuşu Motifi (Asya tarzı, Batıdan tamamen farklı)
+    _drawCenterYinYangDragon(canvas, cR * 0.72, gold);
 
     canvas.restore();
 
@@ -427,6 +422,108 @@ class _ChineseWheelPainter extends CustomPainter {
 
       canvas.restore();
     }
+  }
+
+  void _drawCenterYinYangDragon(Canvas canvas, double r, Color gold) {
+    // Yin-Yang tarzı çift kıvrımlı ejderha-anka kuşu motifi
+    final pStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final pFill = Paint()..style = PaintingStyle.fill;
+
+    // Ana Yin-Yang dairesi (ince altın çizgi)
+    pStroke..color = gold.withOpacity(0.5)..strokeWidth = 1.5;
+    canvas.drawCircle(Offset.zero, r, pStroke);
+
+    // Yin-Yang S-eğrisi (ortayı ikiye bölen akışkan kıvrım)
+    final sCurve = Path()
+      ..moveTo(0, -r)
+      ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, 0)
+      ..cubicTo(-r * 0.8, 0, -r * 0.8, r * 0.6, 0, r);
+    pStroke..color = gold.withOpacity(0.6)..strokeWidth = 1.8;
+    canvas.drawPath(sCurve, pStroke);
+
+    // Yin tarafı (sol üst yarım) - hafif dolgu
+    final yinPath = Path()
+      ..moveTo(0, -r)
+      ..arcTo(Rect.fromCircle(center: Offset.zero, radius: r), -math.pi / 2, -math.pi, false)
+      ..cubicTo(-r * 0.8, r * 0.6, -r * 0.8, 0, 0, 0)
+      ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, -r + 0.01);
+    // Gerçek Yin-Yang: sol yarısı koyu dolguyla
+    pFill..color = gold.withOpacity(0.08);
+    // Sağ yarıyı dolduralım (Yang = parlak)
+    final yangPath = Path()
+      ..moveTo(0, -r)
+      ..arcTo(Rect.fromCircle(center: Offset.zero, radius: r), -math.pi / 2, math.pi, false)
+      ..cubicTo(-r * 0.8, r * 0.6, -r * 0.8, 0, 0, 0)
+      ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, -r + 0.01);
+    // Yang tarafını hafif altın dolgu
+    canvas.drawPath(yangPath, Paint()..color = gold.withOpacity(0.12)..style = PaintingStyle.fill);
+
+    // Yin-Yang göz noktaları (büyük dairesel noktalar)
+    // Üst göz (Yang gözü - karanlık tarafta parlak nokta)
+    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, Paint()..color = gold.withOpacity(0.6)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, pStroke..color = gold.withOpacity(0.4)..strokeWidth = 1.0);
+    // Alt göz (Yin gözü - aydınlık tarafta koyu nokta)
+    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, Paint()..color = gold.withOpacity(0.15)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, pStroke..color = gold.withOpacity(0.5)..strokeWidth = 1.0);
+
+    // ── Ejderha kıvrımı (sağ üst - Yang tarafı) ──
+    // Ejderha başı (küçük detaylar)
+    final dragonP = Paint()
+      ..color = gold.withOpacity(0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    
+    // Ejderha boynuzu / bıyıklar
+    canvas.drawLine(Offset(r * 0.25, -r * 0.75), Offset(r * 0.45, -r * 0.9), dragonP);
+    canvas.drawLine(Offset(r * 0.15, -r * 0.72), Offset(r * 0.08, -r * 0.92), dragonP);
+    // Küçük ejderha göz
+    canvas.drawCircle(Offset(r * 0.18, -r * 0.65), r * 0.04, Paint()..color = gold.withOpacity(0.8)..style = PaintingStyle.fill);
+    
+    // Ejderha yüzgeç/bıyık kıvrımı  
+    final whisker = Path()
+      ..moveTo(r * 0.35, -r * 0.6)
+      ..quadraticBezierTo(r * 0.55, -r * 0.5, r * 0.5, -r * 0.35);
+    canvas.drawPath(whisker, dragonP..strokeWidth = 1.2);
+    
+    // ── Anka kuşu kıvrımı (sol alt - Yin tarafı) ──  
+    // Anka kuşu kuyruk tüyleri
+    final phoenixP = Paint()
+      ..color = gold.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+
+    // Kıvrımlı kuyruk tüyleri
+    final feather1 = Path()
+      ..moveTo(-r * 0.25, r * 0.6)
+      ..quadraticBezierTo(-r * 0.55, r * 0.85, -r * 0.3, r * 0.9);
+    canvas.drawPath(feather1, phoenixP);
+    
+    final feather2 = Path()
+      ..moveTo(-r * 0.2, r * 0.55)
+      ..quadraticBezierTo(-r * 0.6, r * 0.65, -r * 0.45, r * 0.85);
+    canvas.drawPath(feather2, phoenixP..strokeWidth = 1.0);
+    
+    final feather3 = Path()
+      ..moveTo(-r * 0.15, r * 0.65)
+      ..quadraticBezierTo(-r * 0.4, r * 0.95, -r * 0.15, r * 0.92);
+    canvas.drawPath(feather3, phoenixP..strokeWidth = 1.2);
+
+    // Dış dekoratif noktalar (8 nokta, pusula gibi)
+    for (int i = 0; i < 8; i++) {
+      final a = i * math.pi / 4;
+      final dotR = i % 2 == 0 ? r * 0.04 : r * 0.025;
+      final dotPos = Offset(math.cos(a) * r * 0.88, math.sin(a) * r * 0.88);
+      canvas.drawCircle(dotPos, dotR, Paint()..color = gold.withOpacity(i % 2 == 0 ? 0.5 : 0.3)..style = PaintingStyle.fill);
+    }
+
+    // İç ince halka (merkezi çevreleyen zarif çizgi)
+    pStroke..color = gold.withOpacity(0.25)..strokeWidth = 0.6;
+    canvas.drawCircle(Offset.zero, r * 0.28, pStroke);
   }
 
   void _drawIcon(Canvas canvas, int idx, double s) {

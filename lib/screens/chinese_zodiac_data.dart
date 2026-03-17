@@ -1,6 +1,6 @@
 import 'dart:ui' show Color;
 
-/// Çin Astrolojisi - Kapsamlı Veri Modeli
+/// Asya Astrolojisi - Kapsamlı Veri Modeli
 /// 12 Hayvan, 5 Element, Yin-Yang, Kariyer, Evlilik, Feng Shui, İsimlendirme
 
 class ChineseZodiacData {
@@ -34,7 +34,7 @@ class ChineseZodiacData {
       'traits': ['Zeki', 'Çevik', 'Becerikli', 'Çalışkan', 'Kurnaz'],
       'strengths': ['Keskin zekâ', 'Çabuk uyum', 'Stratejik düşünce', 'Sosyal beceri', 'Fırsatçı göz'],
       'weaknesses': ['Aşırı hesapçı', 'Kurnazlık', 'Güvensizlik', 'Stres eğilimi'],
-      'personality': 'Sıçan yılında doğanlar doğal liderlerdir. Zekâları ve çevikliğiyle dikkat çekerler. Her durumda ayakta kalma becerisine sahiplerdir.',
+      'personality': 'Sıçan ruhunu taşıyanlar, evrenin en keskin gözlemcileridir. Başkalarının göremediği fırsatları sezinler, karanlıkta bile yolunu bulan bir iç pusulaya sahiptirler. Zekâları yalnızca analitik değil — sezgisel bir derinlik taşır. Bir odaya girdiklerinde enerjiyi okur, insanların söylemediklerini duyar ve zamanın ruhunu yakalarlar. Bu güç onları sessiz ama sarsılmaz liderler yapar.',
       'love': 'Aşkta duygusal ve sadık. Partneri için fedakarlık yapar ama duygularını göstermekte zorlanır.',
       'bestMatch': [4, 8], // Ejderha, Maymun
       'goodMatch': [1, 6], // Öküz, At  
@@ -55,7 +55,7 @@ class ChineseZodiacData {
       'traits': ['Güvenilir', 'Sabırlı', 'Güçlü', 'Kararlı', 'Sadık'],
       'strengths': ['Sarsılmaz irade', 'Dayanıklılık', 'Güvenilirlik', 'Çalışkanlık', 'Pratik zekâ'],
       'weaknesses': ['İnatçılık', 'Değişime direnç', 'Duygusal kapalılık', 'Aşırı geleneksellik'],
-      'personality': 'Öküz yılında doğanlar sarsılmaz bir iradeye sahiptir. Hedeflerine ulaşmak için azimle çalışırlar ve etraflarına güven verirler.',
+      'personality': 'Öküz ruhunu taşıyanlar, zamanın kendisiyle yarışmayan bilge ruhlardır. Onlar için hayat bir sprint değil, bir maratondur — ve her adımı bilinçle atarlar. Toprak gibi sağlam, dağ gibi heybetli duruşları, etraflarındaki insanlara derin bir güven verir. Sözleri azdır ama her biri altın değerindedir. Fırtınalar geçer, modalar değişir — ama Öküz ruhunun inşa ettiği temeller sonsuza kadar ayakta kalır.',
       'love': 'Aşkta sadık ve güvenilir. Uzun vadeli ilişkilere değer verir. Duygularını göstermekte ağır kalır ama sevgisi derindir.',
       'bestMatch': [5, 9], // Yılan, Horoz
       'goodMatch': [0, 3], // Sıçan, Tavşan
@@ -76,7 +76,7 @@ class ChineseZodiacData {
       'traits': ['Cesur', 'Tutkulu', 'Maceracı', 'Bağımsız', 'Karizmatik'],
       'strengths': ['Cesaret', 'Liderlik', 'Karizma', 'Adalet duygusu', 'Koruyuculuk'],
       'weaknesses': ['Saldırganlık', 'Sabırsızlık', 'Dikbaşlılık', 'Riskli kararlar'],
-      'personality': 'Kaplan yılında doğanlar doğuştan cesurdur. Güçlü kişilikleri ve tutkuları onları etkileyici kılar.',
+      'personality': 'Kaplan ruhunu taşıyanlar, içlerinde uykuya dalmış bir volkan barındırır. Sakin görünürler ama gözlerinin ardında fırtınalar kopar. Adalet duyguları pusula gibi nettir — haksızlık gördüklerinde sessiz kalamazlar. Kalabalıklarda bile yalnız durabilecek cesarete sahiptirler. Bir Kaplanın sadakati nadirdir ama kazanıldığında — ölümsüzdür. Onlar doğanın aristokratlarıdır; kükremedikleri zamanlarda bile varlıkları hissedilir.',
       'love': 'Aşkta tutkulu ve koruyucu. Partnerini bir kraliçe/kral gibi korur. Bağımsızlığına düşkündür.',
       'bestMatch': [6, 10], // At, Köpek
       'goodMatch': [4, 8], // Ejderha, Maymun
@@ -97,7 +97,7 @@ class ChineseZodiacData {
       'traits': ['Zarif', 'Nazik', 'Barışçıl', 'Duyarlı', 'Sanatsal'],
       'strengths': ['Zarafet', 'Diplomasi', 'Sezgi gücü', 'Sanatsal yetenek', 'Empati'],
       'weaknesses': ['Aşırı hassasiyet', 'Kaçınmacılık', 'Kararsızlık', 'Çekingenlik'],
-      'personality': 'Tavşan yılında doğanlar incelik ve zerafet timsalidir. Barışçıl ruhları ve güçlü sezgileriyle çevrelerine huzur getirirler.',
+      'personality': 'Tavşan ruhunu taşıyanlar, evrenin en hassas antenlerine sahiptir. Bir odanın enerjisini, bir bakışın ardındaki duyguyu, söylenmemiş kelimeleri algılarlar. Zerafetleri yüzeysel değil — ruhlarının derinliklerinden gelen bir uyumdur. Kaosun ortasında bile iç huzurlarını koruyabilirler. Sanatı, güzelliği ve inceliği sadece takdir etmezler — onlar bu kavramları yaşarlar. Sessiz güçleri, fırtınayı bile sakinleştirme yeteneğindedir.',
       'love': 'Aşkta romantik ve zarif. Uyumlu ve huzurlu ilişkiler arar. Çatışmadan kaçınır.',
       'bestMatch': [7, 11], // Keçi, Domuz
       'goodMatch': [1, 10], // Öküz, Köpek
@@ -118,7 +118,7 @@ class ChineseZodiacData {
       'traits': ['Güçlü', 'Asil', 'Enerjik', 'Karizmatik', 'Şanslı'],
       'strengths': ['Doğal karizma', 'Güç', 'Cesaret', 'Şans', 'Vizyon'],
       'weaknesses': ['Kibir', 'Sabırsızlık', 'Agresiflik', 'Otoriter tavır'],
-      'personality': 'Ejderha yılında doğanlar en şanslı burç olarak kabul edilir. Güçlü ve karizmatik kişilikleriyle doğal liderlerdir.',
+      'personality': 'Ejderha ruhunu taşıyanlar, kaderin özel olarak işaretlediği ruhlardır. İçlerinde antik bir ateş yanar — hem yaratıcı hem dönüştürücü. Sıradan hayattan tatmin olmazlar çünkü ruhları büyüklük için kodlanmıştır. Bir Ejderhanın varlığı odayı doldurur, enerjisi bulaşıcıdır ve vizyonu çağının ötesindedir. Onlar kral yaratıcıları, imparatorluk kurucuları ve çağ değiştiricileridir.',
       'love': 'Aşkta tutkulu ve dominant. Güçlü bir partner ister. Sevgisini büyük jestlerle gösterir.',
       'bestMatch': [0, 8], // Sıçan, Maymun
       'goodMatch': [2, 9], // Kaplan, Horoz
@@ -139,7 +139,7 @@ class ChineseZodiacData {
       'traits': ['Bilge', 'Gizemli', 'Sezgisel', 'Zarif', 'Stratejik'],
       'strengths': ['Derin bilgelik', 'Strateji', 'Sezgi', 'Zarafet', 'Analitik düşünce'],
       'weaknesses': ['Şüphecilik', 'Kıskançlık', 'Gizlilik', 'Soğukluk'],
-      'personality': 'Yılan yılında doğanlar derin bilgelik taşır. Güçlü sezgileri ve analitik düşünceleriyle dikkat çekerler.',
+      'personality': 'Yılan ruhunu taşıyanlar, zamanın ötesinden gelen bir bilgelikle doğarlar. Yüzeyin altını görür, kelimelerin ardındaki niyeti sezerler. Mistik bir çekicilikleri vardır — insanlar onları tam olarak çözemez ama etkilenmekten kendilerini alamaz. Düşünceleri derin, stratejileri çok katmanlı, sezgileri neredeyse doğaüstüdür. Bir Yılan ruhunun sessizliği, bin kelimenin söylediklerinden daha çok şey anlatır.',
       'love': 'Aşkta gizemli ve derin. Tam güvenmedikçe kalbini açmaz. Ama sevince sonsuz sadakatle bağlanır.',
       'bestMatch': [1, 9], // Öküz, Horoz
       'goodMatch': [4, 0], // Ejderha, Sıçan
@@ -160,7 +160,7 @@ class ChineseZodiacData {
       'traits': ['Enerjik', 'Özgür', 'Neşeli', 'Sosyal', 'Atletik'],
       'strengths': ['Sınırsız enerji', 'Özgürlük ruhu', 'Sosyal beceri', 'Atletizm', 'Neşe'],
       'weaknesses': ['Sabırsızlık', 'Kararsızlık', 'Bağlanma korkusu', 'Aşırı hareketlilik'],
-      'personality': 'At yılında doğanlar özgürlük aşığıdır. Sınırsız enerjileri ve neşeli kişilikleriyle her ortamın yıldızı olurlar.',
+      'personality': 'At ruhunu taşıyanlar, rüzgârın bedene bürünmüş halidir. Özgürlükleri yalnızca fiziksel değil — ruhsal bir ihtiyaçtır. Duvarlar onları bunaltır, rutinler onları soldurur. Ama koştuklarında — ah, koştuklarında dünya durur ve izler. Enerjileri güneş gibidir: yanlarında olmak insanları canlandırır, ısıtır ve ilham verir. Bir At ruhunun neşesi sahte değildir — yaşamın kendisine duyulan derin bir aşktan doğar.',
       'love': 'Aşkta heyecan ve macera arar. Bağımsızlığına düşkün, ama doğru kişiyi bulunca tam bağlanır.',
       'bestMatch': [2, 10], // Kaplan, Köpek
       'goodMatch': [7, 11], // Keçi, Domuz
@@ -181,7 +181,7 @@ class ChineseZodiacData {
       'traits': ['Yaratıcı', 'Şefkatli', 'Hassas', 'Sakinleştirici', 'Estetik'],
       'strengths': ['Yaratıcılık', 'Sanatsal ruh', 'Şefkat', 'Estetik anlayış', 'Huzur verme'],
       'weaknesses': ['Aşırı hassasiyet', 'Bağımlılık', 'Kararsızlık', 'Endişe eğilimi'],
-      'personality': 'Keçi yılında doğanlar sanatsal ruha sahiptir. Yaratıcılıkları ve hassas ruhları onları benzersiz kılar.',
+      'personality': 'Keçi ruhunu taşıyanlar, evrenin şiirini duyan nadir ruhlardır. Bir günbatımında başkalarının göremediği renkleri, bir melodide gizli duyguları fark ederler. Yaratıcılıkları yalnızca bir yetenek değil — dünyayı algılama biçimleridir. Hassasiyetleri zayıflık değil, evrenle kurdukları derin bağın göstergesidir. Bir Keçi ruhunun dokunduğu her şey — bir yemek, bir söz, bir bakış — sanata dönüşür.',
       'love': 'Aşkta romantik ve duygusal. Güven ve sıcaklık arar. Koruma altında hissedildikçe açılır.',
       'bestMatch': [3, 11], // Tavşan, Domuz
       'goodMatch': [6, 2], // At, Kaplan
@@ -202,7 +202,7 @@ class ChineseZodiacData {
       'traits': ['Zeki', 'Esprili', 'Yaratıcı', 'Kurnaz', 'Girişimci'],
       'strengths': ['Parlak zekâ', 'Espri yeteneği', 'Yaratıcılık', 'Problem çözme', 'Esneklik'],
       'weaknesses': ['Sabırsızlık', 'Kurnazlık', 'Güvenilmezlik', 'Çabuk sıkılma'],
-      'personality': 'Maymun yılında doğanlar parlak zekâları ve esprili kişilikleriyle tanınır. Problem çözme yetenekleri üstündür.',
+      'personality': 'Maymun ruhunu taşıyanlar, evrenin jokerleridir. Zekâları öyle hızlı çalışır ki, başkaları daha sorunu anlamadan onlar çoktan üç çözüm üretmiştir. Esprileri sadece güldürmez — hakikati maskeler arkasından fısıldar. Sıkılmak onlar için varoluşsal bir tehlikedir; bu yüzden hayatı sürekli yeniden icat ederler. Bir Maymun ruhunun yanında asla sıkılmazsınız — çünkü onlar sihirbaz gibidir: her an bir sonraki numarayı hazırlarlar.',
       'love': 'Aşkta eğlenceli ve heyecanlı. Sıkılmaktan korkar. Zeki ve esprili bir partner arar.',
       'bestMatch': [0, 4], // Sıçan, Ejderha
       'goodMatch': [5, 11], // Yılan, Domuz
@@ -223,7 +223,7 @@ class ChineseZodiacData {
       'traits': ['Gözlemci', 'Çalışkan', 'Cesur', 'Pratik', 'Detaycı'],
       'strengths': ['Keskin gözlem', 'Çalışkanlık', 'Dürüstlük', 'Pratiklik', 'Organizasyon'],
       'weaknesses': ['Eleştiricilik', 'Kibirlilik', 'Aşırı titizlik', 'Baskınlık'],
-      'personality': 'Horoz yılında doğanlar mükemmeliyetçi ve detaycıdır. Keskin gözlem yetenekleri ve çalışkanlıklarıyla başarıya ulaşırlar.',
+      'personality': 'Horoz ruhunu taşıyanlar, karanlığın içinde ışığı ilk gören ve haber veren ruhlardır. Gözleri bir kartal kadar keskin, standartları bir kuyumcu kadar yüksektir. Mükemmeliyetçilikleri yüzeysel bir titizlik değil — dünyaya sundukları her şeyin onurlarını yansıtması gerektiğine dair derin bir inançtır. Cesurdurlar — doğruyu söylemekten çekinmezler, popüler olmasa bile.',
       'love': 'Aşkta dürüst ve doğrudan. net iletişim kurar ama bazen aşırı eleştirel olabilir.',
       'bestMatch': [1, 5], // Öküz, Yılan
       'goodMatch': [4, 8], // Ejderha, Maymun
@@ -244,7 +244,7 @@ class ChineseZodiacData {
       'traits': ['Sadık', 'Dürüst', 'Koruyucu', 'Cesur', 'Adil'],
       'strengths': ['Sadakat', 'Dürüstlük', 'Koruma içgüdüsü', 'Adalet duygusu', 'Cesaret'],
       'weaknesses': ['Endişe eğilimi', 'Karamsar bakış', 'Aşırı korumacılık', 'Güvensizlik'],
-      'personality': 'Köpek yılında doğanlar en sadık ve güvenilir ruhlardır. Dürüstlükleri ve adalet duyguları güçlüdür.',
+      'personality': 'Köpek ruhunu taşıyanlar, evrenin vicdanıdır. İçlerinde taşıdıkları adalet ateşi, haksızlık karşısında asla sönmez. Sadakatleri kör değildir — bilinçli bir seçimdir. Sevdiklerini yalnızca korumakla kalmazlar; onların en iyi versiyonlarını görmelerini sağlarlar. Bir Köpek ruhunun dostluğu, bu dünyadaki en değerli hazinelerden biridir — çünkü koşulsuz, sarsılmaz ve sonsuzdur.',
       'love': 'Aşkta sadık ve koruyucu. Güven en önemli değeridir. Sevdiklerini her koşulda savunur.',
       'bestMatch': [2, 6], // Kaplan, At
       'goodMatch': [3, 11], // Tavşan, Domuz
@@ -265,7 +265,7 @@ class ChineseZodiacData {
       'traits': ['Cömert', 'Şefkatli', 'Neşeli', 'Eğlenceli', 'Nazik'],
       'strengths': ['Cömertlik', 'Sıcaklık', 'Neşe', 'Güçlü iç dünya', 'Sadakat'],
       'weaknesses': ['Saflık', 'Aşırı güven', 'Tembel eğilim', 'Savurganlık'],
-      'personality': 'Domuz yılında doğanlar cömertlik ve şefkatin simgesidir. Sıcak kişilikleri ve neşeli ruhlarıyla herkesi mutlu ederler.',
+      'personality': 'Domuz ruhunu taşıyanlar, evrenin en saf kalpli varlıklarıdır. Cömertlikleri hesapsız, sevgileri koşulsuzdur. Bir odaya girdiklerinde görünmez bir sıcaklık yayılır — sanki güneş doğmuş gibi. Saflıkları zayıflık değil, dünyaya inatla iyilik sunma cesaretidir. Bir Domuz ruhunun sofrasında herkes yer bulur, kalbinde herkes sığınak bulur. Onlar hayatın tadını en derinden alan ve bunu cömertçe paylaşan ruhlardır.',
       'love': 'Aşkta sıcak ve cömert. Sevgisini bolca gösterir. Güvene çok değer verir.',
       'bestMatch': [3, 7], // Tavşan, Keçi
       'goodMatch': [2, 6], // Kaplan, At
