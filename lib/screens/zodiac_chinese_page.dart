@@ -13,8 +13,9 @@ class ZodiacChinesePage extends StatefulWidget {
 }
 
 class _ZodiacChinesePageState extends State<ZodiacChinesePage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _ctrl;
+  late AnimationController _auraCtrl;
   int _animalIdx = 6;
   int _activeSection = 0;
   DateTime _birthDate = DateTime(1999, 12, 20);
@@ -30,10 +31,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   static const List<Map<String, dynamic>> _sections = [
     {'icon': '🐾', 'label': 'Ruhun'},
-    {'icon': '🐴', 'label': '2026'},
-    {'icon': '🌊', 'label': 'Elementler'},
     {'icon': '💞', 'label': 'Kader'},
     {'icon': '⭐', 'label': 'Günlük'},
+    {'icon': '🐴', 'label': '2026'},
+    {'icon': '🌊', 'label': 'Elementler'},
   ];
 
   // 12 hayvan dosya isimleri (sırayla)
@@ -78,6 +79,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   void initState() {
     super.initState();
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))..forward();
+    _auraCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 3000))..repeat(reverse: true);
     _loadUser();
   }
 
@@ -94,7 +96,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() { _auraCtrl.dispose(); _ctrl.dispose(); super.dispose(); }
 
   Map<String, dynamic> get _animal => ChineseZodiacData.animals[_animalIdx];
 
@@ -260,10 +262,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   Widget _sectionWidget() {
     switch (_activeSection) {
       case 0: return _profileSection();
-      case 1: return _yearSection();
-      case 2: return _elementSection();
-      case 3: return _compatibilitySection();
-      case 4: return _dailySection();
+      case 1: return _compatibilitySection();
+      case 2: return _dailySection();
+      case 3: return _yearSection();
+      case 4: return _elementSection();
       default: return _profileSection();
     }
   }
@@ -276,53 +278,71 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final initialIdx = years.indexOf(selectedYear).clamp(0, years.length - 1);
     showModalBottomSheet(
       context: context,
-      backgroundColor: _cardBg,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-      builder: (_) => SizedBox(
-        height: 320,
-        child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('Doğum Yılı', style: TextStyle(color: _goldL, fontSize: 18, fontWeight: FontWeight.w700)),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _birthDate = DateTime(selectedYear, _birthDate.month, _birthDate.day);
-                    _animalIdx = ChineseZodiacData.animalIndexFromYear(selectedYear);
-                    _userElement = ChineseZodiacData.elementFromYear(selectedYear);
-                    _userYinYang = ChineseZodiacData.yinYangFromYear(selectedYear);
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [_crimson, Color(0xFFDC2626)]),
-                    borderRadius: BorderRadius.circular(20),
+      builder: (_) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            height: 320,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.06),
+                  Colors.black.withOpacity(0.2),
+                ],
+              ),
+              border: Border(top: BorderSide(color: Colors.white.withOpacity(0.15), width: 0.5)),
+            ),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  Text('Doğum Yılı', style: TextStyle(color: _goldL, fontSize: 18, fontWeight: FontWeight.w700)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _birthDate = DateTime(selectedYear, _birthDate.month, _birthDate.day);
+                        _animalIdx = ChineseZodiacData.animalIndexFromYear(selectedYear);
+                        _userElement = ChineseZodiacData.elementFromYear(selectedYear);
+                        _userYinYang = ChineseZodiacData.yinYangFromYear(selectedYear);
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [_crimson, Color(0xFFDC2626)]),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text('Tamam', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    ),
                   ),
-                  child: const Text('Tamam', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                ]),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: initialIdx),
+                  itemExtent: 44,
+                  diameterRatio: 1.5,
+                  selectionOverlay: Container(
+                    decoration: BoxDecoration(
+                      border: Border.symmetric(horizontal: BorderSide(color: _gold.withOpacity(0.15))),
+                    ),
+                  ),
+                  onSelectedItemChanged: (i) => selectedYear = years[i],
+                  children: years.map((y) => Center(
+                    child: Text('$y', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 20)),
+                  )).toList(),
                 ),
               ),
             ]),
           ),
-          Expanded(
-            child: CupertinoPicker(
-              scrollController: FixedExtentScrollController(initialItem: initialIdx),
-              itemExtent: 44,
-              diameterRatio: 1.5,
-              selectionOverlay: Container(
-                decoration: BoxDecoration(
-                  border: Border.symmetric(horizontal: BorderSide(color: _gold.withOpacity(0.15))),
-                ),
-              ),
-              onSelectedItemChanged: (i) => selectedYear = years[i],
-              children: years.map((y) => Center(
-                child: Text('$y', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 20)),
-              )).toList(),
-            ),
-          ),
-        ]),
+        ),
       ),
     );
   }
@@ -400,176 +420,155 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final strengths = a['strengths'] as List<String>;
     final weaknesses = a['weaknesses'] as List<String>;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Hero — büyük hayvan figürü
-      Center(child: Stack(alignment: Alignment.center, children: [
-        Container(
-          width: 180, height: 180,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [_crimson.withOpacity(0.07), _gold.withOpacity(0.02), Colors.transparent],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-        ),
-        _animalIcon(_animalIdx, 210),
-      ])),
-      const SizedBox(height: 6),
-      // Yıllar — tıklanabilir
-      GestureDetector(
-        onTap: () => _showAnimalPicker(),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Flexible(child: Text(a['years'] as String, textAlign: TextAlign.center,
-            style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 11))),
-          const SizedBox(width: 6),
-          Icon(Icons.swap_horiz_rounded, color: _gold.withOpacity(0.4), size: 16),
-        ]),
-      ),
-
-      const SizedBox(height: 24),
-
-      // ── Birleşik Profil Kartı — Light Frosted Glass ──
-      ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-          child: Container(
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.13),
-                  Colors.white.withOpacity(0.07),
-                  Colors.white.withOpacity(0.04),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.18), width: 0.6),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 30, offset: const Offset(0, 12)),
-              ],
-            ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Üst: pill tag'ler
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                _profileTag(Color(ChineseZodiacData.elements[_userElement]!['color'] as int), _userElement),
-                _profileTag(_userYinYang == 'Yin' ? const Color(0xFF7C3AED) : const Color(0xFFD97706), _userYinYang),
-                GestureDetector(
-                  onTap: () => _showYearPicker(),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _gold.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _gold.withOpacity(0.15)),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Container(width: 6, height: 6, decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: _gold.withOpacity(0.7),
-                      )),
-                      const SizedBox(width: 8),
-                      Text('${_birthDate.year}', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w600)),
-                      const SizedBox(width: 6),
-                      Icon(Icons.edit_rounded, size: 12, color: _gold.withOpacity(0.5)),
-                    ]),
+      // Hero — Çarpıcı mistik aura ile hayvan figürü
+      Center(child: AnimatedBuilder(
+        animation: _auraCtrl,
+        builder: (context, _) {
+          final pulse = _auraCtrl.value;
+          return SizedBox(
+            width: 280, height: 280,
+            child: Stack(alignment: Alignment.center, children: [
+              // Katman 1: En dış halka — soluk geniş glow
+              Positioned.fill(child: Center(child: Container(
+                width: 260 + pulse * 12,
+                height: 260 + pulse * 12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.transparent,
+                      _crimson.withOpacity(0.02 + pulse * 0.015),
+                      _crimson.withOpacity(0.05 + pulse * 0.02),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.6, 0.8, 1.0],
                   ),
                 ),
-              ]),
-              // Gradient ayırıcı
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                child: Container(height: 0.5, decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.transparent, _gold.withOpacity(0.15), Colors.transparent]),
-                )),
-              ),
-              // Motto — sol accent çizgi ile
-              IntrinsicHeight(child: Row(children: [
-                Container(width: 2, decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(1),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [_gold.withOpacity(0.5), _crimson.withOpacity(0.2)],
+              ))),
+              // Katman 2: Dekoratif halka — ince altın daire
+              Positioned.fill(child: Center(child: Container(
+                width: 230,
+                height: 230,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: _gold.withOpacity(0.06 + pulse * 0.04),
+                    width: 0.5,
                   ),
-                )),
-                const SizedBox(width: 14),
-                Expanded(child: Text(
-                  _getAnimalMotto(_animalIdx),
-                  style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 13.5, fontStyle: FontStyle.italic, height: 1.6, letterSpacing: 0.1),
-                )),
-              ])),
-              // Ayırıcı
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                child: Container(height: 0.5, decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.transparent, _gold.withOpacity(0.15), Colors.transparent]),
-                )),
-              ),
-              // Kişilik — editoryal akış tasarımı
-              Builder(builder: (_) {
-                final sentences = (a['personality'] as String)
-                    .split('. ')
-                    .where((s) => s.trim().isNotEmpty)
-                    .map((s) => s.endsWith('.') ? s : '$s.')
-                    .toList();
-                return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  // İlk cümle — büyük gradient hero alıntı
-                  if (sentences.isNotEmpty) ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [_goldL, _gold, _goldL.withOpacity(0.7)],
-                    ).createShader(bounds),
-                    child: Text(
-                      sentences.first,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        height: 1.6,
-                        letterSpacing: 0.2,
-                      ),
+                ),
+              ))),
+              // Katman 3: İç halka — kesikli altın
+              Positioned.fill(child: Center(child: CustomPaint(
+                size: const Size(210, 210),
+                painter: _AuraRingPainter(
+                  color: _gold.withOpacity(0.08 + pulse * 0.06),
+                  dashCount: 36,
+                  radius: 105,
+                ),
+              ))),
+              // Katman 4: Kırmızı iç radyal glow
+              Positioned.fill(child: Center(child: Container(
+                width: 180 + pulse * 6,
+                height: 180 + pulse * 6,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      _crimson.withOpacity(0.12 + pulse * 0.05),
+                      _crimson.withOpacity(0.04),
+                      _gold.withOpacity(0.02),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.35, 0.6, 1.0],
+                  ),
+                ),
+              ))),
+              // Katman 5: 4 köşe dekoratif ışık noktaları
+              ...List.generate(4, (i) {
+                final angle = (i * math.pi / 2) - math.pi / 4;
+                final dist = 100.0 + pulse * 4;
+                return Positioned(
+                  left: 140 + dist * math.cos(angle) - 3,
+                  top: 140 + dist * math.sin(angle) - 3,
+                  child: Container(
+                    width: 6, height: 6,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _gold.withOpacity(0.15 + pulse * 0.15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _gold.withOpacity(0.1 + pulse * 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
                     ),
                   ),
-                  // Kalan cümleler — zarif akış
-                  for (int i = 1; i < sentences.length; i++) ...[
-                    // İnce dekoratif çizgi
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Row(children: [
-                        Container(
-                          width: i.isEven ? 40 : 60,
-                          height: 0.5,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: [
-                              i.isEven ? _gold.withOpacity(0.4) : _crimson.withOpacity(0.4),
-                              Colors.transparent,
-                            ]),
-                          ),
-                        ),
-                      ]),
-                    ),
-                    // Cümle metni
-                    Padding(
-                      padding: EdgeInsets.only(left: i.isEven ? 0 : 12),
-                      child: Text(
-                        sentences[i],
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                          height: 1.7,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                    ),
-                  ],
-                ]);
+                );
               }),
+              // Katman 6: 8 ince radyal çizgi — yıldız patlaması
+              Positioned.fill(child: Center(child: CustomPaint(
+                size: const Size(240, 240),
+                painter: _StarBurstPainter(
+                  color: _gold.withOpacity(0.04 + pulse * 0.03),
+                  rayCount: 8,
+                  innerRadius: 90,
+                  outerRadius: 118,
+                ),
+              ))),
+              // Hayvan figürü — ana ikon
+              _animalIcon(_animalIdx, 200),
+              // Alt dekoratif yarım ay
+              Positioned(
+                bottom: 18,
+                child: Container(
+                  width: 60, height: 2,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(1),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        _gold.withOpacity(0.25 + pulse * 0.15),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ]),
-          ),
-        ),
-      ),
+          );
+        },
+      )),
+      const SizedBox(height: 2),
+      // Yıllar
+      Center(child: Text(a['years'] as String, textAlign: TextAlign.center,
+        style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 11))),
 
-      const SizedBox(height: 16),
+      const SizedBox(height: 40),
+
+      // ── Birleşik Profil Kartı — Tag'ler + Dönen Alıntılar ──
+      Builder(builder: (_) {
+        // Motto + kişilik cümlelerini birleştir
+        final motto = _getAnimalMotto(_animalIdx);
+        final personalitySentences = (a['personality'] as String)
+            .split('. ')
+            .where((s) => s.trim().isNotEmpty)
+            .map((s) => s.endsWith('.') ? s : '$s.')
+            .toList();
+        final allQuotes = [motto, ...personalitySentences];
+        return _UnifiedProfileCard(
+          quotes: allQuotes,
+          crimson: _crimson,
+          gold: _gold,
+          goldL: _goldL,
+          element: _userElement,
+          yinYang: _userYinYang,
+          year: _birthDate.year,
+          onYearTap: _showYearPicker,
+        );
+      }),
+
+      const SizedBox(height: 40),
 
       // ── Karakter Profili — yeni tasarım ──
       Builder(builder: (_) {
@@ -1565,10 +1564,10 @@ class _TabIconPainter extends CustomPainter {
 
     switch (index) {
       case 0: _drawSoul(canvas, cx, cy, r, p); break;
-      case 1: _drawHorse(canvas, cx, cy, r, p); break;
-      case 2: _drawElements(canvas, cx, cy, r, p); break;
-      case 3: _drawHeart(canvas, cx, cy, r, p); break;
-      case 4: _drawStar(canvas, cx, cy, r, p); break;
+      case 1: _drawHeart(canvas, cx, cy, r, p); break;
+      case 2: _drawStar(canvas, cx, cy, r, p); break;
+      case 3: _drawHorse(canvas, cx, cy, r, p); break;
+      case 4: _drawElements(canvas, cx, cy, r, p); break;
     }
   }
 
@@ -1953,4 +1952,450 @@ class _StatIconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _StatIconPainter old) => old.statKey != statKey || old.color != color;
+}
+
+// ── Aura Kesikli Halka Painter ──
+class _AuraRingPainter extends CustomPainter {
+  final Color color;
+  final int dashCount;
+  final double radius;
+  _AuraRingPainter({required this.color, required this.dashCount, required this.radius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+
+    final dashAngle = (2 * math.pi) / dashCount;
+    final gapRatio = 0.4; // Boşluk oranı
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = i * dashAngle;
+      final sweepAngle = dashAngle * (1 - gapRatio);
+      canvas.drawArc(
+        Rect.fromCircle(center: Offset(cx, cy), radius: radius),
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _AuraRingPainter old) => old.color != color;
+}
+
+// ── Yıldız Patlaması Radyal Çizgi Painter ──
+class _StarBurstPainter extends CustomPainter {
+  final Color color;
+  final int rayCount;
+  final double innerRadius;
+  final double outerRadius;
+  _StarBurstPainter({
+    required this.color,
+    required this.rayCount,
+    required this.innerRadius,
+    required this.outerRadius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round;
+
+    for (int i = 0; i < rayCount; i++) {
+      final angle = (2 * math.pi * i / rayCount) - math.pi / 2;
+      final inner = Offset(
+        cx + innerRadius * math.cos(angle),
+        cy + innerRadius * math.sin(angle),
+      );
+      final outer = Offset(
+        cx + outerRadius * math.cos(angle),
+        cy + outerRadius * math.sin(angle),
+      );
+      canvas.drawLine(inner, outer, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarBurstPainter old) => old.color != color;
+}
+
+// ── Köşe Dekoratif Çizgi Painter ──
+class _CornerAccentPainter extends CustomPainter {
+  final Color color;
+  final int corner; // 0=sol üst, 1=sağ üst, 2=sağ alt, 3=sol alt
+  _CornerAccentPainter({required this.color, required this.corner});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    final w = size.width;
+    final h = size.height;
+    final len = w * 0.65;
+
+    final path = Path();
+    switch (corner) {
+      case 0: // Sol üst
+        path.moveTo(0, len);
+        path.lineTo(0, 0);
+        path.lineTo(len, 0);
+        break;
+      case 1: // Sağ üst
+        path.moveTo(w - len, 0);
+        path.lineTo(w, 0);
+        path.lineTo(w, len);
+        break;
+      case 2: // Sağ alt
+        path.moveTo(w, h - len);
+        path.lineTo(w, h);
+        path.lineTo(w - len, h);
+        break;
+      case 3: // Sol alt
+        path.moveTo(len, h);
+        path.lineTo(0, h);
+        path.lineTo(0, h - len);
+        break;
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CornerAccentPainter old) => old.color != color || old.corner != corner;
+}
+
+// ── Birleşik Profil Kartı — Tag'ler + Dönen Alıntılar ──
+class _UnifiedProfileCard extends StatefulWidget {
+  final List<String> quotes; // [0]=motto, [1..n]=personality
+  final Color crimson;
+  final Color gold;
+  final Color goldL;
+  final String element;
+  final String yinYang;
+  final int year;
+  final VoidCallback onYearTap;
+  const _UnifiedProfileCard({
+    required this.quotes,
+    required this.crimson,
+    required this.gold,
+    required this.goldL,
+    required this.element,
+    required this.yinYang,
+    required this.year,
+    required this.onYearTap,
+  });
+  @override
+  State<_UnifiedProfileCard> createState() => _UnifiedProfileCardState();
+}
+
+class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
+    with SingleTickerProviderStateMixin {
+  int _idx = 0;
+  bool _slideForward = true;
+  late AnimationController _timerCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _timerCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4500),
+    )..addStatusListener((s) {
+      if (s == AnimationStatus.completed) _advance();
+    });
+    _timerCtrl.forward();
+  }
+
+  void _advance() {
+    if (!mounted) return;
+    setState(() {
+      _slideForward = true;
+      _idx = (_idx + 1) % widget.quotes.length;
+    });
+    _timerCtrl.forward(from: 0);
+  }
+
+  void _goBack() {
+    if (!mounted) return;
+    setState(() {
+      _slideForward = false;
+      _idx = (_idx - 1 + widget.quotes.length) % widget.quotes.length;
+    });
+    _timerCtrl.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _timerCtrl.dispose();
+    super.dispose();
+  }
+
+  Widget _ornamentalLine() => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 30),
+    child: SizedBox(
+      height: 10,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _WavePainter(color: widget.gold.withOpacity(0.25)),
+      ),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final count = widget.quotes.length;
+    final isMotto = _idx == 0;
+    final elData = ChineseZodiacData.elements[widget.element]!;
+    final elColor = Color(elData['color'] as int);
+    final yyColor = widget.yinYang == 'Yin' ? const Color(0xFF7C3AED) : const Color(0xFFD97706);
+
+    return GestureDetector(
+      onTapUp: (details) {
+        final w = context.size?.width ?? 300;
+        if (details.localPosition.dx > w / 2) {
+          _advance();
+        } else {
+          _goBack();
+        }
+      },
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity == null) return;
+        if (details.primaryVelocity! < -100) _advance();
+        if (details.primaryVelocity! > 100) _goBack();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.14),
+                  Colors.white.withOpacity(0.06),
+                  Colors.white.withOpacity(0.03),
+                ],
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.18), width: 0.6),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 35, offset: const Offset(0, 14)),
+                BoxShadow(color: widget.crimson.withOpacity(0.03), blurRadius: 50, spreadRadius: -8),
+              ],
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                // ─ Etiketler — editorial style ─
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Text(widget.element.toUpperCase(), style: TextStyle(
+                    color: elColor.withOpacity(0.75),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2.5,
+                  )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(width: 0.5, height: 12, color: Colors.white.withOpacity(0.12)),
+                  ),
+                  Text(widget.yinYang.toUpperCase(), style: TextStyle(
+                    color: yyColor.withOpacity(0.7),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2.5,
+                  )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(width: 0.5, height: 12, color: Colors.white.withOpacity(0.12)),
+                  ),
+                  GestureDetector(
+                    onTap: widget.onYearTap,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('${widget.year}', style: TextStyle(
+                        color: widget.gold.withOpacity(0.7),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2.5,
+                      )),
+                      const SizedBox(width: 5),
+                      Icon(Icons.edit_rounded, size: 10, color: widget.gold.withOpacity(0.35)),
+                    ]),
+                  ),
+                ]),
+
+                // ─ Dekoratif çizgi ─
+                _ornamentalLine(),
+
+                // ─ Dönen alıntı ─
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, anim) => FadeTransition(
+                    opacity: anim,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(_slideForward ? 0.06 : -0.06, 0),
+                        end: Offset.zero,
+                      ).animate(anim),
+                      child: child,
+                    ),
+                  ),
+                  child: Text(
+                    widget.quotes[_idx],
+                    key: ValueKey(_idx),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.75),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      height: 1.65,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                // ─ İlerleme çubuğu ─
+                AnimatedBuilder(
+                  animation: _timerCtrl,
+                  builder: (_, __) => Container(
+                    height: 1.5,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(1),
+                      color: Colors.white.withOpacity(0.05),
+                    ),
+                    child: FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: _timerCtrl.value,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(1),
+                          gradient: LinearGradient(
+                            colors: [widget.crimson.withOpacity(0.45), widget.gold.withOpacity(0.55)],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // ─ Dot göstergeler ─
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(count, (i) {
+                  final active = i == _idx;
+                  return Container(
+                    width: active ? 6 : 3.5,
+                    height: active ? 6 : 3.5,
+                    margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: active
+                          ? widget.gold.withOpacity(0.7)
+                          : Colors.white.withOpacity(0.12),
+                      boxShadow: active
+                          ? [BoxShadow(color: widget.gold.withOpacity(0.25), blurRadius: 4)]
+                          : null,
+                    ),
+                  );
+                })),
+              ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WavePainter extends CustomPainter {
+  final Color color;
+  _WavePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    final w = size.width;
+    final cy = size.height / 2;
+    const amp = 3.5;
+    const segments = 60;
+
+    path.moveTo(0, cy);
+    for (int i = 0; i <= segments; i++) {
+      final x = (i / segments) * w;
+      final y = cy + amp * math.sin((i / segments) * math.pi * 6);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    // Kenarlarda solma efekti — segment bazlı opacity
+    for (int i = 0; i < segments; i++) {
+      final x1 = (i / segments) * w;
+      final x2 = ((i + 1) / segments) * w;
+      final y1 = cy + amp * math.sin((i / segments) * math.pi * 6);
+      final y2 = cy + amp * math.sin(((i + 1) / segments) * math.pi * 6);
+      final t = (i / segments);
+      final fade = t < 0.15 ? t / 0.15 : (t > 0.85 ? (1 - t) / 0.15 : 1.0);
+      canvas.drawLine(
+        Offset(x1, y1), Offset(x2, y2),
+        Paint()
+          ..color = color.withOpacity(fade * (color.opacity))
+          ..strokeWidth = 0.8
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CrescentPainter extends CustomPainter {
+  final Color color;
+  _CrescentPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.45;
+
+    // Dış daire
+    final outer = Path()..addOval(Rect.fromCircle(center: Offset(cx, cy), radius: r));
+    // İç daire — sağa kaydırılmış
+    final inner = Path()..addOval(Rect.fromCircle(center: Offset(cx + r * 0.55, cy), radius: r * 0.85));
+    // Hilal = dış - iç
+    final crescent = Path.combine(PathOperation.difference, outer, inner);
+
+    canvas.drawPath(crescent, Paint()
+      ..color = color
+      ..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
