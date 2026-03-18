@@ -40,7 +40,7 @@ class ChineseZodiacData {
       'goodMatch': [1, 6], // Öküz, At  
       'conflict': [6, 3], // At, Tavşan
       'careers': ['Finans Uzmanı', 'Girişimci', 'Muhasebeci', 'Avukat', 'Yazar'],
-      'careerAdvice': 'Analitik zekanız finansta parlıyor. Girişimcilik ve danışmanlık alanlarında büyük başarı potansiyeli. Risk almayı sevsiniz ama kontrolü elden bırakmayın.',
+      'careerAdvice': 'Karanlıkta bile yolunu bulan gözleriniz, sayıların arasında altın madeni keşfeder. Sezgilerinizi stratejiye dönüştürdüğünüzde, başkalarının göremediği kapılar size açılır.',
       'luckyNumbers': [2, 3], 'luckyColors': ['Mavi', 'Altın', 'Yeşil'],
       'luckyDirections': ['Güney', 'Güneydoğu'],
       'unluckyNumbers': [5, 9], 'unluckyColors': ['Sarı', 'Kahverengi'],
@@ -61,7 +61,7 @@ class ChineseZodiacData {
       'goodMatch': [0, 3], // Sıçan, Tavşan
       'conflict': [6, 7], // At, Keçi
       'careers': ['Mühendis', 'Çiftçi', 'Bankacı', 'Mimar', 'Cerrah'],
-      'careerAdvice': 'Sabrınız ve detaycılığınız mühendislik ve mimarlıkta sizi öne çıkarır. Uzun vadeli projeler sizin için idealdir.',
+      'careerAdvice': 'Sabırla inşa ettiğiniz her yapı, zamanın testini geçer. Sizin eliniz değdiğinde kaos düzene, hayal gerçeğe dönüşür. Büyük eserler acele etmeyenleri bekler.',
       'luckyNumbers': [1, 4], 'luckyColors': ['Beyaz', 'Sarı', 'Yeşil'],
       'luckyDirections': ['Kuzey', 'Güney'],
       'unluckyNumbers': [5, 6], 'unluckyColors': ['Mavi'],
@@ -82,7 +82,7 @@ class ChineseZodiacData {
       'goodMatch': [4, 8], // Ejderha, Maymun
       'conflict': [8, 5], // Maymun, Yılan
       'careers': ['Asker', 'Komutan', 'CEO', 'Sporcu', 'Gazeteci'],
-      'careerAdvice': 'Liderlik kabiliyetiniz sizi yöneticilik pozisyonlarına taşır. Rekabetçi alanlarda öne çıkarsınız.',
+      'careerAdvice': 'Kükremenize gerek yok — varlığınız yeter. Cesaretiniz sizi tahtlara oturtur, adalet duygunuz ise orada tutar. Liderlik sizin için bir görev değil, doğanızdır.',
       'luckyNumbers': [1, 3, 4], 'luckyColors': ['Mavi', 'Gri', 'Turuncu'],
       'luckyDirections': ['Doğu', 'Kuzey'],
       'unluckyNumbers': [6, 7, 8], 'unluckyColors': ['Kahverengi'],
@@ -103,7 +103,7 @@ class ChineseZodiacData {
       'goodMatch': [1, 10], // Öküz, Köpek
       'conflict': [9, 0], // Horoz, Sıçan
       'careers': ['Sanatçı', 'Diplomat', 'Psikolog', 'Tasarımcı', 'Müzisyen'],
-      'careerAdvice': 'Sanatsal yeteneğiniz ve diplomatik beceriniz sizi yaratıcı sektörlerde öne çıkarır.',
+      'careerAdvice': 'Dünyanın gürültüsünde bile şiir duyarsınız. İnceliğiniz bir süper güçtür — insanları, renkleri ve duyguları birbirine bağlayan görünmez ipliği siz dokursunuz.',
       'luckyNumbers': [3, 4, 6], 'luckyColors': ['Pembe', 'Mor', 'Kırmızı'],
       'luckyDirections': ['Doğu', 'Güney'],
       'unluckyNumbers': [1, 7, 8], 'unluckyColors': ['Koyu Kahve'],
@@ -124,7 +124,7 @@ class ChineseZodiacData {
       'goodMatch': [2, 9], // Kaplan, Horoz
       'conflict': [10, 1], // Köpek, Öküz
       'careers': ['Politikacı', 'CEO', 'Yatırımcı', 'Sanatçı', 'Lider'],
-      'careerAdvice': 'Büyük düşünün! Liderlik pozisyonları sizin için biçilmiş kaftan. Girişimcilik ve yatırım alanlarında şansınız yüksek.',
+      'careerAdvice': 'İçinizdeki ateş, sıradan bir kariyer için çok büyük. Siz imparatorluklar kurmak, vizyonları gerçeğe dönüştürmek için varsınız. Büyük düşünün — çünkü evren sizinle aynı dilde konuşuyor.',
       'luckyNumbers': [1, 6, 7], 'luckyColors': ['Altın', 'Gümüş', 'Beyaz'],
       'luckyDirections': ['Doğu', 'Kuzey', 'Güney'],
       'unluckyNumbers': [3, 8], 'unluckyColors': ['Mavi'],
@@ -145,7 +145,7 @@ class ChineseZodiacData {
       'goodMatch': [4, 0], // Ejderha, Sıçan
       'conflict': [2, 11], // Kaplan, Domuz
       'careers': ['Bilim İnsanı', 'Filozof', 'Psikolog', 'Dedektif', 'Danışman'],
-      'careerAdvice': 'Analitik zekânız araştırma ve danışmanlıkta sizi parlak kılar. Stratejik planlama sizin güçlü yanınız.',
+      'careerAdvice': 'Yüzeyin altını gören gözleriniz, başkalarının kaçırdığı gerçekleri ortaya çıkarır. Sessiz bilgeliğiniz en karmaşık düğümleri bile çözer — stratejiniz su gibi akıp her engeli aşar.',
       'luckyNumbers': [2, 8, 9], 'luckyColors': ['Kırmızı', 'Siyah', 'Sarı'],
       'luckyDirections': ['Güney', 'Güneybatı'],
       'unluckyNumbers': [1, 6, 7], 'unluckyColors': ['Beyaz'],
@@ -166,7 +166,7 @@ class ChineseZodiacData {
       'goodMatch': [7, 11], // Keçi, Domuz
       'conflict': [0, 1], // Sıçan, Öküz
       'careers': ['Sporcu', 'Pilot', 'Satıcı', 'Komedyen', 'Rehber'],
-      'careerAdvice': 'Enerjiniz ve sosyalliğiniz sizi satış, spor ve eğlence sektöründe parlak kılar. Masabaşı işlerden kaçının.',
+      'careerAdvice': 'Rüzgâr gibisiniz — duvarlar arasına sığmazsınız. Enerjiniz sadece size değil, dokunduğunuz herkese hayat verir. Özgürlüğünüzü besleyen bir kariyer, ruhunuzu da besler.',
       'luckyNumbers': [2, 3, 7], 'luckyColors': ['Sarı', 'Yeşil', 'Kırmızı'],
       'luckyDirections': ['Güney', 'Güneybatı'],
       'unluckyNumbers': [1, 5, 6], 'unluckyColors': ['Beyaz', 'Mavi'],
@@ -187,7 +187,7 @@ class ChineseZodiacData {
       'goodMatch': [6, 2], // At, Kaplan
       'conflict': [1, 10], // Öküz, Köpek
       'careers': ['Ressam', 'Müzisyen', 'Terapi Uzmanı', 'Aşçı', 'Tasarımcı'],
-      'careerAdvice': 'Sanatsal yetenekleriniz ve şefkatiniz yaratıcı mesleklerde ve sağlık sektöründe sizi öne çıkarır.',
+      'careerAdvice': 'Dokunduğunuz her şeyi sanata dönüştüren elleriniz var. Şefkatiniz iyileştirir, yaratıcılığınız ilham verir — sizin işiniz dünyayı güzelleştirmektir, bir fırça darbesiyle ya da bir gülümsemeyle.',
       'luckyNumbers': [2, 7], 'luckyColors': ['Yeşil', 'Kahverengi', 'Kırmızı'],
       'luckyDirections': ['Güney', 'Güneybatı'],
       'unluckyNumbers': [4, 9], 'unluckyColors': ['Siyah'],
@@ -208,7 +208,7 @@ class ChineseZodiacData {
       'goodMatch': [5, 11], // Yılan, Domuz
       'conflict': [2, 11], // Kaplan, Domuz
       'careers': ['Yazılımcı', 'Stand-up Komedyen', 'Mühendis', 'Mucit', 'Pazarlamacı'],
-      'careerAdvice': 'Hızlı zekanız teknoloji ve yaratıcı sektörlerde sizi parlak kılar. Sıkıcı rutinlerden kaçının.',
+      'careerAdvice': 'Zihniniz bir sihirbazın eli gibi çalışır — sorunları çözmez, onları yok eder. Sıkıcı olanı büyüleyiciye çeviren zekanız, inovasyonun tam kalbinde atıyor.',
       'luckyNumbers': [4, 9], 'luckyColors': ['Beyaz', 'Mavi', 'Altın'],
       'luckyDirections': ['Batı', 'Kuzeybatı'],
       'unluckyNumbers': [2, 7], 'unluckyColors': ['Kırmızı'],
@@ -229,7 +229,7 @@ class ChineseZodiacData {
       'goodMatch': [4, 8], // Ejderha, Maymun
       'conflict': [3, 10], // Tavşan, Köpek
       'careers': ['Askeri Komutan', 'Gazeteci', 'Cerrah', 'Kalite Kontrolcü', 'Polis'],
-      'careerAdvice': 'Detaycılığınız ve organizasyon beceriniz kalite kontrol ve yönetim alanlarında sizi vazgeçilmez kılar.',
+      'careerAdvice': 'Karanlıkta ilk ışığı siz görürsünüz. Mükemmeliyetçiliğiniz bir lüks değil, standart belirleyen bir güçtür — elinizden geçen her iş, onurlu imzanızı taşır.',
       'luckyNumbers': [5, 7, 8], 'luckyColors': ['Altın', 'Kahverengi', 'Sarı'],
       'luckyDirections': ['Batı', 'Güneybatı'],
       'unluckyNumbers': [1, 3, 9], 'unluckyColors': ['Beyaz'],
@@ -250,7 +250,7 @@ class ChineseZodiacData {
       'goodMatch': [3, 11], // Tavşan, Domuz
       'conflict': [4, 9], // Ejderha, Horoz
       'careers': ['Avukat', 'Polis', 'Doktor', 'Öğretmen', 'Sosyal Hizmet Uzmanı'],
-      'careerAdvice': 'Adalet duygunuz ve sadakatiniz hukuk, güvenlik ve eğitim alanlarında sizi güçlü kılar.',
+      'careerAdvice': 'İçinizdeki pusula her zaman doğruyu gösterir. Adaletiniz sizi yalnızca iyi bir profesyonel değil, insanların güvenle sığındığı bir liman yapar.',
       'luckyNumbers': [3, 4, 9], 'luckyColors': ['Kırmızı', 'Yeşil', 'Mor'],
       'luckyDirections': ['Doğu', 'Güney'],
       'unluckyNumbers': [1, 6, 7], 'unluckyColors': ['Kahverengi'],
@@ -271,7 +271,7 @@ class ChineseZodiacData {
       'goodMatch': [2, 6], // Kaplan, At
       'conflict': [5, 8], // Yılan, Maymun
       'careers': ['Aşçı', 'Hayırsever', 'Hemşire', 'Veteriner', 'Otelci'],
-      'careerAdvice': 'Sıcaklığınız ve cömertliğiniz hizmet sektörü ve sağlık alanında sizi sevilen biri yapar.',
+      'careerAdvice': 'Kalbiniz bir okyanus gibi geniştir — herkes için yer vardır. Cömertliğinizle dokunan elleriniz, ister bir sofrada ister bir hastane koridorunda olsun, her yerde mucize yaratır.',
       'luckyNumbers': [2, 5, 8], 'luckyColors': ['Sarı', 'Gri', 'Kahverengi'],
       'luckyDirections': ['Kuzey', 'Doğu'],
       'unluckyNumbers': [1, 7, 8], 'unluckyColors': ['Kırmızı', 'Mavi'],
