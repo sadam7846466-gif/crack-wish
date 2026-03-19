@@ -21,6 +21,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   DateTime _birthDate = DateTime(1999, 12, 20);
   String _userElement = 'Su';
   String _userYinYang = 'Yin';
+  int _selectedCompat = -1;
 
   // Asya tarzı renk paleti
   static const Color _crimson = Color(0xFFB91C1C);
@@ -1066,63 +1067,351 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final good = (a['goodMatch'] as List<int>);
     final bad = (a['conflict'] as List<int>);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Aşk & İlişki
-      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _secHead('❤️', 'Aşk & İlişki'),
-        const SizedBox(height: 12),
-        Text(a['love'] as String, style: _bodyStyle()),
-      ])),
-      const SizedBox(height: 20),
-      _secHead('💍', 'Burç Uyum Haritası'),
-      const SizedBox(height: 4),
-      Text('${a['name']} burcunun diğer burçlarla uyumu', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13)),
-      const SizedBox(height: 16),
-      _compatGroup('💖 Mükemmel Uyum', best, const Color(0xFFE91E63)),
-      const SizedBox(height: 12),
-      _compatGroup('💛 İyi Uyum', good, const Color(0xFF4CAF50)),
-      const SizedBox(height: 12),
-      _compatGroup('⚡ Zorlayıcı', bad, const Color(0xFFFF9800)),
-      const SizedBox(height: 20),
-      // Tüm burçlarla uyum tablosu
-      _secHead('📊', 'Detaylı Uyum Tablosu'),
-      const SizedBox(height: 12),
-      ...List.generate(12, (i) {
-        if (i == _animalIdx) return const SizedBox.shrink();
-        final other = ChineseZodiacData.animals[i];
-        int score;
-        Color c;
-        String label;
-        if (best.contains(i)) { score = 95; c = const Color(0xFFE91E63); label = 'Mükemmel'; }
-        else if (good.contains(i)) { score = 75; c = const Color(0xFF4CAF50); label = 'İyi'; }
-        else if (bad.contains(i)) { score = 35; c = const Color(0xFFFF9800); label = 'Zorlayıcı'; }
-        else { score = 60; c = const Color(0xFF78909C); label = 'Normal'; }
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: c.withOpacity(0.2)),
+      // Aşk & İlişki — 💌 Aşk Mektubu
+      Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF2A1A10).withOpacity(0.9),
+              const Color(0xFF1E1210).withOpacity(0.95),
+              const Color(0xFF2A1515).withOpacity(0.9),
+            ],
           ),
-          child: Row(children: [
-            Text(other['emoji'] as String, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 10),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(other['name'] as String, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 4),
-              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-                value: score / 100, backgroundColor: Colors.white.withOpacity(0.08), color: c, minHeight: 4,
+          border: Border.all(color: const Color(0xFF8B6914).withOpacity(0.2), width: 0.5),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 30, offset: const Offset(0, 12)),
+          ],
+        ),
+        child: Stack(children: [
+          ...[
+            [4.0, 4.0, null, null], [null, 4.0, 4.0, null],
+            [4.0, null, null, 4.0], [null, null, 4.0, 4.0],
+          ].map((pos) => Positioned(
+            left: pos[0] != null ? pos[0]! + 8 : null,
+            top: pos[1] != null ? pos[1]! + 8 : null,
+            right: pos[2] != null ? pos[2]! + 8 : null,
+            bottom: pos[3] != null ? pos[3]! + 8 : null,
+            child: SizedBox(
+              width: 16, height: 16,
+              child: CustomPaint(painter: _CornerPainter(
+                color: const Color(0xFF8B6914).withOpacity(0.25),
+                topLeft: pos[0] != null && pos[1] != null,
+                topRight: pos[2] != null && pos[1] != null,
+                bottomLeft: pos[0] != null && pos[3] != null,
+                bottomRight: pos[2] != null && pos[3] != null,
               )),
-            ])),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-              child: Text(label, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700)),
             ),
-          ]),
-        );
-      }),
+          )),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(26, 28, 26, 24),
+            child: Column(children: [
+              Container(
+                width: 56, height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const RadialGradient(
+                    center: Alignment(-0.2, -0.2),
+                    colors: [Color(0xFFC62828), Color(0xFF8B0000), Color(0xFF4A0000)],
+                    stops: [0.0, 0.5, 1.0],
+                  ),
+                  border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.4), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(color: const Color(0xFF8B0000).withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(2, 2)),
+                  ],
+                ),
+                child: const Icon(Icons.favorite_rounded, color: Color(0xFFD4A017), size: 24),
+              ),
+              const SizedBox(height: 14),
+              ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [Color(0xFFD4A017), Color(0xFFF5D78E), Color(0xFFD4A017)],
+                ).createShader(bounds),
+                child: const Text('Aşk & İlişki', style: TextStyle(
+                  color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300,
+                  letterSpacing: 3.0,
+                )),
+              ),
+              const SizedBox(height: 16),
+              Row(children: [
+                Expanded(child: Container(height: 0.5, decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.transparent, const Color(0xFFD4A017).withOpacity(0.3),
+                  ]),
+                ))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('✦', style: TextStyle(
+                    color: const Color(0xFFD4A017).withOpacity(0.35), fontSize: 8,
+                  )),
+                ),
+                Expanded(child: Container(height: 0.5, decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    const Color(0xFFD4A017).withOpacity(0.3), Colors.transparent,
+                  ]),
+                ))),
+              ]),
+              const SizedBox(height: 18),
+              Text(a['love'] as String, textAlign: TextAlign.center, style: TextStyle(
+                color: Colors.white.withOpacity(0.72),
+                fontSize: 14.5, fontStyle: FontStyle.italic,
+                height: 1.75, letterSpacing: 0.2,
+              )),
+              const SizedBox(height: 18),
+              Container(height: 0.5, color: const Color(0xFFD4A017).withOpacity(0.12)),
+              const SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('Sevgiyle mühürlendi', style: TextStyle(
+                  color: const Color(0xFFD4A017).withOpacity(0.3),
+                  fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.0, fontStyle: FontStyle.italic,
+                )),
+                const SizedBox(width: 6),
+                Icon(Icons.favorite, size: 9, color: const Color(0xFFC62828).withOpacity(0.5)),
+              ]),
+            ]),
+          ),
+        ]),
+      ),
+      const SizedBox(height: 20),
+      // ── Burç Uyum — Podium Sıralama ──
+      ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.05),
+              border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.12), width: 0.5),
+            ),
+            child: Column(children: [
+              ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [Color(0xFFD4A017), Color(0xFFF5D78E), Color(0xFFD4A017)],
+                ).createShader(bounds),
+                child: const Text('Burç Uyum Haritası', style: TextStyle(
+                  color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 1,
+                )),
+              ),
+              const SizedBox(height: 4),
+              Text('${a['name']} burcunun en uyumlu burçları', style: TextStyle(
+                color: Colors.white.withOpacity(0.4), fontSize: 12, fontStyle: FontStyle.italic,
+              )),
+              const SizedBox(height: 22),
+              // ── TOP 3 PODIUM — açıklamalı + özel ikon ──
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                // 2. sıra
+                if (best.length > 1) Expanded(child: _podiumFull(
+                  best[1], '🥈', const Color(0xFFC0C0C0), 45, 'Kalp kalbe bağ',
+                )),
+                if (best.length <= 1) const Expanded(child: SizedBox()),
+                const SizedBox(width: 6),
+                // 1. sıra
+                Expanded(child: _podiumFull(
+                  best[0], '🥇', const Color(0xFFD4A017), 65, 'Ruh eşiniz',
+                )),
+                const SizedBox(width: 6),
+                // 3. sıra
+                if (good.isNotEmpty) Expanded(child: _podiumFull(
+                  good[0], '🥉', const Color(0xFFCD7F32), 30, 'Güçlü çekim',
+                )),
+                if (good.isEmpty) const Expanded(child: SizedBox()),
+              ]),
+              const SizedBox(height: 18),
+              // Ayırıcı
+              Container(height: 0.5, decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  Colors.transparent, const Color(0xFFD4A017).withOpacity(0.15), Colors.transparent,
+                ]),
+              )),
+              // ── İYİ UYUM — kart stili ──
+              if (good.length > 1) ...[
+                const SizedBox(height: 14),
+                Row(children: [
+                  Icon(Icons.lightbulb_outline_rounded, color: const Color(0xFFD4A017).withOpacity(0.5), size: 14),
+                  const SizedBox(width: 6),
+                  Text('Aklınızda Bulunsun', style: TextStyle(color: const Color(0xFFD4A017).withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Text('Alternatif bir seçenek', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 9, fontStyle: FontStyle.italic)),
+                ]),
+                const SizedBox(height: 10),
+                ...good.sublist(1).map((i) {
+                  final gAnimal = ChineseZodiacData.animals[i];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFD4A017).withOpacity(0.03),
+                      border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.1), width: 0.5),
+                    ),
+                    child: Row(children: [
+                      _animalIcon(i, 42),
+                      const SizedBox(width: 12),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(gAnimal['name'] as String, style: TextStyle(
+                          color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w700,
+                        )),
+                        const SizedBox(height: 2),
+                        Text('Yolunuza çıkarsa fırsatı kaçırmayın', style: TextStyle(
+                          color: Colors.white.withOpacity(0.3), fontSize: 10, fontStyle: FontStyle.italic,
+                        )),
+                      ])),
+                    ]),
+                  );
+                }),
+              ],
+              // ── ZORLAYICI — ✗ çarpı işaretli ──
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFFFF3D00).withOpacity(0.04),
+                  border: Border.all(color: const Color(0xFFFF3D00).withOpacity(0.12), width: 0.5),
+                ),
+                child: Column(children: [
+                  Row(children: [
+                    Icon(Icons.warning_amber_rounded, color: const Color(0xFFFF3D00).withOpacity(0.5), size: 14),
+                    const SizedBox(width: 6),
+                    Text('Dikkat — Zorlayıcı', style: TextStyle(
+                      color: const Color(0xFFFF3D00).withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w700,
+                    )),
+                    const Spacer(),
+                    Text('Ekstra sabır gerekir', style: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 9, fontStyle: FontStyle.italic)),
+                  ]),
+                  const SizedBox(height: 10),
+                  Row(children: bad.map((i) => Expanded(child: Column(children: [
+                    _animalIcon(i, 42, opacity: 0.4),
+                    const SizedBox(height: 4),
+                    Text(ChineseZodiacData.animals[i]['name'] as String, style: TextStyle(
+                      color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.w600,
+                    )),
+                  ]))).toList()),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      ),
+      const SizedBox(height: 20),
+      // ── Detaylı Uyum Tablosu — Seçimli ──
+      _secHead('📊', 'Detaylı Uyum Tablosu'),
+      const SizedBox(height: 6),
+      Text('Merak ettiğin burca dokun ✨', style: TextStyle(
+        color: Colors.white.withOpacity(0.3), fontSize: 11, fontStyle: FontStyle.italic,
+      )),
+      const SizedBox(height: 14),
+      // Hayvan seçim gridi — 2 satır 6 sütun
+      ...List.generate(2, (row) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(children: List.generate(6, (col) {
+          final i = row * 6 + col;
+          if (i == _animalIdx) {
+            return Expanded(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: Opacity(opacity: 0.15, child: _animalIcon(i, 36)),
+            ));
+          }
+          Color borderC;
+          if (best.contains(i)) borderC = const Color(0xFFE91E63);
+          else if (good.contains(i)) borderC = const Color(0xFFD4A017);
+          else if (bad.contains(i)) borderC = const Color(0xFFFF3D00);
+          else borderC = const Color(0xFF78909C);
+          final selected = _selectedCompat == i;
+          return Expanded(child: GestureDetector(
+            onTap: () => setState(() => _selectedCompat = selected ? -1 : i),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: selected ? borderC.withOpacity(0.1) : Colors.transparent,
+                border: Border.all(
+                  color: selected ? borderC.withOpacity(0.5) : borderC.withOpacity(0.12),
+                  width: selected ? 1.5 : 0.5,
+                ),
+              ),
+              child: _animalIcon(i, 36),
+            ),
+          ));
+        })),
+      )),
+      // Detay paneli — seçiliyse göster
+      if (_selectedCompat >= 0 && _selectedCompat != _animalIdx) ...[
+        const SizedBox(height: 6),
+        Builder(builder: (ctx) {
+          final si = _selectedCompat;
+          final other = ChineseZodiacData.animals[si];
+          int score; Color c; String label; String desc;
+          if (best.contains(si)) {
+            score = 95; c = const Color(0xFFE91E63); label = 'Mükemmel Uyum';
+            desc = 'Bu burçla aranızda derin bir bağ var. Birbirini tamamlayan enerjiler güçlü bir çekim yaratır.';
+          } else if (good.contains(si)) {
+            score = 75; c = const Color(0xFFD4A017); label = 'İyi Uyum';
+            desc = 'Doğal bir uyum ve anlayış mevcut. Birlikte geçirilen zaman keyifli ve verimli olur.';
+          } else if (bad.contains(si)) {
+            score = 35; c = const Color(0xFFFF3D00); label = 'Zorlayıcı';
+            desc = 'Bu ilişki sabır ve anlayış gerektirir. Farklılıklar sürtüşmeye yol açabilir ama büyümeyi de sağlar.';
+          } else {
+            score = 60; c = const Color(0xFF78909C); label = 'Nötr';
+            desc = 'Standart bir ilişki. Büyük çatışma yok ama özel bir çekim de hissedilmez.';
+          }
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: c.withOpacity(0.04),
+              border: Border.all(color: c.withOpacity(0.15)),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                _animalIcon(si, 50),
+                const SizedBox(width: 14),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(other['name'] as String, style: TextStyle(
+                    color: Colors.white.withOpacity(0.9), fontSize: 16, fontWeight: FontWeight.w700,
+                  )),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: c.withOpacity(0.12),
+                    ),
+                    child: Text(label, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ])),
+                // Skor
+                Column(children: [
+                  Text('$score', style: TextStyle(color: c, fontSize: 28, fontWeight: FontWeight.w800, height: 1)),
+                  Text('puan', style: TextStyle(color: c.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w600)),
+                ]),
+              ]),
+              const SizedBox(height: 12),
+              // Progress bar
+              ClipRRect(borderRadius: BorderRadius.circular(3), child: Stack(children: [
+                Container(height: 4, decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(3),
+                )),
+                FractionallySizedBox(widthFactor: score / 100, child: Container(
+                  height: 4, decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    gradient: LinearGradient(colors: [c.withOpacity(0.4), c]),
+                    boxShadow: [BoxShadow(color: c.withOpacity(0.3), blurRadius: 6)],
+                  ),
+                )),
+              ])),
+              const SizedBox(height: 12),
+              Text(desc, style: TextStyle(
+                color: Colors.white.withOpacity(0.45), fontSize: 12, height: 1.5,
+              )),
+            ]),
+          );
+        }),
+      ],
     ]);
   }
 
@@ -1212,6 +1501,26 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       ),
     );
   }
+
+  Widget _matchStat(String label, double value, Color color) => Expanded(
+    child: Column(children: [
+      Text(label, style: TextStyle(
+        color: color.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 0.5,
+      )),
+      const SizedBox(height: 6),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: LinearProgressIndicator(
+          value: value, backgroundColor: Colors.white.withOpacity(0.06),
+          color: color.withOpacity(0.6), minHeight: 3,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text('${(value * 100).toInt()}%', style: TextStyle(
+        color: color.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w700,
+      )),
+    ]),
+  );
 
   Widget _glass({required Widget child}) => ClipRRect(
     borderRadius: BorderRadius.circular(22),
@@ -1423,6 +1732,410 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     );
   }
 
+  Widget _compatCardCreative(String title, String pct, List<int> indices, Color c, IconData icon) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.03),
+        border: Border.all(color: c.withOpacity(0.15), width: 0.5),
+      ),
+      child: Row(children: [
+        // Sol aksent şerit
+        Container(
+          width: 4,
+          height: 90,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter, end: Alignment.bottomCenter,
+              colors: [c.withOpacity(0.8), c.withOpacity(0.2)],
+            ),
+          ),
+        ),
+        Expanded(child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Başlık satırı
+            Row(children: [
+              Container(
+                width: 28, height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: c.withOpacity(0.12),
+                  boxShadow: [BoxShadow(color: c.withOpacity(0.15), blurRadius: 10)],
+                ),
+                child: Icon(icon, color: c.withOpacity(0.8), size: 14),
+              ),
+              const SizedBox(width: 10),
+              Text(title, style: TextStyle(color: c, fontSize: 15, fontWeight: FontWeight.w700)),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8), color: c.withOpacity(0.12),
+                ),
+                child: Text(pct, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w800)),
+              ),
+            ]),
+            const SizedBox(height: 12),
+            // Hayvan avatarları
+            Row(children: indices.map((i) {
+              final animal = ChineseZodiacData.animals[i];
+              return Expanded(child: Column(children: [
+                Container(
+                  width: 42, height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(colors: [
+                      c.withOpacity(0.1), Colors.transparent,
+                    ]),
+                    border: Border.all(color: c.withOpacity(0.2), width: 1),
+                  ),
+                  child: Center(child: Text(animal['emoji'] as String, style: const TextStyle(fontSize: 24))),
+                ),
+                const SizedBox(height: 5),
+                Text(animal['name'] as String, style: TextStyle(
+                  color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w600,
+                )),
+              ]));
+            }).toList()),
+          ]),
+        )),
+      ]),
+    );
+  }
+
+  Widget _chainTier(String label, List<int> indices, Color c) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: c.withOpacity(0.04),
+        border: Border.all(color: c.withOpacity(0.12), width: 0.5),
+      ),
+      child: Column(children: [
+        Text(label, style: TextStyle(
+          color: c, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1,
+        )),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(
+          indices.length * 2 - 1, (idx) {
+            if (idx.isOdd) {
+              // Yatay bağlantı çizgisi
+              return Container(width: 16, height: 1, color: c.withOpacity(0.15));
+            }
+            final i = indices[idx ~/ 2];
+            final animal = ChineseZodiacData.animals[i];
+            return Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: c.withOpacity(0.08),
+                  border: Border.all(color: c.withOpacity(0.3), width: 1),
+                  boxShadow: [BoxShadow(color: c.withOpacity(0.1), blurRadius: 8)],
+                ),
+                child: Center(child: Text(animal['emoji'] as String, style: const TextStyle(fontSize: 20))),
+              ),
+              const SizedBox(height: 4),
+              Text(animal['name'] as String, style: TextStyle(
+                color: Colors.white.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w600,
+              )),
+            ]);
+          },
+        )),
+      ]),
+    );
+  }
+
+  Widget _miniScoreLabel(String text, Color c) => Row(children: [
+    Container(width: 5, height: 5, decoration: BoxDecoration(
+      shape: BoxShape.circle, color: c,
+      boxShadow: [BoxShadow(color: c.withOpacity(0.4), blurRadius: 4)],
+    )),
+    const SizedBox(width: 6),
+    Text(text, style: TextStyle(color: c.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w700)),
+  ]);
+
+  Widget _crystalOrb(Map<String, dynamic> animal, Color c, int score) {
+    return Column(children: [
+      Container(
+        width: 56, height: 56,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            center: const Alignment(-0.3, -0.4),
+            colors: [
+              c.withOpacity(0.15),
+              c.withOpacity(0.06),
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+          border: Border.all(color: c.withOpacity(0.2), width: 1),
+          boxShadow: [
+            BoxShadow(color: c.withOpacity(0.1), blurRadius: 14, spreadRadius: 2),
+            BoxShadow(color: c.withOpacity(0.06), blurRadius: 6),
+          ],
+        ),
+        child: Stack(children: [
+          // Işık yansıması
+          Positioned(top: 6, left: 10, child: Container(
+            width: 14, height: 8,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              gradient: LinearGradient(colors: [
+                Colors.white.withOpacity(0.12), Colors.transparent,
+              ]),
+            ),
+          )),
+          Center(child: Text(animal['emoji'] as String, style: const TextStyle(fontSize: 24))),
+        ]),
+      ),
+      const SizedBox(height: 5),
+      Text(animal['name'] as String, style: TextStyle(
+        color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w600,
+      )),
+      Text('%$score', style: TextStyle(
+        color: c.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.w800,
+      )),
+    ]);
+  }
+
+  Widget _barRow(Map<String, dynamic> animal, int score, Color c) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(children: [
+        Text(animal['emoji'] as String, style: const TextStyle(fontSize: 18)),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 48,
+          child: Text(animal['name'] as String, style: TextStyle(
+            color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w600,
+          )),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: ClipRRect(
+          borderRadius: BorderRadius.circular(2),
+          child: Stack(children: [
+            Container(height: 4, decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(2),
+            )),
+            FractionallySizedBox(widthFactor: score / 100, child: Container(
+              height: 4, decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                gradient: LinearGradient(colors: [c.withOpacity(0.3), c]),
+                boxShadow: [BoxShadow(color: c.withOpacity(0.3), blurRadius: 4)],
+              ),
+            )),
+          ]),
+        )),
+        const SizedBox(width: 8),
+        Text('$score', style: TextStyle(
+          color: c.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w700,
+        )),
+      ]),
+    );
+  }
+
+  Widget _medalBadge(Map<String, dynamic> animal, Color c, String pct) {
+    return Column(children: [
+      Container(
+        width: 52, height: 52,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: c.withOpacity(0.06),
+          border: Border.all(color: c.withOpacity(0.35), width: 2),
+          boxShadow: [
+            BoxShadow(color: c.withOpacity(0.12), blurRadius: 10, spreadRadius: 1),
+          ],
+        ),
+        child: Center(
+          child: Container(
+            width: 42, height: 42,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: c.withOpacity(0.15), width: 0.5),
+            ),
+            child: Center(child: Text(animal['emoji'] as String, style: const TextStyle(fontSize: 22))),
+          ),
+        ),
+      ),
+      const SizedBox(height: 5),
+      Text(animal['name'] as String, style: TextStyle(
+        color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w600,
+      )),
+      Container(
+        margin: const EdgeInsets.only(top: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          color: c.withOpacity(0.1),
+        ),
+        child: Text(pct, style: TextStyle(
+          color: c.withOpacity(0.7), fontSize: 8, fontWeight: FontWeight.w800,
+        )),
+      ),
+    ]);
+  }
+
+  Widget _miniScoreCard(Map<String, dynamic> animal, int score, Color c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: c.withOpacity(0.05),
+          border: Border.all(color: c.withOpacity(0.12), width: 0.5),
+        ),
+        child: Column(children: [
+          SizedBox(
+            width: 44, height: 44,
+            child: Stack(children: [
+              CustomPaint(
+                size: const Size(44, 44),
+                painter: _MiniRingPainter(score / 100, c),
+              ),
+              Center(child: Text(animal['emoji'] as String, style: const TextStyle(fontSize: 20))),
+            ]),
+          ),
+          const SizedBox(height: 5),
+          Text(animal['name'] as String, style: TextStyle(
+            color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w600,
+          )),
+          Text('%$score', style: TextStyle(
+            color: c.withOpacity(0.6), fontSize: 9, fontWeight: FontWeight.w800,
+          )),
+        ]),
+      ),
+    );
+  }
+
+  Widget _podiumFull(int animalIdx, String medal, Color c, double pillarH, String desc) {
+    final animal = ChineseZodiacData.animals[animalIdx];
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      _animalIcon(animalIdx, 42),
+      const SizedBox(height: 3),
+      Text(animal['name'] as String, style: TextStyle(
+        color: Colors.white.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.w600,
+      )),
+      Text(medal, style: const TextStyle(fontSize: 12)),
+      Text(desc, style: TextStyle(
+        color: c.withOpacity(0.5), fontSize: 8, fontWeight: FontWeight.w600, fontStyle: FontStyle.italic,
+      )),
+      const SizedBox(height: 4),
+      Container(
+        width: double.infinity, height: pillarH,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            colors: [c.withOpacity(0.3), c.withOpacity(0.05)],
+          ),
+          border: Border(
+            top: BorderSide(color: c.withOpacity(0.5), width: 1),
+            left: BorderSide(color: c.withOpacity(0.12), width: 0.5),
+            right: BorderSide(color: c.withOpacity(0.12), width: 0.5),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _podiumItem(Map<String, dynamic> animal, String medal, Color c, double pillarH) {
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Text(animal['emoji'] as String, style: const TextStyle(fontSize: 26)),
+      const SizedBox(height: 2),
+      Text(animal['name'] as String, style: TextStyle(
+        color: Colors.white.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.w600,
+      )),
+      Text(medal, style: const TextStyle(fontSize: 12)),
+      const SizedBox(height: 4),
+      Container(
+        width: double.infinity, height: pillarH,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            colors: [c.withOpacity(0.3), c.withOpacity(0.05)],
+          ),
+          border: Border(
+            top: BorderSide(color: c.withOpacity(0.5), width: 1),
+            left: BorderSide(color: c.withOpacity(0.12), width: 0.5),
+            right: BorderSide(color: c.withOpacity(0.12), width: 0.5),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _podiumPlace(Map<String, dynamic> animal, int place, Color c, double height) {
+    final medals = ['🥇', '🥈', '🥉'];
+    return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+      // Emoji
+      Text(animal['emoji'] as String, style: const TextStyle(fontSize: 30)),
+      const SizedBox(height: 4),
+      Text(animal['name'] as String, style: TextStyle(
+        color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600,
+      )),
+      const SizedBox(height: 2),
+      Text(medals[place - 1], style: const TextStyle(fontSize: 14)),
+      const SizedBox(height: 6),
+      // Sütun
+      Container(
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            colors: [c.withOpacity(0.25), c.withOpacity(0.06)],
+          ),
+          border: Border(
+            top: BorderSide(color: c.withOpacity(0.4), width: 1),
+            left: BorderSide(color: c.withOpacity(0.15), width: 0.5),
+            right: BorderSide(color: c.withOpacity(0.15), width: 0.5),
+          ),
+          boxShadow: place == 1 ? [
+            BoxShadow(color: c.withOpacity(0.15), blurRadius: 16),
+          ] : null,
+        ),
+        child: Center(child: Text(
+          '$place', style: TextStyle(
+            color: c.withOpacity(0.3), fontSize: 32, fontWeight: FontWeight.w900,
+          ),
+        )),
+      ),
+    ]);
+  }
+
+  Widget _rankRow(int startRank, List<int> indices, Color c, String label) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: TextStyle(color: c.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
+      const SizedBox(height: 8),
+      Row(children: List.generate(indices.length, (idx) {
+        final animal = ChineseZodiacData.animals[indices[idx]];
+        return Expanded(child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            width: 18, height: 18,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle, color: c.withOpacity(0.1),
+              border: Border.all(color: c.withOpacity(0.25), width: 0.5),
+            ),
+            child: Center(child: Text('${startRank + idx}', style: TextStyle(
+              color: c.withOpacity(0.5), fontSize: 8, fontWeight: FontWeight.w800,
+            ))),
+          ),
+          const SizedBox(width: 4),
+          Text(animal['emoji'] as String, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 3),
+          Flexible(child: Text(animal['name'] as String, style: TextStyle(
+            color: Colors.white.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.w500,
+          ), overflow: TextOverflow.ellipsis)),
+        ]));
+      })),
+    ]);
+  }
+
   Widget _compatGroup(String title, List<int> indices, Color c) {
     return _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title, style: TextStyle(color: c, fontSize: 16, fontWeight: FontWeight.w700)),
@@ -1437,6 +2150,78 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       }).toList()),
     ]));
   }
+
+  Widget _tinderSection(String title, List<int> indices, Color c, int score) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Başlık
+      Row(children: [
+        Container(width: 3, height: 14, decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(2),
+          color: c.withOpacity(0.6),
+        )),
+        const SizedBox(width: 8),
+        Text(title, style: TextStyle(color: c, fontSize: 14, fontWeight: FontWeight.w700)),
+      ]),
+      const SizedBox(height: 10),
+      // Kartlar — yatay kaydırılabilir
+      SizedBox(
+        height: 120,
+        child: Row(children: List.generate(indices.length, (idx) {
+          final i = indices[idx];
+          final animal = ChineseZodiacData.animals[i];
+          final rotation = (idx - (indices.length - 1) / 2) * 0.03;
+          return Expanded(child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Transform.rotate(
+              angle: rotation,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.white.withOpacity(0.04),
+                  border: Border.all(color: c.withOpacity(0.2), width: 0.5),
+                  boxShadow: [
+                    BoxShadow(color: c.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: Column(children: [
+                  // Üst gradient şerit
+                  Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      gradient: LinearGradient(colors: [c.withOpacity(0.6), c.withOpacity(0.2)]),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Emoji
+                  Text(animal['emoji'] as String, style: const TextStyle(fontSize: 32)),
+                  const SizedBox(height: 6),
+                  // İsim
+                  Text(animal['name'] as String, style: TextStyle(
+                    color: Colors.white.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.w600,
+                  )),
+                  const SizedBox(height: 4),
+                  // Yüzde
+                  Text('%$score', style: TextStyle(
+                    color: c.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w800,
+                  )),
+                ]),
+              ),
+            ),
+          ));
+        })),
+      ),
+    ]);
+  }
+
+  Widget _legendDot(String label, Color c) => Row(children: [
+    Container(width: 6, height: 6, decoration: BoxDecoration(
+      shape: BoxShape.circle, color: c,
+      boxShadow: [BoxShadow(color: c.withOpacity(0.4), blurRadius: 4)],
+    )),
+    const SizedBox(width: 4),
+    Text(label, style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 9, fontWeight: FontWeight.w600)),
+  ]);
 
   Widget _fengShuiCard(String emoji, String label, String value) => Container(
     margin: const EdgeInsets.only(bottom: 10),
@@ -2394,6 +3179,413 @@ class _CrescentPainter extends CustomPainter {
     canvas.drawPath(crescent, Paint()
       ..color = color
       ..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CornerPainter extends CustomPainter {
+  final Color color;
+  final bool topLeft, topRight, bottomLeft, bottomRight;
+  _CornerPainter({required this.color, this.topLeft = false, this.topRight = false, this.bottomLeft = false, this.bottomRight = false});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 0.8..strokeCap = StrokeCap.round;
+    final w = size.width; final h = size.height;
+    if (topLeft) {
+      canvas.drawLine(Offset.zero, Offset(w, 0), p);
+      canvas.drawLine(Offset.zero, Offset(0, h), p);
+    }
+    if (topRight) {
+      canvas.drawLine(Offset(w, 0), Offset.zero, p);
+      canvas.drawLine(Offset(w, 0), Offset(w, h), p);
+    }
+    if (bottomLeft) {
+      canvas.drawLine(Offset(0, h), Offset(w, h), p);
+      canvas.drawLine(Offset(0, h), Offset.zero, p);
+    }
+    if (bottomRight) {
+      canvas.drawLine(Offset(w, h), Offset(0, h), p);
+      canvas.drawLine(Offset(w, h), Offset(w, 0), p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _HeartbeatPainter extends CustomPainter {
+  final Color color;
+  _HeartbeatPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final cy = size.height * 0.5;
+    final p = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 1.2..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    // EKG pattern: düz — P dalgası — QRS spike — düz
+    // Normalize: 0-1 arası
+    final points = <List<double>>[
+      [0.0, 0], [0.08, 0], [0.10, -3], [0.12, 0], // P dalgası
+      [0.16, 0], [0.18, 5], [0.20, -18], [0.22, 12], [0.24, -3], [0.26, 0], // QRS
+      [0.30, 0], [0.32, 3], [0.35, 0], // T dalgası
+      [0.50, 0], // düz
+      [0.58, 0], [0.60, -3], [0.62, 0], // P dalgası 2
+      [0.66, 0], [0.68, 5], [0.70, -18], [0.72, 12], [0.74, -3], [0.76, 0], // QRS 2
+      [0.80, 0], [0.82, 3], [0.85, 0], // T dalgası 2
+      [1.0, 0], // düz
+    ];
+
+    for (int i = 0; i < points.length; i++) {
+      final x = points[i][0] * w;
+      final y = cy + points[i][1];
+      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+    }
+
+    canvas.drawPath(path, p);
+
+    // İkinci hafif çizgi — biraz yukarıda
+    final p2 = Paint()..color = color.withOpacity(color.opacity * 0.3)..style = PaintingStyle.stroke..strokeWidth = 0.5;
+    final path2 = Path();
+    for (int i = 0; i < points.length; i++) {
+      final x = points[i][0] * w;
+      final y = cy - 30 + points[i][1] * 0.4;
+      if (i == 0) { path2.moveTo(x, y); } else { path2.lineTo(x, y); }
+    }
+    canvas.drawPath(path2, p2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _RosePetalPainter extends CustomPainter {
+  final Color color;
+  _RosePetalPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final petals = <List<double>>[
+      [0.12, 0.15, 14, 0.4, 0.06],
+      [0.85, 0.10, 10, 1.2, 0.05],
+      [0.75, 0.80, 16, 2.1, 0.07],
+      [0.20, 0.70, 12, 3.5, 0.05],
+      [0.55, 0.30, 8, 0.8, 0.04],
+      [0.90, 0.55, 11, 4.2, 0.06],
+      [0.08, 0.45, 9, 2.8, 0.04],
+      [0.65, 0.90, 13, 1.6, 0.05],
+      [0.40, 0.12, 7, 5.0, 0.03],
+    ];
+    for (final petal in petals) {
+      final cx = petal[0] * size.width;
+      final cy = petal[1] * size.height;
+      final s = petal[2];
+      canvas.save();
+      canvas.translate(cx, cy);
+      canvas.rotate(petal[3]);
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset.zero, width: s, height: s * 0.55),
+        Paint()..color = color.withOpacity(petal[4])..style = PaintingStyle.fill,
+      );
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset.zero, width: s * 1.1, height: s * 0.6),
+        Paint()..color = color.withOpacity(petal[4] * 0.5)..style = PaintingStyle.stroke..strokeWidth = 0.3,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _MatchRingPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final Color bgColor;
+  _MatchRingPainter({required this.progress, required this.color, required this.bgColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2 - 4;
+    // Arka plan halka
+    canvas.drawCircle(center, r, Paint()..color = bgColor..style = PaintingStyle.stroke..strokeWidth = 3);
+    // İlerleme yayı
+    final rect = Rect.fromCircle(center: center, radius: r);
+    canvas.drawArc(
+      rect, -math.pi / 2, 2 * math.pi * progress, false,
+      Paint()
+        ..color = color.withOpacity(0.7)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round,
+    );
+    // Glow yayı
+    canvas.drawArc(
+      rect, -math.pi / 2, 2 * math.pi * progress, false,
+      Paint()
+        ..color = color.withOpacity(0.2)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _EnvelopeFlapPainter extends CustomPainter {
+  final Color flapColor;
+  final Color lineColor;
+  _EnvelopeFlapPainter({required this.flapColor, required this.lineColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    // Zarf kapağı — üçgen (açılmış halde, yukarı doğru V)
+    final flapPath = Path()
+      ..moveTo(0, h)           // sol alt
+      ..lineTo(w / 2, 0)       // üst orta (sivri uç)
+      ..lineTo(w, h)           // sağ alt
+      ..close();
+
+    // Kapak dolgusu
+    canvas.drawPath(flapPath, Paint()..color = flapColor..style = PaintingStyle.fill);
+
+    // Kapak kenar çizgileri
+    final linePaint = Paint()..color = lineColor..style = PaintingStyle.stroke..strokeWidth = 0.5;
+    canvas.drawLine(Offset(0, h), Offset(w / 2, 0), linePaint);
+    canvas.drawLine(Offset(w / 2, 0), Offset(w, h), linePaint);
+
+    // Alt kenarda ince yatay çizgi
+    canvas.drawLine(Offset(0, h - 0.5), Offset(w, h - 0.5), Paint()..color = lineColor..strokeWidth = 0.3);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _EnvelopeFoldPainter extends CustomPainter {
+  final Color lineColor;
+  _EnvelopeFoldPainter({required this.lineColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()..color = lineColor..style = PaintingStyle.stroke..strokeWidth = 0.5;
+
+    // Sol alt köşeden üst ortaya
+    canvas.drawLine(Offset(0, h), Offset(w / 2, 0), p);
+    // Sağ alt köşeden üst ortaya
+    canvas.drawLine(Offset(w, h), Offset(w / 2, 0), p);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CompatWheelPainter extends CustomPainter {
+  final int centerIdx;
+  final List<int> best, good, bad;
+  final double radius;
+  final Offset center;
+  _CompatWheelPainter({required this.centerIdx, required this.best, required this.good, required this.bad, required this.radius, required this.center});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (int i = 0; i < 12; i++) {
+      if (i == centerIdx) continue;
+      final angle = (i * 30 - 90) * math.pi / 180;
+      final end = Offset(center.dx + radius * math.cos(angle), center.dy + radius * math.sin(angle));
+
+      Color col;
+      double width;
+      double opacity;
+      if (best.contains(i)) { col = const Color(0xFFE91E63); width = 1.5; opacity = 0.5; }
+      else if (good.contains(i)) { col = const Color(0xFF4CAF50); width = 1.0; opacity = 0.35; }
+      else if (bad.contains(i)) { col = const Color(0xFFFF9800); width = 0.8; opacity = 0.3; }
+      else { col = const Color(0xFF78909C); width = 0.4; opacity = 0.12; }
+
+      // Glow çizgi
+      if (best.contains(i) || good.contains(i)) {
+        canvas.drawLine(center, end, Paint()..color = col.withOpacity(opacity * 0.3)..strokeWidth = width + 4..strokeCap = StrokeCap.round..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
+      }
+      // Ana çizgi
+      canvas.drawLine(center, end, Paint()..color = col.withOpacity(opacity)..strokeWidth = width..strokeCap = StrokeCap.round);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _MiniRingPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  _MiniRingPainter(this.progress, this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 2;
+    // Arka plan halkası
+    canvas.drawCircle(center, radius, Paint()
+      ..color = color.withOpacity(0.08)..style = PaintingStyle.stroke..strokeWidth = 2.5);
+    // İlerleme arkı
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2, 2 * math.pi * progress, false,
+      Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.stroke..strokeWidth = 2.5..strokeCap = StrokeCap.round,
+    );
+    // Glow
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2, 2 * math.pi * progress, false,
+      Paint()..color = color.withOpacity(0.15)..style = PaintingStyle.stroke..strokeWidth = 5..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _AnimalIconPainter extends CustomPainter {
+  final int animalIndex;
+  final Color color;
+  _AnimalIconPainter(this.animalIndex, this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+    final cy = h / 2;
+    final p = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 1.5..strokeCap = StrokeCap.round;
+    final pf = Paint()..color = color.withOpacity(0.15)..style = PaintingStyle.fill;
+
+    switch (animalIndex) {
+      case 0: // Sıçan
+        canvas.drawCircle(Offset(cx, cy + 2), 8, pf);
+        canvas.drawCircle(Offset(cx, cy + 2), 8, p);
+        canvas.drawOval(Rect.fromLTWH(cx - 10, cy - 10, 8, 10), p);
+        canvas.drawOval(Rect.fromLTWH(cx + 2, cy - 10, 8, 10), p);
+        final qt = Path()..moveTo(cx + 8, cy + 6)..cubicTo(cx + 18, cy + 2, cx + 14, cy - 8, cx + 20, cy - 6);
+        canvas.drawPath(qt, p);
+        canvas.drawCircle(Offset(cx - 3, cy), 1, Paint()..color = color);
+        canvas.drawCircle(Offset(cx + 3, cy), 1, Paint()..color = color);
+        break;
+      case 1: // Öküz
+        canvas.drawOval(Rect.fromLTWH(cx - 10, cy - 4, 20, 16), pf);
+        canvas.drawOval(Rect.fromLTWH(cx - 10, cy - 4, 20, 16), p);
+        final lh = Path()..moveTo(cx - 8, cy - 4)..quadraticBezierTo(cx - 14, cy - 16, cx - 4, cy - 12);
+        final rh = Path()..moveTo(cx + 8, cy - 4)..quadraticBezierTo(cx + 14, cy - 16, cx + 4, cy - 12);
+        canvas.drawPath(lh, p);
+        canvas.drawPath(rh, p);
+        canvas.drawCircle(Offset(cx, cy + 4), 2, p);
+        break;
+      case 2: // Kaplan
+        canvas.drawCircle(Offset(cx, cy), 12, pf);
+        canvas.drawCircle(Offset(cx, cy), 12, p);
+        for (var i = -1; i <= 1; i++) {
+          canvas.drawLine(Offset(cx + i * 5 - 1, cy - 8), Offset(cx + i * 5 + 1, cy - 2), p);
+        }
+        canvas.drawLine(Offset(cx - 10, cy - 6), Offset(cx - 12, cy - 14), p);
+        canvas.drawLine(Offset(cx + 10, cy - 6), Offset(cx + 12, cy - 14), p);
+        break;
+      case 3: // Tavşan
+        canvas.drawCircle(Offset(cx, cy + 4), 8, pf);
+        canvas.drawCircle(Offset(cx, cy + 4), 8, p);
+        canvas.drawOval(Rect.fromLTWH(cx - 7, cy - 18, 5, 16), p);
+        canvas.drawOval(Rect.fromLTWH(cx + 2, cy - 18, 5, 16), p);
+        break;
+      case 4: // Ejderha
+        canvas.drawCircle(Offset(cx - 2, cy - 2), 8, pf);
+        canvas.drawCircle(Offset(cx - 2, cy - 2), 8, p);
+        for (var i = -2; i <= 2; i++) {
+          canvas.drawLine(Offset(cx - 2 + i * 4, cy - 10), Offset(cx - 2 + i * 3, cy - 16 + i.abs() * 2), p);
+        }
+        final sb = Path()..moveTo(cx + 6, cy + 2)..cubicTo(cx + 14, cy + 6, cx + 8, cy + 14, cx + 16, cy + 12);
+        canvas.drawPath(sb, p);
+        break;
+      case 5: // Yılan
+        final snake = Path()..moveTo(cx - 14, cy + 4)..cubicTo(cx - 6, cy - 10, cx + 6, cy + 10, cx + 14, cy - 4);
+        canvas.drawPath(snake, Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 2.5..strokeCap = StrokeCap.round);
+        canvas.drawCircle(Offset(cx + 12, cy - 5), 1.5, Paint()..color = color);
+        canvas.drawLine(Offset(cx + 14, cy - 4), Offset(cx + 18, cy - 6), p);
+        canvas.drawLine(Offset(cx + 14, cy - 4), Offset(cx + 18, cy - 2), p);
+        break;
+      case 6: // At
+        canvas.drawOval(Rect.fromLTWH(cx - 6, cy - 6, 12, 16), pf);
+        canvas.drawOval(Rect.fromLTWH(cx - 6, cy - 6, 12, 16), p);
+        for (var i = 0; i < 3; i++) {
+          final mp = Path()..moveTo(cx - 6, cy - 4 + i * 4)..quadraticBezierTo(cx - 14, cy - 8 + i * 4, cx - 10, cy - 12 + i * 4);
+          canvas.drawPath(mp, p);
+        }
+        canvas.drawLine(Offset(cx - 2, cy - 6), Offset(cx - 4, cy - 14), p);
+        canvas.drawLine(Offset(cx + 2, cy - 6), Offset(cx + 4, cy - 14), p);
+        break;
+      case 7: // Keçi
+        canvas.drawCircle(Offset(cx, cy + 2), 8, pf);
+        canvas.drawCircle(Offset(cx, cy + 2), 8, p);
+        final lg = Path()..moveTo(cx - 6, cy - 6)..quadraticBezierTo(cx - 16, cy - 14, cx - 8, cy - 16);
+        final rg = Path()..moveTo(cx + 6, cy - 6)..quadraticBezierTo(cx + 16, cy - 14, cx + 8, cy - 16);
+        canvas.drawPath(lg, p);
+        canvas.drawPath(rg, p);
+        canvas.drawLine(Offset(cx, cy + 10), Offset(cx, cy + 16), p);
+        break;
+      case 8: // Maymun
+        canvas.drawCircle(Offset(cx, cy), 9, pf);
+        canvas.drawCircle(Offset(cx, cy), 9, p);
+        canvas.drawCircle(Offset(cx - 12, cy - 4), 5, p);
+        canvas.drawCircle(Offset(cx + 12, cy - 4), 5, p);
+        canvas.drawCircle(Offset(cx - 3, cy - 2), 1, Paint()..color = color);
+        canvas.drawCircle(Offset(cx + 3, cy - 2), 1, Paint()..color = color);
+        final smile = Path()..moveTo(cx - 3, cy + 3)..quadraticBezierTo(cx, cy + 6, cx + 3, cy + 3);
+        canvas.drawPath(smile, p);
+        break;
+      case 9: // Horoz
+        canvas.drawCircle(Offset(cx, cy), 8, pf);
+        canvas.drawCircle(Offset(cx, cy), 8, p);
+        final comb = Path()..moveTo(cx - 2, cy - 8)..lineTo(cx, cy - 14)..lineTo(cx + 2, cy - 8);
+        canvas.drawPath(comb, p);
+        canvas.drawLine(Offset(cx + 8, cy), Offset(cx + 14, cy + 2), p);
+        canvas.drawLine(Offset(cx + 14, cy + 2), Offset(cx + 8, cy + 2), p);
+        for (var i = 0; i < 3; i++) {
+          final tf = Path()..moveTo(cx - 8, cy + 2)..quadraticBezierTo(cx - 16, cy - 4 + i * 6, cx - 12, cy - 8 + i * 6);
+          canvas.drawPath(tf, p);
+        }
+        break;
+      case 10: // Köpek
+        canvas.drawCircle(Offset(cx, cy), 9, pf);
+        canvas.drawCircle(Offset(cx, cy), 9, p);
+        final le = Path()..moveTo(cx - 8, cy - 2)..quadraticBezierTo(cx - 16, cy, cx - 14, cy + 10);
+        final re = Path()..moveTo(cx + 8, cy - 2)..quadraticBezierTo(cx + 16, cy, cx + 14, cy + 10);
+        canvas.drawPath(le, p);
+        canvas.drawPath(re, p);
+        canvas.drawCircle(Offset(cx, cy + 2), 2, Paint()..color = color);
+        break;
+      case 11: // Domuz
+        canvas.drawCircle(Offset(cx, cy + 2), 10, pf);
+        canvas.drawCircle(Offset(cx, cy + 2), 10, p);
+        canvas.drawOval(Rect.fromLTWH(cx - 4, cy, 8, 6), p);
+        canvas.drawCircle(Offset(cx - 2, cy + 3), 0.8, Paint()..color = color);
+        canvas.drawCircle(Offset(cx + 2, cy + 3), 0.8, Paint()..color = color);
+        canvas.drawOval(Rect.fromLTWH(cx - 12, cy - 10, 8, 8), p);
+        canvas.drawOval(Rect.fromLTWH(cx + 4, cy - 10, 8, 8), p);
+        final tl = Path()..moveTo(cx + 10, cy + 4)..cubicTo(cx + 16, cy + 2, cx + 18, cy - 4, cx + 14, cy - 6);
+        canvas.drawPath(tl, p);
+        break;
+    }
   }
 
   @override
