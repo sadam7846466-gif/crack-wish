@@ -149,7 +149,11 @@ class _BentoGridState extends State<BentoGrid>
                       children: [
                         _BentoCard(
                           compact: true,
-                          icon: '☁️', // Rüya simgesi
+                          iconWidget: const Icon(
+                            CupertinoIcons.cloud_fill,
+                            size: 16,
+                            color: AppColors.textWhite,
+                          ),
                           title: l10n.bentoDreamTitle,
                           desc: l10n.bentoDreamDesc,
                           accent: const Color(0xFF60E0FF), // Parlak neon mavi
@@ -205,7 +209,11 @@ class _BentoGridState extends State<BentoGrid>
                             children: [
                               _BentoCard(
                                 compact: true,
-                                icon: '🌈',
+                                iconWidget: const Icon(
+                                  Icons.auto_awesome_rounded,
+                                  size: 16,
+                                  color: AppColors.textWhite,
+                                ),
                                 title: l10n.bentoMotivationTitle,
                                 desc: l10n.bentoMotivationDesc,
                                 accent: const Color(0xFF50F0A0), // Parlak neon yeşil
@@ -306,7 +314,11 @@ class _BentoGridState extends State<BentoGrid>
                       children: [
                         _BentoCard(
                           compact: true,
-                          icon: '⭐',
+                          iconWidget: const Icon(
+                            Icons.stars_rounded,
+                            size: 16,
+                            color: AppColors.textWhite,
+                          ),
                           title: l10n.bentoZodiacTitle,
                           desc: l10n.bentoZodiacDesc,
                           accent: const Color(0xFFFFD060), // Parlak altın sarısı
@@ -417,31 +429,36 @@ class _MoodCardState extends State<_MoodCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _MoodEmojiButton(
-                    emoji: '😢',
+                    moodKey: '😢',
+                    icon: CupertinoIcons.cloud_rain_fill,
                     isSelected: _selectedMood == '😢',
                     onTap: () => _selectMood('😢'),
                   ),
                   const SizedBox(width: 6),
                   _MoodEmojiButton(
-                    emoji: '😔',
+                    moodKey: '😔',
+                    icon: CupertinoIcons.cloud_sun_fill,
                     isSelected: _selectedMood == '😔',
                     onTap: () => _selectMood('😔'),
                   ),
                   const SizedBox(width: 6),
                   _MoodEmojiButton(
-                    emoji: '😊',
+                    moodKey: '😊',
+                    icon: CupertinoIcons.smiley_fill,
                     isSelected: _selectedMood == '😊',
                     onTap: () => _selectMood('😊'),
                   ),
                   const SizedBox(width: 6),
                   _MoodEmojiButton(
-                    emoji: '😄',
+                    moodKey: '😄',
+                    icon: Icons.sentiment_very_satisfied_rounded,
                     isSelected: _selectedMood == '😄',
                     onTap: () => _selectMood('😄'),
                   ),
                   const SizedBox(width: 6),
                   _MoodEmojiButton(
-                    emoji: '🤩',
+                    moodKey: '🤩',
+                    icon: Icons.auto_awesome_rounded,
                     isSelected: _selectedMood == '🤩',
                     onTap: () => _selectMood('🤩'),
                   ),
@@ -454,12 +471,14 @@ class _MoodCardState extends State<_MoodCard> {
 }
 
 class _MoodEmojiButton extends StatelessWidget {
-  final String emoji;
+  final String moodKey;
+  final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _MoodEmojiButton({
-    required this.emoji,
+    required this.moodKey,
+    required this.icon,
     required this.isSelected,
     required this.onTap,
   });
@@ -503,9 +522,10 @@ class _MoodEmojiButton extends StatelessWidget {
                   : null,
             ),
             child: Center(
-              child: Text(
-                emoji,
-                style: TextStyle(fontSize: isSelected ? 18 : 16),
+              child: Icon(
+                icon,
+                size: isSelected ? 18 : 16,
+                color: Colors.white,
               ),
             ),
           ),
@@ -941,7 +961,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                                 child: Center(
                                   child: widget.iconWidget ?? Text(
                                     widget.icon,
-                                    style: TextStyle(fontSize: iconFont),
+                                    style: TextStyle(fontSize: iconFont, fontFamilyFallback: const ['Apple Color Emoji']),
                                   ),
                                 ),
                               ),

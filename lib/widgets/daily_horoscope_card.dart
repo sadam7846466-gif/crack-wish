@@ -114,7 +114,7 @@ class DailyHoroscopeCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _StatItem(
-                      emoji: '💕',
+                      icon: Icons.favorite_rounded,
                       label: l10n.zodiacLove,
                       value: 0.8,
                     ),
@@ -122,7 +122,7 @@ class DailyHoroscopeCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatItem(
-                      emoji: '💼',
+                      icon: Icons.work_rounded,
                       label: l10n.zodiacCareer,
                       value: 0.9,
                     ),
@@ -130,7 +130,7 @@ class DailyHoroscopeCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatItem(
-                      emoji: '💰',
+                      icon: Icons.savings_rounded,
                       label: l10n.zodiacMoney,
                       value: 0.7,
                     ),
@@ -146,12 +146,12 @@ class DailyHoroscopeCard extends StatelessWidget {
 }
 
 class _StatItem extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
   final String label;
   final double value;
 
   const _StatItem({
-    required this.emoji,
+    required this.icon,
     required this.label,
     required this.value,
   });
@@ -163,7 +163,7 @@ class _StatItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 14)),
+            Icon(icon, size: 14, color: AppColors.textWhite70),
             const SizedBox(width: 4),
             Text(
               label,

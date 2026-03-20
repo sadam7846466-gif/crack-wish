@@ -315,15 +315,25 @@ class _HomePageState extends State<HomePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.homeGreeting,
-              style: const TextStyle(
-                color: AppColors.textWhite,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                height: 1.2,
-                fontFamilyFallback: ['Apple Color Emoji'],
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.homeGreeting.replaceAll('👋', '').trimRight(),
+                  style: const TextStyle(
+                    color: AppColors.textWhite,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.waving_hand_rounded,
+                  size: 20,
+                  color: AppColors.textWhite,
+                ),
+              ],
             ),
             const SizedBox(height: 2),
             Text(

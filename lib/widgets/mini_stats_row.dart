@@ -73,7 +73,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     {'emoji': '☥', 'image': 'assets/images/talismans/talisman_08.webp', 'tr': 'Ankh', 'en': 'Ankh',
      'descTr': 'Yaşam enerjisi ve sonsuzluk simgesi. Bugün hayat gücün dorukta.',
      'descEn': 'Symbol of life energy and eternity. Your vitality peaks today.'},
-    {'emoji': '𓂀', 'image': 'assets/images/talismans/talisman_09.webp', 'tr': 'Horus\'un Gözü', 'en': 'Eye of Horus',
+    {'emoji': '👁️', 'image': 'assets/images/talismans/talisman_09.webp', 'tr': 'Horus\'un Gözü', 'en': 'Eye of Horus',
      'descTr': 'Bilgelik ve koruma gözü üzerinde. Gerçekleri bugün daha net göreceksin.',
      'descEn': 'The eye of wisdom and protection watches over you. You will see truths more clearly today.'},
     {'emoji': '🐞', 'image': 'assets/images/talismans/talisman_10.webp', 'tr': 'Uğur Böceği', 'en': 'Ladybug',
@@ -237,6 +237,20 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     }
   }
 
+  Widget _themeIconWidget(int index) {
+    switch (index) {
+      case 0:
+        return const Icon(Icons.favorite_rounded, size: 16, color: Colors.white);
+      case 1:
+        return const Icon(Icons.savings_rounded, size: 16, color: Colors.white);
+      case 2:
+        return const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white);
+      case 3:
+      default:
+        return const Icon(Icons.spa_rounded, size: 16, color: Colors.white);
+    }
+  }
+
   void _openOverlay(int index) {
     HapticFeedback.lightImpact();
 
@@ -351,7 +365,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
         width: 22,
         height: 22,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 20)),
+        errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji'])),
       );
     }
 
@@ -366,7 +380,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
           width: 26,
           height: 26,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Text(talisman['emoji']!, style: const TextStyle(fontSize: 16)),
+          errorBuilder: (_, __, ___) => Text(talisman['emoji']!, style: const TextStyle(fontSize: 16, fontFamilyFallback: ['Apple Color Emoji'])),
         ),
       );
     }
@@ -378,6 +392,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
           child: _MiniStatCard(
             key: _key0,
             icon: theme['emoji']!,
+            iconWidget: _themeIconWidget(_themeIndex),
             label: l10n.statTheme,
             onTap: () => _openOverlay(0),
           ),
@@ -570,11 +585,11 @@ class _StatOverlayState extends State<_StatOverlay>
                   child: Image.asset(
                     widget.imagePath!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 40)),
+                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 40, fontFamilyFallback: ['Apple Color Emoji'])),
                   ),
                 )
               else
-                Text(widget.emoji, style: const TextStyle(fontSize: 44)),
+                Text(widget.emoji, style: const TextStyle(fontSize: 44, fontFamilyFallback: ['Apple Color Emoji'])),
               const SizedBox(height: 12),
               Text(
                 widget.title,
@@ -708,7 +723,7 @@ class _MiniStatCardState extends State<_MiniStatCard>
                           width: 24,
                           height: 24,
                           child: Center(
-                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
+                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16, fontFamilyFallback: ['Apple Color Emoji'])),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -752,7 +767,7 @@ class _MiniStatCardState extends State<_MiniStatCard>
                           width: 24,
                           height: 24,
                           child: Center(
-                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16)),
+                            child: widget.iconWidget ?? Text(widget.icon, style: const TextStyle(fontSize: 16, fontFamilyFallback: ['Apple Color Emoji'])),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -1526,12 +1541,12 @@ class _CookieGridItemState extends State<_CookieGridItem>
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stack) => const Text(
                           '🥠',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji']),
                         ),
                       )
                     : const Text(
                         '🥠',
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji']),
                       ),
               ),
             ),
