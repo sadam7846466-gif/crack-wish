@@ -254,7 +254,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       child: SingleChildScrollView(
         key: ValueKey(_activeSection),
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
         child: _sectionWidget(),
       ),
     );
@@ -438,36 +438,36 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   gradient: RadialGradient(
                     colors: [
                       Colors.transparent,
-                      _crimson.withOpacity(0.02 + pulse * 0.015),
-                      _crimson.withOpacity(0.05 + pulse * 0.02),
+                      const Color(0xFFE8DCC8).withOpacity(0.03 + pulse * 0.015),
+                      const Color(0xFFE8DCC8).withOpacity(0.06 + pulse * 0.02),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.6, 0.8, 1.0],
                   ),
                 ),
               ))),
-              // Katman 2: Dekoratif halka — ince altın daire
+              // Katman 2: Dekoratif halka — ince cream daire
               Positioned.fill(child: Center(child: Container(
                 width: 230,
                 height: 230,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: _gold.withOpacity(0.06 + pulse * 0.04),
+                    color: const Color(0xFFE8DCC8).withOpacity(0.10 + pulse * 0.04),
                     width: 0.5,
                   ),
                 ),
               ))),
-              // Katman 3: İç halka — kesikli altın
+              // Katman 3: İç halka — kesikli cream
               Positioned.fill(child: Center(child: CustomPaint(
                 size: const Size(210, 210),
                 painter: _AuraRingPainter(
-                  color: _gold.withOpacity(0.08 + pulse * 0.06),
+                  color: const Color(0xFFE8DCC8).withOpacity(0.10 + pulse * 0.06),
                   dashCount: 36,
                   radius: 105,
                 ),
               ))),
-              // Katman 4: Kırmızı iç radyal glow
+              // Katman 4: Koyu iç radyal glow — derinlik
               Positioned.fill(child: Center(child: Container(
                 width: 180 + pulse * 6,
                 height: 180 + pulse * 6,
@@ -475,9 +475,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      _crimson.withOpacity(0.12 + pulse * 0.05),
-                      _crimson.withOpacity(0.04),
-                      _gold.withOpacity(0.02),
+                      const Color(0xFF0A0505).withOpacity(0.35 + pulse * 0.05),
+                      const Color(0xFF0A0505).withOpacity(0.18),
+                      Colors.transparent,
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.35, 0.6, 1.0],
@@ -495,7 +495,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     width: 6, height: 6,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _gold.withOpacity(0.15 + pulse * 0.15),
+                      color: const Color(0xFFE8DCC8).withOpacity(0.20 + pulse * 0.15),
                       boxShadow: [
                         BoxShadow(
                           color: _gold.withOpacity(0.1 + pulse * 0.1),
@@ -540,12 +540,27 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           );
         },
       )),
-      const SizedBox(height: 2),
-      // Yıllar
-      Center(child: Text(a['years'] as String, textAlign: TextAlign.center,
-        style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 11))),
+      const SizedBox(height: 10),
+      // Yıllar — tıklanabilir
+      Center(child: GestureDetector(
+        onTap: _showYearPicker,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _gold.withOpacity(0.12)),
+            color: _gold.withOpacity(0.04),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(a['years'] as String, textAlign: TextAlign.center,
+              style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 11)),
+            const SizedBox(width: 6),
+            Icon(Icons.edit_outlined, size: 11, color: _gold.withOpacity(0.3)),
+          ]),
+        ),
+      )),
 
-      const SizedBox(height: 40),
+      const SizedBox(height: 24),
 
       // ── Birleşik Profil Kartı — Tag'ler + Dönen Alıntılar ──
       Builder(builder: (_) {
@@ -678,10 +693,81 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 gradient: LinearGradient(colors: [Colors.transparent, _accent.withOpacity(0.12), Colors.transparent]),
               )),
             ),
-            // Güçlü & Gelişim — kompakt tag'ler
-            Wrap(spacing: 6, runSpacing: 6, children: [
-              ...strengths.take(4).map((s) => _traitTag(s, const Color(0xFFCBB270))),
-              ...weaknesses.take(3).map((w) => _traitTag(w, const Color(0xFFB85C5C))),
+            // Güçlü & Gelişim — iki sütun karşılaşma
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Sol — Güçlü yönler
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.shield_outlined, size: 12, color: const Color(0xFFCBB270).withOpacity(0.6)),
+                  const SizedBox(width: 5),
+                  Text('Güçlü Yönler', style: TextStyle(
+                    color: const Color(0xFFCBB270).withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1,
+                  )),
+                ]),
+                const SizedBox(height: 8),
+                ...strengths.take(4).toList().asMap().entries.map((e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Row(children: [
+                    Container(
+                      width: 16, height: 16,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFCBB270).withOpacity(0.08),
+                      ),
+                      child: Center(child: Text('${e.key + 1}', style: TextStyle(
+                        color: const Color(0xFFCBB270).withOpacity(0.5), fontSize: 8, fontWeight: FontWeight.w700,
+                      ))),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(e.value, style: TextStyle(
+                      color: Colors.white.withOpacity(0.65), fontSize: 11, fontWeight: FontWeight.w500,
+                    ))),
+                  ]),
+                )),
+              ])),
+              // Orta — ayırıcı çizgi
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  width: 0.5, height: 85,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: [Colors.white.withOpacity(0.08), Colors.transparent],
+                    ),
+                  ),
+                ),
+              ),
+              // Sağ — Gelişim alanları
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Icon(Icons.trending_up_rounded, size: 12, color: const Color(0xFFB85C5C).withOpacity(0.6)),
+                  const SizedBox(width: 5),
+                  Text('Gelişim Alanı', style: TextStyle(
+                    color: const Color(0xFFB85C5C).withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1,
+                  )),
+                ]),
+                const SizedBox(height: 8),
+                ...weaknesses.take(3).toList().asMap().entries.map((e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Row(children: [
+                    Container(
+                      width: 16, height: 16,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFB85C5C).withOpacity(0.08),
+                      ),
+                      child: Center(child: Text('${e.key + 1}', style: TextStyle(
+                        color: const Color(0xFFB85C5C).withOpacity(0.5), fontSize: 8, fontWeight: FontWeight.w700,
+                      ))),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(e.value, style: TextStyle(
+                      color: Colors.white.withOpacity(0.65), fontSize: 11, fontWeight: FontWeight.w500,
+                    ))),
+                  ]),
+                )),
+              ])),
             ]),
             ]),
           ),
@@ -694,7 +780,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         Row(children: [
           SizedBox(width: 22, height: 22, child: CustomPaint(painter: _CareerIconPainter(color: _gold))),
           const SizedBox(width: 8),
-          const Text('Kariyer Haritası', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const Text('Kariyer Haritası', style: TextStyle(color: Color(0xFFE8DCC8), fontSize: 18, fontWeight: FontWeight.w700)),
         ]),
         const SizedBox(height: 14),
         // Tavsiye — editöryal alıntı stili
@@ -1067,21 +1153,26 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final good = (a['goodMatch'] as List<int>);
     final bad = (a['conflict'] as List<int>);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 12),
       // Aşk & İlişki — 💌 Aşk Mektubu
-      Container(
+      ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           gradient: LinearGradient(
             begin: Alignment.topCenter, end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF2A1A10).withOpacity(0.9),
-              const Color(0xFF1E1210).withOpacity(0.95),
-              const Color(0xFF2A1515).withOpacity(0.9),
+              Colors.white.withOpacity(0.08),
+              Colors.white.withOpacity(0.03),
+              const Color(0xFF2A1515).withOpacity(0.15),
             ],
           ),
           border: Border.all(color: const Color(0xFF8B6914).withOpacity(0.2), width: 0.5),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 30, offset: const Offset(0, 12)),
+            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 30, offset: const Offset(0, 12)),
           ],
         ),
         child: Stack(children: [
@@ -1125,15 +1216,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 child: const Icon(Icons.favorite_rounded, color: Color(0xFFD4A017), size: 24),
               ),
               const SizedBox(height: 14),
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFFD4A017), Color(0xFFF5D78E), Color(0xFFD4A017)],
-                ).createShader(bounds),
-                child: const Text('Aşk & İlişki', style: TextStyle(
-                  color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300,
-                  letterSpacing: 3.0,
-                )),
-              ),
+              const Text('Aşk & İlişki', style: TextStyle(
+                color: Color(0xFFE8DCC8), fontSize: 22, fontWeight: FontWeight.w300,
+                letterSpacing: 3.0,
+              )),
               const SizedBox(height: 16),
               Row(children: [
                 Expanded(child: Container(height: 0.5, decoration: BoxDecoration(
@@ -1174,6 +1260,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           ),
         ]),
       ),
+      ),
+      ),
       const SizedBox(height: 20),
       // ── Burç Uyum — Podium Sıralama ──
       ClipRRect(
@@ -1188,14 +1276,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.12), width: 0.5),
             ),
             child: Column(children: [
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFFD4A017), Color(0xFFF5D78E), Color(0xFFD4A017)],
-                ).createShader(bounds),
-                child: const Text('Burç Uyum Haritası', style: TextStyle(
-                  color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 1,
-                )),
-              ),
+              const Text('Burç Uyum Haritası', style: TextStyle(
+                color: Color(0xFFE8DCC8), fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 1,
+              )),
               const SizedBox(height: 4),
               Text('${a['name']} burcunun en uyumlu burçları', style: TextStyle(
                 color: Colors.white.withOpacity(0.4), fontSize: 12, fontStyle: FontStyle.italic,
@@ -1227,42 +1310,52 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   Colors.transparent, const Color(0xFFD4A017).withOpacity(0.15), Colors.transparent,
                 ]),
               )),
-              // ── İYİ UYUM — kart stili ──
+              // ── İYİ UYUM — panel stili ──
               if (good.length > 1) ...[
                 const SizedBox(height: 14),
-                Row(children: [
-                  Icon(Icons.lightbulb_outline_rounded, color: const Color(0xFFD4A017).withOpacity(0.5), size: 14),
-                  const SizedBox(width: 6),
-                  Text('Aklınızda Bulunsun', style: TextStyle(color: const Color(0xFFD4A017).withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Text('Alternatif bir seçenek', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 9, fontStyle: FontStyle.italic)),
-                ]),
-                const SizedBox(height: 10),
-                ...good.sublist(1).map((i) {
-                  final gAnimal = ChineseZodiacData.animals[i];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: const Color(0xFFD4A017).withOpacity(0.03),
-                      border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.1), width: 0.5),
-                    ),
-                    child: Row(children: [
-                      _animalIcon(i, 42),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(gAnimal['name'] as String, style: TextStyle(
-                          color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w700,
-                        )),
-                        const SizedBox(height: 2),
-                        Text('Yolunuza çıkarsa fırsatı kaçırmayın', style: TextStyle(
-                          color: Colors.white.withOpacity(0.3), fontSize: 10, fontStyle: FontStyle.italic,
-                        )),
-                      ])),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFD4A017).withOpacity(0.03),
+                    border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.1), width: 0.5),
+                  ),
+                  child: Column(children: [
+                    Row(children: [
+                      Icon(Icons.lightbulb_outline_rounded, color: const Color(0xFFD4A017).withOpacity(0.5), size: 14),
+                      const SizedBox(width: 6),
+                      Text('Aklınızda Bulunsun', style: TextStyle(color: const Color(0xFFD4A017).withOpacity(0.6), fontSize: 12, fontWeight: FontWeight.w700)),
+                      const Spacer(),
+                      Text('Alternatif bir seçenek', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 9, fontStyle: FontStyle.italic)),
                     ]),
-                  );
-                }),
+                    const SizedBox(height: 10),
+                    ...good.sublist(1).map((i) {
+                      final gAnimal = ChineseZodiacData.animals[i];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color(0xFFD4A017).withOpacity(0.03),
+                          border: Border.all(color: const Color(0xFFD4A017).withOpacity(0.08), width: 0.5),
+                        ),
+                        child: Row(children: [
+                          _animalIcon(i, 42),
+                          const SizedBox(width: 12),
+                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(gAnimal['name'] as String, style: TextStyle(
+                              color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w700,
+                            )),
+                            const SizedBox(height: 2),
+                            Text('Yolunuza çıkarsa fırsatı kaçırmayın', style: TextStyle(
+                              color: Colors.white.withOpacity(0.3), fontSize: 10, fontStyle: FontStyle.italic,
+                            )),
+                          ])),
+                        ]),
+                      );
+                    }),
+                  ]),
+                ),
               ],
               // ── ZORLAYICI — ✗ çarpı işaretli ──
               const SizedBox(height: 14),
@@ -1298,120 +1391,454 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         ),
       ),
       const SizedBox(height: 20),
-      // ── Detaylı Uyum Tablosu — Seçimli ──
-      _secHead('📊', 'Detaylı Uyum Tablosu'),
-      const SizedBox(height: 6),
-      Text('Merak ettiğin burca dokun ✨', style: TextStyle(
-        color: Colors.white.withOpacity(0.3), fontSize: 11, fontStyle: FontStyle.italic,
-      )),
-      const SizedBox(height: 14),
-      // Hayvan seçim gridi — 2 satır 6 sütun
-      ...List.generate(2, (row) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Row(children: List.generate(6, (col) {
-          final i = row * 6 + col;
-          if (i == _animalIdx) {
-            return Expanded(child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: Opacity(opacity: 0.15, child: _animalIcon(i, 36)),
-            ));
-          }
-          Color borderC;
-          if (best.contains(i)) borderC = const Color(0xFFE91E63);
-          else if (good.contains(i)) borderC = const Color(0xFFD4A017);
-          else if (bad.contains(i)) borderC = const Color(0xFFFF3D00);
-          else borderC = const Color(0xFF78909C);
-          final selected = _selectedCompat == i;
-          return Expanded(child: GestureDetector(
-            onTap: () => setState(() => _selectedCompat = selected ? -1 : i),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: selected ? borderC.withOpacity(0.1) : Colors.transparent,
-                border: Border.all(
-                  color: selected ? borderC.withOpacity(0.5) : borderC.withOpacity(0.12),
-                  width: selected ? 1.5 : 0.5,
-                ),
-              ),
-              child: _animalIcon(i, 36),
-            ),
-          ));
-        })),
-      )),
-      // Detay paneli — seçiliyse göster
-      if (_selectedCompat >= 0 && _selectedCompat != _animalIdx) ...[
-        const SizedBox(height: 6),
-        Builder(builder: (ctx) {
-          final si = _selectedCompat;
-          final other = ChineseZodiacData.animals[si];
-          int score; Color c; String label; String desc;
-          if (best.contains(si)) {
-            score = 95; c = const Color(0xFFE91E63); label = 'Mükemmel Uyum';
-            desc = 'Bu burçla aranızda derin bir bağ var. Birbirini tamamlayan enerjiler güçlü bir çekim yaratır.';
-          } else if (good.contains(si)) {
-            score = 75; c = const Color(0xFFD4A017); label = 'İyi Uyum';
-            desc = 'Doğal bir uyum ve anlayış mevcut. Birlikte geçirilen zaman keyifli ve verimli olur.';
-          } else if (bad.contains(si)) {
-            score = 35; c = const Color(0xFFFF3D00); label = 'Zorlayıcı';
-            desc = 'Bu ilişki sabır ve anlayış gerektirir. Farklılıklar sürtüşmeye yol açabilir ama büyümeyi de sağlar.';
-          } else {
-            score = 60; c = const Color(0xFF78909C); label = 'Nötr';
-            desc = 'Standart bir ilişki. Büyük çatışma yok ama özel bir çekim de hissedilmez.';
-          }
-          return Container(
-            padding: const EdgeInsets.all(16),
+      // ── Detaylı Uyum Tablosu — Premium Tasarım ──
+      ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(18, 22, 18, 22),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: c.withOpacity(0.04),
-              border: Border.all(color: c.withOpacity(0.15)),
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.10),
+                  Colors.white.withOpacity(0.04),
+                  _crimson.withOpacity(0.03),
+                ],
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.6),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 30, offset: const Offset(0, 12)),
+              ],
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Başlık
               Row(children: [
-                _animalIcon(si, 50),
-                const SizedBox(width: 14),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(other['name'] as String, style: TextStyle(
-                    color: Colors.white.withOpacity(0.9), fontSize: 16, fontWeight: FontWeight.w700,
-                  )),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: c.withOpacity(0.12),
-                    ),
-                    child: Text(label, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700)),
-                  ),
-                ])),
-                // Skor
-                Column(children: [
-                  Text('$score', style: TextStyle(color: c, fontSize: 28, fontWeight: FontWeight.w800, height: 1)),
-                  Text('puan', style: TextStyle(color: c.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w600)),
-                ]),
+                SizedBox(width: 22, height: 22, child: CustomPaint(painter: _CompatChartIconPainter(color: _gold))),
+                const SizedBox(width: 10),
+                const Text('Detaylı Uyum Tablosu', style: TextStyle(
+                  color: Color(0xFFE8DCC8), fontSize: 18, fontWeight: FontWeight.w700,
+                )),
               ]),
-              const SizedBox(height: 12),
-              // Progress bar
-              ClipRRect(borderRadius: BorderRadius.circular(3), child: Stack(children: [
-                Container(height: 4, decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(3),
-                )),
-                FractionallySizedBox(widthFactor: score / 100, child: Container(
-                  height: 4, decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    gradient: LinearGradient(colors: [c.withOpacity(0.4), c]),
-                    boxShadow: [BoxShadow(color: c.withOpacity(0.3), blurRadius: 6)],
-                  ),
-                )),
-              ])),
-              const SizedBox(height: 12),
-              Text(desc, style: TextStyle(
-                color: Colors.white.withOpacity(0.45), fontSize: 12, height: 1.5,
+              const SizedBox(height: 6),
+              Text('Merak ettiğin burca dokun ✨', style: TextStyle(
+                color: _gold.withOpacity(0.4), fontSize: 11, fontStyle: FontStyle.italic,
               )),
+              const SizedBox(height: 16),
+              // Hayvan seçim gridi — 2 satır 6 sütun
+              ...List.generate(2, (row) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(children: List.generate(6, (col) {
+                  final i = row * 6 + col;
+                  Color borderC;
+                  if (i == _animalIdx) borderC = _gold;
+                  else if (best.contains(i)) borderC = const Color(0xFFC4A0AD);
+                  else if (good.contains(i)) borderC = const Color(0xFFB8AD8E);
+                  else if (bad.contains(i)) borderC = const Color(0xFF7B6B8A);
+                  else borderC = const Color(0xFF8E99A4);
+                  final selected = _selectedCompat == i;
+                  final isMe = i == _animalIdx;
+                  return Expanded(child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedCompat = selected ? -1 : i),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: selected ? borderC.withOpacity(0.12) : (isMe ? _gold.withOpacity(0.04) : Colors.transparent),
+                          border: Border.all(
+                            color: selected ? borderC.withOpacity(0.6) : (isMe ? _gold.withOpacity(0.18) : borderC.withOpacity(0.12)),
+                            width: selected ? 1.5 : (isMe ? 0.8 : 0.5),
+                          ),
+                          boxShadow: selected ? [
+                            BoxShadow(color: borderC.withOpacity(0.2), blurRadius: 12, spreadRadius: -2),
+                          ] : null,
+                        ),
+                        child: _animalIcon(i, 36, opacity: selected ? 1.0 : (isMe ? 0.7 : 0.55)),
+                      ),
+                    ),
+                  ));
+                })),
+              )),
+              // Renk gösterge çubuğu
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 2),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  _legendDot(_gold, 'Ben'),
+                  const SizedBox(width: 10),
+                  _legendDot(const Color(0xFFC4A0AD), 'Mükemmel'),
+                  const SizedBox(width: 12),
+                  _legendDot(const Color(0xFFB8AD8E), 'İyi'),
+                  const SizedBox(width: 12),
+                  _legendDot(const Color(0xFF6B9B9B), 'Nötr'),
+                  const SizedBox(width: 12),
+                  _legendDot(const Color(0xFF7B6B8A), 'Zorlayıcı'),
+                ]),
+              ),
+              // ── Detay paneli — seçiliyse göster ──
+              if (_selectedCompat >= 0) ...[
+                const SizedBox(height: 16),
+                // Dekoratif ayırıcı
+                Container(height: 0.5, decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Colors.transparent, _gold.withOpacity(0.2), Colors.transparent,
+                  ]),
+                )),
+                const SizedBox(height: 16),
+                Builder(builder: (ctx) {
+                  final si = _selectedCompat;
+                  final me = _animal;
+                  final other = ChineseZodiacData.animals[si];
+                  final myEl = me['fixedElement'] as String;
+                  final otherEl = other['fixedElement'] as String;
+                  final myTraits = (me['traits'] as List<String>);
+                  final otherTraits = (other['traits'] as List<String>);
+                  int baseScore; Color c; String label; String desc; String advice;
+                  if (si == _animalIdx) {
+                    baseScore = 100; c = Colors.white; label = 'Kendinle Uyum';
+                    desc = 'Kendini tanımak en büyük güçtür. Aynı enerjinin iki yansıması — güçlü yanlarını da zayıf yanlarını da biliyorsun.';
+                    advice = 'Kendine karşı dürüst ve şefkatli ol. En derin bağ, kendinle kurduğun bağdır. Güçlü yanlarını kutla, zayıf yanlarını kucakla.';
+                  } else if (best.contains(si)) {
+                    baseScore = 95; c = const Color(0xFFC4A0AD); label = 'Mükemmel Uyum';
+                    desc = 'Bu burçla aranızda derin bir bağ var. Birbirini tamamlayan enerjiler güçlü bir çekim yaratır.';
+                    advice = 'Bu eşsiz bağı korumak için birbirinize zaman ayırın. Enerjileriniz doğal olarak örtüşüyor — bunu kutlayın ve birlikte büyüyün.';
+                  } else if (good.contains(si)) {
+                    baseScore = 78; c = const Color(0xFFB8AD8E); label = 'İyi Uyum';
+                    desc = 'Doğal bir uyum ve anlayış mevcut. Birlikte geçirilen zaman keyifli ve verimli olur.';
+                    advice = 'İlişkinizi derinleştirmek için ortak hobiler keşfedin. Doğal uyumunuz güçlü — küçük jestlerle büyük anlar yaratabilirsiniz.';
+                  } else if (bad.contains(si)) {
+                    baseScore = 35; c = const Color(0xFF7B6B8A); label = 'Zorlayıcı';
+                    desc = 'Bu ilişki sabır ve anlayış gerektirir. Farklılıklar büyümeyi de sağlar.';
+                    advice = 'Sabır anahtarınız olsun. Farklılıklarınızı tehdit değil, zenginlik olarak görün. En güçlü bağlar zorlukları aşarak kurulur.';
+                  } else {
+                    baseScore = 58; c = const Color(0xFF6B9B9B); label = 'Nötr';
+                    desc = 'Standart bir ilişki. Büyük çatışma yok ama özel bir çekim de hissedilmez.';
+                    advice = 'Bu ilişkiye bilinçli emek verin. Ortak noktalar keşfettikçe bağınız güçlenebilir. Önyargısız yaklaşın.';
+                  }
+                  // Kategori puanları — base'den türetilmiş
+                  final seed = (_animalIdx * 13 + si * 7) % 20;
+                  final loveScore = (baseScore + (seed % 10) - 3).clamp(15, 100);
+                  final friendScore = (baseScore + ((seed + 5) % 12) - 4).clamp(15, 100);
+                  final workScore = (baseScore + ((seed + 3) % 8) - 2).clamp(15, 100);
+                  final commScore = (baseScore + ((seed + 7) % 14) - 6).clamp(15, 100);
+                  final avgScore = ((loveScore + friendScore + workScore + commScore) / 4).round();
+
+                  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    // ── Hero: İki burç karşı karşıya ──
+                    Center(child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      // Sol — kullanıcının burcu
+                      Column(children: [
+                        Container(
+                          width: 72, height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [_crimson.withOpacity(0.15), Colors.transparent],
+                            ),
+                            border: Border.all(color: _gold.withOpacity(0.15), width: 0.5),
+                          ),
+                          child: Center(child: _animalIcon(_animalIdx, 52)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(me['name'] as String, style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600,
+                        )),
+                      ]),
+                      // Orta — Skor dairesi
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(children: [
+                          Stack(alignment: Alignment.center, children: [
+                            SizedBox(width: 64, height: 64, child: CircularProgressIndicator(
+                              value: avgScore / 100,
+                              strokeWidth: 3.5,
+                              backgroundColor: Colors.white.withOpacity(0.06),
+                              valueColor: AlwaysStoppedAnimation(c),
+                              strokeCap: StrokeCap.round,
+                            )),
+                            Column(mainAxisSize: MainAxisSize.min, children: [
+                              Text('$avgScore', style: TextStyle(
+                                color: c, fontSize: 22, fontWeight: FontWeight.w800, height: 1,
+                              )),
+                              Text('puan', style: TextStyle(
+                                color: c.withOpacity(0.5), fontSize: 8, fontWeight: FontWeight.w600,
+                              )),
+                            ]),
+                          ]),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: c.withOpacity(0.12),
+                              border: Border.all(color: c.withOpacity(0.25), width: 0.5),
+                            ),
+                            child: Text(label, style: TextStyle(
+                              color: c, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.3,
+                            )),
+                          ),
+                        ]),
+                      ),
+                      // Sağ — seçilen burç
+                      Column(children: [
+                        Container(
+                          width: 72, height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [c.withOpacity(0.15), Colors.transparent],
+                            ),
+                            border: Border.all(color: c.withOpacity(0.2), width: 0.5),
+                          ),
+                          child: Center(child: _animalIcon(si, 52)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(other['name'] as String, style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600,
+                        )),
+                      ]),
+                    ])),
+                    const SizedBox(height: 20),
+                    // ── Açıklama ──
+                    Center(child: Text(desc, textAlign: TextAlign.center, style: TextStyle(
+                      color: Colors.white.withOpacity(0.45), fontSize: 12, height: 1.6,
+                      fontStyle: FontStyle.italic,
+                    ))),
+                    const SizedBox(height: 20),
+                    // Dekoratif ayırıcı
+                    Container(height: 0.5, decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.transparent, c.withOpacity(0.15), Colors.transparent,
+                      ]),
+                    )),
+                    const SizedBox(height: 18),
+                    // ── Kategoriler — 4'lü uyum detayı ──
+                    Text('Uyum Detayları', style: TextStyle(
+                      color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5,
+                    )),
+                    const SizedBox(height: 14),
+                    _compatCategory('Aşk & Romantizm', loveScore, c, _CompatCatType.love),
+                    const SizedBox(height: 12),
+                    _compatCategory('Dostluk & Sadakat', friendScore, c, _CompatCatType.friend),
+                    const SizedBox(height: 12),
+                    _compatCategory('İş & Kariyer', workScore, c, _CompatCatType.work),
+                    const SizedBox(height: 12),
+                    _compatCategory('İletişim & Anlayış', commScore, c, _CompatCatType.comm),
+                    const SizedBox(height: 20),
+                    // Dekoratif ayırıcı
+                    Container(height: 0.5, decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.transparent, c.withOpacity(0.15), Colors.transparent,
+                      ]),
+                    )),
+                    const SizedBox(height: 18),
+                    // ── Element Karşılaştırması ──
+                    Text('Element Etkileşimi', style: TextStyle(
+                      color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5,
+                    )),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white.withOpacity(0.03),
+                        border: Border.all(color: Colors.white.withOpacity(0.06), width: 0.5),
+                      ),
+                      child: Row(children: [
+                        // Sol element
+                        Expanded(child: Column(children: [
+                          Text(
+                            ChineseZodiacData.elements[myEl]!['emoji'] as String,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(myEl, style: TextStyle(
+                            color: Color(ChineseZodiacData.elements[myEl]!['color'] as int).withOpacity(0.8),
+                            fontSize: 13, fontWeight: FontWeight.w700,
+                          )),
+                          Text(me['name'] as String, style: TextStyle(
+                            color: Colors.white.withOpacity(0.3), fontSize: 10,
+                          )),
+                        ])),
+                        // Ortadaki ok / bağ
+                        Column(children: [
+                          SizedBox(
+                            width: 40, height: 20,
+                            child: CustomPaint(painter: _ElementBondPainter(
+                              leftColor: Color(ChineseZodiacData.elements[myEl]!['color'] as int),
+                              rightColor: Color(ChineseZodiacData.elements[otherEl]!['color'] as int),
+                            )),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _elementRelationLabel(myEl, otherEl),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.45), fontSize: 9,
+                              fontWeight: FontWeight.w700, letterSpacing: 0.3,
+                            ),
+                          ),
+                        ]),
+                        // Sağ element
+                        Expanded(child: Column(children: [
+                          Text(
+                            ChineseZodiacData.elements[otherEl]!['emoji'] as String,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(otherEl, style: TextStyle(
+                            color: Color(ChineseZodiacData.elements[otherEl]!['color'] as int).withOpacity(0.8),
+                            fontSize: 13, fontWeight: FontWeight.w700,
+                          )),
+                          Text(other['name'] as String, style: TextStyle(
+                            color: Colors.white.withOpacity(0.3), fontSize: 10,
+                          )),
+                        ])),
+                      ]),
+                    ),
+                    // Açıklayıcı cümle
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        _elementRelationDesc(myEl, otherEl),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.35), fontSize: 11,
+                          height: 1.5, fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Dekoratif ayırıcı
+                    Container(height: 0.5, decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.transparent, c.withOpacity(0.15), Colors.transparent,
+                      ]),
+                    )),
+                    const SizedBox(height: 18),
+                    // ── Karakter Karşılaştırması — Trait Tag'ler ──
+                    Text('Karakter Karşılaştırması', style: TextStyle(
+                      color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.5,
+                    )),
+                    const SizedBox(height: 12),
+                    // VS karşılaşma düzeni
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      // Sol — kullanıcının özellikleri
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                        Text(me['name'] as String, style: TextStyle(
+                          color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w700,
+                        )),
+                        const SizedBox(height: 8),
+                        ...myTraits.take(4).map((t) => Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.white.withOpacity(0.04),
+                              border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                            ),
+                            child: Text(t, style: TextStyle(
+                              color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600,
+                            )),
+                          ),
+                        )),
+                      ])),
+                      // Orta — VS çizgisi
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Column(children: [
+                          const SizedBox(height: 2),
+                          Container(
+                            width: 28, height: 28,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.04),
+                              border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                            ),
+                            child: Center(child: Text('VS', style: TextStyle(
+                              color: Colors.white.withOpacity(0.25), fontSize: 8,
+                              fontWeight: FontWeight.w800, letterSpacing: 0.5,
+                            ))),
+                          ),
+                          Container(
+                            width: 0.5, height: 80,
+                            margin: const EdgeInsets.only(top: 6),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                                colors: [Colors.white.withOpacity(0.08), Colors.transparent],
+                              ),
+                            ),
+                          ),
+                        ]),
+                      ),
+                      // Sağ — karşı tarafın özellikleri
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(other['name'] as String, style: TextStyle(
+                          color: c.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.w700,
+                        )),
+                        const SizedBox(height: 8),
+                        ...otherTraits.take(4).map((t) => Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: c.withOpacity(0.05),
+                              border: Border.all(color: c.withOpacity(0.12), width: 0.5),
+                            ),
+                            child: Text(t, style: TextStyle(
+                              color: c.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w600,
+                            )),
+                          ),
+                        )),
+                      ])),
+                    ]),
+                    const SizedBox(height: 20),
+                    // Dekoratif ayırıcı
+                    Container(height: 0.5, decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.transparent, c.withOpacity(0.15), Colors.transparent,
+                      ]),
+                    )),
+                    const SizedBox(height: 16),
+                    // ── Tavsiye Bölümü ──
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      // Sol dekoratif çizgi
+                      Container(
+                        width: 2, height: 50,
+                        margin: const EdgeInsets.only(top: 2, right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(1),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                            colors: [c.withOpacity(0.5), c.withOpacity(0.05)],
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('İlişki Tavsiyesi', style: TextStyle(
+                          color: c.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5,
+                        )),
+                        const SizedBox(height: 6),
+                        Text(advice, style: TextStyle(
+                          color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.6,
+                          fontStyle: FontStyle.italic,
+                        )),
+                      ])),
+                    ]),
+                  ]);
+                }),
+              ],
             ]),
-          );
-        }),
-      ],
+          ),
+        ),
+      ),
     ]);
   }
 
@@ -1419,10 +1846,23 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final now = DateTime.now();
     final fortune = ChineseZodiacData.getDayFortune(_animalIdx, now);
     final c = fortune['color'] as Color;
+    final mood = fortune['mood'] as Map<String, String>;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Günlük şans
+      const SizedBox(height: 12),
+
+      // ── 1) Kozmik Fısıltı — Mistik mesaj ──
+      SizedBox(height: 140, child: _glass(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text('✦', style: TextStyle(fontSize: 28, color: _goldL.withOpacity(0.8))),
+        const SizedBox(height: 8),
+        Text(fortune['whisper'] as String, textAlign: TextAlign.center,
+          style: TextStyle(color: _goldL.withOpacity(0.9), fontSize: 15, fontStyle: FontStyle.italic, height: 1.5)),
+      ])))),
+
+      const SizedBox(height: 16),
+
+      // ── 2) Günlük Şans Puanı (Ana kart) ──
       _glass(child: Column(children: [
-        Text(fortune['emoji'] as String, style: const TextStyle(fontSize: 50)),
+        SizedBox(width: 60, height: 60, child: CustomPaint(painter: _FortuneIconPainter(level: fortune['level'] as String, color: c))),
         const SizedBox(height: 8),
         ShaderMask(
           shaderCallback: (b) => LinearGradient(colors: [c, c.withOpacity(0.6)]).createShader(b),
@@ -1438,7 +1878,99 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         const SizedBox(height: 16),
         Text(fortune['advice'] as String, textAlign: TextAlign.center, style: _bodyStyle()),
       ])),
-      const SizedBox(height: 20),
+
+      const SizedBox(height: 16),
+
+      // ── 3) Ruh Hali Tahmini ──
+      _glass(child: Row(children: [
+        Container(
+          width: 50, height: 50,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(colors: [c.withOpacity(0.3), c.withOpacity(0.05)]),
+          ),
+          child: CustomPaint(painter: _MoodIconPainter(mood: mood['mood']!, color: c)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Bugünkü Ruh Halin', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, letterSpacing: 0.5)),
+          const SizedBox(height: 2),
+          Text(mood['mood']!, style: TextStyle(color: _goldL, fontSize: 18, fontWeight: FontWeight.w700)),
+          Text(mood['desc']!, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+        ])),
+      ])),
+
+      const SizedBox(height: 16),
+
+      // ── 4) Enerji Ritmi — Dalga Grafiği ──
+      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.bolt, color: _goldL.withOpacity(0.7), size: 18),
+          const SizedBox(width: 6),
+          Text('Enerji Ritmin', style: TextStyle(color: _goldL, fontSize: 15, fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 120,
+          width: double.infinity,
+          child: CustomPaint(
+            painter: _EnergyWavePainter(
+              morning: fortune['morningEnergy'] as double,
+              afternoon: fortune['afternoonEnergy'] as double,
+              evening: fortune['eveningEnergy'] as double,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          _energyLabel('Sabah', fortune['morningEnergy'] as double, const Color(0xFFFFB74D)),
+          _energyLabel('Öğle', fortune['afternoonEnergy'] as double, const Color(0xFFFF8A65)),
+          _energyLabel('Akşam', fortune['eveningEnergy'] as double, const Color(0xFF9575CD)),
+        ]),
+      ])),
+
+      const SizedBox(height: 16),
+
+      // ── 5) Yap / Yapma ──
+      Row(children: [
+        Expanded(child: _glass(child: Column(children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF4CAF50).withOpacity(0.15),
+              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3)),
+            ),
+            child: const Icon(Icons.check, color: Color(0xFF4CAF50), size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text('YAP', style: TextStyle(color: const Color(0xFF4CAF50).withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1)),
+          const SizedBox(height: 4),
+          Text(fortune['doAdvice'] as String, textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.3)),
+        ]))),
+        const SizedBox(width: 12),
+        Expanded(child: _glass(child: Column(children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _crimson.withOpacity(0.15),
+              border: Border.all(color: _crimson.withOpacity(0.3)),
+            ),
+            child: Icon(Icons.close, color: _crimson.withOpacity(0.8), size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text('YAPMA', style: TextStyle(color: _crimson.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1)),
+          const SizedBox(height: 4),
+          Text(fortune['dontAdvice'] as String, textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.3)),
+        ]))),
+      ]),
+
+      const SizedBox(height: 16),
+
+      // ── 6) Şanslı Saat & Aktivite ──
       Row(children: [
         Expanded(child: _glass(child: Column(children: [
           const Text('🕐', style: TextStyle(fontSize: 24)),
@@ -1454,7 +1986,31 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           Text(fortune['luckyActivity'] as String, style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
         ]))),
       ]),
+
+      const SizedBox(height: 16),
+
+      // ── 7) Günün Meydan Okuması ──
+      _glass(child: Row(children: [
+        Container(
+          width: 44, height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(colors: [_gold.withOpacity(0.2), _crimson.withOpacity(0.15)]),
+            border: Border.all(color: _gold.withOpacity(0.2)),
+          ),
+          child: Icon(Icons.flag_outlined, color: _goldL.withOpacity(0.8), size: 22),
+        ),
+        const SizedBox(width: 14),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Günün Meydan Okuması', style: TextStyle(color: _goldL.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+          const SizedBox(height: 3),
+          Text(fortune['challenge'] as String, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.4)),
+        ])),
+      ])),
+
       const SizedBox(height: 20),
+
+      // ── 9) Şanslı Sayılar & Renkler ──
       _secHead('🔢', 'Şanslı Sayılar'),
       const SizedBox(height: 10),
       Wrap(spacing: 10, children: (_animal['luckyNumbers'] as List<int>).map((n) =>
@@ -1464,6 +2020,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       _secHead('🎨', 'Şanslı Renkler'),
       const SizedBox(height: 10),
       Wrap(spacing: 10, runSpacing: 10, children: (_animal['luckyColors'] as List<String>).map((c) => _chip(c)).toList()),
+    ]);
+  }
+
+  Widget _energyLabel(String label, double value, Color c) {
+    return Column(children: [
+      Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: c)),
+      const SizedBox(height: 4),
+      Text(label, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10)),
+      Text('${(value * 100).toInt()}%', style: TextStyle(color: c, fontSize: 13, fontWeight: FontWeight.w700)),
     ]);
   }
 
@@ -1595,6 +2160,82 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ]),
   );
 
+  // Uyum tablosu — Gösterge noktası
+  Widget _legendDot(Color c, String label) => Row(mainAxisSize: MainAxisSize.min, children: [
+    Container(width: 6, height: 6, decoration: BoxDecoration(
+      shape: BoxShape.circle, color: c.withOpacity(0.6),
+    )),
+    const SizedBox(width: 4),
+    Text(label, style: TextStyle(
+      color: Colors.white.withOpacity(0.3), fontSize: 9, fontWeight: FontWeight.w500,
+    )),
+  ]);
+
+  // Uyum tablosu — Kategori satırı
+  Widget _compatCategory(String label, int score, Color c, _CompatCatType type) {
+    IconData icon;
+    switch (type) {
+      case _CompatCatType.love: icon = Icons.favorite_rounded; break;
+      case _CompatCatType.friend: icon = Icons.people_rounded; break;
+      case _CompatCatType.work: icon = Icons.work_rounded; break;
+      case _CompatCatType.comm: icon = Icons.chat_bubble_rounded; break;
+    }
+    return Row(children: [
+      Icon(icon, color: c.withOpacity(0.5), size: 14),
+      const SizedBox(width: 8),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(label, style: TextStyle(
+            color: Colors.white.withOpacity(0.55), fontSize: 11, fontWeight: FontWeight.w600,
+          )),
+          const Spacer(),
+          Text('$score%', style: TextStyle(
+            color: c.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w700,
+          )),
+        ]),
+        const SizedBox(height: 5),
+        ClipRRect(borderRadius: BorderRadius.circular(2), child: Stack(children: [
+          Container(height: 3.5, decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06), borderRadius: BorderRadius.circular(2),
+          )),
+          FractionallySizedBox(widthFactor: score / 100, child: Container(
+            height: 3.5, decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2),
+              gradient: LinearGradient(colors: [c.withOpacity(0.3), c.withOpacity(0.8)]),
+              boxShadow: [BoxShadow(color: c.withOpacity(0.2), blurRadius: 4)],
+            ),
+          )),
+        ])),
+      ])),
+    ]);
+  }
+
+  // Element ilişki — kısa etiket
+  String _elementRelationLabel(String a, String b) {
+    if (a == b) return 'Kardeş Ruh';
+    final elData = ChineseZodiacData.elements[a]!;
+    if (elData['generates'] == b) return 'Besleyici Bağ';
+    if (elData['controls'] == b) return 'Yönlendirici Güç';
+    if (elData['weakenedBy'] == b) return 'Dengeleyici Güç';
+    final bData = ChineseZodiacData.elements[b]!;
+    if (bData['generates'] == a) return 'Besleyici Bağ';
+    if (bData['controls'] == a) return 'Yönlendirici Güç';
+    return 'Bağımsız Akış';
+  }
+
+  // Element ilişki — açıklayıcı cümle
+  String _elementRelationDesc(String a, String b) {
+    if (a == b) return 'İkiniz de aynı enerjiden besleniyor. Birbirinizi sözlere gerek kalmadan anlıyorsunuz — bu nadir bir bağdır.';
+    final elData = ChineseZodiacData.elements[a]!;
+    if (elData['generates'] == b) return 'Senin varlığın onu güçlendiriyor, yanında olduğunda daha iyi hissediyor. Doğal bir destek kaynağısın.';
+    if (elData['controls'] == b) return 'Senin bakış açın ona yön veriyor. Farkında olmadan onu etkiliyorsun — bu hem güç hem de sorumluluk.';
+    if (elData['weakenedBy'] == b) return 'Bu ilişkide bazen kendini yorgun hissedebilirsin. Dengeyi korumak biraz çaba istiyor ama karşılığı var.';
+    final bData = ChineseZodiacData.elements[b]!;
+    if (bData['generates'] == a) return 'Onun varlığı seni güçlendiriyor, yanında olduğunda daha enerjik hissediyorsun. Doğal bir destek kaynağın.';
+    if (bData['controls'] == a) return 'Onun fikirleri ve duruşu seni yönlendiriyor. Bu etki seni büyütür — eğer açık olabilirsen.';
+    return 'İkiniz farklı dünyalardan geliyor. Birbirinizi keşfetmek zaman alır ama sürprizlerle dolu olabilir.';
+  }
+
   // Motto
   String _getAnimalMotto(int idx) => const [
     'Gecenin en karanlık anında bile yolunu bulan, dünyayı sessizce yeniden şekillendiren ruhtur. Küçük adımlar, büyük imparatorluklar kurar.',
@@ -1687,7 +2328,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   Widget _secHead(String emoji, String title) => Row(children: [
     Text(emoji, style: const TextStyle(fontSize: 18)),
     const SizedBox(width: 8),
-    Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+    Text(title, style: const TextStyle(color: Color(0xFFE8DCC8), fontSize: 18, fontWeight: FontWeight.w700)),
   ]);
 
   Widget _miniHead(String emoji, String title) => Row(children: [
@@ -2214,14 +2855,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ]);
   }
 
-  Widget _legendDot(String label, Color c) => Row(children: [
-    Container(width: 6, height: 6, decoration: BoxDecoration(
-      shape: BoxShape.circle, color: c,
-      boxShadow: [BoxShadow(color: c.withOpacity(0.4), blurRadius: 4)],
-    )),
-    const SizedBox(width: 4),
-    Text(label, style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 9, fontWeight: FontWeight.w600)),
-  ]);
+
 
   Widget _fengShuiCard(String emoji, String label, String value) => Container(
     margin: const EdgeInsets.only(bottom: 10),
@@ -2256,70 +2890,65 @@ class _YinYangBgPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Derin siyah temel (Yin tarafı)
-    canvas.drawRect(Rect.fromLTWH(0, 0, w, h),
-      Paint()..color = const Color(0xFF06060A));
-
-    // ── Yang tarafı: S-eğrisi ile bölünen kırmızı yarı ──
-    // Klasik Yin-Yang: sağ üst kırmızı, S kıvrımıyla sol alta geçiyor
-    final yangPath = Path()
-      ..moveTo(w, 0)              // Sağ üst köşe
-      ..lineTo(w * 0.5, 0)        // Üst ortaya gel
-      // S-eğrisi: üstten ortaya sağa kıvrılarak
-      ..cubicTo(
-        w * 1.1, h * 0.12,       // Sağa doğru şişen kontrol noktası
-        w * 1.05, h * 0.35,      // Sağda kalmaya devam
-        w * 0.5, h * 0.5,        // Tam ortaya
-      )
-      // S-eğrisi: ortadan alta sola kıvrılarak
-      ..cubicTo(
-        w * -0.05, h * 0.65,     // Sola doğru şişen kontrol noktası
-        w * -0.1, h * 0.88,      // Solda kalmaya devam
-        w * 0.5, h,              // Alt ortaya
-      )
-      ..lineTo(w, h)             // Sağ alt köşe
-      ..close();                 // Kapanış
-
-    // Yang dolgusu — zengin kırmızı gradient (merkezi parlak, kenarlara doğru koyu)
-    canvas.drawPath(yangPath, Paint()
+    // Crisis Red arka plan (Yang tarafı — tüm ekran)
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), Paint()
       ..shader = RadialGradient(
-        center: const Alignment(0.4, -0.2),
-        radius: 1.3,
+        center: const Alignment(0.0, -0.3),
+        radius: 1.4,
         colors: [
-          const Color(0xFFEF4444).withOpacity(0.22),
-          const Color(0xFFDC2626).withOpacity(0.14),
-          const Color(0xFFB91C1C).withOpacity(0.06),
+          const Color(0xFFBC211F).withOpacity(0.28),
+          const Color(0xFFA81C1A).withOpacity(0.18),
+          const Color(0xFF901510).withOpacity(0.08),
         ],
         stops: const [0, 0.4, 1],
       ).createShader(Rect.fromLTWH(0, 0, w, h)));
 
-    // İkinci katman — daha yoğun çekirdek (sağ üstte)
-    canvas.drawPath(yangPath, Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(0.6, -0.5),
-        radius: 0.8,
-        colors: [
-          const Color(0xFFEF4444).withOpacity(0.12),
-          Colors.transparent,
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, w, h)));
-
-    // ── S-eğrisi kenarı boyunca yumuşak kırmızı glow ──
-    final glowPath = Path()
-      ..moveTo(w * 0.5, 0)
+    // ── Yin tarafı: S-eğrisi aşağıya kaydırılmış ──
+    final yinPath = Path()
+      ..moveTo(w, 0)
+      ..lineTo(w * 0.55, 0)
       ..cubicTo(
-        w * 1.1, h * 0.12,
-        w * 1.05, h * 0.35,
-        w * 0.5, h * 0.5,
+        w * 1.1, h * 0.18,
+        w * 1.05, h * 0.42,
+        w * 0.5, h * 0.58,
       )
       ..cubicTo(
-        w * -0.05, h * 0.65,
-        w * -0.1, h * 0.88,
+        w * -0.05, h * 0.72,
+        w * -0.1, h * 0.92,
+        w * 0.5, h,
+      )
+      ..lineTo(w, h)
+      ..close();
+
+    // Yin dolgusu — derin siyah
+    canvas.drawPath(yinPath, Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0.4, -0.2),
+        radius: 1.3,
+        colors: [
+          const Color(0xFF06060A).withOpacity(0.97),
+          const Color(0xFF06060A).withOpacity(0.90),
+          const Color(0xFF06060A).withOpacity(0.78),
+        ],
+        stops: const [0, 0.5, 1],
+      ).createShader(Rect.fromLTWH(0, 0, w, h)));
+
+    // ── S-eğrisi kenarı boyunca yumuşak glow ──
+    final glowPath = Path()
+      ..moveTo(w * 0.55, 0)
+      ..cubicTo(
+        w * 1.1, h * 0.18,
+        w * 1.05, h * 0.42,
+        w * 0.5, h * 0.58,
+      )
+      ..cubicTo(
+        w * -0.05, h * 0.72,
+        w * -0.1, h * 0.92,
         w * 0.5, h,
       );
     // Geniş blur glow
     canvas.drawPath(glowPath, Paint()
-      ..color = const Color(0xFFDC2626).withOpacity(0.08)
+      ..color = const Color(0xFFBC211F).withOpacity(0.10)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 60
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 30));
@@ -3026,32 +3655,37 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                 // ─ Dekoratif çizgi ─
                 _ornamentalLine(),
 
-                // ─ Dönen alıntı ─
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, anim) => FadeTransition(
-                    opacity: anim,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: Offset(_slideForward ? 0.06 : -0.06, 0),
-                        end: Offset.zero,
-                      ).animate(anim),
-                      child: child,
-                    ),
-                  ),
-                  child: Text(
-                    widget.quotes[_idx],
-                    key: ValueKey(_idx),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.italic,
-                      height: 1.65,
-                      letterSpacing: 0.2,
+                // ─ Dönen alıntı — sabit alan ─
+                SizedBox(
+                  height: 85,
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeIn,
+                      transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: Offset(_slideForward ? 0.06 : -0.06, 0),
+                            end: Offset.zero,
+                          ).animate(anim),
+                          child: child,
+                        ),
+                      ),
+                      child: Text(
+                        widget.quotes[_idx],
+                        key: ValueKey(_idx),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.75),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.italic,
+                          height: 1.65,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -3590,4 +4224,699 @@ class _AnimalIconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Uyum tablosu kategorileri
+enum _CompatCatType { love, friend, work, comm }
+
+// Detaylı Uyum Tablosu — Özel grafik ikonu
+class _CompatChartIconPainter extends CustomPainter {
+  final Color color;
+  _CompatChartIconPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    final pf = Paint()
+      ..color = color.withOpacity(0.15)
+      ..style = PaintingStyle.fill;
+    final w = size.width;
+    final h = size.height;
+    // Çubuk grafik — 3 bar
+    final barW = w * 0.18;
+    // Bar 1 (sol, kısa)
+    final b1 = RRect.fromLTRBR(w * 0.1, h * 0.55, w * 0.1 + barW, h * 0.85, const Radius.circular(2));
+    canvas.drawRRect(b1, pf);
+    canvas.drawRRect(b1, p);
+    // Bar 2 (orta, uzun)
+    final b2 = RRect.fromLTRBR(w * 0.38, h * 0.2, w * 0.38 + barW, h * 0.85, const Radius.circular(2));
+    canvas.drawRRect(b2, pf);
+    canvas.drawRRect(b2, p);
+    // Bar 3 (sağ, orta)
+    final b3 = RRect.fromLTRBR(w * 0.66, h * 0.4, w * 0.66 + barW, h * 0.85, const Radius.circular(2));
+    canvas.drawRRect(b3, pf);
+    canvas.drawRRect(b3, p);
+    // Alt çizgi
+    canvas.drawLine(Offset(w * 0.05, h * 0.88), Offset(w * 0.95, h * 0.88), p..strokeWidth = 1.0);
+    // Trend çizgisi
+    final trend = Path()
+      ..moveTo(w * 0.15, h * 0.52)
+      ..quadraticBezierTo(w * 0.4, h * 0.12, w * 0.75, h * 0.35);
+    canvas.drawPath(trend, Paint()
+      ..color = color.withOpacity(0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round);
+    // Trend noktaları
+    canvas.drawCircle(Offset(w * 0.15, h * 0.52), 2, Paint()..color = color.withOpacity(0.6));
+    canvas.drawCircle(Offset(w * 0.75, h * 0.35), 2, Paint()..color = color.withOpacity(0.6));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Element bağı çizgisi painter
+class _ElementBondPainter extends CustomPainter {
+  final Color leftColor;
+  final Color rightColor;
+  _ElementBondPainter({required this.leftColor, required this.rightColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cy = h / 2;
+    // Gradient çizgi
+    final p = Paint()
+      ..shader = LinearGradient(
+        colors: [leftColor.withOpacity(0.6), rightColor.withOpacity(0.6)],
+      ).createShader(Rect.fromLTWH(0, 0, w, h))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    // Dalgalı bağ çizgisi
+    final path = Path()
+      ..moveTo(0, cy)
+      ..cubicTo(w * 0.3, cy - 6, w * 0.7, cy + 6, w, cy);
+    canvas.drawPath(path, p);
+    // Uç noktalar
+    canvas.drawCircle(Offset(2, cy), 2.5, Paint()..color = leftColor.withOpacity(0.5));
+    canvas.drawCircle(Offset(w - 2, cy), 2.5, Paint()..color = rightColor.withOpacity(0.5));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Günlük Şans İkonu ──
+class _FortuneIconPainter extends CustomPainter {
+  final String level;
+  final Color color;
+  _FortuneIconPainter({required this.level, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.4;
+
+    switch (level) {
+      case 'Çok Şanslı':
+        _drawStarBurst(canvas, cx, cy, r);
+        break;
+      case 'Şanslı':
+        _drawRisingSun(canvas, cx, cy, r);
+        break;
+      case 'Normal':
+        _drawBalance(canvas, cx, cy, r);
+        break;
+      case 'Dikkatli Ol':
+        _drawMysticEye(canvas, cx, cy, r);
+        break;
+      case 'Riskli':
+        _drawStorm(canvas, cx, cy, r);
+        break;
+    }
+  }
+
+  void _drawStarBurst(Canvas canvas, double cx, double cy, double r) {
+    canvas.drawCircle(Offset(cx, cy), r * 1.1, Paint()
+      ..color = color.withOpacity(0.12)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12));
+    final path = Path();
+    for (int i = 0; i < 8; i++) {
+      final angle = (i * math.pi / 4) - math.pi / 2;
+      final outerR = i % 2 == 0 ? r : r * 0.45;
+      final x = cx + outerR * math.cos(angle);
+      final y = cy + outerR * math.sin(angle);
+      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+    }
+    path.close();
+    canvas.drawPath(path, Paint()
+      ..shader = RadialGradient(colors: [color, color.withOpacity(0.4)])
+        .createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r)));
+    canvas.drawPath(path, Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 1);
+    canvas.drawCircle(Offset(cx, cy), r * 0.15, Paint()..color = color);
+  }
+
+  void _drawRisingSun(Canvas canvas, double cx, double cy, double r) {
+    canvas.drawCircle(Offset(cx, cy + r * 0.1), r * 0.6, Paint()
+      ..color = color.withOpacity(0.1)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10));
+    canvas.drawLine(Offset(cx - r, cy + r * 0.2), Offset(cx + r, cy + r * 0.2), Paint()
+      ..color = color.withOpacity(0.3)..strokeWidth = 1);
+    final sunRect = Rect.fromCircle(center: Offset(cx, cy + r * 0.2), radius: r * 0.55);
+    canvas.drawArc(sunRect, math.pi, math.pi, true, Paint()
+      ..shader = RadialGradient(colors: [color, color.withOpacity(0.3)]).createShader(sunRect));
+    for (int i = 0; i < 7; i++) {
+      final angle = math.pi + (i * math.pi / 6) - math.pi / 12;
+      canvas.drawLine(
+        Offset(cx + r * 0.65 * math.cos(angle), cy + r * 0.2 + r * 0.65 * math.sin(angle)),
+        Offset(cx + r * 0.95 * math.cos(angle), cy + r * 0.2 + r * 0.95 * math.sin(angle)),
+        Paint()..color = color.withOpacity(0.5)..strokeWidth = 1.5..strokeCap = StrokeCap.round);
+    }
+  }
+
+  void _drawBalance(Canvas canvas, double cx, double cy, double r) {
+    final paint = Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.stroke..strokeWidth = 1.5;
+    canvas.drawLine(Offset(cx, cy - r * 0.5), Offset(cx, cy + r * 0.5), paint);
+    canvas.drawLine(Offset(cx - r * 0.7, cy - r * 0.5), Offset(cx + r * 0.7, cy - r * 0.5), paint);
+    final basePath = Path()
+      ..moveTo(cx - r * 0.18, cy + r * 0.5)
+      ..lineTo(cx + r * 0.18, cy + r * 0.5)
+      ..lineTo(cx, cy + r * 0.3)
+      ..close();
+    canvas.drawPath(basePath, Paint()..color = color.withOpacity(0.15));
+    canvas.drawPath(basePath, paint);
+    final leftArc = Rect.fromCircle(center: Offset(cx - r * 0.7, cy - r * 0.35), radius: r * 0.2);
+    canvas.drawArc(leftArc, 0, math.pi, false, paint);
+    canvas.drawCircle(Offset(cx - r * 0.7, cy - r * 0.5), 2.5, Paint()..color = color.withOpacity(0.6));
+    final rightArc = Rect.fromCircle(center: Offset(cx + r * 0.7, cy - r * 0.35), radius: r * 0.2);
+    canvas.drawArc(rightArc, 0, math.pi, false, paint);
+    canvas.drawCircle(Offset(cx + r * 0.7, cy - r * 0.5), 2.5, Paint()..color = color.withOpacity(0.6));
+  }
+
+  void _drawMysticEye(Canvas canvas, double cx, double cy, double r) {
+    canvas.drawCircle(Offset(cx, cy), r * 0.5, Paint()
+      ..color = color.withOpacity(0.08)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+    final eyePath = Path()
+      ..moveTo(cx - r, cy)
+      ..quadraticBezierTo(cx, cy - r * 0.65, cx + r, cy)
+      ..quadraticBezierTo(cx, cy + r * 0.65, cx - r, cy)
+      ..close();
+    canvas.drawPath(eyePath, Paint()..color = color.withOpacity(0.1));
+    canvas.drawPath(eyePath, Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+    canvas.drawCircle(Offset(cx, cy), r * 0.28, Paint()
+      ..shader = RadialGradient(colors: [color, color.withOpacity(0.2)])
+        .createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.28)));
+    canvas.drawCircle(Offset(cx, cy), r * 0.12, Paint()..color = const Color(0xFF0A0A0F));
+    canvas.drawCircle(Offset(cx - r * 0.06, cy - r * 0.08), r * 0.05, Paint()..color = Colors.white.withOpacity(0.7));
+  }
+
+  void _drawStorm(Canvas canvas, double cx, double cy, double r) {
+    final cloudPath = Path();
+    cloudPath.addOval(Rect.fromCenter(center: Offset(cx - r * 0.2, cy - r * 0.35), width: r * 0.7, height: r * 0.45));
+    cloudPath.addOval(Rect.fromCenter(center: Offset(cx + r * 0.2, cy - r * 0.3), width: r * 0.8, height: r * 0.5));
+    cloudPath.addOval(Rect.fromCenter(center: Offset(cx, cy - r * 0.45), width: r * 0.6, height: r * 0.4));
+    canvas.drawPath(cloudPath, Paint()..color = color.withOpacity(0.2));
+    final bolt = Path()
+      ..moveTo(cx + r * 0.05, cy - r * 0.1)
+      ..lineTo(cx - r * 0.12, cy + r * 0.15)
+      ..lineTo(cx + r * 0.02, cy + r * 0.12)
+      ..lineTo(cx - r * 0.08, cy + r * 0.5)
+      ..lineTo(cx + r * 0.12, cy + r * 0.08)
+      ..lineTo(cx - r * 0.02, cy + r * 0.1)
+      ..close();
+    canvas.drawPath(bolt, Paint()..color = color.withOpacity(0.8));
+    canvas.drawPath(bolt, Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 1);
+    for (int i = 0; i < 3; i++) {
+      final dx = cx - r * 0.35 + i * r * 0.35;
+      final dy = cy + r * 0.3 + i * r * 0.12;
+      canvas.drawLine(Offset(dx, dy), Offset(dx - r * 0.05, dy + r * 0.12), Paint()
+        ..color = color.withOpacity(0.3)..strokeWidth = 1..strokeCap = StrokeCap.round);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _FortuneIconPainter old) => old.level != level || old.color != color;
+}
+
+// ── Ruh Hali İkonu ──
+class _MoodIconPainter extends CustomPainter {
+  final String mood;
+  final Color color;
+  _MoodIconPainter({required this.mood, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.32;
+    final p = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 1.8..strokeCap = StrokeCap.round;
+
+    switch (mood) {
+      case 'Enerjik': _drawFlame(canvas, cx, cy, r, p); break;
+      case 'Huzurlu': _drawMoon(canvas, cx, cy, r, p); break;
+      case 'Yaratıcı': _drawBulb(canvas, cx, cy, r, p); break;
+      case 'Sosyal': _drawPeople(canvas, cx, cy, r, p); break;
+      case 'Düşünceli': _drawThought(canvas, cx, cy, r, p); break;
+      case 'Maceracı': _drawMountain(canvas, cx, cy, r, p); break;
+      case 'Romantik': _drawHearts(canvas, cx, cy, r, p); break;
+      case 'Kararlı': _drawDiamond(canvas, cx, cy, r, p); break;
+      case 'Neşeli': _drawSun(canvas, cx, cy, r, p); break;
+      case 'Odaklı': _drawTarget(canvas, cx, cy, r, p); break;
+      case 'Şefkatli': _drawHands(canvas, cx, cy, r, p); break;
+      case 'Güçlü': _drawShield(canvas, cx, cy, r, p); break;
+    }
+  }
+
+  // ⚡ Enerjik — Zigzag şimşek
+  void _drawFlame(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Glow
+    canvas.drawCircle(Offset(cx, cy), r * 0.5, Paint()
+      ..color = color.withOpacity(0.1)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+
+    final bolt = Path()
+      ..moveTo(cx - r * 0.15, cy - r * 1.0)
+      ..lineTo(cx + r * 0.35, cy - r * 1.0)
+      ..lineTo(cx + r * 0.05, cy - r * 0.15)
+      ..lineTo(cx + r * 0.4, cy - r * 0.15)
+      ..lineTo(cx - r * 0.1, cy + r * 1.0)
+      ..lineTo(cx + r * 0.1, cy + r * 0.1)
+      ..lineTo(cx - r * 0.3, cy + r * 0.1)
+      ..close();
+    canvas.drawPath(bolt, Paint()..color = color.withOpacity(0.6));
+    canvas.drawPath(bolt, p);
+  }
+
+  // 🌙 Huzurlu — Hilal ay + yıldızlar
+  void _drawMoon(Canvas canvas, double cx, double cy, double r, Paint p) {
+    final moon = Path()
+      ..addOval(Rect.fromCircle(center: Offset(cx - r * 0.1, cy), radius: r * 0.7));
+    final cut = Path()
+      ..addOval(Rect.fromCircle(center: Offset(cx + r * 0.3, cy - r * 0.15), radius: r * 0.55));
+    final crescent = Path.combine(PathOperation.difference, moon, cut);
+    canvas.drawPath(crescent, Paint()..color = color.withOpacity(0.3));
+    canvas.drawPath(crescent, p);
+    void star(double sx, double sy, double sr) {
+      canvas.drawCircle(Offset(sx, sy), sr, Paint()..color = color.withOpacity(0.7));
+    }
+    star(cx + r * 0.55, cy - r * 0.5, r * 0.08);
+    star(cx + r * 0.75, cy + r * 0.1, r * 0.06);
+    star(cx + r * 0.35, cy + r * 0.5, r * 0.05);
+  }
+
+  // ✨ Yaratıcı — Kayan yıldız + parıltı izi
+  void _drawBulb(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Ana yıldız glow
+    canvas.drawCircle(Offset(cx + r * 0.3, cy - r * 0.4), r * 0.25, Paint()
+      ..color = color.withOpacity(0.15)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6));
+
+    // 4 kollu yıldız
+    final star = Path();
+    final sX = cx + r * 0.3, sY = cy - r * 0.4, sR = r * 0.35;
+    star.moveTo(sX, sY - sR);
+    star.quadraticBezierTo(sX + sR * 0.12, sY - sR * 0.12, sX + sR, sY);
+    star.quadraticBezierTo(sX + sR * 0.12, sY + sR * 0.12, sX, sY + sR);
+    star.quadraticBezierTo(sX - sR * 0.12, sY + sR * 0.12, sX - sR, sY);
+    star.quadraticBezierTo(sX - sR * 0.12, sY - sR * 0.12, sX, sY - sR);
+    canvas.drawPath(star, Paint()..color = color.withOpacity(0.7));
+
+    // Kayan kuyruk — eğri çizgi
+    final tail = Path()
+      ..moveTo(cx + r * 0.15, cy - r * 0.25)
+      ..cubicTo(cx - r * 0.2, cy + r * 0.1, cx - r * 0.4, cy + r * 0.3, cx - r * 0.7, cy + r * 0.7);
+    canvas.drawPath(tail, Paint()
+      ..color = color.withOpacity(0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round);
+
+    // İz parıltıları
+    canvas.drawCircle(Offset(cx - r * 0.15, cy + r * 0.05), r * 0.05, Paint()..color = color.withOpacity(0.4));
+    canvas.drawCircle(Offset(cx - r * 0.35, cy + r * 0.3), r * 0.04, Paint()..color = color.withOpacity(0.3));
+    canvas.drawCircle(Offset(cx - r * 0.55, cy + r * 0.55), r * 0.03, Paint()..color = color.withOpacity(0.2));
+  }
+
+  // 👥 Sosyal — İki kişi silüeti
+  void _drawPeople(Canvas canvas, double cx, double cy, double r, Paint p) {
+    canvas.drawCircle(Offset(cx - r * 0.35, cy - r * 0.4), r * 0.25, p);
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(cx - r * 0.35, cy + r * 0.35), width: r * 0.8, height: r * 0.9),
+      math.pi, math.pi, false, p);
+    canvas.drawCircle(Offset(cx + r * 0.35, cy - r * 0.4), r * 0.25, p);
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(cx + r * 0.35, cy + r * 0.35), width: r * 0.8, height: r * 0.9),
+      math.pi, math.pi, false, p);
+    canvas.drawCircle(Offset(cx, cy + r * 0.1), r * 0.2, Paint()
+      ..color = color.withOpacity(0.1)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+  }
+
+  // 💭 Düşünceli — Düşünce balonu
+  void _drawThought(Canvas canvas, double cx, double cy, double r, Paint p) {
+    final bubble = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(cx, cy - r * 0.15), width: r * 1.6, height: r * 1.2),
+      Radius.circular(r * 0.5),
+    );
+    canvas.drawRRect(bubble, Paint()..color = color.withOpacity(0.1));
+    canvas.drawRRect(bubble, p);
+    canvas.drawCircle(Offset(cx - r * 0.4, cy + r * 0.55), r * 0.12, Paint()..color = color.withOpacity(0.3));
+    canvas.drawCircle(Offset(cx - r * 0.6, cy + r * 0.75), r * 0.07, Paint()..color = color.withOpacity(0.2));
+    canvas.drawCircle(Offset(cx - r * 0.3, cy - r * 0.15), r * 0.08, Paint()..color = color.withOpacity(0.5));
+    canvas.drawCircle(Offset(cx, cy - r * 0.15), r * 0.08, Paint()..color = color.withOpacity(0.5));
+    canvas.drawCircle(Offset(cx + r * 0.3, cy - r * 0.15), r * 0.08, Paint()..color = color.withOpacity(0.5));
+  }
+
+  // ⛰ Maceracı — Geliştirilmiş dağ + bayrak
+  void _drawMountain(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Uzak dağ silüeti
+    final farMt = Path()
+      ..moveTo(cx + r * 0.1, cy + r * 0.7)
+      ..lineTo(cx + r * 0.45, cy - r * 0.3)
+      ..lineTo(cx + r * 0.55, cy - r * 0.15)
+      ..lineTo(cx + r * 0.7, cy - r * 0.4)
+      ..lineTo(cx + r * 1.0, cy + r * 0.7)
+      ..close();
+    canvas.drawPath(farMt, Paint()..color = color.withOpacity(0.08));
+    canvas.drawPath(farMt, Paint()..color = color.withOpacity(0.15)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+
+    // Ana dağ — sırt hattı ile
+    final mt = Path()
+      ..moveTo(cx - r * 0.9, cy + r * 0.7)
+      ..lineTo(cx - r * 0.2, cy - r * 0.6)
+      ..lineTo(cx - r * 0.05, cy - r * 0.45)
+      ..lineTo(cx + r * 0.05, cy - r * 0.65)
+      ..lineTo(cx + r * 0.6, cy + r * 0.7)
+      ..close();
+    canvas.drawPath(mt, Paint()..color = color.withOpacity(0.2));
+    canvas.drawPath(mt, p);
+
+    // Kar örtüsü
+    final snow = Path()
+      ..moveTo(cx - r * 0.2, cy - r * 0.6)
+      ..lineTo(cx - r * 0.05, cy - r * 0.45)
+      ..lineTo(cx + r * 0.05, cy - r * 0.65)
+      ..lineTo(cx + r * 0.15, cy - r * 0.4)
+      ..lineTo(cx - r * 0.05, cy - r * 0.35)
+      ..lineTo(cx - r * 0.3, cy - r * 0.4)
+      ..close();
+    canvas.drawPath(snow, Paint()..color = Colors.white.withOpacity(0.35));
+
+    // Bayrak direği + bayrak
+    final peakX = cx + r * 0.05, peakY = cy - r * 0.65;
+    canvas.drawLine(Offset(peakX, peakY), Offset(peakX, peakY - r * 0.4),
+      Paint()..color = color..strokeWidth = 1.5..strokeCap = StrokeCap.round);
+    final flag = Path()
+      ..moveTo(peakX, peakY - r * 0.4)
+      ..lineTo(peakX + r * 0.3, peakY - r * 0.3)
+      ..lineTo(peakX, peakY - r * 0.2);
+    canvas.drawPath(flag, Paint()..color = color.withOpacity(0.7));
+
+    // Taban çizgisi
+    canvas.drawLine(Offset(cx - r * 0.9, cy + r * 0.7), Offset(cx + r * 1.0, cy + r * 0.7),
+      Paint()..color = color.withOpacity(0.15)..strokeWidth = 0.5);
+  }
+
+  // 💕 Romantik — İç içe kalpler
+  void _drawHearts(Canvas canvas, double cx, double cy, double r, Paint p) {
+    void drawHeart(double hx, double hy, double hr, double opacity) {
+      final h = Path()
+        ..moveTo(hx, hy + hr * 0.5)
+        ..cubicTo(hx - hr * 0.9, hy - hr * 0.05, hx - hr * 0.5, hy - hr * 0.75, hx, hy - hr * 0.25)
+        ..cubicTo(hx + hr * 0.5, hy - hr * 0.75, hx + hr * 0.9, hy - hr * 0.05, hx, hy + hr * 0.5);
+      canvas.drawPath(h, Paint()..color = color.withOpacity(opacity * 0.3));
+      canvas.drawPath(h, Paint()..color = color.withOpacity(opacity)..style = PaintingStyle.stroke..strokeWidth = 1.5..strokeCap = StrokeCap.round);
+    }
+    // Büyük kalp
+    drawHeart(cx - r * 0.1, cy + r * 0.1, r * 0.85, 0.5);
+    // Küçük kalp (biraz sağda ve yukarıda)
+    drawHeart(cx + r * 0.3, cy - r * 0.25, r * 0.5, 0.8);
+    // Parıltı
+    canvas.drawCircle(Offset(cx + r * 0.6, cy - r * 0.5), r * 0.06, Paint()..color = color.withOpacity(0.5));
+    canvas.drawCircle(Offset(cx - r * 0.5, cy - r * 0.6), r * 0.04, Paint()..color = color.withOpacity(0.4));
+  }
+
+  // 🏹 Kararlı — Yukarı ok (engeli aşma)
+  void _drawDiamond(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Engel çizgisi
+    canvas.drawLine(Offset(cx - r * 0.6, cy + r * 0.1), Offset(cx + r * 0.6, cy + r * 0.1),
+      Paint()..color = color.withOpacity(0.2)..strokeWidth = 1.5);
+    // Kırılma efekti
+    canvas.drawLine(Offset(cx - r * 0.15, cy + r * 0.1), Offset(cx - r * 0.25, cy + r * 0.25),
+      Paint()..color = color.withOpacity(0.15)..strokeWidth = 1);
+    canvas.drawLine(Offset(cx + r * 0.15, cy + r * 0.1), Offset(cx + r * 0.25, cy + r * 0.25),
+      Paint()..color = color.withOpacity(0.15)..strokeWidth = 1);
+
+    // Ok gövdesi
+    canvas.drawLine(Offset(cx, cy + r * 0.9), Offset(cx, cy - r * 0.5),
+      Paint()..color = color.withOpacity(0.6)..strokeWidth = 2.2..strokeCap = StrokeCap.round);
+    // Ok ucu
+    final arrow = Path()
+      ..moveTo(cx, cy - r * 0.95)
+      ..lineTo(cx - r * 0.25, cy - r * 0.45)
+      ..lineTo(cx, cy - r * 0.55)
+      ..lineTo(cx + r * 0.25, cy - r * 0.45)
+      ..close();
+    canvas.drawPath(arrow, Paint()..color = color.withOpacity(0.7));
+    canvas.drawPath(arrow, p);
+
+    // Glow yukarıda
+    canvas.drawCircle(Offset(cx, cy - r * 0.7), r * 0.2, Paint()
+      ..color = color.withOpacity(0.1)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6));
+  }
+
+  // ☀️ Neşeli — Güneş
+  void _drawSun(Canvas canvas, double cx, double cy, double r, Paint p) {
+    canvas.drawCircle(Offset(cx, cy), r * 0.5, Paint()
+      ..color = color.withOpacity(0.1)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+    canvas.drawCircle(Offset(cx, cy), r * 0.4, Paint()..color = color.withOpacity(0.25));
+    canvas.drawCircle(Offset(cx, cy), r * 0.4, p);
+    // 8 ışın
+    for (int i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+      canvas.drawLine(
+        Offset(cx + r * 0.55 * math.cos(angle), cy + r * 0.55 * math.sin(angle)),
+        Offset(cx + r * 0.85 * math.cos(angle), cy + r * 0.85 * math.sin(angle)),
+        Paint()..color = color.withOpacity(0.5)..strokeWidth = i % 2 == 0 ? 2.0 : 1.2..strokeCap = StrokeCap.round);
+    }
+    // Gülümseme
+    canvas.drawArc(Rect.fromCenter(center: Offset(cx, cy + r * 0.05), width: r * 0.35, height: r * 0.2),
+      0, math.pi, false, Paint()..color = color.withOpacity(0.4)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+  }
+
+  // 🎯 Odaklı — Hedef tahtası
+  void _drawTarget(Canvas canvas, double cx, double cy, double r, Paint p) {
+    canvas.drawCircle(Offset(cx, cy), r * 0.85, p);
+    canvas.drawCircle(Offset(cx, cy), r * 0.55, Paint()..color = color.withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+    canvas.drawCircle(Offset(cx, cy), r * 0.25, Paint()..color = color.withOpacity(0.4));
+    canvas.drawCircle(Offset(cx, cy), r * 0.1, Paint()..color = color.withOpacity(0.8));
+    // Nişangah çizgileri
+    canvas.drawLine(Offset(cx, cy - r * 0.85), Offset(cx, cy - r * 0.55),
+      Paint()..color = color.withOpacity(0.3)..strokeWidth = 1);
+    canvas.drawLine(Offset(cx, cy + r * 0.85), Offset(cx, cy + r * 0.55),
+      Paint()..color = color.withOpacity(0.3)..strokeWidth = 1);
+    canvas.drawLine(Offset(cx - r * 0.85, cy), Offset(cx - r * 0.55, cy),
+      Paint()..color = color.withOpacity(0.3)..strokeWidth = 1);
+    canvas.drawLine(Offset(cx + r * 0.85, cy), Offset(cx + r * 0.55, cy),
+      Paint()..color = color.withOpacity(0.3)..strokeWidth = 1);
+  }
+
+  // 🤲 Şefkatli — Açık eller
+  void _drawHands(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Merkez glow — sıcaklık
+    canvas.drawCircle(Offset(cx, cy), r * 0.3, Paint()
+      ..color = color.withOpacity(0.12)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8));
+
+    // 5 yaprak — açılan çiçek
+    for (int i = 0; i < 5; i++) {
+      final angle = -math.pi / 2 + i * (2 * math.pi / 5);
+      final px = cx + r * 0.5 * math.cos(angle);
+      final py = cy + r * 0.5 * math.sin(angle);
+      final petal = Path()
+        ..moveTo(cx, cy)
+        ..quadraticBezierTo(
+          cx + r * 0.35 * math.cos(angle - 0.4),
+          cy + r * 0.35 * math.sin(angle - 0.4),
+          px, py)
+        ..quadraticBezierTo(
+          cx + r * 0.35 * math.cos(angle + 0.4),
+          cy + r * 0.35 * math.sin(angle + 0.4),
+          cx, cy);
+      canvas.drawPath(petal, Paint()..color = color.withOpacity(0.12 + i * 0.03));
+      canvas.drawPath(petal, Paint()
+        ..color = color.withOpacity(0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2);
+    }
+
+    // Merkez nokta
+    canvas.drawCircle(Offset(cx, cy), r * 0.12, Paint()..color = color.withOpacity(0.6));
+    canvas.drawCircle(Offset(cx, cy), r * 0.06, Paint()..color = Colors.white.withOpacity(0.5));
+
+    // Dış halka — yayılan enerji
+    canvas.drawCircle(Offset(cx, cy), r * 0.8, Paint()
+      ..color = color.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8);
+  }
+
+  // 👑 Güçlü — Taç
+  void _drawShield(Canvas canvas, double cx, double cy, double r, Paint p) {
+    // Glow
+    canvas.drawCircle(Offset(cx, cy - r * 0.1), r * 0.4, Paint()
+      ..color = color.withOpacity(0.08)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6));
+
+    // Taç gövdesi
+    final crown = Path()
+      ..moveTo(cx - r * 0.7, cy + r * 0.4)
+      ..lineTo(cx - r * 0.7, cy - r * 0.15)
+      ..lineTo(cx - r * 0.35, cy + r * 0.1)
+      ..lineTo(cx, cy - r * 0.7)
+      ..lineTo(cx + r * 0.35, cy + r * 0.1)
+      ..lineTo(cx + r * 0.7, cy - r * 0.15)
+      ..lineTo(cx + r * 0.7, cy + r * 0.4)
+      ..close();
+    canvas.drawPath(crown, Paint()..color = color.withOpacity(0.2));
+    canvas.drawPath(crown, p);
+
+    // Taban bandı
+    final band = RRect.fromRectAndRadius(
+      Rect.fromLTRB(cx - r * 0.7, cy + r * 0.3, cx + r * 0.7, cy + r * 0.55),
+      Radius.circular(r * 0.05),
+    );
+    canvas.drawRRect(band, Paint()..color = color.withOpacity(0.15));
+    canvas.drawRRect(band, p);
+
+    // Mücevherler (tepe noktaları)
+    canvas.drawCircle(Offset(cx, cy - r * 0.55), r * 0.08, Paint()..color = color.withOpacity(0.7));
+    canvas.drawCircle(Offset(cx - r * 0.6, cy - r * 0.05), r * 0.06, Paint()..color = color.withOpacity(0.5));
+    canvas.drawCircle(Offset(cx + r * 0.6, cy - r * 0.05), r * 0.06, Paint()..color = color.withOpacity(0.5));
+
+    // Bant mücevheri
+    canvas.drawCircle(Offset(cx, cy + r * 0.42), r * 0.06, Paint()..color = color.withOpacity(0.5));
+  }
+
+  @override
+  bool shouldRepaint(covariant _MoodIconPainter old) => old.mood != mood || old.color != color;
+}
+
+// ── Enerji Dalga Grafiği ──
+class _EnergyWavePainter extends CustomPainter {
+  final double morning;
+  final double afternoon;
+  final double evening;
+  _EnergyWavePainter({required this.morning, required this.afternoon, required this.evening});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final leftPad = 28.0;
+    final chartW = w - leftPad;
+    final topPad = 4.0;
+    final bottomPad = 18.0;
+    final chartH = h - topPad - bottomPad;
+    final baseline = topPad + chartH;
+
+    final colors = [const Color(0xFFFFB74D), const Color(0xFFFF8A65), const Color(0xFF9575CD)];
+    final labelColor = Colors.white.withOpacity(0.25);
+
+    // ── Y ekseni grid çizgileri + etiketler ──
+    for (int pct = 25; pct <= 100; pct += 25) {
+      final y = baseline - (pct / 100) * chartH;
+      for (double x = leftPad; x < w; x += 5) {
+        canvas.drawLine(Offset(x, y), Offset(x + 2.5, y),
+          Paint()..color = Colors.white.withOpacity(0.05)..strokeWidth = 0.5);
+      }
+      final tp = TextPainter(
+        text: TextSpan(text: '$pct', style: TextStyle(color: labelColor, fontSize: 8)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(canvas, Offset(leftPad - tp.width - 4, y - tp.height / 2));
+    }
+
+    // ── Taban çizgisi ──
+    canvas.drawLine(Offset(leftPad, baseline), Offset(w, baseline),
+      Paint()..color = Colors.white.withOpacity(0.08)..strokeWidth = 0.5);
+
+    // ── X ekseni zaman etiketleri ──
+    final times = ['06:00', '10:00', '14:00', '18:00', '22:00'];
+    for (int i = 0; i < times.length; i++) {
+      final x = leftPad + i * chartW / (times.length - 1);
+      final tp = TextPainter(
+        text: TextSpan(text: times[i], style: TextStyle(color: labelColor, fontSize: 8)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(canvas, Offset(x - tp.width / 2, baseline + 4));
+      canvas.drawLine(Offset(x, baseline), Offset(x, baseline + 3),
+        Paint()..color = Colors.white.withOpacity(0.1)..strokeWidth = 0.5);
+    }
+
+    // ── Kontrol noktaları ──
+    final points = <Offset>[
+      Offset(leftPad, baseline - 0.15 * chartH),
+      Offset(leftPad + chartW * 0.2, baseline - morning * chartH),
+      Offset(leftPad + chartW * 0.5, baseline - afternoon * chartH),
+      Offset(leftPad + chartW * 0.8, baseline - evening * chartH),
+      Offset(w, baseline - 0.1 * chartH),
+    ];
+
+    // Catmull-Rom smooth eğri
+    final wavePath = Path()..moveTo(points[0].dx, points[0].dy);
+    final fillPath = Path()..moveTo(points[0].dx, points[0].dy);
+
+    for (int i = 0; i < points.length - 1; i++) {
+      final p0 = i > 0 ? points[i - 1] : points[i];
+      final p1 = points[i];
+      final p2 = points[i + 1];
+      final p3 = i < points.length - 2 ? points[i + 2] : points[i + 1];
+      final cp1x = p1.dx + (p2.dx - p0.dx) / 6;
+      final cp1y = p1.dy + (p2.dy - p0.dy) / 6;
+      final cp2x = p2.dx - (p3.dx - p1.dx) / 6;
+      final cp2y = p2.dy - (p3.dy - p1.dy) / 6;
+      wavePath.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
+      fillPath.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
+    }
+
+    fillPath.lineTo(w, baseline);
+    fillPath.lineTo(leftPad, baseline);
+    fillPath.close();
+
+    // ── Gradient dolgu ──
+    canvas.drawPath(fillPath, Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [const Color(0xFFFF8A65).withOpacity(0.18), const Color(0xFFFF8A65).withOpacity(0.02)],
+      ).createShader(Rect.fromLTWH(leftPad, topPad, chartW, chartH)));
+
+    // ── Dalga çizgisi ──
+    canvas.drawPath(wavePath, Paint()
+      ..style = PaintingStyle.stroke..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round
+      ..shader = LinearGradient(colors: colors).createShader(Rect.fromLTWH(leftPad, 0, chartW, h)));
+
+    // ── Glow ──
+    canvas.drawPath(wavePath, Paint()
+      ..style = PaintingStyle.stroke..strokeWidth = 8
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
+      ..shader = LinearGradient(colors: colors.map((c) => c.withOpacity(0.15)).toList())
+        .createShader(Rect.fromLTWH(leftPad, 0, chartW, h)));
+
+    // ── Tepe noktaları ──
+    final peakPts = [points[1], points[2], points[3]];
+    final peakVals = [morning, afternoon, evening];
+    for (int i = 0; i < 3; i++) {
+      final pt = peakPts[i];
+      final clr = colors[i];
+      // Dikey kesikli
+      for (double y = pt.dy; y < baseline; y += 4) {
+        canvas.drawLine(Offset(pt.dx, y), Offset(pt.dx, y + 2),
+          Paint()..color = clr.withOpacity(0.12)..strokeWidth = 0.5);
+      }
+      canvas.drawCircle(pt, 7, Paint()..color = clr.withOpacity(0.12)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5));
+      canvas.drawCircle(pt, 4, Paint()..color = clr);
+      canvas.drawCircle(pt, 2, Paint()..color = Colors.white.withOpacity(0.8));
+      // Değer etiketi
+      final tp = TextPainter(
+        text: TextSpan(text: '${(peakVals[i] * 100).toInt()}%',
+          style: TextStyle(color: clr, fontSize: 9, fontWeight: FontWeight.w700)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(canvas, Offset(pt.dx - tp.width / 2, pt.dy - tp.height - 6));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _EnergyWavePainter old) =>
+    old.morning != morning || old.afternoon != afternoon || old.evening != evening;
 }
