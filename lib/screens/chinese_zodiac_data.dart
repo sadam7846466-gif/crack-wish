@@ -343,21 +343,37 @@ class ChineseZodiacData {
     'Domuz için At yılı sosyal ve eğlenceli bir dönemdir. Cömertliğiniz takdir edilir ama bütçenize dikkat edin.',
   ];
 
-  /// Güne göre şans hesapla (basit ama etkili algoritma)
+  /// Güne göre şans hesapla — Güçlü günlük değişim algoritması
   static Map<String, dynamic> getDayFortune(int animalIndex, DateTime date) {
-    final daySeed = date.year * 1000 + date.month * 100 + date.day;
-    final seed = (daySeed * 31 + animalIndex * 137 + animalIndex * animalIndex * 13) % 10007;
-    final rng = ((daySeed + animalIndex * 53) * 41) % 100;
-    int _h(int extra) => ((seed * 31 + extra * 137 + animalIndex * 97) % 10007).abs();
+    // Güçlü seed: her gün + her burç için kesinlikle farklı
+    final dayNum = date.year * 10000 + date.month * 100 + date.day;
+    // Asal sayı tabanlı hash — ardışık günlerde tamamen farklı sonuçlar
+    int _mix(int a, int b) => ((a * 2654435761 + b * 40503) & 0x7FFFFFFF);
+    final baseSeed = _mix(dayNum, animalIndex * 7919 + 104729);
+    // Her extra için benzersiz, günle doğrudan bağlı hash
+    int _h(int extra) => _mix(baseSeed, extra * 15487469 + dayNum * 31);
 
-    // Seviye bazlı tutarlı içerik havuzları
-    String level; String advice; Color color; double eBase;
+    // Şans seviyesi — daha düzgün dağılım
+    final rng = (_h(0) % 100);
+
+    // Seviye bazlı tutarlı içerik havuzları — GENİŞLETİLMİŞ
+    String level; Color color; double eBase;
+    List<String> advicePool;
     List<Map<String, String>> moodPool;
     List<String> affPool, whisperPool, challengePool, doPool, dontPool, activityPool;
 
     if (rng < 15) {
       level = 'Çok Şanslı'; color = const Color(0xFFFFD700); eBase = 0.75;
-      advice = 'Bugün yıldızlar sizden yana! Büyük kararlar almak ve yeni başlangıçlar için ideal bir gün.';
+      advicePool = [
+        'Bugün yıldızlar sizden yana! Büyük kararlar almak ve yeni başlangıçlar için ideal bir gün.',
+        'Kozmik enerji zirve yapıyor — hayallerinizi gerçeğe dönüştürmek için harika bir fırsat.',
+        'Evren bugün size altın kapılar açıyor. Cesaretle ilerleyin, şans yanınızda.',
+        'Bugün her dokunduğunuz altına dönüşebilir. Büyük düşünün ve harekete geçin.',
+        'Yıldızlar sizin için dans ediyor — bu enerjiyi değerlendirin, yarın çok geç olabilir.',
+        'Mucizeler bugün mümkün. Gözlerinizi açın ve evrenden gelen işaretleri takip edin.',
+        'Nadiren bu kadar güçlü bir kozmik destek görüyoruz. Bugün imkansız diye bir şey yok.',
+        'Şans rüzgarları tam arkanızda. Yelkenlerinizi açın ve en uzak limanlara doğru yol alın.',
+      ];
       moodPool = [
         {'mood': 'Enerjik', 'emoji': '⚡', 'desc': 'Yüksek motivasyon ve aksiyon günü'},
         {'mood': 'Yaratıcı', 'emoji': '🎨', 'desc': 'İlham dolu, büyük fikirler doğuyor'},
@@ -366,15 +382,39 @@ class ChineseZodiacData {
         {'mood': 'Güçlü', 'emoji': '🔥', 'desc': 'İçindeki aslan uyanıyor'},
         {'mood': 'Neşeli', 'emoji': '☀️', 'desc': 'Pozitif titreşimler yayıyorsun'},
       ];
-      affPool = ['Bugün evren seninle aynı yöne akıyor.', 'Cesaretinle ışıyorsun — bırak herkes görsün!', 'Bugün fark yaratacak güçtesin, durma.', 'Ruhundaki ateş bugün daha parlak yanıyor.'];
-      whisperPool = ['Yıldızlar fısıldıyor: "Zamanın geldi."', 'Kozmik enerjiler hizalandı — bugün senin günün.', 'Evren senin için büyük kapılar açıyor.', 'Yıldız haritanda bugün parlak bir ışık var.'];
-      challengePool = ['Bugün cesur bir adım at — ertelediğin o şeyi yap', 'Bir hayalini birine sesli söyle', 'Yeni bir şey dene — konfor alanını genişlet', 'Bugünkü en büyük başarını not al ve kutla'];
-      doPool = ['Büyük kararlar al', 'Spontane ol ve akışa bırak', 'Yeni projelere başla', 'Cesur adımlar at'];
-      dontPool = ['Fırsatları kaçırma', 'Küçük düşünme', 'Kendini küçümseme', 'Tereddüt etme'];
-      activityPool = ['Yeni proje', 'Spor', 'Toplantı', 'Keşif'];
+      affPool = [
+        'Bugün evren seninle aynı yöne akıyor.', 'Cesaretinle ışıyorsun — bırak herkes görsün!',
+        'Bugün fark yaratacak güçtesin, durma.', 'Ruhundaki ateş bugün daha parlak yanıyor.',
+        'Sen bir yıldızsın ve bugün en çok parlayan sensin.', 'İçindeki güç dağları yerinden oynatabilir.',
+        'Bugün attığın her adım seni zirveye taşıyor.', 'Evren bugün senin lehine çalışıyor — hisset.',
+      ];
+      whisperPool = [
+        'Yıldızlar fısıldıyor: "Zamanın geldi."', 'Kozmik enerjiler hizalandı — bugün senin günün.',
+        'Evren senin için büyük kapılar açıyor.', 'Yıldız haritanda bugün parlak bir ışık var.',
+        'Kaderin bugün sana gülümsüyor — gülümse sen de.', 'Galaksiler senin için hizalandı — fırsatı yakala.',
+        'Antik yıldızlar diyor: "Bu ruh büyük işler başaracak."', 'Gökyüzü bugün senin adını fısıldıyor.',
+      ];
+      challengePool = [
+        'Bugün cesur bir adım at — ertelediğin o şeyi yap', 'Bir hayalini birine sesli söyle',
+        'Yeni bir şey dene — konfor alanını genişlet', 'Bugünkü en büyük başarını not al ve kutla',
+        'Bugün biri için beklenmedik bir güzellik yap', 'En cesur fikrine bugün bir adım at',
+        'Kendine lüks bir ödül ver — hak ediyorsun', 'Bugün bir liderin tavrıyla hareket et',
+      ];
+      doPool = ['Büyük kararlar al', 'Spontane ol ve akışa bırak', 'Yeni projelere başla', 'Cesur adımlar at', 'Liderlik pozisyonu üstlen', 'Risk al ve kazan', 'Hayallerini paylaş', 'Büyük hamleler yap'];
+      dontPool = ['Fırsatları kaçırma', 'Küçük düşünme', 'Kendini küçümseme', 'Tereddüt etme', 'Başkalarının seni durdurmasına izin verme', 'Güvenini kaybetme', 'Erteleme tuzağına düşme', 'Mükemmeliyetçiliğe takılma'];
+      activityPool = ['Yeni proje', 'Spor', 'Toplantı', 'Keşif', 'Sunum yapma', 'Yatırım araştırma', 'Network etkinliği', 'Yaratıcı çalışma'];
     } else if (rng < 40) {
       level = 'Şanslı'; color = const Color(0xFF4CAF50); eBase = 0.6;
-      advice = 'Pozitif enerji yüksek. Planlarınızı hayata geçirin ve fırsatları değerlendirin.';
+      advicePool = [
+        'Pozitif enerji yüksek. Planlarınızı hayata geçirin ve fırsatları değerlendirin.',
+        'Güzel bir gün sizi bekliyor. Sevdiklerinizle vakit geçirin ve anın tadını çıkarın.',
+        'Bugün küçük detaylarda büyük mutluluklar gizli. Gözlerinizi dört açın.',
+        'İç sesiniz bugün doğru yolu gösteriyor — ona güvenin ve adım atın.',
+        'Bugün rüzgar arkanızdan esiyor. Planlarınızı hayata geçirmek için ideal zaman.',
+        'Evren bugün size küçük hediyeler sunuyor — fark edin ve kabul edin.',
+        'Pozitif titreşimler sizi sarıyor. Bu enerjiyi çevrenizle paylaşın.',
+        'Güzel sürprizlere açık olun — bugün beklenmedik kapılar açılabilir.',
+      ];
       moodPool = [
         {'mood': 'Sosyal', 'emoji': '🤝', 'desc': 'İnsan ilişkileri güçleniyor'},
         {'mood': 'Romantik', 'emoji': '💫', 'desc': 'Duygusal bağlar derinleşiyor'},
@@ -382,16 +422,42 @@ class ChineseZodiacData {
         {'mood': 'Neşeli', 'emoji': '☀️', 'desc': 'Gülümsemen bulaşıcı bugün'},
         {'mood': 'Yaratıcı', 'emoji': '🎨', 'desc': 'Güzel şeyler üretme zamanı'},
         {'mood': 'Maceracı', 'emoji': '🌍', 'desc': 'Spontane planlar bugün iyi gidecek'},
+        {'mood': 'Şefkatli', 'emoji': '🤲', 'desc': 'Sevgini çevrene yay'},
+        {'mood': 'Odaklı', 'emoji': '🎯', 'desc': 'Hedeflerine net adımlar at'},
       ];
-      affPool = ['Her adımın seni doğru yere götürüyor.', 'İçindeki ışık bugün çevreni de aydınlatıyor.', 'Evren senin için sessizce kapılar açıyor.', 'Bugün küçük mucizeler seni bulacak.'];
-      whisperPool = ['Ay ışığı yolunu aydınlatıyor — güven ve ilerle.', 'Rüzgâr değişti — güzel şeyler yaklaşıyor.', 'Geceyi geçiren yıldızlar sana sabahı müjdeliyor.', 'Evrenin ritmiyle uyumlusun — akışa bırak.'];
-      challengePool = ['Sevdiğin birine teşekkür mesajı gönder', 'Bugün tanımadığın birine gülümse', 'Bir yabancıya iltifat et', '3 şey yaz: bugün minnettar olduğun'];
-      doPool = ['Sevdiklerinle vakit geçir', 'Planlarını hayata geçir', 'İçgüdülerine güven', 'Yeni insanlarla tanış'];
-      dontPool = ['Güzel anları kaçırma', 'Olumsuzlara odaklanma', 'Fırsatları erteleme', 'Şüpheye kapılma'];
-      activityPool = ['Buluşma', 'Yürüyüş', 'Alışveriş', 'Yemek yapma'];
+      affPool = [
+        'Her adımın seni doğru yere götürüyor.', 'İçindeki ışık bugün çevreni de aydınlatıyor.',
+        'Evren senin için sessizce kapılar açıyor.', 'Bugün küçük mucizeler seni bulacak.',
+        'Gülümsemen bugün en güçlü silahın.', 'Kalbindeki sıcaklık çevrene yayılıyor.',
+        'Enerjin bulaşıcı — yanındakiler de hissediyor.', 'Bugün her şey yolunda gidecek — güven.',
+      ];
+      whisperPool = [
+        'Ay ışığı yolunu aydınlatıyor — güven ve ilerle.', 'Rüzgâr değişti — güzel şeyler yaklaşıyor.',
+        'Geceyi geçiren yıldızlar sana sabahı müjdeliyor.', 'Evrenin ritmiyle uyumlusun — akışa bırak.',
+        'Kozmik melodiler bugün senin için çalıyor.', 'Yıldız tozu ruhuna taze enerji saçıyor.',
+        'Gece gökyüzü senin için en parlak yıldızı sakladı.', 'Ay ve güneş bugün senin dengende buluşuyor.',
+      ];
+      challengePool = [
+        'Sevdiğin birine teşekkür mesajı gönder', 'Bugün tanımadığın birine gülümse',
+        'Bir yabancıya iltifat et', '3 şey yaz: bugün minnettar olduğun',
+        'Eski bir arkadaşını ara ve hal hatır sor', 'Bugün birinin gününü güzelleştir',
+        'Sevdiğin bir mekâna git ve anın tadını çıkar', 'Bir yakınına el yazısıyla not bırak',
+      ];
+      doPool = ['Sevdiklerinle vakit geçir', 'Planlarını hayata geçir', 'İçgüdülerine güven', 'Yeni insanlarla tanış', 'Kendine güzel bir şey al', 'Doğada vakit geçir', 'Yaratıcı bir proje başlat', 'Spontane bir plan yap'];
+      dontPool = ['Güzel anları kaçırma', 'Olumsuzlara odaklanma', 'Fırsatları erteleme', 'Şüpheye kapılma', 'Enerjini boşa harcama', 'Negatif insanlara zaman ver', 'Kendini kısıtlama', 'Mükemmeliyetçi olma'];
+      activityPool = ['Buluşma', 'Yürüyüş', 'Alışveriş', 'Yemek yapma', 'Kahve molası', 'Park gezisi', 'Film izleme', 'Müzik dinleme'];
     } else if (rng < 65) {
       level = 'Normal'; color = const Color(0xFF78909C); eBase = 0.45;
-      advice = 'Dengeli bir gün. Rutininize sadık kalın ve küçük adımlarla ilerleyin.';
+      advicePool = [
+        'Dengeli bir gün. Rutininize sadık kalın ve küçük adımlarla ilerleyin.',
+        'Bugün sakin ve dengeli kalmak en doğru strateji. Adım adım ilerleyin.',
+        'Orta tempolu bir gün — acele etmeyin, ama durmayın da. Denge anahtarınız.',
+        'Bugün kendine odaklan. Küçük ama anlamlı adımlar at.',
+        'Sakin bir nehir gibi akmaya devam et — hedefe ulaşacaksın.',
+        'Bugün büyük sürprizler bekleme, ama küçük güzellikleri fark et.',
+        'Dengeni koru ve enerjini akıllıca kullan — yarına güçlü başla.',
+        'Bugün altyapı günü. Gözle görülmeyen ama önemli adımlar at.',
+      ];
       moodPool = [
         {'mood': 'Huzurlu', 'emoji': '🧘', 'desc': 'İç denge ve sükunet günü'},
         {'mood': 'Düşünceli', 'emoji': '🔮', 'desc': 'Derinlere in, kendini keşfet'},
@@ -399,59 +465,127 @@ class ChineseZodiacData {
         {'mood': 'Odaklı', 'emoji': '🎯', 'desc': 'Konsantrasyonun güçlü, detaylara dikkat'},
         {'mood': 'Sosyal', 'emoji': '🤝', 'desc': 'Yakın çevrenle bağları güçlendir'},
         {'mood': 'Şefkatli', 'emoji': '🤲', 'desc': 'Kendine ve çevrene şefkat göster'},
+        {'mood': 'Kararlı', 'emoji': '💎', 'desc': 'Küçük hedefler koy ve başar'},
+        {'mood': 'Neşeli', 'emoji': '☀️', 'desc': 'Günün güzel yanlarını keşfet'},
       ];
-      affPool = ['Sabrın en güçlü silahın olacak bugün.', 'Kalbinin sesini dinle, o asla yanılmaz.', 'İç huzurun, dış başarıyı çekecek.', 'Bugün geçmişi bırak, geleceğe güvenle bak.'];
-      whisperPool = ['Sessiz bir mucize yolda — gözlerini aç.', 'Evrenin fısıltısı bugün sana doğru esiyor.', 'Kozmik pusulan dengeyi gösteriyor — sabret.', 'Antik bilgelik diyor ki: "Sabır, güçtür."'];
-      challengePool = ['Bir fincan çayı mindful şekilde iç', '5 dakika sessizce otur ve nefesine odaklan', 'Sevdiğin müziği gözlerin kapalı dinle', 'Doğada 10 dakika sessiz yürüyüş yap'];
-      doPool = ['Rutinine sadık kal', 'Küçük adımlarla ilerle', 'Kendine zaman ayır', 'Doğayla bağlan'];
-      dontPool = ['Aşırı düşünmekten kaçın', 'Kendini zorlama', 'Acele etme', 'Kontrolü elden bırakma'];
-      activityPool = ['Meditasyon', 'Okuma', 'Yazı yazma', 'Yürüyüş'];
+      affPool = [
+        'Sabrın en güçlü silahın olacak bugün.', 'Kalbinin sesini dinle, o asla yanılmaz.',
+        'İç huzurun, dış başarıyı çekecek.', 'Bugün geçmişi bırak, geleceğe güvenle bak.',
+        'Küçük adımlar büyük yolculukların başlangıcıdır.', 'Dengen senin süper gücün — koru onu.',
+        'Her nefes alışın seni yeniler — fark et.', 'Bugün olduğun yer tam olman gereken yer.',
+      ];
+      whisperPool = [
+        'Sessiz bir mucize yolda — gözlerini aç.', 'Evrenin fısıltısı bugün sana doğru esiyor.',
+        'Kozmik pusulan dengeyi gösteriyor — sabret.', 'Antik bilgelik diyor ki: "Sabır, güçtür."',
+        'Yıldızlar sessiz ama seni izliyorlar.', 'Ay ışığında saklı bir mesaj var — dinle.',
+        'Evrenin saati senin için doğru çalıyor.', 'Rüzgârın taşıdığı sırları duyabiliyor musun?',
+      ];
+      challengePool = [
+        'Bir fincan çayı mindful şekilde iç', '5 dakika sessizce otur ve nefesine odaklan',
+        'Sevdiğin müziği gözlerin kapalı dinle', 'Doğada 10 dakika sessiz yürüyüş yap',
+        'Bugün yapacaklar listenden 1 şeyi sil — rahatla', 'Bir sayfaya bugünkü düşüncelerini yaz',
+        'Pencereden gökyüzünü 5 dakika izle', 'Sevdiğin bir yemeği yavaşça ve tadını çıkararak ye',
+      ];
+      doPool = ['Rutinine sadık kal', 'Küçük adımlarla ilerle', 'Kendine zaman ayır', 'Doğayla bağlan', 'Planlama yap', 'Düzenle ve organize et', 'Oku ve öğren', 'Sağlığına dikkat et'];
+      dontPool = ['Aşırı düşünmekten kaçın', 'Kendini zorlama', 'Acele etme', 'Kontrolü elden bırakma', 'Başkalarıyla kıyaslama', 'Gereksiz stres yapma', 'Negatif içeriklere maruz kalma', 'Kendini ihmal etme'];
+      activityPool = ['Meditasyon', 'Okuma', 'Yazı yazma', 'Yürüyüş', 'Yoga', 'Puzzle çözme', 'Çizim yapma', 'Bahçe işleri'];
     } else if (rng < 85) {
       level = 'Dikkatli Ol'; color = const Color(0xFFFF9800); eBase = 0.3;
-      advice = 'Bugün biraz temkinli olun. Büyük kararları erteleyin ve detaylara dikkat edin.';
+      advicePool = [
+        'Bugün biraz temkinli olun. Büyük kararları erteleyin ve detaylara dikkat edin.',
+        'Dikkatli adımlar atmanız gereken bir gün. Sezgilerinize güvenin ama aceleci olmayın.',
+        'Bugün savunma pozisyonunda kalmak akıllıca. Enerjinizi koruyun.',
+        'Temkinli olmak zayıflık değil, bilgeliktir. Bugün bu bilgeliği kullanın.',
+        'Küçük sorunlar büyümeden çözün — bugün detaylara odaklanın.',
+        'İç sesiniz bugün sizi uyarıyor — dinleyin ve ona göre hareket edin.',
+        'Bugün büyük adımlar atmak yerine mevcut durumunuzu sağlamlaştırın.',
+        'Enerjiniz dalgalı — önemli kararları bir sonraki güne bırakın.',
+      ];
       moodPool = [
         {'mood': 'Düşünceli', 'emoji': '🔮', 'desc': 'İç gözlem ve farkındalık zamanı'},
         {'mood': 'Huzurlu', 'emoji': '🧘', 'desc': 'Sakinliğini koru, içine dön'},
         {'mood': 'Odaklı', 'emoji': '🎯', 'desc': 'Detaylara odaklan, yavaş ilerle'},
         {'mood': 'Şefkatli', 'emoji': '🤲', 'desc': 'Bugün anlayışlı ol, kendine de'},
         {'mood': 'Güçlü', 'emoji': '🔥', 'desc': 'Direncin seni ayakta tutuyor'},
+        {'mood': 'Kararlı', 'emoji': '💎', 'desc': 'Sağlam dur, bu da geçecek'},
       ];
-      affPool = ['İçindeki güç, dışındaki her engelden büyük.', 'Her fırtına sonrası güneş doğar — bugün de öyle.', 'Bugün kendine nazik ol, yarın güçlü olacaksın.', 'Dikkat, bilgeliğin ilk adımıdır.'];
-      whisperPool = ['Yıldızlar diyor ki: "Sabret, zamanın yakın."', 'Görünmez eller seni koruyarak yönlendiriyor.', 'Bugün durağan gibi görünse de altyapı kuruluyor.', 'Kozmik enerji seni içe dönmeye çağırıyor.'];
-      challengePool = ['Telefonunu 1 saat kenara koy ve sessizliğin tadını çıkar', '5 dakika derin nefes egzersizi yap', 'Bugün için 1 şey yaz: bırakman gereken', 'Kendine güzel bir şey söyle — sesli olarak'];
-      doPool = ['Detaylara dikkat et', 'Kararları ertele ve düşün', 'İç sesini dinle', 'Sakin kal ve gözlemle'];
-      dontPool = ['Büyük kararlar alma', 'Tartışmalara girme', 'Risk alma', 'Aceleci olma'];
-      activityPool = ['Meditasyon', 'Günlük yazma', 'Dinlenme', 'Okuma'];
+      affPool = [
+        'İçindeki güç, dışındaki her engelden büyük.', 'Her fırtına sonrası güneş doğar — bugün de öyle.',
+        'Bugün kendine nazik ol, yarın güçlü olacaksın.', 'Dikkat, bilgeliğin ilk adımıdır.',
+        'Bugün yavaşlamak seni güçlendirecek.', 'Köklerini derinleştir — fırtınaları böyle atlatırsın.',
+        'Zorluklardan geçen ruhlar daha parlak parlar.', 'Sabrın meyvesi tatlı olacak — güven.',
+      ];
+      whisperPool = [
+        'Yıldızlar diyor ki: "Sabret, zamanın yakın."', 'Görünmez eller seni koruyarak yönlendiriyor.',
+        'Bugün durağan gibi görünse de altyapı kuruluyor.', 'Kozmik enerji seni içe dönmeye çağırıyor.',
+        'Ay bulutların ardında ama hâlâ parlıyor — sen de öyle.', 'Gece en karanlık olduğunda şafak en yakındır.',
+        'Evren seni test ediyor — geçeceksin.', 'Kadim ruhlar fısıldıyor: "Dayanıklılığın seni taşıyacak."',
+      ];
+      challengePool = [
+        'Telefonunu 1 saat kenara koy ve sessizliğin tadını çıkar', '5 dakika derin nefes egzersizi yap',
+        'Bugün için 1 şey yaz: bırakman gereken', 'Kendine güzel bir şey söyle — sesli olarak',
+        'Bu gece erken yat ve kaliteli uyku al', 'Stres yapan 1 şeyi bugünlük bırak',
+        'Sıcak bir duş al ve zihnini temizle', 'Sevdiğin bir anıyı düşün ve gülümse',
+      ];
+      doPool = ['Detaylara dikkat et', 'Kararları ertele ve düşün', 'İç sesini dinle', 'Sakin kal ve gözlemle', 'Enerjini koru', 'Sınırlarını belirle', 'Güvendiğin birine danış', 'Küçük hedefler koy'];
+      dontPool = ['Büyük kararlar alma', 'Tartışmalara girme', 'Risk alma', 'Aceleci olma', 'Kontrolünü kaybetme', 'Gereksiz harcamalar yapma', 'Olumsuz düşüncelere kapılma', 'Kendini zorla'];
+      activityPool = ['Meditasyon', 'Günlük yazma', 'Dinlenme', 'Okuma', 'Sıcak çay', 'Hafif yürüyüş', 'Nefes egzersizi', 'Müzik terapi'];
     } else {
       level = 'Riskli'; color = const Color(0xFFE53935); eBase = 0.2;
-      advice = 'Bugün enerjiler karışık. Önemli kararları erteleyin, sakin kalın ve iç sesinizi dinleyin.';
+      advicePool = [
+        'Bugün enerjiler karışık. Önemli kararları erteleyin, sakin kalın ve iç sesinizi dinleyin.',
+        'Kozmik fırtına etkisi altındasınız. Kendinizi koruyun ve büyük adımlardan kaçının.',
+        'Bugün derinden nefes alın ve sığınağınıza çekilin. Yarın güneş yeniden doğacak.',
+        'Zorlayıcı bir gün olabilir — ama unutmayın, en güçlü çelik ateşte dövülür.',
+        'Bugün düşük profilde kalın. Enerjinizi koruyun — yarın için biriktirin.',
+        'Rüzgâr sert esiyor — yelkenlerinizi indirin ve fırtınanın geçmesini bekleyin.',
+        'Bugün kendinize şefkat gösterin. Bazı günler sadece dayanmak bile kahramanlıktır.',
+        'Kozmik enerjiler çalkantılı — güvenli limanda kalın ve sabırlı olun.',
+      ];
       moodPool = [
         {'mood': 'Huzurlu', 'emoji': '🧘', 'desc': 'Sakinliğin en büyük gücün'},
         {'mood': 'Düşünceli', 'emoji': '🔮', 'desc': 'İçe dön, dinlen, hazırlan'},
         {'mood': 'Şefkatli', 'emoji': '🤲', 'desc': 'Kendine sevgi ve şefkat göster'},
         {'mood': 'Güçlü', 'emoji': '🔥', 'desc': 'İçsel gücünle bu günü de atlatacaksın'},
         {'mood': 'Kararlı', 'emoji': '💎', 'desc': 'Dayanıklılığın seni zirveye taşıyacak'},
+        {'mood': 'Odaklı', 'emoji': '🎯', 'desc': 'Tek bir şeye odaklan ve hayatta kal'},
       ];
-      affPool = ['Bu da geçecek — sen bundan da güçlüsün.', 'Fırtınalar en güçlü kökleri büyütür.', 'Bugün kendini toparla, yarın parlayacaksın.', 'Durağanlık da bir güçtür — sabret.'];
-      whisperPool = ['Yıldızlar diyor: "Bugün koru, yarın saldır."', 'Kozmik kalkan etrafında — güvendesin.', 'Karanlık gece, en parlak yıldızları gösterir.', 'Evren sana dinlenme molası veriyor — kabul et.'];
-      challengePool = ['Gün batımını izle ve bir dilek tut', 'Rahatlatıcı bir banyo yap veya sıcak çay iç', 'Bugün sadece 1 iş yap, ama onu iyi yap', 'Sevdiğin bir anıyı hatırla ve gülümse'];
-      doPool = ['Kendini koru ve dinlen', 'Sınırlarını belirle', 'Sevdiklerinin yanında ol', 'Erken yat'];
-      dontPool = ['Büyük harcamalar yapma', 'Kendini aşırı yorma', 'Olumsuz insanlara zaman verme', 'Geçmişe takılma'];
-      activityPool = ['Dinlenme', 'Meditasyon', 'Sıcak çay', 'Erken uyku'];
+      affPool = [
+        'Bu da geçecek — sen bundan da güçlüsün.', 'Fırtınalar en güçlü kökleri büyütür.',
+        'Bugün kendini toparla, yarın parlayacaksın.', 'Durağanlık da bir güçtür — sabret.',
+        'En karanlık gece bile şafağı getirir.', 'Güçlü insanlar zor günlerde şekillenir.',
+        'Kırılganlığını kabul et — bu cesaret ister.', 'Bugün dinlen, yarın savaşırsın.',
+      ];
+      whisperPool = [
+        'Yıldızlar diyor: "Bugün koru, yarın saldır."', 'Kozmik kalkan etrafında — güvendesin.',
+        'Karanlık gece, en parlak yıldızları gösterir.', 'Evren sana dinlenme molası veriyor — kabul et.',
+        'Ateşin külleri altında hâlâ yanıyor — sabret.', 'Gökyüzü kararsa da yıldızlar kaybolmaz.',
+        'Kadim bilgelik: "Çekilmek de bir stratejidir."', 'Fırtına geçecek ve sen hâlâ ayakta olacaksın.',
+      ];
+      challengePool = [
+        'Gün batımını izle ve bir dilek tut', 'Rahatlatıcı bir banyo yap veya sıcak çay iç',
+        'Bugün sadece 1 iş yap, ama onu iyi yap', 'Sevdiğin bir anıyı hatırla ve gülümse',
+        'Kendine sarıl — bazen en iyi destek sensin', 'Favori battaniyene sarıl ve film izle',
+        'Bugün "hayır" deme cesaretini göster', 'Sessizce 3 şey say: hayatında iyi olan',
+      ];
+      doPool = ['Kendini koru ve dinlen', 'Sınırlarını belirle', 'Sevdiklerinin yanında ol', 'Erken yat', 'Rahatlatıcı aktiviteler yap', 'İçine dön ve meditasyon yap', 'Güvenli alanda kal', 'Enerjini koru'];
+      dontPool = ['Büyük harcamalar yapma', 'Kendini aşırı yorma', 'Olumsuz insanlara zaman verme', 'Geçmişe takılma', 'Agresif kararlar alma', 'Tartışmalara girme', 'Sosyal medyada vakit harcama', 'Uykusuz kalma'];
+      activityPool = ['Dinlenme', 'Meditasyon', 'Sıcak çay', 'Erken uyku', 'Hafif müzik', 'Sıcak banyo', 'Kitap okuma', 'Doğa sesleri'];
     }
 
-    // Enerji — seviyeye uygun
-    final mE = (eBase + ((_h(1) % 25) / 100.0)).clamp(0.15, 0.98);
-    final aE = (eBase + ((_h(2) % 20) / 100.0) - 0.05).clamp(0.15, 0.95);
-    final eE = (eBase + ((_h(3) % 20) / 100.0) - 0.1).clamp(0.15, 0.90);
+    // Enerji — seviyeye uygun, günlük değişen
+    final mE = (eBase + ((_h(1) % 30) / 100.0)).clamp(0.15, 0.98);
+    final aE = (eBase + ((_h(2) % 28) / 100.0) - 0.05).clamp(0.15, 0.95);
+    final eE = (eBase + ((_h(3) % 26) / 100.0) - 0.1).clamp(0.15, 0.90);
 
     return {
       'level': level, 'emoji': '', 'color': color,
-      'score': (100 - rng).clamp(10, 100), 'advice': advice,
-      'luckyHour': '${(_h(4) % 12 + 6).clamp(6, 21)}:00',
+      'score': (100 - rng).clamp(10, 100),
+      'advice': advicePool[_h(12) % advicePool.length],
+      'luckyHour': '${(_h(4) % 16 + 6).clamp(6, 21)}:00',
       'luckyActivity': activityPool[_h(5) % activityPool.length],
       'affirmation': affPool[_h(6) % affPool.length],
-      'mood': moodPool[((daySeed * 7 + animalIndex * 251 + 43) % moodPool.length).abs()],
+      'mood': moodPool[_h(7) % moodPool.length],
       'morningEnergy': mE, 'afternoonEnergy': aE, 'eveningEnergy': eE,
       'challenge': challengePool[_h(8) % challengePool.length],
       'whisper': whisperPool[_h(9) % whisperPool.length],

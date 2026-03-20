@@ -1932,7 +1932,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       const SizedBox(height: 16),
 
       // ── 5) Yap / Yapma ──
-      Row(children: [
+      // ── 5) Yap / Yapma — İki Kart ──
+      IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Expanded(child: _glass(child: Column(children: [
           Container(
             width: 36, height: 36,
@@ -1966,60 +1967,204 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           Text(fortune['dontAdvice'] as String, textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.3)),
         ]))),
-      ]),
-
-      const SizedBox(height: 16),
-
-      // ── 6) Şanslı Saat & Aktivite ──
-      Row(children: [
-        Expanded(child: _glass(child: Column(children: [
-          const Text('🕐', style: TextStyle(fontSize: 24)),
-          const SizedBox(height: 6),
-          Text('Şanslı Saat', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-          Text(fortune['luckyHour'] as String, style: TextStyle(color: _goldL, fontSize: 16, fontWeight: FontWeight.w700)),
-        ]))),
-        const SizedBox(width: 12),
-        Expanded(child: _glass(child: Column(children: [
-          const Text('🎯', style: TextStyle(fontSize: 24)),
-          const SizedBox(height: 6),
-          Text('Şanslı Aktivite', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-          Text(fortune['luckyActivity'] as String, style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
-        ]))),
-      ]),
-
-      const SizedBox(height: 16),
-
-      // ── 7) Günün Meydan Okuması ──
-      _glass(child: Row(children: [
-        Container(
-          width: 44, height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(colors: [_gold.withOpacity(0.2), _crimson.withOpacity(0.15)]),
-            border: Border.all(color: _gold.withOpacity(0.2)),
-          ),
-          child: Icon(Icons.flag_outlined, color: _goldL.withOpacity(0.8), size: 22),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Günün Meydan Okuması', style: TextStyle(color: _goldL.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
-          const SizedBox(height: 3),
-          Text(fortune['challenge'] as String, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.4)),
-        ])),
       ])),
 
-      const SizedBox(height: 20),
-
-      // ── 9) Şanslı Sayılar & Renkler ──
-      _secHead('🔢', 'Şanslı Sayılar'),
-      const SizedBox(height: 10),
-      Wrap(spacing: 10, children: (_animal['luckyNumbers'] as List<int>).map((n) =>
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: _gold.withOpacity(0.12), shape: BoxShape.circle, border: Border.all(color: _gold.withOpacity(0.3))),
-          child: Center(child: Text('$n', style: TextStyle(color: _goldL, fontSize: 18, fontWeight: FontWeight.w800))))).toList()),
       const SizedBox(height: 16),
-      _secHead('🎨', 'Şanslı Renkler'),
-      const SizedBox(height: 10),
-      Wrap(spacing: 10, runSpacing: 10, children: (_animal['luckyColors'] as List<String>).map((c) => _chip(c)).toList()),
+
+      // ── 6) Şanslı Saat · Sayılar · Renkler — Üçlü Elegant Kart ──
+      ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.14),
+                  Colors.white.withOpacity(0.06),
+                  Colors.white.withOpacity(0.04),
+                ],
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.18), width: 0.7),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 30, offset: const Offset(0, 12)),
+              ],
+            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              // ── Başlık ──
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(width: 28, height: 0.5, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.transparent, _gold.withOpacity(0.3)]),
+                  )),
+                  const SizedBox(width: 10),
+                  Text('✦', style: TextStyle(color: _goldL.withOpacity(0.3), fontSize: 8)),
+                  const SizedBox(width: 8),
+                  Text('Şans Rehberin', style: TextStyle(
+                    color: _goldL.withOpacity(0.45), fontSize: 10,
+                    fontWeight: FontWeight.w700, letterSpacing: 1.5,
+                  )),
+                  const SizedBox(width: 8),
+                  Text('✦', style: TextStyle(color: _goldL.withOpacity(0.3), fontSize: 8)),
+                  const SizedBox(width: 10),
+                  Container(width: 28, height: 0.5, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [_gold.withOpacity(0.3), Colors.transparent]),
+                  )),
+                ]),
+              ),
+              // ── 3 sütunlu içerik ──
+              IntrinsicHeight(child: Row(children: [
+              // ── Şanslı Saat ──
+              Expanded(child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
+                child: Builder(builder: (context) {
+                  final hourStr = fortune['luckyHour'] as String;
+                  final hour = int.tryParse(hourStr.split(':').first) ?? 12;
+                  final IconData timeIcon;
+                  if (hour >= 6 && hour < 12) {
+                    timeIcon = Icons.wb_sunny_outlined;
+                  } else if (hour >= 12 && hour < 17) {
+                    timeIcon = Icons.wb_sunny_rounded;
+                  } else if (hour >= 17 && hour < 20) {
+                    timeIcon = Icons.wb_twilight_rounded;
+                  } else {
+                    timeIcon = Icons.nightlight_round_outlined;
+                  }
+                  return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Text('Saat', style: TextStyle(
+                      color: _goldL.withOpacity(0.4), fontSize: 9,
+                      fontWeight: FontWeight.w700, letterSpacing: 1.5,
+                    )),
+                    const SizedBox(height: 8),
+                    Text(hourStr, style: TextStyle(
+                      color: _goldL, fontSize: 26,
+                      fontWeight: FontWeight.w800, letterSpacing: 0.5,
+                    )),
+                    const SizedBox(height: 6),
+                    Icon(timeIcon, color: _goldL.withOpacity(0.35), size: 18),
+                  ]);
+                }),
+              )),
+              // Dikey ayırıcı
+              Container(width: 0.7, decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, _gold.withOpacity(0.15), _gold.withOpacity(0.15), Colors.transparent],
+                  stops: const [0.1, 0.3, 0.7, 0.9],
+                ),
+              )),
+              // ── Şanslı Sayılar ──
+              Expanded(child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
+                child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Text('Sayılar', style: TextStyle(
+                    color: _goldL.withOpacity(0.4), fontSize: 9,
+                    fontWeight: FontWeight.w700, letterSpacing: 1.5,
+                  )),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 6, runSpacing: 6,
+                    alignment: WrapAlignment.center,
+                    children: (_animal['luckyNumbers'] as List<int>).map((n) =>
+                      Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: _gold.withOpacity(0.25), width: 0.8),
+                        ),
+                        child: Center(child: Text('$n', style: TextStyle(
+                          color: _goldL, fontSize: 13, fontWeight: FontWeight.w700,
+                        ))),
+                      ),
+                    ).toList(),
+                  ),
+                ]),
+              )),
+              // Dikey ayırıcı
+              Container(width: 0.7, decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, _gold.withOpacity(0.15), _gold.withOpacity(0.15), Colors.transparent],
+                  stops: const [0.1, 0.3, 0.7, 0.9],
+                ),
+              )),
+              // ── Şanslı Renkler ──
+              Expanded(child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
+                child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Text('Renkler', style: TextStyle(
+                    color: _goldL.withOpacity(0.4), fontSize: 9,
+                    fontWeight: FontWeight.w700, letterSpacing: 1.5,
+                  )),
+                  const SizedBox(height: 10),
+                  ...(_animal['luckyColors'] as List<String>).map((c) {
+                    final clr = _colorFromName(c);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Container(
+                        width: double.infinity, height: 26,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(13),
+                          color: clr.withOpacity(0.3),
+                          border: Border.all(color: clr.withOpacity(0.5), width: 1),
+                        ),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+                          Container(width: 6, height: 6, decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: clr,
+                          )),
+                          const SizedBox(width: 6),
+                          Text(c, style: TextStyle(
+                            color: Colors.white.withOpacity(0.85), fontSize: 10,
+                            fontWeight: FontWeight.w600, letterSpacing: 0.3,
+                          )),
+                        ]),
+                      ),
+                    );
+                  }),
+                ]),
+              )),
+            ])),
+            ]),
+          ),
+        ),
+      ),
+
+      const SizedBox(height: 16),
+
+      // ── 7) Günün Meydan Okuması — Kompakt Görev Kartı ──
+      _glass(child: Row(children: [
+        // Sol — at ikonu
+        Container(
+          width: 48, height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(colors: [_gold.withOpacity(0.12), _crimson.withOpacity(0.08)]),
+            border: Border.all(color: _gold.withOpacity(0.18), width: 0.6),
+          ),
+          child: Center(
+            child: SizedBox(
+              width: 26, height: 32,
+              child: CustomPaint(painter: _ChallengeIconPainter(gold: _gold, goldL: _goldL)),
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        // Sağ — etiket + metin
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Senin için bir meydan okumamız var!', style: TextStyle(
+            color: _goldL.withOpacity(0.5), fontSize: 10,
+            fontWeight: FontWeight.w600, letterSpacing: 0.3,
+          )),
+          const SizedBox(height: 4),
+          Text(fortune['challenge'] as String, style: TextStyle(
+            color: Colors.white.withOpacity(0.85), fontSize: 13,
+            fontWeight: FontWeight.w500, fontStyle: FontStyle.italic, height: 1.4,
+          )),
+        ])),
+      ])),
     ]);
   }
 
@@ -2086,6 +2231,22 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       )),
     ]),
   );
+
+  Color _colorFromName(String name) {
+    const map = <String, Color>{
+      'Kırmızı': Color(0xFFE53935), 'Mavi': Color(0xFF42A5F5),
+      'Yeşil': Color(0xFF66BB6A), 'Sarı': Color(0xFFFDD835),
+      'Altın': Color(0xFFD4A017), 'Turuncu': Color(0xFFFF9800),
+      'Mor': Color(0xFF9C27B0), 'Beyaz': Color(0xFFEEEEEE),
+      'Siyah': Color(0xFF616161), 'Gümüş': Color(0xFFBDBDBD),
+      'Gri': Color(0xFF78909C),
+      'Pembe': Color(0xFFEC407A), 'Lacivert': Color(0xFF1A237E),
+      'Bordo': Color(0xFF880E4F), 'Kahverengi': Color(0xFF795548),
+      'Turkuaz': Color(0xFF26C6DA), 'Bej': Color(0xFFD7CCC8),
+      'Haki': Color(0xFF9E9D24), 'Eflatun': Color(0xFFAB47BC),
+    };
+    return map[name] ?? _goldL;
+  }
 
   Widget _glass({required Widget child}) => ClipRRect(
     borderRadius: BorderRadius.circular(22),
@@ -4022,6 +4183,125 @@ class _EnvelopeFoldPainter extends CustomPainter {
     canvas.drawLine(Offset(0, h), Offset(w / 2, 0), p);
     // Sağ alt köşeden üst ortaya
     canvas.drawLine(Offset(w, h), Offset(w / 2, 0), p);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _ChallengeIconPainter extends CustomPainter {
+  final Color gold;
+  final Color goldL;
+  _ChallengeIconPainter({required this.gold, required this.goldL});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final s = size.width;
+    final h = size.height;
+
+    final fill = Paint()
+      ..color = goldL.withOpacity(0.55)
+      ..style = PaintingStyle.fill;
+    final stroke = Paint()
+      ..color = goldL.withOpacity(0.8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.7;
+
+    // ── 1) Tepe topu ──
+    canvas.drawCircle(Offset(cx, h * 0.05), s * 0.05, fill);
+    canvas.drawCircle(Offset(cx, h * 0.05), s * 0.05, stroke);
+
+    // Bağlantı çubuğu (top → taç)
+    final stick = Path()
+      ..moveTo(cx - s * 0.025, h * 0.09)
+      ..lineTo(cx + s * 0.025, h * 0.09)
+      ..lineTo(cx + s * 0.02, h * 0.14)
+      ..lineTo(cx - s * 0.02, h * 0.14)
+      ..close();
+    canvas.drawPath(stick, fill);
+
+    // ── 2) Taç — açık halka + 3 eğik prong ──
+    final crownY = h * 0.22;
+    // Taç halkası (oval band)
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, crownY), width: s * 0.34, height: h * 0.06),
+      fill,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, crownY), width: s * 0.34, height: h * 0.06),
+      stroke,
+    );
+
+    // 3 prong — dışa eğilerek yukarı çıkan (pembe queen referansı)
+    final prongStroke = Paint()
+      ..color = goldL.withOpacity(0.65)
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final ballFill = Paint()..color = goldL.withOpacity(0.6);
+
+    // Sol prong
+    canvas.drawLine(Offset(cx - s * 0.13, crownY - h * 0.02), Offset(cx - s * 0.16, h * 0.11), prongStroke);
+    canvas.drawCircle(Offset(cx - s * 0.16, h * 0.10), s * 0.022, ballFill);
+    // Orta prong (tepe topuna bağlı)
+    canvas.drawLine(Offset(cx, crownY - h * 0.03), Offset(cx, h * 0.14), prongStroke);
+    // Sağ prong
+    canvas.drawLine(Offset(cx + s * 0.13, crownY - h * 0.02), Offset(cx + s * 0.16, h * 0.11), prongStroke);
+    canvas.drawCircle(Offset(cx + s * 0.16, h * 0.10), s * 0.022, ballFill);
+
+    // ── 3) Boyun ──
+    final neckTop = crownY + h * 0.03;
+    final neckBot = h * 0.34;
+    final neck = Path()
+      ..moveTo(cx - s * 0.06, neckTop)
+      ..lineTo(cx + s * 0.06, neckTop)
+      ..lineTo(cx + s * 0.07, neckBot)
+      ..lineTo(cx - s * 0.07, neckBot)
+      ..close();
+    canvas.drawPath(neck, fill);
+    canvas.drawPath(neck, stroke);
+
+    // ── 4) Yaka — şişkin oval halka ──
+    final collarY = h * 0.37;
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, collarY), width: s * 0.36, height: h * 0.06),
+      fill,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, collarY), width: s * 0.36, height: h * 0.06),
+      stroke,
+    );
+
+    // ── 5) Gövde — düz koni ──
+    final bodyTop = collarY + h * 0.03;
+    final bodyBot = h * 0.78;
+    final body = Path()
+      ..moveTo(cx - s * 0.12, bodyTop)
+      ..lineTo(cx + s * 0.12, bodyTop)
+      ..lineTo(cx + s * 0.26, bodyBot)
+      ..lineTo(cx - s * 0.26, bodyBot)
+      ..close();
+    canvas.drawPath(body, fill);
+    canvas.drawPath(body, stroke);
+
+    // ── 6) Taban — çift oval halka ──
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, bodyBot + h * 0.02), width: s * 0.56, height: h * 0.06),
+      fill,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, bodyBot + h * 0.02), width: s * 0.56, height: h * 0.06),
+      stroke,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, h * 0.88), width: s * 0.60, height: h * 0.06),
+      fill,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, h * 0.88), width: s * 0.60, height: h * 0.06),
+      stroke,
+    );
   }
 
   @override
