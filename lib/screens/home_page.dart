@@ -322,6 +322,7 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 height: 1.2,
+                fontFamilyFallback: ['Apple Color Emoji'],
               ),
             ),
             const SizedBox(height: 2),
