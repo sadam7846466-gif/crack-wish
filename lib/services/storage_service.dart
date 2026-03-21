@@ -859,4 +859,20 @@ class StorageService {
       await prefs.setStringList(_keyCompletedCosmicTasks, current);
     }
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // WELCOME / AUTH
+  // ═══════════════════════════════════════════════════════════════
+
+  static const String _keyHasSeenWelcome = 'has_seen_welcome';
+
+  static Future<bool> hasSeenWelcome() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyHasSeenWelcome) ?? false;
+  }
+
+  static Future<void> setHasSeenWelcome(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyHasSeenWelcome, value);
+  }
 }

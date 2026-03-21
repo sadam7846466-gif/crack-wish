@@ -3,6 +3,29 @@ import 'package:google_fonts/google_fonts.dart';
 import 'colors.dart';
 
 class AppTheme {
+  /// Emoji fallback'li TextTheme oluştur
+  /// Google Fonts emoji glyph içermediği için Apple Color Emoji'yi fallback olarak ekliyoruz
+  static TextTheme _withEmojiFallback(TextTheme theme) {
+    const fallback = ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'];
+    return theme.copyWith(
+      displayLarge: theme.displayLarge?.copyWith(fontFamilyFallback: fallback),
+      displayMedium: theme.displayMedium?.copyWith(fontFamilyFallback: fallback),
+      displaySmall: theme.displaySmall?.copyWith(fontFamilyFallback: fallback),
+      headlineLarge: theme.headlineLarge?.copyWith(fontFamilyFallback: fallback),
+      headlineMedium: theme.headlineMedium?.copyWith(fontFamilyFallback: fallback),
+      headlineSmall: theme.headlineSmall?.copyWith(fontFamilyFallback: fallback),
+      titleLarge: theme.titleLarge?.copyWith(fontFamilyFallback: fallback),
+      titleMedium: theme.titleMedium?.copyWith(fontFamilyFallback: fallback),
+      titleSmall: theme.titleSmall?.copyWith(fontFamilyFallback: fallback),
+      bodyLarge: theme.bodyLarge?.copyWith(fontFamilyFallback: fallback),
+      bodyMedium: theme.bodyMedium?.copyWith(fontFamilyFallback: fallback),
+      bodySmall: theme.bodySmall?.copyWith(fontFamilyFallback: fallback),
+      labelLarge: theme.labelLarge?.copyWith(fontFamilyFallback: fallback),
+      labelMedium: theme.labelMedium?.copyWith(fontFamilyFallback: fallback),
+      labelSmall: theme.labelSmall?.copyWith(fontFamilyFallback: fallback),
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -13,10 +36,12 @@ class AppTheme {
         secondary: AppColors.primaryPurple,
         surface: AppColors.bgDark4,
       ),
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme.apply(
-          bodyColor: AppColors.textWhite,
-          displayColor: AppColors.textWhite,
+      textTheme: _withEmojiFallback(
+        GoogleFonts.interTextTheme(
+          ThemeData.dark().textTheme.apply(
+            bodyColor: AppColors.textWhite,
+            displayColor: AppColors.textWhite,
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -37,10 +62,12 @@ class AppTheme {
         secondary: AppColors.primaryPurple,
         surface: Colors.white,
       ),
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.light().textTheme.apply(
-          bodyColor: const Color(0xFF1D1D1F),
-          displayColor: const Color(0xFF1D1D1F),
+      textTheme: _withEmojiFallback(
+        GoogleFonts.interTextTheme(
+          ThemeData.light().textTheme.apply(
+            bodyColor: const Color(0xFF1D1D1F),
+            displayColor: const Color(0xFF1D1D1F),
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(

@@ -652,7 +652,7 @@ class _CookieGlow extends StatelessWidget {
                     Color(0xFFFFB464),
                     BlendMode.srcATop,
                   ),
-                  child: Text(emoji, style: const TextStyle(fontSize: 92)),
+                  child: Text(emoji, style: const TextStyle(fontSize: 92, fontFamilyFallback: ['Apple Color Emoji'])),
                 ),
               ),
             ),
@@ -1028,7 +1028,6 @@ class _FortunePaperState extends State<_FortunePaper>
                                               color: Color(0xFF4A3928),
                                               fontSize: 11.5,
                                               fontWeight: FontWeight.w500,
-                                              fontFamily: 'Roboto',
                                               height: 1.3,
                                               letterSpacing: 0.1,
                                             ),
@@ -1411,7 +1410,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                                   fit: BoxFit.contain,
                                 ),
                               )
-                            : const Text('🥠', style: TextStyle(fontSize: 36)),
+                            : const Text('🥠', style: TextStyle(fontSize: 36, fontFamilyFallback: ['Apple Color Emoji'])),
                       ),
                     ),
                     // Kilit ikonu
@@ -1430,7 +1429,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                           ),
                         ),
                         child: const Center(
-                          child: Text('🔒', style: TextStyle(fontSize: 13)),
+                          child: Text('🔒', style: TextStyle(fontSize: 13, fontFamilyFallback: const ['Apple Color Emoji'])),
                         ),
                       ),
                     ),
@@ -1568,7 +1567,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
             ),
           ),
           child: Center(
-            child: Text(icon, style: const TextStyle(fontSize: 15)),
+            child: Text(icon, style: const TextStyle(fontSize: 15, fontFamilyFallback: ['Apple Color Emoji'])),
           ),
         ),
         const SizedBox(width: 12),

@@ -687,7 +687,7 @@ class _EmojiBadge extends StatelessWidget {
               height: size * 0.7,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                return Text('🥠', style: TextStyle(fontSize: size * 0.5));
+                return Text('🥠', style: TextStyle(fontSize: size * 0.5, fontFamilyFallback: const ['Apple Color Emoji']));
               },
             ),
           ),
@@ -789,7 +789,7 @@ class _EmptyPlaceholder extends StatelessWidget {
         children: [
           Opacity(
             opacity: 0.7,
-            child: const Text('🥠', style: TextStyle(fontSize: 48)),
+            child: const Text('🥠', style: TextStyle(fontSize: 48, fontFamilyFallback: ['Apple Color Emoji'])),
           ),
           const SizedBox(height: 10),
           Text(

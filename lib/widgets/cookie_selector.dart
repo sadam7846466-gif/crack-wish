@@ -238,7 +238,7 @@ class _CookieSelectorState extends State<CookieSelector> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔒', style: TextStyle(fontSize: 32)),
+                    const Text('🔒', style: TextStyle(fontSize: 32, fontFamilyFallback: ['Apple Color Emoji'])),
                     const SizedBox(height: 12),
                     Text(
                       cookieName,
@@ -426,7 +426,7 @@ class _CookieSelectorItem extends StatelessWidget {
                     height: imageSize,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      return const Text('🥠', style: TextStyle(fontSize: 22));
+                      return const Text('🥠', style: TextStyle(fontSize: 22, fontFamilyFallback: ['Apple Color Emoji']));
                     },
                   ),
                 ),
