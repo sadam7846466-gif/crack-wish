@@ -875,4 +875,33 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyHasSeenWelcome, value);
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ZODIAC TRAIT BOOSTS (Görev tamamlayınca artan değerler)
+  // ═══════════════════════════════════════════════════════════════
+
+  static const String _keyTraitBoosts = 'zodiac_trait_boosts';
+
+  /// Trait boost'larını oku → { "Sabırsızlık": 5, "Dürüst": 3 } gibi
+  static Future<Map<String, int>> getTraitBoosts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final json = prefs.getString(_keyTraitBoosts);
+    if (json == null) return {};
+    try {
+      final Map<String, dynamic> decoded = jsonDecode(json) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, (v as num).toInt()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// Belirli bir trait'in boost'unu artır
+  static Future<void> addTraitBoost(String traitName, int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final boosts = await getTraitBoosts();
+    final current = boosts[traitName] ?? 0;
+    // Maksimum toplam boost: +40 puan
+    boosts[traitName] = (current + amount).clamp(0, 40);
+    await prefs.setString(_keyTraitBoosts, jsonEncode(boosts));
+  }
 }

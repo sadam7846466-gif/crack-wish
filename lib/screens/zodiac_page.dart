@@ -21,6 +21,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   int _selectedIndex = 0; // Varsayılan: Koç
   String? _userName;
   DateTime _birthDate = DateTime(1999, 12, 20);
+  Map<String, int> _traitBoosts = {};
 
   static const Color _gold = Color(0xFFFFD060);
   static const Color _goldL = Color(0xFFFFE8A1);
@@ -42,6 +43,7 @@ class _ZodiacPageState extends State<ZodiacPage>
       'quality': 'Öncü',
       'qualityEmoji': '⚡',
       'traits': ['Cesur', 'Enerjik', 'Girişken', 'Tutkulu', 'Kararlı', 'Lider'],
+      'allTraits': ['Cesur', 'Enerjik', 'Girişken', 'Tutkulu', 'Kararlı', 'Lider', 'Ateşli', 'Bağımsız', 'Atılgan', 'Güçlü'],
       'strengths': [
         'Doğal liderlik',
         'Cesaret ve atılganlık',
@@ -50,6 +52,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Yüksek enerji',
         'Öz güven',
       ],
+      'allStrengths': ['Doğal liderlik', 'Cesaret ve atılganlık', 'Girişimci ruh', 'Bağımsızlık', 'Yüksek enerji', 'Öz güven', 'Hızlı karar verme', 'Motivasyon gücü', 'Rekabetçi ruh', 'Savaşçı irade'],
       'weaknesses': [
         'Sabırsızlık',
         'Düşünmeden hareket',
@@ -58,6 +61,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Bencillik',
         'Acelecilik',
       ],
+      'allWeaknesses': ['Sabırsızlık', 'Düşünmeden hareket', 'Hırslı olma', 'Çabuk öfkelenme', 'Bencillik', 'Acelecilik', 'Sert tepki', 'Dinlememe', 'Takım çalışmasında zorlanma', 'Aşırı rekabet'],
       'description':
           'Koç burcu, Zodyak\'ın ilk ve en ateşli başlangıcıdır. Mars\'ın yönetimindeki bu burç, liderlik, cesaret ve eyleme geçme gücünü temsil eder. Koç bireyler doğuştan öncüdür; bilinmeyenden korkmazlar, aksine ona doğru koşarlar. Her yeni durumda ilk adımı atan, enerji ve tutku dolu ruhlardır.',
       'love':
@@ -95,6 +99,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Estetik',
         'Pratik',
       ],
+      'allTraits': ['Güvenilir', 'Sabırlı', 'Kararlı', 'Sadık', 'Estetik', 'Pratik', 'Dayanıklı', 'Huzurlu', 'Duyusal', 'Topraklanmış'],
       'strengths': [
         'Sarsılmaz irade',
         'Maddi güvenlik',
@@ -103,6 +108,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Sabır',
         'Güvenilirlik',
       ],
+      'allStrengths': ['Sarsılmaz irade', 'Maddi güvenlik', 'Sanatsal hassasiyet', 'Sadakat', 'Sabır', 'Güvenilirlik', 'Doğa sevgisi', 'Lezzet anlayışı', 'Konfor yaratma', 'Istikrarlı dostluk'],
       'weaknesses': [
         'İnatçılık',
         'Değişime direnç',
@@ -111,6 +117,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Üşengeçlik',
         'Kıskançlık',
       ],
+      'allWeaknesses': ['İnatçılık', 'Değişime direnç', 'Aşırı sahiplenme', 'Maddiyatçılık', 'Üşengeçlik', 'Kıskançlık', 'Konfor bağımlılığı', 'Rutine sığınma', 'Risk almama', 'Paylaşmaktan kaçınma'],
       'description':
           'Boğa, Zodyak\'ın en kararlı ve güvenilir burcudur. Venüs\'ün zarif dokunuşuyla güzellik, konfor ve maddi güvenliğe değer verir. Sabırla hedeflerine ulaşır, sözünde durur ve sevdiklerine sıkıca bağlanır. Doğanın ve sanatın tadını çıkaran, ayakları yere basan bir ruhtur.',
       'love':
@@ -148,6 +155,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'İletişimci',
         'Çok Yönlü',
       ],
+      'allTraits': ['Meraklı', 'Zeki', 'Sosyal', 'Esnek', 'İletişimci', 'Çok Yönlü', 'Hızlı', 'Uyumlu', 'Espritüel', 'Keşfedici'],
       'strengths': [
         'Hızlı öğrenme',
         'İletişim becerisi',
@@ -156,6 +164,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Çok yönlülük',
         'Esnek düşünce',
       ],
+      'allStrengths': ['Hızlı öğrenme', 'İletişim becerisi', 'Uyum yeteneği', 'Meraklı doğa', 'Çok yönlülük', 'Esnek düşünce', 'Espri yeteneği', 'Ağ kurma becerisi', 'Bilgi sentezi', 'Hızlı adaptasyon'],
       'weaknesses': [
         'Kararsızlık',
         'Yüzeysellik',
@@ -164,6 +173,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Gevşeklik',
         'Odak eksikliği',
       ],
+      'allWeaknesses': ['Kararsızlık', 'Yüzeysellik', 'Çabuk sıkılma', 'Tutarsızlık', 'Gevşeklik', 'Odak eksikliği', 'Dedikodu eğilimi', 'Söz tutamama', 'Dağınıklık', 'Coşku kaybı'],
       'description':
           'İkizler, zihinsel çevikliğin ve iletişimin burcudur. Merkür\'ün hızıyla düşünen bu burç, her konuyla ilgilenir, her ortama uyum sağlar. Sosyal kelebekler olarak tanınırlar; sohbetleri her zaman ilgi çekici ve bilgilendiricidir. İki yüzlü değil, çok yönlüdürler.',
       'love':
@@ -201,6 +211,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Şefkatli',
         'Empatik',
       ],
+      'allTraits': ['Duygusal', 'Koruyucu', 'Sezgisel', 'Sadık', 'Şefkatli', 'Empatik', 'Annesel', 'İçsel', 'Hassas', 'Bağlı'],
       'strengths': [
         'Derin empati',
         'Aile bağları',
@@ -209,6 +220,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Şefkat',
         'Sadakat',
       ],
+      'allStrengths': ['Derin empati', 'Aile bağları', 'Güçlü sezgiler', 'Koruyucu yapı', 'Şefkat', 'Sadakat', 'Yuva yaratma', 'Duygusal zekâ', 'Besleyici enerji', 'Hafıza gücü'],
       'weaknesses': [
         'Aşırı duygusallık',
         'Geçmişe takılma',
@@ -217,6 +229,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Karamsarlık',
         'Aşırı hassasiyet',
       ],
+      'allWeaknesses': ['Aşırı duygusallık', 'Geçmişe takılma', 'Kabuğuna çekilme', 'Alınganlık', 'Karamsarlık', 'Aşırı hassasiyet', 'Edilgen saldırganlık', 'Suçluluk manipülasyonu', 'Kapanma refleksi', 'Aşırı endişe'],
       'description':
           'Yengeç, Zodyak\'ın en duygusal ve koruyucu burcudur. Ay\'ın etkisiyle duyguları derin, sezgileri güçlüdür. Sevdiklerini kabuğunun altında korur, yuvasını bir sığınak gibi yaratır. Gözyaşlarının altında bir okyanus kadar güç taşır.',
       'love':
@@ -254,6 +267,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Tutkulu',
         'Sadık',
       ],
+      'allTraits': ['Özgüvenli', 'Lider Ruhlu', 'Cömert', 'Yaratıcı', 'Tutkulu', 'Sadık', 'Karizmatik', 'Ateşli', 'Asil', 'Parlak'],
       'strengths': [
         'Doğal karizma',
         'Yaratıcı güç',
@@ -262,6 +276,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Özgüven',
         'Cesaret',
       ],
+      'allStrengths': ['Doğal karizma', 'Yaratıcı güç', 'Cömertlik', 'Liderlik ruhu', 'Özgüven', 'Cesaret', 'Sahne hakimiyeti', 'İlham verme', 'Asalet', 'Koruyucu içgüdü'],
       'weaknesses': [
         'Gurur',
         'Dikkat beklentisi',
@@ -270,6 +285,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'İnatçılık',
         'Egoizm',
       ],
+      'allWeaknesses': ['Gurur', 'Dikkat beklentisi', 'Otoriter tavır', 'Kibir', 'İnatçılık', 'Egoizm', 'Kolay kırılma', 'Gösteriş düşkünlüğü', 'Onay bağımlılığı', 'Eleştiriye kapalılık'],
       'description':
           'Aslan, Zodyak\'ın kralıdır. Güneş\'in ışığını taşıyan bu burç, sahneye çıktığı anda tüm dikkatleri üzerine çeker. Cömert, sadık ve yaratıcı bir ruhtur. Etrafındakilere enerji verir, ilham kaynağı olur. Liderliği doğasında vardır.',
       'love':
@@ -307,6 +323,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Yardımsever',
         'Pratik',
       ],
+      'allTraits': ['Analitik', 'Düzenli', 'Detaycı', 'Mükemmeliyetçi', 'Yardımsever', 'Pratik', 'Özenli', 'Titiz', 'Alçak gönüllü', 'Stratejik'],
       'strengths': [
         'Analitik zekâ',
         'Düzen ve organizasyon',
@@ -315,6 +332,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Pratiklik',
         'Güvenilirlik',
       ],
+      'allStrengths': ['Analitik zekâ', 'Düzen ve organizasyon', 'Hizmet ruhu', 'Detaycılık', 'Pratiklik', 'Güvenilirlik', 'Problem çözme', 'Sağlık bilinci', 'Verimlilik', 'Titiz çalışma'],
       'weaknesses': [
         'Aşırı eleştirellik',
         'Mükemmeliyetçilik',
@@ -323,6 +341,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Detaylarda boğulma',
         'Soğuk görünüm',
       ],
+      'allWeaknesses': ['Aşırı eleştirellik', 'Mükemmeliyetçilik', 'Endişe eğilimi', 'Evham', 'Detaylarda boğulma', 'Soğuk görünüm', 'Kendini yıpratma', 'Kontrolcülük', 'Esneklik eksikliği', 'Duygu bastırma'],
       'description':
           'Başak, Zodyak\'ın en analitik ve detaycı burcudur. Merkür\'ün pratik yönüyle her detayı görür, düzeni sever ve çevresini sürekli iyileştirmeye çalışır. Alçakgönüllü ama inanılmaz güçlü bir iç dünyaya sahiptir. Hizmet ruhu en belirgin özelliğidir.',
       'love':
@@ -360,6 +379,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Zarif',
         'Romantik',
       ],
+      'allTraits': ['Diplomatik', 'Estetik', 'Adil', 'Uyumlu', 'Zarif', 'Romantik', 'Dengeli', 'Nazik', 'Uzlaşmacı', 'Rafine'],
       'strengths': [
         'Adalet duygusu',
         'Estetik anlayış',
@@ -368,6 +388,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Zarafet',
         'Sosyal beceri',
       ],
+      'allStrengths': ['Adalet duygusu', 'Estetik anlayış', 'Diplomasi', 'Uyum yeteneği', 'Zarafet', 'Sosyal beceri', 'Arabuluculuk', 'Stil duygusu', 'Ortam yaratma', 'Nezaket'],
       'weaknesses': [
         'Kararsızlık',
         'Çatışmadan kaçınma',
@@ -376,6 +397,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Hayır diyememe',
         'Kendinden ödün verme',
       ],
+      'allWeaknesses': ['Kararsızlık', 'Çatışmadan kaçınma', 'Başkalarına bağımlılık', 'Yüzeysellik', 'Hayır diyememe', 'Kendinden ödün verme', 'Pasif agresiflik', 'Memnun etme takıntısı', 'Kendi sesini kaybetme', 'Yalnızlık korkusu'],
       'description':
           'Terazi, denge ve uyumun burcudur. Venüs\'ün zarafetiyle güzelliğe, adalete ve ilişkilere büyük önem verir. Her durumda orta yolu bulmaya çalışır. Estetik anlayışı ve diplomatik yetenekleri onu benzersiz kılar.',
       'love':
@@ -406,6 +428,7 @@ class _ZodiacPageState extends State<ZodiacPage>
       'quality': 'Sabit',
       'qualityEmoji': '⚓',
       'traits': ['Tutkulu', 'Gizemli', 'Kararlı', 'Derin', 'Manyetik', 'Güçlü'],
+      'allTraits': ['Tutkulu', 'Gizemli', 'Kararlı', 'Derin', 'Manyetik', 'Güçlü', 'Sezgisel', 'Stratejik', 'Dayanıklı', 'Dönüştürücü'],
       'strengths': [
         'Derin sezgi',
         'Yeniden doğuş gücü',
@@ -414,6 +437,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Kararlılık',
         'Stratejik zeka',
       ],
+      'allStrengths': ['Derin sezgi', 'Yeniden doğuş gücü', 'Sadakat', 'Tutku', 'Kararlılık', 'Stratejik zeka', 'Psikolojik derinlik', 'Gizem çekiciliği', 'Kriz yönetimi', 'Keşif gücü'],
       'weaknesses': [
         'Kıskançlık',
         'İntikamcılık',
@@ -422,6 +446,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Gizemlilik',
         'Sahiplenicilik',
       ],
+      'allWeaknesses': ['Kıskançlık', 'İntikamcılık', 'Aşırı kontrol', 'Şüphecilik', 'Gizemlilik', 'Sahiplenicilik', 'Manipülasyon', 'Paranoya', 'Kin tutma', 'Obsesif bağlanma'],
       'description':
           'Akrep, Zodyak\'ın en derin ve tutkulu burcudur. Plüton\'un dönüştürücü gücüyle yaşamın en karanlık köşelerine bakmaktan çekinmez. Güçlü sezgileri ve manyetik çekiciliğiyle tanınır. Anka kuşu gibi her krizden daha güçlü doğar.',
       'love':
@@ -459,6 +484,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Dürüst',
         'Enerjik',
       ],
+      'allTraits': ['Maceracı', 'Özgür', 'Filozof', 'İyimser', 'Dürüst', 'Enerjik', 'Vizyoner', 'Neşeli', 'Keşşaf', 'Cömert'],
       'strengths': [
         'Vizyon genişliği',
         'Macera ruhu',
@@ -467,6 +493,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Özgür düşünce',
         'Dürüstlük',
       ],
+      'allStrengths': ['Vizyon genişliği', 'Macera ruhu', 'Felsefi derinlik', 'İyimserlik', 'Özgür düşünce', 'Dürüstlük', 'Kültürel zenginlik', 'Mizah anlayışı', 'İlham verme', 'Ruhani arayış'],
       'weaknesses': [
         'Sorumsuzluk',
         'Aşırı dürüstlük',
@@ -475,6 +502,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Patavatsızlık',
         'Huzursuzluk',
       ],
+      'allWeaknesses': ['Sorumsuzluk', 'Aşırı dürüstlük', 'Taahhüt korkusu', 'Sabırsızlık', 'Patavatsızlık', 'Huzursuzluk', 'Aşırı iyimserlik', 'Detay atlama', 'Kaçış eğilimi', 'Yerleşememe'],
       'description':
           'Yay, Zodyak\'ın kaşifi ve filozofudur. Jüpiter\'in genişletici enerjisiyle sınırları zorlar, yeni ufuklara yelken açar. Hayata büyük bir iyimserlikle bakar, bilgelik arayışı hiç bitmez. Okçu gibi hedefine doğru uçar.',
       'love':
@@ -512,6 +540,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Geleneksel',
         'Dayanıklı',
       ],
+      'allTraits': ['Disiplinli', 'Hırslı', 'Sorumlu', 'Ciddi', 'Geleneksel', 'Dayanıklı', 'Sabırlı', 'Stratejik', 'Güvenilir', 'Azimli'],
       'strengths': [
         'İrade gücü',
         'Uzun vadeli planlama',
@@ -520,6 +549,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Kararlılık',
         'Güvenilirlik',
       ],
+      'allStrengths': ['İrade gücü', 'Uzun vadeli planlama', 'Sorumluluk bilinci', 'Disiplin', 'Kararlılık', 'Güvenilirlik', 'Sabırlı yükseliş', 'Pratik zekâ', 'Otorite', 'Dayanıklılık'],
       'weaknesses': [
         'Aşırı ciddiyet',
         'Duygularını bastırma',
@@ -528,6 +558,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Katı kuralcılık',
         'Maddiyatçılık',
       ],
+      'allWeaknesses': ['Aşırı ciddiyet', 'Duygularını bastırma', 'İş koliklik', 'Karamsarlık', 'Katı kuralcılık', 'Maddiyatçılık', 'Duygusal soğukluk', 'Eğlenememe', 'Statü takıntısı', 'Aşırı kontrol'],
       'description':
           'Oğlak, Zodyak\'ın en disiplinli ve hırslı burcudur. Satürn\'ün yapıcı etkisiyle hedeflerine adım adım ilerler. Sabırla dağın zirvesine tırmanır. Sözüne güvenilir, sorumluluklarını asla ihmal etmez. Zamanla daha da güçlenir.',
       'love':
@@ -565,6 +596,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Vizyoner',
         'Asi',
       ],
+      'allTraits': ['Yenilikçi', 'Bağımsız', 'Hümanist', 'Orijinal', 'Vizyoner', 'Asi', 'Ileriçi', 'Zeki', 'Toplumcu', 'Özgün'],
       'strengths': [
         'Özgün düşünce',
         'İnsancıl bakış',
@@ -573,6 +605,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Gelecek vizyonu',
         'Yenilikçilik',
       ],
+      'allStrengths': ['Özgün düşünce', 'İnsancıl bakış', 'Devrimci ruh', 'Bağımsızlık', 'Gelecek vizyonu', 'Yenilikçilik', 'Teknoloji sevgisi', 'Toplumsal bilinç', 'Sıra dışı bakış', 'Entelektüel derinlik'],
       'weaknesses': [
         'Duygusal mesafe',
         'İnatçılık',
@@ -581,6 +614,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Ukalalık',
         'Aşırı rasyonalite',
       ],
+      'allWeaknesses': ['Duygusal mesafe', 'İnatçılık', 'Asi tutum', 'Bağlanma korkusu', 'Ukalalık', 'Aşırı rasyonalite', 'Üstünlük taslama', 'Empati eksikliği', 'Kurallara karşı çıkma', 'Öngörülemezlik'],
       'description':
           'Kova, Zodyak\'ın yenilikçisi ve devrimcisidir. Uranüs\'ün sıra dışı enerjisiyle kalıpları kırar, geleceği hayal eder. İnsanlığın iyiliği için çalışır. Bireysel özgürlüğe düşkün, orijinal düşünceli vizyonerlerdir.',
       'love':
@@ -618,6 +652,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Şefkatli',
         'Gizemli',
       ],
+      'allTraits': ['Hayalperest', 'Empati', 'Sanatsal', 'Sezgisel', 'Şefkatli', 'Gizemli', 'Rühani', 'Fedakar', 'Romantik', 'Hassas'],
       'strengths': [
         'Sınırsız empati',
         'Sanatsal yetenek',
@@ -626,6 +661,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Şefkat',
         'Fedakarlık',
       ],
+      'allStrengths': ['Sınırsız empati', 'Sanatsal yetenek', 'Ruhani derinlik', 'Sezgisel güç', 'Şefkat', 'Fedakarlık', 'Hayal gücü', 'Müzik yeteneği', 'Şifa enerjisi', 'Rüya yorumlama'],
       'weaknesses': [
         'Gerçeklikten kaçış',
         'Aşırı hassasiyet',
@@ -634,6 +670,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Kararsızlık',
         'Aşırı duygusallık',
       ],
+      'allWeaknesses': ['Gerçeklikten kaçış', 'Aşırı hassasiyet', 'Sınır koyamama', 'Kurban psikolojisi', 'Kararsızlık', 'Aşırı duygusallık', 'Bağımlılık eğilimi', 'Pasiflik', 'Kolay kandırılma', 'Erteleme'],
       'description':
           'Balık, Zodyak\'ın son ve en ruhani burcudur. Neptün\'ün hayalci dünyasıyla sınırları olmayan bir iç evrene sahiptir. Tüm burçların bilgeliğini taşır. Güçlü empatisi ve sanatsal ruhuyla dokunduğu her şeye anlam katar.',
       'love':
@@ -666,14 +703,15 @@ class _ZodiacPageState extends State<ZodiacPage>
   Future<void> _loadUserData() async {
     final name = await StorageService.getUserName();
     final savedDate = await StorageService.getBirthDate();
+    final boosts = await StorageService.getTraitBoosts();
     if (mounted) {
       setState(() {
         _userName = name;
+        _traitBoosts = boosts;
         if (savedDate != null) {
           _birthDate = savedDate;
           _selectedIndex = _signIndexFromDate(savedDate);
         } else {
-          // Varsayılan tarihten burcu hesapla
           _selectedIndex = _signIndexFromDate(_birthDate);
         }
       });
@@ -947,65 +985,78 @@ class _ZodiacPageState extends State<ZodiacPage>
       builder: (_) => ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.55,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.92,
+            ),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1210).withOpacity(0.85),
+              color: Colors.white.withOpacity(0.08),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(32),
               ),
               border: Border(
-                top: BorderSide(color: _gold.withOpacity(0.3), width: 1.0),
+                top: BorderSide(color: _gold.withOpacity(0.25), width: 0.8),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 40,
+                  offset: const Offset(0, -8),
+                ),
+              ],
             ),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  width: 36,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    gradient: LinearGradient(
-                      colors: [
-                        _gold.withOpacity(0.1),
-                        _gold.withOpacity(0.4),
-                        _gold.withOpacity(0.1),
-                      ],
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 36,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      gradient: LinearGradient(
+                        colors: [
+                          _gold.withOpacity(0.1),
+                          _gold.withOpacity(0.4),
+                          _gold.withOpacity(0.1),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'BİR BURÇ SEÇİN',
-                  style: GoogleFonts.cinzel(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 2,
+                  const SizedBox(height: 16),
+                  Text(
+                    'BİR BURÇ SEÇİN',
+                    style: GoogleFonts.cinzel(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 2,
+                    ),
                   ),
-                ),
-                Text(
-                  'Uyum oranınızı görmek için partnerinizi seçin',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 12,
+                  Text(
+                    'Uyum oranınızı görmek için partnerinizi seçin',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: GridView.builder(
+                  const SizedBox(height: 14),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
+                      horizontal: 16,
+                      vertical: 4,
                     ),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
-                          childAspectRatio: 0.85,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.74,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
                         ),
                     itemCount: _signs.length,
                     itemBuilder: (context, index) {
@@ -1022,7 +1073,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                     sign2: sign,
                                     gold: const Color(
                                       0xFFE5CC75,
-                                    ), // Slightly muted/softer gold color
+                                    ),
                                   ),
                               transitionsBuilder: (_, a, __, child) =>
                                   FadeTransition(opacity: a, child: child),
@@ -1034,26 +1085,36 @@ class _ZodiacPageState extends State<ZodiacPage>
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.04),
+                            color: Colors.white.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: _gold.withOpacity(0.15)),
+                            border: Border.all(color: _gold.withOpacity(0.12)),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
                                 sign['image'] as String,
-                                width: 45,
-                                height: 45,
+                                width: 40,
+                                height: 40,
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                               Text(
                                 sign['nameEn'].toString().toUpperCase(),
                                 style: GoogleFonts.cinzel(
                                   color: _gold,
-                                  fontSize: 10,
+                                  fontSize: 9,
                                   fontWeight: FontWeight.w600,
                                 ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                sign['dates'] as String,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.35),
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -1061,8 +1122,11 @@ class _ZodiacPageState extends State<ZodiacPage>
                       );
                     },
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: MediaQuery.of(context).padding.bottom + 16,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1737,14 +1801,16 @@ class _ZodiacPageState extends State<ZodiacPage>
   Widget _analyticsCard(Map<String, dynamic> s) {
     final strengths = s['strengths'] as List<String>;
     final weaknesses = s['weaknesses'] as List<String>;
-    final traits = s['traits'] as List<String>;
     final name = s['name'] as String;
 
-    final values = List.generate(traits.length > 6 ? 6 : traits.length, (i) {
-      final h = (traits[i].hashCode ^ (i * 7919)).abs() % 100;
-      return 0.55 + (h % 40) / 100.0;
+    // 10 günde bir trait rotasyonu
+    final activeTraits = _getActiveTraits(s);
+
+    final scoreMap = _computeTraitScores(s, _traitBoosts);
+    final values = List.generate(6, (i) {
+      return (scoreMap[activeTraits[i]] ?? 75) / 100.0;
     });
-    final displayTraits = traits.take(6).toList();
+    final displayTraits = activeTraits;
 
     const usageHints = <String, String>{
       'Doğal liderlik': 'Takım kurmada kullan',
@@ -1928,7 +1994,12 @@ class _ZodiacPageState extends State<ZodiacPage>
               onTap: () => Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) =>
-                      _ZodiacDetailPage(sign: s, gold: _gold),
+                      _ZodiacDetailPage(
+                        sign: s,
+                        gold: _gold,
+                        boosts: _traitBoosts,
+                        onBoostUpdated: _loadUserData,
+                      ),
                   transitionsBuilder: (_, a, __, child) =>
                       FadeTransition(opacity: a, child: child),
                   transitionDuration: const Duration(milliseconds: 400),
@@ -2165,6 +2236,7 @@ class _ZodiacPageState extends State<ZodiacPage>
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 children: [
@@ -2202,10 +2274,13 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ),
                 ],
               ),
-              Icon(
-                Icons.all_inclusive,
-                color: _gold.withOpacity(0.6),
-                size: 28,
+              Padding(
+                padding: const EdgeInsets.only(top: 26),
+                child: Icon(
+                  Icons.all_inclusive,
+                  color: _gold.withOpacity(0.6),
+                  size: 28,
+                ),
               ),
               GestureDetector(
                 onTap: () => _showZodiacPickerForCompatibility(currentSignData),
@@ -3503,12 +3578,321 @@ class _RadarChartPainter extends CustomPainter {
 }
 
 // ═══════════════════════════════════════════
+// 10 GÜNLÜK ROTASYON SİSTEMİ
+// ═══════════════════════════════════════════
+
+/// Genel rotasyon: [allKey] havuzundan her 10 günde bir farklı [take] tanesini seçer.
+/// Seçim deterministik: aynı burç + aynı periyotta hep aynı öğeler.
+/// [category] parametresi farklı listeler (traits/strengths/weaknesses) için
+/// farklı shuffle sonuçları üretir.
+List<String> _getActiveList(
+  Map<String, dynamic> sign, {
+  required String allKey,
+  required String defaultKey,
+  required String category,
+  int take = 6,
+}) {
+  final allItems = sign[allKey] as List<dynamic>?;
+  final defaultItems = sign[defaultKey] as List<dynamic>;
+
+  if (allItems == null || allItems.length <= take) {
+    return defaultItems.take(take).cast<String>().toList();
+  }
+
+  final now = DateTime.now();
+  final daysSinceEpoch = now.difference(DateTime(2025, 1, 1)).inDays;
+  final period = daysSinceEpoch ~/ 10;
+
+  final signName = sign['name'] as String;
+  final seed = signName.hashCode ^ (period * 31337) ^ category.hashCode;
+
+  final pool = List<String>.from(allItems.cast<String>());
+  final rng = math.Random(seed);
+  for (int i = pool.length - 1; i > 0; i--) {
+    final j = rng.nextInt(i + 1);
+    final tmp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = tmp;
+  }
+
+  return pool.take(take).toList();
+}
+
+/// Radar chart trait'leri — her 10 günde 6 farklı
+List<String> _getActiveTraits(Map<String, dynamic> sign) =>
+    _getActiveList(sign, allKey: 'allTraits', defaultKey: 'traits', category: 'traits');
+
+/// Süper Güçlerin — her 10 günde 6 farklı
+List<String> _getActiveStrengths(Map<String, dynamic> sign) =>
+    _getActiveList(sign, allKey: 'allStrengths', defaultKey: 'strengths', category: 'strengths');
+
+/// Büyüme Alanların — her 10 günde 6 farklı
+List<String> _getActiveWeaknesses(Map<String, dynamic> sign) =>
+    _getActiveList(sign, allKey: 'allWeaknesses', defaultKey: 'weaknesses', category: 'weaknesses');
+
+// ═══════════════════════════════════════════
+// TUTARLI TRAIT SKORU HESAPLAMA
+// ═══════════════════════════════════════════
+
+/// Zayıflık adından olumlu karşılığına dönüşüm haritası (rozet adları için)
+const _weaknessToPositive = <String, String>{
+  'Sabırsızlık': 'Sabır',
+  'Düşünmeden hareket': 'Düşünceli Hareket',
+  'Hırslı olma': 'Dengeli Hırs',
+  'Çabuk öfkelenme': 'Sakinlik',
+  'Bencillik': 'Empati',
+  'Acelecilik': 'Sabır',
+  'İnatçılık': 'Esneklik',
+  'Değişime direnç': 'Uyum',
+  'Aşırı sahiplenme': 'Güven',
+  'Maddiyatçılık': 'Ruhani Zenginlik',
+  'Üşengeçlik': 'Motivasyon',
+  'Kıskançlık': 'Güven',
+  'Kararsızlık': 'Kararlılık',
+  'Yüzeysellik': 'Derinlik',
+  'Çabuk sıkılma': 'Odaklanma',
+  'Tutarsızlık': 'Tutarlılık',
+  'Gevşeklik': 'Disiplin',
+  'Odak eksikliği': 'Odaklanma',
+  'Aşırı duygusallık': 'Duygusal Denge',
+  'Geçmişe takılma': 'Şimdi',
+  'Kabuğuna çekilme': 'Açılma',
+  'Alınganlık': 'Dayanıklılık',
+  'Karamsarlık': 'İyimserlik',
+  'Aşırı hassasiyet': 'Dayanıklılık',
+  'Gurur': 'Alçakgönüllülük',
+  'Dikkat beklentisi': 'İç Huzur',
+  'Otoriter tavır': 'Şefkatli Liderlik',
+  'Kibir': 'Tevazu',
+  'Egoizm': 'Paylaşım',
+  'Aşırı eleştirellik': 'Anlayış',
+  'Mükemmeliyetçilik': 'Kabul',
+  'Endişe eğilimi': 'Güven',
+  'Evham': 'Huzur',
+  'Detaylarda boğulma': 'Büyük Resim',
+  'Soğuk görünüm': 'Sıcaklık',
+  'Çatışmadan kaçınma': 'Cesaret',
+  'Başkalarına bağımlılık': 'Bağımsızlık',
+  'Hayır diyememe': 'Sınır Koyma',
+  'Kendinden ödün verme': 'Öz Değer',
+  'İntikamcılık': 'Affetme',
+  'Aşırı kontrol': 'Güven',
+  'Şüphecilik': 'Güven',
+  'Gizemlilik': 'Açıklık',
+  'Sahiplenicilik': 'Bırakma',
+  'Sorumsuzluk': 'Sorumluluk',
+  'Aşırı dürüstlük': 'İncelik',
+  'Taahhüt korkusu': 'Bağlanma',
+  'Patavatsızlık': 'Zarafet',
+  'Huzursuzluk': 'İç Huzur',
+  'Aşırı ciddiyet': 'Neşe',
+  'Duygularını bastırma': 'Duygusal Özgürlük',
+  'İş koliklik': 'Denge',
+  'Katı kuralcılık': 'Esneklik',
+  'Duygusal mesafe': 'Yakınlık',
+  'Asi tutum': 'Uyum',
+  'Bağlanma korkusu': 'Bağlanma',
+  'Ukalalık': 'Alçakgönüllülük',
+  'Aşırı rasyonalite': 'Sezgisellik',
+  'Gerçeklikten kaçış': 'Gerçeklik',
+  'Sınır koyamama': 'Sınır Koyma',
+  'Kurban psikolojisi': 'Güçlenme',
+  // ── Genişletilmiş havuz (allWeaknesses) ──
+  'Sert tepki': 'Yumuşak Güç',
+  'Dinlememe': 'Aktif Dinleme',
+  'Takım çalışmasında zorlanma': 'İş Birliği',
+  'Aşırı rekabet': 'Dengeli Rekabet',
+  'Konfor bağımlılığı': 'Cesaret',
+  'Rutine sığınma': 'Yenilik',
+  'Risk almama': 'Cesur Adım',
+  'Paylaşmaktan kaçınma': 'Cömertlik',
+  'Dedikodu eğilimi': 'Saygı',
+  'Söz tutamama': 'Sadakat',
+  'Dağınıklık': 'Düzen',
+  'Coşku kaybı': 'İlham',
+  'Edilgen saldırganlık': 'Doğrudanlık',
+  'Suçluluk manipülasyonu': 'Dürüst İfade',
+  'Kapanma refleksi': 'Açılma',
+  'Aşırı endişe': 'Huzur',
+  'Kolay kırılma': 'Dayanıklılık',
+  'Gösteriş düşkünlüğü': 'Sadelik',
+  'Onay bağımlılığı': 'Öz Değer',
+  'Eleştiriye kapalılık': 'Gelişim',
+  'Kendini yıpratma': 'Öz Bakım',
+  'Kontrolcülük': 'Bırakma',
+  'Esneklik eksikliği': 'Esneklik',
+  'Duygu bastırma': 'Duygusal Özgürlük',
+  'Pasif agresiflik': 'Doğrudanlık',
+  'Memnun etme takıntısı': 'Öz Değer',
+  'Kendi sesini kaybetme': 'Ses Bulma',
+  'Yalnızlık korkusu': 'İç Huzur',
+  'Manipülasyon': 'Dürüstlük',
+  'Paranoya': 'Güven',
+  'Kin tutma': 'Affetme',
+  'Obsesif bağlanma': 'Sağlıklı Bağ',
+  'Aşırı iyimserlik': 'Gerçekçilik',
+  'Detay atlama': 'Dikkat',
+  'Kaçış eğilimi': 'Yüzleşme',
+  'Yerleşememe': 'Kök Salma',
+  'Duygusal soğukluk': 'Sıcaklık',
+  'Eğlenememe': 'Neşe',
+  'Statü takıntısı': 'İçsel Değer',
+  'Üstünlük taslama': 'Eşitlik',
+  'Empati eksikliği': 'Empati',
+  'Kurallara karşı çıkma': 'Uyum',
+  'Öngörülemezlik': 'Tutarlılık',
+  'Bağımlılık eğilimi': 'Bağımsızlık',
+  'Pasiflik': 'İnisiyatif',
+  'Kolay kandırılma': 'Sağduyu',
+  'Erteleme': 'Harekete Geçme',
+};
+
+/// Bir burcun trait ve strength isimlerini anlam bazında eşleştirerek
+/// her iki bölümde de (radar chart + detay sayfası) tutarlı yüzdelik üretir.
+/// [boosts] parametresi kalıcı olarak kaydedilmiş trait boost'larını uygular.
+Map<String, double> _computeTraitScores(Map<String, dynamic> sign, [Map<String, int>? boosts]) {
+  final traits = sign['traits'] as List<dynamic>;
+  final strengths = sign['strengths'] as List<dynamic>;
+  final weaknesses = sign['weaknesses'] as List<dynamic>;
+  final map = <String, double>{};
+  final b = boosts ?? {};
+
+  // 1) Tüm trait skorlarını hesapla + boost uygula
+  final count = traits.length > 6 ? 6 : traits.length;
+  final traitScores = <int, double>{};
+  for (int i = 0; i < count; i++) {
+    final traitName = traits[i] as String;
+    final h = (traitName.hashCode ^ (i * 7919)).abs() % 100;
+    final base = 55 + (h % 40).toDouble();
+    final boost = b[traitName] ?? 0;
+    final score = (base + boost).clamp(0, 99).toDouble();
+    traitScores[i] = score;
+    map[traitName] = score;
+  }
+
+  // 1b) allTraits'teki ekstra trait'ler için de skor hesapla (rotasyon desteği)
+  final allTraits = sign['allTraits'] as List<dynamic>?;
+  if (allTraits != null) {
+    for (int i = 0; i < allTraits.length; i++) {
+      final tName = allTraits[i] as String;
+      if (!map.containsKey(tName)) {
+        final h = (tName.hashCode ^ (i * 7919)).abs() % 100;
+        final base = 55 + (h % 40).toDouble();
+        final boost = b[tName] ?? 0;
+        map[tName] = (base + boost).clamp(0, 99).toDouble();
+      }
+    }
+  }
+
+  // 2) Her strength için en uygun trait'i BUL ve aynı skoru ata
+  for (int si = 0; si < strengths.length && si < count; si++) {
+    final sName = strengths[si] as String;
+    final matchIdx = _findBestTraitMatch(sName, traits, count);
+    final baseScore = traitScores[matchIdx >= 0 ? matchIdx : si]!;
+    final boost = b[sName] ?? 0;
+    map[sName] = (baseScore + boost).clamp(0, 99).toDouble();
+  }
+
+  // 2b) allStrengths'teki ekstra öğeler için de skor hesapla (rotasyon desteği)
+  final allStrengths = sign['allStrengths'] as List<dynamic>?;
+  if (allStrengths != null) {
+    for (int i = 0; i < allStrengths.length; i++) {
+      final sName = allStrengths[i] as String;
+      if (!map.containsKey(sName)) {
+        final h = (sName.hashCode ^ (i * 7919)).abs() % 100;
+        final base = 55 + (h % 40).toDouble();
+        final boost = b[sName] ?? 0;
+        map[sName] = (base + boost).clamp(0, 99).toDouble();
+      }
+    }
+  }
+
+  // 3) Weaknesses: kendi formülü (30-65 arası) + boost
+  for (int i = 0; i < weaknesses.length && i < 6; i++) {
+    final wName = weaknesses[i] as String;
+    final h = (wName.hashCode ^ (i * 5147)).abs() % 100;
+    final base = 30 + (h % 35).toDouble();
+    final boost = b[wName] ?? 0;
+    map[wName] = (base + boost).clamp(0, 99).toDouble();
+  }
+
+  // 3b) allWeaknesses'teki ekstra öğeler için de skor hesapla (rotasyon desteği)
+  final allWeaknesses = sign['allWeaknesses'] as List<dynamic>?;
+  if (allWeaknesses != null) {
+    for (int i = 0; i < allWeaknesses.length; i++) {
+      final wName = allWeaknesses[i] as String;
+      if (!map.containsKey(wName)) {
+        final h = (wName.hashCode ^ (i * 5147)).abs() % 100;
+        final base = 30 + (h % 35).toDouble();
+        final boost = b[wName] ?? 0;
+        map[wName] = (base + boost).clamp(0, 99).toDouble();
+      }
+    }
+  }
+
+  return map;
+}
+
+/// Bir strength adına en iyi eşleşen trait'in index'ini döndürür.
+/// Eşleşme bulunamazsa -1 döner (fallback olarak index kullanılır).
+int _findBestTraitMatch(String strength, List<dynamic> traits, int count) {
+  final sLower = strength.toLowerCase();
+  final sWords = sLower.split(' ');
+
+  // Strateji 1: Strength, trait adını içeriyor mu?
+  //   Örn: "Dürüstlük" → contains("dürüst") ✓
+  //   Örn: "İyimserlik" → contains("iyimser") ✓ (İ→i dönüşümü ile)
+  for (int i = 0; i < count; i++) {
+    final tLower = (traits[i] as String).toLowerCase();
+    if (tLower.length >= 3 && sLower.contains(tLower)) return i;
+  }
+
+  // Strateji 2: Trait, strength adını (veya herhangi bir kelimesini) içeriyor mu?
+  //   Örn: "Maceracı" → contains("macera") ✓ ("Macera ruhu" kelimesi)
+  for (int i = 0; i < count; i++) {
+    final tLower = (traits[i] as String).toLowerCase();
+    for (final w in sWords) {
+      if (w.length >= 4 && tLower.contains(w)) return i;
+    }
+  }
+
+  // Strateji 3: Strength'in herhangi bir kelimesi, trait ile ortak kök paylaşıyor mu?
+  //   En az 4 karakter ortak ön ek kontrolü
+  for (int i = 0; i < count; i++) {
+    final tLower = (traits[i] as String).toLowerCase();
+    for (final w in sWords) {
+      if (w.length >= 4 && tLower.length >= 4) {
+        int common = 0;
+        final minLen = w.length < tLower.length ? w.length : tLower.length;
+        for (int j = 0; j < minLen; j++) {
+          if (w[j] == tLower[j]) {
+            common++;
+          } else {
+            break;
+          }
+        }
+        if (common >= 4) return i;
+      }
+    }
+  }
+
+  return -1; // Eşleşme bulunamadı, fallback index kullanılacak
+}
+
+// ═══════════════════════════════════════════
 // KENDİNİ KEŞFET — DETAY SAYFASI (Zigzag Kart Tasarım)
 // ═══════════════════════════════════════════
 class _ZodiacDetailPage extends StatefulWidget {
   final Map<String, dynamic> sign;
   final Color gold;
-  const _ZodiacDetailPage({required this.sign, required this.gold});
+  final Map<String, int> boosts;
+  final VoidCallback? onBoostUpdated;
+  const _ZodiacDetailPage({
+    required this.sign,
+    required this.gold,
+    this.boosts = const {},
+    this.onBoostUpdated,
+  });
 
   @override
   State<_ZodiacDetailPage> createState() => _ZodiacDetailPageState();
@@ -3525,22 +3909,36 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Liste her açılışta karıştırılıyor (kullanıcının sıkılmasını ve aynı duty/challenge listesini görmesini engeller)
-    shuffledStrengths = (List<String>.from(
-      widget.sign['strengths'] as List<dynamic>,
-    )..shuffle()).take(3).toList();
-    shuffledWeaknesses = (List<String>.from(
-      widget.sign['weaknesses'] as List<dynamic>,
-    )..shuffle()).take(3).toList();
+    // Rotasyonlu havuzdan al, sonra karıştır ve 3 tanesini göster
+    final activeStrengths = _getActiveStrengths(widget.sign);
+    final activeWeaknesses = _getActiveWeaknesses(widget.sign);
+    shuffledStrengths = (List<String>.from(activeStrengths)..shuffle()).take(3).toList();
+    shuffledWeaknesses = (List<String>.from(activeWeaknesses)..shuffle()).take(3).toList();
   }
 
-  // Trait için yüzde hesapla
+  // Trait için yüzde hesapla — radar chart ile tutarlı
+  Map<String, double> _scoreMap = {};
+
+  void _reloadScores() {
+    StorageService.getTraitBoosts().then((boosts) {
+      if (mounted) {
+        setState(() {
+          _scoreMap = _computeTraitScores(widget.sign, boosts);
+        });
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_scoreMap.isEmpty) {
+      _scoreMap = _computeTraitScores(widget.sign, widget.boosts);
+    }
+  }
+
   int _getPct(String trait, bool isStrength) {
-    // Biraz da rastgeleleşmesini sağlayan gün değişkeni ekleyelim ki skorlar da değişsin
-    final dayRandom = DateTime.now().day;
-    final h = (trait.hashCode.abs() ^ (trait.length * 3571) ^ dayRandom) % 100;
-    if (isStrength) return 80 + (h % 16);
-    return 40 + (h % 26);
+    return (_scoreMap[trait] ?? (isStrength ? 75 : 45)).round();
   }
 
   @override
@@ -4193,11 +4591,23 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       topWeakness: topWeakness,
       baseColor: _warmGold,
       initialPct: pct,
-      onJourneyCompleted: () {
-        setState(() {
-          final first = shuffledWeaknesses.removeAt(0);
-          shuffledWeaknesses.add(first);
-        });
+      onDayCompleted: () async {
+        // Her günlük görev tamamlandığında +1 boost
+        await StorageService.addTraitBoost(topWeakness, 1);
+        widget.onBoostUpdated?.call();
+        _reloadScores();
+      },
+      onJourneyCompleted: () async {
+        // Serüven tamamlandığında ekstra +2 bonus
+        await StorageService.addTraitBoost(topWeakness, 2);
+        widget.onBoostUpdated?.call();
+        _reloadScores();
+        if (mounted) {
+          setState(() {
+            final first = shuffledWeaknesses.removeAt(0);
+            shuffledWeaknesses.add(first);
+          });
+        }
       },
     );
   }
@@ -4207,6 +4617,7 @@ class _CosmicChallengeCard extends StatefulWidget {
   final String topWeakness;
   final Color baseColor;
   final int initialPct;
+  final VoidCallback? onDayCompleted;
   final VoidCallback? onJourneyCompleted;
 
   const _CosmicChallengeCard({
@@ -4214,6 +4625,7 @@ class _CosmicChallengeCard extends StatefulWidget {
     required this.topWeakness,
     required this.baseColor,
     required this.initialPct,
+    this.onDayCompleted,
     this.onJourneyCompleted,
   });
 
@@ -5037,7 +5449,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '"${widget.topWeakness} Ustası"',
+                      '"${_weaknessToPositive[widget.topWeakness] ?? widget.topWeakness} Ustası"',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cinzel(
                         color: widget.baseColor,
@@ -5211,7 +5623,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 border: Border.all(color: widget.baseColor.withOpacity(0.5)),
               ),
               child: Text(
-                'Kazanılan Rozet:\n"${widget.topWeakness} Ustası"',
+                'Kazanılan Rozet:\n"${_weaknessToPositive[widget.topWeakness] ?? widget.topWeakness} Ustası"',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: widget.baseColor,
@@ -5493,6 +5905,9 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
             onTap: () {
               final taskToMark = days[currentDay - 1]['task'] as String;
               StorageService.addCompletedCosmicTask(taskToMark);
+
+              // Her günlük görev tamamlandığında boost kaydet
+              widget.onDayCompleted?.call();
 
               if (currentDay >= totalDays) {
                 widget.onJourneyCompleted?.call();
