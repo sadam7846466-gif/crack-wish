@@ -5763,8 +5763,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                   _t('Sonuç', 'Outcome'),
                                 ];
                                 final slotLabels = _isBuyukArkana ? slotLabels3 : slotLabels7;
-                                final slotSymbols3 = ['☽', '◉', '✦'];
-                                final slotSymbols7 = ['☽', '◉', '✦', '⚝', '⊛', '☾', '✧'];
+                                final slotSymbols3 = [Icons.nightlight_round, Icons.circle_outlined, Icons.auto_awesome];
+                                final slotSymbols7 = [Icons.nightlight_round, Icons.circle_outlined, Icons.auto_awesome, Icons.star_outline, Icons.brightness_low, Icons.nights_stay, Icons.diamond_outlined];
                                 final symbols = _isBuyukArkana ? slotSymbols3 : slotSymbols7;
                                 final cardW = _isBuyukArkana ? 88.0 : 70.0;
                                 final cardH = _isBuyukArkana ? 138.0 : 105.0;
@@ -5883,18 +5883,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                           ),
                                                           ),
                                                           Center(
-                                                            child: Text(
+                                                            child: Icon(
                                                               symbols[i],
-                                                              style: TextStyle(
-                                                                fontSize: _isBuyukArkana ? 26 : 20,
-                                                                color: Colors.white.withOpacity(0.15 + pulse * 0.15),
-                                                                shadows: [
-                                                                  Shadow(
-                                                                    color: const Color(0xFFB388FF).withOpacity(0.3 * pulse),
-                                                                    blurRadius: 8,
-                                                                  ),
-                                                                ],
-                                                              ),
+                                                              size: _isBuyukArkana ? 26 : 20,
+                                                              color: Colors.white.withOpacity(0.15 + pulse * 0.15),
+                                                              shadows: [
+                                                                Shadow(
+                                                                  color: const Color(0xFFB388FF).withOpacity(0.3 * pulse),
+                                                                  blurRadius: 8,
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                           Positioned(

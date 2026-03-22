@@ -796,7 +796,7 @@ class _DreamPageState extends State<DreamPage>
     final starsOpacity = _isTyping ? 0.22 : 0.35;
     final noiseOpacity = _isTyping ? 0.03 : 0.08;
     final backgroundGradient = _resolveBackgroundGradient();
-    final bottomContentPadding = MediaQuery.of(context).padding.bottom + 160;
+    final bottomContentPadding = MediaQuery.of(context).padding.bottom + 24;
 
     return Scaffold(
       extendBody: true,
@@ -1016,7 +1016,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   ),
                 ),
-                const SizedBox(height: 36),
+                const SizedBox(height: 20),
                 // Mood Section
                 Column(
                   children: [
@@ -1030,7 +1030,7 @@ class _DreamPageState extends State<DreamPage>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                     AnimatedScale(
                       scale: _showMoodPulse ? 1.05 : 1.0,
                       duration: const Duration(milliseconds: 110),
@@ -1039,7 +1039,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 24),
                 // Submit Button
                 ValueListenableBuilder<bool>(
                   valueListenable: _hasDreamTextNotifier,
@@ -1201,11 +1201,171 @@ class _DreamPageState extends State<DreamPage>
                     );
                   },
                 ),
+                const SizedBox(height: 32),
+                // ─── İPUÇLARI VE SEMBOL REHBERİ ───
+                _buildDreamTipsSection(),
+                const SizedBox(height: 20),
+                _buildCommonSymbolsSection(),
+                const SizedBox(height: 16),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDreamTipsSection() {
+    final tips = _isTr
+        ? [
+            'Rüyanı mümkün olduğunca detaylı yaz — renkleri, sesleri ve duyguları da ekle.',
+            'Uyandıktan hemen sonra yazmak, detayları hatırlamanı kolaylaştırır.',
+            'Tekrarlayan rüyalar, çözülmemiş bir konuya işaret edebilir.',
+            'Rüya günlüğü tutmak bilinçaltınla daha güçlü bağ kurmanı sağlar.',
+          ]
+        : [
+            'Write your dream in as much detail as possible — include colors, sounds and feelings.',
+            'Writing right after waking up makes it easier to remember details.',
+            'Recurring dreams may point to an unresolved issue.',
+            'Keeping a dream journal helps you build a stronger connection with your subconscious.',
+          ];
+
+    final tipIndex = math.Random().nextInt(tips.length);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C6CF3).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Center(
+              child: Icon(Icons.lightbulb_outline, color: Color(0xFFB8A8FF), size: 18),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isTr ? 'İpucu' : 'Tip',
+                  style: TextStyle(
+                    color: const Color(0xFFB8A8FF),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tips[tipIndex],
+                  style: TextStyle(
+                    color: AppColors.textWhite70.withOpacity(0.85),
+                    fontSize: 12.5,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommonSymbolsSection() {
+    final symbols = _isTr
+        ? [
+            _SymbolInfo(Icons.water_drop_outlined, 'Su', 'Duygusal derinlik\nve bilinçaltı'),
+            _SymbolInfo(Icons.flight, 'Uçmak', 'Özgürlük arzusu\nve kontrol'),
+            _SymbolInfo(Icons.pest_control_outlined, 'Yılan', 'Dönüşüm ve\ngizli korkular'),
+            _SymbolInfo(Icons.home_outlined, 'Ev', 'Benlik ve\niç dünya'),
+            _SymbolInfo(Icons.local_fire_department_outlined, 'Ateş', 'Tutku, öfke\nve arınma'),
+            _SymbolInfo(Icons.sentiment_very_dissatisfied, 'Diş', 'Güvensizlik\nve kaygı'),
+          ]
+        : [
+            _SymbolInfo(Icons.water_drop_outlined, 'Water', 'Emotional depth\nand subconscious'),
+            _SymbolInfo(Icons.flight, 'Flying', 'Desire for freedom\nand control'),
+            _SymbolInfo(Icons.pest_control_outlined, 'Snake', 'Transformation\nand hidden fears'),
+            _SymbolInfo(Icons.home_outlined, 'Home', 'Self and\ninner world'),
+            _SymbolInfo(Icons.local_fire_department_outlined, 'Fire', 'Passion, anger\nand purification'),
+            _SymbolInfo(Icons.sentiment_very_dissatisfied, 'Teeth', 'Insecurity\nand anxiety'),
+          ];
+
+    final shuffled = List<_SymbolInfo>.from(symbols)..shuffle(math.Random());
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            _isTr ? 'Sık Görülen Semboller' : 'Common Symbols',
+            style: TextStyle(
+              color: AppColors.textWhite70,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 88,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: shuffled.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, index) {
+              final s = shuffled[index];
+              return Container(
+                width: 90,
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(s.icon, color: const Color(0xFFB8A8FF), size: 22),
+                    const SizedBox(height: 4),
+                    Text(
+                      s.label,
+                      style: const TextStyle(
+                        color: AppColors.textWhite,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      s.desc,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textWhite50,
+                        fontSize: 9,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -2469,8 +2629,19 @@ class _DreamPageState extends State<DreamPage>
     }
     if (title.contains('🔍') ||
         title.toLowerCase().contains('bilişsel') ||
+        title.toLowerCase().contains('detaylı') ||
         title.toLowerCase().contains('okuma')) {
       return Icons.search;
+    }
+    if (title.contains('💭') ||
+        title.toLowerCase().contains('bilinçaltı') ||
+        title.toLowerCase().contains('subconscious')) {
+      return Icons.bubble_chart;
+    }
+    if (title.contains('✨') ||
+        title.toLowerCase().contains('sembol') ||
+        title.toLowerCase().contains('symbol')) {
+      return Icons.auto_awesome;
     }
     if (title.contains('👤') ||
         title.toLowerCase().contains('kişisel') ||
@@ -2479,20 +2650,25 @@ class _DreamPageState extends State<DreamPage>
     }
     if (title.contains('📌') ||
         title.toLowerCase().contains('sonuç') ||
+        title.toLowerCase().contains('tavsiye') ||
         title.toLowerCase().contains('dengeli')) {
       return Icons.push_pin;
     }
     if (title.toLowerCase().contains('duygu')) {
       return Icons.favorite_outline;
     }
-    if (title.toLowerCase().contains('sembol')) {
-      return Icons.auto_awesome;
-    }
     if (title.toLowerCase().contains('geçmiş')) {
       return Icons.history;
     }
     return Icons.circle_outlined;
   }
+}
+
+class _SymbolInfo {
+  final IconData icon;
+  final String label;
+  final String desc;
+  const _SymbolInfo(this.icon, this.label, this.desc);
 }
 
 class _InterpretationSection {

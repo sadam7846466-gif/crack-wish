@@ -253,7 +253,7 @@ class DreamAnalysisService {
     return null;
   }
 
-  /// Bilimsel yorum üretir
+  /// Bilimsel yorum üretir — detaylı ve derin
   String interpret({
     required DreamInput input,
     required DreamAnalysis analysis,
@@ -262,6 +262,7 @@ class DreamAnalysisService {
     final primaryEmotion = input.emotions.isNotEmpty
         ? input.emotions.first
         : Emotion.calm;
+    final dreamText = input.text.toLowerCase();
 
     final clarifiedThreat = _resolveClarification(
       'threat',
@@ -279,33 +280,213 @@ class DreamAnalysisService {
       answers,
     );
 
-    final settingDescription = clarifiedPast
-        ? 'geçmişle ilişkili bellekleri yeniden değerlendirdiğini'
-        : 'mevcut zihinsel durumları işlediğini';
+    // Sembol tespiti
+    final symbols = <String>[];
+    final symbolAnalyses = <String>[];
+    _detectAndDescribeSymbols(dreamText, symbols, symbolAnalyses);
+
+    // Duygusal yoğunluk analizi
+    final emotionIntensity = _analyzeEmotionIntensity(dreamText, primaryEmotion);
+
+    // Sahne karmaşıklığı
+    final sentences = input.text
+        .split(RegExp(r'[.!?]+'))
+        .where((s) => s.trim().isNotEmpty)
+        .length;
+    final complexity = sentences > 4 ? 'karmaşık' : (sentences > 2 ? 'orta düzeyde' : 'yoğunlaştırılmış');
+
+    // Bağlam cümleleri
+    final settingDesc = clarifiedPast
+        ? 'Beyin, geçmişle ilişkili bellekleri yeniden değerlendiriyor ve eski anıları yeni duygusal çerçevelerle işliyor.'
+        : 'Zihin, mevcut yaşantıdaki duygusal yükleri ve çözülmemiş sorunları gece boyunca işlemeye devam ediyor.';
     final movementNote = clarifiedMovement
-        ? 'Hareketli akış, zihnin bir çözüm arayışını simüle ettiğini gösterir.'
-        : 'Daha durağan akış, zihnin dengeyi korumaya çalıştığını gösterir.';
-    final threatDescription = clarifiedThreat
-        ? 'bir tehdit algısıyla ilişkili'
-        : 'duygusal bir iç değerlendirme';
+        ? 'Rüyadaki hareketli akış, beyninizin aktif olarak bir çözüm senaryosu simüle ettiğini gösteriyor. Zihin, hareket yoluyla kontrolü yeniden kazanmaya çalışıyor.'
+        : 'Daha durağan sahne yapısı, zihnin dengeyi korumaya ve duygusal düzenleme yapmaya odaklandığını düşündürüyor.';
+    final threatNote = clarifiedThreat
+        ? 'Amigdala kaynaklı tehdit algısı aktif — bu, rüyanızın bir "güvenlik simülasyonu" işlevi gördüğünü düşündürüyor. Beyin, olası tehlikelere karşı hazırlık yapıyor.'
+        : 'Belirgin bir tehdit sinyali tespit edilmedi. Rüya daha çok duygusal işleme ve anı konsolidasyonu ile ilgili görünüyor.';
+
+    // Bilinçaltı analizi
+    final subconsciousAnalysis = _buildSubconsciousAnalysis(
+      dreamText, primaryEmotion, clarifiedThreat, clarifiedPast, clarifiedMovement, symbols,
+    );
+
+    // Tavsiye
+    final advice = _buildAdvice(primaryEmotion, clarifiedThreat, clarifiedPast, symbols);
+
+    // Sembol bölümü
+    final symbolSection = symbols.isNotEmpty
+        ? '''
+✨ Sembol Haritası
+${symbolAnalyses.join('\n')}'''
+        : '';
 
     return '''
 🧠 Nörobilimsel Çerçeve
-REM uykusunda beyin, duygusal yük taşıyan anıları hikâye formatında işler.
-Bu sırada mantık merkezleri baskılanır, duygu merkezleri aktiftir.
-
-🔍 Bilişsel Okuma
-Bu rüyada görülen sahneler, beynin $settingDescription düşündürüyor.
+REM uykusunda beyin, duygusal yük taşıyan anıları hikâye formatında işler. Bu sırada prefrontal korteks (mantık merkezi) baskılanır, limbik sistem (duygu merkezi) aktifleşir. Rüyanızda $complexity bir sahne yapısı tespit edildi.
+$settingDesc
 $movementNote
 
-👤 Kişisel Bağ
-Uyandığında seçtiğin duygu (${primaryEmotion.label}),
-bu rüyanın $threatDescription olduğunu gösterir.
+🔍 Detaylı Rüya Analizi
+$threatNote
+$emotionIntensity
+Rüyadaki sahneler, beynin gece boyunca gerçekleştirdiği duygusal düzenleme sürecinin bir yansımasıdır. Bu süreçte beyin, gündüz bastırılan veya tam olarak işlenemeyen duyguları güvenli bir ortamda yeniden deneyimler.
 
-📌 Dengeli Sonuç
-Bu rüya büyük ihtimalle gelecekle değil,
-son dönemde yaşanan veya bastırılan bir durumla bağlantılıdır.
-''';
+💭 Bilinçaltı Analizi
+$subconsciousAnalysis
+$symbolSection
+
+📌 Sonuç ve Tavsiye
+$advice''';
+  }
+
+  void _detectAndDescribeSymbols(String text, List<String> symbols, List<String> analyses) {
+    final symbolDescriptions = {
+      'su': MapEntry('Su / Deniz', 'Su sembolleri bilinçaltındaki duygusal derinliği ve bastırılmış hisleri temsil eder. Durgun su iç huzuru, dalgalı su duygusal çalkantıyı simgeler.'),
+      'deniz': MapEntry('Su / Deniz', 'Deniz, bilinçaltının enginliğini ve keşfedilmemiş duyguları temsil eder. Derinliklere inmek, bastırılan anılara yüzleşmeyi simgeler.'),
+      'uçmak': MapEntry('Uçmak', 'Uçma rüyaları özgürlük arzusu ve mevcut sınırlamalardan kurtulma ihtiyacını yansıtır. Kontrollü uçuş özgüvenin, kontrolsüz uçuş kaygının göstergesidir.'),
+      'uçuyordum': MapEntry('Uçmak', 'Uçma deneyimi, bilinçaltının baskılardan kurtulma ve yükselme arzusunu simüle etmesidir.'),
+      'düşmek': MapEntry('Düşmek', 'Düşme rüyaları kontrol kaybı korkusu ve güvensizlik hissini yansıtır. Beyin, REM uykusunda kas gevşemesini düşme hissi olarak yorumlayabilir.'),
+      'düştüm': MapEntry('Düşmek', 'Düşme deneyimi, hayatınızdaki bir alandaki kontrolsüzlük hissini ve temel güvenlik ihtiyacını yansıtıyor.'),
+      'ev': MapEntry('Ev / Mekan', 'Ev sembolü benliğinizi ve iç dünyanızı temsil eder. Farklı odalar, kişiliğinizin farklı yönlerine karşılık gelir. Bilinmeyen odalar, keşfedilmemiş potansiyelinizi simgeler.'),
+      'oda': MapEntry('Ev / Mekan', 'Oda, zihnin belirli bir konuya veya duyguya odaklandığı alanı simgeler. Kapalı kapılar bastırılan düşünceleri temsil edebilir.'),
+      'araba': MapEntry('Araba / Yolculuk', 'Araba, hayat yolculuğunuzda kontrolü ve yönü temsil eder. Süren siz iseniz kontrol sizdedir; yolcu iseniz başkalarının etkisi altındasınız demektir.'),
+      'köpek': MapEntry('Köpek', 'Köpek sembolü sadakat, güven ve koruma ile ilişkilidir. Dostça bir köpek güvenilir ilişkileri, saldırgan bir köpek ihanet korkusunu yansıtır.'),
+      'kedi': MapEntry('Kedi', 'Kedi, bağımsızlık, sezgi ve gizemli dişil enerjiyi temsil eder. Bilinçaltındaki bağımsızlık arzusunu ve sezgisel bilgeliği simgeler.'),
+      'yılan': MapEntry('Yılan', 'Yılan, dönüşüm, gizli korkular ve bastırılmış dürtüleri temsil eden güçlü bir arketiptir. Deri değiştirme gibi, kişisel bir dönüşüm sürecine işaret edebilir.'),
+      'ölüm': MapEntry('Ölüm', 'Ölüm sembolü paradoksal olarak yeniden doğuşu ve dönüşümü simgeler. Eski bir alışkanlığın, ilişkinin veya hayat döneminin sona ermesini ve yeni bir başlangıcı temsil eder.'),
+      'öldüm': MapEntry('Ölüm', 'Kendi ölümünüzü görmek, eski benliğinizin bir bölümünün dönüşüm geçirdiğini ve yeni bir kişisel evreye girdiğinizi simgeler.'),
+      'bebek': MapEntry('Bebek / Çocuk', 'Bebek, yeni başlangıçları, saflığı ve korunmaya muhtaç projeleri veya fikirleri temsil eder. İçinizdeki çocuğun sesi olabilir.'),
+      'çocuk': MapEntry('Bebek / Çocuk', 'Çocuk figürü, masumiyeti ve nostaljik bir döneme olan özlemi simgeler. İç çocuğunuzun ihtiyaçlarına dikkat çekiyor olabilir.'),
+      'anne': MapEntry('Anne', 'Anne figürü, şefkat, güvenlik ve koşulsuz sevgi arketipini temsil eder. Bilinçaltınızdaki bakım ve korunma ihtiyacını yansıtır.'),
+      'baba': MapEntry('Baba', 'Baba figürü, otorite, rehberlik ve koruma arketipini temsil eder. Hayatınızdaki yönlendirme ve onay ihtiyacını simgeler.'),
+      'para': MapEntry('Para / Değer', 'Para, öz değer duygusu ve hayattaki güvenlik ihtiyacını simgeler. Para bulmak gizli potansiyeli, kaybetmek güvensizlik hissini yansıtır.'),
+      'altın': MapEntry('Para / Değer', 'Altın, en yüksek değeri ve ruhani zenginliği temsil eder. Bilinçaltınızdaki değer arayışını simgeler.'),
+      'ateş': MapEntry('Ateş', 'Ateş, tutku, öfke, dönüşüm ve arınmayı temsil eder. Kontrollü ateş yaratıcı enerjiyi, kontrolsüz ateş bastırılan öfkeyi simgeler.'),
+      'diş': MapEntry('Diş', 'Diş kaybetme rüyaları güvensizlik, imaj kaygısı ve kontrol kaybı korkusuyla ilişkilidir. Stres dönemlerinde daha sık görülür.'),
+      'kaç': MapEntry('Kaçış', 'Kaçma eylemi, gerçek hayatta kaçınılan bir durumla yüzleşme ihtiyacını simgeler. Beyin, kaçış senaryosunu güvenli ortamda simüle ediyor.'),
+      'kovala': MapEntry('Kovalanma', 'Kovalanma rüyaları, bastırılan korkularla yüzleşilmemesinin bir yansımasıdır. Sizi kovalayan şey, kaçındığınız bir duygu veya sorumluluk olabilir.'),
+    };
+
+    final usedNames = <String>{};
+    for (final entry in symbolDescriptions.entries) {
+      if (text.contains(entry.key) && !usedNames.contains(entry.value.key)) {
+        usedNames.add(entry.value.key);
+        symbols.add(entry.value.key);
+        analyses.add('• ${entry.value.key}: ${entry.value.value}');
+      }
+    }
+  }
+
+  String _analyzeEmotionIntensity(String text, Emotion emotion) {
+    // Duygu yoğunluğu kelimeleri
+    final intensifiers = ['çok', 'aşırı', 'müthiş', 'korkunç', 'dehşet', 'inanılmaz', 'şiddetli', 'yoğun', 'derin'];
+    final hasIntensifier = intensifiers.any((w) => text.contains(w));
+
+    switch (emotion) {
+      case Emotion.anxiety:
+        return hasIntensifier
+            ? 'Yüksek düzeyde kaygı sinyalleri tespit edildi. Beyin, belirsizlik kaynaklı stres hormonlarını (kortizol) rüya yoluyla düzenlemeye çalışıyor. Bu tür rüyalar genellikle çözülmemiş günlük endişelerin yansımasıdır.'
+            : 'Orta düzeyde kaygı sinyalleri mevcut. Bilinçaltı, gündelik yaşamda tam olarak ifade edilemeyen endişeleri rüya sahneleri aracılığıyla işliyor.';
+      case Emotion.fear:
+        return hasIntensifier
+            ? 'Güçlü korku tepkileri tespit edildi. Amigdala aktif olarak tehdit simülasyonu gerçekleştiriyor. Bu, beynin sizi olası tehlikelere hazırlamak için kullandığı evrimsel bir mekanizmadır.'
+            : 'Korku kaynaklı savunma mekanizmaları aktif. Beyin, güvenli rüya ortamında korku tepkilerini deneyimleyerek gerçek hayattaki stres toleransını artırıyor.';
+      case Emotion.calm:
+        return 'Huzur ve iç denge sinyalleri baskın. Parasempatik sinir sistemi aktif; beyin, olumlu anıları güçlendiriyor ve duygusal dengeyi pekiştiriyor. Bu tür rüyalar iyileşme sürecinin göstergesidir.';
+      case Emotion.happiness:
+        return 'Pozitif duygu merkezleri aktif. Beyin, dopamin ve serotonin ilişkili anıları işliyor ve bunları uzun vadeli belleğe kaydetmeye çalışıyor. Bu, zihinsel refahın güçlü bir işaretidir.';
+      case Emotion.sadness:
+        return hasIntensifier
+            ? 'Derin üzüntü ve kayıp sinyalleri tespit edildi. Beyin, yaslanmamış duyguları ve işlenmemiş kayıpları rüya yoluyla yeniden deneyimliyor. Bu, iyileşme sürecinin doğal ve gerekli bir parçasıdır.'
+            : 'Melankoli ve nostalji sinyalleri mevcut. Bilinçaltı, geçmiş deneyimleri yeniden değerlendiriyor ve duygusal kapanış (closure) arıyor.';
+      case Emotion.confusion:
+        return 'Bilişsel belirsizlik ve karar verme güçlüğü sinyalleri aktif. Beyin, birden fazla senaryoyu aynı anda simüle ediyor. Bu, hayatınızda netlik gerektiren bir konunun varlığına işaret edebilir.';
+    }
+  }
+
+  String _buildSubconsciousAnalysis(
+    String text, Emotion emotion, bool hasThreat, bool hasPast, bool hasMovement, List<String> symbols,
+  ) {
+    final parts = <String>[];
+
+    parts.add('Bilinçaltınız bu rüya aracılığıyla size önemli mesajlar gönderiyor:');
+
+    if (hasThreat) {
+      parts.add('• Beyin, bir tehdit veya stres kaynağını güvenli ortamda simüle ediyor. Bu, bastırılan korku veya kaygının yüzeye çıkmasıdır. Bilinçaltınız bu durumla yüzleşmenizi istiyor.');
+    }
+
+    if (hasPast) {
+      parts.add('• Geçmişe dair anılar aktif olarak yeniden işleniyor. Bilinçaltınız, eski deneyimlerden ders çıkarmaya ve tamamlanmamış duygusal süreçleri kapatmaya çalışıyor.');
+    }
+
+    if (hasMovement) {
+      parts.add('• Hareketli sahneler, bilinçaltınızın aktif olarak bir çözüm veya çıkış yolu aradığını gösteriyor. Zihin, hareketsizliğe boyun eğmeyi reddediyor.');
+    }
+
+    switch (emotion) {
+      case Emotion.anxiety:
+        parts.add('• Kaygı, bilinçaltınızın kontrolsüzlük hissine verdiği bir alarm sinyalidir. Rüyanız, bu kaygının kökenini size göstermeye çalışıyor.');
+        break;
+      case Emotion.fear:
+        parts.add('• Korku tepkisi, bilinçaltınızdaki korunma mekanizmasının aktif olduğunu gösteriyor. Bu rüya, yüzleşilmesi gereken bir korkunun varlığına işaret ediyor.');
+        break;
+      case Emotion.calm:
+        parts.add('• Huzurlu uyandığınız bu rüya, bilinçaltınızın dengede olduğunu ve duygusal iyileşme sürecinin devam ettiğini gösteriyor.');
+        break;
+      case Emotion.happiness:
+        parts.add('• Mutluluk hissi, bilinçaltınızın pozitif anıları projekte ettiğini gösteriyor. Bu, ruhsal sağlığınızın güçlü olduğunun bir kanıtıdır.');
+        break;
+      case Emotion.sadness:
+        parts.add('• Üzüntü, bilinçaltınızın işlenmemiş bir kayıp veya hayal kırıklığıyla uğraştığını gösteriyor. Bu duyguyu bastırmak yerine kabullenmek iyileşme sürecini hızlandırır.');
+        break;
+      case Emotion.confusion:
+        parts.add('• Belirsizlik, bilinçaltınızın birden fazla seçenek arasında kaldığını gösteriyor. Rüyanız, netlik ihtiyacınızı yansıtıyor.');
+        break;
+    }
+
+    if (symbols.isNotEmpty) {
+      parts.add('• Rüyanızdaki semboller (${symbols.join(', ')}), bilinçaltınızın size gönderdiği şifreli mesajlardır. Her biri ayrı bir duygusal katmanı temsil ediyor.');
+    }
+
+    return parts.join('\n');
+  }
+
+  String _buildAdvice(Emotion emotion, bool hasThreat, bool hasPast, List<String> symbols) {
+    final advice = <String>[];
+
+    advice.add('Bu rüya, beynin gece boyunca gerçekleştirdiği duygusal düzenleme sürecinin doğal bir parçasıdır.');
+
+    if (hasThreat) {
+      advice.add('Rüyanızdaki tehdit unsurları, gerçek hayatta kaçındığınız bir konuyla yüzleşme zamanının geldiğine işaret edebilir. Korkuyu kabullenmek, onu kontrol etmenin ilk adımıdır.');
+    }
+
+    if (hasPast) {
+      advice.add('Geçmişe dair imgeler, tamamlanmamış bir duygusal sürecin varlığını düşündürüyor. Bu anılarla barışmak, ileri adım atmanızı kolaylaştıracaktır.');
+    }
+
+    switch (emotion) {
+      case Emotion.anxiety:
+        advice.add('Tavsiye: Yatmadan önce 5 dakika derin nefes egzersizi yapın. Kaygı tetikleyicilerinizi bir günlüğe yazarak bilinçli hale getirin. Düzenli rüya kaydı tutmak, bilinçaltınızla daha iyi iletişim kurmanıza yardımcı olacaktır.');
+        break;
+      case Emotion.fear:
+        advice.add('Tavsiye: Korku kaynağını güvenli bir ortamda (terapi, günlük yazma) ifade edin. Lucid rüya tekniklerini deneyerek rüyadaki korkularla bilinçli olarak yüzleşebilirsiniz.');
+        break;
+      case Emotion.calm:
+        advice.add('Tavsiye: Bu huzurlu rüya deneyimini korumak için uyku düzeninizi sürdürün. Yatmadan önce pozitif niyetler belirlemek, olumlu rüya deneyimlerini artırır.');
+        break;
+      case Emotion.happiness:
+        advice.add('Tavsiye: Bu pozitif enerjiyi gün içinde de taşımak için rüyanızdaki mutluluk anını detaylıca yazın ve zor zamanlarda tekrar okuyun.');
+        break;
+      case Emotion.sadness:
+        advice.add('Tavsiye: Üzüntüyü bastırmak yerine hissetmeye izin verin. Rüyanızdaki duyguyu bir mektuba dökün — alıcısı olmak zorunda değil. Bu eylem bilinçaltınıza "seni duyuyorum" mesajı verir.');
+        break;
+      case Emotion.confusion:
+        advice.add('Tavsiye: Karar vermekte zorlandığınız konuyu kağıda yazın. Rüya günlüğü tutarak bilinçaltınızın size verdiği ipuçlarını zamanla daha net görmeye başlayacaksınız.');
+        break;
+    }
+
+    return advice.join('\n');
   }
 
   /// GPT yalnızca metni zenginleştirir, karar vermez.
