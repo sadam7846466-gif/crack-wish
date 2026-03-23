@@ -62,7 +62,7 @@ class SupabaseDreamService {
     try {
       final response = await _client
           .post(
-            Uri.parse('$_supabaseUrl/functions/v1/deep-analysis'),
+            Uri.parse('$_supabaseUrl/functions/v1/analyze-dream-premium'),
             headers: _headers,
             body: jsonEncode({
               'dreamText': dreamText,
@@ -94,7 +94,7 @@ class SupabaseDreamService {
     try {
       final response = await _client
           .post(
-            Uri.parse('$_supabaseUrl/functions/v1/deep-analysis'),
+            Uri.parse('$_supabaseUrl/functions/v1/analyze-dream-premium'),
             headers: _headers,
             body: jsonEncode({
               'dreamText': dreamText,
@@ -223,11 +223,13 @@ class DreamDistribution {
 class DeepAnalysisQuestions {
   final bool success;
   final String? errorMessage;
+  final bool isValidDream;
   final List<DeepQuestion> questions;
 
   DeepAnalysisQuestions({
     required this.success,
     this.errorMessage,
+    this.isValidDream = true,
     this.questions = const [],
   });
 
@@ -239,12 +241,14 @@ class DeepAnalysisQuestions {
 
     return DeepAnalysisQuestions(
       success: true,
+      isValidDream: json['is_valid_dream'] as bool? ?? true,
       questions: questionsList,
     );
   }
 
   factory DeepAnalysisQuestions.error(String message) {
-    return DeepAnalysisQuestions(success: false, errorMessage: message);
+    return DeepAnalysisQuestions(
+        success: false, errorMessage: message, isValidDream: false);
   }
 }
 

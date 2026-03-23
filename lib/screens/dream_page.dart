@@ -383,9 +383,9 @@ class _DreamPageState extends State<DreamPage>
     '💡 As stress decreases, nightmares become less frequent.',
   ];
   static const String _notAnalyzableMessageTr =
-      'Yazdığın metinde analiz edilebilir bir rüya sahnesi bulamadım.';
+      'Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.';
   static const String _notAnalyzableMessageEn =
-      'I could not find a dream scene in your text that can be analyzed.';
+      'Are you sure this was a dream?\nPlease describe a real scene you experienced while sleeping.';
 
   String get _notAnalyzableMessage =>
       _trEn(_notAnalyzableMessageTr, _notAnalyzableMessageEn);
@@ -495,19 +495,13 @@ class _DreamPageState extends State<DreamPage>
     super.dispose();
   }
 
-  Future<bool> _interpretDream() async {
+  Future<bool> _interpretDreamPremium() async {
     final trimmed = _dreamController.text.trim();
-    if (trimmed.length < 15) {
-      return false;
-    }
-    if (_selectedEmotion == null) {
-      return false;
-    }
+    if (trimmed.length < 15) return false;
+    if (_selectedEmotion == null) return false;
 
-    // Bilimsel eğitici mesaj göster
     final messages = _educationalMessagesFor();
-    final randomMessage =
-        messages[math.Random().nextInt(messages.length)];
+    final randomMessage = messages[math.Random().nextInt(messages.length)];
 
     final retryCompleter = Completer<void>();
     _retryCompleter = retryCompleter;
@@ -519,15 +513,101 @@ class _DreamPageState extends State<DreamPage>
       _overlayNotAnalyzableMessage = '';
       _overlayShowNotAnalyzable = false;
       _overlayQuestions = [];
-      _overlayAccentColor = _resolveEmotionAccentColor(_selectedEmotion);
+      _overlayAccentColor = const Color(0xFF7C6CF3); // Premium Kozmik İndigo
     });
 
-    // Yumuşak açılış animasyonu
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() => _analysisOverlayVisible = true);
-      }
+      if (mounted) setState(() => _analysisOverlayVisible = true);
     });
+
+    final locale = _isTr ? 'tr' : 'en';
+    final emotionLabel = _selectedEmotion!.label;
+
+    // 1. ADIM: Soruları Getir
+    final questionResult = await _supabaseDreamService.generateQuestions(
+      dreamText: trimmed,
+      emotion: emotionLabel,
+      locale: locale,
+    );
+
+    if (!questionResult.success || !questionResult.isValidDream) {
+      // Hata veya Rüya Algılanamadı
+      if (mounted) {
+        setState(() {
+          _overlayShowNotAnalyzable = true;
+          _overlayNotAnalyzableMessage = _notAnalyzableMessage; // Standart rüya değil uyarısı
+        });
+      }
+      return true;
+    }
+
+    // Soruları ekrana bas ve cevabı bekle
+    final uiQuestions = questionResult.questions
+        .map((q) => _ClarificationQuestion(id: q.id, text: q.question))
+        .toList();
+
+    List<ClarificationAnswer> userAnswers = [];
+
+    if (uiQuestions.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _overlayQuestions = uiQuestions;
+        });
+      }
+
+      final answersCompleter = Completer<List<ClarificationAnswer>>();
+      _answersCompleter = answersCompleter;
+
+      // Kullanıcının dönen çember altında evet/hayır cevaplarını vermesini bekle
+      userAnswers = await answersCompleter.future;
+    }
+
+    // 2. ADIM: Soruları yanıtlandı — spinner kalsın, soruları kaldır
+    if (mounted) {
+      setState(() {
+        _overlayQuestions = [];
+      });
+    }
+
+    // Standart yorumu çağır ama overlay'ı sıfırlama (fade-out/in olmasın)
+    return await _interpretDream(skipOverlaySetup: true);
+  }
+
+  Future<bool> _interpretDream({bool skipOverlaySetup = false}) async {
+    final trimmed = _dreamController.text.trim();
+    if (trimmed.length < 15) {
+      return false;
+    }
+    if (_selectedEmotion == null) {
+      return false;
+    }
+
+    if (!skipOverlaySetup) {
+      // Bilimsel eğitici mesaj göster
+      final messages = _educationalMessagesFor();
+      final randomMessage =
+          messages[math.Random().nextInt(messages.length)];
+
+      final retryCompleter = Completer<void>();
+      _retryCompleter = retryCompleter;
+      setState(() {
+        _showAnalysisOverlay = true;
+        _analysisOverlayVisible = false;
+        _overlayContent = 'analyzing';
+        _overlayRandomMessage = randomMessage;
+        _overlayNotAnalyzableMessage = '';
+        _overlayShowNotAnalyzable = false;
+        _overlayQuestions = [];
+        _overlayAccentColor = _resolveEmotionAccentColor(_selectedEmotion);
+      });
+
+      // Yumuşak açılış animasyonu
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() => _analysisOverlayVisible = true);
+        }
+      });
+    }
 
     // ─── API ÇAĞRISI ───
     final locale = _isTr ? 'tr' : 'en';
@@ -558,7 +638,22 @@ class _DreamPageState extends State<DreamPage>
       _apiSummary = '';
       _latestAnalysis = analysis;
     } else {
-      // API başarılı → Sonuçları kaydet
+      // API başarılı ama içerik bir "Rüya" değilse, direkt hata popup'ını göster
+      if (result.category == "Geçersiz Metin" || result.category == "Invalid Content") {
+        if (mounted) {
+          setState(() {
+            _overlayShowNotAnalyzable = true;
+            // API'den gelen mesaj yerine doğrudan Flutter içindeki genel/gizemli hata mesajını basıyoruz
+            _overlayNotAnalyzableMessage = _notAnalyzableMessage;
+            // Animasyon veya ekran değişimi yapma, doğrudan "analyzing" ekranında hata mesajı belirecek.
+          });
+        }
+        // return false demeyip true diyoruz çünkü API bir cevap verdi, ama işlem rüya değil.
+        // Dialog içindeki onTap (_handleAnalysisRetry) fonksiyonu modalı kapatıp yeni giriş yapmayı sağlar.
+        return true; 
+      }
+
+      // API başarılı ve gerçek bir rüya → Sonuçları kaydet
       _apiDistribution = result.distribution;
       _apiCategory = result.category;
       _generalAnalysis = result.sections.map((s) => '${s.emoji} ${s.title}\n${s.content}').join('\n\n');
@@ -902,17 +997,23 @@ class _DreamPageState extends State<DreamPage>
 
   Widget _buildNewDreamTab() {
     final activeColors = [
-      const Color(0xFF9B7FFF),
-      const Color(0xFFAA90FF),
-      const Color(0xFFB8A8FF),
-      const Color(0xFFC0BCFF),
-      const Color(0xFFA8C8FF),
-      const Color(0xFF8BD5FF),
-      const Color(0xFF7DDBFF),
-    ];
-    final halfColors = activeColors
-        .map((color) => color.withOpacity(0.8))
-        .toList();
+      const Color(0xFFBBA8FF),
+      const Color(0xFFC4B4FF),
+      const Color(0xFFCCC0FF),
+      const Color(0xFFD3CBFF),
+      const Color(0xFFC5D6FF),
+      const Color(0xFFB3E0FF),
+      const Color(0xFFAAE5FF),
+    ].map((c) => c.withOpacity(0.55)).toList();
+    final halfColors = [
+      const Color(0xFFCDBEFF),
+      const Color(0xFFD4C8FF),
+      const Color(0xFFDAD0FF),
+      const Color(0xFFDFD9FF),
+      const Color(0xFFD5E2FF),
+      const Color(0xFFC8EAFF),
+      const Color(0xFFC0EDFF),
+    ].map((color) => color.withOpacity(0.38)).toList();
     final inactiveBaseColors = [
       const Color(0xFFC9B8FF),
       const Color(0xFFD2C4FF),
@@ -1016,18 +1117,24 @@ class _DreamPageState extends State<DreamPage>
                   ],
                 ),
                 const SizedBox(height: 30),
-                // Submit Button
+                // Submit Buttons (Standard & Premium)
                 ValueListenableBuilder<bool>(
                   valueListenable: _hasDreamTextNotifier,
                   builder: (context, hasDreamText, child) {
                     final hasEmotion = _selectedEmotion != null;
                     final isActive = hasDreamText && hasEmotion;
-                    final isHalfActive =
-                        (hasDreamText || hasEmotion) && !isActive;
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: GlassButton.custom(
+                    final isHalfActive = (hasDreamText || hasEmotion) && !isActive;
+
+                    Widget buildActionButton({
+                      required String title,
+                      required String subtitle,
+                      required List<Color> activeGradients,
+                      required List<Color> halfGradients,
+                      required Color customGlowColor,
+                      required VoidCallback onTap,
+                      List<Gradient>? extraGradientLayers,
+                    }) {
+                      return GlassButton.custom(
                         width: double.infinity,
                         height: 56,
                         onTap: () async {
@@ -1039,17 +1146,17 @@ class _DreamPageState extends State<DreamPage>
                             await _pulseMoodRail();
                             return;
                           }
-                          await _interpretDream();
+                          onTap();
                         },
                         useOwnLayer: true,
                         quality: GlassQuality.standard,
                         shape: const LiquidRoundedSuperellipse(
-                          borderRadius: 30,
+                          borderRadius: 24,
                         ),
                         interactionScale: 0.97,
                         stretch: 0.25,
                         resistance: 0.08,
-                        glowColor: const Color(0xFF7C6CF3).withOpacity(
+                        glowColor: customGlowColor.withOpacity(
                           isActive ? 0.35 : (isHalfActive ? 0.25 : 0.15),
                         ),
                         glowRadius: isActive ? 1.8 : (isHalfActive ? 1.5 : 1.2),
@@ -1064,20 +1171,22 @@ class _DreamPageState extends State<DreamPage>
                           saturation: 1.0,
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(24),
                           child: Stack(
                             children: [
                               Positioned.fill(
-                                child: DecoratedBox(
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                       colors: isActive
-                                          ? activeColors
+                                          ? activeGradients
                                           : (isHalfActive
-                                                ? halfColors
-                                                : inactiveColors),
+                                              ? halfGradients
+                                              : inactiveColors),
                                       stops: const [
                                         0.0,
                                         0.22,
@@ -1091,6 +1200,16 @@ class _DreamPageState extends State<DreamPage>
                                   ),
                                 ),
                               ),
+                              // Ek gradient katmanları (mücevher efekti)
+                              if (extraGradientLayers != null)
+                                ...extraGradientLayers.map((g) => Positioned.fill(
+                                  child: AnimatedOpacity(
+                                    opacity: (isActive || isHalfActive) ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeInOut,
+                                    child: DecoratedBox(decoration: BoxDecoration(gradient: g)),
+                                  ),
+                                )),
                               Positioned.fill(
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
@@ -1142,7 +1261,7 @@ class _DreamPageState extends State<DreamPage>
                                       color: Colors.white.withOpacity(0.18),
                                       width: 0.7,
                                     ),
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: BorderRadius.circular(24),
                                   ),
                                 ),
                               ),
@@ -1151,16 +1270,16 @@ class _DreamPageState extends State<DreamPage>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      _l10n.dreamAnalyzeButton,
+                                      title,
                                       style: const TextStyle(
                                         color: AppColors.textWhite,
-                                        fontSize: 14,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      _l10n.dreamAnalyzeEstimate,
+                                      subtitle,
                                       style: TextStyle(
                                         color: AppColors.textWhite70,
                                         fontSize: 10,
@@ -1173,6 +1292,127 @@ class _DreamPageState extends State<DreamPage>
                             ],
                           ),
                         ),
+                      );
+                    }
+
+                    // Kuzey Işıkları (Aurora Borealis)
+                    final premiumActiveColors = List.filled(
+                      7, const Color(0xFF1A1535).withOpacity(0.25),
+                    );
+                    final premiumHalfColors = List.filled(
+                      7, const Color(0xFF1A1535).withOpacity(0.15),
+                    );
+
+                    // Aurora katmanları (yumuşak geçişli)
+                    final gemLayers = <Gradient>[
+                      // Aurora yeşili — ana dalga
+                      RadialGradient(
+                        center: const Alignment(-0.3, -0.2),
+                        radius: 1.8,
+                        colors: [
+                          const Color(0xFF00E676).withOpacity(0.28),
+                          const Color(0xFF00E676).withOpacity(0.12),
+                          const Color(0xFF00E676).withOpacity(0.03),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.55, 1.0],
+                      ),
+                      // Teal dalga — sağ
+                      RadialGradient(
+                        center: const Alignment(0.5, 0.0),
+                        radius: 1.7,
+                        colors: [
+                          const Color(0xFF22D3EE).withOpacity(0.25),
+                          const Color(0xFF22D3EE).withOpacity(0.10),
+                          const Color(0xFF22D3EE).withOpacity(0.03),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.55, 1.0],
+                      ),
+                      // Mor parıltı — sağ üst
+                      RadialGradient(
+                        center: const Alignment(0.6, -0.4),
+                        radius: 1.5,
+                        colors: [
+                          const Color(0xFF7C3AED).withOpacity(0.28),
+                          const Color(0xFF7C3AED).withOpacity(0.12),
+                          const Color(0xFF7C3AED).withOpacity(0.03),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.55, 1.0],
+                      ),
+                      // Yeşil-teal karışım — alt
+                      RadialGradient(
+                        center: const Alignment(0.0, 0.5),
+                        radius: 1.6,
+                        colors: [
+                          const Color(0xFF2DD4BF).withOpacity(0.22),
+                          const Color(0xFF2DD4BF).withOpacity(0.10),
+                          const Color(0xFF2DD4BF).withOpacity(0.03),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.55, 1.0],
+                      ),
+                      // Magenta dokunuş — sol alt
+                      RadialGradient(
+                        center: const Alignment(-0.5, 0.3),
+                        radius: 1.2,
+                        colors: [
+                          const Color(0xFFD946EF).withOpacity(0.18),
+                          const Color(0xFFD946EF).withOpacity(0.07),
+                          const Color(0xFFD946EF).withOpacity(0.02),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25, 0.55, 1.0],
+                      ),
+                      // İndigo derinlik — geniş
+                      RadialGradient(
+                        center: const Alignment(-0.6, -0.5),
+                        radius: 1.8,
+                        colors: [
+                          const Color(0xFF4338CA).withOpacity(0.20),
+                          const Color(0xFF4338CA).withOpacity(0.08),
+                          const Color(0xFF4338CA).withOpacity(0.02),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.3, 0.6, 1.0],
+                      ),
+                    ];
+
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: Row(
+                        children: [
+                          // Sol: Standart Yorum
+                          Expanded(
+                            child: buildActionButton(
+                              title: _l10n.dreamAnalyzeButton,
+                              subtitle: _l10n.dreamAnalyzeEstimate,
+                              activeGradients: activeColors,
+                              halfGradients: halfColors,
+                              customGlowColor: const Color(0xFF7C6CF3),
+                              onTap: () async {
+                                await _interpretDream(); // normal
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Sağ: Premium Yorum
+                          Expanded(
+                            child: buildActionButton(
+                              title: _isTr ? 'Derin Analiz' : 'Deep Analysis',
+                              subtitle: _isTr ? 'Sırlarını keşfet' : 'Discover secrets',
+                              activeGradients: premiumActiveColors,
+                              halfGradients: premiumHalfColors,
+                              customGlowColor: const Color(0xFF22D3EE),
+                              extraGradientLayers: gemLayers,
+                              onTap: () async {
+                                await _interpretDreamPremium(); 
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -2020,10 +2260,14 @@ class _DreamPageState extends State<DreamPage>
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) => selectByDx(details.localPosition.dx),
-          onPanUpdate: (details) => selectByDx(details.localPosition.dx),
+          onHorizontalDragStart: (details) => selectByDx(details.localPosition.dx),
+          onHorizontalDragUpdate: (details) => selectByDx(details.localPosition.dx),
+          onHorizontalDragEnd: (_) {},
           child: Column(
             children: [
-              Row(
+              SizedBox(
+                height: 20,
+                child: Row(
                 children: emotions.map((emotion) {
                   final label = _emotionLabel(emotion);
                   final isSelected = _selectedEmotion == emotion;
@@ -2031,7 +2275,7 @@ class _DreamPageState extends State<DreamPage>
                     color: isSelected
                         ? Colors.white.withOpacity(0.95)
                         : Colors.white.withOpacity(0.6),
-                    fontSize: isSelected ? 12.5 : 12,
+                    fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   );
                   final itemWidth = constraints.maxWidth / emotions.length;
@@ -2077,6 +2321,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   );
                 }).toList(),
+              ),
               ),
               const SizedBox(height: 10),
               SizedBox(
@@ -2668,20 +2913,9 @@ class _DreamPageState extends State<DreamPage>
         cards.add(
           _InterpretationCardWidget(
             icon: icon,
-            title: '${section.emoji} ${section.title}',
+            title: section.title, // [?] hatasını önlemek için emoji'yi string'den çıkardık
             body: section.content,
             index: i,
-          ),
-        );
-      }
-      // Özet kartı
-      if (_apiSummary.isNotEmpty) {
-        cards.add(
-          _InterpretationCardWidget(
-            icon: Icons.summarize,
-            title: _isTr ? '📌 Özet' : '📌 Summary',
-            body: _apiSummary,
-            index: _apiSections.length,
           ),
         );
       }
@@ -3044,11 +3278,11 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
                   ],
                 ),
               ),
-            // Sorular ve butonlar - çemberin altında
+            // Sorular ve butonlar - çemberin altında (Eğer hata mesajıysa tam ortada)
             Positioned(
               left: 20,
               right: 20,
-              top: centerY + 60, // Çemberin altında
+              top: showNotAnalyzable ? centerY - 30 : (centerY + 60), 
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 280),
@@ -4395,6 +4629,23 @@ class _InterpretationCardWidgetState extends State<_InterpretationCardWidget>
 
   @override
   Widget build(BuildContext context) {
+    // [?] Hatası Veren Emojileri Temizle
+    String cleanTitle = widget.title
+        .replaceAll('🧠', '')
+        .replaceAll('❤️', '')
+        .replaceAll('🧩', '')
+        .replaceAll('🌲', '')
+        .replaceAll('🌫️', '')
+        .replaceAll('🌫', '')
+        .replaceAll('🔁', '')
+        .replaceAll('🔬', '')
+        .replaceAll('📌', '')
+        .replaceAll('👉', '')
+        .trim();
+
+    // Body'deki sorunlu parmak emojisini güvenli bir ok işaretiyle değiştir
+    String cleanBody = widget.body.replaceAll('👉', '➤');
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -4411,7 +4662,7 @@ class _InterpretationCardWidgetState extends State<_InterpretationCardWidget>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14), // 25 → 14 (performans)
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -4451,7 +4702,7 @@ class _InterpretationCardWidgetState extends State<_InterpretationCardWidget>
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          widget.title,
+                          cleanTitle,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -4470,15 +4721,16 @@ class _InterpretationCardWidgetState extends State<_InterpretationCardWidget>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    widget.body,
+                    cleanBody,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 13,
-                      height: 1.55,
+                      color: Colors.white.withOpacity(0.95), // Daha net beyaz
+                      fontSize: 14, // 13'ten 14'e çıktı (Okunabilirlik)
+                      height: 1.65, // 1.55'ten 1.65'e (Paragraflar arası boşluk hissi)
+                      letterSpacing: 0.2,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 6,
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),
                       ],

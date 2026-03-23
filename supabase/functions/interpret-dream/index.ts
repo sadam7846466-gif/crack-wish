@@ -78,10 +78,14 @@ Dream:
 Good interpretation style:
 - Focus on the conflict between self-protection and responsibility toward others.
 - Keep the language concise.
-- Use explicit bullet styles like "→" for linking actions and "👉" for insights, exactly as the user wants.
+- Use explicit bullet styles like "→" for linking actions and "➤" for insights.
 - Do not over-explain every symbol.
 - Do not invent relationship problems.
-- Make the meaning feel specific and psychologically grounded.`;
+- Make the meaning feel specific and psychologically grounded.
+
+VALIDATION RULE:
+- First, check if the text is actually a dream or a psychological experience.
+- If the text is clearly spam, a news article, stock market prices, random letters, or completely unrelated to a dream (e.g., "Dolar kuru", "sadasdasda"), set "is_valid_dream" to false and return empty strings for the rest.`;
 
     const userPrompt = `Analyze this dream.
 
@@ -94,6 +98,7 @@ ${emotion}
 Return this exact JSON structure:
 
 {
+  "is_valid_dream": true,
   "core_conflict": "string",
   "distribution": {
     "emotional_load": 0,
@@ -103,12 +108,13 @@ Return this exact JSON structure:
   },
   "analysis": {
     "brain": "Explain what the brain is doing. Example: 'Bu rüya, beynin sorumluluk + bağlanma yükünü aynı anda işlemeye çalıştığını gösteriyor.\\nYukarı çıkman ama hemen ardından düşüş olması, kaçış ve geri dönme döngüsüne benzer: çözülmemiş bir zihinsel çatışma.'",
-    "emotion": "Explain dominant emotion structure using → and 👉. Example: 'Suçluluk + koruma içgüdüsü\\n\\nYukarı çıkman → bireysel kurtulma refleksi\\nArkandakilerin içeride kalması → “yalnız kalamam” hissi\\n\\n👉 Zihin özgürlük isterken bağlılığı bırakmıyor.'",
-    "symbol": "Explain core symbol using = and 👉. Example: 'Kafes = kontrol dışı kalma durumu\\n\\nAsılı olması → belirsizlik\\nDüşmesi → ani duygusal yüklenme\\n\\n👉 Zihinde “denge bozulursa herkes zarar görür” algısı var.'",
+    "emotion": "Explain dominant emotion structure using → and ➤. Example: 'Suçluluk + koruma içgüdüsü\\n\\nYukarı çıkman → bireysel kurtulma refleksi\\nArkandakilerin içeride kalması → “yalnız kalamam” hissi\\n\\n➤ Zihin özgürlük isterken bağlılığı bırakmıyor.'",
+    "symbol": "Explain core symbol using = and ➤. Example: 'Kafes = kontrol dışı kalma durumu\\n\\nAsılı olması → belirsizlik\\nDüşmesi → ani duygusal yüklenme\\n\\n➤ Zihinde “denge bozulursa herkes zarar görür” algısı var.'",
     "nature": "OPTIONAL: Analyze nature/environment if present. Example: 'Doğal ortam = ilkel beyin / hayatta kalma modu.\\nMantıktan çok refleks çalışıyor. Güvenli bir yapı hissi yok → zihinsel güvensizlik.'",
     "physical_pain": "OPTIONAL: Analyze physical sensation if present. Example: 'Beyin, duygusal acıyı bedensel acı gibi simüle etmiş.\\n\\nGenelde: yoğun stres, bastırılmış korku ile birlikte görülür.'",
     "recent_effect": "OPTIONAL: Analyze recent memory effect. Example: 'Son günlerde: sevdiklerinle ilgili sorumluluk, “Ben iyi olursam ya onlar?” düşüncesi yüksek ihtimalle aktiftir.'",
-    "summary": "Summarize clearly and scientifically, focusing heavily on cognitive burden, responsibility, or conflict. Example: 'Bu rüya, bireysel kurtulma isteği ile sevdiklerini koruma zorunluluğu arasında kalan zihnin, kontrol kaybı korkusunu işlemesiyle oluşmuş. Rüyadaki acı, duygusal yükün yoğunluğunu gösteriyor.'"
+    "summary": "Summarize clearly and scientifically, focusing heavily on cognitive burden, responsibility, or conflict. Example: 'Bu rüya, bireysel kurtulma isteği ile sevdiklerini koruma zorunluluğu arasında kalan zihnin, kontrol kaybı korkusunu işlemesiyle oluşmuş. Rüyadaki acı, duygusal yükün yoğunluğunu gösteriyor.'",
+    "advice": "Give a psychological, actionable recommendation to the dreamer based on the core conflict. Use ➤ for bullet if needed. Example: 'Zihnini rahatlatmak için başkalarına duyduğun sorumluluk hissini bir kenara bırakıp kendi sınırlarını korumaya odaklanmalısın.'"
   }
 }`;
 
@@ -152,6 +158,18 @@ Return this exact JSON structure:
 
     const parsed = JSON.parse(rawContent);
 
+    if (parsed.is_valid_dream === false) {
+      const invalidResult = {
+        category: isTr ? "Geçersiz Metin" : "Invalid Content",
+        distribution: { emotional_load: 0, uncertainty: 0, recent_memory_effect: 0, brain_activity: 0 },
+        sections: [
+          { emoji: "⚠️", title: isTr ? "Rüya Algılanamadı" : "No Dream Detected", content: isTr ? "Yazdıkların bir rüya anlatısı gibi görünmüyor (haber, arama terimi, döviz kuru, anlamsız metin vb.). Lütfen gerçekten gördüğün bir rüyayı yazdığından emin ol." : "This does not look like a dream narrative. Please make sure you are describing an actual dream." }
+        ],
+        summary: ""
+      };
+      return new Response(JSON.stringify(invalidResult), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // siz → sen post-processing
     const fix = (t: string): string => {
       if (!isTr || !t) return t;
@@ -174,6 +192,7 @@ Return this exact JSON structure:
     if (a.physical_pain && !a.physical_pain.includes("OPTIONAL")) sections.push({ emoji: "🌫", title: isTr ? "Fiziksel His" : "Physical Sensation", content: fix(a.physical_pain) });
     if (a.recent_effect && !a.recent_effect.includes("OPTIONAL")) sections.push({ emoji: "🔁", title: isTr ? "Yakın Zaman Etkisi" : "Recent Effect", content: fix(a.recent_effect) });
     if (a.summary) sections.push({ emoji: "🔬", title: isTr ? "Bilimsel Özet" : "Scientific Summary", content: fix(a.summary) });
+    if (a.advice) sections.push({ emoji: "💡", title: isTr ? "Kendine Not" : "Note to Self", content: fix(a.advice) });
 
     const result = {
       category: fix(parsed.core_conflict || ""),
