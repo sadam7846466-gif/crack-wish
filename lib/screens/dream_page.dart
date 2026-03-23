@@ -11,6 +11,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../services/storage_service.dart';
 import '../services/dream_analysis_service.dart';
+import '../services/supabase_dream_service.dart';
 import '../models/emotion.dart';
 import '../models/dream_analysis.dart';
 import '../models/dream_input.dart';
@@ -337,8 +338,14 @@ class _DreamPageState extends State<DreamPage>
   late String _currentPrompt;
   late String _currentSubtitle;
   final DreamAnalysisService _analysisService = DreamAnalysisService();
+  final SupabaseDreamService _supabaseDreamService = SupabaseDreamService();
+  DreamDistribution _apiDistribution = const DreamDistribution(); // Sabit 4 metrik
+  String _apiCategory = ''; // "Kabus", "Duygusal İşleme", vs.
+  List<DreamSection> _apiSections = []; // Yapılandırılmış bölümler
+  String _apiSummary = ''; // 1 cümle
   String? _lastLocaleCode;
   bool _localizedSeedsReady = false;
+  int _currentTipIndex = 0; // Biliyor muydun? için sabit index
 
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
@@ -393,6 +400,7 @@ class _DreamPageState extends State<DreamPage>
     _scrollController.addListener(_onScroll);
     _emotionOrder = List<Emotion>.from(Emotion.values);
     _emotionOrder.shuffle(math.Random());
+    _currentTipIndex = math.Random().nextInt(50); // Biliyor muydun? sabit tip
   }
 
   @override
@@ -496,112 +504,82 @@ class _DreamPageState extends State<DreamPage>
       return false;
     }
 
-    final isAnalyzable = _analysisService.hasAnalyzableScene(trimmed);
-
-    // YENİ BİLİMSEL SİSTEM
-    final dreamInput = DreamInput(
-      text: _dreamController.text,
-      emotions: [_selectedEmotion!], // Artık kesinlikle null değil
-    );
-
-    DreamAnalysis? analysis;
-    final clarificationQuestions = <_ClarificationQuestion>[];
-    var questionCount = 0;
-    if (isAnalyzable) {
-      // Bilişsel analiz (deterministik)
-      analysis = _analysisService.analyzeDream(dreamInput.text);
-
-      clarificationQuestions.addAll(
-        _buildClarificationQuestions(analysis, _selectedEmotion!),
-      );
-      questionCount = clarificationQuestions.length;
-    }
-
     // Bilimsel eğitici mesaj göster
     final messages = _educationalMessagesFor();
     final randomMessage =
         messages[math.Random().nextInt(messages.length)];
-    final notAnalyzableMessage = _notAnalyzableMessage;
 
-    final answersCompleter = Completer<List<ClarificationAnswer>>();
     final retryCompleter = Completer<void>();
-    _answersCompleter = answersCompleter;
     _retryCompleter = retryCompleter;
     setState(() {
       _showAnalysisOverlay = true;
       _analysisOverlayVisible = false;
       _overlayContent = 'analyzing';
       _overlayRandomMessage = randomMessage;
-      _overlayNotAnalyzableMessage = notAnalyzableMessage;
-      _overlayShowNotAnalyzable = !isAnalyzable;
-      _overlayQuestions = List<_ClarificationQuestion>.from(
-        clarificationQuestions,
-      );
+      _overlayNotAnalyzableMessage = '';
+      _overlayShowNotAnalyzable = false;
+      _overlayQuestions = [];
       _overlayAccentColor = _resolveEmotionAccentColor(_selectedEmotion);
     });
 
-    // Yumuşak açılış animasyonu - frame sonrası tetikle
+    // Yumuşak açılış animasyonu
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() => _analysisOverlayVisible = true);
       }
     });
 
-    if (!isAnalyzable) {
-      await retryCompleter.future;
-      if (mounted) {
-        setState(() {
-          _analysisOverlayVisible = false;
-          _showAnalysisOverlay = false;
-        });
-        _dreamFocusNode.requestFocus();
-      }
-      _answersCompleter = null;
-      _retryCompleter = null;
-      return false;
-    }
+    // ─── API ÇAĞRISI ───
+    final locale = _isTr ? 'tr' : 'en';
+    final emotionLabel = _selectedEmotion!.label;
 
-    List<ClarificationAnswer> clarificationAnswers = [];
-    if (clarificationQuestions.isNotEmpty) {
-      clarificationAnswers = await answersCompleter.future;
+    final result = await _supabaseDreamService.interpretDream(
+      dreamText: trimmed,
+      emotion: emotionLabel,
+      locale: locale,
+    );
+
+    if (!result.success) {
+      // API bağlantı hatası → Lokal fallback
+      final dreamInput = DreamInput(
+        text: _dreamController.text,
+        emotions: [_selectedEmotion!],
+      );
+      final analysis = _analysisService.analyzeDream(dreamInput.text);
+      final interpretation = _analysisService.interpret(
+        input: dreamInput,
+        analysis: analysis,
+        answers: [],
+      );
+      _generalAnalysis = interpretation;
+      _apiDistribution = const DreamDistribution();
+      _apiCategory = '';
+      _apiSections = [];
+      _apiSummary = '';
+      _latestAnalysis = analysis;
     } else {
-      await Future.delayed(const Duration(milliseconds: 1800));
+      // API başarılı → Sonuçları kaydet
+      _apiDistribution = result.distribution;
+      _apiCategory = result.category;
+      _generalAnalysis = result.sections.map((s) => '${s.emoji} ${s.title}\n${s.content}').join('\n\n');
+      _apiSections = result.sections;
+      _apiSummary = result.summary;
+      _latestAnalysis = DreamAnalysis(
+        hasThreat: false,
+        hasPastReference: false,
+        hasMovement: false,
+        isSingleScene: false,
+      );
     }
 
-    if (clarificationQuestions.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-
-    // Bilimsel yorum üret
-    final interpretation = _analysisService.interpret(
-      input: dreamInput,
-      analysis: analysis!,
-      answers: clarificationAnswers,
-    );
-
-    if (mounted) {
-      setState(() {
-        _latestAnalysis = analysis;
-        _latestClarifications = clarificationAnswers;
-      });
-    }
-
-    // Eski sistem için backward compatibility
-    final dream = _dreamController.text.toLowerCase();
-    _detectedSymbols = _localizeSymbols(_detectSymbols(dream));
-    _generalAnalysis = interpretation; // Bilimsel yorum
-    _psychologyAnalysis = interpretation; // Aynı yorum (tek kaynak)
-    _spiritualAnalysis = interpretation;
-    _advice = interpretation;
-
-    // Otomatik başlık oluştur
-    final autoTitle = _generateTitle(
-      _dreamController.text,
-      _detectedSymbols,
-      _selectedEmotion,
-    );
+    _psychologyAnalysis = _generalAnalysis;
+    _spiritualAnalysis = _generalAnalysis;
+    _advice = _generalAnalysis;
 
     // Rüyayı kaydet
+    final autoTitle = _apiCategory.isNotEmpty
+        ? _apiCategory
+        : _generateTitle(_dreamController.text, _detectedSymbols, _selectedEmotion);
     final now = DateTime.now().toIso8601String();
     await StorageService.saveDream({
       'title': autoTitle,
@@ -614,16 +592,15 @@ class _DreamPageState extends State<DreamPage>
       'psychology': _psychologyAnalysis,
       'spiritual': _spiritualAnalysis,
       'advice': _advice,
-      'scientificInterpretation': interpretation,
-      'questionCount': questionCount,
-      if (clarificationAnswers.isNotEmpty)
-        'clarification': clarificationAnswers.map((e) => e.toJson()).toList(),
+      'scientificInterpretation': _generalAnalysis,
+      'questionCount': 0,
+      'category': _apiCategory,
+      'summary': _apiSummary,
     });
 
     await StorageService.setDreamDoneToday();
 
     if (mounted) {
-      // Önce analiz içeriğini kapat (boş geçiş), sonra yorum aç
       setState(() {
         _overlayContent = 'gap';
         _isWriting = true;
@@ -634,7 +611,6 @@ class _DreamPageState extends State<DreamPage>
         }
       });
     }
-    _answersCompleter = null;
     _retryCompleter = null;
 
     return true;
@@ -977,7 +953,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
                 AnimatedScale(
                   scale: _showDreamInputWarning ? 1.03 : 1.0,
                   duration: const Duration(milliseconds: 110),
@@ -1016,7 +992,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 28),
                 // Mood Section
                 Column(
                   children: [
@@ -1039,7 +1015,7 @@ class _DreamPageState extends State<DreamPage>
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 30),
                 // Submit Button
                 ValueListenableBuilder<bool>(
                   valueListenable: _hasDreamTextNotifier,
@@ -1201,12 +1177,10 @@ class _DreamPageState extends State<DreamPage>
                     );
                   },
                 ),
-                const SizedBox(height: 32),
-                // ─── İPUÇLARI VE SEMBOL REHBERİ ───
+                const SizedBox(height: 44),
+                // ─── BİLGİLENDİRİCİ İPUCU ───
                 _buildDreamTipsSection(),
-                const SizedBox(height: 20),
-                _buildCommonSymbolsSection(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -1218,19 +1192,187 @@ class _DreamPageState extends State<DreamPage>
   Widget _buildDreamTipsSection() {
     final tips = _isTr
         ? [
-            'Rüyanı mümkün olduğunca detaylı yaz — renkleri, sesleri ve duyguları da ekle.',
-            'Uyandıktan hemen sonra yazmak, detayları hatırlamanı kolaylaştırır.',
-            'Tekrarlayan rüyalar, çözülmemiş bir konuya işaret edebilir.',
-            'Rüya günlüğü tutmak bilinçaltınla daha güçlü bağ kurmanı sağlar.',
+            // Temel rüya bilimi
+            'Tekrarlayan rüyalar, çözülmemiş duygusal bir konuya işaret edebilir.',
+            'Rüya günlüğü tutmak, rüyalarını hatırlama yeteneğini güçlendirir.',
+            'Ortalama bir insan ömrü boyunca yaklaşık 6 yılını rüya görerek geçirir.',
+            'REM uykusu sırasında beyin, uyanıkken olduğu kadar aktiftir.',
+            'Rüyada gördüğün yüzler genellikle hayatında bir noktada karşılaştığın kişilere aittir.',
+            'Beyin, rüya sırasında günlük deneyimleri işler ve anıları pekiştirir.',
+            'Lucid rüya, rüyada olduğunu fark edip yönlendirebilme durumudur.',
+            'Stres ve kaygı düzeyi arttıkça kabus görme olasılığı da artar.',
+            'Kör doğan insanlar görsel rüya görmez ama ses, dokunma ve koku ile rüya görür.',
+            'Rüyalar genellikle uykunun REM evresinde gerçekleşir ve her biri 5-20 dakika sürer.',
+            // Hafıza ve algı
+            'Uykudan uyanır uyanmaz rüyanın %90\'ı ilk 10 dakikada unutulur.',
+            'Siyah-beyaz rüya görmek, renkli televizyon öncesi nesilde daha yaygındı.',
+            'Rüyada zaman algısı farklı çalışır — saatler sürmüş gibi hissedilen rüyalar dakikalar içinde olur.',
+            'Dış dünyadan gelen sesler rüyanın içeriğine dahil olabilir.',
+            'Hamile kadınlar, hormonal değişimler nedeniyle daha canlı ve yoğun rüyalar görür.',
+            'Hayvanlar da rüya görür — köpeklerin REM uykusunda patilerini hareket ettirdiği gözlemlenmiştir.',
+            'Rüyalar problem çözme yeteneğini artırabilir — birçok bilimsel keşif rüyada ilham almıştır.',
+            'Gece boyunca 4-6 farklı rüya görürsün ama çoğunu hatırlamazsın.',
+            'Düşme rüyaları genellikle güvensizlik veya kontrol kaybı hissiyle ilişkilidir.',
+            'Beyin rüyada mantık filtrelerini devre dışı bırakır, bu yüzden rüyalar absürt olabilir.',
+            // Nörobilim ve psikoloji
+            'Rüyalar sırasında amigdala aktifleşir — bu yüzden rüyalarda duygular çok yoğun hissedilir.',
+            'Beyin rüyada yeni sinaptik bağlantılar kurabilir, bu da yaratıcılığı destekler.',
+            'Kabuslar aslında beynin tehlike simülasyonudur — seni olası tehditlere hazırlar.',
+            'Rüyada okuduğun bir metin her baktığında değişir çünkü dil merkezi tam çalışmaz.',
+            'Uyku felci, REM atonisi ile bilincin çakışmasından kaynaklanır ve zararsızdır.',
+            'Çocuklar yetişkinlere göre daha sık kabus görür çünkü duygusal düzenleme gelişmektedir.',
+            'Rüyalar sırasında prefrontal korteks baskılanır — bu yüzden eleştiri ve mantık azalır.',
+            'Rüyada koşup da ilerleyememek, gerçek hayattaki çaresizlik hissini yansıtabilir.',
+            'Bazı insanlar rüyada tat ve koku alabilir — bu çok nadir ama gerçek bir olgudur.',
+            'Gündüz yaşanan yoğun duygular, gece rüyanın temasını belirleyebilir.',
+            // İlginç gerçekler
+            'Rüya sırasında yeni bir dil öğrenemezsin ama öğrendiğin bilgileri pekiştirebilirsin.',
+            'Beynin rüya üretme sistemi tamamen kapatılamaz — uyuyan herkes bir şekilde rüya görür.',
+            'Rüyada tanımadığın biri varsa, aslında geçmişte bir yerde gördüğün birinin yüzüdür.',
+            'Bilim insanları bazı rüya içeriklerini beyin taramasıyla tahmin edebiliyor.',
+            'Antik Mısır\'da rüyalar tanrısal mesajlar olarak kabul edilir ve tapınaklarda yorumlanırdı.',
+            'Uykusuzluk arttıkça beyin, telafi için daha yoğun ve canlı rüyalar üretir.',
+            'Rüyadaki duygular genellikle içerikten daha doğru hatırlanır.',
+            'Uyandıktan sonra gözlerini kapatıp sabit kalmak, rüyayı hatırlama şansını artırır.',
+            'Bazı kültürlerde rüyalar kolektif bilinçle bağlantılı kabul edilir.',
+            'Yeni doğan bebekler günün %50\'sini REM uykusunda geçirir — muhtemelen rüya görerek.',
+            // Uyku fizyolojisi
+            'REM uykusunda göz kasları hariç tüm istemli kaslar felç olur — bu seni rüyanı yaşamaktan korur.',
+            'Beyin rüya görürken oksijen tüketimini artırır, bu da enerji harcadığını gösterir.',
+            'Uykunun ilk saatlerinde derin uyku, son saatlerinde ise daha uzun REM dönemleri baskındır.',
+            'Alkol tüketimi REM uykusunu baskılar, bu yüzden alkol sonrası rüya hatırlama azalır.',
+            'Kafein rüya kalitesini etkilemez ama uyku süresini kısaltarak REM dönemini azaltabilir.',
+            'Melatonin hormonu sadece uykuyu düzenlemez, rüyaların canlılığını da artırabilir.',
+            'Uyku apnesi olan kişiler REM döneminde daha sık uyanır ve rüyalarını daha iyi hatırlar.',
+            'Vücut sıcaklığı düştükçe uyku derinleşir ve rüya üretimi artar.',
+            // Rüya psikolojisi
+            'Rüyada birine kızıyorsan, bu genellikle o kişiye değil kendine yönelik bastırılmış bir duyguyu temsil eder.',
+            'Sınavda başarısız olma rüyası, gerçek sınavdan çok performans kaygısıyla ilgilidir.',
+            'Rüyada kaybolmak, hayatta yön bulmakta zorlanma hissinin bir yansımasıdır.',
+            'Rüyada dişlerin dökülmesi birçok kültürde kontrol kaybı ve güvensizlik sembolüdür.',
+            'Rüyada çıplak kalmak, savunmasızlık ve yargılanma korkusuyla bağlantılıdır.',
+            'Rüyada geç kalmak, fırsatları kaçırma veya hayatın hızına yetişememe kaygısını yansıtır.',
+            'Mutlu rüyalar gören insanların gündüz duygusal dayanıklılığı daha yüksektir.',
+            'Rüyada tanıdık bir mekânın farklı görünmesi, o yerle ilgili değişen duygularını yansıtabilir.',
+            // Kültür ve tarih
+            'Eski Yunan\'da Asclepius tapınaklarında hastalar rüya görerek şifa arardı.',
+            'Avustralya Aborjinleri rüyaları "Düş Zamanı" olarak adlandırır ve yaradılış hikâyesiyle ilişkilendirir.',
+            'Tibet Budizmi\'nde rüya yogası, bilinçli rüya görme pratiği olarak yüzyıllardır uygulanır.',
+            'Orta Çağ Avrupa\'sında rüyalar kehanet aracı olarak kabul edilir ve kayıt altına alınırdı.',
+            'Japon kültüründe yılbaşı gecesi görülen ilk rüya (hatsuyume) yılın gidişatını belirler.',
+            'Freud rüyaları bilinçaltının kraliyet yolu olarak tanımladı.',
+            'Jung\'a göre rüyalar, kolektif bilinçaltındaki arketiplerin yansımasıdır.',
+            // Modern araştırmalar
+            'Araştırmalar, rüya günlüğü tutan kişilerin duygusal farkındalığının arttığını gösteriyor.',
+            'Bazı sporcular rüyada antrenman yaparak performanslarını artırabilir.',
+            'Rüya sırasında beyin yeni fikirler üretebilir — periyodik tablo Mendeleev\'in rüyasında şekillendi.',
+            'Müzisyenler rüyalarında sık sık müzik duyar — Paul McCartney "Yesterday" melodisini rüyada buldu.',
+            'Bilim insanları rüya döneminde beynin bilgiyi kategorize ettiğini ve arşivlediğini keşfetti.',
+            'Rüya terapisi, travma sonrası stres bozukluğu tedavisinde etkili bir yöntemdir.',
+            'Korkutucu rüyalar gören kişilere uygulanan imaj provası terapisi kabusları %70 azaltabilir.',
+            'Rüya sırasında beyin, günlük yaşamda fark etmediğin kalıpları ve bağlantıları keşfedebilir.',
+            // Fizyolojik ilişkiler
+            'Ağır yemek yemek rüya yoğunluğunu artırabilir çünkü metabolizma uykuyu etkiler.',
+            'B6 vitamini alan kişilerin rüyalarını daha canlı ve detaylı hatırladığı raporlanmıştır.',
+            'Egzersiz yapan kişiler daha kaliteli uyur ve daha düzenli rüya döngüsüne sahip olur.',
+            'Rüya sırasında kalp atış hızı ve kan basıncı düzensizleşir, bu da rüyanın yoğunluğunu yansıtır.',
+            'Bazı ilaçlar (antidepresanlar gibi) REM uykusunu baskılayarak rüya hatırlamayı azaltabilir.',
+            'Nikotin bandı kullanan kişiler daha canlı ve garip rüyalar gördüğünü bildirmiştir.',
+            'Yüksek rakımda uyumak oksijen düşüklüğü nedeniyle daha yoğun rüyalara neden olabilir.',
+            'Gündüz uyuyanlar REM dönemine daha hızlı girer ve daha canlı rüyalar görebilir.',
           ]
         : [
-            'Write your dream in as much detail as possible — include colors, sounds and feelings.',
-            'Writing right after waking up makes it easier to remember details.',
-            'Recurring dreams may point to an unresolved issue.',
-            'Keeping a dream journal helps you build a stronger connection with your subconscious.',
+            // Core dream science
+            'Recurring dreams can signal an unresolved emotional issue.',
+            'Keeping a dream journal strengthens your ability to recall dreams.',
+            'The average person spends about 6 years of their life dreaming.',
+            'During REM sleep, the brain is nearly as active as when you are awake.',
+            'The faces you see in dreams usually belong to people you have encountered in real life.',
+            'The brain processes daily experiences and consolidates memories during dreams.',
+            'Lucid dreaming is when you become aware you are dreaming and can influence the dream.',
+            'Higher stress and anxiety levels increase the likelihood of nightmares.',
+            'People born blind do not have visual dreams but dream with sound, touch and smell.',
+            'Dreams mostly occur during REM sleep and each one lasts about 5-20 minutes.',
+            // Memory and perception
+            'Within 10 minutes of waking, 90% of the dream is typically forgotten.',
+            'Black-and-white dreams were more common in generations before color television.',
+            'Time perception works differently in dreams — hours can feel like minutes.',
+            'Sounds from the outside world can be incorporated into dream content.',
+            'Pregnant women tend to have more vivid and intense dreams due to hormonal changes.',
+            'Animals dream too — dogs have been observed moving their paws during REM sleep.',
+            'Dreams can boost problem-solving — many scientific discoveries were inspired by dreams.',
+            'You have 4-6 different dreams each night but rarely remember most of them.',
+            'Falling dreams are often linked to feelings of insecurity or loss of control.',
+            'The brain disables its logic filters during dreams, which is why they can seem absurd.',
+            // Neuroscience and psychology
+            'The amygdala is highly active during dreams — that is why emotions feel so intense.',
+            'The brain can form new synaptic connections during dreams, fueling creativity.',
+            'Nightmares are actually threat simulations — your brain rehearsing for danger.',
+            'Text changes every time you look at it in a dream because the language center is suppressed.',
+            'Sleep paralysis occurs when REM atonia overlaps with wakefulness and is harmless.',
+            'Children have more nightmares than adults because emotional regulation is still developing.',
+            'The prefrontal cortex is suppressed during dreaming, reducing logic and self-criticism.',
+            'Being unable to run in a dream can reflect real-life feelings of helplessness.',
+            'Some people can taste and smell in dreams — rare but a documented phenomenon.',
+            'Intense daytime emotions can shape the theme of your dreams at night.',
+            // Fascinating facts
+            'You cannot learn a new language in a dream, but you can consolidate what you learned.',
+            'The brain\'s dream-generation system cannot be fully shut off — everyone dreams.',
+            'A stranger in your dream is actually a face your brain stored from a past encounter.',
+            'Scientists can predict some dream content using brain scans.',
+            'In ancient Egypt, dreams were considered divine messages and interpreted in temples.',
+            'Sleep deprivation causes the brain to produce more vivid dreams as compensation.',
+            'Dream emotions are usually remembered more accurately than dream content.',
+            'Keeping your eyes closed and staying still after waking increases dream recall.',
+            'Some cultures view dreams as connected to a collective consciousness.',
+            'Newborns spend 50% of their sleep in REM — likely dreaming extensively.',
+            // Sleep physiology
+            'During REM sleep, all voluntary muscles except the eyes are paralyzed — this keeps you from acting out dreams.',
+            'The brain increases oxygen consumption while dreaming, showing it is actively working.',
+            'Deep sleep dominates early in the night while longer REM periods occur toward morning.',
+            'Alcohol suppresses REM sleep, which is why dream recall drops after drinking.',
+            'Caffeine does not affect dream quality but can shorten sleep duration, reducing REM time.',
+            'Melatonin not only regulates sleep but can also make dreams more vivid.',
+            'People with sleep apnea wake more often during REM and tend to remember dreams better.',
+            'As body temperature drops, sleep deepens and dream production increases.',
+            // Dream psychology
+            'Being angry at someone in a dream often represents a suppressed emotion directed at yourself.',
+            'Failing an exam in a dream is usually about performance anxiety, not the actual exam.',
+            'Being lost in a dream reflects a feeling of struggling to find direction in life.',
+            'Teeth falling out in dreams symbolizes loss of control and insecurity across many cultures.',
+            'Being naked in a dream is linked to vulnerability and fear of being judged.',
+            'Being late in a dream reflects anxiety about missing opportunities or keeping up with life.',
+            'People who have happy dreams tend to show higher emotional resilience during the day.',
+            'A familiar place looking different in a dream can reflect your changing feelings about it.',
+            // Culture and history
+            'In ancient Greece, patients would sleep in Asclepius temples hoping for healing dreams.',
+            'Australian Aboriginals call dreams "Dreamtime" and link them to their creation story.',
+            'Tibetan Buddhism has practiced dream yoga — conscious dreaming — for centuries.',
+            'In medieval Europe, dreams were considered prophecy tools and were officially documented.',
+            'In Japanese culture, the first dream of the new year (hatsuyume) foretells the year ahead.',
+            'Freud described dreams as the royal road to the unconscious.',
+            'Jung believed dreams reflect archetypes from the collective unconscious.',
+            // Modern research
+            'Studies show that keeping a dream journal increases emotional self-awareness.',
+            'Some athletes improve their performance by mentally rehearsing in dreams.',
+            'The brain can generate new ideas during dreams — the periodic table came to Mendeleev in a dream.',
+            'Musicians often hear music in dreams — Paul McCartney discovered the melody for "Yesterday" in one.',
+            'Scientists found that the brain categorizes and archives information during dreams.',
+            'Dream therapy is an effective treatment for post-traumatic stress disorder.',
+            'Imagery rehearsal therapy can reduce nightmares by up to 70% in people with frightening dreams.',
+            'During dreams, the brain can discover patterns and connections you missed while awake.',
+            // Physiological connections
+            'Eating heavy meals can intensify dreams because metabolism affects sleep quality.',
+            'People taking vitamin B6 have reported remembering dreams more vividly and in detail.',
+            'Regular exercise leads to better sleep quality and a more consistent dream cycle.',
+            'Heart rate and blood pressure become irregular during dreams, reflecting dream intensity.',
+            'Some medications like antidepressants can suppress REM sleep and reduce dream recall.',
+            'People using nicotine patches have reported more vivid and bizarre dreams.',
+            'Sleeping at high altitude can cause more intense dreams due to lower oxygen levels.',
+            'Daytime nappers enter REM faster and may experience more vivid dreams.',
           ];
 
-    final tipIndex = math.Random().nextInt(tips.length);
+    final tipIndex = _currentTipIndex % tips.length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1250,7 +1392,7 @@ class _DreamPageState extends State<DreamPage>
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Center(
-              child: Icon(Icons.lightbulb_outline, color: Color(0xFFB8A8FF), size: 18),
+              child: Icon(Icons.auto_awesome, color: Color(0xFFB8A8FF), size: 18),
             ),
           ),
           const SizedBox(width: 12),
@@ -1259,7 +1401,7 @@ class _DreamPageState extends State<DreamPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isTr ? 'İpucu' : 'Tip',
+                  _isTr ? 'Biliyor muydun?' : 'Did you know?',
                   style: TextStyle(
                     color: const Color(0xFFB8A8FF),
                     fontSize: 12,
@@ -1284,90 +1426,7 @@ class _DreamPageState extends State<DreamPage>
     );
   }
 
-  Widget _buildCommonSymbolsSection() {
-    final symbols = _isTr
-        ? [
-            _SymbolInfo(Icons.water_drop_outlined, 'Su', 'Duygusal derinlik\nve bilinçaltı'),
-            _SymbolInfo(Icons.flight, 'Uçmak', 'Özgürlük arzusu\nve kontrol'),
-            _SymbolInfo(Icons.pest_control_outlined, 'Yılan', 'Dönüşüm ve\ngizli korkular'),
-            _SymbolInfo(Icons.home_outlined, 'Ev', 'Benlik ve\niç dünya'),
-            _SymbolInfo(Icons.local_fire_department_outlined, 'Ateş', 'Tutku, öfke\nve arınma'),
-            _SymbolInfo(Icons.sentiment_very_dissatisfied, 'Diş', 'Güvensizlik\nve kaygı'),
-          ]
-        : [
-            _SymbolInfo(Icons.water_drop_outlined, 'Water', 'Emotional depth\nand subconscious'),
-            _SymbolInfo(Icons.flight, 'Flying', 'Desire for freedom\nand control'),
-            _SymbolInfo(Icons.pest_control_outlined, 'Snake', 'Transformation\nand hidden fears'),
-            _SymbolInfo(Icons.home_outlined, 'Home', 'Self and\ninner world'),
-            _SymbolInfo(Icons.local_fire_department_outlined, 'Fire', 'Passion, anger\nand purification'),
-            _SymbolInfo(Icons.sentiment_very_dissatisfied, 'Teeth', 'Insecurity\nand anxiety'),
-          ];
 
-    final shuffled = List<_SymbolInfo>.from(symbols)..shuffle(math.Random());
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Text(
-            _isTr ? 'Sık Görülen Semboller' : 'Common Symbols',
-            style: TextStyle(
-              color: AppColors.textWhite70,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 88,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: shuffled.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (context, index) {
-              final s = shuffled[index];
-              return Container(
-                width: 90,
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(s.icon, color: const Color(0xFFB8A8FF), size: 22),
-                    const SizedBox(height: 4),
-                    Text(
-                      s.label,
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      s.desc,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textWhite50,
-                        fontSize: 9,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   Color _resolveEmotionAccentColor(Emotion? emotion) {
     switch (emotion) {
@@ -1782,6 +1841,18 @@ class _DreamPageState extends State<DreamPage>
   }
 
   _DreamMetrics _computeChartMetrics() {
+    // API'den distribution geldiyse kullan
+    final d = _apiDistribution;
+    if (d.emotionalLoad > 0 || d.uncertainty > 0 || d.recentMemoryEffect > 0 || d.brainActivity > 0) {
+      return _DreamMetrics(
+        duygusal: d.emotionalLoad.toDouble(),
+        belirsizlik: d.uncertainty.toDouble(),
+        yakinGecmis: d.recentMemoryEffect.toDouble(),
+        beyinAkt: d.brainActivity.toDouble(),
+      );
+    }
+
+    // Lokal fallback
     final emotion = _selectedEmotion;
     final analysis = _latestAnalysis;
     if (analysis == null || emotion == null) {
@@ -2588,7 +2659,36 @@ class _DreamPageState extends State<DreamPage>
   ) {
     final cards = <Widget>[];
 
-    // Map sections to appropriate card types
+    // API'den gelen kısa analiz varsa onu göster
+    // API'den yapılandırılmış sections geldiyse
+    if (_apiSections.isNotEmpty) {
+      for (var i = 0; i < _apiSections.length; i++) {
+        final section = _apiSections[i];
+        final icon = _getIconForEmoji(section.emoji);
+        cards.add(
+          _InterpretationCardWidget(
+            icon: icon,
+            title: '${section.emoji} ${section.title}',
+            body: section.content,
+            index: i,
+          ),
+        );
+      }
+      // Özet kartı
+      if (_apiSummary.isNotEmpty) {
+        cards.add(
+          _InterpretationCardWidget(
+            icon: Icons.summarize,
+            title: _isTr ? '📌 Özet' : '📌 Summary',
+            body: _apiSummary,
+            index: _apiSections.length,
+          ),
+        );
+      }
+      return cards;
+    }
+
+    // Fallback: eski parse yöntemi
     for (var i = 0; i < sections.length; i++) {
       final section = sections[i];
       final title = section.title.replaceAll(RegExp(r'^[🧠🔍👤📌✨💭]\s*'), '');
@@ -2604,7 +2704,6 @@ class _DreamPageState extends State<DreamPage>
       );
     }
 
-    // If no sections, show default
     if (cards.isEmpty) {
       cards.add(
         _InterpretationCardWidget(
@@ -2619,6 +2718,22 @@ class _DreamPageState extends State<DreamPage>
     }
 
     return cards;
+  }
+
+  IconData _getIconForEmoji(String emoji) {
+    switch (emoji) {
+      case '🧠': return Icons.psychology;
+      case '❤️': return Icons.favorite;
+      case '🧩': return Icons.extension;
+      case '🌫': return Icons.cloud;
+      case '🔁': return Icons.refresh;
+      case '🔬': return Icons.science;
+      case '🌲': return Icons.park;
+      case '💭': return Icons.chat_bubble_outline;
+      case '⚡': return Icons.bolt;
+      case '🛡': return Icons.shield;
+      default: return Icons.auto_awesome;
+    }
   }
 
   IconData _getIconForSection(String title) {
@@ -2664,12 +2779,6 @@ class _DreamPageState extends State<DreamPage>
   }
 }
 
-class _SymbolInfo {
-  final IconData icon;
-  final String label;
-  final String desc;
-  const _SymbolInfo(this.icon, this.label, this.desc);
-}
 
 class _InterpretationSection {
   final String title;

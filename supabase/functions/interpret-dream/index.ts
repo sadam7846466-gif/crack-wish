@@ -1,0 +1,195 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const MODEL = "gpt-4o-mini";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const { dreamText, emotion, locale } = await req.json();
+
+    if (!dreamText || dreamText.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: "Dream text too short" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const isTr = locale === "tr";
+
+    const systemPrompt = `You are a scientific dream analyst.
+
+Your job is to interpret dreams using psychology and neuroscience-based reasoning.
+
+STRICT RULES:
+- Do NOT predict the future.
+- Do NOT use mystical, spiritual, religious, or fortune-telling language.
+- Do NOT invent personal details, relationship problems, trauma, or life events unless they are clearly present in the dream text.
+- Base the interpretation ONLY on the dream content and the selected waking emotion.
+- First identify the single most important psychological conflict in the dream.
+- Build the whole interpretation around that core conflict.
+- Do NOT explain every symbol separately.
+- Mention only the most relevant symbols if they directly support the core conflict.
+- Avoid generic dream explanations.
+- Avoid repetition.
+- Keep the tone intelligent, grounded, and emotionally perceptive.
+- Write in ${isTr ? 'Turkish. Use informal "sen" form, NEVER "siz".' : 'English.'}
+
+QUALITY RULES:
+- The response must feel specific to this exact dream, not dreams in general.
+- Every sentence must directly connect to an element from the dream.
+- If the analysis sounds generic, rewrite it to be more specific.
+- Prioritize depth over coverage.
+- Short, sharp, meaningful.
+- Format with clear spacing: use '\\n\\n' to create paragraphs and line breaks.
+
+EMOTION RULE:
+- The emotional interpretation should align with the user's selected waking emotion unless the dream strongly contradicts it.
+- If there is a mismatch, describe it as a mixed or layered emotional state instead of forcing a wrong emotion.
+
+PERCENTAGE RULES:
+- emotional_load = emotional intensity, fear, stress, pain, guilt, protection burden
+- uncertainty = lack of control, instability, unclear outcome
+- recent_memory_effect = likely connection to current concerns or recent life events
+- brain_activity = randomness, surreal structure, dream-like noise
+- Percentages must be realistic and must sum to 100.
+- Do not give equal percentages unless strongly justified.
+
+OUTPUT RULES:
+- Return ONLY valid JSON.
+- No markdown.
+- No explanation outside JSON.
+
+EXAMPLE OF GOOD STYLE:
+
+Dream:
+"I was trapped in a cage with my partner and others. I got out, but they remained inside. Then the cage fell and I suffered because of what happened to them."
+
+Good interpretation style:
+- Focus on the conflict between self-protection and responsibility toward others.
+- Keep the language concise.
+- Use explicit bullet styles like "→" for linking actions and "👉" for insights, exactly as the user wants.
+- Do not over-explain every symbol.
+- Do not invent relationship problems.
+- Make the meaning feel specific and psychologically grounded.`;
+
+    const userPrompt = `Analyze this dream.
+
+Dream text:
+${dreamText}
+
+Selected waking emotion:
+${emotion}
+
+Return this exact JSON structure:
+
+{
+  "core_conflict": "string",
+  "distribution": {
+    "emotional_load": 0,
+    "uncertainty": 0,
+    "recent_memory_effect": 0,
+    "brain_activity": 0
+  },
+  "analysis": {
+    "brain": "Explain what the brain is doing. Example: 'Bu rüya, beynin sorumluluk + bağlanma yükünü aynı anda işlemeye çalıştığını gösteriyor.\\nYukarı çıkman ama hemen ardından düşüş olması, kaçış ve geri dönme döngüsüne benzer: çözülmemiş bir zihinsel çatışma.'",
+    "emotion": "Explain dominant emotion structure using → and 👉. Example: 'Suçluluk + koruma içgüdüsü\\n\\nYukarı çıkman → bireysel kurtulma refleksi\\nArkandakilerin içeride kalması → “yalnız kalamam” hissi\\n\\n👉 Zihin özgürlük isterken bağlılığı bırakmıyor.'",
+    "symbol": "Explain core symbol using = and 👉. Example: 'Kafes = kontrol dışı kalma durumu\\n\\nAsılı olması → belirsizlik\\nDüşmesi → ani duygusal yüklenme\\n\\n👉 Zihinde “denge bozulursa herkes zarar görür” algısı var.'",
+    "nature": "OPTIONAL: Analyze nature/environment if present. Example: 'Doğal ortam = ilkel beyin / hayatta kalma modu.\\nMantıktan çok refleks çalışıyor. Güvenli bir yapı hissi yok → zihinsel güvensizlik.'",
+    "physical_pain": "OPTIONAL: Analyze physical sensation if present. Example: 'Beyin, duygusal acıyı bedensel acı gibi simüle etmiş.\\n\\nGenelde: yoğun stres, bastırılmış korku ile birlikte görülür.'",
+    "recent_effect": "OPTIONAL: Analyze recent memory effect. Example: 'Son günlerde: sevdiklerinle ilgili sorumluluk, “Ben iyi olursam ya onlar?” düşüncesi yüksek ihtimalle aktiftir.'",
+    "summary": "Summarize clearly and scientifically, focusing heavily on cognitive burden, responsibility, or conflict. Example: 'Bu rüya, bireysel kurtulma isteği ile sevdiklerini koruma zorunluluğu arasında kalan zihnin, kontrol kaybı korkusunu işlemesiyle oluşmuş. Rüyadaki acı, duygusal yükün yoğunluğunu gösteriyor.'"
+  }
+}`;
+
+    const response = await fetch(OPENAI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.4,
+        max_completion_tokens: 800,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("OpenAI error:", response.status, errText);
+      return new Response(
+        JSON.stringify({ error: "AI service unavailable", detail: errText }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const data = await response.json();
+    const rawContent = data.choices?.[0]?.message?.content;
+
+    if (!rawContent) {
+      console.error("Empty AI response:", JSON.stringify(data));
+      return new Response(
+        JSON.stringify({ error: "Empty AI response" }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const parsed = JSON.parse(rawContent);
+
+    // siz → sen post-processing
+    const fix = (t: string): string => {
+      if (!isTr || !t) return t;
+      return t
+        .replace(/Rüyanız/g,'Rüyan').replace(/rüyanız/g,'rüyan')
+        .replace(/yaşadığınız/g,'yaşadığın').replace(/hissettiğiniz/g,'hissettiğin')
+        .replace(/olmanız/g,'olman').replace(/kalmanız/g,'kalman')
+        .replace(/korkunuz/g,'korkun').replace(/beyniniz/g,'beynin')
+        .replace(/hayatınız/g,'hayatın').replace(/ilişkiniz/g,'ilişkin');
+    };
+
+    const a = parsed.analysis || {};
+
+    // Flutter sections formatına dönüştür
+    const sections = [];
+    if (a.brain) sections.push({ emoji: "🧠", title: isTr ? "Beyin Ne Yapıyordu?" : "What Was the Brain Doing?", content: fix(a.brain) });
+    if (a.emotion) sections.push({ emoji: "❤️", title: isTr ? "Baskın Duygusal Tema" : "Dominant Emotional Theme", content: fix(a.emotion) });
+    if (a.symbol) sections.push({ emoji: "🧩", title: isTr ? "Ana Sembol" : "Main Symbol", content: fix(a.symbol) });
+    if (a.nature && !a.nature.includes("OPTIONAL")) sections.push({ emoji: "🌲", title: isTr ? "Ortam & Doğa" : "Environment", content: fix(a.nature) });
+    if (a.physical_pain && !a.physical_pain.includes("OPTIONAL")) sections.push({ emoji: "🌫", title: isTr ? "Fiziksel His" : "Physical Sensation", content: fix(a.physical_pain) });
+    if (a.recent_effect && !a.recent_effect.includes("OPTIONAL")) sections.push({ emoji: "🔁", title: isTr ? "Yakın Zaman Etkisi" : "Recent Effect", content: fix(a.recent_effect) });
+    if (a.summary) sections.push({ emoji: "🔬", title: isTr ? "Bilimsel Özet" : "Scientific Summary", content: fix(a.summary) });
+
+    const result = {
+      category: fix(parsed.core_conflict || ""),
+      distribution: parsed.distribution || { emotional_load: 25, uncertainty: 25, recent_memory_effect: 25, brain_activity: 25 },
+      sections,
+      summary: fix(parsed.core_conflict || ""), // summary = core_conflict (farklı içerik, duplikasyon yok)
+    };
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Function error:", error);
+    return new Response(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
