@@ -909,59 +909,300 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final yearAnimal = ChineseZodiacData.animals[6]; // At
     final interaction = ChineseZodiacData.yearInteractions[_animalIdx];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Yıl hero
+      // ── Birleşik Hero + Enerji Paneli ──
       _glass(child: Column(children: [
+        // ── Dekoratif üst çizgi ──
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('🐴', style: const TextStyle(fontSize: 50)),
-          const SizedBox(width: 16),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            ShaderMask(
-              shaderCallback: (b) => const LinearGradient(colors: [_crimson, Color(0xFFFF6B6B)]).createShader(b),
-              child: const Text('2026', style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
-            ),
-            Text('AT YILI', style: TextStyle(color: _goldL.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 2)),
-          ]),
+          Container(width: 32, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Colors.transparent, _goldL.withOpacity(0.2)]),
+          )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text('ATEŞ ATI YILI', style: TextStyle(
+              color: _goldL.withOpacity(0.25), fontSize: 9,
+              fontWeight: FontWeight.w700, letterSpacing: 2.5,
+            )),
+          ),
+          Container(width: 32, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [_goldL.withOpacity(0.2), Colors.transparent]),
+          )),
         ]),
         const SizedBox(height: 16),
-        Text('Ateş Atı yılı; enerji, özgürlük ve hareketlilik temalı bir dönem. Cesur adımlar atanları ödüllendirir.',
-          textAlign: TextAlign.center, style: _bodyStyle()),
-      ])),
-      const SizedBox(height: 20),
-      // Yılın özellikleri
-      _secHead('🏮', 'Yılın Enerjisi'),
-      const SizedBox(height: 10),
-      Row(children: [
-        _infoChip('🔥', 'Element', 'Ateş'),
-        const SizedBox(width: 10),
-        _infoChip('☯️', 'Kutupluluk', 'Yang'),
-        const SizedBox(width: 10),
-        _infoChip('⚡', 'Tema', 'Hareket'),
-      ]),
-      const SizedBox(height: 20),
-      // Etkileşim
-      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(_animal['emoji'] as String, style: const TextStyle(fontSize: 24)),
-          const SizedBox(width: 8),
-          const Text('×', style: TextStyle(color: Colors.white38, fontSize: 20)),
-          const SizedBox(width: 8),
-          const Text('🐴', style: TextStyle(fontSize: 24)),
-          const SizedBox(width: 12),
-          Expanded(child: Text('${_animal['name']} & At Yılı Etkileşimi',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700))),
-        ]),
-        const SizedBox(height: 14),
-        Text(interaction, style: _bodyStyle()),
-      ])),
-      const SizedBox(height: 20),
-      // Yıl tavsiyeleri
-      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _secHead('💡', '2026 Tavsiyeleri'),
+        // ── At ikonu ──
+        Container(
+          width: 110, height: 110,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [const Color(0xFFE53935).withOpacity(0.2), const Color(0xFFE53935).withOpacity(0.06), Colors.transparent],
+              stops: const [0.0, 0.45, 1.0],
+              radius: 0.85,
+            ),
+          ),
+          child: Center(child: _animalIcon(6, 90)),
+        ),
         const SizedBox(height: 12),
-        _adviceRow('🌱', 'İlkbahar', 'Yeni başlangıçlar için ideal. Tohumları ekin.'),
-        _adviceRow('☀️', 'Yaz', 'En verimli dönem. Projelere hız verin.'),
-        _adviceRow('🍂', 'Sonbahar', 'Hasat zamanı. Başarılarınızı değerlendirin.'),
-        _adviceRow('❄️', 'Kış', 'Dinlenme ve planlama dönemi. İç dünyanıza dönün.'),
+        // ── 2026 · AT YILI — element renkli ──
+        Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Container(width: 24, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Colors.transparent, const Color(0xFFE53935).withOpacity(0.2)]),
+          )),
+          const SizedBox(width: 10),
+          ShaderMask(
+            shaderCallback: (b) => const LinearGradient(
+              colors: [Color(0xFFFF6B6B), Color(0xFFE53935)],
+            ).createShader(b),
+            child: const Text('2026', style: TextStyle(
+              color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900,
+              height: 1, letterSpacing: 2,
+            )),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(width: 4, height: 4, decoration: BoxDecoration(
+              shape: BoxShape.circle, color: const Color(0xFFE53935).withOpacity(0.35),
+            )),
+          ),
+          Text('AT YILI', style: TextStyle(
+            color: _goldL.withOpacity(0.45), fontSize: 14,
+            fontWeight: FontWeight.w700, letterSpacing: 3,
+          )),
+          const SizedBox(width: 10),
+          Container(width: 24, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [const Color(0xFFE53935).withOpacity(0.2), Colors.transparent]),
+          )),
+        ]),
+        const SizedBox(height: 16),
+        // ── İnce ayırıcı ──
+        Container(height: 0.5, margin: const EdgeInsets.symmetric(horizontal: 20), decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            Colors.transparent, _goldL.withOpacity(0.12), Colors.transparent,
+          ]),
+        )),
+        const SizedBox(height: 14),
+        // ── Açıklama ──
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text('Ateş Atı yılı; enerji, özgürlük ve hareketlilik temalı bir dönem. Cesur adımlar atanları ödüllendirir.',
+            textAlign: TextAlign.center, style: _bodyStyle()),
+        ),
+        const SizedBox(height: 20),
+        // ── Yılın Özü — 3 Nitelik Şeridi ──
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft, end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFFE53935).withOpacity(0.06),
+                Colors.white.withOpacity(0.03),
+                const Color(0xFFE53935).withOpacity(0.04),
+              ],
+            ),
+            border: Border.all(color: const Color(0xFFE53935).withOpacity(0.1), width: 0.6),
+          ),
+          child: Row(children: [
+            // ── Ruhun Alevi — Element ──
+            Expanded(child: Column(children: [
+              SizedBox(
+                width: 32, height: 32,
+                child: CustomPaint(painter: _YearFlameIconPainter()),
+              ),
+              const SizedBox(height: 8),
+              Text('Ateş', style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('Ruhun Alevi', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 8, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+            ])),
+            // ── Dekoratif bağlayıcı ──
+            Container(
+              width: 20, height: 0.5,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [const Color(0xFFE53935).withOpacity(0.15), _goldL.withOpacity(0.15)]),
+              ),
+            ),
+            // ── Kozmik Denge — Kutupluluk ──
+            Expanded(child: Column(children: [
+              SizedBox(
+                width: 32, height: 32,
+                child: CustomPaint(painter: _YearYinYangIconPainter()),
+              ),
+              const SizedBox(height: 8),
+              Text('Yang', style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('Kozmik Denge', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 8, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+            ])),
+            // ── Dekoratif bağlayıcı ──
+            Container(
+              width: 20, height: 0.5,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [_goldL.withOpacity(0.15), const Color(0xFFFFD54F).withOpacity(0.15)]),
+              ),
+            ),
+            // ── Akış Enerjisi — Tema ──
+            Expanded(child: Column(children: [
+              SizedBox(
+                width: 32, height: 32,
+                child: CustomPaint(painter: _YearBoltIconPainter()),
+              ),
+              const SizedBox(height: 8),
+              Text('Hareket', style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('Akış Enerjisi', style: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 8, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+            ])),
+          ]),
+        ),
+      ])),
+      const SizedBox(height: 20),
+      // ── Etkileşim — Premium Karşılaşma Kartı ──
+      Builder(builder: (context) {
+        // Element renkleri
+        final myElColor = Color(ChineseZodiacData.elements[_userElement]!['color'] as int);
+        const yearElColor = Color(0xFFE53935); // Ateş
+        return _glass(child: Column(children: [
+          // ── Üst etiket ──
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Container(width: 28, height: 0.5, decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.transparent, myElColor.withOpacity(0.25)]),
+            )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text('YILLIK ETKİLEŞİM', style: TextStyle(
+                color: _goldL.withOpacity(0.3), fontSize: 9,
+                fontWeight: FontWeight.w700, letterSpacing: 2,
+              )),
+            ),
+            Container(width: 28, height: 0.5, decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [yearElColor.withOpacity(0.25), Colors.transparent]),
+            )),
+          ]),
+          const SizedBox(height: 18),
+          // ── İki hayvan karşı karşıya ──
+          SizedBox(
+            height: 100,
+            child: Stack(alignment: Alignment.center, children: [
+              // ── Kozmik köprü ──
+              Positioned.fill(child: CustomPaint(
+                painter: _CosmicBridgePainter(
+                  leftColor: myElColor.withOpacity(0.25),
+                  rightColor: yearElColor.withOpacity(0.25),
+                ),
+              )),
+              // ── Hayvan ikonları ──
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                // Sol — kullanıcının burcu (element renkli)
+                Column(children: [
+                  Container(
+                    width: 72, height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [myElColor.withOpacity(0.2), myElColor.withOpacity(0.05), Colors.transparent],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                      border: Border.all(color: myElColor.withOpacity(0.2), width: 0.7),
+                      boxShadow: [BoxShadow(color: myElColor.withOpacity(0.15), blurRadius: 16, spreadRadius: 2)],
+                    ),
+                    child: Center(child: _animalIcon(_animalIdx, 54)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(_animal['name'] as String, style: TextStyle(
+                    color: myElColor.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.w600,
+                  )),
+                ]),
+                // Orta — bağ sembolü
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(children: [
+                    Container(
+                      width: 36, height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [Colors.white.withOpacity(0.06), Colors.transparent],
+                        ),
+                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                      ),
+                      child: Center(child: SizedBox(
+                        width: 18, height: 18,
+                        child: CustomPaint(painter: _InteractionStarPainter(color: _goldL.withOpacity(0.45))),
+                      )),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('2026', style: TextStyle(
+                      color: yearElColor.withOpacity(0.45), fontSize: 10,
+                      fontWeight: FontWeight.w800, letterSpacing: 1,
+                    )),
+                  ]),
+                ),
+                // Sağ — At yılı (ateş element renkli)
+                Column(children: [
+                  Container(
+                    width: 72, height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [yearElColor.withOpacity(0.2), yearElColor.withOpacity(0.05), Colors.transparent],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                      border: Border.all(color: yearElColor.withOpacity(0.2), width: 0.7),
+                      boxShadow: [BoxShadow(color: yearElColor.withOpacity(0.15), blurRadius: 16, spreadRadius: 2)],
+                    ),
+                    child: Center(child: _animalIcon(6, 54)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('At', style: TextStyle(
+                    color: yearElColor.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600,
+                  )),
+                ]),
+              ]),
+            ]),
+          ),
+          const SizedBox(height: 14),
+          // ── Dekoratif ayırıcı ──
+          Container(height: 0.5, margin: const EdgeInsets.symmetric(horizontal: 16), decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Colors.transparent, myElColor.withOpacity(0.15), yearElColor.withOpacity(0.15), Colors.transparent,
+            ]),
+          )),
+          const SizedBox(height: 14),
+          // ── Etkileşim metni — sol çizgili alıntı tarzı ──
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 2, height: 50,
+              margin: const EdgeInsets.only(top: 2, right: 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(1),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: [myElColor.withOpacity(0.5), yearElColor.withOpacity(0.2)],
+                ),
+              ),
+            ),
+            Expanded(child: Text(interaction,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.6), fontSize: 13,
+                height: 1.7, fontStyle: FontStyle.italic,
+              ),
+            )),
+          ]),
+        ]));
+      }),
+      const SizedBox(height: 20),
+      // Yıl tavsiyeleri — kişiselleştirilmiş
+      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Row(children: [
+            SizedBox(width: 22, height: 22, child: CustomPaint(painter: _CompassIconPainter(color: _goldL.withOpacity(0.7)))),
+            const SizedBox(width: 10),
+            const Text('Mevsimlik Pusula', style: TextStyle(color: Color(0xFFE8DCC8), fontSize: 18, fontWeight: FontWeight.w700)),
+          ]),
+        ),
+        const SizedBox(height: 12),
+        ...ChineseZodiacData.yearSeasonalAdvice[_animalIdx].map((s) =>
+          _adviceRow(s[0], s[1], s[2]),
+        ),
       ])),
       const SizedBox(height: 24),
       // ── 2026 Zamanlama Rehberi ──
@@ -972,19 +1213,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   }
 
   List<Widget> _buildTimingCards() {
-    final timing = _animal['timingAdvice'] as Map<String, int>;
-    final items = [
-      {'key': 'isKurma', 'emoji': '🏢', 'label': 'İş Kurma'},
-      {'key': 'yatirim', 'emoji': '📈', 'label': 'Yatırım'},
-      {'key': 'evlenme', 'emoji': '💒', 'label': 'Evlenme'},
-      {'key': 'cocuk', 'emoji': '👶', 'label': 'Çocuk'},
-      {'key': 'seyahat', 'emoji': '✈️', 'label': 'Seyahat'},
-      {'key': 'tasima', 'emoji': '🏠', 'label': 'Taşınma'},
-    ];
+    final guideItems = ChineseZodiacData.yearTimingGuide[_animalIdx];
     final colors = [const Color(0xFFE53935), const Color(0xFFFF9800), const Color(0xFFFFEB3B), const Color(0xFF4CAF50), const Color(0xFF2E7D32)];
     final labels = ['Uygun Değil', 'Dikkatli Ol', 'Nötr', 'Uygun', 'Çok Uygun'];
-    return items.map((item) {
-      final score = timing[item['key']] ?? 3;
+    return guideItems.map((item) {
+      final emoji = item[0] as String;
+      final label = item[1] as String;
+      final score = item[2] as int;
       final sc = colors[score - 1];
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -994,10 +1229,16 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           border: Border.all(color: sc.withOpacity(0.2)),
         ),
         child: Row(children: [
-          Text(item['emoji'] as String, style: const TextStyle(fontSize: 22)),
+          SizedBox(
+            width: 28, height: 28,
+            child: Center(child: SizedBox(
+              width: 22, height: 22,
+              child: CustomPaint(painter: _TimingIconPainter(emoji: emoji, color: sc)),
+            )),
+          ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(item['label'] as String, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+            Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             Row(children: List.generate(5, (i) => Container(
               width: 20, height: 5, margin: const EdgeInsets.only(right: 3),
@@ -1851,12 +2092,39 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       const SizedBox(height: 12),
 
       // ── 1) Kozmik Fısıltı — Mistik mesaj ──
-      SizedBox(height: 140, child: _glass(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('✦', style: TextStyle(fontSize: 28, color: _goldL.withOpacity(0.8))),
+      _glass(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        // ── Tarih (en soluk ton) ──
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: 24, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Colors.transparent, _goldL.withOpacity(0.2)]),
+          )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              '${now.day} ${const ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'][now.month - 1]} ${now.year}',
+              style: TextStyle(
+                color: _goldL.withOpacity(0.3),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+          Container(width: 24, height: 0.5, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [_goldL.withOpacity(0.2), Colors.transparent]),
+          )),
+        ]),
         const SizedBox(height: 8),
+        // ── Yıldız (orta ton — Günlük tab ikonu ile aynı şekil) ──
+        SizedBox(
+          width: 22, height: 22,
+          child: CustomPaint(painter: _DailyQuoteStarPainter()),
+        ),
+        const SizedBox(height: 10),
+        // ── Günlük söz (en parlak ton) ──
         Text(fortune['whisper'] as String, textAlign: TextAlign.center,
-          style: TextStyle(color: _goldL.withOpacity(0.9), fontSize: 15, fontStyle: FontStyle.italic, height: 1.5)),
-      ])))),
+          style: TextStyle(color: _goldL.withOpacity(0.8), fontSize: 15, fontStyle: FontStyle.italic, height: 1.5)),
+      ]))),
 
       const SizedBox(height: 16),
 
@@ -2506,17 +2774,37 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ]),
   );
 
-  Widget _adviceRow(String emoji, String season, String advice) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(emoji, style: const TextStyle(fontSize: 20)),
-      const SizedBox(width: 10),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(season, style: TextStyle(color: _goldL, fontSize: 14, fontWeight: FontWeight.w700)),
-        Text(advice, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
-      ])),
-    ]),
-  );
+  Widget _adviceRow(String emoji, String season, String advice) {
+    // Mevsime göre ikon ve renk
+    final Map<String, Color> seasonColors = {
+      'İlkbahar': const Color(0xFF66BB6A),
+      'Yaz': const Color(0xFFFFB74D),
+      'Sonbahar': const Color(0xFFE57C3A),
+      'Kış': const Color(0xFF64B5F6),
+    };
+    final color = seasonColors[season] ?? _goldL;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(
+          width: 32, height: 32,
+          child: Center(
+            child: SizedBox(
+              width: 24, height: 24,
+              child: CustomPaint(painter: _SeasonIconPainter(season: season, color: color)),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const SizedBox(height: 1),
+          Text(season, style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 3),
+          Text(advice, style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 13, height: 1.5)),
+        ])),
+      ]),
+    );
+  }
 
   Widget _elementCycleRow(String relation, String target, Color c) {
     final tData = ChineseZodiacData.elements[target]!;
@@ -3818,7 +4106,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
 
                 // ─ Dönen alıntı — sabit alan ─
                 SizedBox(
-                  height: 85,
+                  height: 110,
                   child: Center(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 500),
@@ -3838,12 +4126,14 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                         widget.quotes[_idx],
                         key: ValueKey(_idx),
                         textAlign: TextAlign.center,
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.75),
-                          fontSize: 15,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.italic,
-                          height: 1.65,
+                          height: 1.6,
                           letterSpacing: 0.2,
                         ),
                       ),
@@ -4593,6 +4883,50 @@ class _ElementBondPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+// ── Günlük Söz Yıldızı (Günlük tab ikonu ile aynı şekil ve renk) ──
+class _DailyQuoteStarPainter extends CustomPainter {
+  // Günlük tab ikonu ile aynı _goldL rengi
+  static const _starColor = Color(0xFFFFE8A1);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width / 2;
+
+    final p = Paint()
+      ..color = _starColor.withOpacity(0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+
+    // 4 ana ışın
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 2;
+      canvas.drawLine(
+        Offset(cx + r * 0.15 * math.cos(angle), cy + r * 0.15 * math.sin(angle)),
+        Offset(cx + r * math.cos(angle), cy + r * math.sin(angle)),
+        p,
+      );
+    }
+    // 4 çapraz kısa ışın
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 4;
+      canvas.drawLine(
+        Offset(cx + r * 0.15 * math.cos(angle), cy + r * 0.15 * math.sin(angle)),
+        Offset(cx + r * 0.55 * math.cos(angle), cy + r * 0.55 * math.sin(angle)),
+        p..strokeWidth = 1.2,
+      );
+    }
+    p.strokeWidth = 1.8;
+    // Merkez daire
+    canvas.drawCircle(Offset(cx, cy), r * 0.15, p..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 // ── Günlük Şans İkonu ──
 class _FortuneIconPainter extends CustomPainter {
   final String level;
@@ -5067,6 +5401,632 @@ class _MoodIconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _MoodIconPainter old) => old.mood != mood || old.color != color;
+}
+
+// ── Enerji Yolu Painter — Takımyıldız bağlantı çizgileri ──
+// ── Yıl Alev İkonu (Element) ──
+// ── Kozmik Köprü — İki hayvan arası ark ──
+class _CosmicBridgePainter extends CustomPainter {
+  final Color leftColor;
+  final Color rightColor;
+  _CosmicBridgePainter({required this.leftColor, required this.rightColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final cy = size.height * 0.42;
+    final mx = w / 2; // merkez
+
+    // Sol dal — kullanıcı tarafından merkeze
+    final pLeft = Paint()
+      ..shader = LinearGradient(
+        colors: [leftColor, leftColor.withOpacity(0.05)],
+      ).createShader(Rect.fromLTWH(0, 0, mx, size.height))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+    final leftArc = Path()
+      ..moveTo(w * 0.2, cy + 4)
+      ..cubicTo(w * 0.3, cy - 14, w * 0.4, cy - 6, mx, cy);
+    canvas.drawPath(leftArc, pLeft);
+    // Alt dal
+    final leftArc2 = Path()
+      ..moveTo(w * 0.2, cy + 8)
+      ..cubicTo(w * 0.3, cy + 20, w * 0.4, cy + 10, mx, cy);
+    canvas.drawPath(leftArc2, pLeft..strokeWidth = 0.6);
+
+    // Sağ dal — merkez'den At tarafına
+    final pRight = Paint()
+      ..shader = LinearGradient(
+        colors: [rightColor.withOpacity(0.05), rightColor],
+      ).createShader(Rect.fromLTWH(mx, 0, mx, size.height))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+    final rightArc = Path()
+      ..moveTo(mx, cy)
+      ..cubicTo(w * 0.6, cy - 6, w * 0.7, cy - 14, w * 0.8, cy + 4);
+    canvas.drawPath(rightArc, pRight);
+    // Alt dal
+    final rightArc2 = Path()
+      ..moveTo(mx, cy)
+      ..cubicTo(w * 0.6, cy + 10, w * 0.7, cy + 20, w * 0.8, cy + 8);
+    canvas.drawPath(rightArc2, pRight..strokeWidth = 0.6);
+
+    // Merkez birleşme noktası
+    final mergeP = Paint()
+      ..color = Color.lerp(leftColor, rightColor, 0.5)!.withOpacity(0.3)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(mx, cy), 2.5, mergeP);
+    canvas.drawCircle(Offset(mx, cy), 5, mergeP..color = mergeP.color.withOpacity(0.1));
+
+    // Dekoratif yıldız noktaları
+    final dotP = Paint()..style = PaintingStyle.fill;
+    final dots = [0.28, 0.36, 0.64, 0.72];
+    for (int i = 0; i < dots.length; i++) {
+      final t = dots[i];
+      final x = w * t;
+      final yOff = math.sin((t - 0.2) * math.pi * 1.6) * 10;
+      final y = cy - yOff;
+      dotP.color = Color.lerp(leftColor, rightColor, t)!.withOpacity(0.35);
+      canvas.drawCircle(Offset(x, y), 1.0, dotP);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Etkileşim Yıldız İkonu ──
+class _InteractionStarPainter extends CustomPainter {
+  final Color color;
+  _InteractionStarPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width / 2;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    // 4 ana ışın
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 2;
+      canvas.drawLine(
+        Offset(cx + r * 0.2 * math.cos(angle), cy + r * 0.2 * math.sin(angle)),
+        Offset(cx + r * math.cos(angle), cy + r * math.sin(angle)),
+        p,
+      );
+    }
+    // 4 çapraz kısa ışın
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 4;
+      canvas.drawLine(
+        Offset(cx + r * 0.2 * math.cos(angle), cy + r * 0.2 * math.sin(angle)),
+        Offset(cx + r * 0.55 * math.cos(angle), cy + r * 0.55 * math.sin(angle)),
+        p..strokeWidth = 0.8,
+      );
+    }
+    // Merkez
+    canvas.drawCircle(Offset(cx, cy), r * 0.12, Paint()..color = color..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Mevsim İkonları ──
+// ── Pusula İkonu (Mevsimlik Pusula başlığı) ──
+// ── Zamanlama Rehberi İkonları ──
+class _TimingIconPainter extends CustomPainter {
+  final String emoji;
+  final Color color;
+  _TimingIconPainter({required this.emoji, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height, cx = w/2, cy = h/2;
+    final p = Paint()..color=color.withOpacity(0.75)..style=PaintingStyle.stroke..strokeWidth=1.2..strokeCap=StrokeCap.round..strokeJoin=StrokeJoin.round;
+    final f = Paint()..color=color.withOpacity(0.4)..style=PaintingStyle.fill;
+    switch(emoji){
+      case '💰': _coin(canvas,w,h,p,f); break;
+      case '📊': _barChart(canvas,w,h,p); break;
+      case '📈': _trending(canvas,w,h,p,f); break;
+      case '🏦': _bank(canvas,w,h,p); break;
+      case '💎': _diamond(canvas,w,h,p,f); break;
+      case '💼': _briefcase(canvas,w,h,p); break;
+      case '🤝': _handshake(canvas,w,h,p,f); break;
+      case '🏠': _house(canvas,w,h,cx,p); break;
+      case '🏗️': _crane(canvas,w,h,p); break;
+      case '🏡': _cottage(canvas,w,h,cx,p,f); break;
+      case '🛋️': _couch(canvas,w,h,p); break;
+      case '🎓': _gradCap(canvas,w,h,cx,p,f); break;
+      case '📚': _books(canvas,w,h,p); break;
+      case '🔬': _microscope(canvas,w,h,p,f); break;
+      case '🧪': _flask(canvas,w,h,p,f); break;
+      case '🧳': _luggage(canvas,w,h,p); break;
+      case '✈️': _plane(canvas,w,h,p); break;
+      case '🗺️': _mapScroll(canvas,w,h,p); break;
+      case '🌍': _globe(canvas,w,h,cx,cy,p); break;
+      case '🏕️': _tent(canvas,w,h,cx,p); break;
+      case '💕': case '💞': _hearts(canvas,w,h,p); break;
+      case '💐': _bouquet(canvas,w,h,cx,p,f); break;
+      case '💑': _couple(canvas,w,h,cx,p,f); break;
+      case '💝': _giftHeart(canvas,w,h,cx,cy,p,f); break;
+      case '💒': _chapel(canvas,w,h,cx,p,f); break;
+      case '🎨': _palette(canvas,w,h,p,f); break;
+      case '🎵': _musicNote(canvas,w,h,p,f); break;
+      case '✍️': _quill(canvas,w,h,p); break;
+      case '🎭': _masks(canvas,w,h,p); break;
+      case '🖼️': _frame(canvas,w,h,p,f); break;
+      case '🧘': _meditate(canvas,w,h,cx,cy,p); break;
+      case '🏥': _medical(canvas,w,h,cx,cy,p); break;
+      case '🌿': _herb(canvas,w,h,p); break;
+      case '🕊️': _dove(canvas,w,h,p); break;
+      case '🎉': _party(canvas,w,h,cx,p,f); break;
+      case '🥂': _toast(canvas,w,h,cx,p); break;
+      case '🎪': _circus(canvas,w,h,cx,p); break;
+      case '👑': _crown(canvas,w,h,p,f); break;
+      case '🏰': _castle(canvas,w,h,p); break;
+      case '🚀': _rocket(canvas,w,h,p,f); break;
+      case '🎖️': _medal(canvas,w,h,cx,p,f); break;
+      case '👨‍👩‍👧': case '👪': _family(canvas,w,h,cx,p); break;
+      case '👶': _baby(canvas,w,h,cx,cy,p); break;
+      case '💡': _bulb(canvas,w,h,cx,p,f); break;
+      case '🖥️': _monitor(canvas,w,h,p); break;
+      case '🌐': _network(canvas,w,h,cx,cy,p,f); break;
+      case '📱': _phone(canvas,w,h,cx,p); break;
+      case '🏆': _trophy(canvas,w,h,cx,p); break;
+      case '🏃': _runner(canvas,w,h,p); break;
+      case '💪': _muscle(canvas,w,h,p); break;
+      case '🎲': _dice(canvas,w,h,p,f); break;
+      case '♟️': _chess(canvas,w,h,cx,p,f); break;
+      case '🔄': _cycle(canvas,w,h,cx,cy,p); break;
+      case '⏰': _clock(canvas,w,h,cx,cy,p); break;
+      case '📋': _clipboard(canvas,w,h,p); break;
+      case '🔍': _search(canvas,w,h,p); break;
+      case '🤲': _hands(canvas,w,h,cx,p); break;
+      case '⚖️': _scale(canvas,w,h,cx,p); break;
+      case '🎗️': _ribbon(canvas,w,h,cx,p); break;
+      case '🍽️': _plate(canvas,w,h,cx,cy,p); break;
+      case '👔': _tie(canvas,w,h,cx,p); break;
+      case '🌾': _wheat(canvas,w,h,p); break;
+      case '🔮': _crystal(canvas,w,h,cx,cy,p,f); break;
+      default: canvas.drawCircle(Offset(cx,cy),w*0.3,p); canvas.drawCircle(Offset(cx,cy),2,f);
+    }
+  }
+  void _coin(Canvas c,double w,double h,Paint p,Paint f){c.drawOval(Rect.fromLTWH(w*.2,h*.15,w*.6,h*.35),p);c.drawOval(Rect.fromLTWH(w*.25,h*.4,w*.5,h*.3),p);c.drawOval(Rect.fromLTWH(w*.3,h*.6,w*.4,h*.25),p);c.drawCircle(Offset(w*.5,h*.32),2,f);}
+  void _barChart(Canvas c,double w,double h,Paint p){c.drawLine(Offset(w*.1,h*.9),Offset(w*.1,h*.1),p);c.drawLine(Offset(w*.1,h*.9),Offset(w*.95,h*.9),p..strokeWidth=0.7);c.drawLine(Offset(w*.25,h*.9),Offset(w*.25,h*.55),p..strokeWidth=1.2);c.drawLine(Offset(w*.45,h*.9),Offset(w*.45,h*.35),p);c.drawLine(Offset(w*.65,h*.9),Offset(w*.65,h*.5),p);c.drawLine(Offset(w*.85,h*.9),Offset(w*.85,h*.2),p);}
+  void _trending(Canvas c,double w,double h,Paint p,Paint f){final path=Path()..moveTo(w*.1,h*.75)..cubicTo(w*.3,h*.7,w*.4,h*.45,w*.55,h*.4)..cubicTo(w*.7,h*.35,w*.8,h*.2,w*.9,h*.15);c.drawPath(path,p);c.drawLine(Offset(w*.75,h*.12),Offset(w*.92,h*.12),p..strokeWidth=0.9);c.drawLine(Offset(w*.92,h*.12),Offset(w*.92,h*.3),p);c.drawCircle(Offset(w*.9,h*.15),2,f);}
+  void _bank(Canvas c,double w,double h,Paint p){final roof=Path()..moveTo(w*.5,h*.05)..lineTo(w*.95,h*.3)..lineTo(w*.05,h*.3)..close();c.drawPath(roof,p);c.drawLine(Offset(w*.2,h*.35),Offset(w*.2,h*.75),p);c.drawLine(Offset(w*.4,h*.35),Offset(w*.4,h*.75),p);c.drawLine(Offset(w*.6,h*.35),Offset(w*.6,h*.75),p);c.drawLine(Offset(w*.8,h*.35),Offset(w*.8,h*.75),p);c.drawLine(Offset(w*.05,h*.8),Offset(w*.95,h*.8),p);c.drawLine(Offset(w*.05,h*.9),Offset(w*.95,h*.9),p..strokeWidth=1.5);}
+  void _diamond(Canvas c,double w,double h,Paint p,Paint f){final d=Path()..moveTo(w*.5,h*.02)..lineTo(w*.9,h*.35)..lineTo(w*.5,h*.95)..lineTo(w*.1,h*.35)..close();c.drawPath(d,p);c.drawLine(Offset(w*.1,h*.35),Offset(w*.9,h*.35),p..strokeWidth=0.7);c.drawLine(Offset(w*.3,h*.35),Offset(w*.5,h*.02),p);c.drawLine(Offset(w*.7,h*.35),Offset(w*.5,h*.02),p);c.drawCircle(Offset(w*.5,h*.35),1.5,f);}
+  void _briefcase(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.08,h*.35,w*.92,h*.88,const Radius.circular(3)),p);c.drawLine(Offset(w*.35,h*.35),Offset(w*.35,h*.2),p..strokeWidth=0.9);c.drawLine(Offset(w*.35,h*.2),Offset(w*.65,h*.2),p);c.drawLine(Offset(w*.65,h*.2),Offset(w*.65,h*.35),p);c.drawLine(Offset(w*.08,h*.55),Offset(w*.92,h*.55),p..strokeWidth=0.6);}
+  void _handshake(Canvas c,double w,double h,Paint p,Paint f){final l=Path()..moveTo(w*.05,h*.5)..cubicTo(w*.15,h*.3,w*.35,h*.3,w*.5,h*.45);c.drawPath(l,p);final r=Path()..moveTo(w*.95,h*.5)..cubicTo(w*.85,h*.3,w*.65,h*.3,w*.5,h*.45);c.drawPath(r,p);c.drawLine(Offset(w*.5,h*.45),Offset(w*.5,h*.65),p..strokeWidth=0.7);c.drawCircle(Offset(w*.5,h*.45),2,f);}
+  void _house(Canvas c,double w,double h,double cx,Paint p){final house=Path()..moveTo(cx,h*.1)..lineTo(w*.88,h*.42)..lineTo(w*.88,h*.9)..lineTo(w*.12,h*.9)..lineTo(w*.12,h*.42)..close();c.drawPath(house,p);c.drawRect(Rect.fromLTWH(w*.38,h*.58,w*.24,h*.32),p..strokeWidth=0.8);}
+  void _crane(Canvas c,double w,double h,Paint p){c.drawLine(Offset(w*.7,h*.95),Offset(w*.7,h*.1),p..strokeWidth=1.3);c.drawLine(Offset(w*.7,h*.1),Offset(w*.15,h*.1),p..strokeWidth=1.0);c.drawLine(Offset(w*.15,h*.1),Offset(w*.15,h*.35),p..strokeWidth=0.7);c.drawLine(Offset(w*.7,h*.3),Offset(w*.15,h*.1),p..strokeWidth=0.6);c.drawLine(Offset(w*.55,h*.95),Offset(w*.85,h*.95),p..strokeWidth=1.0);}
+  void _cottage(Canvas c,double w,double h,double cx,Paint p,Paint f){final house=Path()..moveTo(cx,h*.15)..lineTo(w*.85,h*.4)..lineTo(w*.85,h*.85)..lineTo(w*.15,h*.85)..lineTo(w*.15,h*.4)..close();c.drawPath(house,p);c.drawRect(Rect.fromLTWH(w*.4,h*.55,w*.2,h*.3),p..strokeWidth=0.7);c.drawCircle(Offset(w*.25,h*.7),3,f);c.drawCircle(Offset(w*.75,h*.72),2.5,f);}
+  void _couch(Canvas c,double w,double h,Paint p){final s=Path()..moveTo(w*.1,h*.4)..lineTo(w*.1,h*.75)..lineTo(w*.9,h*.75)..lineTo(w*.9,h*.4);c.drawPath(s,p);c.drawLine(Offset(w*.1,h*.55),Offset(w*.9,h*.55),p..strokeWidth=0.7);c.drawLine(Offset(w*.15,h*.75),Offset(w*.15,h*.9),p..strokeWidth=1.0);c.drawLine(Offset(w*.85,h*.75),Offset(w*.85,h*.9),p);final back=Path()..moveTo(w*.1,h*.4)..cubicTo(w*.1,h*.2,w*.9,h*.2,w*.9,h*.4);c.drawPath(back,p..strokeWidth=1.2);}
+  void _gradCap(Canvas c,double w,double h,double cx,Paint p,Paint f){final cap=Path()..moveTo(cx,h*.15)..lineTo(w*.95,h*.4)..lineTo(cx,h*.55)..lineTo(w*.05,h*.4)..close();c.drawPath(cap,p);c.drawLine(Offset(cx,h*.55),Offset(cx,h*.8),p..strokeWidth=0.8);c.drawLine(Offset(w*.3,h*.55),Offset(w*.3,h*.75),p..strokeWidth=0.6);c.drawLine(Offset(w*.7,h*.55),Offset(w*.7,h*.75),p);c.drawCircle(Offset(cx,h*.15),1.5,f);}
+  void _books(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.12,h*.1,w*.32,h*.9,const Radius.circular(1)),p);c.drawRRect(RRect.fromLTRBR(w*.36,h*.15,w*.56,h*.9,const Radius.circular(1)),p);c.drawRRect(RRect.fromLTRBR(w*.6,h*.05,w*.8,h*.9,const Radius.circular(1)),p);c.drawLine(Offset(w*.22,h*.1),Offset(w*.22,h*.9),p..strokeWidth=0.5);}
+  void _microscope(Canvas c,double w,double h,Paint p,Paint f){c.drawCircle(Offset(w*.4,h*.75),w*.12,p);c.drawLine(Offset(w*.4,h*.63),Offset(w*.4,h*.3),p..strokeWidth=1.3);c.drawLine(Offset(w*.4,h*.3),Offset(w*.65,h*.12),p..strokeWidth=1.0);c.drawCircle(Offset(w*.65,h*.12),w*.1,p);c.drawLine(Offset(w*.2,h*.9),Offset(w*.7,h*.9),p..strokeWidth=1.2);c.drawCircle(Offset(w*.4,h*.5),1.5,f);}
+  void _flask(Canvas c,double w,double h,Paint p,Paint f){c.drawLine(Offset(w*.35,h*.08),Offset(w*.65,h*.08),p);c.drawLine(Offset(w*.4,h*.08),Offset(w*.4,h*.35),p);c.drawLine(Offset(w*.6,h*.08),Offset(w*.6,h*.35),p);final b=Path()..moveTo(w*.4,h*.35)..lineTo(w*.15,h*.8)..cubicTo(w*.15,h*.95,w*.85,h*.95,w*.85,h*.8)..lineTo(w*.6,h*.35);c.drawPath(b,p);c.drawCircle(Offset(w*.4,h*.7),2,f);c.drawCircle(Offset(w*.55,h*.75),1.5,f);}
+  void _luggage(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.15,h*.25,w*.85,h*.85,const Radius.circular(4)),p);c.drawLine(Offset(w*.35,h*.25),Offset(w*.35,h*.12),p..strokeWidth=0.9);c.drawLine(Offset(w*.35,h*.12),Offset(w*.65,h*.12),p);c.drawLine(Offset(w*.65,h*.12),Offset(w*.65,h*.25),p);c.drawLine(Offset(w*.15,h*.5),Offset(w*.85,h*.5),p..strokeWidth=0.6);}
+  void _plane(Canvas c,double w,double h,Paint p){final body=Path()..moveTo(w*.5,h*.05)..cubicTo(w*.55,h*.2,w*.55,h*.7,w*.5,h*.95);c.drawPath(body,p);final lw=Path()..moveTo(w*.5,h*.4)..lineTo(w*.05,h*.55)..lineTo(w*.5,h*.5);c.drawPath(lw,p..strokeWidth=1.0);final rw=Path()..moveTo(w*.5,h*.4)..lineTo(w*.95,h*.55)..lineTo(w*.5,h*.5);c.drawPath(rw,p);c.drawLine(Offset(w*.5,h*.85),Offset(w*.35,h*.95),p..strokeWidth=0.7);c.drawLine(Offset(w*.5,h*.85),Offset(w*.65,h*.95),p);}
+  void _mapScroll(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.15,h*.1,w*.85,h*.9,const Radius.circular(2)),p);c.drawLine(Offset(w*.35,h*.1),Offset(w*.35,h*.9),p..strokeWidth=0.5);c.drawLine(Offset(w*.6,h*.1),Offset(w*.6,h*.9),p);c.drawLine(Offset(w*.15,h*.4),Offset(w*.85,h*.4),p);c.drawLine(Offset(w*.15,h*.65),Offset(w*.85,h*.65),p);c.drawCircle(Offset(w*.48,h*.52),3,p..strokeWidth=0.8);}
+  void _globe(Canvas c,double w,double h,double cx,double cy,Paint p){final r=w*.38;c.drawCircle(Offset(cx,cy),r,p);c.drawOval(Rect.fromLTWH(cx-r*.4,cy-r,r*.8,r*2),p..strokeWidth=0.7);c.drawLine(Offset(cx-r,cy),Offset(cx+r,cy),p);c.drawLine(Offset(cx-r*.85,cy-r*.4),Offset(cx+r*.85,cy-r*.4),p..strokeWidth=0.5);c.drawLine(Offset(cx-r*.85,cy+r*.4),Offset(cx+r*.85,cy+r*.4),p);}
+  void _tent(Canvas c,double w,double h,double cx,Paint p){final t=Path()..moveTo(cx,h*.1)..lineTo(w*.9,h*.88)..lineTo(w*.1,h*.88)..close();c.drawPath(t,p);c.drawLine(Offset(cx,h*.1),Offset(cx,h*.88),p..strokeWidth=0.6);c.drawLine(Offset(w*.05,h*.88),Offset(w*.95,h*.88),p..strokeWidth=1.0);}
+  void _hearts(Canvas c,double w,double h,Paint p){_drawH(c,w*.35,h*.45,w*.25,p);_drawH(c,w*.65,h*.4,w*.2,p..strokeWidth=1.0);}
+  void _drawH(Canvas c,double cx,double cy,double s,Paint p){final path=Path()..moveTo(cx,cy+s*.5)..cubicTo(cx-s*1.1,cy-s*.2,cx-s*.3,cy-s*.9,cx,cy-s*.3)..cubicTo(cx+s*.3,cy-s*.9,cx+s*1.1,cy-s*.2,cx,cy+s*.5);c.drawPath(path,p);}
+  void _bouquet(Canvas c,double w,double h,double cx,Paint p,Paint f){c.drawLine(Offset(cx,h*.5),Offset(cx-w*.1,h*.95),p);c.drawLine(Offset(cx,h*.5),Offset(cx+w*.1,h*.95),p);for(int i=0;i<5;i++){final a=(2*math.pi*i/5)-math.pi/2;c.drawCircle(Offset(cx+w*.18*math.cos(a),h*.3+w*.18*math.sin(a)),w*.12,p..strokeWidth=0.9);}c.drawCircle(Offset(cx,h*.3),2,f);}
+  void _couple(Canvas c,double w,double h,double cx,Paint p,Paint f){c.drawCircle(Offset(w*.3,h*.2),w*.1,p);c.drawLine(Offset(w*.3,h*.32),Offset(w*.3,h*.7),p);c.drawCircle(Offset(w*.7,h*.2),w*.1,p);c.drawLine(Offset(w*.7,h*.32),Offset(w*.7,h*.7),p);_drawH(c,cx,h*.55,w*.1,p..strokeWidth=0.8);}
+  void _giftHeart(Canvas c,double w,double h,double cx,double cy,Paint p,Paint f){_drawH(c,cx,cy,w*.3,p);c.drawLine(Offset(cx-w*.15,cy-h*.12),Offset(cx,cy-h*.3),p..strokeWidth=0.8);c.drawLine(Offset(cx+w*.15,cy-h*.12),Offset(cx,cy-h*.3),p);c.drawCircle(Offset(cx,cy-h*.3),2,f);}
+  void _chapel(Canvas c,double w,double h,double cx,Paint p,Paint f){final arch=Path()..moveTo(w*.15,h*.9)..lineTo(w*.15,h*.4)..cubicTo(w*.15,h*.15,w*.85,h*.15,w*.85,h*.4)..lineTo(w*.85,h*.9);c.drawPath(arch,p);c.drawLine(Offset(cx,h*.05),Offset(cx,h*.25),p..strokeWidth=1.0);c.drawLine(Offset(cx-w*.08,h*.15),Offset(cx+w*.08,h*.15),p..strokeWidth=0.8);c.drawCircle(Offset(cx,h*.6),2,f);}
+  void _palette(Canvas c,double w,double h,Paint p,Paint f){c.drawOval(Rect.fromLTWH(w*.08,h*.15,w*.75,h*.7),p);c.drawLine(Offset(w*.7,h*.1),Offset(w*.92,h*.88),p..strokeWidth=1.3);c.drawCircle(Offset(w*.35,h*.42),2,f);c.drawCircle(Offset(w*.5,h*.55),1.8,f);c.drawCircle(Offset(w*.3,h*.62),1.5,f);}
+  void _musicNote(Canvas c,double w,double h,Paint p,Paint f){c.drawCircle(Offset(w*.3,h*.75),w*.12,f);c.drawLine(Offset(w*.42,h*.75),Offset(w*.42,h*.15),p..strokeWidth=1.2);c.drawCircle(Offset(w*.65,h*.65),w*.1,f);c.drawLine(Offset(w*.75,h*.65),Offset(w*.75,h*.2),p);c.drawLine(Offset(w*.42,h*.15),Offset(w*.75,h*.2),p..strokeWidth=1.0);}
+  void _quill(Canvas c,double w,double h,Paint p){final q=Path()..moveTo(w*.25,h*.92)..cubicTo(w*.3,h*.7,w*.5,h*.4,w*.8,h*.08)..cubicTo(w*.85,h*.05,w*.75,h*.15,w*.7,h*.2)..cubicTo(w*.5,h*.5,w*.35,h*.75,w*.3,h*.88);c.drawPath(q,p);c.drawLine(Offset(w*.25,h*.92),Offset(w*.15,h*.98),p..strokeWidth=0.7);c.drawLine(Offset(w*.55,h*.4),Offset(w*.45,h*.55),p..strokeWidth=0.5);}
+  void _masks(Canvas c,double w,double h,Paint p){c.drawOval(Rect.fromLTWH(w*.02,h*.2,w*.5,h*.55),p);c.drawOval(Rect.fromLTWH(w*.48,h*.25,w*.5,h*.5),p);c.drawCircle(Offset(w*.18,h*.4),2,p);c.drawCircle(Offset(w*.38,h*.4),2,p);c.drawCircle(Offset(w*.65,h*.42),2,p);c.drawCircle(Offset(w*.82,h*.42),2,p);final sm=Path()..moveTo(w*.18,h*.58)..cubicTo(w*.22,h*.65,w*.34,h*.65,w*.38,h*.58);c.drawPath(sm,p..strokeWidth=0.8);final fr=Path()..moveTo(w*.65,h*.56)..cubicTo(w*.69,h*.5,w*.78,h*.5,w*.82,h*.56);c.drawPath(fr,p);}
+  void _frame(Canvas c,double w,double h,Paint p,Paint f){c.drawRect(Rect.fromLTWH(w*.1,h*.1,w*.8,h*.8),p);c.drawRect(Rect.fromLTWH(w*.2,h*.2,w*.6,h*.6),p..strokeWidth=0.6);final mt=Path()..moveTo(w*.3,h*.55)..lineTo(w*.45,h*.35)..lineTo(w*.55,h*.45)..lineTo(w*.7,h*.3);c.drawPath(mt,p..strokeWidth=0.9);c.drawCircle(Offset(w*.35,h*.35),2,f);}
+  void _meditate(Canvas c,double w,double h,double cx,double cy,Paint p){c.drawCircle(Offset(cx,h*.18),w*.1,p);c.drawLine(Offset(cx,h*.28),Offset(cx,h*.55),p);final legs=Path()..moveTo(w*.2,h*.7)..cubicTo(w*.3,h*.55,w*.7,h*.55,w*.8,h*.7);c.drawPath(legs,p);c.drawLine(Offset(cx,h*.38),Offset(w*.2,h*.5),p..strokeWidth=0.9);c.drawLine(Offset(cx,h*.38),Offset(w*.8,h*.5),p);for(int i=0;i<3;i++){final y=h*(.8+i*.06);c.drawCircle(Offset(cx,y),1,Paint()..color=color.withOpacity(.2+i*.1)..style=PaintingStyle.fill);}}
+  void _medical(Canvas c,double w,double h,double cx,double cy,Paint p){c.drawRRect(RRect.fromLTRBR(w*.1,h*.1,w*.9,h*.9,const Radius.circular(4)),p);c.drawLine(Offset(cx,h*.25),Offset(cx,h*.75),p..strokeWidth=1.4);c.drawLine(Offset(w*.25,cy),Offset(w*.75,cy),p);}
+  void _herb(Canvas c,double w,double h,Paint p){c.drawLine(Offset(w*.5,h*.95),Offset(w*.5,h*.4),p);final l1=Path()..moveTo(w*.5,h*.6)..cubicTo(w*.2,h*.5,w*.15,h*.3,w*.25,h*.2);c.drawPath(l1,p);final r1=Path()..moveTo(w*.5,h*.45)..cubicTo(w*.75,h*.35,w*.8,h*.2,w*.7,h*.1);c.drawPath(r1,p);c.drawLine(Offset(w*.5,h*.55),Offset(w*.32,h*.35),p..strokeWidth=0.5);c.drawLine(Offset(w*.5,h*.42),Offset(w*.68,h*.22),p);}
+  void _dove(Canvas c,double w,double h,Paint p){final body=Path()..moveTo(w*.15,h*.55)..cubicTo(w*.2,h*.35,w*.6,h*.25,w*.8,h*.35)..cubicTo(w*.9,h*.4,w*.85,h*.6,w*.7,h*.65)..cubicTo(w*.5,h*.7,w*.25,h*.65,w*.15,h*.55);c.drawPath(body,p);final wing=Path()..moveTo(w*.4,h*.4)..cubicTo(w*.3,h*.15,w*.6,h*.08,w*.75,h*.2);c.drawPath(wing,p..strokeWidth=0.9);c.drawCircle(Offset(w*.72,h*.4),1.2,Paint()..color=color.withOpacity(.5)..style=PaintingStyle.fill);}
+  void _party(Canvas c,double w,double h,double cx,Paint p,Paint f){final cone=Path()..moveTo(cx,h*.1)..lineTo(w*.3,h*.9)..lineTo(w*.7,h*.9)..close();c.drawPath(cone,p);c.drawLine(Offset(cx,h*.1),Offset(w*.2,h*.2),p..strokeWidth=0.7);c.drawLine(Offset(cx,h*.1),Offset(w*.8,h*.15),p);c.drawCircle(Offset(w*.25,h*.25),1.5,f);c.drawCircle(Offset(w*.75,h*.2),1.8,f);c.drawCircle(Offset(w*.8,h*.3),1.2,f);}
+  void _toast(Canvas c,double w,double h,double cx,Paint p){c.drawLine(Offset(w*.25,h*.88),Offset(w*.35,h*.5),p..strokeWidth=1.1);c.drawOval(Rect.fromLTWH(w*.15,h*.2,w*.25,h*.35),p..strokeWidth=1.0);c.drawLine(Offset(w*.75,h*.88),Offset(w*.65,h*.5),p..strokeWidth=1.1);c.drawOval(Rect.fromLTWH(w*.6,h*.22,w*.25,h*.32),p);c.drawCircle(Offset(cx,h*.12),1.5,Paint()..color=color.withOpacity(.4)..style=PaintingStyle.fill);}
+  void _circus(Canvas c,double w,double h,double cx,Paint p){final t=Path()..moveTo(cx,h*.08)..cubicTo(w*.2,h*.15,w*.1,h*.5,w*.1,h*.85)..lineTo(w*.9,h*.85)..cubicTo(w*.9,h*.5,w*.8,h*.15,cx,h*.08);c.drawPath(t,p);c.drawLine(Offset(cx,h*.02),Offset(cx,h*.12),p..strokeWidth=1.0);c.drawLine(Offset(w*.1,h*.85),Offset(w*.9,h*.85),p..strokeWidth=1.2);}
+  void _crown(Canvas c,double w,double h,Paint p,Paint f){final cr=Path()..moveTo(w*.1,h*.75)..lineTo(w*.1,h*.3)..lineTo(w*.3,h*.5)..lineTo(w*.5,h*.15)..lineTo(w*.7,h*.5)..lineTo(w*.9,h*.3)..lineTo(w*.9,h*.75)..close();c.drawPath(cr,p);c.drawCircle(Offset(w*.5,h*.13),2,f);}
+  void _castle(Canvas c,double w,double h,Paint p){c.drawLine(Offset(w*.1,h*.9),Offset(w*.1,h*.4),p);c.drawLine(Offset(w*.9,h*.9),Offset(w*.9,h*.4),p);c.drawLine(Offset(w*.1,h*.4),Offset(w*.35,h*.4),p..strokeWidth=0.8);c.drawLine(Offset(w*.65,h*.4),Offset(w*.9,h*.4),p);c.drawLine(Offset(w*.35,h*.4),Offset(w*.35,h*.15),p);c.drawLine(Offset(w*.65,h*.4),Offset(w*.65,h*.15),p);c.drawLine(Offset(w*.35,h*.15),Offset(w*.65,h*.15),p);c.drawLine(Offset(w*.1,h*.9),Offset(w*.9,h*.9),p..strokeWidth=1.0);c.drawRect(Rect.fromLTWH(w*.42,h*.5,w*.16,h*.4),p..strokeWidth=0.7);}
+  void _rocket(Canvas c,double w,double h,Paint p,Paint f){final r=Path()..moveTo(w*.5,h*.05)..cubicTo(w*.65,h*.2,w*.65,h*.55,w*.6,h*.7)..lineTo(w*.4,h*.7)..cubicTo(w*.35,h*.55,w*.35,h*.2,w*.5,h*.05);c.drawPath(r,p);c.drawLine(Offset(w*.4,h*.6),Offset(w*.25,h*.85),p..strokeWidth=0.9);c.drawLine(Offset(w*.6,h*.6),Offset(w*.75,h*.85),p);c.drawCircle(Offset(w*.5,h*.4),w*.06,p);}
+  void _medal(Canvas c,double w,double h,double cx,Paint p,Paint f){c.drawLine(Offset(w*.3,h*.05),Offset(cx,h*.35),p..strokeWidth=0.9);c.drawLine(Offset(w*.7,h*.05),Offset(cx,h*.35),p);c.drawCircle(Offset(cx,h*.6),w*.25,p..strokeWidth=1.2);for(int i=0;i<5;i++){final a=(2*math.pi*i/5)-math.pi/2;c.drawLine(Offset(cx+w*.12*math.cos(a),h*.6+w*.12*math.sin(a)),Offset(cx+w*.2*math.cos(a),h*.6+w*.2*math.sin(a)),p..strokeWidth=0.7);}c.drawCircle(Offset(cx,h*.6),2,f);}
+  void _family(Canvas c,double w,double h,double cx,Paint p){c.drawCircle(Offset(w*.25,h*.2),w*.09,p);c.drawLine(Offset(w*.25,h*.3),Offset(w*.25,h*.65),p);c.drawCircle(Offset(w*.75,h*.2),w*.09,p);c.drawLine(Offset(w*.75,h*.3),Offset(w*.75,h*.65),p);c.drawCircle(Offset(cx,h*.42),w*.07,p);c.drawLine(Offset(cx,h*.5),Offset(cx,h*.72),p);c.drawLine(Offset(w*.25,h*.42),Offset(cx,h*.42),p..strokeWidth=0.6);c.drawLine(Offset(w*.75,h*.42),Offset(cx,h*.42),p);}
+  void _baby(Canvas c,double w,double h,double cx,double cy,Paint p){c.drawCircle(Offset(cx,h*.25),w*.15,p);final crib=Path()..moveTo(w*.15,h*.5)..cubicTo(w*.15,h*.85,w*.85,h*.85,w*.85,h*.5);c.drawPath(crib,p);c.drawLine(Offset(w*.15,h*.5),Offset(w*.85,h*.5),p..strokeWidth=0.7);c.drawLine(Offset(w*.2,h*.85),Offset(w*.2,h*.95),p..strokeWidth=0.8);c.drawLine(Offset(w*.8,h*.85),Offset(w*.8,h*.95),p);}
+  void _bulb(Canvas c,double w,double h,double cx,Paint p,Paint f){c.drawCircle(Offset(cx,h*.35),w*.28,p);c.drawLine(Offset(w*.35,h*.58),Offset(w*.35,h*.78),p..strokeWidth=0.9);c.drawLine(Offset(w*.65,h*.58),Offset(w*.65,h*.78),p);c.drawLine(Offset(w*.35,h*.72),Offset(w*.65,h*.72),p..strokeWidth=0.6);c.drawLine(Offset(w*.38,h*.78),Offset(w*.5,h*.88),p..strokeWidth=0.7);c.drawLine(Offset(w*.62,h*.78),Offset(w*.5,h*.88),p);for(int i=0;i<3;i++){final a=(math.pi/3*(i+1))-math.pi;c.drawLine(Offset(cx+w*.3*math.cos(a),h*.35+w*.3*math.sin(a)),Offset(cx+w*.42*math.cos(a),h*.35+w*.42*math.sin(a)),p..strokeWidth=0.6);}}
+  void _monitor(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.08,h*.1,w*.92,h*.68,const Radius.circular(3)),p);c.drawLine(Offset(w*.5,h*.68),Offset(w*.5,h*.82),p..strokeWidth=1.0);c.drawLine(Offset(w*.3,h*.82),Offset(w*.7,h*.82),p);c.drawLine(Offset(w*.25,h*.88),Offset(w*.75,h*.88),p..strokeWidth=1.2);c.drawCircle(Offset(w*.5,h*.45),w*.08,p..strokeWidth=0.7);}
+  void _network(Canvas c,double w,double h,double cx,double cy,Paint p,Paint f){c.drawCircle(Offset(cx,cy),w*.12,p);for(int i=0;i<6;i++){final a=(math.pi/3*i);final ex=cx+w*.38*math.cos(a);final ey=cy+h*.38*math.sin(a);c.drawLine(Offset(cx+w*.12*math.cos(a),cy+h*.12*math.sin(a)),Offset(ex,ey),p..strokeWidth=0.6);c.drawCircle(Offset(ex,ey),w*.06,p..strokeWidth=0.9);}c.drawCircle(Offset(cx,cy),2,f);}
+  void _phone(Canvas c,double w,double h,double cx,Paint p){c.drawRRect(RRect.fromLTRBR(w*.25,h*.05,w*.75,h*.95,const Radius.circular(4)),p);c.drawLine(Offset(w*.25,h*.15),Offset(w*.75,h*.15),p..strokeWidth=0.5);c.drawLine(Offset(w*.25,h*.82),Offset(w*.75,h*.82),p);c.drawCircle(Offset(cx,h*.88),w*.04,p..strokeWidth=0.7);}
+  void _trophy(Canvas c,double w,double h,double cx,Paint p){final cup=Path()..moveTo(w*.2,h*.12)..lineTo(w*.8,h*.12)..cubicTo(w*.8,h*.5,w*.65,h*.65,cx,h*.68)..cubicTo(w*.35,h*.65,w*.2,h*.5,w*.2,h*.12);c.drawPath(cup,p);c.drawLine(Offset(cx,h*.68),Offset(cx,h*.82),p..strokeWidth=1.0);c.drawLine(Offset(w*.3,h*.82),Offset(w*.7,h*.82),p);c.drawLine(Offset(w*.25,h*.88),Offset(w*.75,h*.88),p..strokeWidth=1.2);final lh=Path()..moveTo(w*.2,h*.25)..cubicTo(w*.05,h*.25,w*.05,h*.5,w*.2,h*.5);c.drawPath(lh,p..strokeWidth=0.8);final rh=Path()..moveTo(w*.8,h*.25)..cubicTo(w*.95,h*.25,w*.95,h*.5,w*.8,h*.5);c.drawPath(rh,p);}
+  void _runner(Canvas c,double w,double h,Paint p){c.drawCircle(Offset(w*.55,h*.12),w*.09,p);c.drawLine(Offset(w*.55,h*.22),Offset(w*.5,h*.5),p);c.drawLine(Offset(w*.5,h*.5),Offset(w*.3,h*.8),p);c.drawLine(Offset(w*.5,h*.5),Offset(w*.75,h*.75),p);c.drawLine(Offset(w*.5,h*.32),Offset(w*.25,h*.42),p..strokeWidth=0.9);c.drawLine(Offset(w*.5,h*.32),Offset(w*.8,h*.3),p);}
+  void _muscle(Canvas c,double w,double h,Paint p){final arm=Path()..moveTo(w*.15,h*.55)..cubicTo(w*.15,h*.3,w*.4,h*.15,w*.5,h*.35)..cubicTo(w*.55,h*.42,w*.6,h*.2,w*.85,h*.2)..cubicTo(w*.95,h*.2,w*.95,h*.45,w*.85,h*.55);c.drawPath(arm,p..strokeWidth=1.3);final bicep=Path()..moveTo(w*.35,h*.25)..cubicTo(w*.4,h*.1,w*.55,h*.1,w*.5,h*.25);c.drawPath(bicep,p..strokeWidth=0.9);c.drawLine(Offset(w*.15,h*.55),Offset(w*.15,h*.8),p..strokeWidth=1.0);}
+  void _dice(Canvas c,double w,double h,Paint p,Paint f){c.drawRRect(RRect.fromLTRBR(w*.12,h*.12,w*.88,h*.88,const Radius.circular(4)),p);c.drawCircle(Offset(w*.3,h*.3),2,f);c.drawCircle(Offset(w*.7,h*.3),2,f);c.drawCircle(Offset(w*.5,h*.5),2,f);c.drawCircle(Offset(w*.3,h*.7),2,f);c.drawCircle(Offset(w*.7,h*.7),2,f);}
+  void _chess(Canvas c,double w,double h,double cx,Paint p,Paint f){final kn=Path()..moveTo(w*.3,h*.88)..lineTo(w*.7,h*.88)..lineTo(w*.68,h*.72)..lineTo(w*.6,h*.55)..cubicTo(w*.7,h*.4,w*.7,h*.2,w*.55,h*.1)..cubicTo(w*.45,h*.05,w*.35,h*.15,w*.32,h*.3)..cubicTo(w*.28,h*.45,w*.32,h*.6,w*.32,h*.72)..close();c.drawPath(kn,p);c.drawCircle(Offset(w*.45,h*.28),1.2,f);}
+  void _cycle(Canvas c,double w,double h,double cx,double cy,Paint p){final r=w*.32;c.drawCircle(Offset(cx,cy),r,p..strokeWidth=1.0);for(int i=0;i<3;i++){final a=(2*math.pi*i/3)-math.pi/2;final ex=cx+r*math.cos(a);final ey=cy+r*math.sin(a);final aa=a+.4;c.drawLine(Offset(ex,ey),Offset(ex+w*.08*math.cos(aa),ey+w*.08*math.sin(aa)),p..strokeWidth=0.9);c.drawLine(Offset(ex,ey),Offset(ex+w*.08*math.cos(aa+math.pi/2),ey+w*.08*math.sin(aa+math.pi/2)),p);}}
+  void _clock(Canvas c,double w,double h,double cx,double cy,Paint p){c.drawCircle(Offset(cx,cy),w*.4,p);c.drawLine(Offset(cx,cy),Offset(cx,cy-h*.25),p..strokeWidth=1.3);c.drawLine(Offset(cx,cy),Offset(cx+w*.18,cy+h*.05),p..strokeWidth=1.0);c.drawCircle(Offset(cx,cy),1.5,Paint()..color=color.withOpacity(.5)..style=PaintingStyle.fill);for(int i=0;i<12;i++){final a=(math.pi/6*i);c.drawCircle(Offset(cx+w*.35*math.cos(a),cy+w*.35*math.sin(a)),0.8,p..strokeWidth=0.5);}}
+  void _clipboard(Canvas c,double w,double h,Paint p){c.drawRRect(RRect.fromLTRBR(w*.15,h*.15,w*.85,h*.92,const Radius.circular(3)),p);c.drawLine(Offset(w*.35,h*.08),Offset(w*.65,h*.08),p..strokeWidth=1.0);c.drawLine(Offset(w*.35,h*.08),Offset(w*.35,h*.2),p..strokeWidth=0.6);c.drawLine(Offset(w*.65,h*.08),Offset(w*.65,h*.2),p);for(int i=0;i<4;i++){final y=h*(.32+i*.15);c.drawLine(Offset(w*.25,y),Offset(w*.75,y),p..strokeWidth=0.5);}}
+  void _search(Canvas c,double w,double h,Paint p){c.drawCircle(Offset(w*.4,h*.38),w*.28,p..strokeWidth=1.2);c.drawLine(Offset(w*.6,h*.58),Offset(w*.88,h*.88),p..strokeWidth=1.5);c.drawCircle(Offset(w*.4,h*.38),1.5,Paint()..color=color.withOpacity(.3)..style=PaintingStyle.fill);}
+  void _hands(Canvas c,double w,double h,double cx,Paint p){final l=Path()..moveTo(w*.15,h*.85)..cubicTo(w*.15,h*.5,w*.3,h*.3,cx,h*.25);c.drawPath(l,p);final r=Path()..moveTo(w*.85,h*.85)..cubicTo(w*.85,h*.5,w*.7,h*.3,cx,h*.25);c.drawPath(r,p);c.drawCircle(Offset(cx,h*.2),2,Paint()..color=color.withOpacity(.4)..style=PaintingStyle.fill);}
+  void _scale(Canvas c,double w,double h,double cx,Paint p){c.drawLine(Offset(cx,h*.1),Offset(cx,h*.85),p..strokeWidth=1.2);c.drawLine(Offset(w*.1,h*.3),Offset(w*.9,h*.3),p..strokeWidth=1.0);c.drawLine(Offset(w*.1,h*.3),Offset(w*.08,h*.55),p..strokeWidth=0.7);c.drawLine(Offset(w*.1,h*.3),Offset(w*.28,h*.55),p);final lb=Path()..moveTo(w*.05,h*.58)..cubicTo(w*.05,h*.5,w*.3,h*.5,w*.3,h*.58);c.drawPath(lb,p);c.drawLine(Offset(w*.9,h*.3),Offset(w*.72,h*.55),p);c.drawLine(Offset(w*.9,h*.3),Offset(w*.92,h*.55),p);final rb=Path()..moveTo(w*.7,h*.58)..cubicTo(w*.7,h*.5,w*.95,h*.5,w*.95,h*.58);c.drawPath(rb,p);c.drawLine(Offset(w*.3,h*.85),Offset(w*.7,h*.85),p..strokeWidth=1.0);}
+  void _ribbon(Canvas c,double w,double h,double cx,Paint p){final r=Path()..moveTo(cx,h*.08)..cubicTo(w*.8,h*.08,w*.85,h*.45,cx,h*.5)..cubicTo(w*.15,h*.45,w*.2,h*.08,cx,h*.08);c.drawPath(r,p);c.drawLine(Offset(cx-w*.08,h*.5),Offset(w*.25,h*.92),p..strokeWidth=0.9);c.drawLine(Offset(cx+w*.08,h*.5),Offset(w*.75,h*.92),p);}
+  void _plate(Canvas c,double w,double h,double cx,double cy,Paint p){c.drawCircle(Offset(cx,cy),w*.3,p);c.drawCircle(Offset(cx,cy),w*.18,p..strokeWidth=0.6);c.drawLine(Offset(w*.08,h*.15),Offset(w*.08,h*.85),p..strokeWidth=1.0);c.drawLine(Offset(w*.04,h*.15),Offset(w*.04,h*.32),p..strokeWidth=0.6);c.drawLine(Offset(w*.12,h*.15),Offset(w*.12,h*.32),p);final kn=Path()..moveTo(w*.92,h*.15)..cubicTo(w*.98,h*.3,w*.96,h*.5,w*.92,h*.55)..lineTo(w*.92,h*.85);c.drawPath(kn,p..strokeWidth=1.0);}
+  void _tie(Canvas c,double w,double h,double cx,Paint p){c.drawLine(Offset(w*.2,h*.05),Offset(cx,h*.25),p..strokeWidth=1.1);c.drawLine(Offset(w*.8,h*.05),Offset(cx,h*.25),p);final t=Path()..moveTo(cx-w*.12,h*.2)..lineTo(cx+w*.12,h*.2)..lineTo(cx+w*.08,h*.55)..lineTo(cx,h*.9)..lineTo(cx-w*.08,h*.55)..close();c.drawPath(t,p);}
+  void _wheat(Canvas c,double w,double h,Paint p){c.drawLine(Offset(w*.5,h*.95),Offset(w*.5,h*.2),p);for(int i=0;i<4;i++){final y=h*(.3+i*.15);c.drawLine(Offset(w*.5,y),Offset(w*.25,y-h*.08),p..strokeWidth=0.8);c.drawLine(Offset(w*.5,y),Offset(w*.75,y-h*.08),p);}c.drawCircle(Offset(w*.5,h*.15),2,Paint()..color=color.withOpacity(.4)..style=PaintingStyle.fill);}
+  void _crystal(Canvas c,double w,double h,double cx,double cy,Paint p,Paint f){c.drawCircle(Offset(cx,cy),w*.35,p);c.drawCircle(Offset(cx,cy),w*.22,p..strokeWidth=0.6);for(int i=0;i<3;i++){final a=(2*math.pi*i/3)-math.pi/2;c.drawLine(Offset(cx+w*.05*math.cos(a),cy+w*.05*math.sin(a)),Offset(cx+w*.2*math.cos(a),cy+w*.2*math.sin(a)),p..strokeWidth=0.5);}c.drawCircle(Offset(cx,cy),2,f);}
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CompassIconPainter extends CustomPainter {
+  final Color color;
+  _CompassIconPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.42;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    // Dış daire
+    canvas.drawCircle(Offset(cx, cy), r, p);
+
+    // 4 ana yön çizgisi
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 2;
+      final isNorth = i == 0;
+      final inner = r * 0.25;
+      final outer = r * (isNorth ? 1.0 : 0.85);
+      canvas.drawLine(
+        Offset(cx + inner * math.cos(angle), cy + inner * math.sin(angle)),
+        Offset(cx + outer * math.cos(angle), cy + outer * math.sin(angle)),
+        p..strokeWidth = (isNorth ? 1.4 : 1.0),
+      );
+    }
+
+    // 4 çapraz — kısa akslar
+    for (int i = 0; i < 4; i++) {
+      final angle = (math.pi / 2 * i) - math.pi / 4;
+      canvas.drawLine(
+        Offset(cx + r * 0.3 * math.cos(angle), cy + r * 0.3 * math.sin(angle)),
+        Offset(cx + r * 0.6 * math.cos(angle), cy + r * 0.6 * math.sin(angle)),
+        p..strokeWidth = 0.6,
+      );
+    }
+
+    // Kuzey ok ucu
+    final nTip = Path()
+      ..moveTo(cx, cy - r * 0.85)
+      ..lineTo(cx - r * 0.12, cy - r * 0.6)
+      ..lineTo(cx + r * 0.12, cy - r * 0.6)
+      ..close();
+    canvas.drawPath(nTip, Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.fill);
+
+    // Merkez
+    canvas.drawCircle(Offset(cx, cy), r * 0.1,
+      Paint()..color = color..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _SeasonIconPainter extends CustomPainter {
+  final String season;
+  final Color color;
+  _SeasonIconPainter({required this.season, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()
+      ..color = color.withOpacity(0.8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.3
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    switch (season) {
+      case 'İlkbahar':
+        _drawSpring(canvas, w, h, p);
+        break;
+      case 'Yaz':
+        _drawSummer(canvas, w, h, p);
+        break;
+      case 'Sonbahar':
+        _drawAutumn(canvas, w, h, p);
+        break;
+      case 'Kış':
+        _drawWinter(canvas, w, h, p);
+        break;
+    }
+  }
+
+  // İlkbahar — filiz + açılan yaprak
+  void _drawSpring(Canvas canvas, double w, double h, Paint p) {
+    // Gövde
+    final stem = Path()
+      ..moveTo(w * 0.5, h * 0.95)
+      ..cubicTo(w * 0.5, h * 0.7, w * 0.48, h * 0.5, w * 0.5, h * 0.35);
+    canvas.drawPath(stem, p);
+    // Sol yaprak — açılıyor
+    final leftLeaf = Path()
+      ..moveTo(w * 0.5, h * 0.5)
+      ..cubicTo(w * 0.2, h * 0.35, w * 0.15, h * 0.15, w * 0.3, h * 0.1)
+      ..cubicTo(w * 0.4, h * 0.08, w * 0.48, h * 0.25, w * 0.5, h * 0.35);
+    canvas.drawPath(leftLeaf, p);
+    // Sağ kıvrık tomurcuk
+    final rightBud = Path()
+      ..moveTo(w * 0.5, h * 0.42)
+      ..cubicTo(w * 0.65, h * 0.3, w * 0.72, h * 0.2, w * 0.65, h * 0.15)
+      ..cubicTo(w * 0.6, h * 0.12, w * 0.55, h * 0.2, w * 0.5, h * 0.35);
+    canvas.drawPath(rightBud, p..strokeWidth = 1.0);
+    // Sol yaprak damarı
+    canvas.drawLine(Offset(w * 0.5, h * 0.45), Offset(w * 0.35, h * 0.25), p..strokeWidth = 0.6);
+    // Tomurcuk noktası
+    canvas.drawCircle(Offset(w * 0.5, h * 0.35), 1.5,
+      Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.fill);
+  }
+
+  // Yaz — ışıltılı güneş
+  void _drawSummer(Canvas canvas, double w, double h, Paint p) {
+    final cx = w / 2;
+    final cy = h / 2;
+    final r = w * 0.2;
+    // Merkez daire
+    canvas.drawCircle(Offset(cx, cy), r, p..strokeWidth = 1.3);
+    // Işınlar — 8 yön, uzun-kısa değişen
+    for (int i = 0; i < 8; i++) {
+      final angle = (math.pi / 4 * i) - math.pi / 2;
+      final isLong = i % 2 == 0;
+      final innerR = r + w * 0.06;
+      final outerR = r + (isLong ? w * 0.22 : w * 0.14);
+      canvas.drawLine(
+        Offset(cx + innerR * math.cos(angle), cy + innerR * math.sin(angle)),
+        Offset(cx + outerR * math.cos(angle), cy + outerR * math.sin(angle)),
+        p..strokeWidth = (isLong ? 1.3 : 0.9),
+      );
+    }
+    // İç glow noktası
+    canvas.drawCircle(Offset(cx, cy), r * 0.35,
+      Paint()..color = color.withOpacity(0.25)..style = PaintingStyle.fill);
+  }
+
+  // Sonbahar — süzülen yaprak
+  void _drawAutumn(Canvas canvas, double w, double h, Paint p) {
+    p.strokeWidth = 1.2;
+    // Ana yaprak şekli
+    final leaf = Path()
+      ..moveTo(w * 0.5, h * 0.08)
+      ..cubicTo(w * 0.75, h * 0.2, w * 0.85, h * 0.5, w * 0.65, h * 0.75)
+      ..cubicTo(w * 0.55, h * 0.85, w * 0.5, h * 0.92, w * 0.5, h * 0.92)
+      ..cubicTo(w * 0.5, h * 0.92, w * 0.45, h * 0.85, w * 0.35, h * 0.75)
+      ..cubicTo(w * 0.15, h * 0.5, w * 0.25, h * 0.2, w * 0.5, h * 0.08);
+    canvas.drawPath(leaf, p);
+    // Orta damar
+    canvas.drawLine(Offset(w * 0.5, h * 0.12), Offset(w * 0.5, h * 0.88), p..strokeWidth = 0.8);
+    // Sol damarlar
+    canvas.drawLine(Offset(w * 0.5, h * 0.35), Offset(w * 0.32, h * 0.25), p..strokeWidth = 0.6);
+    canvas.drawLine(Offset(w * 0.5, h * 0.55), Offset(w * 0.28, h * 0.5), p);
+    // Sağ damarlar
+    canvas.drawLine(Offset(w * 0.5, h * 0.35), Offset(w * 0.68, h * 0.28), p);
+    canvas.drawLine(Offset(w * 0.5, h * 0.55), Offset(w * 0.7, h * 0.48), p);
+    // Rüzgar izi — küçük eğri
+    final wind = Path()
+      ..moveTo(w * 0.7, h * 0.8)
+      ..cubicTo(w * 0.8, h * 0.75, w * 0.85, h * 0.85, w * 0.78, h * 0.9);
+    canvas.drawPath(wind, p..strokeWidth = 0.7);
+  }
+
+  // Kış — kristal kar tanesi
+  void _drawWinter(Canvas canvas, double w, double h, Paint p) {
+    final cx = w / 2;
+    final cy = h / 2;
+    final r = w * 0.38;
+    p.strokeWidth = 1.1;
+
+    // 6 ana dal
+    for (int i = 0; i < 6; i++) {
+      final angle = (math.pi / 3 * i) - math.pi / 2;
+      final ex = cx + r * math.cos(angle);
+      final ey = cy + r * math.sin(angle);
+      canvas.drawLine(Offset(cx, cy), Offset(ex, ey), p);
+      // Her daldan 2 mini yan dal
+      for (int j = 1; j <= 2; j++) {
+        final frac = j * 0.35;
+        final bx = cx + r * frac * math.cos(angle);
+        final by = cy + r * frac * math.sin(angle);
+        final branchLen = r * 0.22;
+        final a1 = angle + math.pi / 4;
+        final a2 = angle - math.pi / 4;
+        canvas.drawLine(Offset(bx, by),
+          Offset(bx + branchLen * math.cos(a1), by + branchLen * math.sin(a1)),
+          p..strokeWidth = 0.7);
+        canvas.drawLine(Offset(bx, by),
+          Offset(bx + branchLen * math.cos(a2), by + branchLen * math.sin(a2)),
+          p);
+      }
+    }
+    // Merkez noktası
+    canvas.drawCircle(Offset(cx, cy), 1.5,
+      Paint()..color = color.withOpacity(0.5)..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _YearFlameIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [const Color(0xFFFF6B6B).withOpacity(0.9), const Color(0xFFE53935).withOpacity(0.7)],
+      ).createShader(Rect.fromLTWH(0, 0, w, h))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    // Organic flame shape
+    final flame = Path()
+      ..moveTo(w * 0.5, h * 0.05)
+      ..cubicTo(w * 0.65, h * 0.2, w * 0.85, h * 0.35, w * 0.8, h * 0.55)
+      ..cubicTo(w * 0.78, h * 0.7, w * 0.7, h * 0.82, w * 0.6, h * 0.9)
+      ..cubicTo(w * 0.55, h * 0.95, w * 0.45, h * 0.95, w * 0.4, h * 0.9)
+      ..cubicTo(w * 0.3, h * 0.82, w * 0.22, h * 0.7, w * 0.2, h * 0.55)
+      ..cubicTo(w * 0.15, h * 0.35, w * 0.35, h * 0.2, w * 0.5, h * 0.05);
+    canvas.drawPath(flame, p);
+
+    // Inner flame core
+    final inner = Path()
+      ..moveTo(w * 0.5, h * 0.35)
+      ..cubicTo(w * 0.58, h * 0.45, w * 0.62, h * 0.55, w * 0.58, h * 0.7)
+      ..cubicTo(w * 0.55, h * 0.78, w * 0.45, h * 0.78, w * 0.42, h * 0.7)
+      ..cubicTo(w * 0.38, h * 0.55, w * 0.42, h * 0.45, w * 0.5, h * 0.35);
+    canvas.drawPath(inner, p..strokeWidth = 1.0);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Yıl Yin-Yang İkonu (Kutupluluk) ──
+class _YearYinYangIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.42;
+    final p = Paint()
+      ..color = const Color(0xFFFFE8A1).withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+
+    // Outer circle
+    canvas.drawCircle(Offset(cx, cy), r, p);
+
+    // S-curve divider
+    final sCurve = Path()
+      ..moveTo(cx, cy - r)
+      ..cubicTo(cx + r * 0.6, cy - r * 0.3, cx - r * 0.6, cy + r * 0.3, cx, cy + r);
+    canvas.drawPath(sCurve, p..strokeWidth = 1.2);
+
+    // Yang dot (top, filled)
+    canvas.drawCircle(Offset(cx, cy - r * 0.45), r * 0.12,
+      Paint()..color = const Color(0xFFFFE8A1).withOpacity(0.7)..style = PaintingStyle.fill);
+
+    // Yin dot (bottom, ring)
+    canvas.drawCircle(Offset(cx, cy + r * 0.45), r * 0.12, p..strokeWidth = 1.0);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Yıl Şimşek İkonu (Tema/Hareket) ──
+class _YearBoltIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [const Color(0xFFFFD54F).withOpacity(0.9), const Color(0xFFFFA726).withOpacity(0.6)],
+      ).createShader(Rect.fromLTWH(0, 0, w, h))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    // Bolt shape
+    final bolt = Path()
+      ..moveTo(w * 0.55, h * 0.05)
+      ..lineTo(w * 0.3, h * 0.45)
+      ..lineTo(w * 0.5, h * 0.45)
+      ..lineTo(w * 0.42, h * 0.95)
+      ..lineTo(w * 0.7, h * 0.5)
+      ..lineTo(w * 0.5, h * 0.5)
+      ..close();
+    canvas.drawPath(bolt, p);
+
+    // Glow spark dots
+    final dotP = Paint()..color = const Color(0xFFFFD54F).withOpacity(0.3)..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(w * 0.25, h * 0.25), 1.5, dotP);
+    canvas.drawCircle(Offset(w * 0.75, h * 0.7), 1.2, dotP);
+    canvas.drawCircle(Offset(w * 0.8, h * 0.3), 1.0, dotP);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _EnergyPathPainter extends CustomPainter {
+  final Color gold;
+  _EnergyPathPainter({required this.gold});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final cy = size.height * 0.38; // düğüm noktaları hizası
+
+    // Sol → Orta bağlantı
+    final p1 = Paint()
+      ..shader = LinearGradient(
+        colors: [const Color(0xFFFF6B35).withOpacity(0.25), Colors.white.withOpacity(0.2)],
+      ).createShader(Rect.fromLTWH(w / 6, cy - 5, w / 3, 10))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round;
+
+    final path1 = Path()
+      ..moveTo(w / 6, cy)
+      ..cubicTo(w * 0.28, cy - 8, w * 0.38, cy + 8, w / 2, cy);
+    canvas.drawPath(path1, p1);
+
+    // Orta → Sağ bağlantı
+    final p2 = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.white.withOpacity(0.2), const Color(0xFFFFD54F).withOpacity(0.25)],
+      ).createShader(Rect.fromLTWH(w / 2, cy - 5, w / 3, 10))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..strokeCap = StrokeCap.round;
+
+    final path2 = Path()
+      ..moveTo(w / 2, cy)
+      ..cubicTo(w * 0.62, cy + 8, w * 0.72, cy - 8, w * 5 / 6, cy);
+    canvas.drawPath(path2, p2);
+
+    // Dekoratif mini noktalar yol üzerinde
+    final dotPaint = Paint()..color = gold.withOpacity(0.1);
+    for (double t = 0.3; t <= 0.7; t += 0.2) {
+      canvas.drawCircle(Offset(w * t, cy + math.sin(t * 10) * 3), 1.2, dotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ── Enerji Dalga Grafiği ──

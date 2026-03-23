@@ -343,6 +343,159 @@ class ChineseZodiacData {
     'Domuz için At yılı sosyal ve eğlenceli bir dönemdir. Cömertliğiniz takdir edilir ama bütçenize dikkat edin.',
   ];
 
+  // ── 2026 MEVSİMSEL TAVSİYELER (Her hayvan için kişiselleştirilmiş) ──
+  static const List<List<List<String>>> yearSeasonalAdvice = [
+    // 0-Sıçan
+    [['🌱', 'İlkbahar', 'Temkinli başlangıçlar yapın. Küçük ama sağlam adımlar atın, finansal planlarınızı gözden geçirin.'],
+     ['☀️', 'Yaz', 'Sosyal ağınızı genişletin. Stratejik ortaklıklar kurmak için ideal dönem.'],
+     ['🍂', 'Sonbahar', 'Birikiminizi değerlendirin. Yatırımlarınızı analiz edin, gereksiz harcamaları kesin.'],
+     ['❄️', 'Kış', 'Geri çekilin ve gözlem yapın. Yeni yıl için güçlü bir strateji oluşturun.']],
+    // 1-Öküz
+    [['🌱', 'İlkbahar', 'Alışkanlıklarınızı yeniden yapılandırın. Değişime kapınızı aralayın, küçük adımlarla başlayın.'],
+     ['☀️', 'Yaz', 'Beceri geliştirmeye odaklanın. Yeni bir kurs veya eğitim programına katılın.'],
+     ['🍂', 'Sonbahar', 'Emeğinizin karşılığını almaya başlayacaksınız. Sabrınız ödüllendirilir.'],
+     ['❄️', 'Kış', 'Sevdiklerinizle kaliteli vakit geçirin. Sağlığınıza ekstra özen gösterin.']],
+    // 2-Kaplan
+    [['🌱', 'İlkbahar', 'Büyük projelere cesurca başlayın! At yılı enerjisi sizinle tam uyumlu.'],
+     ['☀️', 'Yaz', 'Zirve döneminiz. Kariyerde atılım yapın, risk almaktan korkmayın.'],
+     ['🍂', 'Sonbahar', 'Kazanımlarınızı pekiştirin. Ekibinizi güçlendirin ve delegasyon yapın.'],
+     ['❄️', 'Kış', 'Enerjinizi koruyun, kendinizi yenileyin. Gelecek yıl için vizyonunuzu netleştirin.']],
+    // 3-Tavşan
+    [['🌱', 'İlkbahar', 'Yeni sosyal çevreler edinin. Sanatsal projelere başlamak için mükemmel zamanlama.'],
+     ['☀️', 'Yaz', 'İlişkileriniz güçleniyor. Romantik dönem — kalbinizin sesini dinleyin.'],
+     ['🍂', 'Sonbahar', 'Yaratıcılığınızı maddi değere dönüştürün. Estetik projelerde parlayın.'],
+     ['❄️', 'Kış', 'İç dünyanıza çekilin, meditasyon ve sanat ile ruhunuzu besleyin.']],
+    // 4-Ejderha
+    [['🌱', 'İlkbahar', 'Büyük hedeflerinize koşun. Liderlik fırsatları kendini gösterecek.'],
+     ['☀️', 'Yaz', 'En güçlü döneminiz! Büyük yatırımlar ve iş kurmak için altın zaman.'],
+     ['🍂', 'Sonbahar', 'İmparatorluğunuzu genişletin. Yeni pazarlara ve alanlara açılın.'],
+     ['❄️', 'Kış', 'Stratejik geri çekilme. Acele etmeyin, büyük hamleleri ilkbahara saklayın.']],
+    // 5-Yılan
+    [['🌱', 'İlkbahar', 'Sezgileriniz güçlü ama acele etmeyin. Araştırma ve analiz döneminiz.'],
+     ['☀️', 'Yaz', 'Gizli fırsatları keşfedin. Başkalarının göremediği detaylar avantajınız.'],
+     ['🍂', 'Sonbahar', 'Stratejik hamleler için uygun. Uzun vadeli planlarınızı devreye sokun.'],
+     ['❄️', 'Kış', 'Bilgeliğinizi derinleştirin. Okuyun, öğrenin, kendinizi geliştirin.']],
+    // 6-At
+    [['🌱', 'İlkbahar', 'Kendi yılınız başladı! Kırmızı aksesuar ile şansınızı artırın. Yeni sayfa açın.'],
+     ['☀️', 'Yaz', 'Enerjiniz zirvede ama Ben Nian dikkat gerektirir — ani kararlardan kaçının.'],
+     ['🍂', 'Sonbahar', 'Dengeyi bulun. Özgürlük ve sorumluluk arasındaki ince çizgiyi koruyun.'],
+     ['❄️', 'Kış', 'Yılı güçlü kapatın. Tempolu ama bilinçli hareket edin, yeni yıla hazırlanın.']],
+    // 7-Keçi
+    [['🌱', 'İlkbahar', 'Yaratıcılığınız çiçek açıyor. Sanat, müzik veya tasarım projelerine başlayın.'],
+     ['☀️', 'Yaz', 'İlişkilerde güzel gelişmeler. Sevdiklerinizle bağlarınızı güçlendirin.'],
+     ['🍂', 'Sonbahar', 'Eserlerinizi dünyayla paylaşın. Sergi veya lansman için ideal dönem.'],
+     ['❄️', 'Kış', 'Ruhunuzu dinlendirin. Sıcak bir ortamda yaratıcı ilhamınızı yenileyin.']],
+    // 8-Maymun
+    [['🌱', 'İlkbahar', 'Zekanızı iş fikirlerine dönüştürün. Girişimcilik ruhunuz ateşleniyor.'],
+     ['☀️', 'Yaz', 'Hızlı hareket edin ama dürtüsel olmayın. Fırsatlar bol, seçici olun.'],
+     ['🍂', 'Sonbahar', 'Sosyal ağınız genişliyor. Network etkinliklerine katılın ve yeni kapılar açın.'],
+     ['❄️', 'Kış', 'Yenilikçi projelerinizi planlayın. Teknolojiyle ilgili yatırımlar şanslı.']],
+    // 9-Horoz
+    [['🌱', 'İlkbahar', 'Kariyer atılımı için harekete geçin. Disiplininiz ve titizliğiniz ödüllendirilecek.'],
+     ['☀️', 'Yaz', 'Maddi kazanç dönemi. Çalışkanlığınızın meyvelerini toplamaya başlayın.'],
+     ['🍂', 'Sonbahar', 'Organizasyon yeteneklerinizi kullanarak büyük projeleri tamamlayın.'],
+     ['❄️', 'Kış', 'Detaylara odaklanın, eksikleri giderin. Mükemmeliyetçiliğiniz sizi öne taşır.']],
+    // 10-Köpek
+    [['🌱', 'İlkbahar', 'Sadakatiniz ve dürüstlüğünüz kapılar açıyor. Güvenilir ortaklıklar kurun.'],
+     ['☀️', 'Yaz', 'İlişkileriniz derinleşiyor. Romantik dönem — cesur adımlar atın.'],
+     ['🍂', 'Sonbahar', 'Topluma katkı sağlayan projelerde yer alın. Vicdanınız sizi doğru yönlendirir.'],
+     ['❄️', 'Kış', 'Ailenizle bağlarınızı güçlendirin. Sıcaklık ve huzur arayışı ön planda.']],
+    // 11-Domuz
+    [['🌱', 'İlkbahar', 'Cömertliğinizi akıllıca yönlendirin. Yardım ederken kendinizi de unutmayın.'],
+     ['☀️', 'Yaz', 'Sosyal hayatınız parlak! Eğlence ve kutlamalar sizi bekliyor.'],
+     ['🍂', 'Sonbahar', 'Bütçenizi gözden geçirin. Biriktirme zamanı — lüks harcamaları erteleyin.'],
+     ['❄️', 'Kış', 'Ev ve aile odaklı bir dönem. Sevdiklerinizle sıcak anlar yaşayın.']],
+  ];
+
+  // ── 2026 KİŞİSEL ZAMANLAMA REHBERİ (Her hayvan için özel kategoriler) ──
+  // [emoji, label, score(1-5)]
+  static const List<List<List<dynamic>>> yearTimingGuide = [
+    // 0-Sıçan — Finansal zekâ ve strateji odaklı
+    [['💰', 'Finansal Hamle', 4],
+     ['🤝', 'Stratejik Ortaklık', 3],
+     ['🏠', 'Mülk Yatırımı', 2],
+     ['📊', 'Borsa & Kripto', 5],
+     ['🎓', 'Eğitim & Sertifika', 4],
+     ['🧳', 'İş Seyahati', 3]],
+    // 1-Öküz — Dayanıklılık ve uzun vade odaklı
+    [['🏗️', 'Uzun Vadeli Yatırım', 4],
+     ['📚', 'Beceri Geliştirme', 5],
+     ['💒', 'Evlilik & Nişan', 4],
+     ['🌾', 'Arazi & Tarla', 3],
+     ['🏥', 'Sağlık Check-up', 5],
+     ['🏠', 'Ev Tadilatı', 3]],
+    // 2-Kaplan — Cesaret ve liderlik odaklı
+    [['👑', 'Liderlik Atılımı', 5],
+     ['🎲', 'Cesur Risk Alma', 4],
+     ['🏆', 'Spor & Yarışma', 5],
+     ['🚀', 'Startup Kurma', 4],
+     ['🗺️', 'Macera Seyahati', 5],
+     ['💕', 'Aşk İlanı', 3]],
+    // 3-Tavşan — Estetik ve ilişki odaklı
+    [['🎨', 'Sanat Projesi', 5],
+     ['💐', 'Romantizm', 5],
+     ['🖼️', 'Estetik Yatırım', 4],
+     ['🧘', 'Terapi & Şifa', 4],
+     ['🎭', 'Sosyal Etkinlik', 4],
+     ['🕊️', 'İç Huzur Arayışı', 3]],
+    // 4-Ejderha — Büyüklük ve güç odaklı
+    [['🏰', 'İmparatorluk Kurma', 5],
+     ['💎', 'Lüks Yatırım', 5],
+     ['📈', 'Büyük Sermaye', 4],
+     ['🎖️', 'Kariyer Zirvesi', 5],
+     ['💒', 'Görkemli Düğün', 4],
+     ['🌍', 'Uluslararası Açılım', 4]],
+    // 5-Yılan — Bilgelik ve strateji odaklı
+    [['🔬', 'Araştırma & Analiz', 5],
+     ['♟️', 'Stratejik Hamle', 4],
+     ['💼', 'Gizli Yatırım', 3],
+     ['🔮', 'Ruhsal Gelişim', 5],
+     ['🎓', 'Akademik Kariyer', 4],
+     ['🏠', 'Sessiz Taşınma', 2]],
+    // 6-At — Özgürlük ve hareket odaklı
+    [['✈️', 'Dünya Turu', 4],
+     ['🏃', 'Spor & Fitness', 5],
+     ['🎉', 'Sosyal Etkinlik', 5],
+     ['🔄', 'Kariyer Değişimi', 3],
+     ['🏕️', 'Macera & Keşif', 5],
+     ['💪', 'Bağımsız Proje', 4]],
+    // 7-Keçi — Yaratıcılık ve sanat odaklı
+    [['🎵', 'Müzik & Sanat', 5],
+     ['💞', 'Romantik Adım', 5],
+     ['🏡', 'Ev Dekorasyonu', 4],
+     ['🌿', 'Doğa Terapisi', 4],
+     ['✍️', 'Yaratıcı Yazarlık', 5],
+     ['👨‍👩‍👧', 'Aile Planı', 4]],
+    // 8-Maymun — İnovasyon ve girişimcilik odaklı
+    [['💡', 'Girişimcilik', 5],
+     ['🖥️', 'Teknoloji Yatırımı', 4],
+     ['🌐', 'Network Genişletme', 5],
+     ['🧪', 'İnovasyon Projesi', 4],
+     ['🎪', 'Eğlence Sektörü', 3],
+     ['📱', 'Dijital Dönüşüm', 4]],
+    // 9-Horoz — Disiplin ve başarı odaklı
+    [['📊', 'Kariyer Atılımı', 5],
+     ['📋', 'Organizasyon', 5],
+     ['🏦', 'Maddi Birikim', 4],
+     ['🔍', 'Detay & Kalite İşi', 5],
+     ['👔', 'Profesyonel İmaj', 4],
+     ['⏰', 'Rutin Optimizasyonu', 4]],
+    // 10-Köpek — Sadakat ve toplum odaklı
+    [['🤲', 'Toplumsal Proje', 5],
+     ['⚖️', 'Adalet & Hak Arama', 4],
+     ['💑', 'İlişki Derinleştirme', 5],
+     ['👪', 'Aile Bağları', 5],
+     ['🎗️', 'Gönüllü Çalışma', 4],
+     ['🏠', 'Güvenli Yuva Kurma', 4]],
+    // 11-Domuz — Keyif ve cömertlik odaklı
+    [['🍽️', 'Gastronomi & Lezzet', 5],
+     ['🥂', 'Sosyal Kutlama', 5],
+     ['💝', 'Hayırseverlik', 4],
+     ['🛋️', 'Konfor Yatırımı', 4],
+     ['💰', 'Birikim & Tasarruf', 2],
+     ['👶', 'Aile Genişletme', 5]],
+  ];
+
   /// Güne göre şans hesapla — Güçlü günlük değişim algoritması
   static Map<String, dynamic> getDayFortune(int animalIndex, DateTime date) {
     // Güçlü seed: her gün + her burç için kesinlikle farklı
