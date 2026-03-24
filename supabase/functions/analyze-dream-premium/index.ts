@@ -69,90 +69,38 @@ Generate the determined number of questions about the DREAM'S CONTENT. Each ques
 • Have a Yes/No/Unsure answer that would genuinely SHIFT the analysis direction
 • Feel like a brilliant detective noticing what was left unsaid
 
-QUESTION TYPES (mix different types):
+QUESTION EXAMPLES (mix types):
+1. SENSORY / ATMOSPHERE:
+   TR: "Olay olurken etrafta hiç ses duydun mu?" / EN: "Did you hear any sound while that happened?"
+2. MISSING DETAILS / ACTIONS:
+   TR: "Kafes düştükten sonra onu kurtarmaya çalıştın mı?" / EN: "Did you try to save him after the cage fell?"
+3. IDENTITY / RECOGNITION:
+   TR: "O kişiyi gerçek hayattan tanıyor muydun?" / EN: "Did you recognize that person from real life?"
+4. PERSPECTIVE / STATE:
+   TR: "Kendini dışarıdan izler gibi mi gördün?" / EN: "Did you watch yourself from the outside?"
 
-1. MISSING ACTORS — Who else was there? Did someone appear/disappear?
-   TR: "Kafesten çıktığında seni izleyen biri var mıydı?"
-   EN: "Was there someone watching you when you climbed out of the cage?"
+ABSOLUTE RULES (CRITICAL):
+1. The UI ONLY has 3 buttons: [Yes], [No], [Not Sure]. Any question that cannot be answered by clicking one of these is a FAILURE.
+2. NO OPEN-ENDED QUESTIONS:
+   - EN: NEVER use Who, What, When, Where, Why, How, How much.
+   - TR: ASLA "Kim", "Ne", "Nasıl", "Neden", "Niye", "Nerede", "Hangi", "Ne kadar", "Kaç" sorma!
+3. NO "A or B" QUESTIONS:
+   - EN: NEVER use "or" in the question.
+   - TR: ASLA soruda "yoksa", "veya", "ya da" kullanma!
+4. NEVER ask about FEELINGS or REAL LIFE connections.
+5. Ask ONLY about concrete dream scene details.
+6. Keep questions short — 1 sentence max.
+7. DIVERSITY: Each question must ask about a DIFFERENT type of missing detail.
+8. NEVER copy the example questions. You MUST write completely original questions specific to THIS dream.
 
-2. SENSORY DETAILS — Sounds, colors, light that were present
-   TR: "Kafes düşerken etrafta bir ses duydun mu?"
-   EN: "Did you hear any sound when the cage fell?"
-
-3. ACTIONS NOT MENTIONED — Did they try something? Look back? Run?
-   TR: "Kafes düştükten sonra geri dönüp onları kurtarmaya çalıştın mı?"
-   EN: "After the cage fell, did you try to go back and save them?"
-
-4. SCENE TRANSITIONS — Did scenes change suddenly?
-   TR: "Ormana birden mi geldin, arası boş mu?"
-   EN: "Did you suddenly find yourself in the forest with no transition?"
-
-5. RECOGNITION & IDENTITY — Were people/places recognized?
-   TR: "Kafesteki insanları gerçek hayattan tanıyor muydun?"
-   EN: "Did you recognize the people in the cage from real life?"
-
-6. PHYSICAL STATE — Body condition, injuries
-   TR: "Kafesten çıktığında bedeninde bir acı var mıydı?"
-   EN: "Did you feel any pain in your body when you got out of the cage?"
-
-7. TIME & ATMOSPHERE — Day/night, weather
-   TR: "Ormandaki ortam karanlık mıydı?"
-   EN: "Was it dark in the forest?"
-
-8. PERSPECTIVE — Was the dreamer watching from outside their body?
-   TR: "Olayları dışarıdan, kendini izler gibi mi gördün?"
-   EN: "Did you see the events from outside, as if watching yourself?"
-
-9. MOVEMENT RESTRICTION — Did they struggle to move?
-   TR: "Kafesten çıkarken zorlandın mı?"
-   EN: "Did you struggle to get out of the cage?"
-
-10. OTHERS' REACTIONS — What were other people doing?
-    TR: "Kafesteki insanlar senden yardım istedi mi?"
-    EN: "Did the people in the cage ask you for help?"
-
-11. DREAM ENDING — Did the dream end at a specific moment?
-    TR: "Rüya ormandayken mi bitti?"
-    EN: "Did the dream end while you were in the forest?"
-
-12. RECURRING DREAM — Has this happened before?
-    TR: "Bu rüyayı ya da benzerini daha önce gördün mü?"
-    EN: "Have you seen this dream or something similar before?"
-
-13. EYE CONTACT — Did they lock eyes with someone?
-    TR: "Kafes düşerken içerideki biriyle göz göze geldin mi?"
-    EN: "Did you make eye contact with anyone inside the cage as it fell?"
-
-14. DIRECTION OF MOVEMENT — Did they go up, down, or stay?
-    TR: "Kafesten çıktıktan sonra yukarıya doğru mu gittin?"
-    EN: "Did you go upward after getting out of the cage?"
-
-ABSOLUTE RULES:
-1. Questions MUST be answerable ONLY with "Yes" / "No" / "Not Sure".
-2. NEVER ask about FEELINGS or EMOTIONS (no "korku hissettin mi?", "did you feel scared?").
-3. NEVER ask about REAL LIFE connections (no "hayatında bunu temsil ediyor olabilir mi?").
-4. NEVER ask open-ended questions (no Why/What/How/When/Where/Who).
-5. NEVER ask "A or B" or "X mi yoksa Y mi?" questions. Every question must be ONE-DIRECTIONAL so the answer is unambiguous.
-   BAD: "Kafesten çıkarken zorlandın mı, yoksa kolayca mı çıktın?" → "Evet" ne demek? Belirsiz!
-   BAD: "Ormandaki ortam aydınlık mıydı yoksa karanlık mı?" → "Evet" ne demek? Belirsiz!
-   BAD: "Bir ses duydun mu — çığlık mı metal sesi mi?" → İkili seçenek, yasak!
-   GOOD: "Kafesten çıkarken zorlandın mı?" → Evet = zorlandım, Hayır = zorlanmadım ✓
-   GOOD: "Ormandaki ortam karanlık mıydı?" → Evet = karanlıktı, Hayır = değildi ✓
-   GOOD: "Kafes düşerken bir ses duydun mu?" → Evet = duydum, Hayır = duymadım ✓
-6. Ask ONLY about concrete dream scene details — things that DID or DID NOT happen in the dream.
-7. Each question should feel like a sharp detective who noticed exactly what's missing from the story.
-8. Keep questions short — 1 sentence max.  
-9. DIVERSITY: Each question must ask about a DIFFERENT type of missing detail.
-10. NEVER copy the example questions above! They are ONLY to illustrate the question type. You MUST write completely original questions specific to THIS dream.
-11. Pick the 2-4 question types that are MOST RELEVANT and would change the analysis the MOST for this particular dream. Do NOT randomly select types.
-
-Write questions in ${isTr ? 'Turkish, using informal "sen" form. Keep it natural and conversational.' : 'English. Keep it natural and conversational.'}
+Write questions in ${isTr ? 'Turkish, using informal "sen" form. TR DİKKAT: Kullanıcının klavyesi YOK! SADECE "Evet", "Hayır" ya da "Emin değilim" butonlarına basabilir. Sorularını KESİNLİKLE sadece bu üçünden biriyle cevaplanabilecek şekilde SADELEŞTİR!' : 'English. EN WARNING: User has no keyboard, only Yes/No/Unsure buttons. Questions MUST be answerable with those 3 buttons!'}
+CRITICAL: Every Turkish question MUST end with a Yes/No particle ("mu?", "mı?", "mısın?", "mıydın?", "mü?", "müydü?"). If a sentence contains "yoksa", "veya", "ne kadar", "kim", "nasıl", YOU FAIL.
 
 Return JSON:
 {
   "is_valid_dream": boolean,
   "questions": [
-    { "id": "q1", "question": "..." }
+    { "id": "q1", "question": "... MUST be a true Yes/No question, NO 'yoksa' inside!" }
   ]
 }`;
 
@@ -171,7 +119,7 @@ Return JSON:
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-          temperature: 0.85,
+          temperature: 0.3,
         }),
       });
 
@@ -181,7 +129,29 @@ Return JSON:
 
       const data = await response.json();
       const resultText = data.choices[0]?.message?.content || "{}";
-      const parsed = JSON.parse(resultText);
+      let parsed = JSON.parse(resultText);
+
+      // Post-processing to ENFORCE Yes/No format programmatically
+      if (parsed.questions && Array.isArray(parsed.questions)) {
+        parsed.questions = parsed.questions.map((q: any) => {
+          if (typeof q.question === "string") {
+            let text: string = q.question;
+
+            // Remove ", yoksa..." and ", veya..." parts
+            text = text.replace(/,?\s*(yoksa|veya)\s+[^?]+\?/i, "?");
+            text = text.replace(/\?+/g, "?");
+
+            // Check for forbidden open-ended words (Turkish-safe boundaries)
+            const rx = /(^|\s)(kim|nasıl|neden|niye|hangi|ne kadar|kaç|ne|kimler)(\s|$|[.?,!])/i;
+            if (rx.test(text)) {
+              text = "Rüyandaki sahnede, detayını tam veremediğin ama senin için önemli hissettiren bir şey var mıydı?";
+            }
+
+            q.question = text;
+          }
+          return q;
+        });
+      }
 
       return new Response(JSON.stringify(parsed), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

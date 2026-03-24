@@ -58,6 +58,15 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
 
   void _onPointerDown(PointerDownEvent event) {
     if (_isPopping) return;
+    
+    // Eğer sayfada aktif bir PopScope engeli varsa veya sayfa kendi pop'unu yönetiyorsa kaydırmayı tamamen iptal et.
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      if (route.willHandlePopInternally || route.popDisposition == RoutePopDisposition.doNotPop) {
+        return;
+      }
+    }
+
     _initialPosition = event.position;
     _swipeDecided = false;
     _swipeAccepted = false;
@@ -135,8 +144,14 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
       
       if (_animController.isCompleted) {
         _animController.removeListener(listener);
-        if (mounted && Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).maybePop().then((didPop) {
+            if (!didPop && mounted) {
+              // PopScope blocked the pop — snap back instead
+              _isPopping = false;
+              _snapBack();
+            }
+          });
         }
       }
     };

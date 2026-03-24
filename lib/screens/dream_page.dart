@@ -349,38 +349,38 @@ class _DreamPageState extends State<DreamPage>
 
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
-    '🧠 REM uykusunda mantık merkezleri baskılanır, bu yüzden rüyalar mantıksız görünür.',
-    '💤 Rüyalar genellikle yakın dönemde yaşanan duygusal deneyimleri işler.',
-    '🔬 Beyin, rüya sırasında anıları düzenler ve güçlendirir.',
-    '✨ Lucid rüya, rüyada olduğunuzu fark etme ve kontrol edebilme yeteneğidir.',
-    '🌙 Ortalama bir insan gecede 4-6 rüya görür, ancak çoğunu hatırlamaz.',
-    '💭 Rüya görmek, zihinsel sağlığın bir işaretidir.',
-    '🧬 REM uykusu problem çözme ve yaratıcılığı artırır.',
-    '⚡ Beyniniz rüya sırasında uyanıkken olduğu kadar aktiftir.',
-    '🎭 Tekrarlayan rüyalar, çözülmemiş duygusal sorunlara işaret edebilir.',
-    '🌊 Su içeren rüyalar genellikle duygu durumu ile ilişkilidir.',
-    '🚀 Uçma rüyaları özgürlük ve kontrol hissi ile bağlantılıdır.',
-    '⏰ Sabah saatlerinde gördüğünüz rüyaları daha iyi hatırlarsınız.',
-    '📝 Rüya günlüğü tutmak, rüya hatırlama yeteneğinizi geliştirir.',
-    '🔄 Rüyalar, beynin "simülasyon" yaparak olası senaryoları çalıştırmasıdır.',
-    '💡 Stres azaldığında kabus görme sıklığı da azalır.',
+    'REM uykusunda mantık merkezleri baskılanır, bu yüzden rüyalar mantıksız görünür.',
+    'Rüyalar genellikle yakın dönemde yaşanan duygusal deneyimleri işler.',
+    'Beyin, rüya sırasında anıları düzenler ve güçlendirir.',
+    'Lucid rüya, rüyada olduğunuzu fark etme ve kontrol edebilme yeteneğidir.',
+    'Ortalama bir insan gecede 4-6 rüya görür, ancak çoğunu hatırlamaz.',
+    'Rüya görmek, zihinsel sağlığın bir işaretidir.',
+    'REM uykusu problem çözme ve yaratıcılığı artırır.',
+    'Beyniniz rüya sırasında uyanıkken olduğu kadar aktiftir.',
+    'Tekrarlayan rüyalar, çözülmemiş duygusal sorunlara işaret edebilir.',
+    'Su içeren rüyalar genellikle duygu durumu ile ilişkilidir.',
+    'Uçma rüyaları özgürlük ve kontrol hissi ile bağlantılıdır.',
+    'Sabah saatlerinde gördüğünüz rüyaları daha iyi hatırlarsınız.',
+    'Rüya günlüğü tutmak, rüya hatırlama yeteneğinizi geliştirir.',
+    'Rüyalar, beynin simülasyon yaparak olası senaryoları çalıştırmasıdır.',
+    'Stres azaldığında kabus görme sıklığı da azalır.',
   ];
   static const List<String> _educationalMessagesEn = [
-    '🧠 During REM sleep, logic centers are suppressed, so dreams can seem illogical.',
-    '💤 Dreams often process recent emotional experiences.',
-    '🔬 The brain organizes and strengthens memories during dreaming.',
-    '✨ Lucid dreaming is the ability to realize you are dreaming and control it.',
-    '🌙 An average person has 4-6 dreams per night, but forgets most of them.',
-    '💭 Dreaming is a sign of mental health.',
-    '🧬 REM sleep boosts problem solving and creativity.',
-    '⚡ Your brain is nearly as active during dreams as when awake.',
-    '🎭 Recurring dreams can indicate unresolved emotional issues.',
-    '🌊 Water in dreams is often linked to emotional state.',
-    '🚀 Flying dreams are linked to freedom and control.',
-    '⏰ You remember dreams better in the early morning.',
-    '📝 Keeping a dream journal improves recall.',
-    '🔄 Dreams are the brain’s simulation of possible scenarios.',
-    '💡 As stress decreases, nightmares become less frequent.',
+    'During REM sleep, logic centers are suppressed, so dreams can seem illogical.',
+    'Dreams often process recent emotional experiences.',
+    'The brain organizes and strengthens memories during dreaming.',
+    'Lucid dreaming is the ability to realize you are dreaming and control it.',
+    'An average person has 4-6 dreams per night, but forgets most of them.',
+    'Dreaming is a sign of mental health.',
+    'REM sleep boosts problem solving and creativity.',
+    'Your brain is nearly as active during dreams as when awake.',
+    'Recurring dreams can indicate unresolved emotional issues.',
+    'Water in dreams is often linked to emotional state.',
+    'Flying dreams are linked to freedom and control.',
+    'You remember dreams better in the early morning.',
+    'Keeping a dream journal improves recall.',
+    'Dreams are the brain\'s simulation of possible scenarios.',
+    'As stress decreases, nightmares become less frequent.',
   ];
   static const String _notAnalyzableMessageTr =
       'Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.';
@@ -426,10 +426,21 @@ class _DreamPageState extends State<DreamPage>
     }
   }
 
-  void _closeWritingModal() {
+  void _closeWritingModal({bool instant = false}) {
     setState(() {
       _analysisOverlayVisible = false;
     });
+
+    if (instant) {
+      if (mounted) {
+        setState(() {
+          _showAnalysisOverlay = false;
+          _isWriting = false;
+          _overlayContent = 'analyzing';
+        });
+      }
+      return;
+    }
 
     // Kapanma animasyonu bitmesini bekle
     Future.delayed(const Duration(milliseconds: 400), () {
@@ -869,7 +880,14 @@ class _DreamPageState extends State<DreamPage>
     final backgroundGradient = _resolveBackgroundGradient();
     final bottomContentPadding = MediaQuery.of(context).padding.bottom + 24;
 
-    return Scaffold(
+    return PopScope(
+      canPop: !(_showAnalysisOverlay || _isWriting),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _closeWritingModal();
+        }
+      },
+      child: Scaffold(
       extendBody: true,
       backgroundColor: const Color(0xFF0F162B),
       body: Stack(
@@ -992,6 +1010,7 @@ class _DreamPageState extends State<DreamPage>
             Positioned.fill(child: _buildMetricOverlay()),
         ],
       ),
+    ),
     );
   }
 
@@ -1713,8 +1732,15 @@ class _DreamPageState extends State<DreamPage>
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: _analysisOverlayVisible ? 1.0 : 0.0),
+    return Dismissible(
+      key: const Key('unified_overlay_dismissible'),
+      direction: DismissDirection.startToEnd, // Sadece sağa kaydırarak kapatma
+      resizeDuration: null, // Önemli: Stack içinde Positioned olduğundan boyutunu küçültmeye çalışmasını engeller
+      onDismissed: (_) {
+        _closeWritingModal(instant: true);
+      },
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: _analysisOverlayVisible ? 1.0 : 0.0),
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeOutCubic,
       builder: (context, animValue, child) {
@@ -1769,6 +1795,7 @@ class _DreamPageState extends State<DreamPage>
           ),
         );
       },
+    ),
     );
   }
 

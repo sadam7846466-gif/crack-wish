@@ -100,21 +100,16 @@ Return this exact JSON structure:
 {
   "is_valid_dream": true,
   "core_conflict": "string",
-  "distribution": {
-    "emotional_load": 0,
-    "uncertainty": 0,
-    "recent_memory_effect": 0,
-    "brain_activity": 0
-  },
+  "distribution": { "emotional_load": 0, "uncertainty": 0, "recent_memory_effect": 0, "brain_activity": 0 },
   "analysis": {
-    "brain": "Explain what the brain is doing. Example: 'Bu rüya, beynin sorumluluk + bağlanma yükünü aynı anda işlemeye çalıştığını gösteriyor.\\nYukarı çıkman ama hemen ardından düşüş olması, kaçış ve geri dönme döngüsüne benzer: çözülmemiş bir zihinsel çatışma.'",
-    "emotion": "Explain dominant emotion structure using → and ➤. Example: 'Suçluluk + koruma içgüdüsü\\n\\nYukarı çıkman → bireysel kurtulma refleksi\\nArkandakilerin içeride kalması → “yalnız kalamam” hissi\\n\\n➤ Zihin özgürlük isterken bağlılığı bırakmıyor.'",
-    "symbol": "Explain core symbol using = and ➤. Example: 'Kafes = kontrol dışı kalma durumu\\n\\nAsılı olması → belirsizlik\\nDüşmesi → ani duygusal yüklenme\\n\\n➤ Zihinde “denge bozulursa herkes zarar görür” algısı var.'",
-    "nature": "OPTIONAL: Analyze nature/environment if present. Example: 'Doğal ortam = ilkel beyin / hayatta kalma modu.\\nMantıktan çok refleks çalışıyor. Güvenli bir yapı hissi yok → zihinsel güvensizlik.'",
-    "physical_pain": "OPTIONAL: Analyze physical sensation if present. Example: 'Beyin, duygusal acıyı bedensel acı gibi simüle etmiş.\\n\\nGenelde: yoğun stres, bastırılmış korku ile birlikte görülür.'",
-    "recent_effect": "OPTIONAL: Analyze recent memory effect. Example: 'Son günlerde: sevdiklerinle ilgili sorumluluk, “Ben iyi olursam ya onlar?” düşüncesi yüksek ihtimalle aktiftir.'",
-    "summary": "Summarize clearly and scientifically, focusing heavily on cognitive burden, responsibility, or conflict. Example: 'Bu rüya, bireysel kurtulma isteği ile sevdiklerini koruma zorunluluğu arasında kalan zihnin, kontrol kaybı korkusunu işlemesiyle oluşmuş. Rüyadaki acı, duygusal yükün yoğunluğunu gösteriyor.'",
-    "advice": "Give a psychological, actionable recommendation to the dreamer based on the core conflict. Use ➤ for bullet if needed. Example: 'Zihnini rahatlatmak için başkalarına duyduğun sorumluluk hissini bir kenara bırakıp kendi sınırlarını korumaya odaklanmalısın.'"
+    "brain": "Short brain process explanation. 2-3 sentences max.",
+    "emotion": "Dominant emotion analysis. MUST use → for mapping and ➤ for conclusion. E.g. 'X → Y \\n\\n➤ Z'",
+    "symbol": "Core symbol explanation. MUST use = for meaning, → for mapping, ➤ for conclusion.",
+    "nature": "OPTIONAL: Environment analysis.",
+    "physical_pain": "OPTIONAL: Physical sensation explanation.",
+    "recent_effect": "OPTIONAL: Recent memory effect.",
+    "summary": "Clear scientific summary. 2-3 sentences.",
+    "advice": "Actionable psychological advice."
   }
 }`;
 
@@ -172,8 +167,13 @@ Return this exact JSON structure:
 
     // siz → sen post-processing
     const fix = (t: string): string => {
-      if (!isTr || !t) return t;
-      return t
+      if (!t) return t;
+      // Strip all emoji characters (keep → ➤ and basic punctuation)
+      let cleaned = t.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA00}-\u{1FAFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '');
+      // Clean up double spaces left by removed emojis
+      cleaned = cleaned.replace(/  +/g, ' ').trim();
+      if (!isTr) return cleaned;
+      return cleaned
         .replace(/Rüyanız/g,'Rüyan').replace(/rüyanız/g,'rüyan')
         .replace(/yaşadığınız/g,'yaşadığın').replace(/hissettiğiniz/g,'hissettiğin')
         .replace(/olmanız/g,'olman').replace(/kalmanız/g,'kalman')
