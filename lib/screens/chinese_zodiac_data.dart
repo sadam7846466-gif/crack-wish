@@ -423,7 +423,7 @@ class ChineseZodiacData {
      ['💒', 'Evlilik & Nişan', 4],
      ['🌾', 'Arazi & Tarla', 3],
      ['🏥', 'Sağlık Check-up', 5],
-     ['🏠', 'Ev Tadilatı', 3]],
+     ['🔨', 'Ev Tadilatı', 3]],
     // 2-Kaplan — Cesaret ve liderlik odaklı
     [['👑', 'Liderlik Atılımı', 5],
      ['🎲', 'Cesur Risk Alma', 4],
@@ -443,7 +443,7 @@ class ChineseZodiacData {
      ['💎', 'Lüks Yatırım', 5],
      ['📈', 'Büyük Sermaye', 4],
      ['🎖️', 'Kariyer Zirvesi', 5],
-     ['💒', 'Görkemli Düğün', 4],
+     ['💍', 'Görkemli Düğün', 4],
      ['🌍', 'Uluslararası Açılım', 4]],
     // 5-Yılan — Bilgelik ve strateji odaklı
     [['🔬', 'Araştırma & Analiz', 5],
@@ -451,7 +451,7 @@ class ChineseZodiacData {
      ['💼', 'Gizli Yatırım', 3],
      ['🔮', 'Ruhsal Gelişim', 5],
      ['🎓', 'Akademik Kariyer', 4],
-     ['🏠', 'Sessiz Taşınma', 2]],
+     ['📦', 'Sessiz Taşınma', 2]],
     // 6-At — Özgürlük ve hareket odaklı
     [['✈️', 'Dünya Turu', 4],
      ['🏃', 'Spor & Fitness', 5],
@@ -486,13 +486,13 @@ class ChineseZodiacData {
      ['💑', 'İlişki Derinleştirme', 5],
      ['👪', 'Aile Bağları', 5],
      ['🎗️', 'Gönüllü Çalışma', 4],
-     ['🏠', 'Güvenli Yuva Kurma', 4]],
+     ['🛡️', 'Güvenli Yuva Kurma', 4]],
     // 11-Domuz — Keyif ve cömertlik odaklı
     [['🍽️', 'Gastronomi & Lezzet', 5],
      ['🥂', 'Sosyal Kutlama', 5],
      ['💝', 'Hayırseverlik', 4],
      ['🛋️', 'Konfor Yatırımı', 4],
-     ['💰', 'Birikim & Tasarruf', 2],
+     ['💵', 'Birikim & Tasarruf', 2],
      ['👶', 'Aile Genişletme', 5]],
   ];
 
