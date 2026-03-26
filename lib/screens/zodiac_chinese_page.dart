@@ -4964,7 +4964,7 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
 // ─────────────────────────────────────────────────────
 // ENERGY BRIDGE PAINTER — İkonları Bağlayan Enerji Akışı
 // ─────────────────────────────────────────────────────
-// ── Enerji Kartı Özel İkon Painter (Bagua Trigram çizgisel) ──────
+// ── Enerji Kartı Özel İkon Painter (Evrensel çizgisel) ──────────
 class _EnergyCardIconPainter extends CustomPainter {
   final String iconType;
   final Color color;
@@ -4977,47 +4977,75 @@ class _EnergyCardIconPainter extends CustomPainter {
     final p = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-
-    // Bagua trigram çizgi yardımcısı
-    // solid=true → tam çizgi; solid=false → iki kırık çizgi (ortası boş)
-    void trigramLine(double y, bool solid) {
-      if (solid) {
-        // TAM ÇİZGİ — Yang
-        canvas.drawLine(Offset(w * 0.12, y), Offset(w * 0.88, y), p);
-      } else {
-        // KIRIIK ÇİZGİ — Yin (iki parça, ortası boş)
-        canvas.drawLine(Offset(w * 0.12, y), Offset(w * 0.42, y), p);
-        canvas.drawLine(Offset(w * 0.58, y), Offset(w * 0.88, y), p);
-      }
-    }
-
-    // Trigram çizgi aralıkları: üst/orta/alt
-    final y1 = h * 0.22; // Üst çizgi
-    final y2 = h * 0.50; // Orta çizgi
-    final y3 = h * 0.78; // Alt çizgi
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     switch (iconType) {
+
       case 'dominant':
-        // ☰ Qian — GÖK (üç tam çizgi = maksimum Yang, baskın güç)
-        trigramLine(y1, true);
-        trigramLine(y2, true);
-        trigramLine(y3, true);
+        // 👑 TAÇ — Lider, baskın, güçlü karakter
+        // Alt bant (tabanın yatay çizgisi)
+        canvas.drawLine(Offset(w * 0.1, h * 0.78), Offset(w * 0.9, h * 0.78), p);
+        // Taç gövdesi (W şekli — 5 uç)
+        final crown = Path();
+        crown.moveTo(w * 0.1, h * 0.78);  // Sol taban
+        crown.lineTo(w * 0.1, h * 0.32);  // Sol dış dikey
+        crown.lineTo(w * 0.28, h * 0.52); // Sol iç V
+        crown.lineTo(w * 0.5, h * 0.18);  // Orta tepe
+        crown.lineTo(w * 0.72, h * 0.52); // Sağ iç V
+        crown.lineTo(w * 0.9, h * 0.32);  // Sağ dış dikey
+        crown.lineTo(w * 0.9, h * 0.78);  // Sağ taban
+        canvas.drawPath(crown, p);
+        // Taç üzerindeki üç küçük boncuk/nokta
+        canvas.drawCircle(Offset(w * 0.1, h * 0.28), 2.5, Paint()..color = color..style = PaintingStyle.fill);
+        canvas.drawCircle(Offset(w * 0.5, h * 0.12), 2.5, Paint()..color = color..style = PaintingStyle.fill);
+        canvas.drawCircle(Offset(w * 0.9, h * 0.28), 2.5, Paint()..color = color..style = PaintingStyle.fill);
         break;
 
       case 'support':
-        // ☴ Xun — RÜZGAR (alt kırık, üst iki tam = destekleyici, nüfuz eden)
-        trigramLine(y1, true);
-        trigramLine(y2, true);
-        trigramLine(y3, false);
+        // 🛡 KAL KAN — Destekleyici, koruyucu karakter
+        final shield = Path();
+        shield.moveTo(w * 0.5, h * 0.06); // Üst orta
+        shield.lineTo(w * 0.88, h * 0.22); // Sağ üst köşe
+        shield.lineTo(w * 0.88, h * 0.58); // Sağ orta (yay başlangıcı)
+        shield.quadraticBezierTo(w * 0.88, h * 0.82, w * 0.5, h * 0.95); // Sağ yay → alt sivri uç
+        shield.quadraticBezierTo(w * 0.12, h * 0.82, w * 0.12, h * 0.58); // Sol yay
+        shield.lineTo(w * 0.12, h * 0.22); // Sol kenar yukarı
+        shield.close();
+        canvas.drawPath(shield, p);
+        // Üst yatay ayırıcı çizgi (iç detay)
+        canvas.drawLine(Offset(w * 0.2, h * 0.38), Offset(w * 0.8, h * 0.38), p..strokeWidth = 1.2);
         break;
 
       case 'drain':
-        // ☷ Kun — TOPRAK (üç kırık çizgi = alıcı, absorbe eden, tüketen)
-        trigramLine(y1, false);
-        trigramLine(y2, false);
-        trigramLine(y3, false);
+        // 🪫 AZALAN PİL — Yorucu, enerji tüketen karakter
+        // Pil gövdesi (dikdörtgen)
+        final battBody = RRect.fromRectAndRadius(
+          Rect.fromLTWH(w * 0.1, h * 0.22, w * 0.72, h * 0.56),
+          const Radius.circular(4),
+        );
+        canvas.drawRRect(battBody, p);
+        // Pil ucunun pozitif terminali (sağ küçük dikdörtgen)
+        canvas.drawRect(Rect.fromLTWH(w * 0.82, h * 0.38, w * 0.1, h * 0.24), p..strokeWidth = 1.4);
+        // İç çubuklar — sadece 1 çubuk dolu (düşük şarj hissi)
+        final barH = h * 0.32;
+        final barY = h * 0.34;
+        final barW = w * 0.12;
+        final barSpacing = w * 0.04;
+        final startX = w * 0.16;
+        // 1. çubuk — dolu (opak)
+        canvas.drawRect(
+          Rect.fromLTWH(startX, barY, barW, barH),
+          Paint()..color = color..style = PaintingStyle.fill,
+        );
+        // 2-4. çubuklar — boş (sadece stroke)
+        for (int i = 1; i < 4; i++) {
+          canvas.drawRect(
+            Rect.fromLTWH(startX + i * (barW + barSpacing), barY, barW, barH),
+            p..strokeWidth = 1.2,
+          );
+        }
         break;
     }
   }
