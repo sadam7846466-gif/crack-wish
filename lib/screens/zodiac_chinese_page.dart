@@ -5078,67 +5078,55 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // "Altı birleşik, ince, dalgalı (S-kavisli) ve elit çizgiler" tabanlı tasarım
-        final pLine = p
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round
-          ..color = color;
-
-        // Bütün alev dilleri tabanda BİRLEŞECEK (w: 0.5, h: 0.88 merkezi noktasından uzanacak)
-
-        // Alt taban birleştirme dalgası (dalların dibini toplayan bir zemin düğümü)
-        final baseKnot = Path();
-        baseKnot.moveTo(w * 0.38, h * 0.85);
-        baseKnot.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.62, h * 0.85);
-        canvas.drawPath(baseKnot, pLine..strokeWidth = 2.4);
-
-        // 1. ANA TEPE DILI (Güçlü S-Kavisi, Sağa doğru dalgalanıyor)
-        final mainF = Path();
-        mainF.moveTo(w * 0.5, h * 0.9); // Ortak birleşik taban
-        // Sola doğru daralıp sağa kırılan dalga
-        mainF.cubicTo(w * 0.35, h * 0.6, w * 0.75, h * 0.3, w * 0.58, h * 0.1);
-        canvas.drawPath(mainF, pLine..strokeWidth = 2.4);
-
-        // 2. SOL BÜYÜK YAN DALGA (Sola doğru kıvrılıp içe dalgalanıyor)
-        final leftF = Path();
-        leftF.moveTo(w * 0.46, h * 0.9); // Ortak taban bölgesinden çıkış
-        leftF.cubicTo(w * 0.15, h * 0.7, w * 0.35, h * 0.45, w * 0.22, h * 0.35);
-        canvas.drawPath(leftF, pLine..strokeWidth = 1.8);
-
-        // 3. SAĞ BÜYÜK YAN DALGA (Sağa doğru kıvrılıp içe dalgalanıyor)
-        final rightF = Path();
-        rightF.moveTo(w * 0.54, h * 0.9); // Ortak taban bölgesinden çıkış
-        rightF.cubicTo(w * 0.85, h * 0.7, w * 0.65, h * 0.45, w * 0.78, h * 0.35);
-        canvas.drawPath(rightF, pLine..strokeWidth = 1.8);
-
-        // 4. İÇ SOL DALGA (Alevi zenginleştiren, çok ince S-kavisi)
-        final iLeftF = Path();
-        iLeftF.moveTo(w * 0.48, h * 0.9);
-        iLeftF.cubicTo(w * 0.35, h * 0.75, w * 0.5, h * 0.6, w * 0.4, h * 0.45);
-        canvas.drawPath(iLeftF, pLine..strokeWidth = 1.4);
-
-        // 5. İÇ SAĞ DALGA (Alevi zenginleştiren, çok ince S-kavisi)
-        final iRightF = Path();
-        iRightF.moveTo(w * 0.52, h * 0.9);
-        iRightF.cubicTo(w * 0.65, h * 0.75, w * 0.5, h * 0.6, w * 0.6, h * 0.45);
-        canvas.drawPath(iRightF, pLine..strokeWidth = 1.4);
-
-        // 6. KIVILCIM DETAYLARI (Dalgalı formu destekleyen bağımsız elit dokunuşlar)
-        final sparkL = Path();
-        sparkL.moveTo(w * 0.28, h * 0.28);
-        sparkL.quadraticBezierTo(w * 0.3, h * 0.25, w * 0.35, h * 0.28);
-        canvas.drawPath(sparkL, pLine..strokeWidth = 1.2);
-
-        final sparkR = Path();
-        sparkR.moveTo(w * 0.72, h * 0.28);
-        sparkR.quadraticBezierTo(w * 0.7, h * 0.25, w * 0.65, h * 0.28);
-        canvas.drawPath(sparkR, pLine..strokeWidth = 1.2);
+        // Kullanıcının son attığı klasik, ayrık 5 damla parçalı elit ateş referansı
+        final fp = Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
         
-        final sparkTop = Path();
-        sparkTop.moveTo(w * 0.54, h * 0.04);
-        sparkTop.quadraticBezierTo(w * 0.56, h * 0.03, w * 0.58, h * 0.06);
-        canvas.drawPath(sparkTop, pLine..strokeWidth = 1.4);
+        // --- 1. MERKEZ BÜYÜK DAMLA (Ana gövde, ucu sağa kıvrık) ---
+        final cF = Path();
+        cF.moveTo(w * 0.5, h * 0.85); // Ortada sivri alt taban
+        // Sol dış kavis (Sola şişer, tepeye sağa kıvrılır)
+        cF.cubicTo(w * 0.35, h * 0.65, w * 0.45, h * 0.3, w * 0.55, h * 0.1); // Tepe sivri uç
+        // Sağ dış kavis (Tepe ucundan döner, sağa şişip alta iner)
+        cF.cubicTo(w * 0.65, h * 0.35, w * 0.7, h * 0.65, w * 0.5, h * 0.85); 
+        canvas.drawPath(cF, fp);
+
+        // --- 2. SOL BÜYÜK YAN DALGA (Sivri taban, sola şişer ve sola uçar) ---
+        final lF = Path();
+        lF.moveTo(w * 0.32, h * 0.8); // Sol alt sivri uç
+        // Dış (sol) kavis
+        lF.cubicTo(w * 0.05, h * 0.65, w * 0.15, h * 0.45, w * 0.22, h * 0.35); // Tepe uç
+        // İç (sağ) kavis
+        lF.cubicTo(w * 0.32, h * 0.5, w * 0.4, h * 0.65, w * 0.32, h * 0.8);
+        canvas.drawPath(lF, fp);
+
+        // --- 3. SAĞ BÜYÜK YAN DALGA (Sivri taban, sağa şişer ve ucu hafif sola/yukarı döner) ---
+        final rF = Path();
+        rF.moveTo(w * 0.68, h * 0.85); // Sağ alt sivri uç
+        // Dış (sağ) kavis
+        rF.cubicTo(w * 0.95, h * 0.7, w * 0.8, h * 0.45, w * 0.82, h * 0.38); // Tepe uç
+        // İç (sol) kavis
+        rF.cubicTo(w * 0.75, h * 0.55, w * 0.6, h * 0.65, w * 0.68, h * 0.85); 
+        canvas.drawPath(rF, fp);
+
+        // --- 4. İÇ SOL KÜÇÜK KIVILCIM (Merkez ile sol arasında, sola uçuşan ince damla) ---
+        final isL = Path();
+        isL.moveTo(w * 0.42, h * 0.5); // Sivri altı
+        // Dış (sol) kavis
+        isL.cubicTo(w * 0.35, h * 0.4, w * 0.38, h * 0.3, w * 0.32, h * 0.22); // Sol tepe ucu
+        // İç (sağ) kavis
+        isL.cubicTo(w * 0.45, h * 0.3, w * 0.45, h * 0.4, w * 0.42, h * 0.5);
+        canvas.drawPath(isL, fp);
+
+        // --- 5. ÜST SOL KÜÇÜK KIVILCIM (Sol alevin üstünde uçuşan minik damla) ---
+        final fsL = Path();
+        fsL.moveTo(w * 0.28, h * 0.42); // Sivri altı
+        // Dış kavis
+        fsL.cubicTo(w * 0.2, h * 0.32, w * 0.25, h * 0.25, w * 0.18, h * 0.18); // Sol tepe ucu
+        // İç kavis
+        fsL.cubicTo(w * 0.3, h * 0.25, w * 0.32, h * 0.35, w * 0.28, h * 0.42);
+        canvas.drawPath(fsL, fp);
         break;
 
       case 'Ağaç':
