@@ -5028,25 +5028,13 @@ class _EnergyCardIconPainter extends CustomPainter {
         canvas.drawRRect(battBody, p);
         // Pil ucunun pozitif terminali (sağ küçük dikdörtgen)
         canvas.drawRect(Rect.fromLTWH(w * 0.82, h * 0.38, w * 0.1, h * 0.24), p..strokeWidth = 1.4);
-        // İç çubuklar — sadece 1 çubuk dolu (düşük şarj hissi)
-        final barH = h * 0.32;
-        final barY = h * 0.34;
-        final barW = w * 0.12;
-        final barSpacing = w * 0.04;
-        final startX = w * 0.16;
-        // 1. çubuk — dolu (opak)
+        // İç tek çubuk — solda küçük dolu bar (kritik düşük seviye)
         canvas.drawRect(
-          Rect.fromLTWH(startX, barY, barW, barH),
+          Rect.fromLTWH(w * 0.16, h * 0.34, w * 0.14, h * 0.32),
           Paint()..color = color..style = PaintingStyle.fill,
         );
-        // 2-4. çubuklar — boş (sadece stroke)
-        for (int i = 1; i < 4; i++) {
-          canvas.drawRect(
-            Rect.fromLTWH(startX + i * (barW + barSpacing), barY, barW, barH),
-            p..strokeWidth = 1.2,
-          );
-        }
         break;
+
     }
   }
 
