@@ -1412,11 +1412,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _energyCard('dominant', 'Baskın', fsProfile['dominant'] as String, elColor),
+                      _energyCard('dominant', 'Baskın', fsProfile['dominant'] as String),
                       const SizedBox(width: 8),
-                      _energyCard('support', 'Destekler', fsProfile['supportEnergy'] as String, elColor),
+                      _energyCard('support', 'Destekler', fsProfile['supportEnergy'] as String),
                       const SizedBox(width: 8),
-                      _energyCard('drain', 'Yorar', fsProfile['drainEnergy'] as String, elColor),
+                      _energyCard('drain', 'Yorar', fsProfile['drainEnergy'] as String),
                     ],
                   ),
                 ),
@@ -1722,32 +1722,32 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ]);
   }
 
-  // Küçük enerji kartı (3'lü grid için) — özgün custom paint ikon + tek renk
-  Widget _energyCard(String iconType, String label, String desc, Color color) => Expanded(
+  // Küçük enerji kartı (3'lü grid için) — sade beyaz tema, özgün ikon
+  Widget _energyCard(String iconType, String label, String desc) => Expanded(
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.25), width: 0.8),
+        border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Özgün ikon
+          // Özgün ikon (beyaz)
           SizedBox(
             width: 28, height: 28,
-            child: CustomPaint(painter: _EnergyCardIconPainter(iconType: iconType, color: color)),
+            child: CustomPaint(painter: _EnergyCardIconPainter(iconType: iconType, color: Colors.white.withOpacity(0.85))),
           ),
           const SizedBox(height: 8),
           Text(label, style: TextStyle(
-            color: color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8,
+            color: Colors.white.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8,
           )),
           const SizedBox(height: 8),
           Text(
             desc,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 9.5, height: 1.5),
+            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9.5, height: 1.5),
           ),
         ],
       ),
