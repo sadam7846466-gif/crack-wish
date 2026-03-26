@@ -5078,36 +5078,45 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Güçlü, çizgisel ve hırçın 'Line-Art' alev
-        final strokeP = p..strokeWidth = 2.4..color = color;
-        final glowP = p..strokeWidth = 1.2..color = color.withOpacity(0.5);
+        // Keskin, 5 uçlu ve güçlü Ateş silüeti (Referans görsele sadık)
+        final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
         
-        // 1. Merkez Ana Alev Dili (Çizgisel Katmanlar)
-        final cF = Path();
-        cF.moveTo(w * 0.5, h * 0.1);
-        cF.quadraticBezierTo(w * 0.65, h * 0.45, w * 0.5, h * 0.85);
-        cF.quadraticBezierTo(w * 0.35, h * 0.45, w * 0.5, h * 0.1);
-        canvas.drawPath(cF, strokeP);
-        canvas.drawPath(cF, glowP..strokeWidth = 3.5); // Hafif bir dış ışıma çizgisi
+        final flame = Path();
+        // Merkez ana tepe
+        flame.moveTo(w * 0.5, h * 0.15); 
+        
+        // Sağ üst - ince dar geçiş
+        flame.quadraticBezierTo(w * 0.55, h * 0.35, w * 0.65, h * 0.32);
+        // Sağ dış büyük uç (Flare)
+        flame.quadraticBezierTo(w * 0.85, h * 0.45, w * 0.82, h * 0.8);
+        
+        // Alt taban - Referanstaki gibi keskin dönüş
+        flame.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.18, h * 0.8);
+        
+        // Sol dış büyük uç (Flare)
+        flame.quadraticBezierTo(w * 0.15, h * 0.45, w * 0.35, h * 0.32);
+        // Sol üst - ince dar geçiş
+        flame.quadraticBezierTo(w * 0.45, h * 0.35, w * 0.5, h * 0.15);
+        flame.close();
+        
+        canvas.drawPath(flame, fillPaint);
 
-        // 2. Sol Yan Hırçın Flare Çizgisi
-        final lF = Path();
-        lF.moveTo(w * 0.4, h * 0.35);
-        lF.cubicTo(w * 0.1, h * 0.45, w * 0.2, h * 0.75, w * 0.42, h * 0.82);
-        canvas.drawPath(lF, strokeP..strokeWidth = 2.0);
-        // Sol ikincil iç çizgi
-        canvas.drawLine(Offset(w * 0.35, h * 0.55), Offset(w * 0.42, h * 0.75), strokeP..strokeWidth = 1.4);
+        // İç katman dilleri (Referanstaki o 3 iç sivri uç etkisi için)
+        final innerC = Path();
+        innerC.moveTo(w * 0.5, h * 0.45); // İç merkez tepe
+        innerC.lineTo(w * 0.55, h * 0.7);
+        innerC.lineTo(w * 0.65, h * 0.62); // İç sağ tepe
+        innerC.lineTo(w * 0.6, h * 0.82);
+        innerC.lineTo(w * 0.4, h * 0.82);
+        innerC.lineTo(w * 0.35, h * 0.62); // İç sol tepe
+        innerC.lineTo(w * 0.45, h * 0.7);
+        innerC.close();
+        
+        // Negatif alan / Derinlik etkisi
+        canvas.drawPath(innerC, Paint()..color = Colors.black.withOpacity(0.15)..style = PaintingStyle.fill);
 
-        // 3. Sağ Yan Hırçın Flare Çizgisi
-        final rF = Path();
-        rF.moveTo(w * 0.6, h * 0.3);
-        rF.cubicTo(w * 0.9, h * 0.4, w * 0.8, h * 0.8, w * 0.58, h * 0.85);
-        canvas.drawPath(rF, strokeP..strokeWidth = 2.0);
-        // Sağ ikincil iç çizgi
-        canvas.drawLine(Offset(w * 0.65, h * 0.5), Offset(w * 0.58, h * 0.7), strokeP..strokeWidth = 1.4);
-
-        // En uçtaki keskin kıvılcım çizgisi
-        canvas.drawLine(Offset(w * 0.5, h * 0.05), Offset(w * 0.5, h * 0.15), strokeP..strokeWidth = 1.8);
+        // En uç noktaya vurgu
+        canvas.drawCircle(Offset(w * 0.5, h * 0.15), 1.2, Paint()..color = Colors.white.withOpacity(0.3));
         break;
 
       case 'Ağaç':
