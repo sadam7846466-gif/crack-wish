@@ -1482,24 +1482,24 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   const SizedBox(height: 10),
                   Row(children: (fsProfile['colors'] as List<String>).map((c) {
                     final colorVal = _colorFromNameEx(c, Colors.white);
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                    return Expanded(
                       child: Column(children: [
                         Container(
-                          width: 36, height: 36,
+                          width: 44, height: 44,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: colorVal,
                             border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 6),
                         Text(c, textAlign: TextAlign.center, style: TextStyle(
                           color: Colors.white.withOpacity(0.35), fontSize: 8.0,
                         )),
                       ]),
                     );
                   }).toList()),
+
                 ]),
               ),
 
