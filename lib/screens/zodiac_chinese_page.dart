@@ -1266,129 +1266,293 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   }
 
   // ══════════════════════════════════════════
-  // 2) ELEMENT & YIN-YANG
+  // 2) ELEMENT & YIN-YANG — FENG SHUİ MERKEZİ
   // ══════════════════════════════════════════
   Widget _elementSection() {
     final elData = ChineseZodiacData.elements[_userElement]!;
     final elColor = Color(elData['color'] as int);
+    final fsProfile = ChineseZodiacData.fengShuiElementProfile[_userElement]!;
+    final yyProfile = ChineseZodiacData.fengShuiYinYang[_userYinYang]!;
+    final animalFs = ChineseZodiacData.animalFengShui[_animalIdx];
+    final weeklyTask = ChineseZodiacData.weeklyFengShuiTask(_userElement, _userYinYang);
+    final isYin = _userYinYang == 'Yin';
+    final yyColor = isYin ? const Color(0xFF7C3AED) : const Color(0xFFD97706);
+
+    // Günlük uyum skoru hesapla (deterministic)
+    final today = DateTime.now();
+    final seed = today.year * 1000 + today.month * 100 + today.day + _animalIdx * 7;
+    final baseScore = 62 + (seed % 27); // 62-88 arası
+    final elBonus = _userElement == 'Ateş' || _userElement == 'Ağaç' ? 5 : 0;
+    final yyBonus = isYin ? 3 : 4;
+    final harmonyScore = (baseScore + elBonus + yyBonus).clamp(0, 100);
+
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Element hero
-      _glass(child: Column(children: [
-        Text(elData['emoji'] as String, style: const TextStyle(fontSize: 60)),
-        const SizedBox(height: 8),
-        ShaderMask(
-          shaderCallback: (b) => LinearGradient(colors: [elColor, elColor.withOpacity(0.6)]).createShader(b),
-          child: Text(_userElement, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
-        ),
-        const SizedBox(height: 12),
-        Text(elData['desc'] as String, textAlign: TextAlign.center, style: _bodyStyle()),
-      ])),
-      const SizedBox(height: 20),
-      // Element özellikleri
-      Row(children: [
-        _infoChip('🌸', 'Mevsim', elData['season'] as String),
-        const SizedBox(width: 10),
-        _infoChip('🧭', 'Yön', elData['direction'] as String),
-      ]),
-      const SizedBox(height: 10),
-      Row(children: [
-        _infoChip('🫀', 'Organ', elData['organ'] as String),
-        const SizedBox(width: 10),
-        _infoChip('💭', 'Duygu', elData['emotion'] as String),
-      ]),
-      const SizedBox(height: 20),
-      // Element döngüsü
-      _secHead('🔄', 'Beş Element Döngüsü'),
-      const SizedBox(height: 12),
-      _glass(child: Column(children: [
-        _elementCycleRow('Üretir →', elData['generates'] as String, const Color(0xFF4CAF50)),
-        _elementCycleRow('Kontrol →', elData['controls'] as String, const Color(0xFFFF9800)),
-        _elementCycleRow('Zayıflatılır ←', elData['weakenedBy'] as String, const Color(0xFFE53935)),
-      ])),
-      const SizedBox(height: 20),
-      // Yin Yang
-      _secHead('☯️', 'Yin-Yang Dengesi'),
-      const SizedBox(height: 12),
-      _glass(child: Row(children: [
-        Expanded(child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: _userYinYang == 'Yin' ? Colors.white.withOpacity(0.08) : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: _userYinYang == 'Yin' ? Border.all(color: Colors.white.withOpacity(0.2)) : null,
+
+      // ── MOD 1: KİŞİSEL ENERJİ + MEKAN EŞLEŞMESİ ──
+      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Header
+        Row(children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: elColor.withOpacity(0.15),
+              border: Border.all(color: elColor.withOpacity(0.35), width: 0.8),
+            ),
+            child: Center(child: Text(elData['emoji'] as String, style: const TextStyle(fontSize: 18))),
           ),
-          child: Column(children: [
-            const Text('☽', style: TextStyle(fontSize: 28)),
-            const SizedBox(height: 6),
-            Text('Yin', style: TextStyle(color: Colors.white.withOpacity(_userYinYang == 'Yin' ? 1 : 0.4), fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text('Alıcı · Sezgisel\nİçe dönük · Sakin', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-          ]),
-        )),
-        const SizedBox(width: 12),
-        Expanded(child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: _userYinYang == 'Yang' ? _gold.withOpacity(0.1) : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: _userYinYang == 'Yang' ? Border.all(color: _gold.withOpacity(0.3)) : null,
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('$_userElement Enerjisi', style: TextStyle(
+              color: elColor, fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.3,
+            )),
+            Text('$_userYinYang · Kişisel Profil', style: TextStyle(
+              color: Colors.white.withOpacity(0.4), fontSize: 11, letterSpacing: 1,
+            )),
+          ])),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: yyColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: yyColor.withOpacity(0.25)),
+            ),
+            child: Text(isYin ? '🌙 Yin' : '☀️ Yang', style: TextStyle(
+              color: yyColor, fontSize: 11, fontWeight: FontWeight.w700,
+            )),
           ),
-          child: Column(children: [
-            const Text('☀', style: TextStyle(fontSize: 28)),
-            const SizedBox(height: 6),
-            Text('Yang', style: TextStyle(color: _userYinYang == 'Yang' ? _goldL : Colors.white.withOpacity(0.4), fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Text('Verici · Aktif\nDışa dönük · Ateşli', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-          ]),
-        )),
-      ])),
-      const SizedBox(height: 20),
-      // 5 element haritası
-      _secHead('🌊', 'Tüm Elementler'),
-      const SizedBox(height: 12),
-      ...ChineseZodiacData.elements.entries.map((e) {
-        final c = Color(e.value['color'] as int);
-        final isUser = e.key == _userElement;
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
+        ]),
+        const SizedBox(height: 16),
+        Container(height: 0.5, color: Colors.white.withOpacity(0.08)),
+        const SizedBox(height: 14),
+        // Baskın enerji
+        _fsBadge('⚡', 'Baskın enerji', fsProfile['dominant'] as String, elColor),
+        const SizedBox(height: 10),
+        _fsBadge('🌊', 'Dengeni destekleyen mekan', fsProfile['supportEnergy'] as String, const Color(0xFF4FC3F7)),
+        const SizedBox(height: 10),
+        _fsBadge('🌀', 'Seni yoran enerji', fsProfile['drainEnergy'] as String, const Color(0xFFEF9A9A)),
+        const SizedBox(height: 10),
+        _fsBadge('🔴', 'Eksik element', fsProfile['missing'] as String, const Color(0xFFFFB74D)),
+        const SizedBox(height: 14),
+        // Mini aksiyon kutusu
+        Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isUser ? c.withOpacity(0.12) : Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isUser ? c.withOpacity(0.4) : Colors.white.withOpacity(0.06)),
+            color: elColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: elColor.withOpacity(0.2), width: 0.7),
           ),
-          child: Row(children: [
-            Text(e.value['emoji'] as String, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 12),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('⚡', style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Text(e.key, style: TextStyle(color: isUser ? c : Colors.white.withOpacity(0.8), fontSize: 15, fontWeight: FontWeight.w700)),
-                if (isUser) ...[const SizedBox(width: 8), Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: c.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                  child: Text('Senin Elementin', style: TextStyle(color: c, fontSize: 9, fontWeight: FontWeight.w700)),
-                )],
-              ]),
-              Text('${e.value['season']} · ${e.value['direction']}', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+              Text('1 Dakikalık Aksiyon', style: TextStyle(
+                color: elColor.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1,
+              )),
+              const SizedBox(height: 4),
+              Text(fsProfile['miniAction'] as String, style: TextStyle(
+                color: Colors.white.withOpacity(0.75), fontSize: 13, height: 1.5,
+              )),
             ])),
           ]),
-        );
-      }),
-      const SizedBox(height: 24),
-      // ── Feng Shui (Element bölümüne entegre) ──
-      _secHead('🏡', 'Feng Shui Rehberi'),
-      const SizedBox(height: 12),
-      _fengShuiCard('🎨', 'Renk Paleti', (_animal['fengShui'] as Map<String, String>)['renk']!),
-      _fengShuiCard('🧭', 'Şanslı Yön', (_animal['fengShui'] as Map<String, String>)['yön']!),
-      _fengShuiCard('🪵', 'Malzeme', (_animal['fengShui'] as Map<String, String>)['malzeme']!),
-      const SizedBox(height: 12),
+        ),
+      ])),
+
+      const SizedBox(height: 16),
+
+      // ── MOD 2: GÜNLÜK UYUM SKORU ──
       _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _secHead('✨', 'Tasarım Tavsiyeleri'),
+        Text('BUGÜNÜN ENERJİ UYUMU', style: TextStyle(
+          color: _goldL.withOpacity(0.3), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2,
+        )),
+        const SizedBox(height: 16),
+        Row(children: [
+          // Skor yüzük
+          SizedBox(width: 80, height: 80, child: Stack(alignment: Alignment.center, children: [
+            CircularProgressIndicator(
+              value: harmonyScore / 100,
+              strokeWidth: 5,
+              backgroundColor: Colors.white.withOpacity(0.06),
+              valueColor: AlwaysStoppedAnimation(Color.lerp(const Color(0xFF4CAF50), _gold, harmonyScore / 100)!),
+              strokeCap: StrokeCap.round,
+            ),
+            Column(mainAxisSize: MainAxisSize.min, children: [
+              Text('$harmonyScore', style: const TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800,
+              )),
+              Text('/100', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9)),
+            ]),
+          ])),
+          const SizedBox(width: 20),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _scoreRow('🟢', 'Kişisel enerji', harmonyScore > 75 ? 'Yüksek' : harmonyScore > 55 ? 'Orta' : 'Düşük'),
+            const SizedBox(height: 6),
+            _scoreRow('🔵', 'Element akışı', _userElement == 'Ateş' ? 'Aktif' : _userElement == 'Su' ? 'Derin' : 'Dengeli'),
+            const SizedBox(height: 6),
+            _scoreRow(isYin ? '🌙' : '☀️', 'Yin-Yang dengesi', isYin ? 'İçe dönük' : 'Dışa açık'),
+            const SizedBox(height: 6),
+            _scoreRow('🏠', 'Mekan uyumu', fsProfile['idealSpace'] as String),
+          ])),
+        ]),
+        const SizedBox(height: 14),
+        Container(height: 0.5, color: Colors.white.withOpacity(0.08)),
         const SizedBox(height: 12),
-        Text((_animal['fengShui'] as Map<String, String>)['tavsiye']!, style: _bodyStyle()),
+        // Feng shui önerisi
+        Row(children: [
+          Text('🧭', style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(
+            'Feng Shui önerisi: ${fsProfile['baguaFocus']}',
+            style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12, height: 1.5),
+          )),
+        ]),
+      ])),
+
+      const SizedBox(height: 16),
+
+      // ── MOD 3: YIN-YANG MEKAN REÇETESİ ──
+      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 10),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${_userYinYang} Enerjisi & Mekan', style: TextStyle(
+              color: yyColor, fontSize: 15, fontWeight: FontWeight.w800,
+            )),
+            Text(yyProfile['state'] as String, style: TextStyle(
+              color: Colors.white.withOpacity(0.4), fontSize: 11,
+            )),
+          ]),
+        ]),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.amber.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.amber.withOpacity(0.15)),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('⚠️', style: const TextStyle(fontSize: 13)),
+            const SizedBox(width: 8),
+            Expanded(child: Text(yyProfile['risk'] as String, style: TextStyle(
+              color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.4,
+            ))),
+          ]),
+        ),
+        const SizedBox(height: 10),
+        _fsBadge('🏠', 'Mekan ihtiyacın', yyProfile['spaceNeed'] as String, yyColor),
+        const SizedBox(height: 8),
+        _fsBadge('✨', 'Dengelemek için', yyProfile['activate'] as String, const Color(0xFF80CBC4)),
+        const SizedBox(height: 8),
+        _fsBadge('💡', 'Işık tavsiyen', yyProfile['lightTip'] as String, const Color(0xFFFFD54F)),
+        const SizedBox(height: 8),
+        _fsBadge('🔇', 'Ses tavsiyen', yyProfile['soundTip'] as String, const Color(0xFFCE93D8)),
+        const SizedBox(height: 8),
+        _fsBadge('🗑️', 'Bu hafta çıkar', yyProfile['declutter'] as String, const Color(0xFFEF9A9A)),
+        const SizedBox(height: 8),
+        _fsBadge('🎨', 'Sana yakışan renkler', yyProfile['color'] as String, yyColor),
+      ])),
+
+      const SizedBox(height: 16),
+
+      // ── MOD 4: HEDEF BAZLI BAGUA SEÇİCİ ──
+      _BaguaGoalSelector(
+        goals: ChineseZodiacData.baguaGoals,
+        elColor: elColor,
+        goldL: _goldL,
+        gold: _gold,
+      ),
+
+      const SizedBox(height: 16),
+
+      // ── MOD 5: BURÇ BAZLI MEKAN GÜCÜ ──
+      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(animalFs['animalEmoji'] as String, style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 10),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${_animal['name']} — Mekan Profili', style: TextStyle(
+              color: _goldL.withOpacity(0.85), fontSize: 15, fontWeight: FontWeight.w800,
+            )),
+            Text('Güç Köşen: ${animalFs['powerCorner']}', style: TextStyle(
+              color: elColor.withOpacity(0.6), fontSize: 11,
+            )),
+          ])),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: elColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: elColor.withOpacity(0.2)),
+            ),
+            child: Text(animalFs['powerColor'] as String, style: TextStyle(
+              color: elColor, fontSize: 9, fontWeight: FontWeight.w700,
+            )),
+          ),
+        ]),
+        const SizedBox(height: 14),
+        Container(height: 0.5, color: Colors.white.withOpacity(0.08)),
+        const SizedBox(height: 12),
+        _fsBadge('✨', 'Senin mekan enerjin', animalFs['spaceVibe'] as String, _goldL.withOpacity(0.8)),
+        const SizedBox(height: 8),
+        _fsBadge('💼', 'Çalışma alanın', animalFs['workSpace'] as String, const Color(0xFF80CBC4)),
+        const SizedBox(height: 8),
+        _fsBadge('💕', 'İlişki köşen', animalFs['loveSpace'] as String, const Color(0xFFCE93D8)),
+        const SizedBox(height: 8),
+        _fsBadge('🌀', 'Kaçın', animalFs['avoidEnergy'] as String, const Color(0xFFEF9A9A)),
+        const SizedBox(height: 14),
+        // Haftalık görev
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [elColor.withOpacity(0.1), yyColor.withOpacity(0.06)],
+              begin: Alignment.topLeft, end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _gold.withOpacity(0.15)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('BUGÜNÜN FENG SHUİ GÖREVİ', style: TextStyle(
+              color: _goldL.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1.5,
+            )),
+            const SizedBox(height: 8),
+            Text(weeklyTask['task']!, style: TextStyle(
+              color: Colors.white.withOpacity(0.85), fontSize: 13.5, height: 1.5,
+            )),
+          ]),
+        ),
       ])),
     ]);
   }
+
+  Widget _fsBadge(String emoji, String label, String value, Color accent) => Padding(
+    padding: const EdgeInsets.only(bottom: 2),
+    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(emoji, style: const TextStyle(fontSize: 13)),
+      const SizedBox(width: 8),
+      Expanded(child: RichText(text: TextSpan(children: [
+        TextSpan(text: '$label  ', style: TextStyle(
+          color: accent.withOpacity(0.75), fontSize: 11.5, fontWeight: FontWeight.w700,
+        )),
+        TextSpan(text: value, style: TextStyle(
+          color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.5,
+        )),
+      ]))),
+    ]),
+  );
+
+  Widget _scoreRow(String emoji, String label, String value) => Row(children: [
+    Text(emoji, style: const TextStyle(fontSize: 11)),
+    const SizedBox(width: 6),
+    Text('$label: ', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+    Expanded(child: Text(value, style: TextStyle(
+      color: Colors.white.withOpacity(0.75), fontSize: 11, fontWeight: FontWeight.w600,
+    ), overflow: TextOverflow.ellipsis)),
+  ]);
+
+
 
 
 
@@ -4400,11 +4564,163 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
         ),                    // BackdropFilter end
       );                      // ClipRRect end  
   }
+}// ═══════════════════════════════════════════════════════
+// BAGUA HEDEF SEÇİCİ — StatefulWidget
+// ═══════════════════════════════════════════════════════
+class _BaguaGoalSelector extends StatefulWidget {
+  final Map<String, Map<String, String>> goals;
+  final Color elColor;
+  final Color goldL;
+  final Color gold;
+  const _BaguaGoalSelector({required this.goals, required this.elColor, required this.goldL, required this.gold});
+
+  @override
+  State<_BaguaGoalSelector> createState() => _BaguaGoalSelectorState();
 }
 
+class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
+  String _selectedGoal = 'Para';
 
+  @override
+  Widget build(BuildContext context) {
+    final goal = widget.goals[_selectedGoal]!;
+    final goalColor = _goalColor(_selectedGoal);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.07),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Başlık
+            Text('HEDEF BAZLI ALAN AKTİVASYONU', style: TextStyle(
+              color: widget.goldL.withOpacity(0.35), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2,
+            )),
+            const SizedBox(height: 4),
+            Text('Bagua Haritası', style: TextStyle(
+              color: widget.goldL.withOpacity(0.85), fontSize: 16, fontWeight: FontWeight.w800,
+            )),
+            const SizedBox(height: 14),
+            // Hedef butonları
+            Wrap(spacing: 8, runSpacing: 8, children: widget.goals.keys.map((key) {
+              final isSelected = key == _selectedGoal;
+              final g = widget.goals[key]!;
+              return GestureDetector(
+                onTap: () => setState(() => _selectedGoal = key),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? _goalColor(key).withOpacity(0.18) : Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? _goalColor(key).withOpacity(0.5) : Colors.white.withOpacity(0.08),
+                      width: isSelected ? 1 : 0.5,
+                    ),
+                  ),
+                  child: Text('${g['emoji']} $key', style: TextStyle(
+                    color: isSelected ? _goalColor(key) : Colors.white.withOpacity(0.5),
+                    fontSize: 12, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                  )),
+                ),
+              );
+            }).toList()),
+            const SizedBox(height: 18),
+            // Seçili hedef detayı
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOutCubic,
+              child: _goalDetail(goal, goalColor),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _goalDetail(Map<String, String> goal, Color color) => Container(
+    key: ValueKey(_selectedGoal),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // Bagua alanı
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Row(children: [
+          Text('🧭 ', style: const TextStyle(fontSize: 13)),
+          Expanded(child: Text(goal['bagua']!, style: TextStyle(
+            color: color, fontSize: 12, fontWeight: FontWeight.w700,
+          ))),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      _bRow('✅', 'Ekle', goal['activate']!, color),
+      const SizedBox(height: 8),
+      _bRow('❌', 'Çıkar', goal['remove']!, const Color(0xFFEF9A9A)),
+      const SizedBox(height: 8),
+      _bRow('💎', 'Renk paleti', goal['color']!, const Color(0xFFFFD54F)),
+      const SizedBox(height: 12),
+      // Pro tip
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [color.withOpacity(0.08), Colors.transparent],
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.15)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('💡', style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(goal['tip']!, style: TextStyle(
+            color: Colors.white.withOpacity(0.75), fontSize: 12.5, height: 1.5,
+          ))),
+        ]),
+      ),
+    ]),
+  );
+
+  Widget _bRow(String emoji, String label, String value, Color accent) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(emoji, style: const TextStyle(fontSize: 13)),
+      const SizedBox(width: 8),
+      Expanded(child: RichText(text: TextSpan(children: [
+        TextSpan(text: '$label  ', style: TextStyle(
+          color: accent.withOpacity(0.8), fontSize: 11.5, fontWeight: FontWeight.w700,
+        )),
+        TextSpan(text: value, style: TextStyle(
+          color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.4,
+        )),
+      ]))),
+    ],
+  );
+
+  Color _goalColor(String goal) {
+    switch (goal) {
+      case 'Para': return const Color(0xFF4CAF50);
+      case 'Aşk': return const Color(0xFFE91E63);
+      case 'Kariyer': return const Color(0xFF2196F3);
+      case 'Huzur': return const Color(0xFFFF9800);
+      case 'Sağlık': return const Color(0xFF00BCD4);
+      default: return Colors.white;
+    }
+  }
+}
 
 class _WavePainter extends CustomPainter {
+
   final Color color;
   _WavePainter({required this.color});
 

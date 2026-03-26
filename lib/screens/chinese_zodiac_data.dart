@@ -762,4 +762,261 @@ class ChineseZodiacData {
     if (monthDay >= 120 && monthDay <= 218) return 'Kova';
     return 'Balık';
   }
+
+  // ── FENG SHUİ VERİ KATMANI ──
+
+  /// Element bazlı Feng Shui profili
+  /// dominant: Bu elementin güçlü tarafı
+  /// missing: Dengesi için eksik element / alan tavsiyesi
+  /// supportEnergy: Seni destekleyen enerji tanımı
+  /// drainEnergy: Seni yoran enerji tanımı
+  /// colors: İdeal renkler (liste)
+  /// materials: İdeal malzemeler
+  /// shapes: Uygun formlar
+  /// avoid: Kaçınılacaklar
+  static const Map<String, Map<String, dynamic>> fengShuiElementProfile = {
+    'Ağaç': {
+      'dominant': 'Büyüme enerjisi — yaratıcı, vizyoner, ileri odaklı.',
+      'missing': 'Metal dengesi zayıf. Yapı ve sınır eksikliği olabilir.',
+      'supportEnergy': 'Açık ve ferah alanlar, doğal ışık, bitki örtüsü seni besler.',
+      'drainEnergy': 'Dağınık, karanlık ve sıkışık ortamlar enerjiini yavaşlatır.',
+      'miniAction': 'Masanda en az bir canlı bitki bulundur. Doğanın büyüme enerjisi sana güç verir.',
+      'colors': ['Yeşil', 'Açık mavi', 'Turkuaz', 'Bej'],
+      'materials': ['Ahşap', 'Bambu', 'Keten', 'Bitkisel lifler'],
+      'shapes': ['Dikey uzun formlar', 'İnce sütunlar', 'Dal desenleri'],
+      'avoid': 'Metal baskın dekor, fazla gri-beyaz, sert köşeli mobilyalar',
+      'baguaFocus': 'Güneydoğu (Refah) ve Doğu (Aile & Sağlık) köşelerini aktif tut.',
+      'idealSpace': 'Açık plan, yeşil dokunuşlar, pencere önü çalışma masası.',
+    },
+    'Ateş': {
+      'dominant': 'Tutku ve dönüşüm enerjisi — lider, karizmatik, hareketli.',
+      'missing': 'Su dengesi zayıf. Sakinleşme ve içe yönelme için alan gerekir.',
+      'supportEnergy': 'Güneye bakan alanlar, sıcak tonlar, hareket ve ritim seni güçlendirir.',
+      'drainEnergy': 'Kaotik, soğuk ve akışsız ortamlar tüketir. Fazla stimülasyon sinir eder.',
+      'miniAction': 'Ortamında bir mum veya sıcak lamba yak; sembolik ateş enerjisi ilham verir.',
+      'colors': ['Kırmızı', 'Turuncu', 'Mor', 'Pembe', 'Altın'],
+      'materials': ['Deri', 'Yün', 'Kristal', 'Aydınlatma öğeleri'],
+      'shapes': ['Yıldız', 'Üçgen', 'Sivri tepe formları'],
+      'avoid': 'Çok fazla mavi/siyah, ağır perdeler, ayna karşı ayna',
+      'baguaFocus': 'Güney (Şöhret & Tanınma) köşesi senin için en güçlü alan.',
+      'idealSpace': 'Sıcak aydınlatma, canlı renk vurguları, sergi alanı.',
+    },
+    'Toprak': {
+      'dominant': 'İstikrar ve besleyicilik enerjisi — güvenilir, dengeli, merkezi.',
+      'missing': 'Ağaç enerjisi zayıf. Büyüme ve yenilik için akış gerekir.',
+      'supportEnergy': 'Merkezi ve simetrik alanlar, toprak tonları, sağlam zeminler seni destekler.',
+      'drainEnergy': 'Sürekli değişen, belirsiz ve kaotik ortamlar güvensizlik hissi yaratır.',
+      'miniAction': 'Kristal veya taş bir nesne masana veya merkezi alana koy. Toprak enerjisini çıpalamak için.',
+      'colors': ['Kahve', 'Sarı', 'Bal rengi', 'Açık kiremit', 'Krem'],
+      'materials': ['Taş', 'Seramik', 'Toprak kaplar', 'Ağır kumaşlar'],
+      'shapes': ['Kare', 'Dikdörtgen', 'Yatay formlar'],
+      'avoid': 'Çok fazla su elementi (akvaryum, büyük ayna), sürekli değişen dekor',
+      'baguaFocus': 'Merkez (Sağlık) ve Kuzeydoğu (Bilgi) alanları seni besler.',
+      'idealSpace': 'Simetrik yerleşim, sıcak zemin, istikrarlı mobilya düzeni.',
+    },
+    'Metal': {
+      'dominant': 'Berraklık ve hassasiyet enerjisi — analitik, organize, net.',
+      'missing': 'Ateş enerjisi zayıf. Yaratıcılık ve sıcaklık için renk gerekir.',
+      'supportEnergy': 'Temiz, minimal ve düzenli alanlar zihni açar ve odaklar.',
+      'drainEnergy': 'Dağınık, kirli ve gürültülü ortamlar kararlarını bulanıklaştırır.',
+      'miniAction': 'Çalışma alanını tamamen sadeleştir. Her gereksiz eşyayı kaldır; zihin netliği için boşluk şart.',
+      'colors': ['Beyaz', 'Gri', 'Gümüş', 'Krem', 'Açık altın'],
+      'materials': ['Metal', 'Paslanmaz çelik', 'Krom', 'Beyaz mermer'],
+      'shapes': ['Daire', 'Oval', 'Yuvarlak kenarlar', 'Simetri'],
+      'avoid': 'Keskin kırmızı vurgular, kaotik desen, fazla organik form',
+      'baguaFocus': 'Batı (Yaratıcılık & Çocuklar) ve Kuzeybatı (Destekçiler) senin güç bölgelerin.',
+      'idealSpace': 'Minimalist, beyaz baskın, net çizgiler, az eşya.',
+    },
+    'Su': {
+      'dominant': 'Akış ve bilgelik enerjisi — derin, sezgisel, gizemli.',
+      'missing': 'Toprak enerjisi zayıf. Çıpalama ve güvenlik hissi eksik olabilir.',
+      'supportEnergy': 'Akışkan, esnek ve huzurlu alanlar seni besler. Sessizlik güç kaynağın.',
+      'drainEnergy': 'Kalabalık, gürültülü ve sınında koşturanlar enerjiini bitirir.',
+      'miniAction': 'Küçük bir çeşme, akvaryum veya su sesi çıkaran bir nesne ortamına ekle.',
+      'colors': ['Siyah', 'Lacivert', 'Koyu mor', 'Antrasit', 'Koyu mavi'],
+      'materials': ['Cam', 'Ayna', 'Su öğeleri', 'Parlak yüzeyler'],
+      'shapes': ['Dalgalı', 'Asimetrik', 'Serbest form', 'Akim formları'],
+      'avoid': 'Çok fazla toprak tonu, ağır taş objeler, aşırı düz çizgiler',
+      'baguaFocus': 'Kuzey (Kariyer & Yaşam Yolu) köşesi senin için en güçlü alandır.',
+      'idealSpace': 'Sakin, karanlık vurgular, yumuşak ışık, akıcı tekstiller.',
+    },
+  };
+
+  /// Yin/Yang bazlı mekan önerileri
+  static const Map<String, Map<String, dynamic>> fengShuiYinYang = {
+    'Yin': {
+      'state': 'İçe dönük · Sezgisel · Sakin',
+      'risk': 'Çok fazla Yin: içe kapanma, atalet, dinginliğin durağanlığa dönüşmesi.',
+      'spaceNeed': 'Sessiz köşeler, yumuşak ışık, doğal dokular ve dinlendirici renkler.',
+      'activate': 'Biraz Yang enerji eklemek için pencere aç, aydınlatmayı artır, renk vurgusu ekle.',
+      'lightTip': 'Sabah gün ışığını içeri al — perde açmak bile enerjiyi canlandırır.',
+      'soundTip': 'Hafif müzik veya doğa sesi çal; sessizliği kır ama çok gürültü yaratma.',
+      'declutter': 'Yatak odasındaki gereksiz eşyaları kaldır — Yin dinlenme alanı saf kalmalı.',
+      'color': 'Pastel tonlar, gümüş, açık mavi, lavanta.',
+      'weekly': [
+        'Girişinizi temizle ve aydınlat — enerji buradan girer.',
+        'Oturma alanına bir sıcak ışık kaynağı ekle.',
+        'Çalışma masandaki gereksiz kâğıtları topla.',
+        'Kuzey yönündeki köşenizi aktif tut — kariyer enerjisi.',
+        'Bir bitki ya da çiçek seç, canlı element ekle.',
+        'Eski/kullanılmayan eşyayı çıkar — enerji akışını aç.',
+        'Pencereleri temizle — netlik enerjisi gelsin.',
+      ],
+    },
+    'Yang': {
+      'state': 'Dışa dönük · Aktif · Enerjik',
+      'risk': 'Çok fazla Yang: tükenmişlik, sabırsızlık, kaos ve dağılma riski.',
+      'spaceNeed': 'Düzenli, sadeleştirilmiş alanlar; rahatlama köşesi; sessizlik adaları.',
+      'activate': 'Biraz Yin enerji eklemek için tonları koyulaştır, ses yalıtımı ekle, akış köşesi yarat.',
+      'lightTip': 'Akşam mavi ışıktan kaç; ambar ve sarı tonda ışık sinir sistemini sakinleştirir.',
+      'soundTip': 'Gün içinde en az 10 dakika tam sessizlikte otur; zihni yavaşlatır.',
+      'declutter': 'Girişini ve çalışma masanı sadeleştir — Yang insanlar bu alanlarda kaotik olur.',
+      'color': 'Koyu, toprak tonları, lacivert, derin yeşil.',
+      'weekly': [
+        'Çalışma masasını komple sadeleştir — sadece bugünün işi kalsın.',
+        'Yatak odasına elektronik sokma veya uzak tut.',
+        'Batı köşene (Yaratıcılık) küçük bir obje koy.',
+        'Zararlı "enerji sızdıran" dağınıklığı temizle.',
+        'Bir oturma köşesi belirle ve yalnızca dinlenmeye ayır.',
+        'Güney yönünü aktif tut — görünürlük ve başarı.',
+        'Akşam ortamını koyulaştır, geçiş ritüeli yarat.',
+      ],
+    },
+  };
+
+  /// Hedef bazlı Bagua önerileri
+  /// Kullanıcı hedef seçer → hangi köşe, ne koyulur, ne uzaklaştırılır
+  static const Map<String, Map<String, String>> baguaGoals = {
+    'Para': {
+      'emoji': '💰',
+      'bagua': 'Güneydoğu — Zenginlik & Bolluk',
+      'activate': 'Canlı bitki, mor veya mor tonlu kristal, akan su sembolü.',
+      'remove': 'Bozuk eşya, tıkayan mobilya, boş kaplar.',
+      'tip': 'Bu köşeye sağlıklı bir bitki koy. Büyüyen bitki büyüyen refahı simgeler.',
+      'color': 'Mor · Yeşil · Altın',
+    },
+    'Aşk': {
+      'emoji': '💕',
+      'bagua': 'Güneybatı — İlişkiler & Aşk',
+      'activate': 'Çift objeler (iki mum, iki taş), pembe veya kırmızı kristal, çifti simgeye şeyler.',
+      'remove': 'Yalnızlık hissettiren objeler, kırık veya tek kalan öğeler.',
+      'tip': 'Pembe kuvars kristali bu köşeye koy. Kalp enerjisini çeker.',
+      'color': 'Pembe · Kırmızı · Beyaz',
+    },
+    'Kariyer': {
+      'emoji': '💼',
+      'bagua': 'Kuzey — Kariyer & Yaşam Yolu',
+      'activate': 'Su elementi (küçük çeşme, ayna), siyah veya lacivert vurgular.',
+      'remove': 'Durgun su izlenimi, tıkayan mobilya, eski iş eşyaları.',
+      'tip': 'Kuzey yönündeki masanda bir ayna veya cam obje bulundur.',
+      'color': 'Siyah · Lacivert · Gri',
+    },
+    'Huzur': {
+      'emoji': '☮️',
+      'bagua': 'Merkez — Sağlık & Denge',
+      'activate': 'Sarı veya bej objeler, kristaller, simetrik yerleşim.',
+      'remove': 'Dağınıklık, akımı kesen mobilyalar, karanlık köşeler.',
+      'tip': 'Evin merkezini temiz ve açık tut. Enerji oradan tüm odalara dağılır.',
+      'color': 'Sarı · Bej · Kahve',
+    },
+    'Sağlık': {
+      'emoji': '🌿',
+      'bagua': 'Doğu — Aile & Sağlık',
+      'activate': 'Canlı bitkiler, ahşap dokunuşlar, yeşil tonlar.',
+      'remove': 'Ölü bitkiler, soluk çiçekler, kırık eşyalar.',
+      'tip': 'Doğu yönüne sağlıklı bir bitki koy. Karaciğer enerjisini destekler.',
+      'color': 'Yeşil · Açık mavi · Bej',
+    },
+  };
+
+  /// Hayvan burç bazlı Feng Shui güç profili
+  static const List<Map<String, dynamic>> animalFengShui = [
+    // 0 - Sıçan
+    {'animalEmoji': '🐀', 'supportEl': 'Su', 'avoidEnergy': 'Aşırı toprak ve ağır kütle',
+     'spaceVibe': 'Zeki ve çevik enerjin için esnek, çok fonksiyonlu alanlar idealdir.',
+     'workSpace': 'Gizli köşe, araştırma masası, kuzey yönü güçlü.',
+     'loveSpace': 'Yumuşak ışık, akıcı tekstil, yakın oturma düzeni.',
+     'powerCorner': 'Kuzey', 'powerColor': 'Lacivert · Gri · Gümüş'},
+    // 1 - Öküz
+    {'animalEmoji': '🐂', 'supportEl': 'Toprak', 'avoidEnergy': 'Kaos ve düzensizlik',
+     'spaceVibe': 'İstikrarlı ve sağlam enerji için simetrik, düzenli mekanlar idealdır.',
+     'workSpace': 'Sağlam masa, düzenli raf, güneydoğu çalışma açısı.',
+     'loveSpace': 'Sıcak, samimi ve konforlu bir köşe. Masif ahşap mobilya.',
+     'powerCorner': 'Kuzeydoğu', 'powerColor': 'Kahve · Sarı · Bej'},
+    // 2 - Kaplan
+    {'animalEmoji': '🐯', 'supportEl': 'Ağaç', 'avoidEnergy': 'Kapalı ve kısıtlayıcı alanlar',
+     'spaceVibe': 'Enerjik ve iddialı doğan için açık alan, yüksek tavan, güçlü aydınlatma.',
+     'workSpace': 'Büyük masa, doğuya bakan açı, cesur renk vurguları.',
+     'loveSpace': 'Sıcak ve çekici, mum ışığı, kahverengi-kırmızı tonlar.',
+     'powerCorner': 'Doğu', 'powerColor': 'Yeşil · Siyah · Lacivert'},
+    // 3 - Tavşan
+    {'animalEmoji': '🐰', 'supportEl': 'Ağaç', 'avoidEnergy': 'Sert, gürültülü ve kaba enerji',
+     'spaceVibe': 'Hassas ve estetik ruhun için yumuşak, huzurlu ve güzel bir ortam şart.',
+     'workSpace': 'Estetik, düzenli, hafif yeşil dokunuşlu, sessiz köşe.',
+     'loveSpace': 'Çiçek, yumuşak tekstil, pastel tonlar, güneybatı köşesi.',
+     'powerCorner': 'Doğu', 'powerColor': 'Yeşil · Pembe · Bej'},
+    // 4 - Ejderha
+    {'animalEmoji': '🐉', 'supportEl': 'Ağaç & Ateş', 'avoidEnergy': 'Küçük ve sıkışık alanlar',
+     'spaceVibe': 'Güçlü ve karizmatik enerjin için büyük formlar, lider estetiği.',
+     'workSpace': 'İddialı masa, yüksek koltuk, güney yönü, siyah-altın kombinasyonu.',
+     'loveSpace': 'Dramatik, koyulaştırılmış tablo, derin renk, güçlü ambiyans.',
+     'powerCorner': 'Güneydoğu', 'powerColor': 'Altın · Kırmızı · Yeşil'},
+    // 5 - Yılan
+    {'animalEmoji': '🐍', 'supportEl': 'Ateş', 'avoidEnergy': 'Dağınık ve gürültülü ortamlar',
+     'spaceVibe': 'Derin ve gizemli enerjin için minimal, sofistike, özenle seçilmiş objeler.',
+     'workSpace': 'Sezgi masası, özenle seçilmiş obje, güney-batı arası.',
+     'loveSpace': 'Aydınlatma sanatı, örtük çekicilik, koyu kırmızı vurgular.',
+     'powerCorner': 'Güney', 'powerColor': 'Kırmızı · Turuncu · Sarı'},
+    // 6 - At
+    {'animalEmoji': '🐴', 'supportEl': 'Ateş', 'avoidEnergy': 'Kısıtlayan ve dar mekanlar',
+     'spaceVibe': 'Özgür ve enerjik ruhun için açık, aydınlık, hareket alanı olan mekanlar.',
+     'workSpace': 'Ayakta çalışma seçeneği, açık alan, koşu izni olan düzen.',
+     'loveSpace': 'Neşeli, sıcak, hareketli bir köşe. Turuncu-pembe dokunuşlar.',
+     'powerCorner': 'Güney', 'powerColor': 'Kırmızı · Turuncu · Sarı'},
+    // 7 - Keçi
+    {'animalEmoji': '🐐', 'supportEl': 'Toprak', 'avoidEnergy': 'Yalnız ve soğuk alanlar',
+     'spaceVibe': 'Yaratıcı ve hassas enerjin için estetik, sanatsal ve huzurlu mekanlar.',
+     'workSpace': 'Sanat köşesi, yumuşak ışık, toprak tonlu yaratıcı masa.',
+     'loveSpace': 'Romantik, çiçekli, yumuşak halı, güneybatı köşe.',
+     'powerCorner': 'Güneybatı', 'powerColor': 'Sarı · Kahve · Pembe'},
+    // 8 - Maymun
+    {'animalEmoji': '🐒', 'supportEl': 'Metal', 'avoidEnergy': 'Monoton ve hareketsiz alanlar',
+     'spaceVibe': 'Zeki ve dinamik enerjin için çok katmanlı, ilginç ve çeşitli mekanlar.',
+     'workSpace': 'Araçları el altında, beyaz tahta ya da not alanı, batı yönü.',
+     'loveSpace': 'Eğlenceli, renkli, sürpriz bir köşe. Oyunbaz ama şık.',
+     'powerCorner': 'Batı', 'powerColor': 'Beyaz · Gümüş · Mavi'},
+    // 9 - Horoz
+    {'animalEmoji': '🐓', 'supportEl': 'Metal', 'avoidEnergy': 'Düzensiz ve dağınık alanlar',
+     'spaceVibe': 'Mükemmeliyetçi enerjin için her şeyin yerli yerinde olduğu düzenli mekanlar.',
+     'workSpace': 'Simetrik masa, organize raf, batı yönü, gümüş vurgular.',
+     'loveSpace': 'Temiz, zarif, sade ama etkileyici köşe.',
+     'powerCorner': 'Batı', 'powerColor': 'Beyaz · Altın · Gümüş'},
+    // 10 - Köpek
+    {'animalEmoji': '🐕', 'supportEl': 'Toprak', 'avoidEnergy': 'Güvensiz ve değişken alanlar',
+     'spaceVibe': 'Sadık ve güvenilir enerjin için sıcak, tutarlı ve güvenli mekanlar.',
+     'workSpace': 'İstikrarlı, sıcak aydınlatmalı, güvenilir malzeme seçimi.',
+     'loveSpace': 'Samimi ve sıcak; köy sadeliği, kahve tonları, birlikte köşesi.',
+     'powerCorner': 'Kuzeybatı', 'powerColor': 'Kahve · Toprak · Sarı'},
+    // 11 - Domuz
+    {'animalEmoji': '🐷', 'supportEl': 'Su', 'avoidEnergy': 'Sert ve agresif objeler',
+     'spaceVibe': 'Neşeli ve cömert enerjin için hoş, konforlu ve davetkar mekanlar.',
+     'workSpace': 'Konforlu ve iyi aydınlatılmış, sizi mutlu eden obje seçimi.',
+     'loveSpace': 'Güzel, romantik, lüks dokunuşlar — pembe veya koyu kırmızı.',
+     'powerCorner': 'Kuzey', 'powerColor': 'Lacivert · Gri · Sarı'},
+  ];
+
+  /// Haftalık feng shui görevi — element bazlı (7 görev)
+  static Map<String, String> weeklyFengShuiTask(String element, String yinYang) {
+    final tasks = fengShuiElementProfile[element]!;
+    final yyTasks = fengShuiYinYang[yinYang]!;
+    final today = DateTime.now();
+    final dayIdx = today.weekday - 1; // 0-6
+    final allTasks = (yyTasks['weekly'] as List<String>);
+    return {
+      'task': allTasks[dayIdx % allTasks.length],
+      'area': (tasks['baguaFocus'] as String).split(' ')[0],
+      'color': (tasks['colors'] as List<String>).first,
+    };
+  }
 }
+
