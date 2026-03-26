@@ -4980,68 +4980,65 @@ class _EnergyCardIconPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    final cx = w / 2;
+    final cy = h / 2;
     final p = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
+      ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
     switch (iconType) {
-      case 'dominant': // Şimşek — güç ve baskınlık
-        final bolt = Path();
-        bolt.moveTo(w * 0.6, h * 0.05);
-        bolt.lineTo(w * 0.3, h * 0.5);
-        bolt.lineTo(w * 0.52, h * 0.5);
-        bolt.lineTo(w * 0.4, h * 0.95);
-        bolt.lineTo(w * 0.7, h * 0.45);
-        bolt.lineTo(w * 0.48, h * 0.45);
-        bolt.close();
-        canvas.drawPath(bolt, p);
+      case 'dominant': // ☀ Radiant Sun — güç odak noktası, baskın enerji
+        // İç daire
+        canvas.drawCircle(Offset(cx, cy), w * 0.22, p);
+        // 8 ışın çizgisi
+        for (int i = 0; i < 8; i++) {
+          final angle = (i * 3.14159 * 2 / 8);
+          final x1 = cx + w * 0.30 * cos(angle);
+          final y1 = cy + h * 0.30 * sin(angle);
+          final x2 = cx + w * 0.44 * cos(angle);
+          final y2 = cy + h * 0.44 * sin(angle);
+          canvas.drawLine(Offset(x1, y1), Offset(x2, y2), p..strokeWidth = 1.4);
+        }
         break;
-      case 'support': // Yaprak — destek ve büyüme
-        final stem = Path();
-        stem.moveTo(w * 0.5, h * 0.9);
-        stem.quadraticBezierTo(w * 0.5, h * 0.6, w * 0.5, h * 0.45);
-        canvas.drawPath(stem, p);
 
-        final leaf = Path();
-        leaf.moveTo(w * 0.5, h * 0.45);
-        leaf.cubicTo(w * 0.75, h * 0.4, w * 0.8, h * 0.15, w * 0.5, h * 0.1);
-        leaf.cubicTo(w * 0.2, h * 0.15, w * 0.25, h * 0.4, w * 0.5, h * 0.45);
-        canvas.drawPath(leaf, p);
-
-        // Damar
-        final vein = Path();
-        vein.moveTo(w * 0.5, h * 0.45);
-        vein.quadraticBezierTo(w * 0.6, h * 0.28, w * 0.62, h * 0.12);
-        canvas.drawPath(vein, p..strokeWidth = 1.0);
+      case 'support': // ≈ Triple Water Wave — akan enerji, destek
+        // 3 paralel dalga çizgisi (yukarıdan aşağıya azalan opaklık)
+        for (int i = 0; i < 3; i++) {
+          final yBase = h * (0.25 + i * 0.25);
+          final wave = Path();
+          wave.moveTo(w * 0.1, yBase);
+          wave.cubicTo(w * 0.3, yBase - h * 0.08, w * 0.5, yBase + h * 0.08, w * 0.7, yBase - h * 0.05);
+          wave.cubicTo(w * 0.82, yBase - h * 0.1, w * 0.92, yBase + h * 0.04, w * 0.92, yBase);
+          canvas.drawPath(wave, p..strokeWidth = (1.8 - i * 0.3)..color = color.withOpacity(1.0 - i * 0.2));
+        }
         break;
-      case 'drain': // Aşağı ok + dalgalar — enerji akışı / tükenme
-        // Merkez dikey ok
-        canvas.drawLine(Offset(w * 0.5, h * 0.1), Offset(w * 0.5, h * 0.72), p..strokeWidth = 1.8);
-        // Ok ucu
-        final arrow = Path();
-        arrow.moveTo(w * 0.5, h * 0.9);
-        arrow.lineTo(w * 0.3, h * 0.65);
-        arrow.moveTo(w * 0.5, h * 0.9);
-        arrow.lineTo(w * 0.7, h * 0.65);
-        canvas.drawPath(arrow, p);
-        // Üstte enerji dalgaları
-        final w1 = Path();
-        w1.moveTo(w * 0.2, h * 0.2);
-        w1.quadraticBezierTo(w * 0.3, h * 0.12, w * 0.4, h * 0.2);
-        canvas.drawPath(w1, p..strokeWidth = 1.2);
-        final w2 = Path();
-        w2.moveTo(w * 0.6, h * 0.2);
-        w2.quadraticBezierTo(w * 0.7, h * 0.12, w * 0.8, h * 0.2);
-        canvas.drawPath(w2, p);
+
+      case 'drain': // ◌ Two clashing arcs — çatışan enerji, tükeniş
+        // Üst yay (sağa açık)
+        final topArc = Path();
+        topArc.addArc(Rect.fromCenter(center: Offset(cx, cy - h * 0.12), width: w * 0.55, height: h * 0.55), 
+          3.14159 * 0.15, 3.14159 * 1.7);
+        canvas.drawPath(topArc, p..color = color);
+        // Alt yay (sola açık, ters)
+        final botArc = Path();
+        botArc.addArc(Rect.fromCenter(center: Offset(cx, cy + h * 0.12), width: w * 0.55, height: h * 0.55), 
+          3.14159 * 1.15, 3.14159 * 1.7);
+        canvas.drawPath(botArc, p..color = color.withOpacity(0.55));
+        // Ortada çatışma noktası
+        canvas.drawCircle(Offset(cx, cy), 2, Paint()..color = color..style = PaintingStyle.fill);
         break;
     }
   }
 
+  double cos(double a) => math.cos(a);
+  double sin(double a) => math.sin(a);
+
   @override bool shouldRepaint(_EnergyCardIconPainter o) => o.iconType != iconType || o.color != color;
 }
+
 
 class _EnergyBridgePainter extends CustomPainter {
   final Color elColor;
