@@ -4964,7 +4964,7 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
 // ─────────────────────────────────────────────────────
 // ENERGY BRIDGE PAINTER — İkonları Bağlayan Enerji Akışı
 // ─────────────────────────────────────────────────────
-// ── Enerji Kartı Özel İkon Painter ──────────────────────────────
+// ── Enerji Kartı Özel İkon Painter (Bagua Trigram çizgisel) ──────
 class _EnergyCardIconPainter extends CustomPainter {
   final String iconType;
   final Color color;
@@ -4974,65 +4974,56 @@ class _EnergyCardIconPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final cx = w / 2;
-    final cy = h / 2;
     final p = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    // Bagua trigram çizgi yardımcısı
+    // solid=true → tam çizgi; solid=false → iki kırık çizgi (ortası boş)
+    void trigramLine(double y, bool solid) {
+      if (solid) {
+        // TAM ÇİZGİ — Yang
+        canvas.drawLine(Offset(w * 0.12, y), Offset(w * 0.88, y), p);
+      } else {
+        // KIRIIK ÇİZGİ — Yin (iki parça, ortası boş)
+        canvas.drawLine(Offset(w * 0.12, y), Offset(w * 0.42, y), p);
+        canvas.drawLine(Offset(w * 0.58, y), Offset(w * 0.88, y), p);
+      }
+    }
+
+    // Trigram çizgi aralıkları: üst/orta/alt
+    final y1 = h * 0.22; // Üst çizgi
+    final y2 = h * 0.50; // Orta çizgi
+    final y3 = h * 0.78; // Alt çizgi
 
     switch (iconType) {
-      case 'dominant': // ☀ Radiant Sun — güç odak noktası, baskın enerji
-        // İç daire
-        canvas.drawCircle(Offset(cx, cy), w * 0.22, p);
-        // 8 ışın çizgisi
-        for (int i = 0; i < 8; i++) {
-          final angle = (i * 3.14159 * 2 / 8);
-          final x1 = cx + w * 0.30 * cos(angle);
-          final y1 = cy + h * 0.30 * sin(angle);
-          final x2 = cx + w * 0.44 * cos(angle);
-          final y2 = cy + h * 0.44 * sin(angle);
-          canvas.drawLine(Offset(x1, y1), Offset(x2, y2), p..strokeWidth = 1.4);
-        }
+      case 'dominant':
+        // ☰ Qian — GÖK (üç tam çizgi = maksimum Yang, baskın güç)
+        trigramLine(y1, true);
+        trigramLine(y2, true);
+        trigramLine(y3, true);
         break;
 
-      case 'support': // ≈ Triple Water Wave — akan enerji, destek
-        // 3 paralel dalga çizgisi (yukarıdan aşağıya azalan opaklık)
-        for (int i = 0; i < 3; i++) {
-          final yBase = h * (0.25 + i * 0.25);
-          final wave = Path();
-          wave.moveTo(w * 0.1, yBase);
-          wave.cubicTo(w * 0.3, yBase - h * 0.08, w * 0.5, yBase + h * 0.08, w * 0.7, yBase - h * 0.05);
-          wave.cubicTo(w * 0.82, yBase - h * 0.1, w * 0.92, yBase + h * 0.04, w * 0.92, yBase);
-          canvas.drawPath(wave, p..strokeWidth = (1.8 - i * 0.3)..color = color.withOpacity(1.0 - i * 0.2));
-        }
+      case 'support':
+        // ☴ Xun — RÜZGAR (alt kırık, üst iki tam = destekleyici, nüfuz eden)
+        trigramLine(y1, true);
+        trigramLine(y2, true);
+        trigramLine(y3, false);
         break;
 
-      case 'drain': // ◌ Two clashing arcs — çatışan enerji, tükeniş
-        // Üst yay (sağa açık)
-        final topArc = Path();
-        topArc.addArc(Rect.fromCenter(center: Offset(cx, cy - h * 0.12), width: w * 0.55, height: h * 0.55), 
-          3.14159 * 0.15, 3.14159 * 1.7);
-        canvas.drawPath(topArc, p..color = color);
-        // Alt yay (sola açık, ters)
-        final botArc = Path();
-        botArc.addArc(Rect.fromCenter(center: Offset(cx, cy + h * 0.12), width: w * 0.55, height: h * 0.55), 
-          3.14159 * 1.15, 3.14159 * 1.7);
-        canvas.drawPath(botArc, p..color = color.withOpacity(0.55));
-        // Ortada çatışma noktası
-        canvas.drawCircle(Offset(cx, cy), 2, Paint()..color = color..style = PaintingStyle.fill);
+      case 'drain':
+        // ☷ Kun — TOPRAK (üç kırık çizgi = alıcı, absorbe eden, tüketen)
+        trigramLine(y1, false);
+        trigramLine(y2, false);
+        trigramLine(y3, false);
         break;
     }
   }
 
-  double cos(double a) => math.cos(a);
-  double sin(double a) => math.sin(a);
-
   @override bool shouldRepaint(_EnergyCardIconPainter o) => o.iconType != iconType || o.color != color;
 }
-
 
 class _EnergyBridgePainter extends CustomPainter {
   final Color elColor;
