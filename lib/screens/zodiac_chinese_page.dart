@@ -5078,88 +5078,67 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Kullanıcının attığı tribal/parçalı, hatları akışkan Ateş referansı
-        final fp = Paint()..color = color..style = PaintingStyle.fill;
+        // "Altı birleşik, ince, dalgalı (S-kavisli) ve elit çizgiler" tabanlı tasarım
+        final pLine = p
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = color;
+
+        // Bütün alev dilleri tabanda BİRLEŞECEK (w: 0.5, h: 0.88 merkezi noktasından uzanacak)
+
+        // Alt taban birleştirme dalgası (dalların dibini toplayan bir zemin düğümü)
+        final baseKnot = Path();
+        baseKnot.moveTo(w * 0.38, h * 0.85);
+        baseKnot.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.62, h * 0.85);
+        canvas.drawPath(baseKnot, pLine..strokeWidth = 2.4);
+
+        // 1. ANA TEPE DILI (Güçlü S-Kavisi, Sağa doğru dalgalanıyor)
+        final mainF = Path();
+        mainF.moveTo(w * 0.5, h * 0.9); // Ortak birleşik taban
+        // Sola doğru daralıp sağa kırılan dalga
+        mainF.cubicTo(w * 0.35, h * 0.6, w * 0.75, h * 0.3, w * 0.58, h * 0.1);
+        canvas.drawPath(mainF, pLine..strokeWidth = 2.4);
+
+        // 2. SOL BÜYÜK YAN DALGA (Sola doğru kıvrılıp içe dalgalanıyor)
+        final leftF = Path();
+        leftF.moveTo(w * 0.46, h * 0.9); // Ortak taban bölgesinden çıkış
+        leftF.cubicTo(w * 0.15, h * 0.7, w * 0.35, h * 0.45, w * 0.22, h * 0.35);
+        canvas.drawPath(leftF, pLine..strokeWidth = 1.8);
+
+        // 3. SAĞ BÜYÜK YAN DALGA (Sağa doğru kıvrılıp içe dalgalanıyor)
+        final rightF = Path();
+        rightF.moveTo(w * 0.54, h * 0.9); // Ortak taban bölgesinden çıkış
+        rightF.cubicTo(w * 0.85, h * 0.7, w * 0.65, h * 0.45, w * 0.78, h * 0.35);
+        canvas.drawPath(rightF, pLine..strokeWidth = 1.8);
+
+        // 4. İÇ SOL DALGA (Alevi zenginleştiren, çok ince S-kavisi)
+        final iLeftF = Path();
+        iLeftF.moveTo(w * 0.48, h * 0.9);
+        iLeftF.cubicTo(w * 0.35, h * 0.75, w * 0.5, h * 0.6, w * 0.4, h * 0.45);
+        canvas.drawPath(iLeftF, pLine..strokeWidth = 1.4);
+
+        // 5. İÇ SAĞ DALGA (Alevi zenginleştiren, çok ince S-kavisi)
+        final iRightF = Path();
+        iRightF.moveTo(w * 0.52, h * 0.9);
+        iRightF.cubicTo(w * 0.65, h * 0.75, w * 0.5, h * 0.6, w * 0.6, h * 0.45);
+        canvas.drawPath(iRightF, pLine..strokeWidth = 1.4);
+
+        // 6. KIVILCIM DETAYLARI (Dalgalı formu destekleyen bağımsız elit dokunuşlar)
+        final sparkL = Path();
+        sparkL.moveTo(w * 0.28, h * 0.28);
+        sparkL.quadraticBezierTo(w * 0.3, h * 0.25, w * 0.35, h * 0.28);
+        canvas.drawPath(sparkL, pLine..strokeWidth = 1.2);
+
+        final sparkR = Path();
+        sparkR.moveTo(w * 0.72, h * 0.28);
+        sparkR.quadraticBezierTo(w * 0.7, h * 0.25, w * 0.65, h * 0.28);
+        canvas.drawPath(sparkR, pLine..strokeWidth = 1.2);
         
-        // Tribal ateş dilleri için fırça (Crescent/Hilal veya damla üretir)
-        // sx,sy   : Keskin alt uç
-        // c1x,c1y : Kalınlığı sağlayan dış kavis (göbek)
-        // ex,ey   : Keskin tepe uç
-        // c2x,c2y : İç kavis
-        void wisp(double sx, double sy, double c1x, double c1y, double ex, double ey, double c2x, double c2y) {
-          final p = Path();
-          p.moveTo(sx, sy);
-          p.quadraticBezierTo(c1x, c1y, ex, ey);
-          p.quadraticBezierTo(c2x, c2y, sx, sy);
-          canvas.drawPath(p, fp);
-        }
-
-        // 1. ANA MERKEZ ALEV (Ortasında negatif alan olan, sağa dönük ikonik ana parça)
-        // Sol kalın kolu
-        wisp(w * 0.45, h * 0.8, 
-             w * 0.35, h * 0.45, 
-             w * 0.55, h * 0.18, 
-             w * 0.48, h * 0.45);
-        // Sağ ince kolu (kapanıp deliği oluşturur)
-        wisp(w * 0.55, h * 0.75, 
-             w * 0.65, h * 0.45, 
-             w * 0.55, h * 0.18, 
-             w * 0.52, h * 0.45);
-
-        // 2. SOL BÜYÜK YAN ALEV (Sola dönük, ortası delik)
-        wisp(w * 0.35, h * 0.82, 
-             w * 0.15, h * 0.6, 
-             w * 0.3, h * 0.35, 
-             w * 0.28, h * 0.55); // Sol dış kol
-        wisp(w * 0.4, h * 0.85, 
-             w * 0.38, h * 0.55, 
-             w * 0.3, h * 0.35, 
-             w * 0.32, h * 0.55); // İç kol
-
-        // 3. SAĞ BÜYÜK YAN ALEV (Sağa dönük, ortası delik)
-        wisp(w * 0.65, h * 0.82, 
-             w * 0.85, h * 0.6, 
-             w * 0.7, h * 0.35, 
-             w * 0.72, h * 0.55); // Sağ dış kol
-        wisp(w * 0.6, h * 0.85, 
-             w * 0.62, h * 0.55, 
-             w * 0.7, h * 0.35, 
-             w * 0.68, h * 0.55); // İç kol
-
-        // 4. MİNİK SERBEST ALEVLER / KIVILCIMLAR (Tribal hissiyat)
-        // En sol dış alt sıçrama
-        wisp(w * 0.2, h * 0.8, 
-             w * 0.12, h * 0.65, 
-             w * 0.2, h * 0.55, 
-             w * 0.22, h * 0.65);
-        
-        // En sağ dış alt sıçrama
-        wisp(w * 0.8, h * 0.8, 
-             w * 0.88, h * 0.65, 
-             w * 0.8, h * 0.55, 
-             w * 0.78, h * 0.65);
-             
-        // Alt zemin merkezi bağlayıcı küçük detaylar
-        wisp(w * 0.42, h * 0.88, 
-             w * 0.4, h * 0.78, 
-             w * 0.48, h * 0.68, 
-             w * 0.45, h * 0.8);
-
-        wisp(w * 0.58, h * 0.88, 
-             w * 0.6, h * 0.78, 
-             w * 0.52, h * 0.68, 
-             w * 0.55, h * 0.8);
-
-        // Uçuşan bağımsız tribal kıvılcımlar (Üst boşluklarda)
-        wisp(w * 0.6, h * 0.15, 
-             w * 0.65, h * 0.1, 
-             w * 0.6, h * 0.05, 
-             w * 0.58, h * 0.1);
-             
-        wisp(w * 0.35, h * 0.25, 
-             w * 0.3, h * 0.2, 
-             w * 0.35, h * 0.15, 
-             w * 0.38, h * 0.2);
+        final sparkTop = Path();
+        sparkTop.moveTo(w * 0.54, h * 0.04);
+        sparkTop.quadraticBezierTo(w * 0.56, h * 0.03, w * 0.58, h * 0.06);
+        canvas.drawPath(sparkTop, pLine..strokeWidth = 1.4);
         break;
 
       case 'Ağaç':
