@@ -31,7 +31,7 @@ class CardSymbol {
 
 /// Pozisyona göre kaç sembol gösterileceğini belirler (3-7)
 int getSymbolCountForPosition(int positionIndex, int availableSymbols) {
-  if (availableSymbols <= 4) return availableSymbols; // 4 veya az ise hepsini göster
+  if (availableSymbols <= 4) return availableSymbols;
   const positionBase = [3, 6, 4, 4, 4, 5, 6]; // Geçmiş,Şimdi,Gizli,Engel,Çevre,Tavsiye,Sonuç
   final base = positionIndex < positionBase.length ? positionBase[positionIndex] : 4;
   return base.clamp(3, availableSymbols.clamp(3, 7));
@@ -58,65 +58,65 @@ List<CardSymbol> _withAnchors(List<CardSymbol> symbols, List<List<double>> ancho
 /// 78 kart için anchor koordinatları (cardId → [[x,y], ...])
 const Map<int, List<List<double>>> _cardAnchors = {
   // ── MAJOR ARCANA ── (sıra = sembol sırası ile eşleşir)
-  // 0-Fool: Köpek→Dog, Uçurum→Cliff, Heybe→Wand, Gül→Traveler
-  0: [[0.58,0.55],[0.55,0.60],[0.48,0.45],[0.50,0.50]],
+  // 0-Fool: Köpek→Dog, Uçurum→Cliff, Heybe→Wand, Güneş→Sun
+  0: [[0.58,0.55],[0.55,0.60],[0.48,0.45],[0.50,0.20]],
   // 1-Magician: Sonsuzluk→Infinity, DörtElement→Table, Asa→RaisedWand
   1: [[0.50,0.25],[0.50,0.72],[0.38,0.18]],
-  // 2-HighPriestess: NarPerdesi→background, Sütunlar→BlackPillar, HilalAy→Crescent, Parşömen→Scroll
-  2: [[0.70,0.30],[0.28,0.50],[0.50,0.82],[0.58,0.45]],
-  // 3-Empress: Taç→Crown, Buğday→Wheat, AkanSu→Vegetation
-  3: [[0.50,0.26],[0.25,0.45],[0.25,0.85]],
+  // 2-HighPriestess: Yıldızlar→background, Sütunlar→BlackPillar, HilalAy→Crescent, Parşömen→Scroll
+  2: [[0.35,0.20],[0.28,0.50],[0.50,0.82],[0.58,0.45]],
+  // 3-Empress: Taç→Crown, Buğday→Wheat, Nar→Pomegranate, Venüs→Shield
+  3: [[0.50,0.26],[0.25,0.45],[0.25,0.85],[0.65,0.55]],
   // 4-Emperor: TaşTaht→StoneThrone, KoçBaşları→LeftRam, KırmızıCüppe→Emperor, Dağlar→Mountains
-  4: [[0.50,0.28],[0.30,0.60],[0.50,0.55],[0.20,0.50]],
-  // 5-Hierophant: ÜçlüTaç→TripleCrown, İkiAnahtar→keys/feet, KutsamaEli→hand
-  5: [[0.50,0.32],[0.50,0.85],[0.38,0.32]],
-  // 6-Lovers: Melek→Angel, BilgiAğacı→Tree, Güneş→top
-  6: [[0.50,0.32],[0.28,0.55],[0.50,0.18]],
+  4: [[0.50,0.28],[0.30,0.60],[0.50,0.55],[0.28,0.45]],
+  // 5-Hierophant: ÜçlüTaç→TripleCrown, Müritler→Disciples, Asa→Staff
+  5: [[0.50,0.32],[0.65,0.85],[0.38,0.32]],
+  // 6-Lovers: Melek→Angel, BilgiAğacı→Left Tree, Adem/Havva→Lovers, Yılan→Snake, AltınYol→Path
+  6: [[0.50,0.32],[0.25,0.55],[0.50,0.65],[0.32,0.48],[0.50,0.85]],
   // 7-Chariot: İkiSfenks→BlackSphinx, YıldızÖrtüsü→StarCanopy, Zırh→Charioteer
   7: [[0.35,0.68],[0.50,0.15],[0.50,0.35]],
-  // 8-Strength: Aslan→Lion, Sonsuzluk→Infinity, ÇiçekÇelenk→LeftFlowers
-  8: [[0.60,0.52],[0.50,0.12],[0.22,0.78]],
+  // 8-Strength: Aslan→Lion, Sonsuzluk→Infinity, Çiçekler→LeftFlowers
+  8: [[0.55,0.50],[0.50,0.15],[0.35,0.76]],
   // 9-Hermit: Fener→Lantern, Asa→Staff, DağZirvesi→Peak
   9: [[0.42,0.35],[0.50,0.45],[0.50,0.65]],
   // 10-Wheel: Çark→Wheel, Sfenks→Sphinx, Yılan→Snake
   10: [[0.50,0.50],[0.50,0.18],[0.28,0.55]],
-  // 11-Justice: Terazi→Scales, Kılıç→Sword, KırmızıPerde→RightPillar
-  11: [[0.62,0.60],[0.38,0.45],[0.72,0.50]],
+  // 11-Justice: Terazi→Scales, Kılıç→Sword, Ay→Moon
+  11: [[0.62,0.60],[0.38,0.45],[0.50,0.20]],
   // 12-HangedMan: TersDuruş→HangedMan, Hale→Halo, DünyaAğacı→Tree
   12: [[0.50,0.55],[0.50,0.75],[0.25,0.50]],
-  // 13-Death: BeyazAt→WhiteHorse, DoğanGüneş→RisingSun, SiyahBayrak→Banner, DüşenKral→Figures
-  13: [[0.45,0.55],[0.68,0.55],[0.70,0.25],[0.35,0.80]],
-  // 14-Temperance: İkiKupa→LeftCup, MelekKanatları→Wings, SudakiAyak→Path
-  14: [[0.52,0.45],[0.30,0.50],[0.55,0.75]],
-  // 15-Devil: GevşekZincirler→Chains, KuyrukAteşi→MaleFigure, ÇıplakFigürler→FemaleFigure
-  15: [[0.50,0.85],[0.72,0.85],[0.28,0.85]],
+  // 13-Death: BeyazAt→WhiteHorse, DoğanGüneş→RisingSun, SiyahBayrak→Banner, DizÇökenler→Figures
+  13: [[0.45,0.42],[0.65,0.48],[0.60,0.22],[0.30,0.72]],
+  // 14-Temperance: İkiKupa→LeftCup, MelekKanatları→Wings, Nehir→River, Güneş→Sun
+  14: [[0.58,0.44],[0.30,0.50],[0.58,0.72],[0.50,0.22]],
+  // 15-Devil: Şeytan→Devil, Pentagram→Pentagram, Zincir→Chain, Figürler→Figures
+  15: [[0.50,0.50],[0.50,0.18],[0.50,0.85],[0.75,0.80]],
   // 16-Tower: Yıldırım→Lightning, DüşenTaç→FallingCrown, Alevler→Flames
   16: [[0.60,0.25],[0.42,0.20],[0.50,0.80]],
-  // 17-Star: 8KöşeliYıldız→CentralStar, İkiSuKabı→WaterPitcher, AğaçtakiKuş→rightside
-  17: [[0.50,0.18],[0.42,0.62],[0.52,0.70]],
-  // 18-Moon: Ay→Moon, İkiKule→LeftTower, KöpekVeKurt→DogWolf, Kerevit→bottom
-  18: [[0.50,0.20],[0.28,0.45],[0.35,0.65],[0.50,0.85]],
-  // 19-Sun: ParlayançGüneş→Sun, Çocuk→Child, Ayçiçekleri→SunflowersL, BeyazAt→Horse
-  19: [[0.50,0.25],[0.55,0.55],[0.25,0.50],[0.50,0.75]],
-  // 20-Judgement: BüyükBoru→Trumpet, Cebrail→Gabriel, DirilenFigürler→RisingFigures
-  20: [[0.38,0.32],[0.50,0.18],[0.35,0.75]],
-  // 21-World: DansEdenFigür→Dancer, DefneÇelengi→Wreath, DörtYaratık→Eagle
-  21: [[0.50,0.50],[0.72,0.50],[0.72,0.15]],
+  // 17-Star: Yıldız→Star, Su→Water, Figür→Figure
+  17: [[0.50,0.18],[0.45,0.85],[0.58,0.55]],
+  // 18-Moon: Ay→Moon, İkiKule→LeftTower, Kurt→Wolf, Nehir→River
+  18: [[0.50,0.20],[0.28,0.45],[0.36,0.68],[0.50,0.85]],
+  // 19-Sun: ParlayanGüneş→Sun, Çocuk→Child, Ayçiçekleri→SunflowersL, BeyazAt→Horse
+  19: [[0.50,0.25],[0.55,0.55],[0.25,0.42],[0.50,0.75]],
+  // 20-Judgement: Boru→Trumpet, Cebrail→Gabriel, Uyananlar→Awakened, Mezarlar→Graves
+  20: [[0.38,0.32],[0.50,0.18],[0.35,0.68],[0.70,0.80]],
+  // 21-World: Dansçı→Dancer, Çelenk→Wreath, Melek, Kartal, Boğa, Aslan
+  21: [[0.50,0.50],[0.72,0.50],[0.28,0.15],[0.72,0.15],[0.25,0.85],[0.72,0.85]],
   // ── CUPS ──
-  22: [[0.50,0.55],[0.50,0.15],[0.50,0.72],[0.30,0.65],[0.32,0.15]],
+  22: [[0.50,0.55],[0.50,0.15],[0.50,0.85],[0.65,0.68],[0.32,0.15]],
   23: [[0.25,0.65],[0.75,0.65],[0.40,0.62],[0.60,0.62],[0.50,0.32],[0.50,0.50]],
   24: [[0.30,0.60],[0.50,0.58],[0.70,0.60],[0.50,0.35],[0.50,0.90],[0.50,0.18]],
-  25: [[0.52,0.65],[0.22,0.35],[0.60,0.50],[0.75,0.50],[0.68,0.82]],
-  26: [[0.50,0.45],[0.35,0.85],[0.50,0.90],[0.70,0.72],[0.28,0.45],[0.50,0.15]],
-  27: [[0.42,0.65],[0.58,0.65],[0.25,0.75],[0.50,0.22],[0.22,0.48],[0.65,0.55]],
-  28: [[0.50,0.70],[0.50,0.40],[0.28,0.55],[0.50,0.38],[0.68,0.45],[0.32,0.32],[0.50,0.15]],
-  29: [[0.35,0.65],[0.65,0.72],[0.50,0.22],[0.65,0.42],[0.32,0.50],[0.55,0.65]],
-  30: [[0.50,0.60],[0.50,0.45],[0.80,0.60],[0.50,0.15]],
+  25: [[0.35,0.65],[0.28,0.35],[0.60,0.50],[0.68,0.55],[0.68,0.82]],
+  26: [[0.50,0.48],[0.38,0.82],[0.50,0.92],[0.68,0.65],[0.30,0.54],[0.65,0.20]],
+  27: [[0.42,0.65],[0.58,0.65],[0.25,0.75],[0.50,0.22],[0.32,0.48],[0.65,0.55]],
+  28: [[0.50,0.70],[0.72,0.35],[0.30,0.60],[0.50,0.38],[0.65,0.50],[0.28,0.35],[0.50,0.15]],
+  29: [[0.35,0.65],[0.65,0.72],[0.50,0.22],[0.62,0.35],[0.32,0.50],[0.55,0.65]],
+  30: [[0.50,0.60],[0.30,0.45],[0.65,0.60],[0.40,0.12]],
   31: [[0.50,0.55],[0.32,0.68],[0.50,0.20],[0.50,0.28],[0.72,0.52],[0.50,0.90]],
   32: [[0.62,0.52],[0.45,0.52],[0.45,0.45],[0.50,0.18],[0.30,0.80]],
   33: [[0.50,0.45],[0.50,0.65],[0.60,0.32],[0.35,0.45],[0.50,0.85]],
-  34: [[0.50,0.45],[0.60,0.42],[0.42,0.60],[0.38,0.65],[0.58,0.78],[0.50,0.90]],
-  35: [[0.45,0.45],[0.65,0.45],[0.42,0.32],[0.38,0.65],[0.75,0.70],[0.50,0.85]],
+  34: [[0.50,0.45],[0.60,0.42],[0.35,0.65],[0.50,0.18],[0.50,0.88]],
+  35: [[0.45,0.45],[0.65,0.45],[0.38,0.65],[0.50,0.88],[0.75,0.70],[0.50,0.85]],
   // ── WANDS ──
   36: [[0.50,0.60],[0.50,0.35],[0.42,0.28],[0.70,0.82],[0.25,0.45]],
   37: [[0.60,0.50],[0.68,0.35],[0.48,0.42],[0.45,0.75],[0.35,0.55]],
@@ -124,20 +124,20 @@ const Map<int, List<List<double>>> _cardAnchors = {
   39: [[0.28,0.45],[0.50,0.35],[0.50,0.70],[0.68,0.60],[0.50,0.55]],
   40: [[0.50,0.68],[0.50,0.50],[0.50,0.42]],
   41: [[0.50,0.45],[0.55,0.60],[0.42,0.35],[0.45,0.25],[0.72,0.70]],
-  42: [[0.50,0.50],[0.45,0.32],[0.32,0.65],[0.40,0.30]],
+  42: [[0.50,0.50],[0.62,0.45],[0.32,0.65],[0.45,0.32]],
   43: [[0.50,0.50],[0.25,0.75],[0.50,0.85]],
   44: [[0.50,0.45],[0.62,0.50],[0.22,0.55],[0.62,0.35]],
   45: [[0.50,0.65],[0.45,0.45],[0.65,0.62],[0.65,0.72]],
   46: [[0.55,0.62],[0.45,0.35],[0.52,0.58],[0.72,0.75]],
   47: [[0.55,0.45],[0.45,0.68],[0.62,0.22],[0.62,0.50],[0.35,0.85]],
-  48: [[0.50,0.45],[0.62,0.45],[0.72,0.45],[0.50,0.82],[0.52,0.60],[0.50,0.18]],
+  48: [[0.50,0.45],[0.62,0.45],[0.72,0.45],[0.38,0.52],[0.48,0.80],[0.50,0.18]],
   49: [[0.50,0.45],[0.68,0.45],[0.32,0.60],[0.45,0.85],[0.50,0.20]],
   // ── SWORDS ──
   50: [[0.50,0.65],[0.50,0.45],[0.50,0.15],[0.40,0.25],[0.50,0.85]],
-  51: [[0.50,0.55],[0.35,0.45],[0.25,0.65],[0.50,0.18]],
-  52: [[0.50,0.50],[0.60,0.60],[0.80,0.40],[0.25,0.85],[0.50,0.12]],
+  51: [[0.50,0.45],[0.65,0.35],[0.50,0.18],[0.75,0.65]],
+  52: [[0.50,0.50],[0.65,0.30],[0.72,0.45],[0.50,0.12],[0.30,0.16]],
   53: [[0.52,0.64],[0.65,0.30],[0.55,0.92],[0.32,0.30]],
-  54: [[0.50,0.65],[0.42,0.52],[0.40,0.88],[0.72,0.68],[0.50,0.18]],
+  54: [[0.50,0.65],[0.35,0.50],[0.40,0.88],[0.72,0.68],[0.50,0.18]],
   55: [[0.40,0.60],[0.58,0.65],[0.50,0.75],[0.65,0.62],[0.50,0.20],[0.60,0.12]],
   56: [[0.65,0.65],[0.68,0.55],[0.32,0.72],[0.30,0.62],[0.45,0.68],[0.50,0.22]],
   57: [[0.50,0.60],[0.68,0.70],[0.50,0.15],[0.72,0.45]],
@@ -146,22 +146,22 @@ const Map<int, List<List<double>>> _cardAnchors = {
   60: [[0.52,0.60],[0.45,0.40],[0.50,0.20],[0.65,0.50],[0.32,0.78]],
   61: [[0.55,0.45],[0.65,0.62],[0.38,0.25],[0.62,0.25],[0.35,0.45]],
   62: [[0.50,0.50],[0.50,0.25],[0.35,0.35],[0.68,0.45],[0.75,0.35],[0.38,0.60],[0.65,0.18]],
-  63: [[0.50,0.45],[0.50,0.25],[0.32,0.38],[0.68,0.65],[0.68,0.58],[0.32,0.70],[0.50,0.15]],
+  63: [[0.50,0.45],[0.50,0.25],[0.32,0.38],[0.68,0.65],[0.35,0.60],[0.32,0.70],[0.50,0.15]],
   // ── PENTACLES ──
   64: [[0.50,0.35],[0.50,0.22],[0.50,0.62],[0.50,0.85],[0.25,0.75]],
   65: [[0.50,0.60],[0.38,0.48],[0.65,0.40],[0.50,0.52],[0.30,0.65],[0.72,0.50]],
-  66: [[0.35,0.72],[0.65,0.72],[0.50,0.25],[0.50,0.40],[0.22,0.65]],
-  67: [[0.50,0.65],[0.50,0.42],[0.50,0.58],[0.40,0.88],[0.72,0.65]],
-  68: [[0.42,0.72],[0.60,0.72],[0.50,0.32],[0.50,0.42],[0.25,0.68]],
-  69: [[0.38,0.48],[0.62,0.55],[0.50,0.55],[0.72,0.72],[0.22,0.58]],
-  70: [[0.37,0.52],[0.62,0.58],[0.63,0.47],[0.50,0.20]],
-  71: [[0.45,0.55],[0.55,0.58],[0.70,0.45],[0.50,0.68]],
+  66: [[0.35,0.72],[0.65,0.72],[0.50,0.18],[0.50,0.40],[0.50,0.55]],
+  67: [[0.50,0.65],[0.50,0.35],[0.50,0.55],[0.40,0.88],[0.50,0.15]],
+  68: [[0.45,0.65],[0.65,0.62],[0.50,0.32],[0.50,0.42],[0.25,0.85]],
+  69: [[0.50,0.45],[0.40,0.50],[0.62,0.55],[0.70,0.65],[0.30,0.65]],
+  70: [[0.40,0.50],[0.75,0.60],[0.60,0.48],[0.50,0.20]],
+  71: [[0.45,0.55],[0.55,0.55],[0.70,0.45],[0.35,0.65]],
   72: [[0.50,0.55],[0.68,0.35],[0.28,0.65],[0.32,0.60],[0.50,0.12]],
   73: [[0.50,0.72],[0.75,0.40],[0.35,0.45],[0.50,0.56],[0.70,0.85]],
-  74: [[0.50,0.55],[0.40,0.30],[0.68,0.70],[0.62,0.68],[0.50,0.20]],
+  74: [[0.50,0.55],[0.40,0.30],[0.25,0.75],[0.68,0.70],[0.50,0.20]],
   75: [[0.55,0.45],[0.50,0.60],[0.45,0.38],[0.50,0.22],[0.50,0.85]],
-  76: [[0.50,0.45],[0.50,0.48],[0.40,0.78],[0.62,0.78],[0.20,0.30],[0.22,0.50]],
-  77: [[0.50,0.45],[0.60,0.52],[0.32,0.40],[0.32,0.65],[0.22,0.65],[0.78,0.45],[0.50,0.20]],
+  76: [[0.50,0.45],[0.50,0.48],[0.40,0.78],[0.62,0.78],[0.25,0.20],[0.30,0.50]],
+  77: [[0.50,0.45],[0.60,0.52],[0.32,0.40],[0.32,0.65],[0.26,0.58],[0.72,0.45],[0.50,0.20]],
 };
 
 /// Kartın içindeki sembolleri ve anlamlarını döndürür
@@ -171,7 +171,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🐕', nameTr: 'Köpek', nameEn: 'Dog', meaningsTr: ['Koruyan içgüdülerin', 'İçindeki sadık rehber', 'Seni koruyan iç ses'], meaningsEn: ['Your protective instincts']),
       CardSymbol(emoji: '🏔️', nameTr: 'Uçurum', nameEn: 'Cliff', meaningsTr: ['Bilinmeyene cesaretin', 'Atılgan ruhunun çağrısı', 'Risk alan kalbin'], meaningsEn: ['Courage to leap into unknown']),
       CardSymbol(emoji: '🎒', nameTr: 'Heybe', nameEn: 'Pouch', meaningsTr: ['Her şey zaten sende', 'Taşıdığın güç yeter', 'İhtiyacın olan sende saklı'], meaningsEn: ['Everything is already within']),
-      CardSymbol(emoji: '🌹', nameTr: 'Gül', nameEn: 'Rose', meaningsTr: ['Saf niyetle yolculuk', 'Temiz kalple adım at', 'Masumiyetin en büyük gücün'], meaningsEn: ['Journey with pure intent']),
+      CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Yolunu aydınlatan ruh', 'İlahi korunma altındasın', 'Aydınlık yeni başlangıç'], meaningsEn: ['Spirit illuminating your path']),
     ],
     1: [ // The Magician
       CardSymbol(emoji: '♾️', nameTr: 'Sonsuzluk', nameEn: 'Infinity', meaningsTr: ['Sınırsız potansiyelin', 'Yaratma gücün sınırsız', 'Henüz keşfetmediğin güç'], meaningsEn: ['Unlimited potential']),
@@ -179,7 +179,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🪄', nameTr: 'Asa', nameEn: 'Wand', meaningsTr: ['İlahi enerji çekiyorsun', 'Evrenle bağlantın güçlü', 'Gökten gelen güç akıyor'], meaningsEn: ['Channeling divine energy']),
     ],
     2: [ // The High Priestess
-      CardSymbol(emoji: '🍇', nameTr: 'Perde', nameEn: 'Veil', meaningsTr: ['Gizli bilginin kapısı', 'Görünmeyeni gösteren aralık', 'Sırların eşiğindesin'], meaningsEn: ['Gate of hidden knowledge']),
+      CardSymbol(emoji: '⭐', nameTr: 'Yıldızlar', nameEn: 'Stars', meaningsTr: ['Kozmik sırların rehberi', 'Sonsuz potansiyelin', 'Evren sana yol gösteriyor'], meaningsEn: ['Guide of cosmic secrets']),
       CardSymbol(emoji: '🏛️', nameTr: 'Sütunlar', nameEn: 'Pillars', meaningsTr: ['Aydınlık-karanlık dengesi', 'İki dünya arasında duruyorsun', 'Denge noktanı bul'], meaningsEn: ['Dark and light balance']),
       CardSymbol(emoji: '🌙', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Sezgi gücün dorukta', 'İç sesin hiç bu kadar net olmadı', 'Hissettiğine güven'], meaningsEn: ['Your intuition peaks']),
       CardSymbol(emoji: '📜', nameTr: 'Parşömen', nameEn: 'Scroll', meaningsTr: ['Açılmamış sırlar', 'Zamanı gelen bilgi', 'Henüz görünmeyen cevaplar'], meaningsEn: ['Secrets not yet revealed']),
@@ -187,7 +187,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
     3: [ // The Empress
       CardSymbol(emoji: '👑', nameTr: 'Taç', nameEn: 'Crown', meaningsTr: ['Kozmik annelik enerjin', 'Besleyen gücün uyanıyor', 'Şefkatin dünyayı değiştirir'], meaningsEn: ['Your cosmic mothering energy']),
       CardSymbol(emoji: '🌾', nameTr: 'Buğday', nameEn: 'Wheat', meaningsTr: ['Şefkatinin hasadı', 'Ektiğin sevgi geri dönüyor', 'Verdiğin kat kat geri geliyor'], meaningsEn: ['Harvest of compassion']),
-      CardSymbol(emoji: '💧', nameTr: 'Su', nameEn: 'Water', meaningsTr: ['Yaratıcılığın akıyor', 'İlham kaynağın taşıyor', 'Dokunduğun her şey çiçek açar'], meaningsEn: ['Creativity flows freely']),
+      CardSymbol(emoji: '🍇', nameTr: 'Nar', nameEn: 'Pomegranate', meaningsTr: ['Yaratıcılığın meyve veriyor', 'Bolluk bereket seninle', 'Üretkenliğin çiçek açar'], meaningsEn: ['Your creativity bears fruit']),
+      CardSymbol(emoji: '🛡️', nameTr: 'Venüs Kalkanı', nameEn: 'Venus Shield', meaningsTr: ['Sevgi en güçlü kalkanın', 'Dişil enerjini kucakla', 'Zarafetinle koruyorsun'], meaningsEn: ['Love is your strongest shield']),
     ],
     4: [ // The Emperor
       CardSymbol(emoji: '🪨', nameTr: 'Taht', nameEn: 'Throne', meaningsTr: ['Otoriten sağlam zeminde', 'Liderliğin doğuştan', 'Sözün güç taşıyor'], meaningsEn: ['Your authority on solid ground']),
@@ -197,13 +198,15 @@ List<CardSymbol> getCardSymbols(int cardId) {
     ],
     5: [ // The Hierophant
       CardSymbol(emoji: '⛪', nameTr: 'Taç', nameEn: 'Crown', meaningsTr: ['Bilinç köprüsü', 'Maddi-manevi bağlantın', 'İçsel bilgeliğin tacı'], meaningsEn: ['Bridge of consciousness']),
-      CardSymbol(emoji: '🗝️', nameTr: 'Anahtarlar', nameEn: 'Keys', meaningsTr: ['Gizli olanı çözme gücün', 'Sırlara erişim anahtarın', 'Kodları kıracak zekâ'], meaningsEn: ['Power to decode hidden']),
-      CardSymbol(emoji: '✋', nameTr: 'El', nameEn: 'Hand', meaningsTr: ['Kutsal destekle korunman', 'İlahi el seni tutuyor', 'Görünmez bir kalkan'], meaningsEn: ['Divinely protected path']),
+      CardSymbol(emoji: '👥', nameTr: 'Müritler', nameEn: 'Disciples', meaningsTr: ['Öğrenmeye açık kalbin', 'Bilgeliği arayan ruhun', 'Rehberliğe kulak ver'], meaningsEn: ['Your heart open to logic']),
+      CardSymbol(emoji: '🪄', nameTr: 'Asa', nameEn: 'Staff', meaningsTr: ['Manevi otoriten', 'İnancının gücü', 'Kutsal bağlantın'], meaningsEn: ['Your spiritual authority']),
     ],
     6: [ // The Lovers
       CardSymbol(emoji: '👼', nameTr: 'Melek', nameEn: 'Angel', meaningsTr: ['Üst bilinç desteğin', 'Evren aşkını onaylıyor', 'Doğru yolda olduğunun işareti'], meaningsEn: ['Higher mind supports']),
-      CardSymbol(emoji: '🍎', nameTr: 'Ağaç', nameEn: 'Tree', meaningsTr: ['Doğru ile arzu arası', 'Kalbinle aklın yarışıyor', 'Seçim zamanı geldi'], meaningsEn: ['Between right and desire']),
-      CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Gerçek aşk gizlenmez', 'Işık her zaman yol bulur', 'Kalp her zaman doğruyu bilir'], meaningsEn: ['True love never hides']),
+      CardSymbol(emoji: '🌳', nameTr: 'Bilgi Ağacı', nameEn: 'Tree of Knowledge', meaningsTr: ['Doğru ile arzu arası', 'Kalbinle aklın yarışıyor', 'Seçim zamanı geldi'], meaningsEn: ['Between right and desire']),
+      CardSymbol(emoji: '🚻', nameTr: 'Adem ve Havva', nameEn: 'Adam & Eve', meaningsTr: ['Ruh eşinle bütünleşme', 'İki zıt kutbun uyumu', 'Seçimini kalbinle yap'], meaningsEn: ['Union with soulmate']),
+      CardSymbol(emoji: '🐍', nameTr: 'Yılan', nameEn: 'Snake', meaningsTr: ['Tutkularının fısıltısı', 'Seni kışkırtan dürtü', 'Dönüşüm kapıda'], meaningsEn: ['Whispers of passion']),
+      CardSymbol(emoji: '🌊', nameTr: 'Nehir', nameEn: 'River', meaningsTr: ['Birlikte akacağınız hayat', 'Aşkın çağlayan gücü', 'Duyguların sonsuz akışı'], meaningsEn: ['Life flowing together']),
     ],
     7: [ // The Chariot
       CardSymbol(emoji: '🐱', nameTr: 'Sfenks', nameEn: 'Sphinx', meaningsTr: ['Zıt güçleri kontrol et', 'Kaos içinde denge bul', 'İç çatışmanı yönet'], meaningsEn: ['Control opposing forces']),
@@ -213,7 +216,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     8: [ // Strength
       CardSymbol(emoji: '🦁', nameTr: 'Aslan', nameEn: 'Lion', meaningsTr: ['Ehlileşecek tutkuların', 'Gücün yumuşaklıkta saklı', 'Kontrol sevgiyle gelir'], meaningsEn: ['Passions to be tamed']),
       CardSymbol(emoji: '♾️', nameTr: 'Sonsuzluk', nameEn: 'Infinity', meaningsTr: ['Barışla gelen zafer', 'Savaşmadan kazanırsın', 'Sabrın en büyük silahın'], meaningsEn: ['Victory through peace']),
-      CardSymbol(emoji: '🌸', nameTr: 'Çelenk', nameEn: 'Garland', meaningsTr: ['Güç yumuşaklıkta', 'Naziklik güçlülüktür', 'Sessiz güç en derin olandır'], meaningsEn: ['Strength in softness']),
+      CardSymbol(emoji: '🌸', nameTr: 'Çiçekler', nameEn: 'Flowers', meaningsTr: ['Gücünü sevgiden alıyorsun', 'Naziklik en büyük güçtür', 'Zarafetle fethedeceksin'], meaningsEn: ['Strength in softness']),
     ],
     9: [ // The Hermit
       CardSymbol(emoji: '🏮', nameTr: 'Fener', nameEn: 'Lantern', meaningsTr: ['Gerçeği içinde ara', 'Cevap dışarıda değil', 'Sessizlikte bilgelik var'], meaningsEn: ['Seek truth within']),
@@ -228,7 +231,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     11: [ // Justice
       CardSymbol(emoji: '⚖️', nameTr: 'Terazi', nameEn: 'Scales', meaningsTr: ['Eylemlerin tartılıyor', 'Hesap zamanı', 'Geçmişin değerlendiriliyor'], meaningsEn: ['Actions being weighed']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıç', nameEn: 'Sword', meaningsTr: ['Gerçek iki yönü keser', 'Doğruluk acıtabilir', 'Hakikat kaçınılmaz'], meaningsEn: ['Truth cuts both ways']),
-      CardSymbol(emoji: '🟥', nameTr: 'Perde', nameEn: 'Curtain', meaningsTr: ['Adaletin sürprizleri var', 'Beklenmedik denge', 'Evren hesabını tutar'], meaningsEn: ['Justice has surprises']),
+      CardSymbol(emoji: '🌙', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['İlahi adalet şaşmaz', 'Evrensel denge sağlanıyor', 'Sezgilerine güven'], meaningsEn: ['Divine justice prevails']),
     ],
     12: [ // The Hanged Man
       CardSymbol(emoji: '🙃', nameTr: 'Duruş', nameEn: 'Pose', meaningsTr: ['Ters görmek açar', 'Bakış açını değiştir', 'Farklı duruş farklı sonuç'], meaningsEn: ['Upside down reveals']),
@@ -239,16 +242,18 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🐴', nameTr: 'At', nameEn: 'Horse', meaningsTr: ['Dönüşüm güçle geliyor', 'Değişim kaçınılmaz', 'Eski sen gidiyor'], meaningsEn: ['Change comes with force']),
       CardSymbol(emoji: '🌅', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Her son yeni başlangıç', 'Bitiş aslında doğuş', 'Kapanan kapı yeni yol açar'], meaningsEn: ['Every end a new start']),
       CardSymbol(emoji: '🏴', nameTr: 'Bayrak', nameEn: 'Banner', meaningsTr: ['Eski düzen bitiyor', 'Alışkanlıklarını bırak', 'Yeni kurallar geliyor'], meaningsEn: ['Old order is ending']),
-      CardSymbol(emoji: '🤴', nameTr: 'Kral', nameEn: 'King', meaningsTr: ['Herkes eşit dönüşümde', 'Kaçış yok kabul et', 'Değişim herkese dokunur'], meaningsEn: ['All equal in change']),
+      CardSymbol(emoji: '👥', nameTr: 'Figürler', nameEn: 'Figures', meaningsTr: ['Herkes eşit dönüşümde', 'Kaçış yok kabul et', 'Değişim herkese dokunur'], meaningsEn: ['All equal in change']),
     ],
     14: [ // Temperance
       CardSymbol(emoji: '🏺', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Zıtlıkları birleştirmen', 'Dengeyi sen kurarsın', 'Uyum senin doğan'], meaningsEn: ['Uniting opposites']),
       CardSymbol(emoji: '🪶', nameTr: 'Kanatlar', nameEn: 'Wings', meaningsTr: ['Ruh ve beden köprün', 'İçsel uyumun güçleniyor', 'Bütünlüğe doğru yoldasın'], meaningsEn: ['Body-spirit bridge']),
-      CardSymbol(emoji: '🦶', nameTr: 'Ayak', nameEn: 'Foot', meaningsTr: ['Bilinçaltı bağlantın', 'Görünmeyen bağın güçlü', 'Derinlerdeki bilgelik'], meaningsEn: ['Subconscious link']),
+      CardSymbol(emoji: '🌊', nameTr: 'Nehir', nameEn: 'River', meaningsTr: ['Duyguların akışı', 'Bilinçaltı bağlantın', 'Sonsuz yaşam enerjin'], meaningsEn: ['Flow of your emotions, Subconscious link']),
+      CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['İçsel aydınlanman', 'Ruhunu ısıtan o denge', 'İlahi ışığın koruması'], meaningsEn: ['Your inner illumination']),
     ],
     15: [ // The Devil
+      CardSymbol(emoji: '🐐', nameTr: 'Şeytan', nameEn: 'Devil', meaningsTr: ['Dünyevi tutkular ve ego', 'Korkularının yansıması', 'Gölge benliğinle yüzleş'], meaningsEn: ['Worldly passions and ego']),
+      CardSymbol(emoji: '⭐', nameTr: 'Pentagram', nameEn: 'Pentagram', meaningsTr: ['Maddeye bağımlılık', 'Dünyevi illüzyon', 'Maddenin ruha üstünlüğü'], meaningsEn: ['Material addiction']),
       CardSymbol(emoji: '⛓️', nameTr: 'Zincir', nameEn: 'Chain', meaningsTr: ['İstersen çıkabilirsin', 'Zincirlerin senaryonu sen yaz', 'Esaret bir seçimdir'], meaningsEn: ['You can escape if willing']),
-      CardSymbol(emoji: '🔥', nameTr: 'Ateş', nameEn: 'Flame', meaningsTr: ['Bağımlılık sessiz yakar', 'Fark etmeden tutsak olursun', 'Gölgelerini tanı'], meaningsEn: ['Addiction burns silently']),
       CardSymbol(emoji: '👤', nameTr: 'Figürler', nameEn: 'Figures', meaningsTr: ['Korkularla yüzleşme zamanı', 'Gerçeğe bakma cesareti', 'Özgürlük cesaret ister'], meaningsEn: ['Time to face your fears']),
     ],
     16: [ // The Tower
@@ -259,13 +264,13 @@ List<CardSymbol> getCardSymbols(int cardId) {
     17: [ // The Star
       CardSymbol(emoji: '🌟', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Karanlıktan sonra umut', 'En karanlık saatten sonra şafak', 'Işık her zaman gelir'], meaningsEn: ['Hope after darkness']),
       CardSymbol(emoji: '💧', nameTr: 'Su', nameEn: 'Water', meaningsTr: ['Toprağı ve ruhu besler', 'Şifa veren enerji', 'Bereket akıyor sana'], meaningsEn: ['Feeds earth and spirit']),
-      CardSymbol(emoji: '🐦', nameTr: 'Kuş', nameEn: 'Bird', meaningsTr: ['Ruhun uçmaya hazır', 'Özgürlüğün kokusu', 'Sınırları aşma zamanı'], meaningsEn: ['Your soul is ready to fly']),
+      CardSymbol(emoji: '👤', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['İlahi akışa teslimiyet', 'Huzur ve şifa', 'Evrensel enerjiyi topraklama'], meaningsEn: ['Surrender to divine flow']),
     ],
     18: [ // The Moon
       CardSymbol(emoji: '🌕', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Her gördüğün gerçek değil', 'Yanılsama içindesin', 'Görünenin ötesine bak'], meaningsEn: ['Not all you see is real']),
       CardSymbol(emoji: '🏰', nameTr: 'Kuleler', nameEn: 'Towers', meaningsTr: ['Bilinen-bilinmeyen kapı', 'İki dünya arasında', 'Eşik bir karar noktası'], meaningsEn: ['Known-unknown gate']),
       CardSymbol(emoji: '🐺', nameTr: 'Kurt', nameEn: 'Wolf', meaningsTr: ['Evcil ve vahşi benin', 'İçindeki iki yüz', 'Karanlık tarafını kabul et'], meaningsEn: ['Your tame and wild self']),
-      CardSymbol(emoji: '🦞', nameTr: 'Kerevit', nameEn: 'Crayfish', meaningsTr: ['Derinlerden gelen korkular', 'Bilinçaltının gölgeleri', 'Bastırdığın şeyler yüzeye çıkıyor'], meaningsEn: ['Fears surfacing from the depths']),
+      CardSymbol(emoji: '🌊', nameTr: 'Nehir', nameEn: 'River', meaningsTr: ['Bilinçaltının akışı', 'Bilinmeze doğru sürükleniş', 'Derin duygular'], meaningsEn: ['Flow of the subconscious']),
     ],
     19: [ // The Sun
       CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['En aydınlık anın geldi', 'Parıldama zamanın', 'Işık sana yöneliyor'], meaningsEn: ['Your brightest moment has come']),
@@ -275,13 +280,17 @@ List<CardSymbol> getCardSymbols(int cardId) {
     ],
     20: [ // Judgement
       CardSymbol(emoji: '📯', nameTr: 'Boru', nameEn: 'Trumpet', meaningsTr: ['Ruhun seni uyandırıyor', 'Uyanış zamanı geldi', 'İkinci şans kapıda'], meaningsEn: ['Your spirit wakes you']),
-      CardSymbol(emoji: '👼', nameTr: 'Cebrail', nameEn: 'Gabriel', meaningsTr: ['Eylemlerin tartılıyor', 'Hesap zamanı', 'Geçmişin değerlendiriliyor'], meaningsEn: ['Your actions are weighed']),
-      CardSymbol(emoji: '🧟', nameTr: 'Figürler', nameEn: 'Figures', meaningsTr: ['Yeni sen doğuyor', 'Diriliş başladı', 'Eski kabuk kırılıyor'], meaningsEn: ['New you is rising']),
+      CardSymbol(emoji: '👼', nameTr: 'Cebrail', nameEn: 'Gabriel', meaningsTr: ['İlahi çağrıyı duyuyorsun', 'Hesaplaşma zamanı', 'Eylemlerin tartılıyor'], meaningsEn: ['Your actions are weighed']),
+      CardSymbol(emoji: '✨', nameTr: 'Uyananlar', nameEn: 'Awakened', meaningsTr: ['Yeni sen doğuyor', 'Ruhsal diriliş başladı', 'Zihinsel uyanışın'], meaningsEn: ['New you is rising']),
+      CardSymbol(emoji: '⚰️', nameTr: 'Mezarlar', nameEn: 'Graves', meaningsTr: ['Eski kabuğunu kırıyorsun', 'Geçmişi ardında bırakma', 'Sınırlayıcı inançlarından kurtuluş'], meaningsEn: ['Break your old shell']),
     ],
     21: [ // The World
       CardSymbol(emoji: '💃', nameTr: 'Dansçı', nameEn: 'Dancer', meaningsTr: ['Yolculuğun tamam, kutla!', 'Döngü tamamlandı', 'Başardın, gururlan'], meaningsEn: ['Journey complete, celebrate!']),
       CardSymbol(emoji: '🌿', nameTr: 'Çelenk', nameEn: 'Wreath', meaningsTr: ['Evrenin taktığı taç', 'Hak ettiğin ödül', 'Başarının sembolü'], meaningsEn: ['Crown from the universe']),
-      CardSymbol(emoji: '🦅', nameTr: 'Yaratıklar', nameEn: 'Creatures', meaningsTr: ['Dört element dengede', 'Tam bütünlük', 'Her şey yerli yerinde'], meaningsEn: ['Four elements in balance']),
+      CardSymbol(emoji: '👼', nameTr: 'Melek', nameEn: 'Angel', meaningsTr: ['Hava elementi', 'Zihinsel aydınlanma', 'Kova burcu enerjisi'], meaningsEn: ['Air element']),
+      CardSymbol(emoji: '🦅', nameTr: 'Kartal', nameEn: 'Eagle', meaningsTr: ['Su elementi', 'Duygusal derinlik', 'Akrep burcu enerjisi'], meaningsEn: ['Water element']),
+      CardSymbol(emoji: '🐂', nameTr: 'Boğa', nameEn: 'Bull', meaningsTr: ['Toprak elementi', 'Maddi istikrar', 'Boğa burcu enerjisi'], meaningsEn: ['Earth element']),
+      CardSymbol(emoji: '🦁', nameTr: 'Aslan', nameEn: 'Lion', meaningsTr: ['Ateş elementi', 'Eylemsel güç', 'Aslan burcu enerjisi'], meaningsEn: ['Fire element']),
     ],
   };
 
@@ -316,19 +325,19 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Evren seninle kutluyor'], meaningsEn: ['The universe celebrates with you']),
     ],
     25: [ // Four of Cups
-      CardSymbol(emoji: '🧘', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Kaçırdığın fırsatlar var'], meaningsEn: ['Opportunities you are missing']),
+      CardSymbol(emoji: '🧘', nameTr: 'Oturan Adam', nameEn: 'Seated Man', meaningsTr: ['Kaçırdığın fırsatlar var'], meaningsEn: ['Opportunities you are missing']),
       CardSymbol(emoji: '🌳', nameTr: 'Ağaç', nameEn: 'Tree', meaningsTr: ['Seni koruyan konfor alanın'], meaningsEn: ['Your protective comfort zone']),
       CardSymbol(emoji: '🏆', nameTr: 'Kupa', nameEn: 'Cup', meaningsTr: ['Görmediğin yeni bir şans'], meaningsEn: ['A new chance you do not see']),
       CardSymbol(emoji: '✨', nameTr: 'Ruh Eli', nameEn: 'Spirit Hand', meaningsTr: ['Evrenin sana uzattığı el'], meaningsEn: ['The hand the universe extends to you']),
       CardSymbol(emoji: '🏆', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Değerini bilmediğin nimetler'], meaningsEn: ['Blessings you undervalue']),
     ],
     26: [ // Five of Cups
-      CardSymbol(emoji: '👤', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Kaybettiklerine takılma'], meaningsEn: ['Do not dwell on your losses']),
-      CardSymbol(emoji: '🍷', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Yaşanan hayal kırıklığı'], meaningsEn: ['The disappointment you experienced']),
+      CardSymbol(emoji: '👤', nameTr: 'Kederli Silüet', nameEn: 'Sorrowful Silhouette', meaningsTr: ['Kaybettiklerine takılma'], meaningsEn: ['Do not dwell on your losses']),
+      CardSymbol(emoji: '🍷', nameTr: 'Devrilen Kadehler', nameEn: 'Fallen Chalices', meaningsTr: ['Yaşanan hayal kırıklığı'], meaningsEn: ['The disappointment you experienced']),
       CardSymbol(emoji: '💧', nameTr: 'Su', nameEn: 'Water', meaningsTr: ['Akanı geri getiremezsin'], meaningsEn: ['You cannot bring back what flowed away']),
-      CardSymbol(emoji: '🏆', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Hâlâ sahip olduğun değerler'], meaningsEn: ['Values you still possess']),
+      CardSymbol(emoji: '🏆', nameTr: 'Kalan Kupalar', nameEn: 'Remaining Cups', meaningsTr: ['Hâlâ sahip olduğun değerler'], meaningsEn: ['Values you still possess']),
       CardSymbol(emoji: '🌉', nameTr: 'Köprü', nameEn: 'Bridge', meaningsTr: ['Yeni başlangıca geçiş yolun'], meaningsEn: ['Your path to a new beginning']),
-      CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Umut hep arkanda duruyor'], meaningsEn: ['Hope always stands behind you']),
+      CardSymbol(emoji: '✨', nameTr: 'Yıldızlar', nameEn: 'Stars', meaningsTr: ['Umut hep arkada duruyor'], meaningsEn: ['Hope always stands behind you']),
     ],
     27: [ // Six of Cups
       CardSymbol(emoji: '👦', nameTr: 'Çocuk', nameEn: 'Child', meaningsTr: ['Masumiyetine dönüş zamanı', 'Çocuksu saflığın', 'Yeniden masum olabilirsin'], meaningsEn: ['Time to return to your innocence']),
@@ -339,8 +348,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🛣️', nameTr: 'Patika', nameEn: 'Path', meaningsTr: ['Geçmişe açılan yolun'], meaningsEn: ['Your path opening to the past']),
     ],
     28: [ // Seven of Cups
-      CardSymbol(emoji: '👤', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Hayallerinin esiri olma'], meaningsEn: ['Do not be a prisoner of dreams']),
-      CardSymbol(emoji: '🏆', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Seçenekler karmaşası'], meaningsEn: ['Confusion of choices']),
+      CardSymbol(emoji: '👤', nameTr: 'Hayalperest', nameEn: 'Dreamer', meaningsTr: ['Hayallerinin esiri olma'], meaningsEn: ['Do not be a prisoner of dreams']),
+      CardSymbol(emoji: '🎭', nameTr: 'İllüzyon', nameEn: 'Illusion', meaningsTr: ['Görüntüye aldanma', 'Seçenekler karmaşası'], meaningsEn: ['Deception of appearances']),
       CardSymbol(emoji: '🐉', nameTr: 'Ejderha', nameEn: 'Dragon', meaningsTr: ['Korku dolu bir hayalin'], meaningsEn: ['A dream filled with fear']),
       CardSymbol(emoji: '🐍', nameTr: 'Yılan', nameEn: 'Snake', meaningsTr: ['Aldatıcı bir arzu'], meaningsEn: ['A deceptive desire']),
       CardSymbol(emoji: '🏰', nameTr: 'Kale', nameEn: 'Castle', meaningsTr: ['Ulaşılmaz bir hedef'], meaningsEn: ['An unreachable goal']),
@@ -348,7 +357,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Gerçek hedefin hangisi?'], meaningsEn: ['Which is your real goal?']),
     ],
     29: [ // Eight of Cups
-      CardSymbol(emoji: '🚶', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Geride bırakma cesaretinIN sesi'], meaningsEn: ['The voice of your courage to let go']),
+      CardSymbol(emoji: '🚶', nameTr: 'Yolcu', nameEn: 'Traveler', meaningsTr: ['Geride bırakma cesaretinIN sesi'], meaningsEn: ['The voice of your courage to let go']),
       CardSymbol(emoji: '🏆', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Artık seni doyurmayan şeyler'], meaningsEn: ['Things that no longer fulfill you']),
       CardSymbol(emoji: '🌒', nameTr: 'Tutulma', nameEn: 'Eclipse', meaningsTr: ['Bilinçaltından gelen işaret'], meaningsEn: ['A signal from your subconscious']),
       CardSymbol(emoji: '🏔️', nameTr: 'Dağ', nameEn: 'Mountain', meaningsTr: ['Önünde yeni keşifler var'], meaningsEn: ['New discoveries lie ahead']),
@@ -356,10 +365,10 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🛤️', nameTr: 'Patika', nameEn: 'Path', meaningsTr: ['Ruhunun seni çektiği yön'], meaningsEn: ['The direction your soul pulls you']),
     ],
     30: [ // Nine of Cups
-      CardSymbol(emoji: '🧘', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Dileklerin gerçekleşiyor'], meaningsEn: ['Your wishes are coming true']),
+      CardSymbol(emoji: '🧘', nameTr: 'Gururlu Adam', nameEn: 'Proud Man', meaningsTr: ['Dileklerin gerçekleşiyor'], meaningsEn: ['Your wishes are coming true']),
       CardSymbol(emoji: '🏆', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Duygusal tatmin ve bolluk'], meaningsEn: ['Emotional satisfaction and abundance']),
-      CardSymbol(emoji: '🎭', nameTr: 'Perde', nameEn: 'Curtain', meaningsTr: ['Daha fazlası perdenin ardında'], meaningsEn: ['More awaits behind the curtain']),
-      CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Evren sana gülümsüyor'], meaningsEn: ['The universe smiles upon you']),
+      CardSymbol(emoji: '⚜️', nameTr: 'Görkemli Örtü', nameEn: 'Magnificent Drape', meaningsTr: ['Sahip olduğun zenginlikler'], meaningsEn: ['Riches you possess']),
+      CardSymbol(emoji: '✨', nameTr: 'Yıldızlar', nameEn: 'Stars', meaningsTr: ['Evren sana gülümsüyor'], meaningsEn: ['The universe smiles upon you']),
     ],
     31: [ // Ten of Cups
       CardSymbol(emoji: '👫', nameTr: 'Aile', nameEn: 'Family', meaningsTr: ['Senin en derin arzun'], meaningsEn: ['Your deepest desire']),
@@ -404,14 +413,14 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '☁️', nameTr: 'Bulut', nameEn: 'Cloud', meaningsTr: ['Hayallerin netleşiyor'], meaningsEn: ['Your dreams are becoming clear']),
     ],
     37: [ // Two of Wands
-      CardSymbol(emoji: '👤', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Büyük kararın eşiğindesin'], meaningsEn: ['You are on the edge of a big decision']),
+      CardSymbol(emoji: '👤', nameTr: 'Kâşif', nameEn: 'Explorer', meaningsTr: ['Büyük kararın eşiğindesin'], meaningsEn: ['You are on the edge of a big decision']),
       CardSymbol(emoji: '🪵', nameTr: 'Asa', nameEn: 'Wand', meaningsTr: ['Elindeki güç ve planlama'], meaningsEn: ['Power and planning in your hands']),
       CardSymbol(emoji: '🔮', nameTr: 'Küre', nameEn: 'Globe', meaningsTr: ['Geleceğe bakışın'], meaningsEn: ['Your vision of the future']),
       CardSymbol(emoji: '🏰', nameTr: 'Kale', nameEn: 'Castle', meaningsTr: ['Konfor alanından çıkma zamanı'], meaningsEn: ['Time to leave your comfort zone']),
       CardSymbol(emoji: '🌊', nameTr: 'Ufuk', nameEn: 'Horizon', meaningsTr: ['Seni bekleyen olanaklar'], meaningsEn: ['Possibilities awaiting you']),
     ],
     38: [ // Three of Wands
-      CardSymbol(emoji: '👤', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Planların hayat buluyor'], meaningsEn: ['Your plans are coming to life']),
+      CardSymbol(emoji: '🧍', nameTr: 'Lider', nameEn: 'Leader', meaningsTr: ['Planların hayat buluyor'], meaningsEn: ['Your plans are coming to life']),
       CardSymbol(emoji: '🪵', nameTr: 'Asalar', nameEn: 'Wands', meaningsTr: ['Attığın sağlam temeller'], meaningsEn: ['The solid foundations you laid']),
       CardSymbol(emoji: '⛵', nameTr: 'Gemi', nameEn: 'Ship', meaningsTr: ['Yola çıkan umutların'], meaningsEn: ['Your hopes setting sail']),
       CardSymbol(emoji: '🌅', nameTr: 'Ufuk', nameEn: 'Horizon', meaningsTr: ['Genişleyen vizyonun'], meaningsEn: ['Your expanding vision']),
@@ -424,8 +433,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🌅', nameTr: 'Ufuk', nameEn: 'Horizon', meaningsTr: ['Altın çağın başlıyor'], meaningsEn: ['Your golden age is beginning']),
     ],
     40: [ // Five of Wands
-      CardSymbol(emoji: '🤼', nameTr: 'Figürler', nameEn: 'Figures', meaningsTr: ['Etrafındaki rekabet ortamı'], meaningsEn: ['The competitive environment around you']),
-      CardSymbol(emoji: '⚔️', nameTr: 'Asalar', nameEn: 'Wands', meaningsTr: ['Çatışan fikirler ve görüşler', 'Farklı sesleri dinle', 'Kaos içinde doğru yolu bul'], meaningsEn: ['Clashing ideas and opinions']),
+      CardSymbol(emoji: '🤼', nameTr: 'Rakipler', nameEn: 'Rivals', meaningsTr: ['Etrafındaki rekabet ortamı'], meaningsEn: ['The competitive environment around you']),
+      CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Çatışan fikirler ve görüşler', 'Farklı sesleri dinle', 'Kaos içinde doğru yolu bul'], meaningsEn: ['Clashing ideas and opinions']),
       CardSymbol(emoji: '✨', nameTr: 'Kıvılcım', nameEn: 'Spark', meaningsTr: ['Sürtüşmeden doğan enerji'], meaningsEn: ['Energy born from friction']),
     ],
     41: [ // Six of Wands
@@ -437,12 +446,12 @@ List<CardSymbol> getCardSymbols(int cardId) {
     ],
     42: [ // Seven of Wands
       CardSymbol(emoji: '🛡️', nameTr: 'Savunucu', nameEn: 'Defender', meaningsTr: ['Tek başına durma cesaretin'], meaningsEn: ['Your courage to stand alone']),
-      CardSymbol(emoji: '🪵', nameTr: 'Asa', nameEn: 'Wand', meaningsTr: ['Elindeki en güçlü silahın'], meaningsEn: ['Your most powerful weapon']),
+      CardSymbol(emoji: '🔱', nameTr: 'Mızrak', nameEn: 'Spear', meaningsTr: ['Elindeki en güçlü silahın'], meaningsEn: ['Your most powerful weapon']),
       CardSymbol(emoji: '⚔️', nameTr: 'Saldırı', nameEn: 'Attack', meaningsTr: ['Sana yönelen dış baskılar'], meaningsEn: ['External pressures aimed at you']),
       CardSymbol(emoji: '🔥', nameTr: 'Ateş', nameEn: 'Fire', meaningsTr: ['Seni ayakta tutan irade gücün'], meaningsEn: ['The willpower keeping you standing']),
     ],
     43: [ // Eight of Wands
-      CardSymbol(emoji: '☄️', nameTr: 'Asalar', nameEn: 'Wands', meaningsTr: ['Hızla gelen haberler'], meaningsEn: ['News arriving fast']),
+      CardSymbol(emoji: '🏹', nameTr: 'Alevli Oklar', nameEn: 'Flaming Arrows', meaningsTr: ['Hızla gelen haberler'], meaningsEn: ['News arriving fast']),
       CardSymbol(emoji: '⛰️', nameTr: 'Tepeler', nameEn: 'Hills', meaningsTr: ['Engeller geride kalıyor'], meaningsEn: ['Obstacles are falling behind']),
       CardSymbol(emoji: '🌊', nameTr: 'Nehir', nameEn: 'River', meaningsTr: ['Hayatının akış hızı artıyor'], meaningsEn: ['The pace of your life is accelerating']),
     ],
@@ -453,8 +462,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🔥', nameTr: 'Alev', nameEn: 'Flame', meaningsTr: ['İçindeki sönmeyen ateş'], meaningsEn: ['The unquenchable fire within you']),
     ],
     45: [ // Ten of Wands
-      CardSymbol(emoji: '🚶', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Omuzlarındaki ağır yük'], meaningsEn: ['The heavy burden on your shoulders']),
-      CardSymbol(emoji: '🪵', nameTr: 'Asalar', nameEn: 'Wands', meaningsTr: ['Fazla sorumluluk üstlendin'], meaningsEn: ['You took on too much responsibility']),
+      CardSymbol(emoji: '🚶', nameTr: 'Yüklü Adam', nameEn: 'Burdened Man', meaningsTr: ['Omuzlarındaki ağır yük'], meaningsEn: ['The heavy burden on your shoulders']),
+      CardSymbol(emoji: '🪵', nameTr: 'Odun Demeti', nameEn: 'Bundle of Wood', meaningsTr: ['Fazla sorumluluk üstlendin'], meaningsEn: ['You took on too much responsibility']),
       CardSymbol(emoji: '🏘️', nameTr: 'Kasaba', nameEn: 'Town', meaningsTr: ['Hedefin çok yakında artık'], meaningsEn: ['Your goal is very close now']),
       CardSymbol(emoji: '🛣️', nameTr: 'Patika', nameEn: 'Path', meaningsTr: ['Son birkaç adım kaldı'], meaningsEn: ['Just a few steps left']),
     ],
@@ -494,7 +503,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '☁️', nameTr: 'Bulut', nameEn: 'Cloud', meaningsTr: ['Dağılan zihinsel sisin'], meaningsEn: ['Your mental fog is clearing']),
     ],
     51: [ // Two of Swords
-      CardSymbol(emoji: '🙈', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Görmezden geldiğin gerçek'], meaningsEn: ['The truth you are ignoring']),
+      CardSymbol(emoji: '🙈', nameTr: 'Gözleri Bağlı Ruh', nameEn: 'Blindfolded Soul', meaningsTr: ['Görmezden geldiğin gerçek'], meaningsEn: ['The truth you are ignoring']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['İçindeki ikilem'], meaningsEn: ['The dilemma within you']),
       CardSymbol(emoji: '🌙', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Sezgine güvenme zamanı'], meaningsEn: ['Time to trust your intuition']),
       CardSymbol(emoji: '🌊', nameTr: 'Deniz', nameEn: 'Sea', meaningsTr: ['Bastırdığın duygular'], meaningsEn: ['Emotions you have suppressed']),
@@ -507,7 +516,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '⛈️', nameTr: 'Fırtına', nameEn: 'Storm', meaningsTr: ['Geçici bir dönem bu sadece'], meaningsEn: ['This is only a temporary phase']),
     ],
     53: [ // Four of Swords
-      CardSymbol(emoji: '🛌', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Ruhunun dinlenme ihtiyacı'], meaningsEn: ['Your souls need for rest']),
+      CardSymbol(emoji: '🛌', nameTr: 'Dinlenen Savaşçı', nameEn: 'Resting Warrior', meaningsTr: ['Ruhunun dinlenme ihtiyacı'], meaningsEn: ['Your souls need for rest']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Askıya aldığın mücadeleler'], meaningsEn: ['Battles you have put on hold']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıç', nameEn: 'Sword', meaningsTr: ['Hazır olduğunda döneceksin'], meaningsEn: ['You will return when ready']),
       CardSymbol(emoji: '🪟', nameTr: 'Vitray', nameEn: 'Stained Glass', meaningsTr: ['İç huzurunun kaynağı'], meaningsEn: ['The source of your inner peace']),
@@ -515,8 +524,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
     54: [ // Five of Swords
       CardSymbol(emoji: '🏆', nameTr: 'Galip', nameEn: 'Victor', meaningsTr: ['Kazandın ama neyi kaybettin?'], meaningsEn: ['You won but what did you lose?']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Ele geçirdiğin avantaj'], meaningsEn: ['The advantage you seized']),
-      CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Bıraktığın yaralar var'], meaningsEn: ['There are wounds you left behind']),
-      CardSymbol(emoji: '🚶', nameTr: 'Figürler', nameEn: 'Figures', meaningsTr: ['Uzaklaşan ilişkilerin'], meaningsEn: ['Your distancing relationships']),
+      CardSymbol(emoji: '⚔️', nameTr: 'Yerdeki Kılıçlar', nameEn: 'Fallen Swords', meaningsTr: ['Bıraktığın yaralar var'], meaningsEn: ['There are wounds you left behind']),
+      CardSymbol(emoji: '🚶', nameTr: 'Uzaklaşanlar', nameEn: 'The Departing Ones', meaningsTr: ['Uzaklaşan ilişkilerin'], meaningsEn: ['Your distancing relationships']),
       CardSymbol(emoji: '🌙', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Vicdanının sesi yükseliyor'], meaningsEn: ['The voice of your conscience rises']),
     ],
     55: [ // Six of Swords
@@ -536,19 +545,19 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🌕', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Her şey ortaya çıkacak'], meaningsEn: ['Everything will come to light']),
     ],
     57: [ // Eight of Swords
-      CardSymbol(emoji: '⛓️', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Kendi kendini sınırlaman'], meaningsEn: ['Your self-imposed limitations']),
+      CardSymbol(emoji: '⛓️', nameTr: 'Tutsak', nameEn: 'Captive', meaningsTr: ['Kendi kendini sınırlaman'], meaningsEn: ['Your self-imposed limitations']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Zihinsel hapishanende'], meaningsEn: ['In your mental prison']),
       CardSymbol(emoji: '🌙', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Gerçeği görmüyorsun'], meaningsEn: ['You are not seeing the truth']),
       CardSymbol(emoji: '🏰', nameTr: 'Kale', nameEn: 'Castle', meaningsTr: ['Çıkış yolu aslında var'], meaningsEn: ['The way out actually exists']),
     ],
     58: [ // Nine of Swords
-      CardSymbol(emoji: '😱', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Seni uykusuz bırakan kaygılar'], meaningsEn: ['Anxieties keeping you sleepless']),
+      CardSymbol(emoji: '😱', nameTr: 'Uykusuz Ruh', nameEn: 'Sleepless Soul', meaningsTr: ['Seni uykusuz bırakan kaygılar'], meaningsEn: ['Anxieties keeping you sleepless']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Zihindeki kâbus döngüsü'], meaningsEn: ['The nightmare cycle in your mind']),
       CardSymbol(emoji: '🛏️', nameTr: 'Yatak', nameEn: 'Bed', meaningsTr: ['Huzursuz ruhunun yansıması'], meaningsEn: ['Reflection of your restless soul']),
       CardSymbol(emoji: '🪟', nameTr: 'Pencere', nameEn: 'Window', meaningsTr: ['Şafak yaklaşıyor dayanman lazım'], meaningsEn: ['Dawn approaches you must endure']),
     ],
     59: [ // Ten of Swords
-      CardSymbol(emoji: '🩸', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['En derin düşüş noktası'], meaningsEn: ['Your deepest point of fall']),
+      CardSymbol(emoji: '🩸', nameTr: 'Yıkılan Beden', nameEn: 'Fallen Body', meaningsTr: ['En derin düşüş noktası'], meaningsEn: ['Your deepest point of fall']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Artık daha kötüsü yok'], meaningsEn: ['It cannot get worse than this']),
       CardSymbol(emoji: '🌅', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Yeniden doğuş başlıyor'], meaningsEn: ['Rebirth is beginning']),
       CardSymbol(emoji: '🏰', nameTr: 'Kale', nameEn: 'Castle', meaningsTr: ['Geride bırakılan eski düzen'], meaningsEn: ['The old order left behind']),
@@ -608,15 +617,15 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🪟', nameTr: 'Pencere', nameEn: 'Window', meaningsTr: ['Detaylara verdiğin özen'], meaningsEn: ['The care you give to details']),
     ],
     67: [ // Four of Pentacles
-      CardSymbol(emoji: '😠', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Bırakamadığın kontrol'], meaningsEn: ['The control you cannot let go of']),
-      CardSymbol(emoji: '🪙', nameTr: 'Sikke', nameEn: 'Coin', meaningsTr: ['Zihinsel takıntıların'], meaningsEn: ['Your mental obsessions']),
-      CardSymbol(emoji: '🪙', nameTr: 'Sikke', nameEn: 'Coin', meaningsTr: ['Kalbini kapadığın şeyler'], meaningsEn: ['Things you closed your heart to']),
-      CardSymbol(emoji: '🪙', nameTr: 'Sikkeler', nameEn: 'Coins', meaningsTr: ['Güvenlik ihtiyacın çok yüksek'], meaningsEn: ['Your need for security is very high']),
+      CardSymbol(emoji: '😠', nameTr: 'Kontrolcü Adam', nameEn: 'Controlling Man', meaningsTr: ['Bırakamadığın kontrol'], meaningsEn: ['The control you cannot let go of']),
+      CardSymbol(emoji: '🪙', nameTr: 'Başındaki Sikke', nameEn: 'Coin on Head', meaningsTr: ['Zihinsel takıntıların'], meaningsEn: ['Your mental obsessions']),
+      CardSymbol(emoji: '🪙', nameTr: 'Kalbindeki Sikke', nameEn: 'Coin on Heart', meaningsTr: ['Kalbini kapadığın şeyler'], meaningsEn: ['Things you closed your heart to']),
+      CardSymbol(emoji: '🪙', nameTr: 'Ayaktaki Sikkeler', nameEn: 'Coins at Feet', meaningsTr: ['Güvenlik ihtiyacın çok yüksek'], meaningsEn: ['Your need for security is very high']),
       CardSymbol(emoji: '🌞', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Kaçırdığın hayat var dışarıda'], meaningsEn: ['There is life you are missing outside']),
     ],
     68: [ // Five of Pentacles
-      CardSymbol(emoji: '🤕', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Zor dönemin ağırlığı'], meaningsEn: ['The weight of your difficult period']),
-      CardSymbol(emoji: '🥶', nameTr: 'Figür', nameEn: 'Figure', meaningsTr: ['Yardım istemeye cesaret et'], meaningsEn: ['Dare to ask for help']),
+      CardSymbol(emoji: '🤕', nameTr: 'Yaralı Adam', nameEn: 'Wounded Man', meaningsTr: ['Zor dönemin ağırlığı'], meaningsEn: ['The weight of your difficult period']),
+      CardSymbol(emoji: '🥶', nameTr: 'Üşüyen Kadın', nameEn: 'Freezing Woman', meaningsTr: ['Yardım istemeye cesaret et'], meaningsEn: ['Dare to ask for help']),
       CardSymbol(emoji: '🪟', nameTr: 'Vitray', nameEn: 'Stained Glass', meaningsTr: ['Görmediğin destek çok yakın'], meaningsEn: ['Unseen support is very close']),
       CardSymbol(emoji: '🪙', nameTr: 'Sikkeler', nameEn: 'Coins', meaningsTr: ['Manevi zenginliğine dön'], meaningsEn: ['Return to your spiritual richness']),
       CardSymbol(emoji: '❄️', nameTr: 'Kar', nameEn: 'Snow', meaningsTr: ['Geçici zorluk eriyecek'], meaningsEn: ['Temporary hardship will melt away']),
@@ -625,8 +634,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🤲', nameTr: 'Hayırsever', nameEn: 'Benefactor', meaningsTr: ['Verme ve alma dengeniz'], meaningsEn: ['Your balance of giving and receiving']),
       CardSymbol(emoji: '⚖️', nameTr: 'Terazi', nameEn: 'Scales', meaningsTr: ['Adil paylaşım enerjin'], meaningsEn: ['Your energy of fair sharing']),
       CardSymbol(emoji: '🪙', nameTr: 'Sikkeler', nameEn: 'Coins', meaningsTr: ['Sana gelen bolluk'], meaningsEn: ['Abundance coming to you']),
-      CardSymbol(emoji: '🧍', nameTr: 'Çırak', nameEn: 'Student', meaningsTr: ['İhtiyacı olan birine uzat'], meaningsEn: ['Extend your hand to someone in need']),
-      CardSymbol(emoji: '🧍', nameTr: 'Çırak', nameEn: 'Student', meaningsTr: ['Sana uzanan eller'], meaningsEn: ['Hands reaching out to you']),
+      CardSymbol(emoji: '🤲', nameTr: 'Yardım Alan', nameEn: 'The Receiver', meaningsTr: ['İhtiyacı olan birine uzat'], meaningsEn: ['Extend your hand to someone in need']),
+      CardSymbol(emoji: '🙏', nameTr: 'Yardım Bekleyen', nameEn: 'The Pleading One', meaningsTr: ['Sana uzanan eller'], meaningsEn: ['Hands reaching out to you']),
     ],
     70: [ // Seven of Pentacles
       CardSymbol(emoji: '🧑‍🌾', nameTr: 'Çiftçi', nameEn: 'Farmer', meaningsTr: ['Sabrının meyvesi yakında'], meaningsEn: ['The fruit of your patience is near']),
@@ -636,8 +645,8 @@ List<CardSymbol> getCardSymbols(int cardId) {
     ],
     71: [ // Eight of Pentacles
       CardSymbol(emoji: '🔨', nameTr: 'Zanaatkar', nameEn: 'Craftsman', meaningsTr: ['Ustalığa giden yoldasın'], meaningsEn: ['You are on the road to mastery']),
-      CardSymbol(emoji: '🪙', nameTr: 'Sikke', nameEn: 'Coin', meaningsTr: ['Her detaya verdiğin emek'], meaningsEn: ['The effort you give to every detail']),
-      CardSymbol(emoji: '🪙', nameTr: 'Sikkeler', nameEn: 'Coins', meaningsTr: ['Biriken deneyim ve beceri'], meaningsEn: ['Accumulating experience and skill']),
+      CardSymbol(emoji: '🪙', nameTr: 'İşlenen Sikke', nameEn: 'Carved Coin', meaningsTr: ['Her detaya verdiğin emek'], meaningsEn: ['The effort you give to every detail']),
+      CardSymbol(emoji: '🪙', nameTr: 'Tamamlanan Sikkeler', nameEn: 'Completed Coins', meaningsTr: ['Biriken deneyim ve beceri'], meaningsEn: ['Accumulating experience and skill']),
       CardSymbol(emoji: '🪚', nameTr: 'Tezgah', nameEn: 'Workbench', meaningsTr: ['Özveriyle çalışmanın ödülü'], meaningsEn: ['The reward of dedicated work']),
     ],
     72: [ // Nine of Pentacles
@@ -657,7 +666,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     74: [ // Page of Pentacles
       CardSymbol(emoji: '👦', nameTr: 'Genç', nameEn: 'Youth', meaningsTr: ['Yeni öğrenme yolculuğun'], meaningsEn: ['Your new learning journey']),
       CardSymbol(emoji: '🪙', nameTr: 'Sikke', nameEn: 'Coin', meaningsTr: ['Dikkatli ve planlı adımların'], meaningsEn: ['Your careful and planned steps']),
-      CardSymbol(emoji: '🌾', nameTr: 'Tarla', nameEn: 'Field', meaningsTr: ['Büyüme potansiyelin çok yüksek'], meaningsEn: ['Your growth potential is very high']),
+      CardSymbol(emoji: '🌱', nameTr: 'Bereketli Vadi', nameEn: 'Fertile Valley', meaningsTr: ['Büyüme potansiyelin çok yüksek'], meaningsEn: ['Your growth potential is very high']),
       CardSymbol(emoji: '🛣️', nameTr: 'Patika', nameEn: 'Path', meaningsTr: ['Adım adım hedefine yürüyorsun'], meaningsEn: ['You walk toward your goal step by step']),
       CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['İlhamının kaynağı burada'], meaningsEn: ['The source of your inspiration is here']),
     ],
@@ -673,7 +682,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🪙', nameTr: 'Sikke', nameEn: 'Coin', meaningsTr: ['Koruyucu bereketin taşıyor'], meaningsEn: ['Your protective blessings overflow']),
       CardSymbol(emoji: '🐇', nameTr: 'Tavşan', nameEn: 'Rabbit', meaningsTr: ['Doğurganlık ve bereket'], meaningsEn: ['Fertility and abundance']),
       CardSymbol(emoji: '🧺', nameTr: 'Sepet', nameEn: 'Basket', meaningsTr: ['Paylaştıkça çoğalan nimetler'], meaningsEn: ['Blessings that multiply as you share']),
-      CardSymbol(emoji: '🌹', nameTr: 'Çardak', nameEn: 'Arbor', meaningsTr: ['Güvenli ve güzel alanın'], meaningsEn: ['Your safe and beautiful space']),
+      CardSymbol(emoji: '🌹', nameTr: 'Gül Bahçesi', nameEn: 'Rose Garden', meaningsTr: ['Güvenli ve güzel alanın'], meaningsEn: ['Your safe and beautiful space']),
       CardSymbol(emoji: '🏛️', nameTr: 'Sütun', nameEn: 'Pillar', meaningsTr: ['Sağlam temellerin seni taşıyor'], meaningsEn: ['Your solid foundations carry you']),
     ],
     77: [ // King of Pentacles
@@ -2224,21 +2233,35 @@ String _buildFullGeneralTheme(List<CardMeaning> meanings, List<String> names, Fl
 /// 7 kart tavsiye paragrafı oluşturma
 String _buildFullAdvice(List<CardMeaning> meanings, List<String> names, FlowType flow, bool isTr) {
   final rng = Random();
-  List<String> pool;
+  final t0 = meanings[0].themeTr.split(',').first.trim().toLowerCase();
+  final t1 = meanings[1].themeTr.split(',').first.trim().toLowerCase();
+  final t2 = meanings[2].themeTr.split(',').first.trim().toLowerCase();
+  final t3 = meanings[3].themeTr.split(',').first.trim().toLowerCase();
+  final t5 = meanings[5].themeTr.split(',').first.trim().toLowerCase();
+  final t6 = meanings[6].themeTr.split(',').first.trim().toLowerCase();
+  
+  final t0en = meanings[0].themeEn.split(',').first.trim().toLowerCase();
+  final t1en = meanings[1].themeEn.split(',').first.trim().toLowerCase();
+  final t2en = meanings[2].themeEn.split(',').first.trim().toLowerCase();
+  final t3en = meanings[3].themeEn.split(',').first.trim().toLowerCase();
+  final t5en = meanings[5].themeEn.split(',').first.trim().toLowerCase();
+  final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
-  pool = isTr ? [
-    '${names[5]} kartının tavsiyesini rehber al. ${names[3]} engelinin üstesinden ${names[2]}\'nin gizli bilgeliğiyle gel. ${names[6]} seni bekliyor.',
-    'Geçmişindeki ${names[0]} artık bitti. Şimdiki ${names[1]} sana güç veriyor. ${names[5]}\'in gösterdiği yolu takip et ve ${names[6]}\'e ulaş.',
-    'Çevrenden gelen ${names[4]} enerjisini hafife alma. ${names[5]} sana net bir yol çiziyor. ${names[3]} engelini aşmak için ${names[2]}\'nin sırlarını kullan.',
-    'Bu yedi kart sana şunu söylüyor: ${names[0]}\'dan ders al, ${names[1]}\'i yaşa, ${names[2]}\'nin peşine düş, ${names[3]}\'ü aş, ${names[4]}\'den güç al, ${names[5]}\'e kulak ver ve ${names[6]}\'e yürü.',
-  ] : [
-    'Take ${names[5]}\'s advice as your guide. Overcome ${names[3]}\'s obstacle with ${names[2]}\'s hidden wisdom. ${names[6]} is waiting for you.',
-    'The past of ${names[0]} is done. The present ${names[1]} gives you strength. Follow the path ${names[5]} shows and reach ${names[6]}.',
-    'Don\'t underestimate the energy of ${names[4]} from your surroundings. ${names[5]} draws a clear path for you. Use ${names[2]}\'s secrets to overcome ${names[3]}.',
-    'These seven cards tell you: learn from ${names[0]}, live ${names[1]}, pursue ${names[2]}, overcome ${names[3]}, draw strength from ${names[4]}, listen to ${names[5]}, and walk toward ${names[6]}.',
+  final poolTr = [
+    'Geçmişteki o "$t0" dönemi artık kapandı. Karşına çıkan "$t3" engelini ancak içindeki o "$t5" hissine sıkı sıkı tutunarak aşabilirsin. Yolu açtığında "$t6" seni bekliyor olacak.',
+    'Eski "$t0" bağları geride kaldı. Şimdiki sahip olduğun "$t1" enerjisi sana ihtiyacın olan gücü zaten veriyor. Sadece iç sesinin fısıldadığı o "$t5" çağrısına kulak ver ve "$t6" hedefine doğru yürümeye başla.',
+    'Şu an önünü kapatan "$t3" zorluğunu gözünde büyütme. Aradığın cevap dışarıda değil, içindeki o derin "$t2" sessizliğinde yatıyor. Düşüncelerindeki "$t5" ışığını takip edersen karanlık dağılır.',
+    'Bu açılım sana şunu fısıldıyor: Gözlerini "$t0" gölgesinden ayır, bugünü mevcut "$t1" enerjinle yaşa. Önündeki o "$t3" sisine takılma, yegane pusulan "$t5" olsun ki "$t6" baharına uyanabilesin.',
   ];
 
-  return pool[rng.nextInt(pool.length)];
+  final poolEn = [
+    'That past era of "$t0en" is now over. You can only overcome the obstacle of "$t3en" ahead of you by fiercely holding on to the feeling of "$t5en". Once the path clears, "$t6en" will be waiting for you.',
+    'Old ties of "$t0en" are left behind. The current "$t1en" energy you possess already grants you the strength you need. Just listen to the call of "$t5en" echoing within you, and start walking towards your target of "$t6en".',
+    'Do not exaggerate the difficulty of "$t3en" blocking your way right now. The answer you seek is not out there, but deep within the silence of your "$t2en". If you follow the light of "$t5en" in your thoughts, the darkness will fade.',
+    'This reading whispers to you: Take your eyes off the shadow of "$t0en", live today with your current "$t1en" energy. Do not get stuck in the fog of "$t3en" ahead—let your true compass be "$t5en" so you can awaken to the spring of "$t6en".',
+  ];
+
+  return isTr ? poolTr[rng.nextInt(poolTr.length)] : poolEn[rng.nextInt(poolEn.length)];
 }
 
 /// Full Arcana 7 kart kapanış mesajı
@@ -2409,25 +2432,25 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
         score += 3;
         if (m1.tone == CardTone.soft) {
           final opts = [
-            {'tr': 'birbirinin ışığını güçlendiriyor — beraber parlıyorlar!', 'en': 'amplify each other\'s light — they shine together!', 'e': '☀️'},
-            {'tr': 'aynı frekansta titreşiyor — güçlü bir rezonans!', 'en': 'vibrate at the same frequency — powerful resonance!', 'e': '💫'},
-            {'tr': 'birlikte umut ve iyimserlik enerjisi taşıyor!', 'en': 'carry hope and optimism energy together!', 'e': '🌟'},
+            {'tr': 'ışığı öyle yoğunlaştırıyor ki, saklandığın gölgelerde bile artık güvendesin.', 'en': 'intensifies the light so much that you are safe even in the shadows you hide in.', 'e': '☀️'},
+            {'tr': 'aynı frekansta titreşiyor. Ruhundaki o sönmüş umudu yeniden tutuşturmak için birleştiler.', 'en': 'vibrate at the same frequency. They united to reignite that extinguished hope in your soul.', 'e': '💫'},
+            {'tr': 'birleşerek o beklediğin mucizenin kırılgan ama kesin tohumunu ekiyor.', 'en': 'combine to plant the fragile yet certain seed of the miracle you wait for.', 'e': '🌟'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
         } else if (m1.tone == CardTone.heavy) {
           final opts = [
-            {'tr': 'birlikte gölgelerin derinliğine iniyor — orada bir hazine var!', 'en': 'descend into the depth of shadows together — there\'s treasure there!', 'e': '🌑'},
-            {'tr': 'karanlıkta birbirini buluyor — bu güç yabana atılmaz!', 'en': 'find each other in the dark — this power is not to be underestimated!', 'e': '🔮'},
-            {'tr': 'ağır enerjileri birleştirip dönüştürüyor!', 'en': 'combine heavy energies and transform them!', 'e': '⚗️'},
+            {'tr': 'birleşerek karanlığın en dibine iniyor. En çok korktuğun o yüzleşme tam da burada yatıyor.', 'en': 'descend into the very bottom of the darkness together. The confrontation you fear most lies right here.', 'e': '🌑'},
+            {'tr': 'kusursuz bir kriz yaratıyor. Sırf parçalanıp yeniden daha güçlü doğabilesin diye.', 'en': 'create a perfect crisis. Just so you can shatter and be reborn stronger.', 'e': '🔮'},
+            {'tr': 'ağır bir karmayı sonlandırmak için buluştu. Kaçma, tam içinden geç.', 'en': 'came together to end a heavy karma. Do not run, pass right through it.', 'e': '⚗️'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
         } else {
           final opts = [
-            {'tr': 'birlikte hassas bir denge kuruyor — uyum!', 'en': 'create a delicate balance together — harmony!', 'e': '⚖️'},
-            {'tr': 'karar anında birbirini destekliyor — net bir yol çiziyor!', 'en': 'support each other at moments of decision — drawing a clear path!', 'e': '🧭'},
-            {'tr': 'birlikte bir kavşak noktası oluşturuyor — seçim zamanı!', 'en': 'form a crossroads together — time to choose!', 'e': '🔀'},
+            {'tr': 'karar anında zihnini bıçak gibi keskinleştiriyor. O adım artık ertelenemez.', 'en': 'sharpens your mind like a knife at the moment of decision. That step can no longer be delayed.', 'e': '⚖️'},
+            {'tr': 'önüne kaçınılmaz bir kavşak seriyor. Seçim yapmamak da en karanlık seçimdir.', 'en': 'lays out an inevitable crossroads before you. Refusing to choose is also the darkest choice.', 'e': '🧭'},
+            {'tr': 'o ertelediğin kırılma anını ayağına getiriyor. Sadece dürüst ol.', 'en': 'brings the breaking point you delayed right to your feet. Just be honest.', 'e': '🔀'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2438,10 +2461,10 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
       if (m1.movement != m2.movement) {
         score += 2;
         final opts = [
-          {'tr': 'zıt yönlere çekiyor — bu gerilim seni büyütecek!', 'en': 'pull in opposite directions — this tension will grow you!', 'e': '⚡'},
-          {'tr': 'biri ileri itiyor, diğeri bekletiyor — sabır ve cesaret arasında bir dans!', 'en': 'one pushes forward, the other holds still — a dance between patience and courage!', 'e': '🌪️'},
-          {'tr': 'karşıt enerjiler — çatışma değil, denge arayışı!', 'en': 'opposing energies — not conflict, but a search for balance!', 'e': '🔄'},
-          {'tr': 'farklı ritimler — bu kontrast sana yeni bir bakış açısı sunuyor!', 'en': 'different rhythms — this contrast offers you a new perspective!', 'e': '🎭'},
+          {'tr': 'zıt yönlere çekerek içsel bir kaos yaratıyor. Bu gerilim aydınlanma ateşini yakacak.', 'en': 'creates inner chaos by pulling in opposite directions. This tension will ignite your fire of enlightenment.', 'e': '⚡'},
+          {'tr': 'bir yanda eylem, diğer yanda durgunluk... Seni durduran dışarısı değil, zihninin ta kendisi.', 'en': 'action on one side, stillness on the other... It is not the outside stopping you, it is your very mind.', 'e': '🌪️'},
+          {'tr': 'farklı ritimlerde çarpışıyor. Dengen tamamen bozulduğunda asıl gücünü bulacaksın.', 'en': 'clashes in different rhythms. You will find your true power when your balance is completely disrupted.', 'e': '🔄'},
+          {'tr': 'aradığın o tuhaf dinginliği tam da bu kaotik çarpışmada sana hediye ediyor.', 'en': 'gifts you that strange serenity you seek right in this chaotic collision.', 'e': '🎭'},
         ];
         final pick = opts[rng.nextInt(opts.length)];
         typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2452,15 +2475,15 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
         score += 2;
         if (m1.phase == CardPhase.beginning || m1.phase == CardPhase.awakening) {
           final opts = [
-            {'tr': 'birlikte yeni bir sayfa açıyor — taze enerji!', 'en': 'open a new chapter together — fresh energy!', 'e': '🌅'},
-            {'tr': 'beraber filizleniyor — bu başlangıç çok güçlü!', 'en': 'sprout together — this beginning is very powerful!', 'e': '🌱'},
+            {'tr': 'birlikte yepyeni, ürkütücü ama çok güçlü bir sayfa açıyor. Eskiyi tamamen sil.', 'en': 'opens a brand new, scary but very powerful chapter together. Erase the old completely.', 'e': '🌅'},
+            {'tr': 'hiç beklemediğin bir anda o yeni döngünün sarsılmaz temellerini atıyor.', 'en': 'lays the unshakable foundations of that new cycle precisely when you least expect it.', 'e': '🌱'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
         } else if (m1.phase == CardPhase.completion || m1.phase == CardPhase.ending) {
           final opts = [
-            {'tr': 'birlikte bir döngüyü kapatıyor — kapanan kapılar, açılan pencereler!', 'en': 'close a cycle together — closing doors, opening windows!', 'e': '🌙'},
-            {'tr': 'beraber bir sonuca ulaşıyor — bu final güçlü!', 'en': 'reach a conclusion together — this finale is powerful!', 'e': '🏁'},
+            {'tr': 'o döneme acımasızca ve kesin olarak nokta koyuyor. Bitti.', 'en': 'ruthlessly and definitively puts an end to that era. It is done.', 'e': '🌙'},
+            {'tr': 'kapanan kapının arkasından bakmanı sana tamamen yasaklıyor. Bu final özgürlüğün için.', 'en': 'forbids you completely from looking behind the closed door. This finale is for your freedom.', 'e': '🏁'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2496,22 +2519,24 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
   // En az 2 ilişki garanti et
   if (relations.length < 2) {
     final fallbackTr = [
-      'birlikte yeni kapılar açıyor!',
-      'sana gizli bir mesaj gönderiyor!',
-      'enerjilerini birleştiriyor!',
+      'enerjilerini o kadar görünmez bir şekilde körüklüyor ki, sonucuna sen bile inanamayacaksın.',
+      'arka planda fısıldaşarak asıl ihtiyacın olan o acı reçeteyi yazıyor.',
+      'zihnindeki kör düğümü yavaşça çözüyor. Buna sadece izin ver.',
     ];
     final fallbackEn = [
-      'open new doors together!',
-      'send you a hidden message!',
-      'combine their energies!',
+      'fuels their energies so invisibly that even you will not believe the outcome.',
+      'whispers in the background to write the bitter prescription you truly need.',
+      'slowly unties the blind knot in your mind. Just allow it to happen.',
     ];
     while (relations.length < 2) {
       final idx = rng.nextInt(fallbackTr.length);
+      final idx1 = rng.nextInt(3);
+      final idx2 = 4 + rng.nextInt(3);
       relations.add(CardRelation(
-        card1Name: names[rng.nextInt(3)],
-        card2Name: names[4 + rng.nextInt(3)],
-        relationTextTr: '${names[rng.nextInt(7)]} ve ${names[rng.nextInt(7)]} ${fallbackTr[idx]}',
-        relationTextEn: '${names[rng.nextInt(7)]} and ${names[rng.nextInt(7)]} ${fallbackEn[idx]}',
+        card1Name: names[idx1],
+        card2Name: names[idx2],
+        relationTextTr: '${names[idx1]} ve ${names[idx2]} ${fallbackTr[idx]}',
+        relationTextEn: '${names[idx1]} and ${names[idx2]} ${fallbackEn[idx]}',
         emoji: '✨',
       ));
     }
@@ -2557,25 +2582,34 @@ Map<String, dynamic> _calculateCosmicScore(List<CardMeaning> meanings, FlowType 
 /// Gizli mesaj — 7 karttan çıkan sır
 Map<String, String> _generateSecretMessage(List<CardMeaning> meanings, List<String> names, FlowType flow, bool isTr) {
   final rng = Random();
-  final t0 = meanings[0].themeTr.split(',').first.trim();
-  final t6 = meanings[6].themeTr.split(',').first.trim();
-  final t0en = meanings[0].themeEn.split(',').first.trim();
-  final t6en = meanings[6].themeEn.split(',').first.trim();
+  final t0 = meanings[0].themeTr.split(',').first.trim().toLowerCase();
+  final t1 = meanings[1].themeTr.split(',').first.trim().toLowerCase();
+  final t2 = meanings[2].themeTr.split(',').first.trim().toLowerCase();
+  final t3 = meanings[3].themeTr.split(',').first.trim().toLowerCase();
+  final t5 = meanings[5].themeTr.split(',').first.trim().toLowerCase();
+  final t6 = meanings[6].themeTr.split(',').first.trim().toLowerCase();
+  
+  final t0en = meanings[0].themeEn.split(',').first.trim().toLowerCase();
+  final t1en = meanings[1].themeEn.split(',').first.trim().toLowerCase();
+  final t2en = meanings[2].themeEn.split(',').first.trim().toLowerCase();
+  final t3en = meanings[3].themeEn.split(',').first.trim().toLowerCase();
+  final t5en = meanings[5].themeEn.split(',').first.trim().toLowerCase();
+  final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
   final poolTr = [
-    'Yedi kartın sessiz anlaşması şu: "$t0" ile başlayan yolculuğun "$t6" ile son bulmayacak — bu sadece bir başlangıç. Asıl hazine, bu iki nokta arasında saklı.',
-    '${names[2]} sana kimsenin söylemediği bir gerçeği fısıldıyor: Engel sandığın şey, aslında seni koruyordu. ${names[6]} bunu kanıtlayacak.',
-    'Kartlar bir sır paylaşıyor: ${names[0]} ile ${names[6]} aynı enerjinin iki yüzü. Biri seni tırtıl yapıyor, diğeri kelebek.',
-    'Yedi kartın gizli mesajı şu: Şu an tam olman gereken yerdesin. ${names[5]} sana bunu hatırlatmak için geldi.',
-    '${names[3]} engel değil, öğretmen. ${names[2]} sana bu dersin sırrını veriyor: "$t0" artık "$t6" olacak.',
+    'Şu an içten içe bildiğin ama kendine bile itiraf edemediğin bir yalanı yaşıyorsun. İçindeki o "$t2" enerjisi sana bunu haykırıyor. O çok korktuğun "$t6", aslında cezan değil, tek kurtuluşun. Artık uyan.',
+    'Evren sana bir ayna tutuyor: Geçmişte yaşadığın o "$t0" senaryosunu zihninde tekrar tekrar oynatarak şimdiki "$t1" zamanını sabote eden ta kendisisin. Engel olan bir dış güç yok. En büyük düşmanın şu an bu satırları okuyor.',
+    'Zihnindeki o sessiz pazarlığı biliyoruz: İçindeki o asıl "$t2" dürtüsünü bastırmak için karşındaki "$t3" engelini sen bilerek kurguladın. Kolay olanı seçip kurbanı oynamayı bırak. Evren senden sadece sarsıcı bir dürüstlük istiyor.',
+    'Önündeki o ihtişamlı "$t6" hedefine öylesine saplantılısın ki, şu an zihninin o derin "$t1" karmaşasında çürüdüğünü göremiyorsun. İçindeki mezarlığı temizlemeden yeni bir hayat inşa edemezsin.',
+    'Birilerinin artık sana şu sert gerçeği söylemesi gerekiyordu: Aradığın cevap ışıkta değil, o karanlığa gömdüğün "$t2" arzusunda saklı. O sözde "$t3" mazeretinin ardına saklanmaktan vazgeçtiğin gün her şey paramparça olup yeniden doğacak.',
   ];
 
   final poolEn = [
-    'The silent pact of seven cards: the journey starting with "$t0en" won\'t end at "$t6en" — this is just the beginning. The real treasure is hidden between these two points.',
-    '${names[2]} whispers a truth no one told you: what you thought was an obstacle was actually protecting you. ${names[6]} will prove this.',
-    'The cards share a secret: ${names[0]} and ${names[6]} are two faces of the same energy. One makes you a caterpillar, the other a butterfly.',
-    'The hidden message of seven cards: you are exactly where you need to be right now. ${names[5]} came to remind you of this.',
-    '${names[3]} is not an obstacle, but a teacher. ${names[2]} gives you the secret of this lesson: "$t0en" will become "$t6en".',
+    'You are currently living a lie that you know deep down but cannot even admit to yourself. That suppressed energy of "$t2en" inside you is screaming this at you. That "$t6en" you fear so much is not your punishment, it is your only salvation. Wake up now.',
+    'The universe is holding a mirror to you: By replaying that "$t0en" scenario from your past over and over in your mind, YOU are the one sabotaging your present "$t1en" reality. There is no external force blocking you. Your greatest enemy is reading these lines right now.',
+    'We have deciphered that silent bargain within your mind: You orchestrated your current obstacle of "$t3en" yourself just to suppress your deep urge for "$t2en". Stop choosing the easy way out and playing the victim. The universe only asks for your shattering honesty.',
+    'You are so obsessed with that glorious "$t6en" goal ahead of you that you cannot see your mind rotting in the current vortex of "$t1en". You cannot build a new life without cleaning the graveyard inside you.',
+    'Someone finally had to tell you this harsh truth: The answer you seek is not in the light, it is hidden in the deep "$t2en" desire you buried in the dark. The day you stop hiding behind your "$t3en" excuse, everything will shatter and be reborn.',
   ];
 
   final idx = rng.nextInt(poolTr.length);

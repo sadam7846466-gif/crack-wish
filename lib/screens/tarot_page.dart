@@ -1871,391 +1871,124 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  /// Kart İlişkileri widget'ı — Premium Aurora Glass teması
+  /// Kart İlişkileri widget'ı — Apple Liquid Glass Teması
   Widget _buildCardRelationsPanel(List<CardRelation> relations) {
-    const orchid = Color(0xFFD49BE8);
-    const mysticTeal = Color(0xFF5DD6D6);
-    const deepPlum = Color(0xFF3D1A5C);
-    const softLavender = Color(0xFFE2C8FF);
-    const roseGold = Color(0xFFF0C0C5);
-    const cosmicBlue = Color(0xFF4A7BD4);
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
-          // Güçlü parlak dış glow
           BoxShadow(
-            color: orchid.withValues(alpha: 0.22),
-            blurRadius: 32,
-            spreadRadius: 1,
-          ),
-          BoxShadow(
-            color: mysticTeal.withValues(alpha: 0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: deepPlum.withValues(alpha: 0.5),
-            blurRadius: 12,
-            spreadRadius: -2,
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            spreadRadius: -5,
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             decoration: BoxDecoration(
+              color: const Color(0xFF161225).withValues(alpha: 0.45),
               borderRadius: BorderRadius.circular(22),
-              // Çok daha opak, belirgin arka plan
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF3A1960).withValues(alpha: 0.75),
-                  const Color(0xFF1E2845).withValues(alpha: 0.65),
-                  const Color(0xFF2D1350).withValues(alpha: 0.72),
-                ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
-              // Gradient kenarlık efekti — soldan sağa renk geçişi
               border: Border.all(
-                width: 1.2,
-                color: orchid.withValues(alpha: 0.35),
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
               ),
             ),
-            child: Stack(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sağ üst köşe glow orb — teal (çok daha parlak)
-                Positioned(
-                  top: -20, right: -20,
-                  child: Container(
-                    width: 100, height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          mysticTeal.withValues(alpha: 0.30),
-                          mysticTeal.withValues(alpha: 0.10),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.4, 1.0],
+                // Başlık
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.05),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+                      ),
+                      child: SizedBox(
+                        width: 18, height: 18,
+                        child: CustomPaint(painter: _ConnectionSymbolPainter()),
                       ),
                     ),
-                  ),
-                ),
-                // Sol alt köşe glow orb — orchid (çok daha parlak)
-                Positioned(
-                  bottom: -15, left: -15,
-                  child: Container(
-                    width: 90, height: 90,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          orchid.withValues(alpha: 0.25),
-                          orchid.withValues(alpha: 0.08),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.45, 1.0],
+                    const SizedBox(width: 12),
+                    Text(
+                      _isTr ? 'KART İLİŞKİLERİ' : 'CARD CONNECTIONS',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2.0,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                // Orta cosmicBlue glow
-                Positioned(
-                  top: 40, left: 20,
-                  child: Container(
-                    width: 60, height: 60,
+                const SizedBox(height: 20),
+                // Her ilişki kartı (Inner Apple-style glass boxes)
+                ...relations.map((r) {
+                  final suit1 = _detectCardSuit(r.card1Name);
+                  final suit2 = _detectCardSuit(r.card2Name);
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          cosmicBlue.withValues(alpha: 0.12),
-                          Colors.transparent,
-                        ],
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        width: 0.5,
                       ),
                     ),
-                  ),
-                ),
-                // Dekoratif köşe sembolleri (daha parlak)
-                Positioned(top: 8, left: 10,
-                  child: Text('✧', style: TextStyle(color: softLavender.withValues(alpha: 0.45), fontSize: 12))),
-                Positioned(top: 8, right: 10,
-                  child: Text('⊹', style: TextStyle(color: mysticTeal.withValues(alpha: 0.40), fontSize: 11))),
-                Positioned(bottom: 8, left: 10,
-                  child: Text('⊹', style: TextStyle(color: orchid.withValues(alpha: 0.35), fontSize: 10))),
-                Positioned(bottom: 8, right: 10,
-                  child: Text('✧', style: TextStyle(color: roseGold.withValues(alpha: 0.40), fontSize: 12))),
-                // Üst gradient shimmer çizgi (çok daha parlak)
-                Positioned(
-                  top: 0, left: 20, right: 20,
-                  child: Container(
-                    height: 2,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          mysticTeal.withValues(alpha: 0.6),
-                          orchid.withValues(alpha: 0.7),
-                          roseGold.withValues(alpha: 0.5),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
-                // Alt gradient shimmer çizgi
-                Positioned(
-                  bottom: 0, left: 30, right: 30,
-                  child: Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          orchid.withValues(alpha: 0.3),
-                          mysticTeal.withValues(alpha: 0.25),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Ana içerik
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Başlık
-                      Row(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
+                            margin: const EdgeInsets.only(top: 2, right: 16),
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  orchid.withValues(alpha: 0.3),
-                                  orchid.withValues(alpha: 0.08),
-                                  Colors.transparent,
-                                ],
-                                stops: const [0.0, 0.5, 1.0],
+                              color: Colors.black.withValues(alpha: 0.2),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.06),
+                                width: 0.5,
                               ),
                             ),
                             child: SizedBox(
-                              width: 22, height: 22,
-                              child: CustomPaint(painter: _ConnectionSymbolPainter()),
+                              width: 20, height: 20,
+                              child: CustomPaint(
+                                painter: _CardPairSymbolPainter(
+                                  suit1: suit1,
+                                  suit2: suit2,
+                                  card1Name: r.card1Name,
+                                  card2Name: r.card2Name,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _isTr ? 'KART İLİŞKİLERİ' : 'CARD CONNECTIONS',
-                            style: TextStyle(
-                              color: softLavender,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.8,
-                              shadows: [
-                                Shadow(
-                                  color: orchid.withValues(alpha: 0.7),
-                                  blurRadius: 14,
-                                ),
-                                Shadow(
-                                  color: mysticTeal.withValues(alpha: 0.3),
-                                  blurRadius: 20,
-                                ),
-                              ],
+                          Expanded(
+                            child: Text(
+                              _isTr ? r.relationTextTr : r.relationTextEn,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                fontSize: 13.5,
+                                height: 1.6,
+                                letterSpacing: 0.3,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      // Başlık altı dekoratif çizgi
-                      Row(
-                        children: [
-                          const SizedBox(width: 36),
-                          Expanded(
-                            child: Container(
-                              height: 1,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    orchid.withValues(alpha: 0.4),
-                                    mysticTeal.withValues(alpha: 0.3),
-                                    Colors.transparent,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text('⟡', style: TextStyle(color: mysticTeal.withValues(alpha: 0.6), fontSize: 8)),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 1,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    mysticTeal.withValues(alpha: 0.3),
-                                    orchid.withValues(alpha: 0.4),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 36),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      // Her ilişki kartı — glassmorphic individual cards
-                      ...relations.asMap().entries.map((entry) {
-                        final idx = entry.key;
-                        final r = entry.value;
-                        final suit1 = _detectCardSuit(r.card1Name);
-                        final suit2 = _detectCardSuit(r.card2Name);
-                        // Her karta farklı bir accent rengi çifti
-                        final cardAccents = [
-                          [orchid, mysticTeal],
-                          [roseGold, cosmicBlue],
-                          [mysticTeal, softLavender],
-                          [softLavender, roseGold],
-                          [cosmicBlue, orchid],
-                        ];
-                        final accent = cardAccents[idx % cardAccents.length];
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            // Belirgin katmanlı arka plan
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                accent[0].withValues(alpha: 0.14),
-                                Colors.white.withValues(alpha: 0.06),
-                                accent[1].withValues(alpha: 0.10),
-                              ],
-                            ),
-                            border: Border.all(
-                              color: accent[0].withValues(alpha: 0.30),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: accent[0].withValues(alpha: 0.10),
-                                blurRadius: 12,
-                                spreadRadius: 0,
-                              ),
-                              BoxShadow(
-                                color: accent[1].withValues(alpha: 0.06),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Stack(
-                              children: [
-                                // İç glow efekti (daha belirgin)
-                                Positioned(
-                                  top: -8, right: -8,
-                                  child: Container(
-                                    width: 50, height: 50,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: RadialGradient(
-                                        colors: [
-                                          accent[1].withValues(alpha: 0.18),
-                                          accent[1].withValues(alpha: 0.05),
-                                          Colors.transparent,
-                                        ],
-                                        stops: const [0.0, 0.4, 1.0],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // Sol kenar accent çizgi
-                                Positioned(
-                                  top: 8, bottom: 8, left: 0,
-                                  child: Container(
-                                    width: 2.5,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(2),
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          accent[0].withValues(alpha: 0.6),
-                                          accent[1].withValues(alpha: 0.3),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // Kart içeriği
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 2),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: RadialGradient(
-                                              colors: [
-                                                accent[0].withValues(alpha: 0.22),
-                                                accent[0].withValues(alpha: 0.06),
-                                                Colors.transparent,
-                                              ],
-                                              stops: const [0.0, 0.5, 1.0],
-                                            ),
-                                          ),
-                                          child: SizedBox(
-                                            width: 26, height: 26,
-                                            child: CustomPaint(
-                                              painter: _CardPairSymbolPainter(
-                                                suit1: suit1,
-                                                suit2: suit2,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          _isTr ? r.relationTextTr : r.relationTextEn,
-                                          style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.92),
-                                            fontSize: 13,
-                                            height: 1.55,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }),
               ],
             ),
           ),
@@ -3304,14 +3037,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           height: 390,
           child: PageView.builder(
             controller: _fullCardPageCtrl,
-            itemCount: 7,
+            itemCount: reading.cardReadings.length,
             onPageChanged: (i) {
               _setStateSafe(() => _fullCardPageIndex = i);
               _infoRevealCtrl?.forward(from: 0.0);
             },
             itemBuilder: (context, pageIndex) {
-              final cardAsset = _allCards[_selectedCardIndexes[pageIndex]].frontAsset;
-              final cardId = _selectedCardIndexes[pageIndex];
+              final cardId = reading.cardReadings[pageIndex].cardIndex;
+              final cardAsset = _allCards[cardId].frontAsset;
               final symbols = getCardSymbols(cardId);
               final symbolCount = getSymbolCountForPosition(pageIndex, symbols.length);
               final selectedSymbols = symbols.take(symbolCount).toList();
@@ -3617,7 +3350,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             return Opacity(
                               opacity: nameOpacity,
                               child: Text(
-                                reading.cardReadings[pageIndex].cardName,
+                                _isTr ? _allCards[cardId].nameTr : _allCards[cardId].nameEn,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -6028,10 +5761,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       offset: Offset(0, 30 * (1.0 - value)),
                       child: Container(
                         // Padding kaldırıldı, Carousel tam ekran genişleyebilsin diye alt elemanlara özel Padding verilecek
-                        child: SingleChildScrollView(
-                          controller: _readingScrollCtrl,
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
+                        child: NotificationListener<ScrollUpdateNotification>(
+                          onNotification: (info) {
+                            if (info.metrics.pixels < -90 && _state == RitualState.revealed) {
+                              _resetToIdle();
+                              return true;
+                            }
+                            return false;
+                          },
+                          child: SingleChildScrollView(
+                            controller: _readingScrollCtrl,
+                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                            child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // ── ÜST KISIM (Tüm yazılar ve paneller Carousel'e kadar) ──
@@ -6426,8 +6167,8 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
   late AnimationController _entranceController;
   late AnimationController _btnBounceCtrl;
   int? _pressedIndex;
-  // Store card positions for hit-testing during drag
-  final Map<int, Rect> _cardRects = {};
+  // Store custom oriented rects for precise hit-testing
+  final Map<int, ({Offset center, Size size, double angle})> _cardHitboxes = {};
 
   @override
   void initState() {
@@ -6476,14 +6217,30 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
     }
     
     final totalCards = widget.cardKeys.length;
+    final double inflation = 0.0; // Enflasyonu sıfırladık, böylece Majör Arkana'da da yandaki karta taşmıyor
     
     // Reverse iterate so top-drawn cards get priority
     for (int i = totalCards - 1; i >= 0; i--) {
-      final rect = _cardRects[i];
-      if (rect == null) continue;
+      final hb = _cardHitboxes[i];
+      if (hb == null) continue;
       if (widget.selectedPositions.contains(i) || widget.hiddenCards.contains(i)) continue;
-      // Expand hit area for easier touch on small rotated cards
-      if (rect.inflate(12).contains(localPos)) return i;
+      
+      // Mathematical rotation check for Oriented Bounding Box (AABB vs OBB collision logic)
+      final dx = localPos.dx - hb.center.dx;
+      final dy = localPos.dy - hb.center.dy;
+      
+      // Inverse rotation to bring localPos into the card's unrotated local coordinate space
+      final cosA = cos(-hb.angle);
+      final sinA = sin(-hb.angle);
+      final rx = dx * cosA - dy * sinA;
+      final ry = dx * sinA + dy * cosA;
+      
+      final hw = (hb.size.width / 2) + inflation;
+      final hh = (hb.size.height / 2) + inflation;
+      
+      if (rx >= -hw && rx <= hw && ry >= -hh && ry <= hh) {
+        return i;
+      }
     }
     return null;
   }
@@ -6516,7 +6273,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
               final cardH = isSmall ? 36.0 * (138.0 / 88.0) : 56.0 * (138.0 / 88.0);
 
               final cards = <Widget>[];
-              _cardRects.clear();
+              _cardHitboxes.clear();
               _btnCenter = Offset(centerX, centerY);
 
               // Dynamic layers based on card count
@@ -6557,8 +6314,12 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                 final scale = baseScale;
                 final opacity = isSelected ? 0.0 : curved.clamp(0.0, 1.0);
                 
-                // Store rect for hit-testing
-                _cardRects[cardIdx] = Rect.fromLTWH(x, y, cardW * scale, cardH * scale);
+                // Store precise oriented bounds for hit-testing
+                _cardHitboxes[cardIdx] = (
+                  center: Offset(x + cardW / 2, y + cardH / 2),
+                  size: Size(cardW * scale, cardH * scale),
+                  angle: rotation,
+                );
                 
                 final cardKey = widget.cardKeys[cardIdx];
                 final isPressed = _pressedIndex == cardIdx;
@@ -8255,8 +8016,10 @@ class _ConnectionSymbolPainter extends CustomPainter {
 class _CardPairSymbolPainter extends CustomPainter {
   final String suit1;
   final String suit2;
+  final String card1Name;
+  final String card2Name;
 
-  _CardPairSymbolPainter({required this.suit1, required this.suit2});
+  _CardPairSymbolPainter({required this.suit1, required this.suit2, required this.card1Name, required this.card2Name});
 
   static const _suitColors = {
     'wands': Color(0xFFFF8A50),
@@ -8265,8 +8028,6 @@ class _CardPairSymbolPainter extends CustomPainter {
     'pentacles': Color(0xFFFFD54F),
     'major': Color(0xFFCE93D8),
   };
-
-  static const _suitIndex = {'wands': 0, 'cups': 1, 'swords': 2, 'pentacles': 3, 'major': 4};
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -8278,10 +8039,7 @@ class _CardPairSymbolPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.38;
 
-    final i1 = _suitIndex[suit1] ?? 4;
-    final i2 = _suitIndex[suit2] ?? 4;
-    final combo = (i1 < i2) ? i1 * 5 + i2 : i2 * 5 + i1;
-    final shape = combo % 8;
+    final shape = (card1Name.hashCode ^ card2Name.hashCode).abs() % 8;
 
     final stroke = Paint()
       ..color = blended
@@ -8412,7 +8170,7 @@ class _CardPairSymbolPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CardPairSymbolPainter old) =>
-      suit1 != old.suit1 || suit2 != old.suit2;
+      suit1 != old.suit1 || suit2 != old.suit2 || card1Name != old.card1Name || card2Name != old.card2Name;
 }
 
 /// Dairesel arc gauge painter
