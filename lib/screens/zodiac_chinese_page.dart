@@ -1348,13 +1348,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     // ── SOL: Element İkonu ──
                     Positioned(left: 0, top: 0, bottom: 0,
                       child: SizedBox(width: 130, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        // Glow zemin
-                        Stack(alignment: Alignment.bottomCenter, children: [
+                        // Glow zemin (yuvarlak soft parlama)
+                        Stack(alignment: Alignment.center, children: [
                           Container(
-                            width: 70, height: 8,
+                            width: 44, height: 44,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: [BoxShadow(color: elColor.withOpacity(0.45), blurRadius: 14, spreadRadius: 2)],
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: elColor.withOpacity(0.35), blurRadius: 22)],
                             ),
                           ),
                           SizedBox(width: 72, height: 72,
@@ -1375,12 +1375,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     // ── SAĞ: Yin/Yang İkonu ──
                     Positioned(right: 0, top: 0, bottom: 0,
                       child: SizedBox(width: 130, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Stack(alignment: Alignment.bottomCenter, children: [
+                        // Glow zemin
+                        Stack(alignment: Alignment.center, children: [
                           Container(
-                            width: 70, height: 8,
+                            width: 44, height: 44,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: [BoxShadow(color: const Color(0xFFB8BCC8).withOpacity(0.35), blurRadius: 14, spreadRadius: 2)],
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: Colors.white.withOpacity(0.15), blurRadius: 22)],
                             ),
                           ),
                           SizedBox(width: 72, height: 72,
@@ -5059,48 +5060,48 @@ class _ElementIconPainter extends CustomPainter {
 
     switch (element) {
       case 'Toprak':
+      case 'Toprak':
         // Modern katmanlı dağ (huzurlu zen formu)
         final path = Path();
         path.moveTo(w * 0.3, h * 0.75);
-        path.lineTo(w * 0.45, h * 0.35);
-        path.lineTo(w * 0.55, h * 0.35);
+        path.lineTo(w * 0.45, h * 0.45);
+        path.lineTo(w * 0.55, h * 0.45);
         path.lineTo(w * 0.7, h * 0.75);
         path.close();
         canvas.drawPath(path, p..strokeWidth = 2.4);
         canvas.drawLine(Offset(w * 0.2, h * 0.85), Offset(w * 0.8, h * 0.85), p..strokeWidth = 2.6..color = color.withOpacity(0.8));
-        canvas.drawLine(Offset(w * 0.38, h * 0.55), Offset(w * 0.62, h * 0.55), p..strokeWidth = 2.0);
+        canvas.drawLine(Offset(w * 0.38, h * 0.6), Offset(w * 0.62, h * 0.6), p..strokeWidth = 2.0);
         break;
 
       case 'Ateş':
         // Net, güçlü alev silüeti
         final flame = Path();
         flame.moveTo(w * 0.5, h * 0.15);
-        flame.quadraticBezierTo(w * 0.85, h * 0.45, w * 0.65, h * 0.8);
-        flame.quadraticBezierTo(w * 0.5, h * 0.9, w * 0.35, h * 0.8);
-        flame.quadraticBezierTo(w * 0.15, h * 0.45, w * 0.5, h * 0.15);
+        flame.cubicTo(w * 0.9, h * 0.6, w * 0.8, h * 0.85, w * 0.5, h * 0.85);
+        flame.cubicTo(w * 0.2, h * 0.85, w * 0.1, h * 0.6, w * 0.5, h * 0.15);
         canvas.drawPath(flame, p..strokeWidth = 2.4..color = color);
         // İç küçük, canlı alev
         final inner = Path();
-        inner.moveTo(w * 0.5, h * 0.4);
-        inner.quadraticBezierTo(w * 0.65, h * 0.6, w * 0.5, h * 0.75);
-        inner.quadraticBezierTo(w * 0.35, h * 0.6, w * 0.5, h * 0.4);
-        canvas.drawPath(inner, p..strokeWidth = 2.0..color = color.withOpacity(0.6));
+        inner.moveTo(w * 0.5, h * 0.45);
+        inner.cubicTo(w * 0.7, h * 0.65, w * 0.65, h * 0.75, w * 0.5, h * 0.75);
+        inner.cubicTo(w * 0.35, h * 0.75, w * 0.3, h * 0.65, w * 0.5, h * 0.45);
+        canvas.drawPath(inner, p..strokeWidth = 2.0..color = color.withOpacity(0.7));
         break;
 
       case 'Ağaç':
         // Zarif, canlı bir yaprak ve damarları
         final leaf = Path();
         leaf.moveTo(w * 0.5, h * 0.15);
-        leaf.cubicTo(w * 0.85, h * 0.3, w * 0.85, h * 0.75, w * 0.5, h * 0.85);
-        leaf.cubicTo(w * 0.15, h * 0.75, w * 0.15, h * 0.3, w * 0.5, h * 0.15);
+        leaf.cubicTo(w * 0.9, h * 0.3, w * 0.9, h * 0.75, w * 0.5, h * 0.85);
+        leaf.cubicTo(w * 0.1, h * 0.75, w * 0.1, h * 0.3, w * 0.5, h * 0.15);
         canvas.drawPath(leaf, p..strokeWidth = 2.4);
         // Merkez damar
         canvas.drawLine(Offset(w * 0.5, h * 0.15), Offset(w * 0.5, h * 0.85), p..strokeWidth = 2.2);
         // Yan damarlar
-        canvas.drawLine(Offset(w * 0.5, h * 0.4), Offset(w * 0.65, h * 0.3), p..strokeWidth = 1.6);
-        canvas.drawLine(Offset(w * 0.5, h * 0.55), Offset(w * 0.7, h * 0.45), p..strokeWidth = 1.6);
-        canvas.drawLine(Offset(w * 0.5, h * 0.45), Offset(w * 0.35, h * 0.35), p..strokeWidth = 1.6);
-        canvas.drawLine(Offset(w * 0.5, h * 0.65), Offset(w * 0.3, h * 0.55), p..strokeWidth = 1.6);
+        canvas.drawLine(Offset(w * 0.5, h * 0.4), Offset(w * 0.65, h * 0.35), p..strokeWidth = 1.6);
+        canvas.drawLine(Offset(w * 0.5, h * 0.6), Offset(w * 0.7, h * 0.5), p..strokeWidth = 1.6);
+        canvas.drawLine(Offset(w * 0.5, h * 0.5), Offset(w * 0.35, h * 0.45), p..strokeWidth = 1.6);
+        canvas.drawLine(Offset(w * 0.5, h * 0.7), Offset(w * 0.3, h * 0.6), p..strokeWidth = 1.6);
         break;
 
       case 'Metal':
@@ -5140,11 +5141,6 @@ class _ElementIconPainter extends CustomPainter {
     }
   }
 
-  double sin(double x) {
-    // Simple sine approximation
-    return (x - x * x * x / 6 + x * x * x * x * x / 120);
-  }
-
   @override
   bool shouldRepaint(_ElementIconPainter old) => old.element != element || old.color != color;
 }
@@ -5161,49 +5157,58 @@ class _YinYangIconPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     final silver = const Color(0xFFCDCDD8);
+    final blackBg = const Color(0xFF1E1E24);
+    final brightWhite = const Color(0xFFFAFAFA);
+    
     final p = Paint()
-      ..color = silver
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round;
 
     if (isYin) {
-      // Saf, zarif ve tekli hilal ay formu
+      // Saf, zarif siyah renkli ve kayık hilal ay formu
+      canvas.save();
+      canvas.translate(w * 0.5, h * 0.5);
+      canvas.rotate(-0.35); // Biraz daha sola kayık
+      
       final path = Path();
-      path.moveTo(w * 0.6, h * 0.15);
-      path.cubicTo(w * 0.1, h * 0.2, w * 0.1, h * 0.8, w * 0.6, h * 0.85);
-      path.cubicTo(w * 0.35, h * 0.7, w * 0.35, h * 0.3, w * 0.6, h * 0.15);
-      canvas.drawPath(path, p..strokeWidth = 3.0..color = silver);
+      path.moveTo(w * 0.1, -h * 0.35);
+      path.cubicTo(-w * 0.4, -h * 0.3, -w * 0.4, h * 0.3, w * 0.1, h * 0.35); // dış yay
+      path.cubicTo(-w * 0.15, h * 0.2, -w * 0.15, -h * 0.2, w * 0.1, -h * 0.35); // iç yay (kesici)
+      
+      canvas.drawPath(path, Paint()..color = blackBg..style = PaintingStyle.fill); // siyah dolgu
+      canvas.drawPath(path, p..strokeWidth = 1.8..color = Colors.white.withOpacity(0.6)); // beyaz çerçeve
+      
+      canvas.restore();
 
       // Etrafında iki küçük ışıltı yıldızı
       void drawStar(double cx, double cy, double sz) {
-        canvas.drawLine(Offset(cx - sz, cy), Offset(cx + sz, cy), p..strokeWidth = 1.5);
-        canvas.drawLine(Offset(cx, cy - sz), Offset(cx, cy + sz), p);
+        canvas.drawLine(Offset(cx - sz, cy), Offset(cx + sz, cy), p..strokeWidth = 1.5..color = silver);
+        canvas.drawLine(Offset(cx, cy - sz), Offset(cx, cy + sz), p..color = silver);
       }
       drawStar(w * 0.75, h * 0.35, 4);
       drawStar(w * 0.85, h * 0.55, 2.5);
 
     } else {
-      // Uyumlu, orantılı günes ışınları
-      canvas.drawCircle(Offset(w * 0.5, h * 0.5), w * 0.2, p..strokeWidth = 2.8..color = silver);
+      // Uyumlu, orantılı günes ışınları ve parlak beyaz merkez
+      canvas.drawCircle(Offset(w * 0.5, h * 0.5), w * 0.18, Paint()..color = brightWhite..style = PaintingStyle.fill);
+      canvas.drawCircle(Offset(w * 0.5, h * 0.5), w * 0.18, p..strokeWidth = 1.8..color = Colors.white.withOpacity(0.6));
+      
       final rayCount = 8;
       for (int i = 0; i < rayCount; i++) {
-        final angle = (i * 3.14159 * 2 / rayCount) - 1.5708;
-        final inner = w * 0.28;
-        final outer = i % 2 == 0 ? w * 0.44 : w * 0.38;
+        final angle = (i * math.pi * 2 / rayCount) - 1.5708;
+        final inner = w * 0.24; // daireden hemen sonra basla
+        final outer = i % 2 == 0 ? w * 0.42 : w * 0.34;
         final cx = w * 0.5;
         final cy = h * 0.5;
         canvas.drawLine(
-          Offset(cx + inner * cos(angle), cy + inner * sin(angle)),
-          Offset(cx + outer * cos(angle), cy + outer * sin(angle)),
-          p..strokeWidth = 2.2..color = silver.withOpacity(i % 2 == 0 ? 1.0 : 0.5),
+          Offset(cx + inner * math.cos(angle), cy + inner * math.sin(angle)),
+          Offset(cx + outer * math.cos(angle), cy + outer * math.sin(angle)),
+          p..strokeWidth = 2.0..color = brightWhite.withOpacity(i % 2 == 0 ? 1.0 : 0.6),
         );
       }
     }
   }
-
-  double sin(double x) => x - x * x * x / 6 + x * x * x * x * x / 120 - x * x * x * x * x * x * x / 5040;
-  double cos(double x) => sin(x + 1.5707963);
 
   @override
   bool shouldRepaint(_YinYangIconPainter old) => old.isYin != isYin;
