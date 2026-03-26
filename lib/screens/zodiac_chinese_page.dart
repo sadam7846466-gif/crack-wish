@@ -1308,126 +1308,108 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
             ),
             child: Column(children: [
 
-              // ── HERO: İKİ ORB — Element & Yin-Yang ──
+              // ── HERO: İKİ ÖZGÜn İKON — Element & Yin-Yang ──
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
-                child: Row(children: [
-                  // ── SOL ORB: Element ──
-                  Expanded(child: Column(children: [
-                    SizedBox(width: 90, height: 90, child: Stack(alignment: Alignment.center, children: [
-                      // Dış glow halkası
-                      Container(width: 90, height: 90, decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(colors: [
-                          elColor.withOpacity(0.22),
-                          elColor.withOpacity(0.07),
-                          Colors.transparent,
-                        ]),
-                      )),
-                      // İkinci glow halkası
-                      Container(width: 76, height: 76, decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.transparent,
-                        border: Border.all(color: elColor.withOpacity(0.25), width: 0.8),
-                      )),
-                      // Ana çember
-                      Container(
-                        width: 62, height: 62,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: elColor.withOpacity(0.14),
-                          border: Border.all(color: elColor.withOpacity(0.5), width: 1.5),
-                          boxShadow: [BoxShadow(color: elColor.withOpacity(0.35), blurRadius: 18, spreadRadius: 1)],
-                        ),
-                        child: Center(child: Text(elData['emoji'] as String, style: const TextStyle(fontSize: 28))),
-                      ),
-                    ])),
-                    const SizedBox(height: 12),
-                    Text(_userElement, style: TextStyle(
-                      color: elColor, fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.3,
-                    )),
-                    const SizedBox(height: 2),
-                    Text('Elementi', style: TextStyle(
-                      color: Colors.white.withOpacity(0.35), fontSize: 10, letterSpacing: 1,
-                    )),
-                  ])),
+                padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                child: SizedBox(
+                  height: 120,
+                  child: Stack(children: [
 
-                  // ── ORTA: Bağ köprüsü ──
-                  SizedBox(width: 80, child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    SizedBox(height: 45, child: Stack(alignment: Alignment.center, children: [
-                      // Gradient köprü çizgisi
-                      Positioned(
-                        left: 0, right: 0, top: 22,
-                        child: Container(height: 1, decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [
-                            elColor.withOpacity(0.6),
-                            Colors.white.withOpacity(0.2),
-                            yyColor.withOpacity(0.6),
-                          ]),
-                        )),
+                    // ── Gradient köprü çizgisi (tam ortada dikey merkez) ──
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Container(height: 1, margin: const EdgeInsets.symmetric(horizontal: 60),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: [
+                              elColor.withOpacity(0.5),
+                              Colors.white.withOpacity(0.15),
+                              const Color(0xFFB8BCC8).withOpacity(0.5),
+                            ]),
+                          ),
+                        ),
                       ),
-                      // Yin-Yang sembolü ortada
-                      Container(
-                        width: 28, height: 28,
+                    ),
+
+                    // ── Yin-Yang sembolü — tam merkez ──
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 32, height: 32,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF1a1025),
-                          border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.7),
+                          color: const Color(0xFF120E1C),
+                          boxShadow: [BoxShadow(color: Colors.white.withOpacity(0.06), blurRadius: 8)],
                         ),
                         child: CustomPaint(painter: _YinYangMiniPainter(
-                          yinColor: yyColor.withOpacity(0.85),
-                          yangColor: elColor.withOpacity(0.85),
+                          yinColor: const Color(0xFF1a1a2e),
+                          yangColor: const Color(0xFFE8E0D0),
                         )),
                       ),
-                    ])),
-                  ])),
+                    ),
 
-                  // ── SAĞ ORB: Yin/Yang ──
-                  Expanded(child: Column(children: [
-                    SizedBox(width: 90, height: 90, child: Stack(alignment: Alignment.center, children: [
-                      // Dış glow halkası
-                      Container(width: 90, height: 90, decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(colors: [
-                          yyColor.withOpacity(0.22),
-                          yyColor.withOpacity(0.07),
-                          Colors.transparent,
+                    // ── SOL: Element İkonu ──
+                    Positioned(left: 0, top: 0, bottom: 0,
+                      child: SizedBox(width: 130, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        // Glow zemin
+                        Stack(alignment: Alignment.bottomCenter, children: [
+                          Container(
+                            width: 70, height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [BoxShadow(color: elColor.withOpacity(0.45), blurRadius: 14, spreadRadius: 2)],
+                            ),
+                          ),
+                          SizedBox(width: 72, height: 72,
+                            child: CustomPaint(painter: _ElementIconPainter(element: _userElement, color: elColor)),
+                          ),
                         ]),
-                      )),
-                      // İkinci glow halkası
-                      Container(width: 76, height: 76, decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.transparent,
-                        border: Border.all(color: yyColor.withOpacity(0.25), width: 0.8),
-                      )),
-                      // Ana çember
-                      Container(
-                        width: 62, height: 62,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: yyColor.withOpacity(0.14),
-                          border: Border.all(color: yyColor.withOpacity(0.5), width: 1.5),
-                          boxShadow: [BoxShadow(color: yyColor.withOpacity(0.35), blurRadius: 18, spreadRadius: 1)],
-                        ),
-                        child: Center(child: Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 28))),
-                      ),
-                    ])),
-                    const SizedBox(height: 12),
-                    Text(_userYinYang, style: TextStyle(
-                      color: yyColor, fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.3,
-                    )),
-                    const SizedBox(height: 2),
-                    Text('Enerjisi', style: TextStyle(
-                      color: Colors.white.withOpacity(0.35), fontSize: 10, letterSpacing: 1,
-                    )),
-                  ])),
-                ]),
+                        const SizedBox(height: 10),
+                        Text(_userElement, style: TextStyle(
+                          color: elColor, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.3,
+                        )),
+                        const SizedBox(height: 1),
+                        Text('Elementi', style: TextStyle(
+                          color: Colors.white.withOpacity(0.3), fontSize: 9.5, letterSpacing: 1.2,
+                        )),
+                      ])),
+                    ),
+
+                    // ── SAĞ: Yin/Yang İkonu ──
+                    Positioned(right: 0, top: 0, bottom: 0,
+                      child: SizedBox(width: 130, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Stack(alignment: Alignment.bottomCenter, children: [
+                          Container(
+                            width: 70, height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [BoxShadow(color: const Color(0xFFB8BCC8).withOpacity(0.35), blurRadius: 14, spreadRadius: 2)],
+                            ),
+                          ),
+                          SizedBox(width: 72, height: 72,
+                            child: CustomPaint(painter: _YinYangIconPainter(isYin: isYin)),
+                          ),
+                        ]),
+                        const SizedBox(height: 10),
+                        Text(_userYinYang, style: const TextStyle(
+                          color: Color(0xFFCDCDD8), fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.3,
+                        )),
+                        const SizedBox(height: 1),
+                        Text('Enerjisi', style: TextStyle(
+                          color: Colors.white.withOpacity(0.3), fontSize: 9.5, letterSpacing: 1.2,
+                        )),
+                      ])),
+                    ),
+
+                  ]),
+                ),
               ),
 
               const SizedBox(height: 24),
 
               // ── 3 ENERJİ KARTI (Baskın / Destekler / Yorar) ──
               Padding(
+
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(children: [
                   _energyCard('⚡', 'Baskın', fsProfile['dominant'] as String, elColor),
@@ -4995,24 +4977,14 @@ class _YinYangMiniPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     final r = size.width / 2 * 0.82;
-
-    // Yang (üst yarı — element rengi)
     final yangPaint = Paint()..color = yangColor..style = PaintingStyle.fill;
     final yinPaint  = Paint()..color = yinColor ..style = PaintingStyle.fill;
-
-    // Üst yarı daire (yang)
     canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r), -3.14159, 3.14159, true, yangPaint);
-    // Alt yarı (yin)
     canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r), 0, 3.14159, true, yinPaint);
-
-    // Üst küçük daire (yin içinde yang)
     canvas.drawCircle(Offset(cx, cy - r / 2), r / 4, yangPaint);
-    // Alt küçük daire (yang içinde yin)
     canvas.drawCircle(Offset(cx, cy + r / 2), r / 4, yinPaint);
-
-    // Dış çizgi
-    final border = Paint()..color = Colors.white.withOpacity(0.15)..style = PaintingStyle.stroke..strokeWidth = 0.8;
-    canvas.drawCircle(Offset(cx, cy), r, border);
+    canvas.drawCircle(Offset(cx, cy), r,
+      Paint()..color = Colors.white.withOpacity(0.15)..style = PaintingStyle.stroke..strokeWidth = 0.8);
   }
 
   @override
@@ -5020,9 +4992,193 @@ class _YinYangMiniPainter extends CustomPainter {
 }
 
 // ─────────────────────────────────────────────────────
+// ELEMENT ICON PAINTER — Her element için özgün çizim
+// ─────────────────────────────────────────────────────
+class _ElementIconPainter extends CustomPainter {
+  final String element;
+  final Color color;
+  _ElementIconPainter({required this.element, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    switch (element) {
+      case 'Toprak':
+        // Jeolojik katmanlar — dalgalı yatay çizgiler
+        for (int i = 0; i < 4; i++) {
+          final y = h * (0.28 + i * 0.14);
+          final amp = 4.0 - i * 0.5;
+          final wavePath = Path();
+          wavePath.moveTo(w * 0.15, y);
+          for (double x = w * 0.15; x <= w * 0.85; x += 8) {
+            final t = (x - w * 0.15) / (w * 0.7);
+            wavePath.lineTo(x, y + amp * (i % 2 == 0 ? 1 : -1) * sin(t * 3.14 * 2));
+          }
+          canvas.drawPath(wavePath, p..strokeWidth = 2.2 - i * 0.3..color = color.withOpacity(1.0 - i * 0.18));
+        }
+        // Altında toprak doku
+        canvas.drawLine(Offset(w * 0.2, h * 0.78), Offset(w * 0.8, h * 0.78), p..strokeWidth = 2.8..color = color.withOpacity(0.7));
+        break;
+
+      case 'Ateş':
+        // Alev şekli — kavisli yükselen form
+        final flame = Path();
+        flame.moveTo(w * 0.5, h * 0.15);
+        flame.cubicTo(w * 0.75, h * 0.3, w * 0.8, h * 0.5, w * 0.65, h * 0.72);
+        flame.cubicTo(w * 0.6, h * 0.82, w * 0.4, h * 0.82, w * 0.35, h * 0.72);
+        flame.cubicTo(w * 0.2, h * 0.5, w * 0.25, h * 0.3, w * 0.5, h * 0.15);
+        canvas.drawPath(flame, p..strokeWidth = 2.5..color = color);
+        // İç küçük alev
+        final inner = Path();
+        inner.moveTo(w * 0.5, h * 0.32);
+        inner.cubicTo(w * 0.62, h * 0.45, w * 0.63, h * 0.6, w * 0.55, h * 0.67);
+        inner.cubicTo(w * 0.45, h * 0.67, w * 0.38, h * 0.6, w * 0.38, h * 0.5);
+        inner.cubicTo(w * 0.38, h * 0.4, w * 0.44, h * 0.33, w * 0.5, h * 0.32);
+        canvas.drawPath(inner, p..strokeWidth = 1.4..color = color.withOpacity(0.45));
+        break;
+
+      case 'Ağaç':
+        // Ağaç — gövde ve yayılan dallar
+        canvas.drawLine(Offset(w * 0.5, h * 0.75), Offset(w * 0.5, h * 0.38), p..strokeWidth = 2.8..color = color);
+        // Sol dallar
+        canvas.drawLine(Offset(w * 0.5, h * 0.38), Offset(w * 0.22, h * 0.22), p..strokeWidth = 2);
+        canvas.drawLine(Offset(w * 0.5, h * 0.5), Offset(w * 0.27, h * 0.4), p..strokeWidth = 1.5);
+        // Sağ dallar
+        canvas.drawLine(Offset(w * 0.5, h * 0.38), Offset(w * 0.78, h * 0.22), p..strokeWidth = 2);
+        canvas.drawLine(Offset(w * 0.5, h * 0.5), Offset(w * 0.73, h * 0.4), p..strokeWidth = 1.5);
+        // Doruk
+        canvas.drawLine(Offset(w * 0.5, h * 0.38), Offset(w * 0.5, h * 0.15), p..strokeWidth = 1.7);
+        // Kök
+        canvas.drawLine(Offset(w * 0.5, h * 0.75), Offset(w * 0.3, h * 0.88), p..strokeWidth = 1.5..color = color.withOpacity(0.5));
+        canvas.drawLine(Offset(w * 0.5, h * 0.75), Offset(w * 0.7, h * 0.88), p..strokeWidth = 1.5..color = color.withOpacity(0.5));
+        break;
+
+      case 'Metal':
+        // Kristal / elmas geometrisi
+        final crystal = Path();
+        crystal.moveTo(w * 0.5, h * 0.12);
+        crystal.lineTo(w * 0.82, h * 0.42);
+        crystal.lineTo(w * 0.5, h * 0.88);
+        crystal.lineTo(w * 0.18, h * 0.42);
+        crystal.close();
+        canvas.drawPath(crystal, p..strokeWidth = 2..color = color);
+        // İç detaylar
+        canvas.drawLine(Offset(w * 0.5, h * 0.12), Offset(w * 0.5, h * 0.42), p..strokeWidth = 1.2..color = color.withOpacity(0.4));
+        canvas.drawLine(Offset(w * 0.18, h * 0.42), Offset(w * 0.82, h * 0.42), p..strokeWidth = 1.2..color = color.withOpacity(0.4));
+        canvas.drawLine(Offset(w * 0.3, h * 0.27), Offset(w * 0.7, h * 0.27), p..strokeWidth = 1..color = color.withOpacity(0.25));
+        break;
+
+      case 'Su':
+        // Su damlası + dalgalar
+        final drop = Path();
+        drop.moveTo(w * 0.5, h * 0.15);
+        drop.cubicTo(w * 0.72, h * 0.38, w * 0.72, h * 0.62, w * 0.5, h * 0.65);
+        drop.cubicTo(w * 0.28, h * 0.62, w * 0.28, h * 0.38, w * 0.5, h * 0.15);
+        canvas.drawPath(drop, p..strokeWidth = 2.2..color = color);
+        // Alt dalgalar
+        for (int i = 0; i < 3; i++) {
+          final y = h * (0.74 + i * 0.09);
+          final wavePath2 = Path();
+          wavePath2.moveTo(w * (0.2 + i * 0.05), y);
+          wavePath2.cubicTo(w * 0.35, y - 6, w * 0.45, y + 6, w * 0.5, y);
+          wavePath2.cubicTo(w * 0.55, y - 6, w * 0.65, y + 6, w * (0.8 - i * 0.05), y);
+          canvas.drawPath(wavePath2, p..strokeWidth = 1.5..color = color.withOpacity(0.8 - i * 0.2));
+        }
+        break;
+    }
+  }
+
+  double sin(double x) {
+    // Simple sine approximation
+    return (x - x * x * x / 6 + x * x * x * x * x / 120);
+  }
+
+  @override
+  bool shouldRepaint(_ElementIconPainter old) => old.element != element || old.color != color;
+}
+
+// ─────────────────────────────────────────────────────
+// YIN-YANG ICON PAINTER — Özgün çizimli ikon
+// ─────────────────────────────────────────────────────
+class _YinYangIconPainter extends CustomPainter {
+  final bool isYin;
+  _YinYangIconPainter({required this.isYin});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final silver = const Color(0xFFCDCDD8);
+    final p = Paint()
+      ..color = silver
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round;
+
+    if (isYin) {
+      // Ay — hilal şekli (iki daire farkı)
+      // Dış daire yayı
+      canvas.drawArc(
+        Rect.fromCenter(center: Offset(w * 0.48, h * 0.42), width: w * 0.52, height: h * 0.52),
+        0.55, 4.45,
+        false,
+        p..strokeWidth = 2.8..color = silver,
+      );
+      // İç daire (hilal için)
+      canvas.drawArc(
+        Rect.fromCenter(center: Offset(w * 0.60, h * 0.42), width: w * 0.38, height: h * 0.38),
+        2.8, 3.0,
+        false,
+        p..strokeWidth = 2.2..color = silver.withOpacity(0.5),
+      );
+      // Küçük yıldız noktalari
+      final dotPaint = Paint()..color = silver.withOpacity(0.45)..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(w * 0.72, h * 0.28), 2.2, dotPaint);
+      canvas.drawCircle(Offset(w * 0.82, h * 0.45), 1.5, dotPaint);
+      canvas.drawCircle(Offset(w * 0.65, h * 0.20), 1.2, dotPaint);
+      // Alt süsleme çizgisi
+      canvas.drawLine(Offset(w * 0.25, h * 0.72), Offset(w * 0.75, h * 0.72),
+        p..strokeWidth = 1.2..color = silver.withOpacity(0.2));
+    } else {
+      // Güneş — merkez + ışın çizgileri
+      canvas.drawCircle(Offset(w * 0.5, h * 0.45), w * 0.18,
+        p..strokeWidth = 2.5..color = silver);
+      final rayCount = 8;
+      for (int i = 0; i < rayCount; i++) {
+        final angle = (i * 3.14159 * 2 / rayCount) - 1.5708;
+        final inner = w * 0.22;
+        final outer = w * 0.36;
+        final cx = w * 0.5;
+        final cy = h * 0.45;
+        canvas.drawLine(
+          Offset(cx + inner * cos(angle), cy + inner * sin(angle)),
+          Offset(cx + outer * cos(angle), cy + outer * sin(angle)),
+          p..strokeWidth = i % 2 == 0 ? 2.2 : 1.4..color = silver.withOpacity(i % 2 == 0 ? 0.9 : 0.45),
+        );
+      }
+    }
+  }
+
+  double sin(double x) => x - x * x * x / 6 + x * x * x * x * x / 120 - x * x * x * x * x * x * x / 5040;
+  double cos(double x) => sin(x + 1.5707963);
+
+  @override
+  bool shouldRepaint(_YinYangIconPainter old) => old.isYin != isYin;
+}
+
+// ─────────────────────────────────────────────────────
 // ROOM SKETCH PAINTER — İdeal mekan çizimi
 // ─────────────────────────────────────────────────────
 class _RoomSketchPainter extends CustomPainter {
+
 
   final Color color;
   _RoomSketchPainter({required this.color});
