@@ -5078,51 +5078,49 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Sadece çizgi (stroke) ile güçlü alev ikonu
-        final sp = Paint()
-          ..color = color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.6
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round;
+        // Modern, premium and bold fire silhouette. 
+        // 5-tongue composition with artistic curves focusing on the right-curving peak.
+        final firePaint = Paint()..color = color..style = PaintingStyle.fill;
+        
+        final flamePath = Path();
+        // Start from high-precision bottom center
+        flamePath.moveTo(w * 0.5, h * 0.9);
+        
+        // 1. Right Side - Bottom to Flare
+        flamePath.cubicTo(w * 0.75, h * 0.85, w * 0.9, h * 0.65, w * 0.85, h * 0.5);
+        // Right Flare (Slightly detached look but joined)
+        flamePath.quadraticBezierTo(w * 0.92, h * 0.35, w * 0.7, h * 0.35);
+        // Inner notch before peak
+        flamePath.quadraticBezierTo(w * 0.65, h * 0.38, w * 0.62, h * 0.28);
+        
+        // 2. CHARACTERISTIC PEAK - Curving to the RIGHT
+        flamePath.cubicTo(w * 0.65, h * 0.02, w * 0.45, h * 0.02, w * 0.4, h * 0.15);
+        
+        // 3. Left Side - Peak to Flare
+        flamePath.quadraticBezierTo(w * 0.35, h * 0.28, w * 0.3, h * 0.28);
+        // Left Flare
+        flamePath.quadraticBezierTo(w * 0.05, h * 0.35, w * 0.15, h * 0.55);
+        flamePath.cubicTo(w * 0.1, h * 0.7, w * 0.25, h * 0.85, w * 0.5, h * 0.9);
+        flamePath.close();
+        
+        canvas.drawPath(flamePath, firePaint);
 
-        // 1. Ana merkez dil — en uzun, sağa kıvrılıyor (referanstaki tepe)
-        final t1 = Path();
-        t1.moveTo(w * 0.5, h * 0.88);
-        t1.cubicTo(w * 0.42, h * 0.65, w * 0.3, h * 0.45, w * 0.38, h * 0.18);
-        t1.cubicTo(w * 0.44, h * 0.05, w * 0.7, h * 0.06, w * 0.65, h * 0.25);
-        t1.quadraticBezierTo(w * 0.58, h * 0.38, w * 0.6, h * 0.48);
-        canvas.drawPath(t1, sp..strokeWidth = 2.8);
+        // Core depth - negative space effect with internal details
+        final corePath = Path();
+        // Central internal wisp
+        corePath.moveTo(w * 0.5, h * 0.45);
+        corePath.quadraticBezierTo(w * 0.45, h * 0.6, w * 0.5, h * 0.75);
+        corePath.quadraticBezierTo(w * 0.55, h * 0.6, w * 0.5, h * 0.45);
+        // Side internal wisps as per premium icon style
+        corePath.moveTo(w * 0.32, h * 0.55);
+        corePath.quadraticBezierTo(w * 0.28, h * 0.65, w * 0.35, h * 0.7);
+        corePath.moveTo(w * 0.68, h * 0.55);
+        corePath.quadraticBezierTo(w * 0.72, h * 0.65, w * 0.65, h * 0.7);
+        
+        canvas.drawPath(corePath, Paint()..color = Colors.black.withOpacity(0.12)..style = PaintingStyle.fill);
 
-        // 2. Sol dış büyük alev dili (sola yayılan)
-        final t2 = Path();
-        t2.moveTo(w * 0.48, h * 0.85);
-        t2.cubicTo(w * 0.28, h * 0.78, w * 0.08, h * 0.65, w * 0.1, h * 0.45);
-        t2.quadraticBezierTo(w * 0.1, h * 0.3, w * 0.28, h * 0.26);
-        t2.quadraticBezierTo(w * 0.35, h * 0.38, w * 0.38, h * 0.5);
-        canvas.drawPath(t2, sp..strokeWidth = 2.4);
-
-        // 3. Sağ dış alev dili (saga yayılan)
-        final t3 = Path();
-        t3.moveTo(w * 0.52, h * 0.85);
-        t3.cubicTo(w * 0.72, h * 0.78, w * 0.88, h * 0.62, w * 0.85, h * 0.45);
-        t3.quadraticBezierTo(w * 0.83, h * 0.32, w * 0.7, h * 0.3);
-        t3.quadraticBezierTo(w * 0.62, h * 0.4, w * 0.62, h * 0.52);
-        canvas.drawPath(t3, sp..strokeWidth = 2.4);
-
-        // 4. Sol iç küçük dil (orta sol)
-        final t4 = Path();
-        t4.moveTo(w * 0.42, h * 0.8);
-        t4.cubicTo(w * 0.3, h * 0.72, w * 0.22, h * 0.6, w * 0.26, h * 0.48);
-        t4.quadraticBezierTo(w * 0.3, h * 0.4, w * 0.38, h * 0.52);
-        canvas.drawPath(t4, sp..strokeWidth = 1.8);
-
-        // 5. Sağ iç küçük dil  (orta sağ)
-        final t5 = Path();
-        t5.moveTo(w * 0.58, h * 0.8);
-        t5.cubicTo(w * 0.7, h * 0.72, w * 0.75, h * 0.6, w * 0.72, h * 0.48);
-        t5.quadraticBezierTo(w * 0.68, h * 0.38, w * 0.6, h * 0.5);
-        canvas.drawPath(t5, sp..strokeWidth = 1.8);
+        // Accent highlight on the very tip for that "flare" spark
+        canvas.drawCircle(Offset(w * 0.5, h * 0.1), 1.0, Paint()..color = Colors.white.withOpacity(0.4));
         break;
 
       case 'Ağaç':
