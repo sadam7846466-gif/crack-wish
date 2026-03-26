@@ -1482,23 +1482,23 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   const SizedBox(height: 10),
                   Row(children: (fsProfile['colors'] as List<String>).map((c) {
                     final colorVal = _colorFromNameEx(c, Colors.white);
-                    return Expanded(child: Padding(
-                      padding: const EdgeInsets.only(right: 6),
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
                       child: Column(children: [
                         Container(
-                          height: 32, width: double.infinity,
+                          width: 36, height: 36,
                           decoration: BoxDecoration(
+                            shape: BoxShape.circle,
                             color: colorVal,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                            border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 5),
                         Text(c, textAlign: TextAlign.center, style: TextStyle(
-                          color: Colors.white.withOpacity(0.35), fontSize: 8.5,
+                          color: Colors.white.withOpacity(0.35), fontSize: 8.0,
                         )),
                       ]),
-                    ));
+                    );
                   }).toList()),
                 ]),
               ),
@@ -1749,23 +1749,34 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   );
 
 
-  // Renk adı → Color dönüştürücü (genişletilmiş)
+  // Renk adı → Color dönüştürücü — sakin/muted ton paleti
   Color _colorFromNameEx(String name, Color fallback) {
     final map = {
-      'Yeşil': const Color(0xFF4CAF50), 'Açık mavi': const Color(0xFF81D4FA),
-      'Turkuaz': const Color(0xFF00BCD4), 'Bej': const Color(0xFFF5F0E8),
-      'Kırmızı': const Color(0xFFE53935), 'Turuncu': const Color(0xFFFF9800),
-      'Mor': const Color(0xFF9C27B0), 'Pembe': const Color(0xFFE91E63),
-      'Altın': const Color(0xFFD4A017), 'Kahve': const Color(0xFF795548),
-      'Sarı': const Color(0xFFFFEB3B), 'Bal rengi': const Color(0xFFFFB300),
-      'Açık kiremit': const Color(0xFFBF7154), 'Krem': const Color(0xFFF5F0DC),
-      'Beyaz': const Color(0xFFF8F8F8), 'Gri': const Color(0xFF90A4AE),
-      'Gümüş': const Color(0xFFB0BEC5), 'Açık altın': const Color(0xFFE8D5A3),
-      'Siyah': const Color(0xFF263238), 'Lacivert': const Color(0xFF1A237E),
-      'Koyu mor': const Color(0xFF4A148C), 'Antrasit': const Color(0xFF37474F),
-      'Koyu mavi': const Color(0xFF0D47A1),
+      'Yeşil':       const Color(0xFF7A9E7E),
+      'Açık mavi':   const Color(0xFF8EB8C5),
+      'Turkuaz':     const Color(0xFF6BA8A4),
+      'Bej':         const Color(0xFFD4C9B0),
+      'Kırmızı':     const Color(0xFFB56060),
+      'Turuncu':     const Color(0xFFBF8A5E),
+      'Mor':         const Color(0xFF8A7AAE),
+      'Pembe':       const Color(0xFFBF8090),
+      'Altın':       const Color(0xFFB8975A),
+      'Kahve':       const Color(0xFF8C6B55),
+      'Sarı':        const Color(0xFFBFAA6A),
+      'Bal rengi':   const Color(0xFFB89060),
+      'Açık kiremit':const Color(0xFFA07860),
+      'Krem':        const Color(0xFFD8CEB8),
+      'Beyaz':       const Color(0xFFE8E4DC),
+      'Gri':         const Color(0xFF8A9AA0),
+      'Gümüş':       const Color(0xFFA0AAAA),
+      'Açık altın':  const Color(0xFFCDBE96),
+      'Siyah':       const Color(0xFF3A4248),
+      'Lacivert':    const Color(0xFF3A4870),
+      'Koyu mor':    const Color(0xFF5A4870),
+      'Antrasit':    const Color(0xFF4A5258),
+      'Koyu mavi':   const Color(0xFF3A5278),
     };
-    return map[name] ?? fallback.withOpacity(0.6);
+    return map[name] ?? fallback.withOpacity(0.5);
   }
 
   Widget _fsBadge(String emoji, String label, String value, Color accent) => Padding(
