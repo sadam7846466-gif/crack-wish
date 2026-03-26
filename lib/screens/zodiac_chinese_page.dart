@@ -5078,89 +5078,82 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Cesur, hırçın ve premium 'Gerçek Alev' silüeti
-        final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
-        final strokePaint = Paint()
-          ..color = color.withOpacity(0.8)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.8
-          ..strokeCap = StrokeCap.round;
+        // Güçlü, çizgisel ve hırçın 'Line-Art' alev
+        final strokeP = p..strokeWidth = 2.4..color = color;
+        final glowP = p..strokeWidth = 1.2..color = color.withOpacity(0.5);
         
-        // 1. Ana Hırçın Gövde
-        final flade = Path();
-        flade.moveTo(w * 0.5, h * 0.05); // Zirve
-        flade.cubicTo(w * 0.8, h * 0.35, w * 0.85, h * 0.7, w * 0.65, h * 0.9);
-        flade.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.35, h * 0.9);
-        flade.cubicTo(w * 0.15, h * 0.7, w * 0.2, h * 0.35, w * 0.5, h * 0.05);
-        canvas.drawPath(flade, fillPaint..color = color.withOpacity(0.9));
+        // 1. Merkez Ana Alev Dili (Çizgisel Katmanlar)
+        final cF = Path();
+        cF.moveTo(w * 0.5, h * 0.1);
+        cF.quadraticBezierTo(w * 0.65, h * 0.45, w * 0.5, h * 0.85);
+        cF.quadraticBezierTo(w * 0.35, h * 0.45, w * 0.5, h * 0.1);
+        canvas.drawPath(cF, strokeP);
+        canvas.drawPath(cF, glowP..strokeWidth = 3.5); // Hafif bir dış ışıma çizgisi
 
-        // 2. Yan Enerji Dilleri (Farklı boyutlarda)
-        final leftWisp = Path();
-        leftWisp.moveTo(w * 0.32, h * 0.45);
-        leftWisp.quadraticBezierTo(w * 0.1, h * 0.55, w * 0.22, h * 0.78);
-        leftWisp.quadraticBezierTo(w * 0.35, h * 0.7, w * 0.32, h * 0.45);
-        canvas.drawPath(leftWisp, fillPaint..color = color.withOpacity(0.6));
+        // 2. Sol Yan Hırçın Flare Çizgisi
+        final lF = Path();
+        lF.moveTo(w * 0.4, h * 0.35);
+        lF.cubicTo(w * 0.1, h * 0.45, w * 0.2, h * 0.75, w * 0.42, h * 0.82);
+        canvas.drawPath(lF, strokeP..strokeWidth = 2.0);
+        // Sol ikincil iç çizgi
+        canvas.drawLine(Offset(w * 0.35, h * 0.55), Offset(w * 0.42, h * 0.75), strokeP..strokeWidth = 1.4);
 
-        final rightWisp = Path();
-        rightWisp.moveTo(w * 0.68, h * 0.4);
-        rightWisp.quadraticBezierTo(w * 0.9, h * 0.5, w * 0.78, h * 0.75);
-        rightWisp.quadraticBezierTo(w * 0.65, h * 0.65, w * 0.68, h * 0.4);
-        canvas.drawPath(rightWisp, fillPaint);
+        // 3. Sağ Yan Hırçın Flare Çizgisi
+        final rF = Path();
+        rF.moveTo(w * 0.6, h * 0.3);
+        rF.cubicTo(w * 0.9, h * 0.4, w * 0.8, h * 0.8, w * 0.58, h * 0.85);
+        canvas.drawPath(rF, strokeP..strokeWidth = 2.0);
+        // Sağ ikincil iç çizgi
+        canvas.drawLine(Offset(w * 0.65, h * 0.5), Offset(w * 0.58, h * 0.7), strokeP..strokeWidth = 1.4);
 
-        // 3. İç Parlama / Core (Güç hissi)
-        final coreP = Path();
-        coreP.moveTo(w * 0.5, h * 0.3);
-        coreP.cubicTo(w * 0.65, h * 0.5, w * 0.6, h * 0.8, w * 0.5, h * 0.8);
-        coreP.cubicTo(w * 0.4, h * 0.8, w * 0.35, h * 0.5, w * 0.5, h * 0.3);
-        canvas.drawPath(coreP, Paint()..color = Colors.white.withOpacity(0.25)..style = PaintingStyle.fill);
-        
-        // Kontur ekle
-        canvas.drawPath(flade, strokePaint);
+        // En uçtaki keskin kıvılcım çizgisi
+        canvas.drawLine(Offset(w * 0.5, h * 0.05), Offset(w * 0.5, h * 0.15), strokeP..strokeWidth = 1.8);
         break;
 
       case 'Ağaç':
-        // Estetik Life Tree - Oval yapraklar ve asimetrik dallar
-        final treeColor = color;
-        final trunkP = p..strokeWidth = 3.6..color = treeColor;
+        // Modern & Zarif "Slim Leaf" Zen Tree
+        final treeC = color;
+        final trunkP = p..strokeWidth = 3.2..color = treeC;
         
-        // 1. Organic Winding Trunk (Kavisli Gövde)
+        // 1. Organic Winding Trunk (Zarif Kıvrımlı Gövde)
         final trunk = Path();
         trunk.moveTo(w * 0.5, h * 0.9);
-        trunk.cubicTo(w * 0.48, h * 0.75, w * 0.58, h * 0.65, w * 0.52, h * 0.5);
+        trunk.cubicTo(w * 0.48, h * 0.78, w * 0.56, h * 0.7, w * 0.52, h * 0.55);
         canvas.drawPath(trunk, trunkP);
 
-        // 2. Varied Branches (Farklı Uzunluklar)
-        final bRight = Path(); // Uzun dal
-        bRight.moveTo(w * 0.54, h * 0.58);
-        bRight.quadraticBezierTo(w * 0.82, h * 0.48, w * 0.88, h * 0.28);
-        canvas.drawPath(bRight, p..strokeWidth = 2.0);
+        // 2. Fine Branches (İnce Dallar)
+        final bR = Path(); // Uzun sağ dal
+        bR.moveTo(w * 0.53, h * 0.6);
+        bR.quadraticBezierTo(w * 0.8, h * 0.52, w * 0.86, h * 0.35);
+        canvas.drawPath(bR, p..strokeWidth = 1.8);
 
-        final bLeftShort = Path(); // Kısa dal
-        bLeftShort.moveTo(w * 0.5, h * 0.65);
-        bLeftShort.quadraticBezierTo(w * 0.25, h * 0.58, w * 0.18, h * 0.48);
-        canvas.drawPath(bLeftShort, p..strokeWidth = 1.6);
+        final bLS = Path(); // Kısa sol alt dal
+        bLS.moveTo(w * 0.5, h * 0.68);
+        bLS.quadraticBezierTo(w * 0.28, h * 0.62, w * 0.22, h * 0.55);
+        canvas.drawPath(bLS, p..strokeWidth = 1.4);
 
-        final bLeftLong = Path(); // Orta dal
-        bLeftLong.moveTo(w * 0.52, h * 0.5);
-        bLeftLong.quadraticBezierTo(w * 0.3, h * 0.4, w * 0.25, h * 0.3);
-        canvas.drawPath(bLeftLong, p..strokeWidth = 1.8);
+        final bLL = Path(); // Orta boy sol üst dal
+        bLL.moveTo(w * 0.51, h * 0.55);
+        bLL.quadraticBezierTo(w * 0.32, h * 0.48, w * 0.28, h * 0.38);
+        canvas.drawPath(bLL, p..strokeWidth = 1.6);
         
-        // 3. Leaf Silhouettes (Daire yerine oval yapraklar)
-        void drawLeaf(double cx, double cy, double rx, double ry, double rot) {
+        // 3. Ultra-Slim Leaf Silhouettes (Daha ince ve zarif yaprak formları)
+        void drawSlimLeaf(double cx, double cy, double rx, double ry, double rot) {
           canvas.save();
           canvas.translate(cx, cy);
           canvas.rotate(rot);
-          canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2), Paint()..color = treeColor..style = PaintingStyle.fill);
+          // rx/ry oranı daha ince bir yaprak için artırıldı
+          canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2), Paint()..color = treeC..style = PaintingStyle.fill);
           canvas.restore();
         }
 
-        drawLeaf(w * 0.88, h * 0.28, 9, 6, 0.35); // Sağ üst
-        drawLeaf(w * 0.25, h * 0.3, 7, 5, -0.6); // Sol üst
-        drawLeaf(w * 0.18, h * 0.48, 6, 4, -0.2); // Sol alt
-        drawLeaf(w * 0.5, h * 0.35, 5, 8, 0.1); // Tepe
+        drawSlimLeaf(w * 0.86, h * 0.35, 9, 3.5, 0.45); // Sağ üst ince yaprak
+        drawSlimLeaf(w * 0.28, h * 0.38, 7, 2.5, -0.65); // Sol üst ince yaprak
+        drawSlimLeaf(w * 0.22, h * 0.55, 6, 2.0, -0.3); // Sol alt ince yaprak
+        drawSlimLeaf(w * 0.52, h * 0.42, 4, 7.5, 0.1); // Tepe dikey ince yaprak
         
-        // Zemin çizgisi
-        canvas.drawLine(Offset(w * 0.35, h * 0.9), Offset(w * 0.65, h * 0.9), p..strokeWidth = 1.0);
+        // Zemin çizgisi (Dengeli)
+        canvas.drawLine(Offset(w * 0.38, h * 0.9), Offset(w * 0.62, h * 0.9), p..strokeWidth = 1.0);
         break;
 
       case 'Metal':
