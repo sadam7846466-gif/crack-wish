@@ -5064,73 +5064,81 @@ class _ElementIconPainter extends CustomPainter {
       case 'Toprak':
         // Modern katmanlı dağ (huzurlu zen formu)
         final path = Path();
-        path.moveTo(w * 0.25, h * 0.75); // Geniş, tüm alanı tam kullanan dağ tabanı
-        path.lineTo(w * 0.45, h * 0.3); // Yüksek tepe
-        path.lineTo(w * 0.55, h * 0.3);
-        path.lineTo(w * 0.75, h * 0.75);
+        path.moveTo(w * 0.2, h * 0.75); // Geniş taban
+        path.lineTo(w * 0.46, h * 0.28); // Daha dik ve asil tepe
+        path.lineTo(w * 0.54, h * 0.28);
+        path.lineTo(w * 0.8, h * 0.75);
         path.close();
         canvas.drawPath(path, p..strokeWidth = 2.4);
         // Zemin geniş ana çizgisi
-        canvas.drawLine(Offset(w * 0.15, h * 0.85), Offset(w * 0.85, h * 0.85), p..strokeWidth = 3.2..color = color.withOpacity(0.9));
-        // İç hacim, katman hatları
-        canvas.drawLine(Offset(w * 0.38, h * 0.45), Offset(w * 0.62, h * 0.45), p..strokeWidth = 2.0);
-        canvas.drawLine(Offset(w * 0.31, h * 0.6), Offset(w * 0.69, h * 0.6), p..strokeWidth = 2.0);
+        canvas.drawLine(Offset(w * 0.1, h * 0.85), Offset(w * 0.9, h * 0.85), p..strokeWidth = 3.2);
+        // İç hacim, katman hatları (daha dengeli)
+        canvas.drawLine(Offset(w * 0.38, h * 0.42), Offset(w * 0.62, h * 0.42), p..strokeWidth = 2.0);
+        canvas.drawLine(Offset(w * 0.28, h * 0.6), Offset(w * 0.72, h * 0.6), p..strokeWidth = 2.0);
         break;
 
       case 'Ateş':
-        // Kullanıcı referansındaki gibi "filled" (dolu) keskin 3 parçalı ateş formu
+        // Cesur, Flare etkili ve hırçın alev (Wild Flame)
         final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
         
-        // Ortadaki ana büyük alev
-        final center = Path();
-        center.moveTo(w * 0.5, h * 0.15);
-        center.quadraticBezierTo(w * 0.3, h * 0.45, w * 0.35, h * 0.65);
-        center.cubicTo(w * 0.4, h * 0.9, w * 0.6, h * 0.9, w * 0.65, h * 0.65);
-        center.quadraticBezierTo(w * 0.7, h * 0.45, w * 0.5, h * 0.15);
-        canvas.drawPath(center, fillPaint);
-
-        // Sol fırlayan dalga
-        final left = Path();
-        left.moveTo(w * 0.38, h * 0.35);
-        left.quadraticBezierTo(w * 0.15, h * 0.5, w * 0.2, h * 0.75);
-        left.quadraticBezierTo(w * 0.25, h * 0.85, w * 0.4, h * 0.8);
-        left.quadraticBezierTo(w * 0.25, h * 0.65, w * 0.38, h * 0.35);
-        canvas.drawPath(left, fillPaint);
-
-        // Sağ, içe dönük dalga
-        final right = Path();
-        right.moveTo(w * 0.62, h * 0.45);
-        right.quadraticBezierTo(w * 0.8, h * 0.55, w * 0.75, h * 0.75);
-        right.quadraticBezierTo(w * 0.7, h * 0.8, w * 0.6, h * 0.78);
-        right.quadraticBezierTo(w * 0.68, h * 0.65, w * 0.62, h * 0.45);
-        canvas.drawPath(right, fillPaint);
+        // Ana gövde - hırçın ve keskin hatlar
+        final wildFlame = Path();
+        wildFlame.moveTo(w * 0.5, h * 0.05); // En üst sivri uç
+        wildFlame.lineTo(w * 0.62, h * 0.28);
+        wildFlame.lineTo(w * 0.78, h * 0.22); // Sağ üst flare fışkırması
+        wildFlame.lineTo(w * 0.7, h * 0.45);
+        wildFlame.lineTo(w * 0.85, h * 0.6); // Sağ orta flare
+        wildFlame.quadraticBezierTo(w * 0.8, h * 0.9, w * 0.5, h * 0.88); // Alt yuvarlak genişlik
+        wildFlame.quadraticBezierTo(w * 0.2, h * 0.9, w * 0.15, h * 0.6); // Sol orta
+        wildFlame.lineTo(w * 0.3, h * 0.45);
+        wildFlame.lineTo(w * 0.22, h * 0.22); // Sol üst flare
+        wildFlame.lineTo(w * 0.38, h * 0.28);
+        wildFlame.close();
+        
+        canvas.drawPath(wildFlame, fillPaint);
+        
+        // İç alev çekirdeği (parlaklık ve derinlik katmanı)
+        final core = Path();
+        core.moveTo(w * 0.5, h * 0.45);
+        core.quadraticBezierTo(w * 0.65, h * 0.6, w * 0.5, h * 0.78);
+        core.quadraticBezierTo(w * 0.35, h * 0.6, w * 0.5, h * 0.45);
+        canvas.drawPath(core, Paint()..color = Colors.white.withOpacity(0.25)..style = PaintingStyle.fill);
+        
+        // Küçük sıçrayan kıvılcımlar (Flare detayları)
+        canvas.drawCircle(Offset(w * 0.82, h * 0.35), 1.5, Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.fill);
+        canvas.drawCircle(Offset(w * 0.18, h * 0.42), 1.0, Paint()..color = color.withOpacity(0.4)..style = PaintingStyle.fill);
         break;
 
       case 'Ağaç':
-        // Minimalist geometrik ağaç (yaprak yerine ağaç formu)
-        final tree = Path();
-        tree.moveTo(w * 0.5, h * 0.15); // Gökyüzüne uzanan tepe
+        // Modern & Estetik "Life Tree" silüeti
+        final pMain = p..strokeWidth = 3.5;
+        // Winding Trunk (Kavisli Estetik Gövde)
+        final trunk = Path();
+        trunk.moveTo(w * 0.5, h * 0.9);
+        trunk.cubicTo(w * 0.45, h * 0.75, w * 0.55, h * 0.72, w * 0.5, h * 0.58);
+        canvas.drawPath(trunk, pMain);
+
+        // Branches (Dengeli Dallanma)
+        final br = Path();
+        br.moveTo(w * 0.5, h * 0.58);
+        br.quadraticBezierTo(w * 0.8, h * 0.48, w * 0.84, h * 0.32); // Sağ Üst
+        br.moveTo(w * 0.5, h * 0.62);
+        br.quadraticBezierTo(w * 0.22, h * 0.52, w * 0.16, h * 0.38); // Sol Alt
+        br.moveTo(w * 0.5, h * 0.58);
+        br.lineTo(w * 0.5, h * 0.35); // Merkez dikey
+        canvas.drawPath(br, p..strokeWidth = 2.0);
+
+        // Foliage (Estetik noktasal yapraklar - Zen tasarımı)
+        final fPaint = Paint()..color = color..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(w * 0.84, h * 0.32), 6, fPaint); 
+        canvas.drawCircle(Offset(w * 0.16, h * 0.38), 5, fPaint); 
+        canvas.drawCircle(Offset(w * 0.5, h * 0.3), 7, fPaint); 
+        // Detay dokunuşları
+        canvas.drawCircle(Offset(w * 0.68, h * 0.42), 2.5, fPaint..color = color.withOpacity(0.5));
+        canvas.drawCircle(Offset(w * 0.32, h * 0.48), 3, fPaint);
         
-        // Sağ dış ve üst kavis (ağaç dallanması)
-        tree.cubicTo(w * 0.9, h * 0.3, w * 0.95, h * 0.65, w * 0.65, h * 0.68);
-        tree.quadraticBezierTo(w * 0.55, h * 0.65, w * 0.55, h * 0.85); // Sağ gövdeye iniş
-        
-        tree.lineTo(w * 0.45, h * 0.85); // Gövde tabanı
-        tree.quadraticBezierTo(w * 0.45, h * 0.65, w * 0.35, h * 0.68); // Sol gövdeden dala çıkış
-        
-        // Sol dış ve üst kavis
-        tree.cubicTo(w * 0.05, h * 0.65, w * 0.1, h * 0.3, w * 0.5, h * 0.15);
-        tree.close();
-        
-        canvas.drawPath(tree, p..strokeWidth = 2.4);
-        
-        // Ağaç kökü/zemin tabanı
-        canvas.drawLine(Offset(w * 0.35, h * 0.85), Offset(w * 0.65, h * 0.85), p..strokeWidth = 2.8);
-        // Gövdeden dala uzanan ana destek çizgisi
-        canvas.drawLine(Offset(w * 0.5, h * 0.45), Offset(w * 0.5, h * 0.8), p..strokeWidth = 2.2);
-        // Alt dallar
-        canvas.drawLine(Offset(w * 0.5, h * 0.6), Offset(w * 0.7, h * 0.45), p..strokeWidth = 1.6);
-        canvas.drawLine(Offset(w * 0.5, h * 0.5), Offset(w * 0.3, h * 0.35), p..strokeWidth = 1.6);
+        // Zemin çizgisi
+        canvas.drawLine(Offset(w * 0.35, h * 0.9), Offset(w * 0.65, h * 0.9), p..strokeWidth = 1.0);
         break;
 
       case 'Metal':
