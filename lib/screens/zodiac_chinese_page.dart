@@ -5078,55 +5078,23 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Kullanıcının son attığı klasik, ayrık 5 damla parçalı elit ateş referansı
-        final fp = Paint()
-          ..color = color
-          ..style = PaintingStyle.fill;
-        
-        // --- 1. MERKEZ BÜYÜK DAMLA (Ana gövde, ucu sağa kıvrık) ---
-        final cF = Path();
-        cF.moveTo(w * 0.5, h * 0.85); // Ortada sivri alt taban
-        // Sol dış kavis (Sola şişer, tepeye sağa kıvrılır)
-        cF.cubicTo(w * 0.35, h * 0.65, w * 0.45, h * 0.3, w * 0.55, h * 0.1); // Tepe sivri uç
-        // Sağ dış kavis (Tepe ucundan döner, sağa şişip alta iner)
-        cF.cubicTo(w * 0.65, h * 0.35, w * 0.7, h * 0.65, w * 0.5, h * 0.85); 
-        canvas.drawPath(cF, fp);
-
-        // --- 2. SOL BÜYÜK YAN DALGA (Sivri taban, sola şişer ve sola uçar) ---
-        final lF = Path();
-        lF.moveTo(w * 0.32, h * 0.8); // Sol alt sivri uç
-        // Dış (sol) kavis
-        lF.cubicTo(w * 0.05, h * 0.65, w * 0.15, h * 0.45, w * 0.22, h * 0.35); // Tepe uç
-        // İç (sağ) kavis
-        lF.cubicTo(w * 0.32, h * 0.5, w * 0.4, h * 0.65, w * 0.32, h * 0.8);
-        canvas.drawPath(lF, fp);
-
-        // --- 3. SAĞ BÜYÜK YAN DALGA (Sivri taban, sağa şişer ve ucu hafif sola/yukarı döner) ---
-        final rF = Path();
-        rF.moveTo(w * 0.68, h * 0.85); // Sağ alt sivri uç
-        // Dış (sağ) kavis
-        rF.cubicTo(w * 0.95, h * 0.7, w * 0.8, h * 0.45, w * 0.82, h * 0.38); // Tepe uç
-        // İç (sol) kavis
-        rF.cubicTo(w * 0.75, h * 0.55, w * 0.6, h * 0.65, w * 0.68, h * 0.85); 
-        canvas.drawPath(rF, fp);
-
-        // --- 4. İÇ SOL KÜÇÜK KIVILCIM (Merkez ile sol arasında, sola uçuşan ince damla) ---
-        final isL = Path();
-        isL.moveTo(w * 0.42, h * 0.5); // Sivri altı
-        // Dış (sol) kavis
-        isL.cubicTo(w * 0.35, h * 0.4, w * 0.38, h * 0.3, w * 0.32, h * 0.22); // Sol tepe ucu
-        // İç (sağ) kavis
-        isL.cubicTo(w * 0.45, h * 0.3, w * 0.45, h * 0.4, w * 0.42, h * 0.5);
-        canvas.drawPath(isL, fp);
-
-        // --- 5. ÜST SOL KÜÇÜK KIVILCIM (Sol alevin üstünde uçuşan minik damla) ---
-        final fsL = Path();
-        fsL.moveTo(w * 0.28, h * 0.42); // Sivri altı
-        // Dış kavis
-        fsL.cubicTo(w * 0.2, h * 0.32, w * 0.25, h * 0.25, w * 0.18, h * 0.18); // Sol tepe ucu
-        // İç kavis
-        fsL.cubicTo(w * 0.3, h * 0.25, w * 0.32, h * 0.35, w * 0.28, h * 0.42);
-        canvas.drawPath(fsL, fp);
+        // 🔥 emoji TextPainter ile render — garanti gerçek alev efekti
+        final fireSpan = TextSpan(
+          text: '🔥',
+          style: TextStyle(fontSize: w * 0.78, height: 1.0),
+        );
+        final fireTp = TextPainter(
+          text: fireSpan,
+          textDirection: TextDirection.ltr,
+        );
+        fireTp.layout();
+        fireTp.paint(
+          canvas,
+          Offset(
+            (w - fireTp.width) / 2,
+            (h - fireTp.height) / 2 - h * 0.04,
+          ),
+        );
         break;
 
       case 'Ağaç':
