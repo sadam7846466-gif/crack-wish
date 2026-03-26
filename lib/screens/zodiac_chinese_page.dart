@@ -4028,58 +4028,169 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
 
   void _showElementInfo(BuildContext ctx, String element, Color color) {
     final Map<String, Map<String, String>> ed = {
-      'Ateş': {'emoji': '🔥', 'title': 'Ateş Elementi', 'desc': 'Tutku, enerji ve liderlik. Ateş insanları karizmatik, hırslı ve yaratıcıdır.', 'traits': 'Cesur · Enerjik · Karizmatik · Tutkulu', 'organ': 'Kalp & İnce Bağırsak', 'season': 'Yaz', 'dir': 'Güney'},
-      'Su': {'emoji': '💧', 'title': 'Su Elementi', 'desc': 'Derinlik, sezgi ve uyum. Su insanları gizemli, empati sahibi ve uyumludur.', 'traits': 'Derin · Sezgisel · Empatik · Uyumlu', 'organ': 'Böbrekler & Mesane', 'season': 'Kış', 'dir': 'Kuzey'},
-      'Toprak': {'emoji': '🌍', 'title': 'Toprak Elementi', 'desc': 'Denge, sabır ve güvenilirlik. Toprak insanları pratik, sadık ve besleyicidir.', 'traits': 'Sabırlı · Güvenilir · Pratik · Sadık', 'organ': 'Mide & Dalak', 'season': 'Geçiş mevsimi', 'dir': 'Merkez'},
-      'Metal': {'emoji': '⚙️', 'title': 'Metal Elementi', 'desc': 'Kararlılık, disiplin ve mükemmeliyetçilik. Metal insanları analitik ve çalışkandır.', 'traits': 'Disiplinli · Analitik · Güçlü · Titiz', 'organ': 'Akciğerler & Kalın Bağırsak', 'season': 'Sonbahar', 'dir': 'Batı'},
-      'Ahşap': {'emoji': '🌿', 'title': 'Ahşap Elementi', 'desc': 'Büyüme, yaratıcılık ve esneklik. Ahşap insanları vizyon sahibi ve iyimserdir.', 'traits': 'Yaratıcı · İyimser · Esnek · Vizyoner', 'organ': 'Karaciğer & Safra Kesesi', 'season': 'İlkbahar', 'dir': 'Doğu'},
+      'Ateş': {
+        'emoji': '🔥',
+        'title': 'Ateş Elementi',
+        'desc': 'Ateş; tutku, dönüşüm ve liderliği simgeler. Bu enerjiyi taşıyanlar çevrelerine ışık ve coşku saçar — karizmatik, hırslı, ilham vericidir.',
+        'traits': 'Cesur · Karizmatik · Tutkulu · Enerjik',
+        'body': 'Kalp & İnce bağırsak — Çin tıbbına göre Ateş enerjisi kalbi besler; sağlıklı bir Ateş dengesi neşe, bağlantı ve güçlü dolaşım getirir.',
+        'season': 'Yaz — güneşin en güçlü olduğu, hareketin ve sosyal enerjinin zirveye çıktığı dönem.',
+        'dir': 'Güney',
+      },
+      'Su': {
+        'emoji': '💧',
+        'title': 'Su Elementi',
+        'desc': 'Su; derinlik, sezgi ve uyum gücünü simgeler. Su insanları gizemli ve içe dönüktür; ancak aktığı her yere hayat verir.',
+        'traits': 'Derin · Sezgisel · Empatik · Gizemli',
+        'body': 'Böbrekler & Mesane — Çin tıbbına göre böbrekler yaşam enerjisinin (Jing) deposudur; Su dengesi dinçlik, kararlılık ve cinsel enerji sağlar.',
+        'season': 'Kış — içe çekilme ve dinlenme zamanı; enerjiyi depo etmek için en uygun mevsim.',
+        'dir': 'Kuzey',
+      },
+      'Toprak': {
+        'emoji': '🌍',
+        'title': 'Toprak Elementi',
+        'desc': 'Toprak; merkeziyet, besleyicilik ve istikrarı simgeler. Toprak insanları çevrelerindeki herkese güven ve denge hissi yaşatır.',
+        'traits': 'Sabırlı · Güvenilir · Besleyici · Pratik',
+        'body': 'Mide & Dalak/Pankreas — Sindirim ve besin dönüşümünün merkezi. Dengeli Toprak enerjisi sağlıklı beslenme alışkanlıkları ve zihinsel netlik getirir.',
+        'season': 'Mevsim geçişleri (her mevsim sonu) — değişim dönemlerinde özellikle güçlenir.',
+        'dir': 'Merkez',
+      },
+      'Metal': {
+        'emoji': '⚙️',
+        'title': 'Metal Elementi',
+        'desc': 'Metal; berraklık, disiplin ve mükemmeliyetçiliği simgeler. Metal insanları değerlere ve kurallara bağlıdır; kaliteyi her şeyin önünde tutar.',
+        'traits': 'Disiplinli · Analitik · Güçlü · Titiz',
+        'body': 'Akciğerler & Kalın bağırsak — Nefes ve arınmanın organları. Metal dengesi temiz bir zihin, güçlü bağışıklık ve sınırları koruma becerisi sağlar.',
+        'season': 'Sonbahar — bırakma, özümseme ve özün geriye kalmasına bırakma dönemi.',
+        'dir': 'Batı',
+      },
+      'Ahşap': {
+        'emoji': '🌿',
+        'title': 'Ahşap Elementi',
+        'desc': 'Ahşap; büyüme, vizyon ve esnekliği simgeler. Ahşap insanları hayatta durmadan büyümek ve yeni şeyler inşa etmek için yaratılmıştır.',
+        'traits': 'Yaratıcı · Vizyoner · İyimser · Esnek',
+        'body': 'Karaciğer & Safra kesesi — Planlama ve karar vermenin organları. Dengeli Ahşap enerjisi öfkeyi salıverir, yaratıcılığı serbest bırakır ve net hedefler koyar.',
+        'season': 'İlkbahar — tohumların filizlendiği, yeni başlangıçların ve büyümenin mevsimi.',
+        'dir': 'Doğu',
+      },
     };
     final d = ed[element] ?? ed['Toprak']!;
-    showModalBottomSheet(context: ctx, backgroundColor: Colors.transparent, builder: (_) => Container(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
-      decoration: BoxDecoration(color: const Color(0xFF12121A), borderRadius: const BorderRadius.vertical(top: Radius.circular(28)), border: Border(top: BorderSide(color: color.withOpacity(0.25), width: 0.8))),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(2)))),
-        Row(children: [Text(d['emoji']!, style: const TextStyle(fontSize: 28)), const SizedBox(width: 12), Text(d['title']!, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.w800))]),
-        const SizedBox(height: 12),
-        Text(d['desc']!, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, height: 1.5)),
-        const SizedBox(height: 16),
-        _infoRow('✨ Özellikler', d['traits']!, color), const SizedBox(height: 8),
-        _infoRow('🫀 Organ sistemi', d['organ']!, color), const SizedBox(height: 8),
-        _infoRow('🌸 Mevsim', d['season']!, color), const SizedBox(height: 8),
-        _infoRow('🧭 Yön', d['dir']!, color),
-      ]),
-    ));
+    showDialog(
+      context: ctx,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (_) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
+                  boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
+                ),
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text(d['emoji']!, style: const TextStyle(fontSize: 26)),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(d['title']!, style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
+                  ]),
+                  const SizedBox(height: 12),
+                  Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
+                  const SizedBox(height: 12),
+                  Text(d['desc']!, style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6)),
+                  const SizedBox(height: 14),
+                  _infoRow('✨', 'Kişilik', d['traits']!, color),
+                  const SizedBox(height: 8),
+                  _infoRow('🌸', 'En güçlü mevsim', d['season']!, color),
+                  const SizedBox(height: 8),
+                  _infoRow('🫀', 'Beden bağlantısı', d['body']!, color),
+                  const SizedBox(height: 8),
+                  _infoRow('🧭', 'Yön', d['dir']!, color),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showYinYangInfo(BuildContext ctx, String yy, Color color) {
     final isYin = yy == 'Yin';
-    showModalBottomSheet(context: ctx, backgroundColor: Colors.transparent, builder: (_) => Container(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
-      decoration: BoxDecoration(color: const Color(0xFF12121A), borderRadius: const BorderRadius.vertical(top: Radius.circular(28)), border: Border(top: BorderSide(color: color.withOpacity(0.25), width: 0.8))),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(2)))),
-        Row(children: [Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 28)), const SizedBox(width: 12), Text(isYin ? 'Yin Enerjisi' : 'Yang Enerjisi', style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.w800))]),
-        const SizedBox(height: 12),
-        Text(isYin ? 'Yin; alıcı, sessiz ve yansıtıcı enerjidir. Gece, ay ve içsellik ile ilişkilendirilir. Yin insanları derin, sezgisel ve empatik bir doğaya sahiptir.' : 'Yang; aktif, yayıcı ve dışa dönük enerjidir. Gündüz, güneş ve hareket ile ilişkilendirilir. Yang insanları girişken, cesur ve enerji dolu bir doğaya sahiptir.',
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, height: 1.5)),
-        const SizedBox(height: 16),
-        _infoRow('✨ Temel özellikler', isYin ? 'Sezgisel · Derin · Dingin · Yaratıcı' : 'Aktif · Lider · Cesur · Enerjik', color), const SizedBox(height: 8),
-        _infoRow('🕐 En güçlü zaman', isYin ? 'Gece — sakin & odaklanmış çalışma' : 'Gündüz — aksiyon & karar alma', color), const SizedBox(height: 8),
-        _infoRow('💡 Güçlü yön', isYin ? 'Dinleme, strateji, içsel keşif' : 'Girişim, liderlik, dışa dönük adımlar', color), const SizedBox(height: 8),
-        _infoRow('⚖️ Denge için', isYin ? 'Zaman zaman harekete geçmek & paylaşmak' : 'Zaman zaman dur, dinle & içe bak', color),
-      ]),
-    ));
+    showDialog(
+      context: ctx,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (_) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
+                  boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
+                ),
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 26)),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(isYin ? 'Yin Enerjisi' : 'Yang Enerjisi', style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
+                  ]),
+                  const SizedBox(height: 12),
+                  Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
+                  const SizedBox(height: 12),
+                  Text(
+                    isYin
+                      ? 'Yin; alıcı, sessiz ve içe dönük enerjidir. Ay ve geceyle özdeşleşir. Yin taşıyan insanlar derin hisler, güçlü sezgi ve yaratıcı bir iç dünyaya sahiptir.'
+                      : 'Yang; aktif, yayıcı ve dışa açılan enerjidir. Güneş ve gündüzle özdeşleşir. Yang taşıyan insanlar hareketi, liderliği ve toplumu besler.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6),
+                  ),
+                  const SizedBox(height: 14),
+                  _infoRow('✨', 'Temel nitelikler', isYin ? 'Sezgisel · Derin · Sakin · Yaratıcı' : 'Girişken · Lider · Cesur · Enerjik', color),
+                  const SizedBox(height: 8),
+                  _infoRow('🕐', 'En güçlü zaman', isYin
+                    ? 'Gece saatleri — zihin sessizleştiğinde Yin enerjisi zirveye çıkar; derin düşünce, sanatsal üretim ve içgörü için ideal zaman.'
+                    : 'Gündüz saatleri — güneşin en parlak olduğu anlarda Yang enerjisi doruğa ulaşır; önemli kararlar, sosyal adımlar ve eylem bu zamana ait.', color),
+                  const SizedBox(height: 8),
+                  _infoRow('💡', 'Doğal güç', isYin
+                    ? 'Dinleme, empati, strateji ve içsel keşif. Yin insanlar söylenmeyeni duyar.'
+                    : 'Harekete geçme, ikna etme, liderlik ve kolektif enerji yaratma.', color),
+                  const SizedBox(height: 8),
+                  _infoRow('⚖️', 'Dengeyi bulmak', isYin
+                    ? 'Yin enerji çok baskın olduğunda içe kapanma ve atalet riski doğar. Düzenli hareket (yürüyüş, dans), paylaşım ve küçük cesur adımlar dengeyi geri getirir.'
+                    : 'Yang enerji çok baskın olduğunda tükenmişlik ve sabırsızlık riski doğar. Sessiz anlar, meditasyon ve dinleme pratiği dengeyi geri getirir.', color),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget _infoRow(String label, String value, Color accent) => Padding(
+  Widget _infoRow(String emoji, String label, String value, Color accent) => Padding(
     padding: const EdgeInsets.only(bottom: 2),
     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: TextStyle(color: accent.withOpacity(0.65), fontSize: 12, fontWeight: FontWeight.w600)),
-      const SizedBox(width: 8),
-      Expanded(child: Text(value, style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12))),
+      Text(emoji, style: const TextStyle(fontSize: 13)),
+      const SizedBox(width: 6),
+      Expanded(child: RichText(text: TextSpan(children: [
+        TextSpan(text: '$label  ', style: TextStyle(color: accent.withOpacity(0.75), fontSize: 12, fontWeight: FontWeight.w700)),
+        TextSpan(text: value, style: TextStyle(color: Colors.white.withOpacity(0.72), fontSize: 12, height: 1.5)),
+      ]))),
     ]),
   );
+
+
 
   @override
   Widget build(BuildContext context) {
