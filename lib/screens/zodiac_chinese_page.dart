@@ -5078,53 +5078,88 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Elit, tamamen ince çizgili (slim line-art) dinamik alev
-        final pLine = p
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round
-          ..color = color;
-
-        // 1. Ana dış alev (Tepe noktası sağa kavisli zarif form)
-        final outer = Path();
-        outer.moveTo(w * 0.5, h * 0.15); // Keskin tepe
+        // Kullanıcının attığı tribal/parçalı, hatları akışkan Ateş referansı
+        final fp = Paint()..color = color..style = PaintingStyle.fill;
         
-        // Sağ dış inen kıvrım
-        outer.cubicTo(w * 0.55, h * 0.35, w * 0.85, h * 0.45, w * 0.75, h * 0.8);
-        // Alt zemin kavis
-        outer.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.25, h * 0.8);
-        // Sol dış yükselen kıvrım
-        outer.cubicTo(w * 0.15, h * 0.45, w * 0.45, h * 0.35, w * 0.5, h * 0.15);
+        // Tribal ateş dilleri için fırça (Crescent/Hilal veya damla üretir)
+        // sx,sy   : Keskin alt uç
+        // c1x,c1y : Kalınlığı sağlayan dış kavis (göbek)
+        // ex,ey   : Keskin tepe uç
+        // c2x,c2y : İç kavis
+        void wisp(double sx, double sy, double c1x, double c1y, double ex, double ey, double c2x, double c2y) {
+          final p = Path();
+          p.moveTo(sx, sy);
+          p.quadraticBezierTo(c1x, c1y, ex, ey);
+          p.quadraticBezierTo(c2x, c2y, sx, sy);
+          canvas.drawPath(p, fp);
+        }
+
+        // 1. ANA MERKEZ ALEV (Ortasında negatif alan olan, sağa dönük ikonik ana parça)
+        // Sol kalın kolu
+        wisp(w * 0.45, h * 0.8, 
+             w * 0.35, h * 0.45, 
+             w * 0.55, h * 0.18, 
+             w * 0.48, h * 0.45);
+        // Sağ ince kolu (kapanıp deliği oluşturur)
+        wisp(w * 0.55, h * 0.75, 
+             w * 0.65, h * 0.45, 
+             w * 0.55, h * 0.18, 
+             w * 0.52, h * 0.45);
+
+        // 2. SOL BÜYÜK YAN ALEV (Sola dönük, ortası delik)
+        wisp(w * 0.35, h * 0.82, 
+             w * 0.15, h * 0.6, 
+             w * 0.3, h * 0.35, 
+             w * 0.28, h * 0.55); // Sol dış kol
+        wisp(w * 0.4, h * 0.85, 
+             w * 0.38, h * 0.55, 
+             w * 0.3, h * 0.35, 
+             w * 0.32, h * 0.55); // İç kol
+
+        // 3. SAĞ BÜYÜK YAN ALEV (Sağa dönük, ortası delik)
+        wisp(w * 0.65, h * 0.82, 
+             w * 0.85, h * 0.6, 
+             w * 0.7, h * 0.35, 
+             w * 0.72, h * 0.55); // Sağ dış kol
+        wisp(w * 0.6, h * 0.85, 
+             w * 0.62, h * 0.55, 
+             w * 0.7, h * 0.35, 
+             w * 0.68, h * 0.55); // İç kol
+
+        // 4. MİNİK SERBEST ALEVLER / KIVILCIMLAR (Tribal hissiyat)
+        // En sol dış alt sıçrama
+        wisp(w * 0.2, h * 0.8, 
+             w * 0.12, h * 0.65, 
+             w * 0.2, h * 0.55, 
+             w * 0.22, h * 0.65);
         
-        canvas.drawPath(outer, pLine);
+        // En sağ dış alt sıçrama
+        wisp(w * 0.8, h * 0.8, 
+             w * 0.88, h * 0.65, 
+             w * 0.8, h * 0.55, 
+             w * 0.78, h * 0.65);
+             
+        // Alt zemin merkezi bağlayıcı küçük detaylar
+        wisp(w * 0.42, h * 0.88, 
+             w * 0.4, h * 0.78, 
+             w * 0.48, h * 0.68, 
+             w * 0.45, h * 0.8);
 
-        // 2. İç alev (Ana formun benzeri, daha küçük)
-        final inner = Path();
-        inner.moveTo(w * 0.5, h * 0.45);
-        inner.cubicTo(w * 0.52, h * 0.55, w * 0.65, h * 0.6, w * 0.6, h * 0.8);
-        inner.quadraticBezierTo(w * 0.5, h * 0.85, w * 0.4, h * 0.8);
-        inner.cubicTo(w * 0.35, h * 0.6, w * 0.48, h * 0.55, w * 0.5, h * 0.45);
-        canvas.drawPath(inner, pLine..strokeWidth = 1.6);
+        wisp(w * 0.58, h * 0.88, 
+             w * 0.6, h * 0.78, 
+             w * 0.52, h * 0.68, 
+             w * 0.55, h * 0.8);
 
-        // 3. Yan bağımsız alev çizgileri (Elite hareket hissi)
-        // Sol dış çizgi (kısa çıkış)
-        final leftLine = Path();
-        leftLine.moveTo(w * 0.25, h * 0.35);
-        leftLine.quadraticBezierTo(w * 0.12, h * 0.5, w * 0.2, h * 0.65);
-        canvas.drawPath(leftLine, pLine..strokeWidth = 1.6);
-
-        // Sağ dış kıvrımlı çizgi (daha yüksek)
-        final rightLine = Path();
-        rightLine.moveTo(w * 0.75, h * 0.28);
-        rightLine.quadraticBezierTo(w * 0.9, h * 0.5, w * 0.78, h * 0.65);
-        canvas.drawPath(rightLine, pLine..strokeWidth = 1.6);
-
-        // Yukarı uca doğru zarif ince detay çizgiler
-        canvas.drawLine(Offset(w * 0.5, h * 0.32), Offset(w * 0.5, h * 0.4), pLine..strokeWidth = 1.2);
-        
-        // Elit bir parıltı hissi için arkaya flu bir ışıma (sadece hissiyat)
-        canvas.drawPath(outer, Paint()..color = color.withOpacity(0.12)..style = PaintingStyle.fill);
+        // Uçuşan bağımsız tribal kıvılcımlar (Üst boşluklarda)
+        wisp(w * 0.6, h * 0.15, 
+             w * 0.65, h * 0.1, 
+             w * 0.6, h * 0.05, 
+             w * 0.58, h * 0.1);
+             
+        wisp(w * 0.35, h * 0.25, 
+             w * 0.3, h * 0.2, 
+             w * 0.35, h * 0.15, 
+             w * 0.38, h * 0.2);
         break;
 
       case 'Ağaç':
