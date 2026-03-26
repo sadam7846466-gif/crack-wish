@@ -5078,64 +5078,86 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Cesur, Flare etkili ve hırçın alev (Wild Flame)
+        // Cesur, hırçın ve premium 'Gerçek Alev' silüeti
         final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
+        final strokePaint = Paint()
+          ..color = color.withOpacity(0.8)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.8
+          ..strokeCap = StrokeCap.round;
         
-        // Ana gövde - hırçın ve keskin hatlar
-        final wildFlame = Path();
-        wildFlame.moveTo(w * 0.5, h * 0.05); // En üst sivri uç
-        wildFlame.lineTo(w * 0.62, h * 0.28);
-        wildFlame.lineTo(w * 0.78, h * 0.22); // Sağ üst flare fışkırması
-        wildFlame.lineTo(w * 0.7, h * 0.45);
-        wildFlame.lineTo(w * 0.85, h * 0.6); // Sağ orta flare
-        wildFlame.quadraticBezierTo(w * 0.8, h * 0.9, w * 0.5, h * 0.88); // Alt yuvarlak genişlik
-        wildFlame.quadraticBezierTo(w * 0.2, h * 0.9, w * 0.15, h * 0.6); // Sol orta
-        wildFlame.lineTo(w * 0.3, h * 0.45);
-        wildFlame.lineTo(w * 0.22, h * 0.22); // Sol üst flare
-        wildFlame.lineTo(w * 0.38, h * 0.28);
-        wildFlame.close();
+        // 1. Ana Hırçın Gövde
+        final flade = Path();
+        flade.moveTo(w * 0.5, h * 0.05); // Zirve
+        flade.cubicTo(w * 0.8, h * 0.35, w * 0.85, h * 0.7, w * 0.65, h * 0.9);
+        flade.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.35, h * 0.9);
+        flade.cubicTo(w * 0.15, h * 0.7, w * 0.2, h * 0.35, w * 0.5, h * 0.05);
+        canvas.drawPath(flade, fillPaint..color = color.withOpacity(0.9));
+
+        // 2. Yan Enerji Dilleri (Farklı boyutlarda)
+        final leftWisp = Path();
+        leftWisp.moveTo(w * 0.32, h * 0.45);
+        leftWisp.quadraticBezierTo(w * 0.1, h * 0.55, w * 0.22, h * 0.78);
+        leftWisp.quadraticBezierTo(w * 0.35, h * 0.7, w * 0.32, h * 0.45);
+        canvas.drawPath(leftWisp, fillPaint..color = color.withOpacity(0.6));
+
+        final rightWisp = Path();
+        rightWisp.moveTo(w * 0.68, h * 0.4);
+        rightWisp.quadraticBezierTo(w * 0.9, h * 0.5, w * 0.78, h * 0.75);
+        rightWisp.quadraticBezierTo(w * 0.65, h * 0.65, w * 0.68, h * 0.4);
+        canvas.drawPath(rightWisp, fillPaint);
+
+        // 3. İç Parlama / Core (Güç hissi)
+        final coreP = Path();
+        coreP.moveTo(w * 0.5, h * 0.3);
+        coreP.cubicTo(w * 0.65, h * 0.5, w * 0.6, h * 0.8, w * 0.5, h * 0.8);
+        coreP.cubicTo(w * 0.4, h * 0.8, w * 0.35, h * 0.5, w * 0.5, h * 0.3);
+        canvas.drawPath(coreP, Paint()..color = Colors.white.withOpacity(0.25)..style = PaintingStyle.fill);
         
-        canvas.drawPath(wildFlame, fillPaint);
-        
-        // İç alev çekirdeği (parlaklık ve derinlik katmanı)
-        final core = Path();
-        core.moveTo(w * 0.5, h * 0.45);
-        core.quadraticBezierTo(w * 0.65, h * 0.6, w * 0.5, h * 0.78);
-        core.quadraticBezierTo(w * 0.35, h * 0.6, w * 0.5, h * 0.45);
-        canvas.drawPath(core, Paint()..color = Colors.white.withOpacity(0.25)..style = PaintingStyle.fill);
-        
-        // Küçük sıçrayan kıvılcımlar (Flare detayları)
-        canvas.drawCircle(Offset(w * 0.82, h * 0.35), 1.5, Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.fill);
-        canvas.drawCircle(Offset(w * 0.18, h * 0.42), 1.0, Paint()..color = color.withOpacity(0.4)..style = PaintingStyle.fill);
+        // Kontur ekle
+        canvas.drawPath(flade, strokePaint);
         break;
 
       case 'Ağaç':
-        // Modern & Estetik "Life Tree" silüeti
-        final pMain = p..strokeWidth = 3.5;
-        // Winding Trunk (Kavisli Estetik Gövde)
+        // Estetik Life Tree - Oval yapraklar ve asimetrik dallar
+        final treeColor = color;
+        final trunkP = p..strokeWidth = 3.6..color = treeColor;
+        
+        // 1. Organic Winding Trunk (Kavisli Gövde)
         final trunk = Path();
         trunk.moveTo(w * 0.5, h * 0.9);
-        trunk.cubicTo(w * 0.45, h * 0.75, w * 0.55, h * 0.72, w * 0.5, h * 0.58);
-        canvas.drawPath(trunk, pMain);
+        trunk.cubicTo(w * 0.48, h * 0.75, w * 0.58, h * 0.65, w * 0.52, h * 0.5);
+        canvas.drawPath(trunk, trunkP);
 
-        // Branches (Dengeli Dallanma)
-        final br = Path();
-        br.moveTo(w * 0.5, h * 0.58);
-        br.quadraticBezierTo(w * 0.8, h * 0.48, w * 0.84, h * 0.32); // Sağ Üst
-        br.moveTo(w * 0.5, h * 0.62);
-        br.quadraticBezierTo(w * 0.22, h * 0.52, w * 0.16, h * 0.38); // Sol Alt
-        br.moveTo(w * 0.5, h * 0.58);
-        br.lineTo(w * 0.5, h * 0.35); // Merkez dikey
-        canvas.drawPath(br, p..strokeWidth = 2.0);
+        // 2. Varied Branches (Farklı Uzunluklar)
+        final bRight = Path(); // Uzun dal
+        bRight.moveTo(w * 0.54, h * 0.58);
+        bRight.quadraticBezierTo(w * 0.82, h * 0.48, w * 0.88, h * 0.28);
+        canvas.drawPath(bRight, p..strokeWidth = 2.0);
 
-        // Foliage (Estetik noktasal yapraklar - Zen tasarımı)
-        final fPaint = Paint()..color = color..style = PaintingStyle.fill;
-        canvas.drawCircle(Offset(w * 0.84, h * 0.32), 6, fPaint); 
-        canvas.drawCircle(Offset(w * 0.16, h * 0.38), 5, fPaint); 
-        canvas.drawCircle(Offset(w * 0.5, h * 0.3), 7, fPaint); 
-        // Detay dokunuşları
-        canvas.drawCircle(Offset(w * 0.68, h * 0.42), 2.5, fPaint..color = color.withOpacity(0.5));
-        canvas.drawCircle(Offset(w * 0.32, h * 0.48), 3, fPaint);
+        final bLeftShort = Path(); // Kısa dal
+        bLeftShort.moveTo(w * 0.5, h * 0.65);
+        bLeftShort.quadraticBezierTo(w * 0.25, h * 0.58, w * 0.18, h * 0.48);
+        canvas.drawPath(bLeftShort, p..strokeWidth = 1.6);
+
+        final bLeftLong = Path(); // Orta dal
+        bLeftLong.moveTo(w * 0.52, h * 0.5);
+        bLeftLong.quadraticBezierTo(w * 0.3, h * 0.4, w * 0.25, h * 0.3);
+        canvas.drawPath(bLeftLong, p..strokeWidth = 1.8);
+        
+        // 3. Leaf Silhouettes (Daire yerine oval yapraklar)
+        void drawLeaf(double cx, double cy, double rx, double ry, double rot) {
+          canvas.save();
+          canvas.translate(cx, cy);
+          canvas.rotate(rot);
+          canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2), Paint()..color = treeColor..style = PaintingStyle.fill);
+          canvas.restore();
+        }
+
+        drawLeaf(w * 0.88, h * 0.28, 9, 6, 0.35); // Sağ üst
+        drawLeaf(w * 0.25, h * 0.3, 7, 5, -0.6); // Sol üst
+        drawLeaf(w * 0.18, h * 0.48, 6, 4, -0.2); // Sol alt
+        drawLeaf(w * 0.5, h * 0.35, 5, 8, 0.1); // Tepe
         
         // Zemin çizgisi
         canvas.drawLine(Offset(w * 0.35, h * 0.9), Offset(w * 0.65, h * 0.9), p..strokeWidth = 1.0);
