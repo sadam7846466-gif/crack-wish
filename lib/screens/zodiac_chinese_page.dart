@@ -1407,15 +1407,19 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
               // ── 3 ENERJİ KARTI (Baskın / Destekler / Yorar) ──
               Padding(
-
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(children: [
-                  _energyCard('⚡', 'Baskın', fsProfile['dominant'] as String, elColor),
-                  const SizedBox(width: 8),
-                  _energyCard('🌿', 'Destekler', fsProfile['supportEnergy'] as String, const Color(0xFF4FC3F7)),
-                  const SizedBox(width: 8),
-                  _energyCard('⚠️', 'Yorar', fsProfile['drainEnergy'] as String, const Color(0xFFEF9A9A)),
-                ]),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _energyCard('⚡', 'Baskın', fsProfile['dominant'] as String, elColor),
+                      const SizedBox(width: 8),
+                      _energyCard('🌿', 'Destekler', fsProfile['supportEnergy'] as String, const Color(0xFF4FC3F7)),
+                      const SizedBox(width: 8),
+                      _energyCard('⚠️', 'Yorar', fsProfile['drainEnergy'] as String, const Color(0xFFEF9A9A)),
+                    ],
+                  ),
+                ),
               ),
 
               const SizedBox(height: 20),
@@ -1721,34 +1725,33 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   // Küçük enerji kartı (3'lü grid için)
   Widget _energyCard(String emoji, String label, String desc, Color color) => Expanded(
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.2), width: 0.7),
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.8),
       ),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 32, height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color.withOpacity(0.12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // İkon + başlık
+          Text(emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: 6),
+          Text(label, style: TextStyle(
+            color: color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8,
+          )),
+          const SizedBox(height: 8),
+          // Tam metin — kesmiyoruz, sarıyor
+          Text(
+            desc,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 9.5, height: 1.5),
           ),
-          child: Center(child: Text(emoji, style: const TextStyle(fontSize: 14))),
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: TextStyle(
-          color: color, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5,
-        )),
-        const SizedBox(height: 4),
-        Text(
-          desc.length > 55 ? '${desc.substring(0, 52)}…' : desc,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9, height: 1.4),
-        ),
-      ]),
+        ],
+      ),
     ),
   );
+
 
   // Renk adı → Color dönüştürücü (genişletilmiş)
   Color _colorFromNameEx(String name, Color fallback) {
