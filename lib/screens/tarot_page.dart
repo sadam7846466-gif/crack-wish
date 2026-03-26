@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../widgets/glass_back_button.dart';
+import '../widgets/swipe_back_wrapper.dart';
 import 'tarot_meanings.dart';
 
 enum RitualState {
@@ -386,7 +387,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       duration: const Duration(seconds: 40),
     );
     // Arka plan animasyonlarını gecikmeli başlat — sayfa geçişi takılmasın
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (!mounted) return;
       _starsCtrl.repeat();
       _fogCtrl.repeat();
@@ -2704,38 +2705,40 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             child: Center(
             child: Material(
               color: Colors.transparent,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: GlassCard(
-                  useOwnLayer: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  shape: const LiquidRoundedSuperellipse(borderRadius: 24),
-                  settings: const LiquidGlassSettings(
-                    thickness: 24,
-                    blur: 15,
-                    glassColor: Color(0x1A1E1845),
-                    chromaticAberration: 0.12,
-                    lightIntensity: 1.0,
-                    ambientStrength: 0.8,
-                    refractiveIndex: 1.3,
-                    saturation: 1.1,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.7,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.18),
+                      width: 0.6,
+                    ),
                   ),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.auto_awesome,
-                          color: Color(0xFFE7D6A5),
+                        Icon(
+                          Icons.menu_book_rounded,
+                          color: Colors.white.withOpacity(0.7),
                           size: 24,
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          _isTr ? 'Tarot\'un Fısıltısı' : 'Whisper of Tarot',
+                          _isTr ? 'Tarot Rehberi' : 'Tarot Guide',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.cormorantGaramond(
-                            color: Colors.white,
+                            color: Colors.white.withOpacity(0.95),
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.2,
@@ -2743,19 +2746,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 6),
                         Container(
-                          height: 1,
+                          height: 0.5,
                           width: 60,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.transparent, const Color(0xFFE7D6A5).withOpacity(0.8), Colors.transparent],
-                            ),
-                          ),
+                          color: Colors.white.withOpacity(0.2),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
                         ..._getRandomGuidanceItems(),
                       ],
                     ),
                   ),
+                ),
                 ),
               ),
             ),
@@ -2858,10 +2858,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(0xFFE7D6A5).withOpacity(0.1),
+              color: Colors.white.withOpacity(0.08),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.12),
+                width: 0.5,
+              ),
             ),
-            child: Icon(icon, color: const Color(0xFFE7D6A5), size: 18),
+            child: Icon(icon, color: Colors.white.withOpacity(0.7), size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -2870,8 +2874,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.95),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
@@ -2881,7 +2885,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 Text(
                   desc,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
+                    color: Colors.white.withOpacity(0.6),
                     fontSize: 12.5,
                     height: 1.4,
                   ),
@@ -3709,10 +3713,18 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   Future<void> _selectCard(int index, GlobalKey cardKey) async {
     if (_isBusy) return;
-    // Sayfa kaydırılırken (geri jesti) kart tıklanmasını engelle
+    // SwipeBackWrapper sürükleme sırasında kart seçimini engelle
+    if (SwipeBackWrapper.isSwiping) return;
+    // Sayfa kaydırılırken (geri jesti) veya kapanırken kart tıklanmasını engelle
     final route = ModalRoute.of(context);
-    if (route != null && route.animation != null && route.animation!.status == AnimationStatus.reverse) return;
-    if (route != null && route.animation != null && route.animation!.value < 0.95) return;
+    if (route != null && route.animation != null) {
+      final anim = route.animation!;
+      // Sayfa kapanıyorsa (reverse) veya henüz tam açılmadıysa engelle
+      if (anim.status == AnimationStatus.reverse) return;
+      if (anim.status != AnimationStatus.completed) return;
+      // SwipeBackWrapper sürükleme sırasında value düşer — bunu da yakala
+      if (anim.value < 0.99) return;
+    }
     final totalReserved = _selectedTablePositions.length + _reservedSlotCount;
     if (totalReserved >= _maxSlots) return;
     if (_selectedTablePositions.contains(index)) return;
@@ -3885,7 +3897,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
                   return GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTap: () {
+                    onTapUp: (_) {
+                      if (SwipeBackWrapper.isSwiping) return;
                       if (isSelected || isHidden) return;
                       _selectCard(i, _cardKeys[i]);
                     },
@@ -4676,12 +4689,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
 
           // ── Noise/grain overlay ──
-          IgnorePointer(
-            child: Opacity(
-              opacity: 0.04,
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: _NoisePainter(),
+          RepaintBoundary(
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.04,
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: _NoisePainter(),
+                ),
               ),
             ),
           ),
@@ -4721,7 +4736,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
 
           // ── 💫 Floating Light Particles ──
-          ...List.generate(12, (i) {
+          ...List.generate(6, (i) {
             final seed = i * 137.5;
             final xPos = (sin(seed) * 0.5 + 0.5) * screenW;
             final baseY = (cos(seed * 0.7) * 0.5 + 0.5) * screenH;
@@ -4998,7 +5013,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         ),
                       ),
                       // Kredi göstergesi ve Rehberlik butonu
-                      SizedBox(
+                      Opacity(
+                        opacity: _state == RitualState.revealed ? 0.0 : 1.0,
+                        child: IgnorePointer(
+                          ignoring: _state == RitualState.revealed,
+                          child: SizedBox(
                         width: 80,
                         child: Align(
                           alignment: Alignment.centerRight,
@@ -5009,21 +5028,29 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               children: [
                                 _TapScaleButton(
                                   onTap: _showTarotGuidanceDialog,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    margin: const EdgeInsets.only(right: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.08),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: const Color(0xFFE7D6A5).withOpacity(0.3),
-                                        width: 0.5,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: ClipOval(
+                                      child: BackdropFilter(
+                                        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                        child: Container(
+                                          width: 38,
+                                          height: 38,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.10),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.18),
+                                              width: 0.6,
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.menu_book_rounded,
+                                            color: Colors.white.withOpacity(0.85),
+                                            size: 17,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: Icon(
-                                      Icons.menu_book_rounded,
-                                      color: const Color(0xFFE7D6A5).withOpacity(0.9),
-                                      size: 16,
                                     ),
                                   ),
                                 ),
@@ -5077,6 +5104,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
+                        ),
+                      ),
                         ),
                       ),
                     ],
@@ -5760,18 +5789,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     child: Transform.translate(
                       offset: Offset(0, 30 * (1.0 - value)),
                       child: Container(
-                        // Padding kaldırıldı, Carousel tam ekran genişleyebilsin diye alt elemanlara özel Padding verilecek
-                        child: NotificationListener<ScrollUpdateNotification>(
-                          onNotification: (info) {
-                            if (info.metrics.pixels < -90 && _state == RitualState.revealed) {
-                              _resetToIdle();
-                              return true;
-                            }
-                            return false;
-                          },
-                          child: SingleChildScrollView(
+                        child: SingleChildScrollView(
                             controller: _readingScrollCtrl,
-                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                            physics: const BouncingScrollPhysics(),
                             child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -5948,24 +5968,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 },
               ),
             ),
-         
-          // Yorum ekranında sol kenar swipe → kart seçimine dön (pop yerine)
-          if (_state == RitualState.revealed)
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 40,
-              child: GestureDetector(
-                onHorizontalDragEnd: (details) {
-                  if (details.velocity.pixelsPerSecond.dx > 200) {
-                    _resetToIdle();
-                  }
-                },
-                behavior: HitTestBehavior.opaque,
-                child: const SizedBox.expand(),
-              ),
-            ),
+
 
           // Yorum ekranında sabit geri butonu — scroll yapınca da erişilebilir
           if (_state == RitualState.revealed)
@@ -5974,6 +5977,38 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               left: 12,
               child: GlassBackButton(
                 onTap: _resetToIdle,
+              ),
+            ),
+
+          // Yorum ekranında sabit rehber kitapçık butonu — overlay üstünde
+          if (_state == RitualState.revealed)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 12,
+              right: 56,
+              child: GestureDetector(
+                onTap: _showTarotGuidanceDialog,
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.10),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.18),
+                          width: 0.6,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        color: Colors.white.withOpacity(0.85),
+                        size: 17,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
 
@@ -6727,7 +6762,7 @@ class _StarFieldPainter extends CustomPainter {
       final path = Path();
       path.moveTo(0, baseY);
 
-      for (double x = 0; x <= size.width; x += 3) {
+      for (double x = 0; x <= size.width; x += 6) {
         final wave1 = sin((x / size.width) * pi * freq + pulse * pi * 2 * 0.4 + ph) * amp;
         final wave2 = sin((x / size.width) * pi * (freq * 1.7) + pulse * pi * 2 * 0.25 + ph * 1.5) * amp * 0.4;
         final y = baseY + wave1 + wave2;
@@ -6771,8 +6806,8 @@ class _StarDustPainter extends CustomPainter {
     final rng = Random(77);
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // 1500 drifting tiny stars
-    for (int i = 0; i < 1500; i++) {
+    // 400 drifting tiny stars (performans için azaltıldı)
+    for (int i = 0; i < 400; i++) {
       final x = rng.nextDouble() * size.width;
       final y = rng.nextDouble() * size.height;
       final ph = rng.nextDouble() * pi * 2;
@@ -6784,8 +6819,8 @@ class _StarDustPainter extends CustomPainter {
       canvas.drawCircle(Offset(x + driftX, y + driftY), sz, paint);
     }
 
-    // 500 twinkling + drifting stars
-    for (int i = 0; i < 500; i++) {
+    // 150 twinkling + drifting stars (performans için azaltıldı)
+    for (int i = 0; i < 150; i++) {
       final x = rng.nextDouble() * size.width;
       final y = rng.nextDouble() * size.height;
       final phase = rng.nextDouble() * pi * 2;
@@ -6957,7 +6992,7 @@ class _NoisePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rng = Random(42);
     final paint = Paint()..color = Colors.white;
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 600; i++) {
       canvas.drawCircle(
         Offset(rng.nextDouble() * size.width, rng.nextDouble() * size.height),
         rng.nextDouble() * 0.8,

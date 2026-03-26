@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
+import '../widgets/guidance_booklet.dart';
 
 class MotivationPage extends StatefulWidget {
   const MotivationPage({super.key});
@@ -181,6 +182,80 @@ class _MotivationPageState extends State<MotivationPage>
             top: MediaQuery.of(context).padding.top + 12,
             left: 12,
             child: GlassBackButton(),
+          ),
+          // Rehber kitapçık butonu
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 14,
+            right: 12,
+            child: GuidanceBookletButton(
+              dialogTitleTr: 'Mod Rehberi',
+              dialogTitleEn: 'Mood Guide',
+              items: const [
+                GuidanceItem(
+                  titleTr: 'Mod Çarkı Nedir?',
+                  titleEn: 'What Is the Mood Wheel?',
+                  descTr: 'Mod çarkı, 12 temel ruh halini temsil eder. Çarkı çevirerek veya doğrudan bir emojiye dokunarak o anki ruh halini seçebilirsin.',
+                  descEn: 'The mood wheel represents 12 basic moods. You can spin the wheel or tap an emoji directly to select your current mood.',
+                  icon: Icons.radio_button_checked_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Neden Ruh Halini Takip Etmelisin?',
+                  titleEn: 'Why Track Your Mood?',
+                  descTr: 'Duygularını düzenli takip etmek, duygusal kalıplarını görmenize ve tetikleyicileri anlamanıza yardımcı olur. Bu, öz-farkındalığın ilk adımıdır.',
+                  descEn: 'Regularly tracking your emotions helps you see emotional patterns and understand triggers. This is the first step to self-awareness.',
+                  icon: Icons.insights_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Duygu ve Fiziksel Bağlantı',
+                  titleEn: 'Emotion-Body Connection',
+                  descTr: 'Duygular sadece zihinsel değildir — vücudunuzda da fiziksel karşılıkları vardır. Stres omuzlarınızı sıkar, mutluluk göğsünüzü hafifletir.',
+                  descEn: 'Emotions are not just mental — they have physical counterparts in your body. Stress tightens your shoulders, happiness lightens your chest.',
+                  icon: Icons.favorite_outline,
+                ),
+                GuidanceItem(
+                  titleTr: 'Olumsuz Duygu = Kötü Değil',
+                  titleEn: 'Negative Emotion ≠ Bad',
+                  descTr: 'Üzüntü, stres veya korku doğal duygulardır. Onları bastırmak yerine kabul etmek, duygusal dayanıklılığı artırır.',
+                  descEn: 'Sadness, stress, or fear are natural emotions. Accepting them rather than suppressing builds emotional resilience.',
+                  icon: Icons.shield_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Kozmik Enerji Etkisi',
+                  titleEn: 'Cosmic Energy Effect',
+                  descTr: 'Seçtiğin ruh hali, arka plandaki kozmik enerjiyi değiştirir. Her duygunun kendine özgü bir renk ve enerji alanı vardır.',
+                  descEn: 'Your selected mood changes the cosmic energy in the background. Each emotion has its own unique color and energy field.',
+                  icon: Icons.auto_awesome_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Günlük Ritüel',
+                  titleEn: 'Daily Ritual',
+                  descTr: 'Her gün aynı saatte ruh halini kontrol etmek, bir farkındalık ritüeli oluşturur. Sabah veya akşam en ideal zamanlardır.',
+                  descEn: 'Checking your mood at the same time each day creates an awareness ritual. Morning or evening are ideal times.',
+                  icon: Icons.schedule_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Duygu Geçişleri',
+                  titleEn: 'Emotion Transitions',
+                  descTr: 'Duygular sabit değildir — gün içinde sürekli değişir. Bu normaldir. Önemli olan, hangi duygunun daha baskın olduğunu fark etmektir.',
+                  descEn: 'Emotions are not fixed — they constantly change throughout the day. What matters is noticing which emotion is dominant.',
+                  icon: Icons.swap_horiz_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Nefes ve Duygu',
+                  titleEn: 'Breath and Emotion',
+                  descTr: 'Stresli veya panikli hissediyorsan, 4-7-8 nefes tekniğini dene: 4 saniye nefes al, 7 saniye tut, 8 saniye ver. Bu teknik sinir sistemini sakinleştirir.',
+                  descEn: 'If feeling stressed or panicked, try the 4-7-8 breathing technique: inhale 4s, hold 7s, exhale 8s. This calms the nervous system.',
+                  icon: Icons.air_outlined,
+                ),
+                GuidanceItem(
+                  titleTr: 'Duygusal Zekâ',
+                  titleEn: 'Emotional Intelligence',
+                  descTr: 'Duygularını tanımak ve adlandırmak, duygusal zekânın temelidir. Bu uygulama, duygusal farkındalığını geliştirmen için tasarlandı.',
+                  descEn: 'Recognizing and naming your emotions is the foundation of emotional intelligence. This app is designed to develop your emotional awareness.',
+                  icon: Icons.lightbulb_outline,
+                ),
+              ],
+            ),
           ),
           // Title
           Positioned(

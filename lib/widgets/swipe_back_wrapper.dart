@@ -15,6 +15,10 @@ class SwipeBackWrapper extends StatefulWidget {
   /// Hızlı fırlatma eşiği (px/sn)
   final double velocityThreshold;
 
+  /// Herhangi bir SwipeBackWrapper aktif sürükleme yapıyorsa true.
+  /// Alt widget'lar bu flag'i kontrol ederek dokunmayı engelleyebilir.
+  static bool isSwiping = false;
+
   const SwipeBackWrapper({
     super.key,
     required this.child,
@@ -37,6 +41,8 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
   Offset? _initialPosition;
   bool _swipeDecided = false;   // Yön kararı verildi mi?
   bool _swipeAccepted = false;  // Yatay sağa swipe kabul edildi mi?
+
+
   
   // Minimum hareket eşiği — bu kadar px hareket etmeden karar verilmez
   static const double _directionThreshold = 20.0;
@@ -83,6 +89,7 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
       
       // Yatay hareket dikeyden en az 1.5x baskınsa VE sağa gidiyorsa → kabul
       _swipeAccepted = delta.dx > 0 && delta.dx.abs() > delta.dy.abs() * 1.5;
+      if (_swipeAccepted) SwipeBackWrapper.isSwiping = true;
     }
     
     // Kabul edilmediyse hiçbir şey yapma
@@ -189,6 +196,7 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
   }
 
   void _reset() {
+    final wasSwiping = _swipeAccepted;
     _swipeDecided = false;
     _swipeAccepted = false;
     _initialPosition = null;
@@ -196,6 +204,15 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
       setState(() {
         _dragOffset = 0.0;
       });
+    }
+    // isSwiping flag'ini gecikmeli sıfırla — GestureDetector.onTapUp
+    // pointer-up'tan SONRA tetiklenebilir, bu da yanlış kart seçimine yol açar.
+    if (wasSwiping) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        SwipeBackWrapper.isSwiping = false;
+      });
+    } else {
+      SwipeBackWrapper.isSwiping = false;
     }
   }
 
@@ -221,9 +238,12 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
         alignment: Alignment.centerLeft,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(borderRadius),
-          child: Opacity(
-            opacity: opacity,
-            child: widget.child,
+          child: AbsorbPointer(
+            absorbing: _swipeAccepted || _isPopping,
+            child: Opacity(
+              opacity: opacity,
+              child: widget.child,
+            ),
           ),
         ),
       ),
