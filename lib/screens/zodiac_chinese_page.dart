@@ -5078,45 +5078,63 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Keskin, 5 uçlu ve güçlü Ateş silüeti (Referans görsele sadık)
-        final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
-        
-        final flame = Path();
-        // Merkez ana tepe
-        flame.moveTo(w * 0.5, h * 0.15); 
-        
-        // Sağ üst - ince dar geçiş
-        flame.quadraticBezierTo(w * 0.55, h * 0.35, w * 0.65, h * 0.32);
-        // Sağ dış büyük uç (Flare)
-        flame.quadraticBezierTo(w * 0.85, h * 0.45, w * 0.82, h * 0.8);
-        
-        // Alt taban - Referanstaki gibi keskin dönüş
-        flame.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.18, h * 0.8);
-        
-        // Sol dış büyük uç (Flare)
-        flame.quadraticBezierTo(w * 0.15, h * 0.45, w * 0.35, h * 0.32);
-        // Sol üst - ince dar geçiş
-        flame.quadraticBezierTo(w * 0.45, h * 0.35, w * 0.5, h * 0.15);
-        flame.close();
-        
-        canvas.drawPath(flame, fillPaint);
+        // Referans görseline birebir sadık: Ana dolgu + negatif alan kesmeler
+        final fp = Paint()..color = color..style = PaintingStyle.fill;
+        final np = Paint()..color = const Color(0xFF1E1E2A)..style = PaintingStyle.fill; // Arkaplan rengi ile negatif kesme
 
-        // İç katman dilleri (Referanstaki o 3 iç sivri uç etkisi için)
-        final innerC = Path();
-        innerC.moveTo(w * 0.5, h * 0.45); // İç merkez tepe
-        innerC.lineTo(w * 0.55, h * 0.7);
-        innerC.lineTo(w * 0.65, h * 0.62); // İç sağ tepe
-        innerC.lineTo(w * 0.6, h * 0.82);
-        innerC.lineTo(w * 0.4, h * 0.82);
-        innerC.lineTo(w * 0.35, h * 0.62); // İç sol tepe
-        innerC.lineTo(w * 0.45, h * 0.7);
-        innerC.close();
-        
-        // Negatif alan / Derinlik etkisi
-        canvas.drawPath(innerC, Paint()..color = Colors.black.withOpacity(0.15)..style = PaintingStyle.fill);
+        // ── Ana dış silüet ──────────────────────────────
+        final body = Path();
+        body.moveTo(w * 0.5, h * 0.88); // Alt merkez
+        // Sol alt yayılma
+        body.quadraticBezierTo(w * 0.15, h * 0.75, w * 0.1, h * 0.55);
+        // Sol dış alev dili (sola çıkan)
+        body.quadraticBezierTo(w * 0.05, h * 0.38, w * 0.25, h * 0.28);
+        // Sol iç boğaz (içe çekiliş)
+        body.quadraticBezierTo(w * 0.3, h * 0.42, w * 0.35, h * 0.38);
+        // Merkez yükselen kısım sol taraftan
+        body.quadraticBezierTo(w * 0.3, h * 0.25, w * 0.38, h * 0.12);
+        // En uzun merkez dil — sağa kıvrılıyor (Referanstaki o karakteristik sağ kıvrım)
+        body.cubicTo(w * 0.45, h * 0.04, w * 0.7, h * 0.05, w * 0.62, h * 0.22);
+        body.quadraticBezierTo(w * 0.55, h * 0.32, w * 0.6, h * 0.35);
+        // Sağ dış alev dili (sağa çıkan)
+        body.quadraticBezierTo(w * 0.88, h * 0.32, w * 0.85, h * 0.5);
+        body.quadraticBezierTo(w * 0.82, h * 0.62, w * 0.75, h * 0.65);
+        // Sağ alt iniş
+        body.quadraticBezierTo(w * 0.88, h * 0.75, w * 0.5, h * 0.88);
+        body.close();
+        canvas.drawPath(body, fp);
 
-        // En uç noktaya vurgu
-        canvas.drawCircle(Offset(w * 0.5, h * 0.15), 1.2, Paint()..color = Colors.white.withOpacity(0.3));
+        // ── Negatif Alan Kesmeler (İçteki alev detayları) ──
+        // Sol iç kesme (küçük sol negatif dil)
+        final nL = Path();
+        nL.moveTo(w * 0.22, h * 0.55);
+        nL.quadraticBezierTo(w * 0.15, h * 0.48, w * 0.24, h * 0.38);
+        nL.quadraticBezierTo(w * 0.28, h * 0.47, w * 0.3, h * 0.55);
+        nL.quadraticBezierTo(w * 0.26, h * 0.6, w * 0.22, h * 0.55);
+        canvas.drawPath(nL, np);
+
+        // Merkez negatif alan (büyük ortadaki beyaz boşluk)
+        final nC = Path();
+        nC.moveTo(w * 0.5, h * 0.55);
+        nC.quadraticBezierTo(w * 0.42, h * 0.4, w * 0.45, h * 0.28);
+        nC.quadraticBezierTo(w * 0.5, h * 0.35, w * 0.54, h * 0.28);
+        nC.quadraticBezierTo(w * 0.57, h * 0.4, w * 0.5, h * 0.55);
+        canvas.drawPath(nC, np);
+
+        // Sağ küçük negatif dil
+        final nR = Path();
+        nR.moveTo(w * 0.65, h * 0.55);
+        nR.quadraticBezierTo(w * 0.7, h * 0.45, w * 0.72, h * 0.38);
+        nR.quadraticBezierTo(w * 0.76, h * 0.46, w * 0.72, h * 0.58);
+        nR.quadraticBezierTo(w * 0.68, h * 0.62, w * 0.65, h * 0.55);
+        canvas.drawPath(nR, np);
+
+        // Alt sol kesme (küçük alt negatif boşluk)
+        final nBL = Path();
+        nBL.moveTo(w * 0.3, h * 0.75);
+        nBL.quadraticBezierTo(w * 0.22, h * 0.72, w * 0.2, h * 0.65);
+        nBL.quadraticBezierTo(w * 0.28, h * 0.68, w * 0.35, h * 0.75);
+        canvas.drawPath(nBL, np);
         break;
 
       case 'Ağaç':
