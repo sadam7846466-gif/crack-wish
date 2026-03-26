@@ -4064,12 +4064,12 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
         'season': 'Sonbahar — bırakma, özümseme ve özün geriye kalmasına bırakma dönemi.',
         'dir': 'Batı',
       },
-      'Ahşap': {
+      'Ağaç': {
         'emoji': '🌿',
-        'title': 'Ahşap Elementi',
-        'desc': 'Ahşap; büyüme, vizyon ve esnekliği simgeler. Ahşap insanları hayatta durmadan büyümek ve yeni şeyler inşa etmek için yaratılmıştır.',
+        'title': 'Ağaç Elementi',
+        'desc': 'Ağaç; büyüme, vizyon ve esnekliği simgeler. Ağaç insanları hayatta durmadan büyümek, kök salmak ve yeni şeyler inşa etmek için yaratılmıştır. Bir ağaç gibi hem esnerler hem de dik dururlar.',
         'traits': 'Yaratıcı · Vizyoner · İyimser · Esnek',
-        'body': 'Karaciğer & Safra kesesi — Planlama ve karar vermenin organları. Dengeli Ahşap enerjisi öfkeyi salıverir, yaratıcılığı serbest bırakır ve net hedefler koyar.',
+        'body': 'Karaciğer & Safra kesesi — Planlama ve karar vermenin enerjik merkezi. Dengeli Ağaç enerjisi öfkeyi salıverir, yaratıcılığı serbest bırakır ve net hedefler koymayı kolaylaştırır.',
         'season': 'İlkbahar — tohumların filizlendiği, yeni başlangıçların ve büyümenin mevsimi.',
         'dir': 'Doğu',
       },
@@ -4078,40 +4078,47 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     showDialog(
       context: ctx,
       barrierColor: Colors.black.withOpacity(0.5),
-      builder: (_) => Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
-                  boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
+      builder: (dCtx) => GestureDetector(
+        onTap: () => Navigator.of(dCtx).pop(),
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: GestureDetector(
+            onTap: () => Navigator.of(dCtx).pop(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
+                      boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
+                    ),
+                    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        Text(d['emoji']!, style: const TextStyle(fontSize: 26)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(d['title']!, style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
+                      ]),
+                      const SizedBox(height: 12),
+                      Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
+                      const SizedBox(height: 12),
+                      Text(d['desc']!, style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6)),
+                      const SizedBox(height: 14),
+                      _infoRow('✨', 'Kişilik', d['traits']!, color),
+                      const SizedBox(height: 8),
+                      _infoRow('🌸', 'En güçlü mevsim', d['season']!, color),
+                      const SizedBox(height: 8),
+                      _infoRow('🫀', 'Beden bağlantısı', d['body']!, color),
+                      const SizedBox(height: 8),
+                      _infoRow('🧭', 'Yön', d['dir']!, color),
+                    ]),
+                  ),
                 ),
-                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Text(d['emoji']!, style: const TextStyle(fontSize: 26)),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(d['title']!, style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
-                  ]),
-                  const SizedBox(height: 12),
-                  Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
-                  const SizedBox(height: 12),
-                  Text(d['desc']!, style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6)),
-                  const SizedBox(height: 14),
-                  _infoRow('✨', 'Kişilik', d['traits']!, color),
-                  const SizedBox(height: 8),
-                  _infoRow('🌸', 'En güçlü mevsim', d['season']!, color),
-                  const SizedBox(height: 8),
-                  _infoRow('🫀', 'Beden bağlantısı', d['body']!, color),
-                  const SizedBox(height: 8),
-                  _infoRow('🧭', 'Yön', d['dir']!, color),
-                ]),
               ),
             ),
           ),
@@ -4125,51 +4132,58 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     showDialog(
       context: ctx,
       barrierColor: Colors.black.withOpacity(0.5),
-      builder: (_) => Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
-                  boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
-                ),
-                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 26)),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(isYin ? 'Yin Enerjisi' : 'Yang Enerjisi', style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
-                  ]),
-                  const SizedBox(height: 12),
-                  Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
-                  const SizedBox(height: 12),
-                  Text(
-                    isYin
-                      ? 'Yin; alıcı, sessiz ve içe dönük enerjidir. Ay ve geceyle özdeşleşir. Yin taşıyan insanlar derin hisler, güçlü sezgi ve yaratıcı bir iç dünyaya sahiptir.'
-                      : 'Yang; aktif, yayıcı ve dışa açılan enerjidir. Güneş ve gündüzle özdeşleşir. Yang taşıyan insanlar hareketi, liderliği ve toplumu besler.',
-                    style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6),
+      builder: (dCtx) => GestureDetector(
+        onTap: () => Navigator.of(dCtx).pop(),
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: GestureDetector(
+            onTap: () => Navigator.of(dCtx).pop(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.22), width: 0.8),
+                      boxShadow: [BoxShadow(color: color.withOpacity(0.12), blurRadius: 30, spreadRadius: -4)],
+                    ),
+                    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 26)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(isYin ? 'Yin Enerjisi' : 'Yang Enerjisi', style: TextStyle(color: color, fontSize: 19, fontWeight: FontWeight.w800))),
+                      ]),
+                      const SizedBox(height: 12),
+                      Container(height: 0.5, color: Colors.white.withOpacity(0.15)),
+                      const SizedBox(height: 12),
+                      Text(
+                        isYin
+                          ? 'Yin; alıcı, sessiz ve içe dönük enerjidir. Ay ve geceyle özdeşleşir. Yin taşıyan insanlar derin hisler, güçlü sezgi ve yaratıcı bir iç dünyaya sahiptir.'
+                          : 'Yang; aktif, yayıcı ve dışa açılan enerjidir. Güneş ve gündüzle özdeşleşir. Yang taşıyan insanlar hareketi, liderliği ve toplumu besler.',
+                        style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 13.5, height: 1.6),
+                      ),
+                      const SizedBox(height: 14),
+                      _infoRow('✨', 'Temel nitelikler', isYin ? 'Sezgisel · Derin · Sakin · Yaratıcı' : 'Girişken · Lider · Cesur · Enerjik', color),
+                      const SizedBox(height: 8),
+                      _infoRow('🕐', 'En güçlü zaman', isYin
+                        ? 'Gece saatleri — zihin sessizleştiğinde Yin enerjisi zirveye çıkar; derin düşünce, sanatsal üretim ve içgörü için ideal zaman.'
+                        : 'Gündüz saatleri — güneşin en parlak olduğu anlarda Yang enerjisi doruğa ulaşır; önemli kararlar, sosyal adımlar ve eylem bu zamana ait.', color),
+                      const SizedBox(height: 8),
+                      _infoRow('💡', 'Doğal güç', isYin
+                        ? 'Dinleme, empati, strateji ve içsel keşif. Yin insanlar söylenmeyeni duyar.'
+                        : 'Harekete geçme, ikna etme, liderlik ve kolektif enerji yaratma.', color),
+                      const SizedBox(height: 8),
+                      _infoRow('⚖️', 'Dengeyi bulmak', isYin
+                        ? 'Yin enerji çok baskın olduğunda içe kapanma ve atalet riski doğar. Düzenli hareket (yürüyüş, dans), paylaşım ve küçük cesur adımlar dengeyi geri getirir.'
+                        : 'Yang enerji çok baskın olduğunda tükenmişlik ve sabırsızlık riski doğar. Sessiz anlar, meditasyon ve dinleme pratiği dengeyi geri getirir.', color),
+                    ]),
                   ),
-                  const SizedBox(height: 14),
-                  _infoRow('✨', 'Temel nitelikler', isYin ? 'Sezgisel · Derin · Sakin · Yaratıcı' : 'Girişken · Lider · Cesur · Enerjik', color),
-                  const SizedBox(height: 8),
-                  _infoRow('🕐', 'En güçlü zaman', isYin
-                    ? 'Gece saatleri — zihin sessizleştiğinde Yin enerjisi zirveye çıkar; derin düşünce, sanatsal üretim ve içgörü için ideal zaman.'
-                    : 'Gündüz saatleri — güneşin en parlak olduğu anlarda Yang enerjisi doruğa ulaşır; önemli kararlar, sosyal adımlar ve eylem bu zamana ait.', color),
-                  const SizedBox(height: 8),
-                  _infoRow('💡', 'Doğal güç', isYin
-                    ? 'Dinleme, empati, strateji ve içsel keşif. Yin insanlar söylenmeyeni duyar.'
-                    : 'Harekete geçme, ikna etme, liderlik ve kolektif enerji yaratma.', color),
-                  const SizedBox(height: 8),
-                  _infoRow('⚖️', 'Dengeyi bulmak', isYin
-                    ? 'Yin enerji çok baskın olduğunda içe kapanma ve atalet riski doğar. Düzenli hareket (yürüyüş, dans), paylaşım ve küçük cesur adımlar dengeyi geri getirir.'
-                    : 'Yang enerji çok baskın olduğunda tükenmişlik ve sabırsızlık riski doğar. Sessiz anlar, meditasyon ve dinleme pratiği dengeyi geri getirir.', color),
-                ]),
+                ),
               ),
             ),
           ),
@@ -4201,45 +4215,32 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     final elColor = Color(elData['color'] as int);
     final yyColor = widget.yinYang == 'Yin' ? const Color(0xFF7C3AED) : const Color(0xFFD97706);
 
-    return GestureDetector(
-      onTapUp: (details) {
-        final w = context.size?.width ?? 300;
-        if (details.localPosition.dx > w / 2) {
-          _advance();
-        } else {
-          _goBack();
-        }
-      },
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity == null) return;
-        if (details.primaryVelocity! < -100) _advance();
-        if (details.primaryVelocity! > 100) _goBack();
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(26),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.14),
-                  Colors.white.withOpacity(0.06),
-                  Colors.white.withOpacity(0.03),
-                ],
-              ),
-              border: Border.all(color: Colors.white.withOpacity(0.18), width: 0.6),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 35, offset: const Offset(0, 14)),
-                BoxShadow(color: widget.crimson.withOpacity(0.03), blurRadius: 50, spreadRadius: -8),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(26),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft, end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.14),
+                Colors.white.withOpacity(0.06),
+                Colors.white.withOpacity(0.03),
               ],
             ),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                // ─ Etiketler — editorial style ─
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            border: Border.all(color: Colors.white.withOpacity(0.18), width: 0.6),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 35, offset: const Offset(0, 14)),
+              BoxShadow(color: widget.crimson.withOpacity(0.03), blurRadius: 50, spreadRadius: -8),
+            ],
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            // ─ SABIT KISIM: Etiketler + Dalgalı çizgi ─
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   GestureDetector(
                     onTap: () => _showElementInfo(context, widget.element, elColor),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -4285,14 +4286,32 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                       )),
                       const SizedBox(width: 5),
                       Icon(Icons.edit_rounded, size: 10, color: widget.gold.withOpacity(0.35)),
-                    ]),
-                  ),
-                ]),
+                    ]),        // outer Row children end
+                  ),           // 3rd GestureDetector end
+                ]),            // Padding's Row children end
+              ),               // Padding end
+            // ─ Dekoratif çizgi ─
+            _ornamentalLine(),
 
-                // ─ Dekoratif çizgi ─
-                _ornamentalLine(),
 
-                // ─ Dönen alıntı — sabit alan ─
+                // ─ Dönen alıntı — sadece bu alan kaydırılabilir ─
+                GestureDetector(
+                  onTapUp: (details) {
+                    final w = context.size?.width ?? 300;
+                    if (details.localPosition.dx > w / 2) {
+                      _advance();
+                    } else {
+                      _goBack();
+                    }
+                  },
+                  onHorizontalDragEnd: (details) {
+                    if (details.primaryVelocity == null) return;
+                    if (details.primaryVelocity! < -100) _advance();
+                    if (details.primaryVelocity! > 100) _goBack();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+                    child: Column(children: [
                 SizedBox(
                   height: 110,
                   child: Center(
@@ -4372,14 +4391,18 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                           : null,
                     ),
                   );
-                })),
-              ]),
-          ),
-        ),
-      ),
-    );
+                 })),
+                    ]),          // Column children end (inside GestureDetector > Padding)
+                  ),             // Padding end
+              ),              // GestureDetector end
+            ]),               // outer Column children end
+          ),                  // Container end
+        ),                    // BackdropFilter end
+      );                      // ClipRRect end  
   }
 }
+
+
 
 class _WavePainter extends CustomPainter {
   final Color color;
