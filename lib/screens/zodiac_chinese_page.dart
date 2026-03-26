@@ -1412,11 +1412,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _energyCard('⚡', 'Baskın', fsProfile['dominant'] as String, elColor),
+                      _energyCard('dominant', 'Baskın', fsProfile['dominant'] as String, elColor),
                       const SizedBox(width: 8),
-                      _energyCard('🌿', 'Destekler', fsProfile['supportEnergy'] as String, const Color(0xFF4FC3F7)),
+                      _energyCard('support', 'Destekler', fsProfile['supportEnergy'] as String, elColor),
                       const SizedBox(width: 8),
-                      _energyCard('⚠️', 'Yorar', fsProfile['drainEnergy'] as String, const Color(0xFFEF9A9A)),
+                      _energyCard('drain', 'Yorar', fsProfile['drainEnergy'] as String, elColor),
                     ],
                   ),
                 ),
@@ -1722,26 +1722,28 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ]);
   }
 
-  // Küçük enerji kartı (3'lü grid için)
-  Widget _energyCard(String emoji, String label, String desc, Color color) => Expanded(
+  // Küçük enerji kartı (3'lü grid için) — özgün custom paint ikon + tek renk
+  Widget _energyCard(String iconType, String label, String desc, Color color) => Expanded(
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.8),
+        border: Border.all(color: color.withOpacity(0.25), width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // İkon + başlık
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 6),
+          // Özgün ikon
+          SizedBox(
+            width: 28, height: 28,
+            child: CustomPaint(painter: _EnergyCardIconPainter(iconType: iconType, color: color)),
+          ),
+          const SizedBox(height: 8),
           Text(label, style: TextStyle(
             color: color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8,
           )),
           const SizedBox(height: 8),
-          // Tam metin — kesmiyoruz, sarıyor
           Text(
             desc,
             textAlign: TextAlign.center,
@@ -4968,6 +4970,79 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
 // ─────────────────────────────────────────────────────
 // ENERGY BRIDGE PAINTER — İkonları Bağlayan Enerji Akışı
 // ─────────────────────────────────────────────────────
+// ── Enerji Kartı Özel İkon Painter ──────────────────────────────
+class _EnergyCardIconPainter extends CustomPainter {
+  final String iconType;
+  final Color color;
+  const _EnergyCardIconPainter({required this.iconType, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    switch (iconType) {
+      case 'dominant': // Şimşek — güç ve baskınlık
+        final bolt = Path();
+        bolt.moveTo(w * 0.6, h * 0.05);
+        bolt.lineTo(w * 0.3, h * 0.5);
+        bolt.lineTo(w * 0.52, h * 0.5);
+        bolt.lineTo(w * 0.4, h * 0.95);
+        bolt.lineTo(w * 0.7, h * 0.45);
+        bolt.lineTo(w * 0.48, h * 0.45);
+        bolt.close();
+        canvas.drawPath(bolt, p);
+        break;
+      case 'support': // Yaprak — destek ve büyüme
+        final stem = Path();
+        stem.moveTo(w * 0.5, h * 0.9);
+        stem.quadraticBezierTo(w * 0.5, h * 0.6, w * 0.5, h * 0.45);
+        canvas.drawPath(stem, p);
+
+        final leaf = Path();
+        leaf.moveTo(w * 0.5, h * 0.45);
+        leaf.cubicTo(w * 0.75, h * 0.4, w * 0.8, h * 0.15, w * 0.5, h * 0.1);
+        leaf.cubicTo(w * 0.2, h * 0.15, w * 0.25, h * 0.4, w * 0.5, h * 0.45);
+        canvas.drawPath(leaf, p);
+
+        // Damar
+        final vein = Path();
+        vein.moveTo(w * 0.5, h * 0.45);
+        vein.quadraticBezierTo(w * 0.6, h * 0.28, w * 0.62, h * 0.12);
+        canvas.drawPath(vein, p..strokeWidth = 1.0);
+        break;
+      case 'drain': // Aşağı ok + dalgalar — enerji akışı / tükenme
+        // Merkez dikey ok
+        canvas.drawLine(Offset(w * 0.5, h * 0.1), Offset(w * 0.5, h * 0.72), p..strokeWidth = 1.8);
+        // Ok ucu
+        final arrow = Path();
+        arrow.moveTo(w * 0.5, h * 0.9);
+        arrow.lineTo(w * 0.3, h * 0.65);
+        arrow.moveTo(w * 0.5, h * 0.9);
+        arrow.lineTo(w * 0.7, h * 0.65);
+        canvas.drawPath(arrow, p);
+        // Üstte enerji dalgaları
+        final w1 = Path();
+        w1.moveTo(w * 0.2, h * 0.2);
+        w1.quadraticBezierTo(w * 0.3, h * 0.12, w * 0.4, h * 0.2);
+        canvas.drawPath(w1, p..strokeWidth = 1.2);
+        final w2 = Path();
+        w2.moveTo(w * 0.6, h * 0.2);
+        w2.quadraticBezierTo(w * 0.7, h * 0.12, w * 0.8, h * 0.2);
+        canvas.drawPath(w2, p);
+        break;
+    }
+  }
+
+  @override bool shouldRepaint(_EnergyCardIconPainter o) => o.iconType != iconType || o.color != color;
+}
+
 class _EnergyBridgePainter extends CustomPainter {
   final Color elColor;
   final Color yyColor;
