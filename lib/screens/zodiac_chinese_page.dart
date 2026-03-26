@@ -1430,7 +1430,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Container(width: 3, height: 14, decoration: BoxDecoration(
-                      color: elColor, borderRadius: BorderRadius.circular(2),
+                      color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(2),
                     )),
                     const SizedBox(width: 8),
                     Text('İdeal Mekan', style: TextStyle(
@@ -1442,21 +1442,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     height: 110,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: elColor.withOpacity(0.04),
+                      color: Colors.white.withOpacity(0.03),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: elColor.withOpacity(0.12)),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
                     child: Stack(children: [
-                      // Köşe ışık efekti
-                      Positioned(top: 0, right: 0,
-                        child: Container(width: 60, height: 60, decoration: BoxDecoration(
-                          gradient: RadialGradient(colors: [elColor.withOpacity(0.15), Colors.transparent]),
-                        )),
-                      ),
                       // Oda çizimi
                       Center(child: SizedBox(
                         width: 160, height: 90,
-                        child: CustomPaint(painter: _RoomSketchPainter(color: elColor)),
+                        child: CustomPaint(painter: _RoomSketchPainter(color: Colors.white.withOpacity(0.5))),
                       )),
                       // Alan açıklaması
                       Positioned(bottom: 8, left: 12, right: 12,
@@ -1478,7 +1472,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Container(width: 3, height: 14, decoration: BoxDecoration(
-                      color: elColor, borderRadius: BorderRadius.circular(2),
+                      color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(2),
                     )),
                     const SizedBox(width: 8),
                     Text('Renk Paleti', style: TextStyle(
@@ -1487,7 +1481,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ]),
                   const SizedBox(height: 10),
                   Row(children: (fsProfile['colors'] as List<String>).map((c) {
-                    final colorVal = _colorFromNameEx(c, elColor);
+                    final colorVal = _colorFromNameEx(c, Colors.white);
                     return Expanded(child: Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: Column(children: [
@@ -1518,27 +1512,27 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [elColor.withOpacity(0.0), elColor.withOpacity(0.14)],
+                    colors: [Colors.white.withOpacity(0.0), Colors.white.withOpacity(0.04)],
                   ),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24),
                   ),
-                  border: Border(top: BorderSide(color: elColor.withOpacity(0.15), width: 0.7)),
+                  border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1), width: 0.7)),
                 ),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Container(
                     width: 34, height: 34,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: elColor.withOpacity(0.2),
-                      border: Border.all(color: elColor.withOpacity(0.4)),
+                      color: Colors.white.withOpacity(0.08),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
                     ),
-                    child: const Center(child: Text('⚡', style: TextStyle(fontSize: 14))),
+                    child: Center(child: Icon(Icons.bolt_rounded, size: 16, color: Colors.white.withOpacity(0.8))),
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('1 Dakikalık Aksiyon', style: TextStyle(
-                      color: elColor.withOpacity(0.85), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5,
+                      color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5,
                     )),
                     const SizedBox(height: 4),
                     Text(fsProfile['miniAction'] as String, style: TextStyle(
