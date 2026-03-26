@@ -5078,49 +5078,53 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // Modern, premium and bold fire silhouette. 
-        // 5-tongue composition with artistic curves focusing on the right-curving peak.
-        final firePaint = Paint()..color = color..style = PaintingStyle.fill;
-        
-        final flamePath = Path();
-        // Start from high-precision bottom center
-        flamePath.moveTo(w * 0.5, h * 0.9);
-        
-        // 1. Right Side - Bottom to Flare
-        flamePath.cubicTo(w * 0.75, h * 0.85, w * 0.9, h * 0.65, w * 0.85, h * 0.5);
-        // Right Flare (Slightly detached look but joined)
-        flamePath.quadraticBezierTo(w * 0.92, h * 0.35, w * 0.7, h * 0.35);
-        // Inner notch before peak
-        flamePath.quadraticBezierTo(w * 0.65, h * 0.38, w * 0.62, h * 0.28);
-        
-        // 2. CHARACTERISTIC PEAK - Curving to the RIGHT
-        flamePath.cubicTo(w * 0.65, h * 0.02, w * 0.45, h * 0.02, w * 0.4, h * 0.15);
-        
-        // 3. Left Side - Peak to Flare
-        flamePath.quadraticBezierTo(w * 0.35, h * 0.28, w * 0.3, h * 0.28);
-        // Left Flare
-        flamePath.quadraticBezierTo(w * 0.05, h * 0.35, w * 0.15, h * 0.55);
-        flamePath.cubicTo(w * 0.1, h * 0.7, w * 0.25, h * 0.85, w * 0.5, h * 0.9);
-        flamePath.close();
-        
-        canvas.drawPath(flamePath, firePaint);
+        // Elit, tamamen ince çizgili (slim line-art) dinamik alev
+        final pLine = p
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = color;
 
-        // Core depth - negative space effect with internal details
-        final corePath = Path();
-        // Central internal wisp
-        corePath.moveTo(w * 0.5, h * 0.45);
-        corePath.quadraticBezierTo(w * 0.45, h * 0.6, w * 0.5, h * 0.75);
-        corePath.quadraticBezierTo(w * 0.55, h * 0.6, w * 0.5, h * 0.45);
-        // Side internal wisps as per premium icon style
-        corePath.moveTo(w * 0.32, h * 0.55);
-        corePath.quadraticBezierTo(w * 0.28, h * 0.65, w * 0.35, h * 0.7);
-        corePath.moveTo(w * 0.68, h * 0.55);
-        corePath.quadraticBezierTo(w * 0.72, h * 0.65, w * 0.65, h * 0.7);
+        // 1. Ana dış alev (Tepe noktası sağa kavisli zarif form)
+        final outer = Path();
+        outer.moveTo(w * 0.5, h * 0.15); // Keskin tepe
         
-        canvas.drawPath(corePath, Paint()..color = Colors.black.withOpacity(0.12)..style = PaintingStyle.fill);
+        // Sağ dış inen kıvrım
+        outer.cubicTo(w * 0.55, h * 0.35, w * 0.85, h * 0.45, w * 0.75, h * 0.8);
+        // Alt zemin kavis
+        outer.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.25, h * 0.8);
+        // Sol dış yükselen kıvrım
+        outer.cubicTo(w * 0.15, h * 0.45, w * 0.45, h * 0.35, w * 0.5, h * 0.15);
+        
+        canvas.drawPath(outer, pLine);
 
-        // Accent highlight on the very tip for that "flare" spark
-        canvas.drawCircle(Offset(w * 0.5, h * 0.1), 1.0, Paint()..color = Colors.white.withOpacity(0.4));
+        // 2. İç alev (Ana formun benzeri, daha küçük)
+        final inner = Path();
+        inner.moveTo(w * 0.5, h * 0.45);
+        inner.cubicTo(w * 0.52, h * 0.55, w * 0.65, h * 0.6, w * 0.6, h * 0.8);
+        inner.quadraticBezierTo(w * 0.5, h * 0.85, w * 0.4, h * 0.8);
+        inner.cubicTo(w * 0.35, h * 0.6, w * 0.48, h * 0.55, w * 0.5, h * 0.45);
+        canvas.drawPath(inner, pLine..strokeWidth = 1.6);
+
+        // 3. Yan bağımsız alev çizgileri (Elite hareket hissi)
+        // Sol dış çizgi (kısa çıkış)
+        final leftLine = Path();
+        leftLine.moveTo(w * 0.25, h * 0.35);
+        leftLine.quadraticBezierTo(w * 0.12, h * 0.5, w * 0.2, h * 0.65);
+        canvas.drawPath(leftLine, pLine..strokeWidth = 1.6);
+
+        // Sağ dış kıvrımlı çizgi (daha yüksek)
+        final rightLine = Path();
+        rightLine.moveTo(w * 0.75, h * 0.28);
+        rightLine.quadraticBezierTo(w * 0.9, h * 0.5, w * 0.78, h * 0.65);
+        canvas.drawPath(rightLine, pLine..strokeWidth = 1.6);
+
+        // Yukarı uca doğru zarif ince detay çizgiler
+        canvas.drawLine(Offset(w * 0.5, h * 0.32), Offset(w * 0.5, h * 0.4), pLine..strokeWidth = 1.2);
+        
+        // Elit bir parıltı hissi için arkaya flu bir ışıma (sadece hissiyat)
+        canvas.drawPath(outer, Paint()..color = color.withOpacity(0.12)..style = PaintingStyle.fill);
         break;
 
       case 'Ağaç':
