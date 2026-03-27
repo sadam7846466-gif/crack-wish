@@ -1276,7 +1276,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final animalFs = ChineseZodiacData.animalFengShui[_animalIdx];
     final weeklyTask = ChineseZodiacData.weeklyFengShuiTask(_userElement, _userYinYang);
     final isYin = _userYinYang == 'Yin';
-    final yyColor = isYin ? const Color(0xFFCFD8DC) : const Color(0xFFFFF5D1);
+    final yyColor = isYin ? const Color(0xFF8B8C9A) : const Color(0xFFFFF5D1);
 
     // Günlük uyum skoru hesapla (deterministic)
     final today = DateTime.now();
@@ -1527,7 +1527,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       color: Colors.white.withOpacity(0.08),
                       border: Border.all(color: Colors.white.withOpacity(0.2)),
                     ),
-                    child: Center(child: Icon(Icons.bolt_rounded, size: 16, color: Colors.white.withOpacity(0.8))),
+                    child: Center(child: SizedBox(
+                      width: 18, height: 18,
+                      child: CustomPaint(painter: _MiniActionSparkPainter(color: Colors.white.withOpacity(0.9))),
+                    )),
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1549,99 +1552,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       const SizedBox(height: 16),
 
 
-      // ── MOD 2: GÜNLÜK UYUM SKORU ──
-      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('BUGÜNÜN ENERJİ UYUMU', style: TextStyle(
-          color: _goldL.withOpacity(0.3), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2,
-        )),
-        const SizedBox(height: 16),
-        Row(children: [
-          // Skor yüzük
-          SizedBox(width: 80, height: 80, child: Stack(alignment: Alignment.center, children: [
-            CircularProgressIndicator(
-              value: harmonyScore / 100,
-              strokeWidth: 5,
-              backgroundColor: Colors.white.withOpacity(0.06),
-              valueColor: AlwaysStoppedAnimation(Color.lerp(const Color(0xFF4CAF50), _gold, harmonyScore / 100)!),
-              strokeCap: StrokeCap.round,
-            ),
-            Column(mainAxisSize: MainAxisSize.min, children: [
-              Text('$harmonyScore', style: const TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800,
-              )),
-              Text('/100', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9)),
-            ]),
-          ])),
-          const SizedBox(width: 20),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _scoreRow('🟢', 'Kişisel enerji', harmonyScore > 75 ? 'Yüksek' : harmonyScore > 55 ? 'Orta' : 'Düşük'),
-            const SizedBox(height: 6),
-            _scoreRow('🔵', 'Element akışı', _userElement == 'Ateş' ? 'Aktif' : _userElement == 'Su' ? 'Derin' : 'Dengeli'),
-            const SizedBox(height: 6),
-            _scoreRow(isYin ? '🌙' : '☀️', 'Yin-Yang dengesi', isYin ? 'İçe dönük' : 'Dışa açık'),
-            const SizedBox(height: 6),
-            _scoreRow('🏠', 'Mekan uyumu', fsProfile['idealSpace'] as String),
-          ])),
-        ]),
-        const SizedBox(height: 14),
-        Container(height: 0.5, color: Colors.white.withOpacity(0.08)),
-        const SizedBox(height: 12),
-        // Feng shui önerisi
-        Row(children: [
-          Text('🧭', style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 8),
-          Expanded(child: Text(
-            'Feng Shui önerisi: ${fsProfile['baguaFocus']}',
-            style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12, height: 1.5),
-          )),
-        ]),
-      ])),
-
-      const SizedBox(height: 16),
-
       // ── MOD 3: YIN-YANG MEKAN REÇETESİ ──
-      _glass(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(isYin ? '🌙' : '☀️', style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${_userYinYang} Enerjisi & Mekan', style: TextStyle(
-              color: yyColor, fontSize: 15, fontWeight: FontWeight.w800,
-            )),
-            Text(yyProfile['state'] as String, style: TextStyle(
-              color: Colors.white.withOpacity(0.4), fontSize: 11,
-            )),
-          ]),
-        ]),
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.amber.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.amber.withOpacity(0.15)),
-          ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('⚠️', style: const TextStyle(fontSize: 13)),
-            const SizedBox(width: 8),
-            Expanded(child: Text(yyProfile['risk'] as String, style: TextStyle(
-              color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.4,
-            ))),
-          ]),
-        ),
-        const SizedBox(height: 10),
-        _fsBadge('🏠', 'Mekan ihtiyacın', yyProfile['spaceNeed'] as String, yyColor),
-        const SizedBox(height: 8),
-        _fsBadge('✨', 'Dengelemek için', yyProfile['activate'] as String, const Color(0xFF80CBC4)),
-        const SizedBox(height: 8),
-        _fsBadge('💡', 'Işık tavsiyen', yyProfile['lightTip'] as String, const Color(0xFFFFD54F)),
-        const SizedBox(height: 8),
-        _fsBadge('🔇', 'Ses tavsiyen', yyProfile['soundTip'] as String, const Color(0xFFCE93D8)),
-        const SizedBox(height: 8),
-        _fsBadge('🗑️', 'Bu hafta çıkar', yyProfile['declutter'] as String, const Color(0xFFEF9A9A)),
-        const SizedBox(height: 8),
-        _fsBadge('🎨', 'Sana yakışan renkler', yyProfile['color'] as String, yyColor),
-      ])),
+      _YinYangInteractivePanel(
+        yyProfile: yyProfile,
+        isYin: isYin,
+        yyColor: yyColor,
+        userYinYang: _userYinYang,
+      ),
 
       const SizedBox(height: 16),
 
@@ -1683,14 +1600,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         const SizedBox(height: 14),
         Container(height: 0.5, color: Colors.white.withOpacity(0.08)),
         const SizedBox(height: 12),
-        _fsBadge('✨', 'Senin mekan enerjin', animalFs['spaceVibe'] as String, _goldL.withOpacity(0.8)),
-        const SizedBox(height: 8),
-        _fsBadge('💼', 'Çalışma alanın', animalFs['workSpace'] as String, const Color(0xFF80CBC4)),
-        const SizedBox(height: 8),
-        _fsBadge('💕', 'İlişki köşen', animalFs['loveSpace'] as String, const Color(0xFFCE93D8)),
-        const SizedBox(height: 8),
-        _fsBadge('🌀', 'Kaçın', animalFs['avoidEnergy'] as String, const Color(0xFFEF9A9A)),
-        const SizedBox(height: 14),
+        _elegantFsRow('Senin Mekan Enerjin', animalFs['spaceVibe'] as String, Icons.auto_awesome, elColor),
+        _elegantFsRow('Çalışma Alanın', animalFs['workSpace'] as String, Icons.work_outline, elColor),
+        _elegantFsRow('İlişki Köşen', animalFs['loveSpace'] as String, Icons.favorite_border, elColor),
+        _elegantFsRow('Kaçın', animalFs['avoidEnergy'] as String, Icons.block, elColor),
+        const SizedBox(height: 10),
         // Haftalık görev
         Container(
           padding: const EdgeInsets.all(14),
@@ -1779,20 +1693,30 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     return map[name] ?? fallback.withOpacity(0.5);
   }
 
-  Widget _fsBadge(String emoji, String label, String value, Color accent) => Padding(
-
-    padding: const EdgeInsets.only(bottom: 2),
+  Widget _elegantFsRow(String label, String value, IconData icon, Color accent) => Padding(
+    padding: const EdgeInsets.only(bottom: 20),
     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(emoji, style: const TextStyle(fontSize: 13)),
-      const SizedBox(width: 8),
-      Expanded(child: RichText(text: TextSpan(children: [
-        TextSpan(text: '$label  ', style: TextStyle(
-          color: accent.withOpacity(0.75), fontSize: 11.5, fontWeight: FontWeight.w700,
+      Container(
+        width: 30, height: 30,
+        decoration: BoxDecoration(
+          color: accent.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: accent.withOpacity(0.2), width: 0.5),
+        ),
+        child: Center(
+          child: Icon(icon, size: 14, color: accent.withOpacity(0.9)),
+        ),
+      ),
+      const SizedBox(width: 14),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(), style: TextStyle(
+          color: accent.withOpacity(0.9), fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.5,
         )),
-        TextSpan(text: value, style: TextStyle(
-          color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.5,
+        const SizedBox(height: 4),
+        Text(value, style: TextStyle(
+          color: Colors.white.withOpacity(0.75), fontSize: 12.5, height: 1.55,
         )),
-      ]))),
+      ])),
     ]),
   );
 
@@ -4630,7 +4554,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     final isMotto = _idx == 0;
     final elData = ChineseZodiacData.elements[widget.element]!;
     final elColor = Color(elData['color'] as int);
-    final yyColor = widget.yinYang == 'Yin' ? const Color(0xFFCFD8DC) : const Color(0xFFFFF5D1);
+    final yyColor = widget.yinYang == 'Yin' ? const Color(0xFF8B8C9A) : const Color(0xFFFFF5D1);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(26),
@@ -5165,23 +5089,101 @@ class _ElementIconPainter extends CustomPainter {
         break;
 
       case 'Ateş':
-        // 🔥 emoji TextPainter ile render — garanti gerçek alev efekti
-        final fireSpan = TextSpan(
-          text: '🔥',
-          style: TextStyle(fontSize: w * 0.78, height: 1.0),
-        );
-        final fireTp = TextPainter(
-          text: fireSpan,
-          textDirection: TextDirection.ltr,
-        );
-        fireTp.layout();
-        fireTp.paint(
-          canvas,
-          Offset(
-            (w - fireTp.width) / 2,
-            (h - fireTp.height) / 2 - h * 0.04,
-          ),
-        );
+        // ── Ultra-İnce & Hiper-Sivri (Hyper-Thin & Sharp) Extreme Line Art Ateş ──
+        
+        final gradientBase = LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            color,
+            color.withOpacity(0.95),
+            Colors.white.withOpacity(0.95), // Bembeyaz jilet gibi bir uç parlaklığı
+          ],
+          stops: const [0.0, 0.4, 1.0],
+        ).createShader(Rect.fromLTWH(0, 0, w, h));
+
+        final gradientEcho = LinearGradient(
+          begin: Alignment.bottomRight,
+          end: Alignment.topCenter,
+          colors: [
+            color.withOpacity(0.0),
+            color.withOpacity(0.50), // Yankı biraz daha belirgin
+            color.withOpacity(0.0),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, w, h));
+
+        // Gizemli ve karanlık bir arka parlama (Yumuşak Işık)
+        final paintGlow = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.miter
+          ..strokeMiterLimit = 12.0 // Ekstra sivri köşeler kesilmesin
+          ..strokeWidth = w * 0.08 
+          ..color = color.withOpacity(0.35)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+
+        // Ana Keskin Hat (Çok daha IPİNCE, jilet gibi yırtıcı)
+        final paintBase = Paint()
+          ..shader = gradientBase
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round // Başlangıç bitiş yine yumuşak ama gövde sivri
+          ..strokeJoin = StrokeJoin.miter 
+          ..strokeMiterLimit = 12.0 // Miter limit maksimize edildi! İğne uçları oluşacak
+          ..strokeWidth = w * 0.028; // Çok çok daha ince! (Ultra-thin)
+
+        // Yankı & Çekirdek Hat (Hayalet gibi ince)
+        final paintEcho = Paint()
+          ..shader = gradientEcho
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.miter
+          ..strokeWidth = w * 0.012;
+
+        // ── Ana Alev Konturu (Daha da kışkırtılmış, agresif sivri tırmanış) ──
+        final path = Path();
+        path.moveTo(w * 0.45, h * 0.88);
+        // Çok daha geniş dış kavis -> Bıçağın İlk Ucu (Daha sola ve yukarı)
+        path.cubicTo(w * 0.20, h * 0.88, w * 0.22, h * 0.55, w * 0.26, h * 0.38);
+        // İçe inanılmaz dik bir düşüş ve yukarı iğne gibi zıplayış (Ana Tepe)
+        path.cubicTo(w * 0.36, h * 0.70, w * 0.42, h * 0.65, w * 0.48, h * 0.02); // 0.02! En zirvede!
+        // Tepeden bıçak gibi sağ aşağıya saplanış -> Sağ Mızrak Ucu
+        path.cubicTo(w * 0.54, h * 0.50, w * 0.46, h * 0.55, w * 0.68, h * 0.30);
+        // İkinci zirveden geri çekiliş -> Sağ Alt Bıçak Ucu
+        path.cubicTo(w * 0.60, h * 0.55, w * 0.66, h * 0.65, w * 0.82, h * 0.50);
+        // Sağ dış kavisli, tırpan gibi kapanış
+        path.cubicTo(w * 0.88, h * 0.75, w * 0.78, h * 0.88, w * 0.55, h * 0.88);
+
+        // ── İç Çekirdek Konturu (Kısa jilet çizgisi) ──
+        final innerPath = Path();
+        innerPath.moveTo(w * 0.48, h * 0.78);
+        innerPath.quadraticBezierTo(w * 0.44, h * 0.50, w * 0.48, h * 0.30); 
+        innerPath.quadraticBezierTo(w * 0.52, h * 0.50, w * 0.48, h * 0.78);
+
+        // ── İkili Kıvılcım (Bıçak / Kıymık şeklinde ateş parçacıkları) ──
+        // Sol alt tırpan kıvılcım
+        final spark1 = Path();
+        spark1.moveTo(w * 0.18, h * 0.25); 
+        spark1.quadraticBezierTo(w * 0.12, h * 0.40, w * 0.20, h * 0.45);
+        spark1.quadraticBezierTo(w * 0.26, h * 0.40, w * 0.18, h * 0.25);
+        
+        // Sağ üst iğne şeklinde uzak kıvılcım
+        final spark2 = Path(); 
+        spark2.moveTo(w * 0.75, h * 0.10); 
+        spark2.quadraticBezierTo(w * 0.70, h * 0.20, w * 0.74, h * 0.25);
+        spark2.quadraticBezierTo(w * 0.80, h * 0.20, w * 0.75, h * 0.10);
+
+        // ── Çizim Sırası Katmanlaması ──
+        canvas.drawPath(path, paintGlow); // Daha yoğun Glow
+        canvas.drawPath(path.shift(Offset(w * 0.035, h * 0.02)), paintEcho); // Ghost Line
+        canvas.drawPath(innerPath, paintEcho..strokeWidth = w * 0.015); // Çekirdek
+        
+        // Ana İpince Hat
+        canvas.drawPath(path, paintBase);
+
+        // Kıvılcımlar (Büyük sol yoğun parlak, ufak sağ iğne gibi)
+        canvas.drawPath(spark1, paintGlow..strokeWidth = w * 0.04); 
+        canvas.drawPath(spark1, paintBase..strokeWidth = w * 0.025);
+        canvas.drawPath(spark2, paintBase..strokeWidth = w * 0.015); 
         break;
 
       case 'Ağaç':
@@ -7433,4 +7435,264 @@ class _EnergyWavePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _EnergyWavePainter old) =>
     old.morning != morning || old.afternoon != afternoon || old.evening != evening;
+}
+
+class _MiniActionSparkPainter extends CustomPainter {
+  final Color color;
+  _MiniActionSparkPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final center = Offset(w / 2, h / 2);
+
+    final path = Path();
+    path.moveTo(w / 2, 0);
+    path.quadraticBezierTo(w / 2, h / 2, w, h / 2);
+    path.quadraticBezierTo(w / 2, h / 2, w / 2, h);
+    path.quadraticBezierTo(w / 2, h / 2, 0, h / 2);
+    path.quadraticBezierTo(w / 2, h / 2, w / 2, 0);
+    path.close();
+
+    // Dış parlama
+    canvas.drawPath(path, Paint()
+      ..color = color.withOpacity(0.4)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)
+    );
+    // İç dolgu
+    canvas.drawPath(path, Paint()..color = color);
+    
+    // Merkezde ekstra parlak nokta
+    canvas.drawCircle(center, w * 0.12, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant _MiniActionSparkPainter old) => old.color != color;
+}
+
+// ── YENİ YİN-YANG İNTERAKTİF PANEL (MOD 3) ──
+class _YinYangInteractivePanel extends StatefulWidget {
+  final Map<String, dynamic> yyProfile;
+  final bool isYin;
+  final Color yyColor;
+  final String userYinYang;
+
+  const _YinYangInteractivePanel({
+    Key? key,
+    required this.yyProfile,
+    required this.isYin,
+    required this.yyColor,
+    required this.userYinYang,
+  }) : super(key: key);
+
+  @override
+  State<_YinYangInteractivePanel> createState() => _YinYangInteractivePanelState();
+}
+
+class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    // 6 kategoriyi slidera atamak için mapliyoruz
+    final items = [
+      {'title': 'Mekan\nİhtiyacı', 'text': widget.yyProfile['spaceNeed'] as String, 'icon': Icons.home_outlined},
+      {'title': 'Denge\nİçin', 'text': widget.yyProfile['activate'] as String, 'icon': Icons.contrast},
+      {'title': 'Işık\nGücü', 'text': widget.yyProfile['lightTip'] as String, 'icon': Icons.auto_awesome},
+      {'title': 'Ses\nFrekansı', 'text': widget.yyProfile['soundTip'] as String, 'icon': Icons.graphic_eq},
+      {'title': 'Arınma\nPlanı', 'text': widget.yyProfile['declutter'] as String, 'icon': Icons.auto_delete_outlined},
+      {'title': 'Renk\nAurası', 'text': widget.yyProfile['color'] as String, 'icon': Icons.palette_outlined},
+    ];
+
+    final current = items[_selectedIndex];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.015),
+        gradient: RadialGradient(
+          center: Alignment.topLeft,
+          radius: 1.8,
+          colors: [
+            widget.yyColor.withOpacity(0.12),
+            Colors.black.withOpacity(0.6),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: widget.yyColor.withOpacity(0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ÜST BİLGİ: İkon & Profil Özeti
+          Row(children: [
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.yyColor.withOpacity(0.08),
+                border: Border.all(color: widget.yyColor.withOpacity(0.3)),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 22, height: 22,
+                  child: CustomPaint(painter: _YinYangIconPainter(isYin: widget.isYin)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${widget.userYinYang} Enerjisi', style: TextStyle(
+                  color: widget.yyColor, fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.5,
+                )),
+                const SizedBox(height: 2),
+                Text(widget.yyProfile['state'] as String, style: TextStyle(
+                  color: Colors.white.withOpacity(0.5), fontSize: 12,
+                )),
+              ]),
+            ),
+          ]),
+          
+          const SizedBox(height: 20),
+          
+          // UYARI / RİSK BİLGİSİ
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 10),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  Container(
+                    width: 2,
+                    decoration: BoxDecoration(
+                      color: widget.yyColor.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      widget.yyProfile['risk'] as String,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.65),
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        height: 1.5,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // İNTERAKTİF TAB SEÇİCİ (CAROUSEL PILLS)
+          SizedBox(
+            height: 74,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final isSelected = _selectedIndex == index;
+                final item = items[index];
+                final icon = item['icon'] as IconData;
+                final title = item['title'] as String;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    width: 72,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected 
+                          ? widget.yyColor.withOpacity(0.2) 
+                          : Colors.white.withOpacity(0.02),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isSelected 
+                            ? widget.yyColor.withOpacity(0.8) 
+                            : Colors.white.withOpacity(0.05),
+                        width: isSelected ? 1.5 : 1.0,
+                      ),
+                      boxShadow: isSelected ? [
+                        BoxShadow(
+                          color: widget.yyColor.withOpacity(0.4),
+                          blurRadius: 14,
+                          spreadRadius: 2,
+                        )
+                      ] : [],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, size: 22, color: isSelected ? Colors.white : Colors.white.withOpacity(0.35)),
+                        const SizedBox(height: 6),
+                        Text(title, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white.withOpacity(0.4),
+                          fontSize: 9.5, height: 1.2, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500, letterSpacing: 0.5,
+                        )),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // DİNAMİK METİN GÖSTERİM KUTUSU
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) {
+               return FadeTransition(opacity: animation, child: SlideTransition(
+                 position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(animation),
+                 child: child,
+               ));
+            },
+            child: Container(
+              key: ValueKey<int>(_selectedIndex),
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                 color: Colors.black.withOpacity(0.2),
+                 borderRadius: BorderRadius.circular(20),
+                 border: Border.all(color: widget.yyColor.withOpacity(0.08)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(current['icon'] as IconData, size: 16, color: widget.yyColor.withOpacity(0.8)),
+                      const SizedBox(width: 8),
+                      Text((current['title'] as String).replaceAll('\n', ' ').toUpperCase(), style: TextStyle(
+                        color: widget.yyColor.withOpacity(0.9), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5,
+                      )),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(current['text'] as String, style: TextStyle(
+                    color: Colors.white.withOpacity(0.85), fontSize: 13, height: 1.55,
+                  )),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

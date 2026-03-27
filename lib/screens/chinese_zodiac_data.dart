@@ -806,7 +806,7 @@ class ChineseZodiacData {
       'missing': 'Ağaç enerjisi zayıf. Büyüme ve yenilik için akış gerekir.',
       'supportEnergy': 'Merkezi ve simetrik alanlar, toprak tonları, sağlam zeminler seni destekler.',
       'drainEnergy': 'Sürekli değişen, belirsiz ve kaotik ortamlar güvensizlik hissi yaratır.',
-      'miniAction': 'Masana veya merkezi alana kristal ya da taş bir nesne koy; mekânın toprak enerjisini dengeler ve odaklanmanı güçlendirir.',
+      'miniAction': 'Toprak enerjisini güçlendirmek için kristal veya taş bir nesneyi masanın üzerine ya da merkezi alana koy.',
       'colors': ['Kahve', 'Sarı', 'Bal rengi', 'Açık kiremit', 'Krem'],
       'materials': ['Taş', 'Seramik', 'Toprak kaplar', 'Ağır kumaşlar'],
       'shapes': ['Kare', 'Dikdörtgen', 'Yatay formlar'],
@@ -829,10 +829,10 @@ class ChineseZodiacData {
     },
     'Su': {
       'dominant': 'Akış ve bilgelik enerjisi — derin, sezgisel, gizemli.',
-      'missing': 'Toprak enerjisi zayıf. Çıpalama ve güvenlik hissi eksik olabilir.',
+      'missing': 'Toprak enerjisi zayıf. İstikrar ve güvenlik hissi eksik olabilir.',
       'supportEnergy': 'Akışkan, esnek ve huzurlu alanlar seni besler. Sessizlik güç kaynağın.',
       'drainEnergy': 'Kalabalık, gürültülü ve sınında koşturanlar enerjiini bitirir.',
-      'miniAction': 'Küçük bir çeşme, akvaryum veya su sesi çıkaran bir nesne ortamına ekle.',
+      'miniAction': 'Ortamına küçük bir çeşme, akvaryum veya su sesi çıkaran bir nesne ekle.',
       'colors': ['Siyah', 'Lacivert', 'Koyu mor', 'Antrasit', 'Koyu mavi'],
       'materials': ['Cam', 'Ayna', 'Su öğeleri', 'Parlak yüzeyler'],
       'shapes': ['Dalgalı', 'Asimetrik', 'Serbest form', 'Akim formları'],
@@ -846,9 +846,9 @@ class ChineseZodiacData {
   static const Map<String, Map<String, dynamic>> fengShuiYinYang = {
     'Yin': {
       'state': 'İçe dönük · Sezgisel · Sakin',
-      'risk': 'Çok fazla Yin: içe kapanma, atalet, dinginliğin durağanlığa dönüşmesi.',
+      'risk': 'Çok fazla Yin: içe kapanma, aşırı pasiflik, dinginliğin durağanlığa dönüşmesi.',
       'spaceNeed': 'Sessiz köşeler, yumuşak ışık, doğal dokular ve dinlendirici renkler.',
-      'activate': 'Biraz Yang enerji eklemek için pencere aç, aydınlatmayı artır, renk vurgusu ekle.',
+      'activate': 'Dengelenmek için biraz Yang enerjisi ekle: Pencereyi aç, aydınlatmayı artır veya sıcak bir renk vurgusu kullan.',
       'lightTip': 'Sabah gün ışığını içeri al — perde açmak bile enerjiyi canlandırır.',
       'soundTip': 'Hafif müzik veya doğa sesi çal; sessizliği kır ama çok gürültü yaratma.',
       'declutter': 'Yatak odasındaki gereksiz eşyaları kaldır — Yin dinlenme alanı saf kalmalı.',
