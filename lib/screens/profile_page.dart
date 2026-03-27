@@ -13,6 +13,7 @@ import 'home_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import 'notification_settings_page.dart';
+import '../widgets/glass_back_button.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -797,16 +798,11 @@ class ThemeGalleryPage extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      color: AppColors.textWhite,
-                      onPressed: () => Navigator.pop(context),
-                      iconSize: 20,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    GlassBackButton(
+                      onTap: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 6),
                     Text(

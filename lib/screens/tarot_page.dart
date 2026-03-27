@@ -4960,7 +4960,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 children: [
                 // Header with back button
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                   child: Row(
                     children: [
                       // Back button – frosted glass iOS style
@@ -4970,7 +4970,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         child: IgnorePointer(
                           ignoring: _state == RitualState.revealed,
                           child: SizedBox(
-                            width: 80,
+                            width: 95,
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: GlassBackButton(
@@ -5018,13 +5018,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         child: IgnorePointer(
                           ignoring: _state == RitualState.revealed,
                           child: SizedBox(
-                        width: 80,
+                        width: 95,
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: Transform.translate(
-                            offset: const Offset(-4, 4),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                               children: [
                                 _TapScaleButton(
                                   onTap: _showTarotGuidanceDialog,
@@ -5056,46 +5054,43 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                 ),
                                 _TapScaleButton(
                                   onTap: _showCreditInfoPanel,
-                                  child: SizedBox(
-                                    width: 40,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: BackdropFilter(
-                                        filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.08),
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(
-                                              color: Colors.white.withOpacity(0.12),
-                                              width: 0.5,
+                                  child: ClipOval(
+                                    child: BackdropFilter(
+                                      filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                      child: Container(
+                                        width: 38,
+                                        height: 38,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.10),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(0.18),
+                                            width: 0.6,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.auto_awesome,
+                                              size: 11,
+                                              color: (!_dailyFreeUsed || _adCredits > 0)
+                                                  ? Colors.white.withOpacity(0.85)
+                                                  : Colors.white.withOpacity(0.25),
                                             ),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.auto_awesome,
-                                                size: 11,
+                                            const SizedBox(width: 1),
+                                            Text(
+                                              !_dailyFreeUsed ? '1' : '$_adCredits',
+                                              style: TextStyle(
                                                 color: (!_dailyFreeUsed || _adCredits > 0)
-                                                    ? const Color(0xFFE2C48E).withOpacity(0.8)
-                                                    : Colors.white.withOpacity(0.25),
+                                                    ? Colors.white.withOpacity(0.85)
+                                                    : Colors.white.withOpacity(0.3),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                !_dailyFreeUsed ? '1' : '$_adCredits',
-                                                style: TextStyle(
-                                                  color: (!_dailyFreeUsed || _adCredits > 0)
-                                                      ? Colors.white.withOpacity(0.85)
-                                                      : Colors.white.withOpacity(0.3),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -5105,7 +5100,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                      ),
                         ),
                       ),
                     ],
@@ -5963,8 +5957,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                    ),
-                  );
+                    );
                 },
               ),
             ),
@@ -5974,43 +5967,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           if (_state == RitualState.revealed)
             Positioned(
               top: MediaQuery.of(context).padding.top + 12,
-              left: 12,
+              left: 20,
               child: GlassBackButton(
                 onTap: _resetToIdle,
               ),
             ),
 
-          // Yorum ekranında sabit rehber kitapçık butonu — overlay üstünde
-          if (_state == RitualState.revealed)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 12,
-              right: 56,
-              child: GestureDetector(
-                onTap: _showTarotGuidanceDialog,
-                child: ClipOval(
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.10),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.18),
-                          width: 0.6,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.menu_book_rounded,
-                        color: Colors.white.withOpacity(0.85),
-                        size: 17,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
 
         ],
       );  // Stack

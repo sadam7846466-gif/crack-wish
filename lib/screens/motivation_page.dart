@@ -180,13 +180,13 @@ class _MotivationPageState extends State<MotivationPage>
           // Back button
           Positioned(
             top: MediaQuery.of(context).padding.top + 12,
-            left: 12,
+            left: 20,
             child: GlassBackButton(),
           ),
           // Rehber kitapçık butonu
           Positioned(
-            top: MediaQuery.of(context).padding.top + 14,
-            right: 12,
+            top: MediaQuery.of(context).padding.top + 12,
+            right: 20,
             child: GuidanceBookletButton(
               dialogTitleTr: 'Mod Rehberi',
               dialogTitleEn: 'Mood Guide',

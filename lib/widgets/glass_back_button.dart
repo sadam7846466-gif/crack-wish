@@ -5,8 +5,13 @@ import 'package:flutter/services.dart';
 /// Tutarlı glassmorphism geri butonu — tüm sayfalarda aynı görünüm + tıklama efekti
 class GlassBackButton extends StatefulWidget {
   final VoidCallback? onTap;
+  final IconData icon;
 
-  const GlassBackButton({super.key, this.onTap});
+  const GlassBackButton({
+    super.key,
+    this.onTap,
+    this.icon = Icons.arrow_back_ios_new_rounded,
+  });
 
   @override
   State<GlassBackButton> createState() => _GlassBackButtonState();
@@ -45,25 +50,24 @@ class _GlassBackButtonState extends State<GlassBackButton> {
         child: AnimatedOpacity(
           opacity: _pressed ? 0.6 : 1.0,
           duration: Duration(milliseconds: _pressed ? 80 : 180),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+          child: ClipOval(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(_pressed ? 0.18 : 0.10),
-                  borderRadius: BorderRadius.circular(14),
+                  shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white.withOpacity(0.18),
                     width: 0.6,
                   ),
                 ),
                 child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
+                  widget.icon,
                   color: Colors.white.withOpacity(0.85),
-                  size: 18,
+                  size: 17,
                 ),
               ),
             ),

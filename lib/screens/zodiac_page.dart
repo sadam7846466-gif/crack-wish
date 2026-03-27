@@ -4101,7 +4101,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
               SliverToBoxAdapter(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -4110,23 +4110,8 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         // ── Geri butonu ──
                         Row(
                           children: [
-                            GestureDetector(
+                            GlassBackButton(
                               onTap: () => Navigator.pop(context),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: gold.withOpacity(0.06),
-                                  border: Border.all(
-                                    color: gold.withOpacity(0.12),
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.arrow_back_ios_new_rounded,
-                                  size: 16,
-                                  color: gold.withOpacity(0.6),
-                                ),
-                              ),
                             ),
                             const Spacer(),
                             SizedBox(

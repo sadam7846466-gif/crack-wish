@@ -83,82 +83,84 @@ class FeatureHeaderActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: const Offset(-4, 4),
-      child: Row(
+    return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Rehber butonu
           TapScaleButton(
             onTap: onGuideTap,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFE7D6A5).withOpacity(0.3),
-                  width: 0.5,
-                ),
-              ),
-              child: Icon(
-                Icons.menu_book_rounded,
-                color: const Color(0xFFE7D6A5).withOpacity(0.9),
-                size: 16,
-              ),
-            ),
-          ),
-          // Kredi göstergesi
-          TapScaleButton(
-            onTap: onCreditTap,
-            child: SizedBox(
-              width: 40,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ClipOval(
                 child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white.withOpacity(0.10),
+                      shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.12),
-                        width: 0.5,
+                        color: Colors.white.withOpacity(0.18),
+                        width: 0.6,
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.auto_awesome,
-                          size: 11,
-                          color: hasCredit
-                              ? const Color(0xFFE2C48E).withOpacity(0.8)
-                              : Colors.white.withOpacity(0.25),
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          '$creditCount',
-                          style: TextStyle(
-                            color: hasCredit
-                                ? Colors.white.withOpacity(0.85)
-                                : Colors.white.withOpacity(0.3),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      color: Colors.white.withOpacity(0.85),
+                      size: 17,
                     ),
                   ),
                 ),
               ),
             ),
           ),
+          // Kredi göstergesi
+          TapScaleButton(
+            onTap: onCreditTap,
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.10),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.18),
+                      width: 0.6,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 11,
+                        color: hasCredit
+                            ? Colors.white.withOpacity(0.85)
+                            : Colors.white.withOpacity(0.25),
+                      ),
+                      const SizedBox(width: 1),
+                      Text(
+                        '$creditCount',
+                        style: TextStyle(
+                          color: hasCredit
+                              ? Colors.white.withOpacity(0.85)
+                              : Colors.white.withOpacity(0.3),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
-      ),
     );
   }
 }

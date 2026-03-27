@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 /// Supabase Edge Function üzerinden rüya yorumlama servisi
@@ -89,35 +90,53 @@ class SupabaseDreamService {
     required String dreamText,
     required String emotion,
     required String locale,
-    required List<Map<String, String>> answers,
+    required List<dynamic> answers,
   }) async {
     try {
+      final reqBody = jsonEncode({
+        'dreamText': dreamText,
+        'emotion': emotion,
+        'locale': locale,
+        'step': 'analyze',
+        'answers': answers,
+      });
+      debugPrint('🔮 [PREMIUM] Request body: $reqBody');
+
       final response = await _client
           .post(
             Uri.parse('$_supabaseUrl/functions/v1/analyze-dream-premium'),
             headers: _headers,
-            body: jsonEncode({
-              'dreamText': dreamText,
-              'emotion': emotion,
-              'locale': locale,
-              'step': 'analyze',
-              'answers': answers,
-            }),
+            body: reqBody,
           )
-          .timeout(const Duration(seconds: 45));
+          .timeout(const Duration(seconds: 60));
+
+      final rawText = utf8.decode(response.bodyBytes);
+      debugPrint('🔮 [PREMIUM] Status: ${response.statusCode}');
+      debugPrint('🔮 [PREMIUM] Raw response (first 500): ${rawText.substring(0, rawText.length > 500 ? 500 : rawText.length)}');
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        return DeepAnalysisResult.error('Sunucu hatası');
+        debugPrint('🔮 [PREMIUM] ERROR: Status ${response.statusCode} — $rawText');
+        return DeepAnalysisResult.error('Sunucu hatası: ${response.statusCode}');
       }
 
-      final body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      final body = jsonDecode(rawText) as Map<String, dynamic>;
 
       if (body.containsKey('error')) {
+        debugPrint('🔮 [PREMIUM] API Error: ${body['error']}');
         return DeepAnalysisResult.error(body['error'].toString());
       }
 
+      debugPrint('🔮 [PREMIUM] Keys: ${body.keys.toList()}');
+      debugPrint('🔮 [PREMIUM] title: ${body['title']}');
+      debugPrint('🔮 [PREMIUM] subconsciousMap null? ${body['subconscious_map'] == null}');
+      debugPrint('🔮 [PREMIUM] archetype null? ${body['archetype'] == null}');
+      debugPrint('🔮 [PREMIUM] symbols: ${body['symbols']}');
+      debugPrint('🔮 [PREMIUM] cosmicClosing: ${body['cosmic_closing']}');
+
       return DeepAnalysisResult.fromJson(body);
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('🔮 [PREMIUM] EXCEPTION: $e');
+      debugPrint('🔮 [PREMIUM] Stack: $stack');
       return DeepAnalysisResult.error('Bağlantı hatası: $e');
     }
   }
@@ -197,24 +216,53 @@ class DreamSection {
 
 /// Sabit 4 metrik dağılımı
 class DreamDistribution {
-  final int emotionalLoad;      // Duygusal Yük
-  final int uncertainty;         // Belirsizlik
-  final int recentMemoryEffect;  // Yakın Geçmiş Etkisi
-  final int brainActivity;       // Beyin Aktivitesi
+  final int emotionalLoad;
+  final String emotionalLoadReasoning;
+  final int uncertainty;
+  final String uncertaintyReasoning;
+  final int recentMemoryEffect;
+  final String recentMemoryReasoning;
+  final int brainActivity;
+  final String brainActivityReasoning;
 
   const DreamDistribution({
     this.emotionalLoad = 0,
+    this.emotionalLoadReasoning = '',
     this.uncertainty = 0,
+    this.uncertaintyReasoning = '',
     this.recentMemoryEffect = 0,
+    this.recentMemoryReasoning = '',
     this.brainActivity = 0,
+    this.brainActivityReasoning = '',
   });
 
   factory DreamDistribution.fromJson(Map<String, dynamic> json) {
+    // Helper to extract value and reasoning safely (backward compatibility)
+    int parseValue(dynamic field) {
+      if (field is int) return field;
+      if (field is num) return field.toInt();
+      if (field is Map<String, dynamic> && field['value'] != null) {
+        return (field['value'] as num).toInt();
+      }
+      return 0;
+    }
+
+    String parseReasoning(dynamic field) {
+      if (field is Map<String, dynamic> && field['reasoning'] != null) {
+        return field['reasoning'].toString();
+      }
+      return '';
+    }
+
     return DreamDistribution(
-      emotionalLoad: (json['emotional_load'] as num?)?.toInt() ?? 0,
-      uncertainty: (json['uncertainty'] as num?)?.toInt() ?? 0,
-      recentMemoryEffect: (json['recent_memory_effect'] as num?)?.toInt() ?? 0,
-      brainActivity: (json['brain_activity'] as num?)?.toInt() ?? 0,
+      emotionalLoad: parseValue(json['emotional_load']),
+      emotionalLoadReasoning: parseReasoning(json['emotional_load']),
+      uncertainty: parseValue(json['uncertainty']),
+      uncertaintyReasoning: parseReasoning(json['uncertainty']),
+      recentMemoryEffect: parseValue(json['recent_memory_effect']),
+      recentMemoryReasoning: parseReasoning(json['recent_memory_effect']),
+      brainActivity: parseValue(json['brain_activity']),
+      brainActivityReasoning: parseReasoning(json['brain_activity']),
     );
   }
 }
@@ -291,41 +339,75 @@ class DeepQuestionOption {
   }
 }
 
-/// Derin analiz sonucu
+/// Derin analiz sonucu — Premium yapı
 class DeepAnalysisResult {
   final bool success;
   final String? errorMessage;
   final String title;
-  final List<AnalysisSection> sections;
-  final List<String> symbols;
-  final String personalAdvice;
+  final SubconsciousMap subconsciousMap;
+  final ArchetypeMatch archetype;
+  final List<DeepSymbol> symbols;
+  final List<TimelineScene> timeline;
+  final ShadowSelf shadowSelf;
+  final EmotionalLayers emotionalLayers;
+  final BrainScience brainScience;
+  final RecurringPattern recurringPattern;
+  final DreamRitual ritual;
+  final String cosmicClosing;
+  final DreamDistribution distribution;
 
   DeepAnalysisResult({
     required this.success,
     this.errorMessage,
     this.title = '',
-    this.sections = const [],
+    this.subconsciousMap = const SubconsciousMap(),
+    this.archetype = const ArchetypeMatch(),
     this.symbols = const [],
-    this.personalAdvice = '',
+    this.timeline = const [],
+    this.shadowSelf = const ShadowSelf(),
+    this.emotionalLayers = const EmotionalLayers(),
+    this.brainScience = const BrainScience(),
+    this.recurringPattern = const RecurringPattern(),
+    this.ritual = const DreamRitual(),
+    this.cosmicClosing = '',
+    this.distribution = const DreamDistribution(),
   });
 
   factory DeepAnalysisResult.fromJson(Map<String, dynamic> json) {
-    final sectionsList = (json['sections'] as List<dynamic>?)
-            ?.map((s) => AnalysisSection.fromJson(s as Map<String, dynamic>))
-            .toList() ??
-        [];
-
-    final symbolsList = (json['symbols'] as List<dynamic>?)
-            ?.map((s) => s.toString())
-            .toList() ??
-        [];
-
     return DeepAnalysisResult(
       success: true,
       title: json['title']?.toString() ?? '',
-      sections: sectionsList,
-      symbols: symbolsList,
-      personalAdvice: json['personalAdvice']?.toString() ?? '',
+      subconsciousMap: json['subconscious_map'] != null
+          ? SubconsciousMap.fromJson(json['subconscious_map'] as Map<String, dynamic>)
+          : const SubconsciousMap(),
+      archetype: json['archetype'] != null
+          ? ArchetypeMatch.fromJson(json['archetype'] as Map<String, dynamic>)
+          : const ArchetypeMatch(),
+      symbols: (json['symbols'] as List<dynamic>?)
+              ?.map((s) => DeepSymbol.fromJson(s as Map<String, dynamic>))
+              .toList() ?? [],
+      timeline: (json['timeline'] as List<dynamic>?)
+              ?.map((t) => TimelineScene.fromJson(t as Map<String, dynamic>))
+              .toList() ?? [],
+      shadowSelf: json['shadow_self'] != null
+          ? ShadowSelf.fromJson(json['shadow_self'] as Map<String, dynamic>)
+          : const ShadowSelf(),
+      emotionalLayers: json['emotional_layers'] != null
+          ? EmotionalLayers.fromJson(json['emotional_layers'] as Map<String, dynamic>)
+          : const EmotionalLayers(),
+      brainScience: json['brain_science'] != null
+          ? BrainScience.fromJson(json['brain_science'] as Map<String, dynamic>)
+          : const BrainScience(),
+      recurringPattern: json['recurring_pattern'] != null
+          ? RecurringPattern.fromJson(json['recurring_pattern'] as Map<String, dynamic>)
+          : const RecurringPattern(),
+      ritual: json['ritual'] != null
+          ? DreamRitual.fromJson(json['ritual'] as Map<String, dynamic>)
+          : const DreamRitual(),
+      cosmicClosing: json['cosmic_closing']?.toString() ?? '',
+      distribution: json['distribution'] != null
+          ? DreamDistribution.fromJson(json['distribution'] as Map<String, dynamic>)
+          : const DreamDistribution(),
     );
   }
 
@@ -334,22 +416,253 @@ class DeepAnalysisResult {
   }
 }
 
-class AnalysisSection {
-  final String title;
-  final String icon;
-  final String content;
+// ── Bilinçaltı Haritası ──
+class SubconsciousMap {
+  final List<MapZone> zones;
+  final String journeyType;
+  final String journeyLabel;
+  final String summary;
 
-  const AnalysisSection({
-    required this.title,
-    required this.icon,
-    required this.content,
+  const SubconsciousMap({
+    this.zones = const [],
+    this.journeyType = '',
+    this.journeyLabel = '',
+    this.summary = '',
   });
 
-  factory AnalysisSection.fromJson(Map<String, dynamic> json) {
-    return AnalysisSection(
+  factory SubconsciousMap.fromJson(Map<String, dynamic> json) {
+    return SubconsciousMap(
+      zones: (json['zones'] as List<dynamic>?)
+              ?.map((z) => MapZone.fromJson(z as Map<String, dynamic>))
+              .toList() ?? [],
+      journeyType: json['journey_type']?.toString() ?? '',
+      journeyLabel: json['journey_label']?.toString() ?? '',
+      summary: json['summary']?.toString() ?? '',
+    );
+  }
+}
+
+class MapZone {
+  final String name;
+  final String symbol;
+  final String description;
+
+  const MapZone({this.name = '', this.symbol = '', this.description = ''});
+
+  factory MapZone.fromJson(Map<String, dynamic> json) {
+    return MapZone(
+      name: json['name']?.toString() ?? '',
+      symbol: json['symbol']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Arketip Eşleşmesi ──
+class ArchetypeMatch {
+  final String primary;
+  final String emoji;
+  final String description;
+  final String shadowNote;
+
+  const ArchetypeMatch({
+    this.primary = '',
+    this.emoji = '🎭',
+    this.description = '',
+    this.shadowNote = '',
+  });
+
+  factory ArchetypeMatch.fromJson(Map<String, dynamic> json) {
+    return ArchetypeMatch(
+      primary: json['primary']?.toString() ?? '',
+      emoji: json['emoji']?.toString() ?? '🎭',
+      description: json['description']?.toString() ?? '',
+      shadowNote: json['shadow_note']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Sembol Derinleme ──
+class DeepSymbol {
+  final String name;
+  final String coreMeaning;
+  final String culturalContext;
+  final String personalReflection;
+
+  const DeepSymbol({
+    this.name = '',
+    this.coreMeaning = '',
+    this.culturalContext = '',
+    this.personalReflection = '',
+  });
+
+  factory DeepSymbol.fromJson(Map<String, dynamic> json) {
+    return DeepSymbol(
+      name: json['name']?.toString() ?? '',
+      coreMeaning: json['core_meaning']?.toString() ?? '',
+      culturalContext: json['cultural_context']?.toString() ?? '',
+      personalReflection: json['personal_reflection']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Zaman Çizgisi ──
+class TimelineScene {
+  final int scene;
+  final String title;
+  final String description;
+  final String psychologicalShift;
+
+  const TimelineScene({
+    this.scene = 0,
+    this.title = '',
+    this.description = '',
+    this.psychologicalShift = '',
+  });
+
+  factory TimelineScene.fromJson(Map<String, dynamic> json) {
+    return TimelineScene(
+      scene: (json['scene'] as num?)?.toInt() ?? 0,
       title: json['title']?.toString() ?? '',
-      icon: json['icon']?.toString() ?? 'brain',
-      content: json['content']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      psychologicalShift: json['psychological_shift']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Gölge Ben ──
+class ShadowSelf {
+  final String revealed;
+  final String answerInsight;
+  final String integrationHint;
+
+  const ShadowSelf({
+    this.revealed = '',
+    this.answerInsight = '',
+    this.integrationHint = '',
+  });
+
+  factory ShadowSelf.fromJson(Map<String, dynamic> json) {
+    return ShadowSelf(
+      revealed: json['revealed']?.toString() ?? '',
+      answerInsight: json['answer_insight']?.toString() ?? '',
+      integrationHint: json['integration_hint']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Duygusal Katmanlar ──
+class EmotionalLayer {
+  final String emotion;
+  final String explanation;
+
+  const EmotionalLayer({this.emotion = '', this.explanation = ''});
+
+  factory EmotionalLayer.fromJson(Map<String, dynamic> json) {
+    return EmotionalLayer(
+      emotion: json['emotion']?.toString() ?? '',
+      explanation: json['explanation']?.toString() ?? '',
+    );
+  }
+}
+
+class EmotionalLayers {
+  final EmotionalLayer surface;
+  final EmotionalLayer middle;
+  final EmotionalLayer deep;
+  final String synthesis;
+
+  const EmotionalLayers({
+    this.surface = const EmotionalLayer(),
+    this.middle = const EmotionalLayer(),
+    this.deep = const EmotionalLayer(),
+    this.synthesis = '',
+  });
+
+  factory EmotionalLayers.fromJson(Map<String, dynamic> json) {
+    return EmotionalLayers(
+      surface: json['surface'] != null
+          ? EmotionalLayer.fromJson(json['surface'] as Map<String, dynamic>)
+          : const EmotionalLayer(),
+      middle: json['middle'] != null
+          ? EmotionalLayer.fromJson(json['middle'] as Map<String, dynamic>)
+          : const EmotionalLayer(),
+      deep: json['deep'] != null
+          ? EmotionalLayer.fromJson(json['deep'] as Map<String, dynamic>)
+          : const EmotionalLayer(),
+      synthesis: json['synthesis']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Nörobilim ──
+class BrainScience {
+  final String primaryRegion;
+  final String primaryRegionEmoji;
+  final String mechanism;
+  final String fascinatingFact;
+
+  const BrainScience({
+    this.primaryRegion = '',
+    this.primaryRegionEmoji = '🧠',
+    this.mechanism = '',
+    this.fascinatingFact = '',
+  });
+
+  factory BrainScience.fromJson(Map<String, dynamic> json) {
+    return BrainScience(
+      primaryRegion: json['primary_region']?.toString() ?? '',
+      primaryRegionEmoji: json['primary_region_emoji']?.toString() ?? '🧠',
+      mechanism: json['mechanism']?.toString() ?? '',
+      fascinatingFact: json['fascinating_fact']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Tekrar Kalıbı ──
+class RecurringPattern {
+  final bool detected;
+  final String patternName;
+  final String description;
+  final String resolutionHint;
+
+  const RecurringPattern({
+    this.detected = false,
+    this.patternName = '',
+    this.description = '',
+    this.resolutionHint = '',
+  });
+
+  factory RecurringPattern.fromJson(Map<String, dynamic> json) {
+    return RecurringPattern(
+      detected: json['detected'] as bool? ?? false,
+      patternName: json['pattern_name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      resolutionHint: json['resolution_hint']?.toString() ?? '',
+    );
+  }
+}
+
+// ── Ritüel Önerisi ──
+class DreamRitual {
+  final String title;
+  final String action;
+  final String emoji;
+  final String scienceNote;
+
+  const DreamRitual({
+    this.title = '',
+    this.action = '',
+    this.emoji = '🕯️',
+    this.scienceNote = '',
+  });
+
+  factory DreamRitual.fromJson(Map<String, dynamic> json) {
+    return DreamRitual(
+      title: json['title']?.toString() ?? '',
+      action: json['action']?.toString() ?? '',
+      emoji: json['emoji']?.toString() ?? '🕯️',
+      scienceNote: json['science_note']?.toString() ?? '',
     );
   }
 }

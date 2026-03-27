@@ -96,7 +96,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 children: [
                   // — Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                     child: Row(
                       children: [
                         GlassBackButton(),

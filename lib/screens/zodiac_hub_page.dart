@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 import '../widgets/glass_back_button.dart';
+import '../widgets/guidance_booklet.dart';
 import '../widgets/fade_page_route.dart';
 import 'zodiac_page.dart';
 import 'zodiac_chinese_page.dart';
@@ -59,11 +60,61 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
           ),
           child: Column(children: [
             // Üst Bar (Geri Butonu)
-            _animWrap(_t1, const Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: GlassBackButton(),
+            _animWrap(_t1, Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const GlassBackButton(),
+                  GuidanceBookletButton(
+                    dialogTitleTr: 'Burç Rehberi',
+                    dialogTitleEn: 'Zodiac Guide',
+                    items: const [
+                      GuidanceItem(
+                        titleTr: '3 Kadim Gelenek',
+                        titleEn: '3 Ancient Traditions',
+                        descTr: 'Batı Zodiyağı, Çin Astrolojisi ve Maya Takvimi — binlerce yıllık üç farklı gelenek, yıldızları ve zamanı farklı yorumlasa da ortak amaçları aynı: insanın iç dünyasını anlamak.',
+                        descEn: 'Western Zodiac, Chinese Astrology, and Maya Calendar — three traditions spanning millennia. Though they interpret stars and time differently, they share a common goal: understanding the inner self.',
+                        icon: Icons.auto_awesome,
+                      ),
+                      GuidanceItem(
+                        titleTr: 'Batı Zodiyağı',
+                        titleEn: 'Western Zodiac',
+                        descTr: 'Güneşin doğum anındaki konumuna göre 12 burç belirlenir. Her burç, kişiliğinizin farklı yönlerini — güçlü yanlarınızı, zorluklarınızı ve duygusal eğilimlerinizi yansıtır.',
+                        descEn: 'Based on the sun\'s position at birth, 12 signs are determined. Each reflects different aspects of your personality — strengths, challenges, and emotional tendencies.',
+                        icon: Icons.wb_sunny_outlined,
+                      ),
+                      GuidanceItem(
+                        titleTr: 'Çin Astrolojisi',
+                        titleEn: 'Chinese Astrology',
+                        descTr: '12 yıllık döngülerle çalışan bu sistem, doğum yılınıza göre bir hayvan burcu atar. Her hayvan, karakterinizi, uyumlu ilişkilerinizi ve yaşam enerjinizi temsil eder.',
+                        descEn: 'Working in 12-year cycles, this system assigns an animal sign based on your birth year. Each animal represents your character, compatible relationships, and life energy.',
+                        icon: Icons.pets_outlined,
+                      ),
+                      GuidanceItem(
+                        titleTr: 'Maya Takvimi',
+                        titleEn: 'Maya Calendar',
+                        descTr: '20 Nahual (gün işareti) ve 13 galaktik tondan oluşan Tzolkin takvimi, doğum gününüze göre kozmik misyonunuzu ortaya koyar. En kadim astroloji sistemlerinden biridir.',
+                        descEn: 'The Tzolkin calendar, composed of 20 Nahuales (day signs) and 13 galactic tones, reveals your cosmic mission based on your birth day. One of the most ancient astrology systems.',
+                        icon: Icons.calendar_today_outlined,
+                      ),
+                      GuidanceItem(
+                        titleTr: 'Element Sistemi',
+                        titleEn: 'Element System',
+                        descTr: 'Her üç gelenek de elementleri kullanır: Ateş, Su, Toprak, Hava. Elementiniz, enerjinizin doğasını ve ruhani yöneliminizi belirler.',
+                        descEn: 'All three traditions use elements: Fire, Water, Earth, Air. Your element determines the nature of your energy and spiritual orientation.',
+                        icon: Icons.local_fire_department_outlined,
+                      ),
+                      GuidanceItem(
+                        titleTr: 'Bilimsel Not',
+                        titleEn: 'Scientific Note',
+                        descTr: 'Astroloji bilimsel olarak kanıtlanmış bir yöntem değildir, ancak binlerce yıldır insanların kendini tanıma yolculuğuna eşlik eden güçlü bir sembolik dildir.',
+                        descEn: 'Astrology is not a scientifically proven method, but it is a powerful symbolic language that has accompanied humanity\'s self-discovery journey for thousands of years.',
+                        icon: Icons.science_outlined,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             )),
             
