@@ -806,7 +806,7 @@ class ChineseZodiacData {
       'missing': 'Ağaç enerjisi zayıf. Büyüme ve yenilik için akış gerekir.',
       'supportEnergy': 'Merkezi ve simetrik alanlar, toprak tonları, sağlam zeminler seni destekler.',
       'drainEnergy': 'Sürekli değişen, belirsiz ve kaotik ortamlar güvensizlik hissi yaratır.',
-      'miniAction': 'Kristal veya taş bir nesne masana veya merkezi alana koy. Toprak enerjisini çıpalamak için.',
+      'miniAction': 'Masana veya merkezi alana kristal ya da taş bir nesne koy; mekânın toprak enerjisini dengeler ve odaklanmanı güçlendirir.',
       'colors': ['Kahve', 'Sarı', 'Bal rengi', 'Açık kiremit', 'Krem'],
       'materials': ['Taş', 'Seramik', 'Toprak kaplar', 'Ağır kumaşlar'],
       'shapes': ['Kare', 'Dikdörtgen', 'Yatay formlar'],

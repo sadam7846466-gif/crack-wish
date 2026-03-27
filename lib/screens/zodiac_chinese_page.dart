@@ -1531,7 +1531,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('1 Dakikalık Aksiyon', style: TextStyle(
+                    Text('Sana Ne İyi Gelir', style: TextStyle(
                       color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5,
                     )),
                     const SizedBox(height: 4),
