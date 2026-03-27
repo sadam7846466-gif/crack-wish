@@ -355,6 +355,7 @@ class DeepAnalysisResult {
   final DreamRitual ritual;
   final String cosmicClosing;
   final DreamDistribution distribution;
+  final List<ClarifyingInsight> clarifyingInsights;
 
   DeepAnalysisResult({
     required this.success,
@@ -371,6 +372,7 @@ class DeepAnalysisResult {
     this.ritual = const DreamRitual(),
     this.cosmicClosing = '',
     this.distribution = const DreamDistribution(),
+    this.clarifyingInsights = const [],
   });
 
   factory DeepAnalysisResult.fromJson(Map<String, dynamic> json) {
@@ -408,11 +410,28 @@ class DeepAnalysisResult {
       distribution: json['distribution'] != null
           ? DreamDistribution.fromJson(json['distribution'] as Map<String, dynamic>)
           : const DreamDistribution(),
+      clarifyingInsights: (json['clarifying_insights'] as List<dynamic>?)
+              ?.map((c) => ClarifyingInsight.fromJson(c as Map<String, dynamic>))
+              .toList() ?? [],
     );
   }
 
   factory DeepAnalysisResult.error(String message) {
     return DeepAnalysisResult(success: false, errorMessage: message);
+  }
+}
+
+class ClarifyingInsight {
+  final String questionId;
+  final String insight;
+
+  const ClarifyingInsight({required this.questionId, required this.insight});
+
+  factory ClarifyingInsight.fromJson(Map<String, dynamic> json) {
+    return ClarifyingInsight(
+      questionId: json['question_id']?.toString() ?? '',
+      insight: json['insight']?.toString() ?? '',
+    );
   }
 }
 

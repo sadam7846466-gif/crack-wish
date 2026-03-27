@@ -349,7 +349,7 @@ class _DreamPageState extends State<DreamPage>
   String? _lastLocaleCode;
   bool _localizedSeedsReady = false;
   int _currentTipIndex = 0; // Biliyor muydun? için sabit index
-
+  List<Map<String, dynamic>> _premiumAnswers = []; // Kullanıcının verdiği premium cevaplar
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
     'REM uykusunda mantık merkezleri baskılanır, bu yüzden rüyalar mantıksız görünür.',
@@ -630,6 +630,7 @@ class _DreamPageState extends State<DreamPage>
     // Premium sonucu kaydet ve göster
     if (mounted) {
       _deepAnalysisResult = deepResult;
+      _premiumAnswers = finalAnswers;
       _isPremiumResult = true;
       print('🔮🔮🔮 Setting _isPremiumResult = true, switching to gap then results');
       setState(() {
@@ -2138,10 +2139,24 @@ class _DreamPageState extends State<DreamPage>
         // ── 4) Kanıta Dayalı Bulgular "Bu sonuca neden vardık?" (Katman 2) ──
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: _ClinicalEvidenceSection(isTr: isTr),
+            padding: const EdgeInsets.symmetric(vertical: 16), // Yumuşak uçtan uca kaydırma için iç padding kullanıldı
+            child: _ClinicalEvidenceSection(isTr: isTr, analysis: _deepAnalysisResult!),
           ),
         ),
+
+        // ── 4.5) Analizi Netleştiren Yanıtlar (Soru-Cevap) ──
+        if (_premiumAnswers.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: _ClinicalAnswersSection(
+                isTr: isTr,
+                answers: _premiumAnswers,
+                insights: _deepAnalysisResult!.clarifyingInsights,
+                globalInsight: _deepAnalysisResult!.shadowSelf.answerInsight,
+              ),
+            ),
+          ),
 
         // ── 5) Açılır Detaylar (Akordeon) (Katman 3) ──
         SliverPadding(
@@ -2150,27 +2165,37 @@ class _DreamPageState extends State<DreamPage>
             delegate: SliverChildListDelegate([
               _ClinicalAccordion(
                 title: isTr ? 'Duygusal Profil' : 'Emotional Profile',
+                subtitle: isTr ? 'Rüya sırasındaki psikolojik katmanlarınız' : 'Psychological layers during the dream',
                 icon: Icons.waves,
-                content: 'Rüya yüzeyde korku hissi taşısa da, derin katmanlarda güçlü bir yalnızlık ve terk edilme kaygısı barındırıyor. Duygular, rüyanın başlangıcında hafif bir gerilimle başlayıp son sahnelerde ani bir paniğe dönüşüyor.',
+                content: _deepAnalysisResult!.emotionalLayers.synthesis,
               ),
-              const SizedBox(height: 12),
-              _ClinicalAccordion(
-                title: isTr ? 'Bellek İzleri' : 'Memory Traces',
-                icon: Icons.memory,
-                content: 'Yakın dönemde maruz kalınan bir mekan (deniz veya su temalı bir görsel/anı) eski bir güvensizlik (düşme) korkusuyla birleşerek sahnelenmiş.',
-              ),
-              const SizedBox(height: 12),
-              _ClinicalAccordion(
-                title: isTr ? 'Sosyal Dinamikler' : 'Social Dynamics',
-                icon: Icons.people_outline,
-                content: 'Rüya boyunca sosyal figürlerin eksikliği veya ulaşılamazlığı göze çarpıyor. Etrafta birileri olsa bile, iletişim kurulamaması pasif izole bir sosyal ağa işaret ediyor.',
-              ),
-              const SizedBox(height: 12),
-              _ClinicalAccordion(
-                title: isTr ? 'Anlatı Yapısı' : 'Narrative Structure',
-                icon: Icons.account_tree_outlined,
-                content: 'Parçalı bir akış var. Doğrusal bir hedef (bir yere ulaşmak) ile başlayıp mantık kırılması (aniden düşüş) ile devam etmesi, uyanık yaşamdaki hedeflerde "zemin kaybetme" endişesi ile paralellik gösteriyor.',
-              ),
+              if (_deepAnalysisResult!.shadowSelf.revealed.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _ClinicalAccordion(
+                  title: isTr ? 'Gölge Benlik' : 'Shadow Self',
+                  subtitle: isTr ? 'Bastırdığınız ve yüzleşmekten kaçındığınız yönler' : 'Suppressed and unexamined aspects of the subconscious',
+                  icon: Icons.person_off_outlined,
+                  content: '${_deepAnalysisResult!.shadowSelf.revealed}\n\n${_deepAnalysisResult!.shadowSelf.answerInsight}',
+                ),
+              ],
+              if (_deepAnalysisResult!.recurringPattern.description.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _ClinicalAccordion(
+                  title: isTr ? 'Kalıplar ve Davranışlar' : 'Recurring Patterns',
+                  subtitle: isTr ? 'Hayatınızda sürekli tekrar eden psikolojik döngüler' : 'Recurring loops and psychological blockages',
+                  icon: Icons.replay,
+                  content: '${_deepAnalysisResult!.recurringPattern.description}\n\n${isTr ? "Öneri:" : "Hint:"} ${_deepAnalysisResult!.recurringPattern.resolutionHint}',
+                ),
+              ],
+              if (_deepAnalysisResult!.ritual.action.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _ClinicalAccordion(
+                  title: isTr ? 'Önerilen Ritüel: ${_deepAnalysisResult!.ritual.title}' : 'Suggested Ritual: ${_deepAnalysisResult!.ritual.title}',
+                  subtitle: isTr ? 'Bu rüyanın etkisini yönetmek için size özel eylem' : 'A specialized action to manage this dream\'s impact',
+                  icon: Icons.self_improvement,
+                  content: '${_deepAnalysisResult!.ritual.action}\n\n${isTr ? "Bilimsel Not:" : "Science Note:"} ${_deepAnalysisResult!.ritual.scienceNote}',
+                ),
+              ],
             ]),
           ),
         ),
@@ -5574,30 +5599,6 @@ class _ClinicalMetricsPanel extends StatelessWidget {
     required this.distribution,
   }) : super(key: key);
 
-  String _getEmotionalSubtext() {
-    if (distribution.emotionalLoad >= 70) return isTr ? 'Duygu yoğunluğu oldukça yüksek' : 'Highly intensive emotional load';
-    if (distribution.emotionalLoad >= 40) return isTr ? 'Orta düzey duygusal salınım' : 'Moderate emotional swings';
-    return isTr ? 'Duygusal tepki nötr seviyede' : 'Neutral emotional response';
-  }
-
-  String _getUncertaintySubtext() {
-    if (distribution.uncertainty >= 70) return isTr ? 'Ani geçişler ve kopukluklar sık' : 'Frequent abrupt transitions';
-    if (distribution.uncertainty >= 40) return isTr ? 'Kısmi mantık kırılmaları' : 'Occasional logic breaks';
-    return isTr ? 'Anlatı akışı net ve bağlantılı' : 'Clear and coherent flow';
-  }
-
-  String _getRecentMemorySubtext() {
-    if (distribution.recentMemoryEffect >= 70) return isTr ? 'Son günlerle örtüşen unsurlar baskın' : 'Dominant recent day residues';
-    if (distribution.recentMemoryEffect >= 40) return isTr ? 'Bazı günlük yankılar göze çarpıyor' : 'Some daily echoes visible';
-    return isTr ? 'Bilinçaltı derine odaklanmış' : 'Subconscious focused on deep past';
-  }
-
-  String _getAgencySubtext() {
-    if (distribution.brainActivity >= 70) return isTr ? 'Aktif karar alma süreci var' : 'Active decision making present';
-    if (distribution.brainActivity >= 40) return isTr ? 'Olaylara kısmi müdahale gözlemleniyor' : 'Partial intervention observed';
-    return isTr ? 'Pasif ve sürüklenen olma hali' : 'Passive and drifting state';
-  }
-
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -5632,7 +5633,6 @@ class _ClinicalMetricsPanel extends StatelessWidget {
                 child: _RingMetric(
                   percentage: distribution.emotionalLoad / 100.0,
                   title: isTr ? 'Duygusal\nYoğunluk' : 'Emotional\nLoad',
-                  subtext: _getEmotionalSubtext(),
                   baseColor: const Color(0xFFD500F9), // Purple neon
                   reasoning: distribution.emotionalLoadReasoning,
                   isTr: isTr,
@@ -5643,7 +5643,6 @@ class _ClinicalMetricsPanel extends StatelessWidget {
                 child: _RingMetric(
                   percentage: distribution.uncertainty / 100.0,
                   title: isTr ? 'Anlatısal\nBelirsizlik' : 'Narrative\nUncertainty',
-                  subtext: _getUncertaintySubtext(),
                   baseColor: const Color(0xFF536DFE), // Blue neon
                   reasoning: distribution.uncertaintyReasoning,
                   isTr: isTr,
@@ -5654,7 +5653,6 @@ class _ClinicalMetricsPanel extends StatelessWidget {
                 child: _RingMetric(
                   percentage: distribution.recentMemoryEffect / 100.0,
                   title: isTr ? 'Yakın\nGeçmiş' : 'Recent\nConnection',
-                  subtext: _getRecentMemorySubtext(),
                   baseColor: const Color(0xFF00BFA5), // Teal neon
                   reasoning: distribution.recentMemoryReasoning,
                   isTr: isTr,
@@ -5665,7 +5663,6 @@ class _ClinicalMetricsPanel extends StatelessWidget {
                 child: _RingMetric(
                   percentage: distribution.brainActivity / 100.0,
                   title: isTr ? 'Ajans /\nKontrol' : 'Agency /\nControl',
-                  subtext: _getAgencySubtext(),
                   baseColor: const Color(0xFF4DB6AC), // Soft Green neon
                   reasoning: distribution.brainActivityReasoning,
                   isTr: isTr,
@@ -5679,10 +5676,18 @@ class _ClinicalMetricsPanel extends StatelessWidget {
   }
 }
 
+class _RingMetricOverlay {
+  static OverlayEntry? currentEntry;
+
+  static void removeCurrent() {
+    currentEntry?.remove();
+    currentEntry = null;
+  }
+}
+
 class _RingMetric extends StatelessWidget {
   final double percentage; // 0.0 - 1.0
   final String title;
-  final String subtext;
   final Color baseColor;
   final String reasoning;
   final bool isTr;
@@ -5691,150 +5696,179 @@ class _RingMetric extends StatelessWidget {
     Key? key,
     required this.percentage,
     required this.title,
-    required this.subtext,
     required this.baseColor,
     this.reasoning = '',
     required this.isTr,
   }) : super(key: key);
 
   void _showReasoning(BuildContext context) {
-    if (reasoning.isEmpty) return; // Fallback for old dreams without reasoning
+    final displayReasoning = reasoning.isNotEmpty 
+        ? reasoning 
+        : (isTr ? 'Geçmiş analizlerde bu değer için özel bir gerekçe üretilmemişti (Eski Sürüm).' : 'No reasoning generated for this old analysis version.');
 
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Dismiss',
-      barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, anim1, anim2) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Material(
-              color: Colors.transparent,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: baseColor.withOpacity(0.5), width: 1.5),
-                      boxShadow: [
-                        BoxShadow(color: baseColor.withOpacity(0.2), blurRadius: 30, spreadRadius: 5),
-                      ],
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Panelin alt kısmını (bottom) doğrudan metriğin sınırından (position.dy) yukarı hizala
+    double bottom = screenHeight - position.dy + 12; // 12px yukarısında hover yapar
+    
+    // Yatayda ortala ama ekran dışına taşmasın
+    double left = position.dx + (size.width / 2) - 120; // 240 width'in yarısı
+    if (left < 16) left = 16;
+    if (left + 240 > screenWidth - 16) left = screenWidth - 240 - 16;
+
+    _RingMetricOverlay.removeCurrent();
+
+    final entry = OverlayEntry(
+      builder: (context) {
+        return Stack(
+          children: [
+            // Arka plandaki tıklamaları bloke etmeyip sadece yakalayan (translucent) katman
+            Positioned.fill(
+              child: Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: (_) => _RingMetricOverlay.removeCurrent(),
+                child: const SizedBox.expand(),
+              ),
+            ),
+            // Tooltip Paneli
+            Positioned(
+              bottom: bottom,
+              left: left,
+              width: 240,
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 0.95 + (0.05 * value),
+                    alignment: Alignment.bottomCenter,
+                    child: Opacity(
+                      opacity: value,
+                      child: child,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.psychology, color: baseColor, size: 40),
-                        const SizedBox(height: 16),
-                        Text(
-                          title.replaceAll('\n', ' ').toUpperCase(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: baseColor, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+                  );
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08), // Daha saydam cam (Frosted Glass)
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.2),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 30, spreadRadius: 5),
+                            BoxShadow(color: baseColor.withOpacity(0.15), blurRadius: 20, spreadRadius: 2),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${(percentage * 100).toInt()}%',
-                          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          reasoning,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.6),
-                        ),
-                        const SizedBox(height: 24),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-                            decoration: BoxDecoration(
-                              color: baseColor.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.insights, color: baseColor.withOpacity(0.9), size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    title.replaceAll('\n', ' ').toUpperCase(),
+                                    style: TextStyle(
+                                      color: baseColor.withOpacity(0.9), 
+                                      fontSize: 11, 
+                                      fontWeight: FontWeight.w700, 
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: Text(
-                              isTr ? 'Anladım' : 'Got it',
-                              style: TextStyle(color: baseColor, fontSize: 14, fontWeight: FontWeight.w600),
+                            const SizedBox(height: 10),
+                            Text(
+                              displayReasoning,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.95), 
+                                fontSize: 12.5, 
+                                height: 1.4,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         );
       },
-      transitionBuilder: (context, anim1, anim2, child) {
-        return FadeTransition(opacity: anim1, child: ScaleTransition(scale: Tween<double>(begin: 0.9, end: 1.0).animate(anim1), child: child));
-      },
     );
+
+    _RingMetricOverlay.currentEntry = entry;
+    Overlay.of(context).insert(entry);
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showReasoning(context),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 58,
-          height: 58,
-          child: CustomPaint(
-            painter: _PremiumRingPainter(percentage, baseColor),
-            child: Center(
-              child: Text(
-                '${(percentage * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showReasoning(context),
+        borderRadius: BorderRadius.circular(16),
+        splashColor: baseColor.withOpacity(0.2),
+        highlightColor: baseColor.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 72,
+                height: 72,
+                child: CustomPaint(
+                  painter: _PremiumRingPainter(percentage, baseColor),
+                  child: Center(
+                    child: Text(
+                      '${(percentage * 100).toInt()}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 28,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 9.5,
+                    height: 1.2,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 24,
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 8.5,
-              height: 1.2,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          height: 38,
-          child: Text(
-            subtext,
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.75),
-              fontSize: 8,
-              height: 1.25,
-            ),
-          ),
-        ),
-      ],
       ),
     );
   }
@@ -5904,59 +5938,147 @@ class _PremiumRingPainter extends CustomPainter {
 
 class _ClinicalEvidenceSection extends StatelessWidget {
   final bool isTr;
-  const _ClinicalEvidenceSection({required this.isTr});
+  final DeepAnalysisResult analysis;
+  const _ClinicalEvidenceSection({required this.isTr, required this.analysis});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(topRight: Radius.circular(12), bottomRight: Radius.circular(12)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            border: Border(
-              left: BorderSide(color: const Color(0xFF7C6CF3).withOpacity(0.8), width: 3),
-              top: BorderSide(color: Colors.white.withOpacity(0.08), width: 1),
-              right: BorderSide(color: Colors.white.withOpacity(0.08), width: 1),
-              bottom: BorderSide(color: Colors.white.withOpacity(0.08), width: 1),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    // Collect evidences from timeline and symbols
+    final evidenceItems = <Map<String, dynamic>>[];
+    
+    // Nöro-bilim bulgusu
+    if (analysis.brainScience.mechanism.isNotEmpty) {
+      evidenceItems.add({
+        'icon': Icons.psychology, 
+        'title': isTr ? 'Nörolojik Taban' : 'Neurological Basis', 
+        'text': analysis.brainScience.mechanism,
+        'color': const Color(0xFFD500F9), // Purple neon
+      });
+    }
+
+    // Semboller için çok daha parlak (Neon/Vivid) ikon ve renk paletleri
+    final List<IconData> symbolIcons = [
+      Icons.auto_awesome,
+      Icons.scatter_plot,
+      Icons.filter_tilt_shift,
+      Icons.toll,
+      Icons.flare,
+    ];
+    final List<Color> symbolColors = [
+      const Color(0xFF18FFFF), // Ultra Parlak Cyan
+      const Color(0xFFFF1744), // Ateşli Kırmızı/Pembe
+      const Color(0xFFFFEA00), // Floresan Sarı/Kehribar
+      const Color(0xFF00E676), // Fosforlu Yeşil
+      const Color(0xFFD500F9), // Elektrik Mor
+    ];
+
+    int sIndex = 0;
+    for (final sym in analysis.symbols) {
+      evidenceItems.add({
+        'icon': symbolIcons[sIndex % symbolIcons.length], 
+        'title': sym.name, 
+        'text': sym.personalReflection,
+        'color': symbolColors[sIndex % symbolColors.length], // Opacity yok, en parlak hali
+      });
+      sIndex++;
+    }
+
+    // Timeline son sahneyi al (Kırılma noktası)
+    if (analysis.timeline.isNotEmpty) {
+      final lastScene = analysis.timeline.last;
+      evidenceItems.add({
+        'icon': Icons.timeline, 
+        'title': lastScene.title, 
+        'text': lastScene.psychologicalShift,
+        'color': const Color(0xFF536DFE), // Blue neon
+      });
+    }
+
+    if (evidenceItems.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, bottom: 16),
+          child: Row(
             children: [
+              Icon(Icons.hub, color: Colors.white.withOpacity(0.5), size: 16),
+              const SizedBox(width: 8),
               Text(
-                isTr ? 'Bu Sonuca Neden Vardık?' : 'Evidence Base',
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                isTr ? 'BU SONUCA NEDEN VARDIK?' : 'EVIDENCE BASE',
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
               ),
-              const SizedBox(height: 16),
-              _buildEvidenceItem(Icons.arrow_downward, 'Düşük Kontrol', 'Metindeki "sonra düştüm" ifadesi iradeden bağımsız bir çekilmeye işaret ediyor.'),
-              const SizedBox(height: 12),
-              _buildEvidenceItem(Icons.waves, 'Kaçınılmaz Yüzleşme', '"Suyun içine girdim" detayı, savunmasız kalınan duyusal bir alana girişi kanıtlıyor.'),
-              const SizedBox(height: 12),
-              _buildEvidenceItem(Icons.question_answer, 'Ek Soru Katkısı', 'Tanıdık birilerini aramadığınızı belirtmeniz sosyal yalnızlık hipotezini güçlendirdi.'),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEvidenceItem(IconData icon, String tag, String detail) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: Colors.white.withOpacity(0.4), size: 16),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(tag, style: const TextStyle(color: Color(0xFFB39DDB), fontSize: 11, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 2),
-              Text(detail, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, height: 1.4)),
-            ],
+        SizedBox(
+          height: 145, // Metinler artık çok kısa olacağı için panelleri gereksiz uzatmadık
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            clipBehavior: Clip.none,
+            itemCount: evidenceItems.length,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final item = evidenceItems[index];
+              return Container(
+                width: 215, // Çok uzun ve hantal olmamaları için genişliği azalttık
+                margin: EdgeInsets.only(right: index == evidenceItems.length - 1 ? 0 : 12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.2),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(item['icon'], color: item['color'] ?? Colors.white70, size: 18), // Matlığı kaldırdık, tam parlaklık (18px)
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  item['title'].toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white, 
+                                    fontSize: 10, 
+                                    fontWeight: FontWeight.w800, 
+                                    letterSpacing: 0.5,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              child: Text(
+                                item['text'],
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.85), 
+                                  fontSize: 12, 
+                                  height: 1.45,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -5966,10 +6088,16 @@ class _ClinicalEvidenceSection extends StatelessWidget {
 
 class _ClinicalAccordion extends StatefulWidget {
   final String title;
+  final String? subtitle;
   final IconData icon;
   final String content;
 
-  const _ClinicalAccordion({required this.title, required this.icon, required this.content});
+  const _ClinicalAccordion({
+    required this.title,
+    this.subtitle,
+    required this.icon,
+    required this.content,
+  });
 
   @override
   State<_ClinicalAccordion> createState() => _ClinicalAccordionState();
@@ -6004,9 +6132,21 @@ class _ClinicalAccordionState extends State<_ClinicalAccordion> {
                     Icon(widget.icon, color: Colors.white.withOpacity(0.5), size: 18),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        widget.title,
-                        style: TextStyle(color: _isExpanded ? Colors.white : Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: TextStyle(color: _isExpanded ? Colors.white : Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                          if (widget.subtitle != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              widget.subtitle!,
+                              style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     Icon(_isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.white.withOpacity(0.3)),
@@ -6097,4 +6237,131 @@ class _ClinicalReflectionQuestion extends StatelessWidget {
 
 class _DummyError extends StatelessWidget { // Sadece hata veya aracı sınıflar varsa engellememek için
   @override Widget build(BuildContext context) => const SizedBox();
+}
+
+class _ClinicalAnswersSection extends StatelessWidget {
+  final bool isTr;
+  final List<Map<String, dynamic>> answers;
+  final List<ClarifyingInsight> insights;
+  final String globalInsight;
+
+  const _ClinicalAnswersSection({
+    required this.isTr,
+    required this.answers,
+    required this.insights,
+    required this.globalInsight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (answers.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, bottom: 12),
+          child: Row(
+            children: [
+              Icon(Icons.question_answer_outlined, color: Colors.white.withOpacity(0.5), size: 16),
+              const SizedBox(width: 8),
+              Text(
+                isTr ? 'ANALİZİ NETLEŞTİREN YANITLAR' : 'CLARIFYING RESPONSES',
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.2),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...answers.asMap().entries.map((entry) {
+                final int idx = entry.key;
+                final qa = entry.value;
+                final bool isYes = qa['answer'] == 'yes';
+                final bool isNo = qa['answer'] == 'no';
+                final String ansText = isYes ? (isTr ? 'Evet' : 'Yes') : (isNo ? (isTr ? 'Hayır' : 'No') : (isTr ? '?' : 'Unsure'));
+                final Color ansColor = isYes ? const Color(0xFF69F0AE) : (isNo ? const Color(0xFFFF5252) : const Color(0xFFFFD740));
+                
+                // Find matching insight from backend
+                final String questionId = qa['questionId']?.toString() ?? '';
+                final matchingInsight = insights.where((i) => i.questionId == questionId || i.questionId.contains(questionId)).firstOrNull?.insight ?? '';
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(16, 14, 16, matchingInsight.isNotEmpty ? 8 : 14),
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 13, height: 1.4),
+                          children: [
+                            TextSpan(text: qa['question'] + '  '),
+                            TextSpan(
+                              text: ansText.toUpperCase(),
+                              style: TextStyle(
+                                color: ansColor, // Yarı saydamlığı iptal ettik, tamamen saf neon
+                                fontSize: 12, // Metni biraz daha büyük yaptık, 10 çok ufaktı
+                                fontWeight: FontWeight.w900, 
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (matchingInsight.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.subdirectory_arrow_right, color: Colors.white.withOpacity(0.3), size: 14),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                matchingInsight,
+                                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontStyle: FontStyle.italic, height: 1.4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (idx < answers.length - 1)
+                      Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 16, endIndent: 16),
+                  ],
+                );
+              }),
+              if (globalInsight.isNotEmpty && globalInsight != 'null') ...[
+                Divider(color: Colors.white.withOpacity(0.1), height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.psychology, color: const Color(0xFFE040FB).withOpacity(0.8), size: 16),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          globalInsight,
+                          style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12, height: 1.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
