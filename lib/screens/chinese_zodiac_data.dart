@@ -892,15 +892,15 @@ class ChineseZodiacData {
       'bagua': 'Güneydoğu — Zenginlik & Bolluk',
       'activate': 'Canlı bitki, mor veya mor tonlu kristal, akan su sembolü.',
       'remove': 'Bozuk eşya, tıkayan mobilya, boş kaplar.',
-      'tip': 'Bu köşeye sağlıklı bir bitki koy. Büyüyen bitki büyüyen refahı simgeler.',
+      'tip': 'Güneydoğu köşesine sağlıklı bir bitki koy. Büyüyen bitki büyüyen refahı simgeler.',
       'color': 'Mor · Yeşil · Altın',
     },
     'Aşk': {
       'emoji': '💕',
       'bagua': 'Güneybatı — İlişkiler & Aşk',
-      'activate': 'Çift objeler (iki mum, iki taş), pembe veya kırmızı kristal, çifti simgeye şeyler.',
+      'activate': 'Çift objeler (iki mum, iki taş), pembe veya kırmızı kristal, çifti simgeleyen şeyler.',
       'remove': 'Yalnızlık hissettiren objeler, kırık veya tek kalan öğeler.',
-      'tip': 'Pembe kuvars kristali bu köşeye koy. Kalp enerjisini çeker.',
+      'tip': 'Güneybatı köşesine pembe kuvars kristali koy. Kalp enerjisini çeker.',
       'color': 'Pembe · Kırmızı · Beyaz',
     },
     'Kariyer': {
@@ -916,7 +916,7 @@ class ChineseZodiacData {
       'bagua': 'Merkez — Sağlık & Denge',
       'activate': 'Sarı veya bej objeler, kristaller, simetrik yerleşim.',
       'remove': 'Dağınıklık, akımı kesen mobilyalar, karanlık köşeler.',
-      'tip': 'Evin merkezini temiz ve açık tut. Enerji oradan tüm odalara dağılır.',
+      'tip': 'Evin merkezini temiz ve açık tut. Gelen enerji oradan tüm odalara dağılır.',
       'color': 'Sarı · Bej · Kahve',
     },
     'Sağlık': {
@@ -924,7 +924,7 @@ class ChineseZodiacData {
       'bagua': 'Doğu — Aile & Sağlık',
       'activate': 'Canlı bitkiler, ahşap dokunuşlar, yeşil tonlar.',
       'remove': 'Ölü bitkiler, soluk çiçekler, kırık eşyalar.',
-      'tip': 'Doğu yönüne sağlıklı bir bitki koy. Karaciğer enerjisini destekler.',
+      'tip': 'Doğu köşesine sağlıklı veya taze bir bitki koy. Karaciğer enerjisini destekler.',
       'color': 'Yeşil · Açık mavi · Bej',
     },
   };

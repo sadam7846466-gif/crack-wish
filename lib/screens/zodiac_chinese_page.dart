@@ -1565,6 +1565,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       // ── MOD 4: HEDEF BAZLI BAGUA SEÇİCİ ──
       _BaguaGoalSelector(
         goals: ChineseZodiacData.baguaGoals,
+        element: _userElement,
         elColor: elColor,
         goldL: _goldL,
         gold: _gold,
@@ -4746,10 +4747,11 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
 // ═══════════════════════════════════════════════════════
 class _BaguaGoalSelector extends StatefulWidget {
   final Map<String, Map<String, String>> goals;
+  final String element;
   final Color elColor;
   final Color goldL;
   final Color gold;
-  const _BaguaGoalSelector({required this.goals, required this.elColor, required this.goldL, required this.gold});
+  const _BaguaGoalSelector({required this.goals, required this.element, required this.elColor, required this.goldL, required this.gold});
 
   @override
   State<_BaguaGoalSelector> createState() => _BaguaGoalSelectorState();
@@ -4758,142 +4760,383 @@ class _BaguaGoalSelector extends StatefulWidget {
 class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
   String _selectedGoal = 'Para';
 
+  String _getChineseChar(String goal) {
+     switch (goal) {
+       case 'Para': return '財'; // Wealth
+       case 'Aşk': return '愛';   // Love
+       case 'Kariyer': return '道'; // Path
+       case 'Huzur': return '和'; // Harmony
+       case 'Sağlık': return '康'; // Health
+       default: return '吉';      // Luck
+     }
+  }
+
+  String _getPersonalizedActivate(String goal, String element) {
+    if (goal == 'Para') {
+      if (element == 'Ağaç') return 'Sarmaşık veya para çiçeği, yeşil bambu, tavanı gören yatay ahşap raflar.';
+      if (element == 'Ateş') return 'Parlak veya kırmızımsı bir kristal, bol günışığı alan çekici bir bitki.';
+      if (element == 'Toprak') return 'Seramik kalın saksıda canlı bitkiler, doğal kahve tonlu dekorlar.';
+      if (element == 'Metal') return 'Madeni paralarla dolu şık metal bir kâse, beyaz çiçekli zarif bitkiler.';
+      if (element == 'Su') return 'Akan su sembolü (ör. mini şelale), yansıtıcı aynalar, siyah-lacivert saksılar.';
+    }
+    if (goal == 'Aşk') {
+      if (element == 'Ağaç') return 'İnce uzun çift ahşap obje, taze yapraklı dekoratif canlı çiçek.';
+      if (element == 'Ateş') return 'İkili sıcak-kırmızı mumlar, aşkı simgeleyen ve ortamı ısıtan loş aydınlatma.';
+      if (element == 'Toprak') return 'Kare veya doğal kesim ikili taş objeler, sarsılmazı simgeleyen ağırlıklar.';
+      if (element == 'Metal') return 'Gümüş veya dairesel parlak çerçeveli romantik bir çift fotoğrafı.';
+      if (element == 'Su') return 'Yan yana uyumla duran kıvrımlı cam biblolar, şeffaf asimetrik objeler.';
+    }
+    if (goal == 'Kariyer') {
+      if (element == 'Ağaç') return 'Kariyer büyümesini tetikleyecek dik formlu asil bir bitki, maskülen çalışma eşyası.';
+      if (element == 'Ateş') return 'İlham verecek iddialı bir lamba, tutkunuzu hatırlatan çerçeveli bir başarı sözü.';
+      if (element == 'Toprak') return 'Kalıcılık hissi için masa üstünde sağlam, doğal kristaller ya da ağır küpler.';
+      if (element == 'Metal') return 'Keskin ve net hatlara sahip gümüş-gri organizer, dairesel metal saat.';
+      if (element == 'Su') return 'Zihni açan lacivert vurgular, derinlik hissi katan yansıtıcı yüzeyler ve camlıklar.';
+    }
+    if (goal == 'Huzur') {
+      if (element == 'Ağaç') return 'Orta noktada sıcak doğal ahşap dokunuş, enerjinin yayılmasına açık bir boşluk.';
+      if (element == 'Ateş') return 'Huzur alanınızı ısıtacak sarı veya sıcak bir ambiyans aydınlatması.';
+      if (element == 'Toprak') return 'Merkezi tam simetrik tutmak, açık kiremit veya toprak halı kullanmak.';
+      if (element == 'Metal') return 'Gürültüyü emen, ferahlık veren minimal ve dairesel objeler, yumuşak yüzeyler.';
+      if (element == 'Su') return 'İçsel sükunet için alanı tamamen engelsiz bırakıp sadece dalgalı bir form eklemek.';
+    }
+    if (goal == 'Sağlık') {
+      if (element == 'Ağaç') return 'Orman yenilenmesini anımsatan geniş yapraklı bitkiler, ahşap rüzgar çanı.';
+      if (element == 'Ateş') return 'Sabah güneşi anımsatan turuncu tonlu bir dekor veya canlı kırmızı çiçekler.';
+      if (element == 'Toprak') return 'Köklenme hissi yaratacak toprak vazolar, doğal şifayı simgeleyen motifler.';
+      if (element == 'Metal') return 'Nefes aldıran pürüzsüz yüzeyler, beyaz çiçekler ve sade metalik çatkılar.';
+      if (element == 'Su') return 'Havayı ferahlatan küçük bir su tası veya mavi-lacivert derin tonlu vazolar.';
+    }
+    return widget.goals[goal]!['activate']!;
+  }
+
+  String _getPersonalizedRemove(String goal, String element) {
+    if (element == 'Ağaç') return 'Solmuş, ölü bitkiler ve oda akışını kesen gereksiz büyük ve sert mobilyalar.';
+    if (element == 'Ateş') return 'Soguk hissi veren sönük ampuller, durgunluk hissi uyandıran cansız tablolar.';
+    if (element == 'Toprak') return 'Dengesiz veya altı bozuk sallanan mobilyalar, güven sarsan asimetrik yerleşimler.';
+    if (element == 'Metal') return 'Düzensiz kağıt yığınları, çok yorucu ve aşırı parlak karışık renklere sahip eşyalar.';
+    if (element == 'Su') return 'Akışı tıkayan ağır ve hantal kutular, uzun süredir kenarda tozlanmış eşyalar.';
+    return widget.goals[goal]!['remove']!;
+  }
+
+  String _getPersonalizedColor(String goal, String element) {
+    if (element == 'Ağaç') return 'Zümrüt Yeşili · Ahşap Tonu · Hafif Altın';
+    if (element == 'Ateş') return 'Yakut Kırmızısı · Şeftali · Sıcak Bej';
+    if (element == 'Toprak') return 'Kum Rengi · Kiremit · Toprak Sarısı';
+    if (element == 'Metal') return 'İnci Beyazı · Gümüş Gri · Platin';
+    if (element == 'Su') return 'Derin Mavi · Turkuaz · Gece Siyahı';
+    return widget.goals[goal]!['color']!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final goal = widget.goals[_selectedGoal]!;
-    final goalColor = _goalColor(_selectedGoal);
+    
+    // Tamamen sadeleşmiş Premium Aurora Paleti
+    final Color activeAccent = widget.gold;
+    final Color mutedGrid = Colors.white.withOpacity(0.06);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(vertical: 36),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.07),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
+            color: Colors.white.withOpacity(0.015),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 40, spreadRadius: -10),
+            ],
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Başlık
-            Text('HEDEF BAZLI ALAN AKTİVASYONU', style: TextStyle(
-              color: widget.goldL.withOpacity(0.35), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2,
-            )),
-            const SizedBox(height: 4),
-            Text('Bagua Haritası', style: TextStyle(
-              color: widget.goldL.withOpacity(0.85), fontSize: 16, fontWeight: FontWeight.w800,
-            )),
-            const SizedBox(height: 14),
-            // Hedef butonları
-            Wrap(spacing: 8, runSpacing: 8, children: widget.goals.keys.map((key) {
-              final isSelected = key == _selectedGoal;
-              final g = widget.goals[key]!;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedGoal = key),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? _goalColor(key).withOpacity(0.18) : Colors.white.withOpacity(0.04),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? _goalColor(key).withOpacity(0.5) : Colors.white.withOpacity(0.08),
-                      width: isSelected ? 1 : 0.5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ── Sofistike Başlık ──
+              Text(
+                'BAGUA HARİTASI',
+                style: TextStyle(
+                  color: widget.goldL.withOpacity(0.9),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 6.0,
+                  fontFamily: 'SF Pro Display',
+                ),
+              ),
+              const SizedBox(height: 38),
+
+              // ── Interaktif Radyal Yörünge (Minimalist) ──
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Arka Yörünge Çizgileri - Sadeleştirilmiş
+                    CustomPaint(
+                      size: const Size(double.infinity, 200),
+                      painter: _OrbitalLinesPainter(
+                        count: widget.goals.keys.length,
+                        selectedIndex: widget.goals.keys.toList().indexOf(_selectedGoal),
+                        radius: 82.0,
+                        activeColor: activeAccent,
+                        baseColor: mutedGrid,
+                      ),
+                    ),
+
+                    // Merkez Çekirdek (Çin Kaligrafisi)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutBack,
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.5),
+                        border: Border.all(color: activeAccent.withOpacity(0.4), width: 1.0),
+                        boxShadow: [
+                          BoxShadow(color: activeAccent.withOpacity(0.15), blurRadius: 20, spreadRadius: 2),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: FadeTransition(opacity: anim, child: child)),
+                        child: Text(
+                          _getChineseChar(_selectedGoal), 
+                          key: ValueKey(_selectedGoal), 
+                          style: TextStyle(
+                            fontSize: 22, 
+                            color: widget.goldL, 
+                            fontWeight: FontWeight.w300,
+                            shadows: [Shadow(color: activeAccent.withOpacity(0.5), blurRadius: 8)],
+                          )
+                        ),
+                      ),
+                    ),
+                    
+                    // Harita Başlıkları (Nodlar)
+                    ...List.generate(widget.goals.keys.length, (i) {
+                       final key = widget.goals.keys.elementAt(i);
+                       final isSelected = key == _selectedGoal;
+                       final angle = i * (2 * math.pi / widget.goals.length) - (math.pi / 2);
+                       
+                       // Seçili nod hafifçe dışarı iter
+                       final push = isSelected ? 8.0 : 0.0;
+                       final dx = math.cos(angle) * (84.0 + push);
+                       final dy = math.sin(angle) * (84.0 + push);
+                       
+                       return Align(
+                         alignment: Alignment.center,
+                         child: AnimatedContainer(
+                           duration: const Duration(milliseconds: 600),
+                           curve: Curves.easeOutBack,
+                           transformAlignment: Alignment.center,
+                           transform: Matrix4.translationValues(dx, dy, 0),
+                           child: GestureDetector(
+                             onTap: () {
+                               setState(() => _selectedGoal = key);
+                             },
+                             behavior: HitTestBehavior.opaque,
+                             child: AnimatedContainer(
+                               duration: const Duration(milliseconds: 400),
+                               curve: Curves.easeOutCubic,
+                               padding: EdgeInsets.symmetric(horizontal: isSelected ? 16 : 10, vertical: isSelected ? 8 : 6),
+                               decoration: BoxDecoration(
+                                 color: isSelected ? Colors.white.withOpacity(0.04) : Colors.transparent,
+                                 borderRadius: BorderRadius.circular(20),
+                                 border: isSelected 
+                                    ? Border.all(color: activeAccent.withOpacity(0.7), width: 0.8)
+                                    : Border.all(color: Colors.transparent, width: 0.8),
+                               ),
+                               child: AnimatedDefaultTextStyle(
+                                 duration: const Duration(milliseconds: 300),
+                                 style: TextStyle(
+                                   color: isSelected ? widget.goldL : Colors.white.withOpacity(0.4),
+                                   fontSize: isSelected ? 13.0 : 11.5,
+                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                   letterSpacing: 0.5,
+                                   fontFamily: 'SF Pro Display',
+                                   shadows: isSelected ? [Shadow(color: activeAccent.withOpacity(0.3), blurRadius: 4)] : [],
+                                 ),
+                                 child: Text(key),
+                               )
+                             ),
+                           ),
+                         ),
+                       );
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // ── Seçili Hedef Aksiyon Detayları (Elemente Özel) ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  switchInCurve: Curves.easeOutQuart,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, anim) => FadeTransition(
+                    opacity: anim,
+                    child: SlideTransition(
+                      position: Tween<Offset>(begin: const Offset(0.04, 0), end: Offset.zero).animate(anim),
+                      child: child,
                     ),
                   ),
-                  child: Text('${g['emoji']} $key', style: TextStyle(
-                    color: isSelected ? _goalColor(key) : Colors.white.withOpacity(0.5),
-                    fontSize: 12, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                  )),
+                  child: Container(
+                    key: ValueKey(_selectedGoal),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Yön Belirtici
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.03),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              ),
+                              child: Icon(Icons.explore_outlined, color: widget.goldL.withOpacity(0.8), size: 14),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(goal['bagua']!, style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ))),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(height: 0.5, color: Colors.white.withOpacity(0.08), width: double.infinity),
+                        const SizedBox(height: 20),
+
+                        // Özelleşmiş Satırlar
+                        _buildMinimalRow('Ekle', _getPersonalizedActivate(_selectedGoal, widget.element), widget.goldL),
+                        const SizedBox(height: 16),
+                        _buildMinimalRow('Çıkar', _getPersonalizedRemove(_selectedGoal, widget.element), Colors.white.withOpacity(0.5)),
+                        const SizedBox(height: 16),
+                        _buildMinimalRow('Renk', _getPersonalizedColor(_selectedGoal, widget.element), widget.goldL.withOpacity(0.8)),
+                        
+                        const SizedBox(height: 28),
+                        
+                        // Zarif Alt Tavsiye (Tip)
+                        Container(
+                           width: double.infinity,
+                           padding: const EdgeInsets.all(18),
+                           decoration: BoxDecoration(
+                             color: Colors.black.withOpacity(0.2),
+                             borderRadius: BorderRadius.circular(16),
+                             border: Border.all(color: Colors.white.withOpacity(0.05), width: 0.5)
+                           ),
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               RichText(
+                                 text: TextSpan(
+                                   children: [
+                                     TextSpan(text: 'Rehber — ', style: TextStyle(color: widget.goldL.withOpacity(0.7), fontSize: 12.5, fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
+                                     TextSpan(text: goal['tip']!, style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12.5, height: 1.6)),
+                                   ]
+                                 )
+                               ),
+                             ]
+                           )
+                        ),
+                      ]
+                    )
+                  ),
                 ),
-              );
-            }).toList()),
-            const SizedBox(height: 18),
-            // Seçili hedef detayı
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              switchInCurve: Curves.easeOutCubic,
-              child: _goalDetail(goal, goalColor),
-            ),
-          ]),
-        ),
-      ),
+              ),
+            ]
+          )
+        )
+      )
     );
   }
 
-  Widget _goalDetail(Map<String, String> goal, Color color) => Container(
-    key: ValueKey(_selectedGoal),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Bagua alanı
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.2)),
+  Widget _buildMinimalRow(String label, String value, Color accentColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+           width: 3, height: 3, 
+           margin: const EdgeInsets.only(top: 8, right: 14),
+           decoration: BoxDecoration(
+             color: accentColor.withOpacity(0.8), 
+             shape: BoxShape.circle,
+           ),
         ),
-        child: Row(children: [
-          Text('🧭 ', style: const TextStyle(fontSize: 13)),
-          Expanded(child: Text(goal['bagua']!, style: TextStyle(
-            color: color, fontSize: 12, fontWeight: FontWeight.w700,
-          ))),
-        ]),
-      ),
-      const SizedBox(height: 12),
-      _bRow('✅', 'Ekle', goal['activate']!, color),
-      const SizedBox(height: 8),
-      _bRow('❌', 'Çıkar', goal['remove']!, const Color(0xFFEF9A9A)),
-      const SizedBox(height: 8),
-      _bRow('💎', 'Renk paleti', goal['color']!, const Color(0xFFFFD54F)),
-      const SizedBox(height: 12),
-      // Pro tip
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.08), Colors.transparent],
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.15)),
+        SizedBox(
+          width: 55,
+          child: Text(label, style: TextStyle(
+            color: accentColor, 
+            fontSize: 12, 
+            fontWeight: FontWeight.w600, 
+            letterSpacing: 0.5,
+          )),
         ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('💡', style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 8),
-          Expanded(child: Text(goal['tip']!, style: TextStyle(
-            color: Colors.white.withOpacity(0.75), fontSize: 12.5, height: 1.5,
-          ))),
-        ]),
-      ),
-    ]),
-  );
+        Expanded(
+          child: Text(value, style: TextStyle(
+            color: Colors.white.withOpacity(0.7), 
+            fontSize: 12.5, 
+            height: 1.5,
+          )),
+        )
+      ],
+    );
+  }
+}
 
-  Widget _bRow(String emoji, String label, String value, Color accent) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(emoji, style: const TextStyle(fontSize: 13)),
-      const SizedBox(width: 8),
-      Expanded(child: RichText(text: TextSpan(children: [
-        TextSpan(text: '$label  ', style: TextStyle(
-          color: accent.withOpacity(0.8), fontSize: 11.5, fontWeight: FontWeight.w700,
-        )),
-        TextSpan(text: value, style: TextStyle(
-          color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.4,
-        )),
-      ]))),
-    ],
-  );
+class _OrbitalLinesPainter extends CustomPainter {
+  final int count;
+  final int selectedIndex;
+  final double radius;
+  final Color activeColor;
+  final Color baseColor;
+  _OrbitalLinesPainter({required this.count, required this.selectedIndex, required this.radius, required this.activeColor, required this.baseColor});
 
-  Color _goalColor(String goal) {
-    switch (goal) {
-      case 'Para': return const Color(0xFF4CAF50);
-      case 'Aşk': return const Color(0xFFE91E63);
-      case 'Kariyer': return const Color(0xFF2196F3);
-      case 'Huzur': return const Color(0xFFFF9800);
-      case 'Sağlık': return const Color(0xFF00BCD4);
-      default: return Colors.white;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    
+    // Yörünge (çok soluk dairesel hat)
+    final pCircle = Paint()
+      ..color = baseColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+    canvas.drawCircle(center, radius, pCircle);
+
+    // Çekirdekten başlıklara giden enerji bağları
+    for (int i = 0; i < count; i++) {
+      final isSelected = i == selectedIndex;
+      final angle = i * (2 * math.pi / count) - (math.pi / 2);
+      
+      final push = isSelected ? 8.0 : 0.0;
+      final currentOuter = radius + push; 
+      
+      final outerDx = center.dx + math.cos(angle) * (currentOuter - 18); 
+      final outerDy = center.dy + math.sin(angle) * (currentOuter - 18);
+      final innerDx = center.dx + math.cos(angle) * 32; 
+      final innerDy = center.dy + math.sin(angle) * 32;
+      
+      final pLine = Paint()
+        ..color = isSelected ? activeColor.withOpacity(0.4) : baseColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = isSelected ? 1.5 : 0.5
+        ..strokeCap = StrokeCap.round;
+        
+      canvas.drawLine(Offset(innerDx, innerDy), Offset(outerDx, outerDy), pLine);
     }
   }
+
+  @override
+  bool shouldRepaint(_OrbitalLinesPainter old) => old.selectedIndex != selectedIndex;
 }
 
 // ─────────────────────────────────────────────────────
