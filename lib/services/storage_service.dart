@@ -314,9 +314,36 @@ class StorageService {
   static Future<void> saveDream(Map<String, dynamic> dream) async {
     final prefs = await SharedPreferences.getInstance();
     final dreams = await getDreams();
+
+    if (dream.containsKey('id')) {
+      final idx = dreams.indexWhere((d) => d['id'] == dream['id']);
+      if (idx != -1) {
+        dreams[idx] = dream;
+        await prefs.setString(_keyDreamList, jsonEncode(dreams));
+        return;
+      }
+    }
+
+    if (!dream.containsKey('id')) {
+      dream['id'] = DateTime.now().millisecondsSinceEpoch.toString();
+    }
+
     dreams.insert(0, dream); // en yeni en üstte
     await prefs.setString(_keyDreamList, jsonEncode(dreams));
     await incrementTotalDreams();
+  }
+
+  static Future<void> clearDreams() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyDreamList);
+    // Varsa legacy'yi de temizle:
+    final count = prefs.getInt('${_keyDreams}_count') ?? 0;
+    for (int i = 0; i < count; i++) {
+      await prefs.remove('${_keyDreams}_${i}_text');
+      await prefs.remove('${_keyDreams}_${i}_mood');
+      await prefs.remove('${_keyDreams}_${i}_date');
+    }
+    await prefs.remove('${_keyDreams}_count');
   }
 
   static Future<bool> isTarotDone() async {

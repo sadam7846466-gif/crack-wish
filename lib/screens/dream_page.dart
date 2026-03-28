@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'dart:async';
@@ -337,6 +338,11 @@ class _DreamPageState extends State<DreamPage>
   Completer<void>? _retryCompleter;
   DeepAnalysisResult? _deepAnalysisResult;
   bool _isPremiumResult = false;
+  bool _isFromHistory = false;
+  bool _isDreamSaved = false;
+  String? _currentDreamId;
+  String? _selectedReflectionAction;
+  int _historyKeyTracker = 0;
   late final List<Emotion> _emotionOrder;
   late String _currentPrompt;
   late String _currentSubtitle;
@@ -632,11 +638,20 @@ class _DreamPageState extends State<DreamPage>
       _deepAnalysisResult = deepResult;
       _premiumAnswers = finalAnswers;
       _isPremiumResult = true;
+      _isFromHistory = false;
+      _isDreamSaved = false;
+      _currentDreamId = null;
+      _selectedReflectionAction = null;
+
+      // Durumu hemen results'a geçecek şekilde güncelle ki kayıt işlemi asılı kalırsa UI'yi kilitlemesin
       print('🔮🔮🔮 Setting _isPremiumResult = true, switching to gap then results');
       setState(() {
         _overlayContent = 'gap';
         _isWriting = true;
       });
+
+      // Otomatik Premium Kayıt İptal Edildi - Kullanıcı butona basarak kaydedecek.
+
       Future.delayed(const Duration(milliseconds: 520), () {
         if (mounted) {
           setState(() => _overlayContent = 'results');
@@ -748,28 +763,7 @@ class _DreamPageState extends State<DreamPage>
     _spiritualAnalysis = _generalAnalysis;
     _advice = _generalAnalysis;
 
-    // Rüyayı kaydet
-    final autoTitle = _apiCategory.isNotEmpty
-        ? _apiCategory
-        : _generateTitle(_dreamController.text, _detectedSymbols, _selectedEmotion);
-    final now = DateTime.now().toIso8601String();
-    await StorageService.saveDream({
-      'title': autoTitle,
-      'text': _dreamController.text,
-      'mood': _selectedEmotion?.name ?? _selectedMood,
-      'emotion': _selectedEmotion?.name,
-      'date': now,
-      'symbols': _detectedSymbols,
-      'general': _generalAnalysis,
-      'psychology': _psychologyAnalysis,
-      'spiritual': _spiritualAnalysis,
-      'advice': _advice,
-      'scientificInterpretation': _generalAnalysis,
-      'questionCount': 0,
-      'category': _apiCategory,
-      'summary': _apiSummary,
-    });
-
+    // Standart Rüyalar artık analiz geçmişine kaydedilmiyor (Sadece Premium kaydedilecek)
     await StorageService.setDreamDoneToday();
 
     if (mounted) {
@@ -1919,7 +1913,7 @@ class _DreamPageState extends State<DreamPage>
                       opacity: animation,
                       child: SlideTransition(
                         position: Tween<Offset>(
-                          begin: const Offset(0, 0.05),
+                          begin: const Offset(0, 0.15),
                           end: Offset.zero,
                         ).animate(animation),
                         child: child,
@@ -2068,7 +2062,9 @@ class _DreamPageState extends State<DreamPage>
   }) {
     final isTr = _isTr;
 
-    return CustomScrollView(
+    return Stack(
+      children: [
+        CustomScrollView(
       key: key,
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
@@ -2076,84 +2072,138 @@ class _DreamPageState extends State<DreamPage>
       slivers: [
         // ── 1) Üst Bar ve Girdi Bağlamı ──
         SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
-            child: Row(
-              children: [
-                GlassBackButton(onTap: _closeWritingModal),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'NÖRO-PSİKOLOJİK ANALİZ' : 'NEURO-PSYCH ANALYSIS',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 2.5,
-                        ),
+          child: _PremiumReveal(
+            index: 0,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, topPadding + 40, 20, 16),
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(
+                      isTr ? 'NÖRO-PSİKOLOJİK ANALİZ' : 'NEURO-PSYCH ANALYSIS',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2.5,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Veri: Rüya Metni • Korku • 3 Netleştirme Sorusu',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+          ),
+        ),
+
+        // ── 1.5) Yazılan Rüya ve Seçilen Duygu ──
+        if (_isFromHistory)
+          SliverToBoxAdapter(
+          child: _PremiumReveal(
+            index: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.04),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.auto_awesome, color: Colors.white.withOpacity(0.5), size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          isTr ? 'RÜYANIZ' : 'YOUR DREAM',
+                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
+                        ),
+                        const Spacer(),
+                        if (_selectedEmotion != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: _resolveEmotionAccentColor(_selectedEmotion!).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _selectedEmotion!.label,
+                              style: TextStyle(color: _resolveEmotionAccentColor(_selectedEmotion!), fontSize: 10, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _dreamController.text,
+                      style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, height: 1.7, fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
 
         // ── 2) Ana Sonuç Kartı (Katman 1) ──
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: _ClinicalMainThemeCard(
-              isTr: isTr,
-              title: _deepAnalysisResult!.title,
-              summary: _deepAnalysisResult!.subconsciousMap.summary,
-              uncertainty: _deepAnalysisResult!.distribution.uncertainty,
+          child: _PremiumReveal(
+            index: 2,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: _ClinicalMainThemeCard(
+                isTr: isTr,
+                title: _deepAnalysisResult!.title,
+                summary: _deepAnalysisResult!.subconsciousMap.summary,
+                uncertainty: _deepAnalysisResult!.distribution.uncertainty,
+              ),
             ),
           ),
         ),
 
         // ── 3) Hızlı Bulgular / Ciddi Metrikler ──
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: _ClinicalMetricsPanel(
-              isTr: isTr,
-              distribution: _deepAnalysisResult!.distribution,
+          child: _PremiumReveal(
+            index: 2,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: _ClinicalMetricsPanel(
+                isTr: isTr,
+                distribution: _deepAnalysisResult!.distribution,
+              ),
             ),
           ),
         ),
 
         // ── 4) Kanıta Dayalı Bulgular "Bu sonuca neden vardık?" (Katman 2) ──
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16), // Yumuşak uçtan uca kaydırma için iç padding kullanıldı
-            child: _ClinicalEvidenceSection(isTr: isTr, analysis: _deepAnalysisResult!),
+          child: _PremiumReveal(
+            index: 3,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16), // Yumuşak uçtan uca kaydırma için iç padding kullanıldı
+              child: _ClinicalEvidenceSection(isTr: isTr, analysis: _deepAnalysisResult!),
+            ),
           ),
         ),
 
         // ── 4.5) Analizi Netleştiren Yanıtlar (Soru-Cevap) ──
         if (_premiumAnswers.isNotEmpty)
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 8),
-              child: _ClinicalAnswersSection(
-                isTr: isTr,
-                answers: _premiumAnswers,
-                insights: _deepAnalysisResult!.clarifyingInsights,
-                globalInsight: _deepAnalysisResult!.shadowSelf.answerInsight,
+            child: _PremiumReveal(
+              index: 4,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
+                child: _ClinicalAnswersSection(
+                  isTr: isTr,
+                  answers: _premiumAnswers,
+                  insights: _deepAnalysisResult!.clarifyingInsights,
+                  globalInsight: _deepAnalysisResult!.shadowSelf.answerInsight,
+                ),
               ),
             ),
           ),
@@ -2203,15 +2253,182 @@ class _DreamPageState extends State<DreamPage>
         // ── 6) Yansıtma Sorusu (Etkileşim) ──
         if (_deepAnalysisResult!.reflectionQuestion.isNotEmpty)
           SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 24, 20, bottomPadding + 80),
-              child: _ClinicalReflectionQuestion(
-                isTr: isTr,
-                questionText: _deepAnalysisResult!.reflectionQuestion,
-                reflectionResponses: _deepAnalysisResult!.reflectionResponses,
+            child: _PremiumReveal(
+              index: 6,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                child: _ClinicalReflectionQuestion(
+                  isTr: isTr,
+                  questionText: _deepAnalysisResult!.reflectionQuestion,
+                  reflectionResponses: _deepAnalysisResult!.reflectionResponses,
+                  initialSelectedAction: _selectedReflectionAction,
+                  onAnswerSelected: (val) async {
+                    if (mounted) {
+                      setState(() {
+                         _selectedReflectionAction = val;
+                      });
+                      if (_isDreamSaved && _currentDreamId != null) {
+                        try {
+                          _historyKeyTracker++;
+                          await StorageService.saveDream({
+                            'id': _currentDreamId,
+                            'isPremium': true,
+                            'title': _deepAnalysisResult!.title,
+                            'text': _dreamController.text,
+                            'emotion': _selectedEmotion?.name,
+                            'date': DateTime.now().toIso8601String(),
+                            'premiumAnswers': jsonEncode(_premiumAnswers),
+                            'premiumData': jsonEncode(_deepAnalysisResult!.rawJson),
+                            'reflectionAction': _selectedReflectionAction,
+                          });
+                        } catch(e) { debugPrint('Upsert error: $e'); }
+                      }
+                    }
+                  },
+                ),
               ),
             ),
           ),
+
+        // ── 6.5) Rüyayı Kaydet Butonu ──
+        if (!_isFromHistory && _deepAnalysisResult != null)
+          SliverToBoxAdapter(
+            child: _PremiumReveal(
+              index: 7,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(40, 24, 40, 0),
+                child: GestureDetector(
+                  onTap: _isDreamSaved ? null : () async {
+                    setState(() { _isDreamSaved = true; _historyKeyTracker++; });
+                    try {
+                      final now = DateTime.now().toIso8601String();
+                      _currentDreamId ??= DateTime.now().millisecondsSinceEpoch.toString();
+                      await StorageService.saveDream({
+                        'id': _currentDreamId,
+                        'isPremium': true,
+                        'title': _deepAnalysisResult!.title,
+                        'text': _dreamController.text,
+                        'emotion': _selectedEmotion?.name,
+                        'date': now,
+                        'premiumAnswers': jsonEncode(_premiumAnswers),
+                        'premiumData': jsonEncode(_deepAnalysisResult!.rawJson),
+                        'reflectionAction': _selectedReflectionAction,
+                      });
+                      await StorageService.setDreamDoneToday();
+                    } catch (e) {
+                      debugPrint('Error saving dream: $e');
+                      if (mounted) setState(() => _isDreamSaved = false);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: _isDreamSaved
+                              ? Colors.green.withOpacity(0.3)
+                              : const Color(0xFFC356FE).withOpacity(0.4),
+                          width: 1),
+                      gradient: LinearGradient(
+                        colors: [
+                          _isDreamSaved
+                              ? Colors.green.withOpacity(0.15)
+                              : const Color(0xFFC356FE).withOpacity(0.15),
+                          _isDreamSaved
+                              ? Colors.green.withOpacity(0.02)
+                              : Colors.transparent,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _isDreamSaved ? Icons.check_circle : Icons.bookmark_add_rounded,
+                          color: _isDreamSaved ? Colors.greenAccent : const Color(0xFFE5A9FF),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isDreamSaved
+                              ? (isTr ? 'KAYDEDİLDİ' : 'SAVED')
+                              : (isTr ? 'RÜYAYI KAYDET' : 'SAVE DREAM'),
+                          style: TextStyle(
+                            color: _isDreamSaved ? Colors.greenAccent : const Color(0xFFE5A9FF),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+        // ── 7) Yeni Rüya Yaz Butonu (Kapatma) ──
+        SliverToBoxAdapter(
+          child: _PremiumReveal(
+            index: 7,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(40, 8, 40, bottomPadding + 80),
+              child: GestureDetector(
+                onTap: () {
+                  // Formu sıfırla ve input ekranına dön
+                  setState(() {
+                    _dreamController.clear();
+                    _selectedEmotion = null;
+                    _deepAnalysisResult = null;
+                    _isPremiumResult = false;
+                    _isFromHistory = false;
+                    _isDreamSaved = false;
+                    _currentDreamId = null;
+                    _selectedReflectionAction = null;
+                    _premiumAnswers = [];
+                    _currentTab = 0; // Kullanıcıyı Yeni Rüya Tab'ine atıyoruz
+                  });
+                  _closeWritingModal(instant: true);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+                    color: Colors.white.withOpacity(0.05),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.edit_note, color: Colors.white.withOpacity(0.6), size: 20),
+                      const SizedBox(width: 10),
+                      Text(
+                        isTr ? 'Yeni Bir Rüya Yaz' : 'Write a New Dream',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+        // Sabit Geri Dönüş Butonu — her zaman üstte
+        Positioned(
+          top: topPadding + 16,
+          left: 16,
+          child: GlassBackButton(onTap: _closeWritingModal),
+        ),
       ],
     );
   }
@@ -2735,6 +2952,7 @@ class _DreamPageState extends State<DreamPage>
 
   Widget _buildHistoryTab() {
     return FutureBuilder<List<Map<String, dynamic>>>(
+      key: ValueKey(_historyKeyTracker),
       future: StorageService.getDreams(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -2776,92 +2994,116 @@ class _DreamPageState extends State<DreamPage>
             final dateStr = dream['date']?.toString() ?? '';
             final formatted = _formatDate(dateStr);
             final shortDate = _formatShortDate(dateStr);
+            final isPremium = dream['isPremium'] == true;
+            final emotionName = dream['emotion']?.toString() ?? dream['mood']?.toString();
+            final emotionEnum = _resolveDreamEmotion(dream);
+            final emotionColor = _resolveEmotionAccentColor(emotionEnum);
+            
+            String emotionLabelValue = shortDate;
+            if (emotionName != null) {
+              final parsed = _emotionFromStored(emotionName);
+              emotionLabelValue = parsed != null ? _emotionLabel(parsed) : emotionName;
+            }
+
             return GestureDetector(
               onTap: () => _showDreamDetail(dream),
               child: Container(
-                margin: const EdgeInsets.only(bottom: 14),
-                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.textWhite.withOpacity(0.05),
-                  border: Border.all(color: Colors.white.withOpacity(0.06)),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.18),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.05),
+                      Colors.white.withOpacity(0.01),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(
+                    color: isPremium 
+                        ? const Color(0xFFC356FE).withOpacity(0.3) 
+                        : Colors.white.withOpacity(0.08),
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: isPremium 
+                            ? const Color(0xFFC356FE).withOpacity(0.15) 
+                            : Colors.white.withOpacity(0.05),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isPremium 
+                              ? const Color(0xFFC356FE).withOpacity(0.3) 
+                              : Colors.transparent,
+                        ),
+                      ),
+                      child: Icon(
+                        isPremium ? Icons.auto_awesome : Icons.nights_stay_rounded,
+                        color: isPremium ? const Color(0xFFE5A9FF) : Colors.white.withOpacity(0.7),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title.isNotEmpty ? title : _l10n.dreamDefaultTitle,
+                            title.isNotEmpty ? title : (_isTr ? 'Gizemli Rüya' : 'Mysterious Dream'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: AppColors.textWhite,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             formatted,
                             style: TextStyle(
-                              color: AppColors.textWhite50,
+                              color: Colors.white.withOpacity(0.4),
                               fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (dream['mood'] != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryPurple.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              (() {
-                                final storedMood = dream['mood']?.toString();
-                                final moodEmotion =
-                                    _emotionFromStored(storedMood);
-                                return moodEmotion != null
-                                    ? _emotionLabel(moodEmotion)
-                                    : (storedMood ?? '');
-                              })(),
-                              style: const TextStyle(
-                                color: AppColors.textWhite,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          )
-                        else
-                          Text(
-                            shortDate,
-                            style: TextStyle(
-                              color: AppColors.textWhite50,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    if (emotionName != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: emotionColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: emotionColor.withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          emotionLabelValue,
+                          style: TextStyle(
+                            color: emotionColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
                           ),
-                      ],
-                    ),
+                        ),
+                      )
+                    else
+                      Text(
+                        shortDate,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -2883,6 +3125,63 @@ class _DreamPageState extends State<DreamPage>
   }
 
   void _showDreamDetail(Map<String, dynamic> dream) {
+    if (dream['isPremium'] == true && dream['premiumData'] != null) {
+      // Premium rüya ise doğrudan analiz ekranına atla
+      try {
+        final pData = dream['premiumData'];
+        
+        Map<String, dynamic> rawObj = {};
+        if (pData is String) {
+          final decoded = jsonDecode(pData);
+          if (decoded is Map) rawObj = Map<String, dynamic>.from(decoded);
+        } else if (pData is Map) {
+          rawObj = Map<String, dynamic>.from(pData);
+        }
+            
+        final decodedDeepResult = DeepAnalysisResult.fromJson(rawObj);
+        
+        final pAns = dream['premiumAnswers'];
+        List ansList = [];
+        if (pAns is String) {
+           try {
+             final decodedAns = jsonDecode(pAns);
+             if (decodedAns is List) ansList = decodedAns;
+           } catch(_) {}
+        } else if (pAns is List) {
+           ansList = pAns;
+        }
+        
+        final decodedAnswers = ansList
+           .where((e) => e != null && e is Map)
+           .map((e) => Map<String, dynamic>.from(e as Map))
+           .toList();
+
+        setState(() {
+          _dreamController.text = dream['text'] ?? '';
+          _selectedEmotion = _resolveDreamEmotion(dream);
+          _deepAnalysisResult = decodedDeepResult;
+          _premiumAnswers = decodedAnswers;
+          _isPremiumResult = true;
+          _isFromHistory = true; // History'den yüklendiğini işaretle
+          
+          // EKSİK KALAN OVERLAY ÇİZİCİLERİ: BUNLAR OLMADAN ŞEFFAF BLOKER OLUŞURYORDU!
+          _showAnalysisOverlay = true; 
+          _analysisOverlayVisible = true;
+          
+          _isWriting = true; // Premium View ana state'i kaplar
+          _overlayContent = 'results';
+          _currentDreamId = dream['id']?.toString();
+          _selectedReflectionAction = dream['reflectionAction']?.toString();
+          _isDreamSaved = true; // Kayıttan geldiği için kayıtlı kabul edilir
+        });
+      } catch (e, stack) {
+        debugPrint('Parsing error in History Tap: $e\n$stack');
+        ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('Kayıtlı veri hatalı: $e'), backgroundColor: Colors.redAccent)
+        );
+      }
+      return;
+    }
     final title = (dream['title'] ?? '').toString().trim();
     final text = dream['text']?.toString() ?? '';
     final storedMood = dream['mood']?.toString();
@@ -2901,11 +3200,8 @@ class _DreamPageState extends State<DreamPage>
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0F1F2A),
+      backgroundColor: Colors.transparent, // Arka planı transparent yapıyoruz Blur ekleyebilmek için
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
       builder: (_) {
         String? enrichedText;
         var isEnriching = false;
@@ -2915,175 +3211,184 @@ class _DreamPageState extends State<DreamPage>
             final canEnrich = _analysisService.canEnrich;
             final showEnrichButton = canEnrich && baseInterpretation.isNotEmpty;
 
-            return DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 0.7,
-              minChildSize: 0.5,
-              maxChildSize: 0.95,
-              builder: (context, scroll) {
-                return SingleChildScrollView(
-                  controller: scroll,
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20), // Liquid glass efekti eklendi
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F141E).withOpacity(0.85), // Premium dark tema
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                  border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2), width: 1)),
+                ),
+                child: DraggableScrollableSheet(
+                  expand: false,
+                  initialChildSize: 0.8,
+                  minChildSize: 0.5,
+                  maxChildSize: 0.95,
+                  builder: (context, scroll) {
+                    return SingleChildScrollView(
+                      controller: scroll,
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
+                          Center(
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  _isTr ? 'STANDART ANALİZ' : 'STANDARD ANALYSIS',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 2.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                          // ── YAZILAN RÜYA KART (Premium Uyumlu) ──
+                          Container(
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.04),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  title.isNotEmpty
-                                      ? title
-                                      : _l10n.dreamDefaultTitle,
-                                  style: const TextStyle(
-                                    color: AppColors.textWhite,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.auto_awesome, color: Colors.white.withOpacity(0.5), size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      _isTr ? 'RÜYANIZ' : 'YOUR DREAM',
+                                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
+                                    ),
+                                    const Spacer(),
+                                    if (moodLabel != null)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: _resolveEmotionAccentColor(emotion).withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          moodLabel,
+                                          style: TextStyle(color: _resolveEmotionAccentColor(emotion), fontSize: 10, fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 12),
                                 Text(
-                                  date,
-                                  style: TextStyle(
-                                    color: AppColors.textWhite50,
-                                    fontSize: 12,
+                                  text,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, height: 1.7, fontWeight: FontWeight.w400),
+                                ),
+                                const SizedBox(height: 12),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    date,
+                                    style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          if (moodLabel != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryPurple.withOpacity(
-                                  0.15,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                moodLabel,
-                                style: const TextStyle(
-                                  color: AppColors.textWhite,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      if (symbols.isNotEmpty)
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: symbols
-                              .map(
-                                (s) => Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
+                          const SizedBox(height: 20),
+                          if (symbols.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: symbols.map((s) => Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primaryPurple.withOpacity(
-                                      0.12,
-                                    ),
-                                    borderRadius: BorderRadius.circular(14),
+                                    color: const Color(0xFF7C6CF3).withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: const Color(0xFF7C6CF3).withOpacity(0.3)),
                                   ),
                                   child: Text(
                                     s,
-                                    style: const TextStyle(
-                                      color: AppColors.textWhite,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
                                   ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      const SizedBox(height: 14),
-                      Text(
-                        text,
-                        style: const TextStyle(
-                          color: AppColors.textWhite70,
-                          fontSize: 14,
-                          height: 1.6,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                                )).toList(),
+                              ),
+                            ),
                       if (general != null && general.isNotEmpty)
-                        _detailBlock('Genel Analiz', general),
+                        _detailBlock(_isTr ? 'Genel Analiz' : 'General Analysis', general, icon: Icons.insights),
                       if (psychology != null && psychology.isNotEmpty)
-                        _detailBlock('Psikolojik', psychology),
+                        _detailBlock(_isTr ? 'Psikolojik Örüntü' : 'Psychological', psychology, icon: Icons.psychology),
                       if (spiritual != null && spiritual.isNotEmpty)
-                        _detailBlock(_l10n.dreamSpiritual, spiritual),
+                        _detailBlock(_isTr ? 'Ruhsal / Sembolik' : 'Spiritual', spiritual, icon: Icons.nights_stay),
                       if (advice != null && advice.isNotEmpty)
-                        _detailBlock('Tavsiye', advice),
+                        _detailBlock(_isTr ? 'Öneri & Adım' : 'Advice', advice, icon: Icons.wb_incandescent_outlined),
                       if (enrichedText != null && enrichedText!.isNotEmpty)
-                        _detailBlock(_l10n.dreamEnriched, enrichedText!),
+                        _detailBlock(_isTr ? 'Derinleştirilmiş Analiz' : 'Deepened Insights', enrichedText!, icon: Icons.auto_awesome),
                       if (showEnrichButton) ...[
                         const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: isEnriching
+                          child: GestureDetector(
+                            onTap: isEnriching
                                 ? null
                                 : () async {
                                     setSheetState(() {
                                       isEnriching = true;
                                     });
-                                    final analysis = _analysisService
-                                        .analyzeDream(text);
-                                    final enriched = await _analysisService
-                                        .enrichWithGpt(
-                                          baseText: baseInterpretation,
-                                          analysis: analysis,
-                                          emotion: emotion,
-                                        );
+                                    final analysis = _analysisService.analyzeDream(text);
+                                    final enriched = await _analysisService.enrichWithGpt(
+                                      baseText: baseInterpretation,
+                                      analysis: analysis,
+                                      emotion: emotion,
+                                    );
                                     if (!context.mounted) return;
                                     setSheetState(() {
                                       enrichedText = enriched;
                                       isEnriching = false;
                                     });
                                   },
-                            icon: isEnriching
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Icon(Icons.auto_fix_high, size: 18),
-                            label: Text(
-                              isEnriching
-                                  ? _l10n.dreamEnriching
-                                  : _l10n.dreamEnrich,
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryPurple,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.all(14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFF7C6CF3).withOpacity(isEnriching ? 0.4 : 0.8),
+                                    const Color(0xFFC356FE).withOpacity(isEnriching ? 0.3 : 0.6),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: isEnriching
+                                    ? null
+                                    : [BoxShadow(color: const Color(0xFF7C6CF3).withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (isEnriching)
+                                    const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  else
+                                    const Icon(Icons.auto_fix_high, size: 18, color: Colors.white),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    isEnriching ? _l10n.dreamEnriching : _l10n.dreamEnrich,
+                                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -3092,8 +3397,8 @@ class _DreamPageState extends State<DreamPage>
                       const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
+                        child: GestureDetector(
+                          onTap: () {
                             final shareText = _l10n.dreamShareText(
                               title.isNotEmpty ? title : _l10n.dreamDefaultTitle,
                               date,
@@ -3105,14 +3410,23 @@ class _DreamPageState extends State<DreamPage>
                             );
                             Share.share(shareText);
                           },
-                          icon: const Icon(Icons.share, size: 18),
-                          label: Text(_l10n.dreamShare),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryPurple,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.all(14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.share, size: 18, color: Colors.white.withOpacity(0.7)),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _l10n.dreamShare,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -3121,11 +3435,13 @@ class _DreamPageState extends State<DreamPage>
                   ),
                 );
               },
-            );
-          },
+            ),
+          ),
         );
       },
     );
+  },
+);
   }
 
   Emotion _resolveDreamEmotion(Map<String, dynamic> dream) {
@@ -3142,31 +3458,42 @@ class _DreamPageState extends State<DreamPage>
     return Emotion.calm;
   }
 
-  Widget _detailBlock(String title, String body) {
+  Widget _detailBlock(String title, String body, {IconData? icon}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.primaryPurple.withOpacity(0.2)),
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primaryPurple,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: Colors.white.withOpacity(0.7), size: 18),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Text(
+                  title.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             body,
-            style: const TextStyle(
-              color: AppColors.textWhite70,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.85),
               fontSize: 13,
               height: 1.6,
             ),
@@ -5594,7 +5921,7 @@ class _ClinicalMainThemeCard extends StatelessWidget {
   }
 }
 
-class _ClinicalMetricsPanel extends StatelessWidget {
+class _ClinicalMetricsPanel extends StatefulWidget {
   final bool isTr;
   final DreamDistribution distribution;
 
@@ -5605,7 +5932,95 @@ class _ClinicalMetricsPanel extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<_ClinicalMetricsPanel> createState() => _ClinicalMetricsPanelState();
+}
+
+class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
+    with SingleTickerProviderStateMixin {
+  int? _selectedIndex;
+  late AnimationController _ringAnimController;
+  late Animation<double> _ringAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ringAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _ringAnim = CurvedAnimation(
+      parent: _ringAnimController,
+      curve: Curves.easeOutCubic,
+    );
+    // Kısa gecikme ile animasyonu başlat (sayfa açılışından sonra)
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) _ringAnimController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ringAnimController.dispose();
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _metrics => [
+    {
+      'percentage': widget.distribution.emotionalLoad / 100.0,
+      'title': widget.isTr ? 'Duygusal\nYoğunluk' : 'Emotional\nLoad',
+      'color': const Color(0xFFD500F9),
+      'reasoning': widget.distribution.emotionalLoadReasoning,
+      'description': widget.isTr
+          ? 'Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.'
+          : 'How intensely your brain\'s emotional center was activated during this dream.',
+    },
+    {
+      'percentage': widget.distribution.uncertainty / 100.0,
+      'title': widget.isTr ? 'Anlatısal\nBelirsizlik' : 'Narrative\nUncertainty',
+      'color': const Color(0xFF536DFE),
+      'reasoning': widget.distribution.uncertaintyReasoning,
+      'description': widget.isTr
+          ? 'Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.'
+          : 'How illogical or inconsistent your dream narrative was.',
+    },
+    {
+      'percentage': widget.distribution.recentMemoryEffect / 100.0,
+      'title': widget.isTr ? 'Yakın\nGeçmiş' : 'Recent\nConnection',
+      'color': const Color(0xFF00BFA5),
+      'reasoning': widget.distribution.recentMemoryReasoning,
+      'description': widget.isTr
+          ? 'Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.'
+          : 'How much of your dream was influenced by recent real-life events.',
+    },
+    {
+      'percentage': widget.distribution.brainActivity / 100.0,
+      'title': widget.isTr ? 'Ajans /\nKontrol' : 'Agency /\nControl',
+      'color': const Color(0xFF4DB6AC),
+      'reasoning': widget.distribution.brainActivityReasoning,
+      'description': widget.isTr
+          ? 'Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.'
+          : 'How much control you had over events in your dream.',
+    },
+  ];
+
+  String _severityLabel(double pct) {
+    final p = (pct * 100).toInt();
+    if (p >= 70) return widget.isTr ? 'Yüksek' : 'High';
+    if (p >= 35) return widget.isTr ? 'Normal' : 'Normal';
+    return widget.isTr ? 'Düşük' : 'Low';
+  }
+
+  Color _severityColor(double pct) {
+    final p = (pct * 100).toInt();
+    if (p >= 70) return const Color(0xFFFF8A65);
+    if (p >= 35) return const Color(0xFF81C784);
+    return const Color(0xFF90CAF9);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final selectedMetric = _selectedIndex != null ? _metrics[_selectedIndex!] : null;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -5617,259 +6032,128 @@ class _ClinicalMetricsPanel extends StatelessWidget {
             border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
             borderRadius: BorderRadius.circular(16),
           ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.donut_large, color: Colors.white.withOpacity(0.5), size: 16),
-              const SizedBox(width: 8),
-              Text(
-                isTr ? 'BİLİŞSEL DAĞILIM' : 'COGNITIVE DISTRIBUTION',
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
+              Row(
+                children: [
+                  Icon(Icons.donut_large, color: Colors.white.withOpacity(0.5), size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.isTr ? 'BİLİŞSEL DAĞILIM' : 'COGNITIVE DISTRIBUTION',
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _RingMetric(
-                  percentage: distribution.emotionalLoad / 100.0,
-                  title: isTr ? 'Duygusal\nYoğunluk' : 'Emotional\nLoad',
-                  baseColor: const Color(0xFFD500F9), // Purple neon
-                  reasoning: distribution.emotionalLoadReasoning,
-                  isTr: isTr,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _RingMetric(
-                  percentage: distribution.uncertainty / 100.0,
-                  title: isTr ? 'Anlatısal\nBelirsizlik' : 'Narrative\nUncertainty',
-                  baseColor: const Color(0xFF536DFE), // Blue neon
-                  reasoning: distribution.uncertaintyReasoning,
-                  isTr: isTr,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _RingMetric(
-                  percentage: distribution.recentMemoryEffect / 100.0,
-                  title: isTr ? 'Yakın\nGeçmiş' : 'Recent\nConnection',
-                  baseColor: const Color(0xFF00BFA5), // Teal neon
-                  reasoning: distribution.recentMemoryReasoning,
-                  isTr: isTr,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _RingMetric(
-                  percentage: distribution.brainActivity / 100.0,
-                  title: isTr ? 'Ajans /\nKontrol' : 'Agency /\nControl',
-                  baseColor: const Color(0xFF4DB6AC), // Soft Green neon
-                  reasoning: distribution.brainActivityReasoning,
-                  isTr: isTr,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    )));
-  }
-}
-
-class _RingMetricOverlay {
-  static OverlayEntry? currentEntry;
-
-  static void removeCurrent() {
-    currentEntry?.remove();
-    currentEntry = null;
-  }
-}
-
-class _RingMetric extends StatelessWidget {
-  final double percentage; // 0.0 - 1.0
-  final String title;
-  final Color baseColor;
-  final String reasoning;
-  final bool isTr;
-
-  const _RingMetric({
-    Key? key,
-    required this.percentage,
-    required this.title,
-    required this.baseColor,
-    this.reasoning = '',
-    required this.isTr,
-  }) : super(key: key);
-
-  void _showReasoning(BuildContext context) {
-    final displayReasoning = reasoning.isNotEmpty 
-        ? reasoning 
-        : (isTr ? 'Geçmiş analizlerde bu değer için özel bir gerekçe üretilmemişti (Eski Sürüm).' : 'No reasoning generated for this old analysis version.');
-
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final position = renderBox.localToGlobal(Offset.zero);
-    final size = renderBox.size;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // Panelin alt kısmını (bottom) doğrudan metriğin sınırından (position.dy) yukarı hizala
-    double bottom = screenHeight - position.dy + 12; // 12px yukarısında hover yapar
-    
-    // Yatayda ortala ama ekran dışına taşmasın
-    double left = position.dx + (size.width / 2) - 120; // 240 width'in yarısı
-    if (left < 16) left = 16;
-    if (left + 240 > screenWidth - 16) left = screenWidth - 240 - 16;
-
-    _RingMetricOverlay.removeCurrent();
-
-    final entry = OverlayEntry(
-      builder: (context) {
-        return Stack(
-          children: [
-            // Arka plandaki tıklamaları bloke etmeyip sadece yakalayan (translucent) katman
-            Positioned.fill(
-              child: Listener(
-                behavior: HitTestBehavior.translucent,
-                onPointerDown: (_) => _RingMetricOverlay.removeCurrent(),
-                child: const SizedBox.expand(),
-              ),
-            ),
-            // Tooltip Paneli
-            Positioned(
-              bottom: bottom,
-              left: left,
-              width: 240,
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                tween: Tween<double>(begin: 0.0, end: 1.0),
-                builder: (context, value, child) {
-                  return Transform.scale(
-                    scale: 0.95 + (0.05 * value),
-                    alignment: Alignment.bottomCenter,
-                    child: Opacity(
-                      opacity: value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Material(
-                  color: Colors.transparent,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08), // Daha saydam cam (Frosted Glass)
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.2),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 30, spreadRadius: 5),
-                            BoxShadow(color: baseColor.withOpacity(0.15), blurRadius: 20, spreadRadius: 2),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.insights, color: baseColor.withOpacity(0.9), size: 16),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    title.replaceAll('\n', ' ').toUpperCase(),
-                                    style: TextStyle(
-                                      color: baseColor.withOpacity(0.9), 
-                                      fontSize: 11, 
-                                      fontWeight: FontWeight.w700, 
-                                      letterSpacing: 0.5,
-                                    ),
+              const SizedBox(height: 24),
+              AnimatedBuilder(
+                animation: _ringAnim,
+                builder: (context, _) {
+                  return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(_metrics.length * 2 - 1, (i) {
+                  if (i.isOdd) return const SizedBox(width: 8);
+                  final index = i ~/ 2;
+                  final m = _metrics[index];
+                  final isSelected = _selectedIndex == index;
+                  final pct = m['percentage'] as double;
+                  final animPct = pct * _ringAnim.value;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedIndex = isSelected ? null : index),
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: _selectedIndex == null || isSelected ? 1.0 : 0.5,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 72, height: 72,
+                                child: CustomPaint(
+                                  painter: _PremiumRingPainter(animPct, m['color']),
+                                  child: Center(
+                                    child: Text('${(animPct * 100).toInt()}%', style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w700)),
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              displayReasoning,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.95), 
-                                fontSize: 12.5, 
-                                height: 1.4,
-                                fontWeight: FontWeight.w500,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 28,
+                                child: Text(m['title'], textAlign: TextAlign.center, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 9.5, height: 1.2, fontWeight: FontWeight.w600)),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(color: _severityColor(pct).withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                                child: Text(_severityLabel(pct), style: TextStyle(color: _severityColor(pct), fontSize: 8.5, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                }),
+              );
+                },
               ),
-            ),
-          ],
-        );
-      },
-    );
-
-    _RingMetricOverlay.currentEntry = entry;
-    Overlay.of(context).insert(entry);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _showReasoning(context),
-        borderRadius: BorderRadius.circular(16),
-        splashColor: baseColor.withOpacity(0.2),
-        highlightColor: baseColor.withOpacity(0.1),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 72,
-                height: 72,
-                child: CustomPaint(
-                  painter: _PremiumRingPainter(percentage, baseColor),
-                  child: Center(
-                    child: Text(
-                      '${(percentage * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 28,
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 9.5,
-                    height: 1.2,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: selectedMetric != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: (selectedMetric['color'] as Color).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: (selectedMetric['color'] as Color).withOpacity(0.2), width: 1),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.info_outline, color: selectedMetric['color'], size: 14),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '${selectedMetric['title'].toString().replaceAll('\n', ' ').toUpperCase()} — ${_severityLabel(selectedMetric['percentage'])}',
+                                      style: TextStyle(color: selectedMetric['color'], fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                selectedMetric['description'] ?? '',
+                                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11.5, height: 1.4, fontStyle: FontStyle.italic),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, (selectedMetric['color'] as Color).withOpacity(0.25), Colors.transparent]))),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(padding: const EdgeInsets.only(top: 2), child: Icon(Icons.arrow_forward, color: selectedMetric['color'], size: 12)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      (selectedMetric['reasoning'] as String).isNotEmpty ? selectedMetric['reasoning'] : (widget.isTr ? 'Bu metrik için özel bir açıklama üretilmemiş.' : 'No reasoning generated.'),
+                                      style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12.5, height: 1.5, fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -6179,11 +6463,15 @@ class _ClinicalReflectionQuestion extends StatefulWidget {
   final bool isTr;
   final String questionText;
   final Map<String, String> reflectionResponses;
+  final String? initialSelectedAction;
+  final Function(String)? onAnswerSelected;
 
   const _ClinicalReflectionQuestion({
     required this.isTr,
     required this.questionText,
     required this.reflectionResponses,
+    this.initialSelectedAction,
+    this.onAnswerSelected,
   });
 
   @override
@@ -6196,6 +6484,17 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
   String _displayedText = '';
   String _fullText = '';
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialSelectedAction != null) {
+      _selectedAction = widget.initialSelectedAction;
+      _fullText = widget.reflectionResponses[_selectedAction!] ?? 
+          (widget.isTr ? 'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.' : 'This awareness is the start of a new path. It is time to face it.');
+      _displayedText = _fullText;
+    }
+  }
+
   void _onActionSelected(String actionKey) async {
     if (_selectedAction != null) return; // Sadece bir kere seçime izin ver
 
@@ -6203,6 +6502,10 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
       _selectedAction = actionKey;
       _isAnalyzing = true;
     });
+    
+    if (widget.onAnswerSelected != null) {
+      widget.onAnswerSelected!(actionKey);
+    }
 
     // Yapay zeka cevap hazırlıyormuş gibi 1.5 saniye bekle
     await Future.delayed(const Duration(milliseconds: 1500));
@@ -6242,10 +6545,10 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
       ),
       child: Column(
         children: [
-          Icon(Icons.lightbulb_outline, color: const Color(0xFFB39DDB), size: 28),
+          Icon(Icons.my_location, color: const Color(0xFFB39DDB), size: 28),
           const SizedBox(height: 16),
           Text(
-            widget.isTr ? 'Kendine Yansıtma Sorusu' : 'Self-Reflection',
+            widget.isTr ? 'Rüyanın Gerçek Sebebi' : 'Root Cause',
             style: const TextStyle(color: Color(0xFFB39DDB), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.0),
           ),
           const SizedBox(height: 8),
@@ -6257,11 +6560,11 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
           const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(child: _buildReflectionBtn('Kesinlikle', const Color(0xFF4DB6AC), 'absolutely')),
-              const SizedBox(width: 8),
-              Expanded(child: _buildReflectionBtn('Olabilir', const Color(0xFF90CAF9), 'maybe')),
-              const SizedBox(width: 8),
-              Expanded(child: _buildReflectionBtn('Emin Değilim', const Color(0xFF9E9E9E), 'not_sure')),
+              Expanded(child: _buildReflectionBtn(widget.isTr ? 'Kesinlikle' : 'Absolutely', 'absolutely')),
+              const SizedBox(width: 10),
+              Expanded(child: _buildReflectionBtn(widget.isTr ? 'Olabilir' : 'Maybe', 'maybe')),
+              const SizedBox(width: 10),
+              Expanded(child: _buildReflectionBtn(widget.isTr ? 'Emin Değilim' : 'Not Sure', 'not_sure')),
             ],
           ),
           AnimatedSize(
@@ -6279,32 +6582,36 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
     );
   }
 
-  Widget _buildReflectionBtn(String label, Color color, String actionKey) {
+  Widget _buildReflectionBtn(String label, String actionKey) {
     final isSelected = _selectedAction == actionKey;
     final isAnySelected = _selectedAction != null;
     
-    // Eğer biri seçilmiş ama bu buton değilse matlaştır
-    final opacity = isAnySelected ? (isSelected ? 1.0 : 0.4) : 1.0;
+    final opacity = isAnySelected ? (isSelected ? 1.0 : 0.3) : 1.0;
 
     return GestureDetector(
       onTap: () => _onActionSelected(actionKey),
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),
         opacity: opacity,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.15) : color.withOpacity(0.05),
-            border: Border.all(color: isSelected ? color.withOpacity(0.6) : color.withOpacity(0.3), width: isSelected ? 1.5 : 1),
-            borderRadius: BorderRadius.circular(10),
+            color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04),
+            border: Border.all(
+              color: isSelected ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.15),
+              width: isSelected ? 1.5 : 1,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : color,
+              color: Colors.white.withOpacity(isSelected ? 1.0 : 0.9),
               fontSize: 12, 
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              letterSpacing: 0.3,
             ),
           ),
         ),
@@ -6542,5 +6849,48 @@ class _ClinicalAnswersSection extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _PremiumReveal extends StatefulWidget {
+  final Widget child;
+  final int index;
+  const _PremiumReveal({Key? key, required this.child, this.index = 0}) : super(key: key);
+
+  @override
+  State<_PremiumReveal> createState() => _PremiumRevealState();
+}
+
+class _PremiumRevealState extends State<_PremiumReveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _slide = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic),
+    );
+
+    // Initial load stagger for top items, quick appear for items lazily loaded upon scrolling down
+    final delay = widget.index < 4 ? widget.index * 150 : 50;
+
+    Future.delayed(Duration(milliseconds: delay), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(opacity: _fade, child: SlideTransition(position: _slide, child: widget.child));
   }
 }

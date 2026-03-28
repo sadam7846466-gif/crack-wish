@@ -369,6 +369,7 @@ class DeepAnalysisResult {
   final DreamDistribution distribution;
   final List<ClarifyingInsight> clarifyingInsights;
   final WakingLifeDeduction wakingLifeDeduction;
+  final Map<String, dynamic>? rawJson;
 
   DeepAnalysisResult({
     required this.success,
@@ -389,6 +390,7 @@ class DeepAnalysisResult {
     this.distribution = const DreamDistribution(),
     this.clarifyingInsights = const [],
     this.wakingLifeDeduction = const WakingLifeDeduction(),
+    this.rawJson,
   });
 
   factory DeepAnalysisResult.fromJson(Map<String, dynamic> json) {
@@ -436,6 +438,8 @@ class DeepAnalysisResult {
       wakingLifeDeduction: json['waking_life_deduction'] != null
           ? WakingLifeDeduction.fromJson(json['waking_life_deduction'] as Map<String, dynamic>)
           : const WakingLifeDeduction(),
+      // Cyclic (Ouroboros) hatasını önlemek için yepyeni bir clone yapıyoruz VE data kaybını kalıcı engelliyoruz.
+      rawJson: Map<String, dynamic>.from(json)..remove('__rawJson__'),
     );
   }
 

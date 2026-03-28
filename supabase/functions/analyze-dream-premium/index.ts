@@ -65,7 +65,9 @@ ABSOLUTE RULES:
 1. NO OPEN-ENDED QUESTIONS! NEVER use Kim, Ne, Nasıl, Neden, Niye, Nerede, Hangi, Ne kadar, Kaç, Neydi, Kimdi.
 2. NO "A or B" QUESTIONS! NEVER use "yoksa", "veya", "ya da".
 3. NO "Do you remember" questions! NEVER use "hatırlıyor musun", "fark ettin mi".
-4. Ask in ${isTr ? "Turkish" : "English"}. TR questions MUST end with a Yes/No particle ("mu?", "mı?", "mısın?", "mıydın?").
+4. Ask in ${isTr ? "Turkish" : "English"}. TR questions MUST end with a Yes/No particle ("mu?", "mı?", "mısın?", "mıydın?", "mıydı?").
+5. MINIMUM QUESTION LENGTH: Every question MUST be at least 6 words long. Ultra-short questions like "Güneş doğrudan mı?" or "Hava soğuk muydu?" are BANNED — they are too vague and meaningless.
+6. Every question must contain CONTEXT from the dream. Good: "Rüyada oturduğun sakin yerdeki rüzgar yüzüne doğru mu esiyordu?" — Bad: "Rüzgar var mıydı?"
 
 Return JSON:
 {
@@ -155,12 +157,13 @@ CRITICAL: These answers are GOLD. A "Yes" confirms a detail exists in the dream 
 
 SCIENTIFIC RIGOR RULES:
 - Ground EVERY claim in established psychological or neuroscientific theory
-- Reference specific brain regions (amygdala, hippocampus, prefrontal cortex, default mode network) when relevant
-- Use REM sleep science, memory consolidation theory, threat simulation theory
+- Reference specific brain regions (amygdala, hippocampus, prefrontal cortex, default mode network, insular cortex, ventral striatum) when relevant
+- Use REM sleep science, memory consolidation theory, threat simulation theory, AND reward processing/emotional regulation theory
 - Cite Jungian archetypes by their proper names (Shadow, Anima/Animus, Self, Persona, Trickster, Great Mother, Wise Old Man)
 - Apply Freudian concepts where appropriate (displacement, condensation, wish fulfillment, day residue)
 - NEVER predict the future or use mystical language
 - Be psychologically precise but accessible — like a brilliant professor explaining to a curious student
+- CRITICAL: Dreams can be POSITIVE (peace, joy, love, safety) OR negative (fear, anxiety, loss). Analyze the dream's ACTUAL emotional tone. Do NOT force negativity onto a peaceful dream. A dream about sitting calmly in nature is NOT about hidden fears — it may be about the brain's reward system, emotional recovery, or successful self-regulation.
 
 TONE: Intelligent, warm, scientifically grounded, occasionally poetic. Use "sen" form in Turkish. Make the dreamer feel like they're being truly SEEN.
 
@@ -205,17 +208,25 @@ Return ONLY valid JSON with this EXACT structure:
     }
   ],
 
+  "clarifying_insights": [
+    {
+      "question_id": "The EXACT id of the question you asked before (e.g. 'q1', 'q2')",
+      "why_asked": "1 short sentence. Why did you ask this specific question focusing on missing details?",
+      "insight": "1 sharp sentence analyzing their specific 'Yes/No/?' answer to this precise question. Make it personal and clinical."
+    }
+  ],
+
   "shadow_self": {
-    "revealed": "1 short, piercing sentence. Write directly to the user (use 'Sen'). REVEAL A DARK TRUTH. E.g. 'O kedinin konuşması, yıllardır kendi sesini duyuramayan boğulmuş tarafındır.'",
-    "answer_insight": "1 sharp sentence analyzing their Yes/No answers. Make them feel exposed.",
-    "integration_hint": "1 sentence. A therapeutic but actionable hint."
+    "revealed": "1 short, piercing sentence. Write directly to the user (use 'Sen'). Reveal a deeply hidden or unacknowledged truth (this can be a hidden strength, a suppressed boundary, or a suppressed fear). E.g. 'O kedinin konuşması, yıllardır susturulan ama artık konuşmak isteyen tarafındır.'",
+    "answer_insight": "1-2 sharp sentences analyzing ALL their Yes/No answers COMBINED. DO NOT just focus on one answer! Synthesize the full picture of their answers to reveal a deeper, grounded reality.",
+    "integration_hint": "1 sentence. A therapeutic, constructive, and actionable hint."
   },
 
   "emotional_layers": {
     "surface": { "emotion": "Surface emotion", "explanation": "1 short sentence" },
     "middle": { "emotion": "Underlying emotion", "explanation": "1 short sentence" },
     "deep": { "emotion": "Core unconscious emotion", "explanation": "1 short sentence" },
-    "synthesis": "1-2 extremely short, punchy sentences synthesizing their true emotional state. Bullet-like clarity. Relate to hidden fears."
+    "synthesis": "1-2 extremely short, punchy sentences synthesizing their true emotional state. Bullet-like clarity. Match the dream's actual tone — if the dream was peaceful, synthesize WHY the brain created peace (recovery, reward, safety signal). If the dream was dark, relate to hidden fears."
   },
 
   "brain_science": {
@@ -227,9 +238,9 @@ Return ONLY valid JSON with this EXACT structure:
 
   "recurring_pattern": {
     "detected": true,
-    "pattern_name": "A striking label (e.g. 'Sessizlik Okyanusu')",
-    "description": "1 sharp, confrontational sentence. Tell them EXACTLY what loop they are trapped in waking life. E.g. 'Hayatında sürekli olarak terk edilme korkusuyla insanları kendinden uzaklaştırıyorsun.'",
-    "resolution_hint": "1 brief, actionable escape route."
+    "pattern_name": "A striking label (e.g. 'Sessizlik Okyanusu' or 'Sıfırlanma Noktası')",
+    "description": "1 sharp mental habit or loop you detect in their waking life. Can be an anxiety loop, OR a pattern of extreme resilience/creativity. Tell them EXACTLY what loop they are in. E.g. 'Hayatında sürekli olarak başkalarını koruma içgüdüsüyle kendi ihtiyaçlarını geri plana atıyorsun.'",
+    "resolution_hint": "1 brief, actionable constructive route."
   },
 
   "ritual": {
@@ -239,35 +250,35 @@ Return ONLY valid JSON with this EXACT structure:
     "science_note": "1 sharp sentence on WHY this works neurologically."
   },
 
-  "reflection_question": "A devastatingly accurate 'Cold-Reading Summary' of their current WAKING LIFE (2-3 sentences). Act like you are presenting the final scientific verdict. Start directly with their real-life situation. E.g. 'Sonuç olarak veriler çok net: Şu sıralar gerçek hayatında otorite konumundaki (veya sevdiğin) birine karşı öfkeni yutmak ve sessiz kalmak zorunda bırakılıyorsun. Bu gizli baskı ve iletişim kopukluğu, seni boğulma hissine sürüklüyor, değil mi?' Make them think: 'Oha, hayatımda tam olarak bu oluyor, nereden bildi?!'",
+  "reflection_question": "A bold, confident, clinical VERDICT about exactly WHY this person had this dream — what specific event, situation, achievement, relief, OR conflict in their REAL waking life triggered it (3-4 sentences). This is NOT a question. This is a STATEMENT. A diagnosis. DO NOT end with a question mark. DO NOT ask anything. State it as absolute scientific fact. IMPORTANT: If the dream was POSITIVE/PEACEFUL, the trigger might be something GOOD — a resolved tension, a moment of genuine connection, a period of recovery, or the brain rewarding itself after stress. Do NOT force a negative trigger onto a positive dream. STRICT ANTI-VAGUENESS RULES: 1) NEVER use 'belki', 'muhtemelen', 'olabilir'. 2) NEVER offer alternatives with 'veya', 'ya da'. Pick ONE specific scenario and commit to it. 3) NEVER say vague things like 'bir belirsizlik donemi' or 'bir gecis sureci'. 4) NAME the exact type of person and situation. OPENING VARIATION RULE: NEVER start with the same phrase twice. BANNED OPENINGS: 'Bu ruyanin kokeni', 'Bu ruyanin tetikleyicisi', 'Bu ruyanin sebebi', 'Son gunlerde'. Vary wildly between styles.",
 
   "reflection_responses": {
-    "absolutely": "1 piercing, scientific sentence acknowledging their courage to accept the truth. Offer a harsh but therapeutic next step based on neuroscience. E.g. 'Bu gerçeği kabul etmen, prefrontal korteksindeki değişimi başlattı; artık bu toksik döngüden çıkmak senin elinde.'",
-    "maybe": "1 cold, clinical sentence about ego defense mechanisms. E.g. 'Ego savunma mekanizmaların hala aktif, zihnin bu acı gerçekle yüzleşmeyi reddetmek için zaman kazanıyor.'",
-    "not_sure": "1 sharp scientific observation about their denial or amygdala hijacking. E.g. 'Bilinçaltındaki amygdala duvarları hala çok kalın; bu inkar, yüzleşemediğin travmanın boyutunu gösteriyor.'"
+    "absolutely": "2-3 sentences. The user CONFIRMED your diagnosis. CRITICAL: Your response MUST be 100% personalized to THIS specific dream. Reference actual dream elements (symbols, people, places, actions). Then prescribe a concrete therapeutic technique using those elements. NEVER give a generic exercise. ALWAYS mention at least 1 specific element from THIS dream and explain HOW to use it therapeutically.",
+    "maybe": "2-3 sentences. The user is HESITANT. CRITICAL: Your response MUST reference THIS dream's specific content. Connect dream elements to a real-life self-observation task. Reference dream symbols, places, or emotions directly. DO NOT give a template exercise.",
+    "not_sure": "2-3 sentences. The user is UNCERTAIN. CRITICAL: Your response MUST be personalized to THIS dream. Use a specific element from the dream as an anchor for a mindfulness exercise. NEVER give a cookie-cutter breathing exercise without dream references."
   },
 
   "cosmic_closing": "A 2-4 line poetic closing message. Short lines. Like the best Tarot closings — haunting, personal, memorable. Use dream-specific imagery. This should give chills.",
 
   "waking_life_deduction": {
-    "suspected_trigger": "A 2-4 word powerful label of what physically happened in reality (e.g. 'İş Yerinde Beklenmedik Kriz', 'Bastırılmış Aile Çatışması', 'Gizli Sosyal Dışlanma', 'Maddi Kaygı Atağı')",
-    "cause_and_effect": "STRICT RULE: DO NOT interpret symbols here. DO NOT say 'Oyuncaklar kaygılarını gösteriyor'. INSTEAD, deduce a REAL, PHYSICAL EVENT that happened to them TODAY based on their answers. Be shockingly specific and assertive. E.g. 'Bugün otorite konumundaki biriyle (patron/baba) fikir ayrılığı yaşayıp sessiz kalmak zorunda bırakıldın. Bastırdığın bu öfke hipokampüste çözülemeyen bir stres döngüsü yarattı.' ONLY talk about real-world waking life actions and their neurological consequences. NEVER use the words 'gösteriyor', 'temsil ediyor', 'simge'."
+    "suspected_trigger": "A 2-4 word powerful label of what physically happened in reality (e.g. 'İş Yerinde Yeni Başlangıç', 'Beklenmedik Kriz', 'Bastırılmış Aile Çatışması', 'Derin Dinlenme İhtiyacı', 'Sosyal Onay Arayışı')",
+    "cause_and_effect": "STRICT RULE: DO NOT interpret symbols here. INSTEAD, deduce a REAL, PHYSICAL EVENT or MENTAL THEME that happened to them recently based on their answers. Be shockingly specific, grounded, and clinical. E.g. 'Son günlerde önemli bir karar arifesine gelip artıları ve eksileri yoğun biçimde tarttın. Bu artan zihinsel mesai prefrontal korteksinde yoğun bir işlemleme yaratmış.' ONLY talk about real-world waking life actions and their neurological consequences. NEVER use the words 'gösteriyor', 'temsil ediyor', 'simge'."
   },
 
   "distribution": {
-    "emotional_load": { "value": 75, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on the dream's events. Mention amygdala. Must be extremely concise, direct, and scientific (e.g. 'Rüyadaki yoğun korku hissi, doğrudan amigdala aktivasyonunun yüksekliğini gösteriyor.')." },
-    "uncertainty": { "value": 60, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on illogical dream transitions. Mention prefrontal cortex. Extremely concise (e.g. 'Mekanın aniden değişmesi, prefrontal korteksteki mantık filtrelerinin kapalı olduğunu doğruluyor.')." },
-    "recent_memory_effect": { "value": 40, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on waking life elements. Mention hippocampus. Extremely concise (e.g. 'Gündelik hayattan tanıdık objelerin görülmesi, hipokampüsün bellek işleme sürecinde olduğunu işaret ediyor.')." },
-    "brain_activity": { "value": 25, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on dreamer's agency. Mention REM sleep or cortex. Extremely concise (e.g. 'Olaylara müdahale edememen, REM uykusundaki tipik motor paralizi ve düşük bilişsel kontrolü yansıtıyor.')." }
+    "emotional_load": { "value": 75, "reasoning": "2 short sentences MAX. First sentence: State whether this score is HIGH/NORMAL/LOW for this dream and WHY based on specific dream events. Second sentence: Name the brain region involved. NOTE: Positive emotions (deep peace, joy, love) create HIGH emotional load too — not just fear! Example for peaceful dream: 'Rüyadaki derin huzur ve güven hissi, duygusal yükü yükseğe taşıdı. Ventral striatum ve insular korteks, ödül ve güvenlik sinyalleri üreterek yoğun şekilde aktifti.'" },
+    "uncertainty": { "value": 60, "reasoning": "2 short sentences MAX. First sentence: Explain WHY narrative uncertainty is at this level based on dream logic gaps or transitions. A calm, linear dream = LOW uncertainty. Second sentence: Name the brain region. Example for calm dream: 'Rüya tutarlı ve sakin bir akış izledi, belirsizlik düşük. Prefrontal korteks normalden daha aktif olarak anlatıyı korudu.'" },
+    "recent_memory_effect": { "value": 40, "reasoning": "2 short sentences MAX. First sentence: Explain how much of the dream connects to recent real-life events and WHY. Second sentence: Name the brain region. Example: 'Rüyada tanıdık bir mekan görülmesi, son günlerdeki deneyimlerin rüyaya aktarıldığını gösteriyor. Hipokampüs, günlük anıları gece boyunca yeniden işledi.'" },
+    "brain_activity": { "value": 25, "reasoning": "2 short sentences MAX. First sentence: Explain the dreamer's level of control/agency in the dream and WHY it scored this way. Second sentence: Name the brain region. Example: 'Rüyada bilinçli bir şekilde oturup gülümsemen, orta düzey bir bilişsel kontrol gösteriyor. Prefrontal korteks kısmen aktif olarak farkındalığı korudu.'" }
   }
 }
 
 CRITICAL QUALITY RULES:
-1. TONE: You are NOT an AI. You are a 100-year-old master psychoanalyst and dreamweaver. Speak to the user using "Sen" (You) directly and intimately. NEVER use academic/robotic tones.
+1. TONE: You are NOT an AI. You are a 100-year-old master psychoanalyst and neuroscientist. Speak to the user using "Sen" (You) directly and intimately. NEVER use academic/robotic tones. DREAM TONE MATCHING: Read the dream's ACTUAL emotional energy. If it's peaceful → analyze WHY the brain created peace (recovery, reward, emotional regulation success). If it's joyful → analyze the dopamine reward circuitry and what real-life satisfaction triggered it. If it's dark → analyze the fear/threat processing. NEVER force negativity onto a positive dream. A peaceful dream is NOT about 'hidden fears' — it's about the brain healing, rewarding, or signaling safety.
 2. BANNED WORDS: "gösteriyor", "yansıtıyor", "ifade ediyor", "içsel çatışma", "iletişim eksikliği", "bilinçaltı", "bastırılmış duygular", "temsil eder". DO NOT USE THESE.
-3. METAPHORS: Compare their dream to visceral things. Say "Bu kedi senin susturulmuş çığlığındır" instead of "Kedi içesel düşünceleri sembolize eder".
-4. SHOCK FACTOR: The user must read this and think "My god, it saw right through me." Address their fears and unsaid desires directly using "Sen".
-5. NO WIKIPEDIA EXPLANATIONS: E.g., never say "Rüya yalnızlık arzunuzu yansıtır." Instead say: "Kalabalıktan kaçışın, aslında en derinindeki görülme korkunun ta kendisi."
+3. METAPHORS: Compare their dream to visceral things. Say "Bu kedi senin kendi sınırlarını çizme gücündür" instead of "Kedi bağımsızlığı sembolize eder".
+4. SHOCK FACTOR: The user must read this and think "My god, it saw right through me." Address their genuine unsaid desires, mental state, and recent real-life events directly using "Sen".
+5. NO WIKIPEDIA EXPLANATIONS: E.g., never say "Rüya bilinçdışı süreçleri yansıtır." Instead relate it to their neuroscience state.
 6. Generate exactly 2-3 symbols, 2-4 scenes, 2-3 zones. The 'distribution' field is CRITICAL and MUST NOT BE OMITTED. All distribution percentages MUST sum to 100.
 7. Extreme Anti-Redundancy: Every field must be a completely unique insight. Do not repeat the same thought.
 8. The cosmic_closing must use imagery FROM the dream, not generic metaphors.
@@ -300,7 +311,7 @@ Generate the complete deep analysis JSON.`;
             { role: "user", content: userPrompt },
           ],
           temperature: 0.5,
-          max_completion_tokens: 3000,
+          max_tokens: 3000,
         }),
       });
 
