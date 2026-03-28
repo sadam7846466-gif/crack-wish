@@ -239,10 +239,20 @@ class DreamDistribution {
   factory DreamDistribution.fromJson(Map<String, dynamic> json) {
     // Helper to extract value and reasoning safely (backward compatibility)
     int parseValue(dynamic field) {
+      if (field == null) return 0;
       if (field is int) return field;
       if (field is num) return field.toInt();
+      if (field is String) {
+        final match = RegExp(r'\d+').firstMatch(field);
+        if (match != null) return int.tryParse(match.group(0)!) ?? 0;
+      }
       if (field is Map<String, dynamic> && field['value'] != null) {
-        return (field['value'] as num).toInt();
+        final val = field['value'];
+        if (val is num) return val.toInt();
+        if (val is String) {
+          final match = RegExp(r'\d+').firstMatch(val);
+          if (match != null) return int.tryParse(match.group(0)!) ?? 0;
+        }
       }
       return 0;
     }
@@ -354,8 +364,11 @@ class DeepAnalysisResult {
   final RecurringPattern recurringPattern;
   final DreamRitual ritual;
   final String cosmicClosing;
+  final String reflectionQuestion;
+  final Map<String, String> reflectionResponses;
   final DreamDistribution distribution;
   final List<ClarifyingInsight> clarifyingInsights;
+  final WakingLifeDeduction wakingLifeDeduction;
 
   DeepAnalysisResult({
     required this.success,
@@ -371,8 +384,11 @@ class DeepAnalysisResult {
     this.recurringPattern = const RecurringPattern(),
     this.ritual = const DreamRitual(),
     this.cosmicClosing = '',
+    this.reflectionQuestion = '',
+    this.reflectionResponses = const {},
     this.distribution = const DreamDistribution(),
     this.clarifyingInsights = const [],
+    this.wakingLifeDeduction = const WakingLifeDeduction(),
   });
 
   factory DeepAnalysisResult.fromJson(Map<String, dynamic> json) {
@@ -407,12 +423,19 @@ class DeepAnalysisResult {
           ? DreamRitual.fromJson(json['ritual'] as Map<String, dynamic>)
           : const DreamRitual(),
       cosmicClosing: json['cosmic_closing']?.toString() ?? '',
+      reflectionQuestion: json['reflection_question']?.toString() ?? '',
+      reflectionResponses: json['reflection_responses'] != null 
+          ? Map<String, String>.from(json['reflection_responses'] as Map)
+          : const {},
       distribution: json['distribution'] != null
           ? DreamDistribution.fromJson(json['distribution'] as Map<String, dynamic>)
           : const DreamDistribution(),
       clarifyingInsights: (json['clarifying_insights'] as List<dynamic>?)
               ?.map((c) => ClarifyingInsight.fromJson(c as Map<String, dynamic>))
               .toList() ?? [],
+      wakingLifeDeduction: json['waking_life_deduction'] != null
+          ? WakingLifeDeduction.fromJson(json['waking_life_deduction'] as Map<String, dynamic>)
+          : const WakingLifeDeduction(),
     );
   }
 
@@ -423,14 +446,37 @@ class DeepAnalysisResult {
 
 class ClarifyingInsight {
   final String questionId;
+  final String whyAsked;
   final String insight;
 
-  const ClarifyingInsight({required this.questionId, required this.insight});
+  const ClarifyingInsight({
+    required this.questionId,
+    required this.whyAsked,
+    required this.insight,
+  });
 
   factory ClarifyingInsight.fromJson(Map<String, dynamic> json) {
     return ClarifyingInsight(
       questionId: json['question_id']?.toString() ?? '',
+      whyAsked: json['why_asked']?.toString() ?? '',
       insight: json['insight']?.toString() ?? '',
+    );
+  }
+}
+
+class WakingLifeDeduction {
+  final String suspectedTrigger;
+  final String causeAndEffect;
+
+  const WakingLifeDeduction({
+    this.suspectedTrigger = '',
+    this.causeAndEffect = '',
+  });
+
+  factory WakingLifeDeduction.fromJson(Map<String, dynamic> json) {
+    return WakingLifeDeduction(
+      suspectedTrigger: json['suspected_trigger']?.toString() ?? '',
+      causeAndEffect: json['cause_and_effect']?.toString() ?? '',
     );
   }
 }

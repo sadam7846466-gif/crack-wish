@@ -2201,12 +2201,17 @@ class _DreamPageState extends State<DreamPage>
         ),
 
         // ── 6) Yansıtma Sorusu (Etkileşim) ──
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, 24, 20, bottomPadding + 80),
-            child: _ClinicalReflectionQuestion(isTr: isTr),
+        if (_deepAnalysisResult!.reflectionQuestion.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 24, 20, bottomPadding + 80),
+              child: _ClinicalReflectionQuestion(
+                isTr: isTr,
+                questionText: _deepAnalysisResult!.reflectionQuestion,
+                reflectionResponses: _deepAnalysisResult!.reflectionResponses,
+              ),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -6170,12 +6175,60 @@ class _ClinicalAccordionState extends State<_ClinicalAccordion> {
   }
 }
 
-class _ClinicalReflectionQuestion extends StatelessWidget {
+class _ClinicalReflectionQuestion extends StatefulWidget {
   final bool isTr;
-  const _ClinicalReflectionQuestion({required this.isTr});
+  final String questionText;
+  final Map<String, String> reflectionResponses;
+
+  const _ClinicalReflectionQuestion({
+    required this.isTr,
+    required this.questionText,
+    required this.reflectionResponses,
+  });
+
+  @override
+  State<_ClinicalReflectionQuestion> createState() => _ClinicalReflectionQuestionState();
+}
+
+class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion> {
+  String? _selectedAction;
+  bool _isAnalyzing = false;
+  String _displayedText = '';
+  String _fullText = '';
+
+  void _onActionSelected(String actionKey) async {
+    if (_selectedAction != null) return; // Sadece bir kere seçime izin ver
+
+    setState(() {
+      _selectedAction = actionKey;
+      _isAnalyzing = true;
+    });
+
+    // Yapay zeka cevap hazırlıyormuş gibi 1.5 saniye bekle
+    await Future.delayed(const Duration(milliseconds: 1500));
+    
+    if (!mounted) return;
+
+    setState(() {
+      _isAnalyzing = false;
+      _fullText = widget.reflectionResponses[actionKey] ?? 
+          (widget.isTr ? 'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.' : 'This awareness is the start of a new path. It is time to face it.');
+    });
+
+    // Yazı daktilo (typewriter) efekti
+    for (int i = 0; i <= _fullText.length; i++) {
+      if (!mounted) return;
+      setState(() {
+        _displayedText = _fullText.substring(0, i);
+      });
+      await Future.delayed(const Duration(milliseconds: 30)); // Daktilo hızı
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.questionText.isEmpty) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -6192,44 +6245,131 @@ class _ClinicalReflectionQuestion extends StatelessWidget {
           Icon(Icons.lightbulb_outline, color: const Color(0xFFB39DDB), size: 28),
           const SizedBox(height: 16),
           Text(
-            isTr ? 'Kendine Yansıtma Sorusu' : 'Self-Reflection',
+            widget.isTr ? 'Kendine Yansıtma Sorusu' : 'Self-Reflection',
             style: const TextStyle(color: Color(0xFFB39DDB), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.0),
           ),
           const SizedBox(height: 8),
           Text(
-            isTr
-                ? 'Bu rüyadaki zemin kaybetme ve kontrolsüzce düşme hissi, şu sıralar hayatında sorumluluğunu almaktan çekindiğin veya sürüklenmesine izin verdiğin bir konuyu çağrıştırıyor olabilir mi?'
-                : 'Does the feeling of unexpected free fall in the dream resonate with a situation in your waking life where you feel you lack control?',
+            widget.questionText,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.5, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(child: _buildReflectionBtn('Kesinlikle', const Color(0xFF4DB6AC))),
+              Expanded(child: _buildReflectionBtn('Kesinlikle', const Color(0xFF4DB6AC), 'absolutely')),
               const SizedBox(width: 8),
-              Expanded(child: _buildReflectionBtn('Olabilir', const Color(0xFF90CAF9))),
+              Expanded(child: _buildReflectionBtn('Olabilir', const Color(0xFF90CAF9), 'maybe')),
               const SizedBox(width: 8),
-              Expanded(child: _buildReflectionBtn('Emin Değilim', const Color(0xFF9E9E9E))),
+              Expanded(child: _buildReflectionBtn('Emin Değilim', const Color(0xFF9E9E9E), 'not_sure')),
             ],
-          )
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.fastOutSlowIn,
+            child: _selectedAction != null 
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 24),
+                    child: _buildResponseArea(),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildReflectionBtn(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        border: Border.all(color: color.withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildReflectionBtn(String label, Color color, String actionKey) {
+    final isSelected = _selectedAction == actionKey;
+    final isAnySelected = _selectedAction != null;
+    
+    // Eğer biri seçilmiş ama bu buton değilse matlaştır
+    final opacity = isAnySelected ? (isSelected ? 1.0 : 0.4) : 1.0;
+
+    return GestureDetector(
+      onTap: () => _onActionSelected(actionKey),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: opacity,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? color.withOpacity(0.15) : color.withOpacity(0.05),
+            border: Border.all(color: isSelected ? color.withOpacity(0.6) : color.withOpacity(0.3), width: isSelected ? 1.5 : 1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : color,
+              fontSize: 12, 
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600
+            ),
+          ),
+        ),
       ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
+    );
+  }
+
+  Widget _buildResponseArea() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05), // Frosted glass tint
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7C6CF3).withOpacity(0.05),
+                blurRadius: 20,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+      child: _isAnalyzing
+          ? Column(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFB39DDB)),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  widget.isTr ? 'Klinik sonuç derleniyor...' : 'Gathering clinical deduction...',
+                  style: const TextStyle(color: Color(0xFFB39DDB), fontSize: 11, fontStyle: FontStyle.italic),
+                ),
+              ],
+            )
+          : Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.psychology_alt, color: Color(0xFFB39DDB), size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.isTr ? 'KLİNİK TESPİT' : 'CLINICAL DEDUCTION',
+                      style: const TextStyle(color: Color(0xFFB39DDB), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  _displayedText + (_displayedText.length < _fullText.length ? '...' : ''),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.6, fontWeight: FontWeight.w400, letterSpacing: 0.3),
+                ),
+              ],
+            ),
+        ),
       ),
     );
   }
@@ -6260,10 +6400,10 @@ class _ClinicalAnswersSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 20, bottom: 12),
+          padding: const EdgeInsets.only(left: 20, bottom: 20),
           child: Row(
             children: [
-              Icon(Icons.question_answer_outlined, color: Colors.white.withOpacity(0.5), size: 16),
+              Icon(Icons.timeline, color: Colors.white.withOpacity(0.5), size: 16),
               const SizedBox(width: 8),
               Text(
                 isTr ? 'ANALİZİ NETLEŞTİREN YANITLAR' : 'CLARIFYING RESPONSES',
@@ -6272,92 +6412,131 @@ class _ClinicalAnswersSection extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.2),
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ...answers.asMap().entries.map((entry) {
+              ...answers.asMap().entries.expand((entry) {
                 final int idx = entry.key;
                 final qa = entry.value;
                 final bool isYes = qa['answer'] == 'yes';
                 final bool isNo = qa['answer'] == 'no';
-                final String ansText = isYes ? (isTr ? 'Evet' : 'Yes') : (isNo ? (isTr ? 'Hayır' : 'No') : (isTr ? '?' : 'Unsure'));
+                final String ansText = isYes ? (isTr ? 'EVET' : 'YES') : (isNo ? (isTr ? 'HAYIR' : 'NO') : (isTr ? '?' : '?'));
                 final Color ansColor = isYes ? const Color(0xFF69F0AE) : (isNo ? const Color(0xFFFF5252) : const Color(0xFFFFD740));
                 
-                // Find matching insight from backend
                 final String questionId = qa['questionId']?.toString() ?? '';
                 final matchingInsight = insights.where((i) => i.questionId == questionId || i.questionId.contains(questionId)).firstOrNull?.insight ?? '';
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(16, 14, 16, matchingInsight.isNotEmpty ? 8 : 14),
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(color: Colors.white.withOpacity(0.95), fontSize: 13, height: 1.4),
+                return [
+                  // Soru ve Yanıt (Node Kutusu)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.04), // Yarı saydam arka plan
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.2),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            TextSpan(text: qa['question'] + '  '),
-                            TextSpan(
-                              text: ansText.toUpperCase(),
-                              style: TextStyle(
-                                color: ansColor, // Yarı saydamlığı iptal ettik, tamamen saf neon
-                                fontSize: 12, // Metni biraz daha büyük yaptık, 10 çok ufaktı
-                                fontWeight: FontWeight.w900, 
-                                letterSpacing: 0.8,
+                            // Sol taraftaki renkli bar
+                            Container(
+                              width: 3.5,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: ansColor,
+                                borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (matchingInsight.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.subdirectory_arrow_right, color: Colors.white.withOpacity(0.3), size: 14),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 14),
+                            // Soru ve Cevap
                             Expanded(
                               child: Text(
-                                matchingInsight,
-                                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontStyle: FontStyle.italic, height: 1.4),
+                                qa['question'],
+                                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, height: 1.4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              ansText,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    if (idx < answers.length - 1)
-                      Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 16, endIndent: 16),
-                  ],
-                );
-              }),
-              if (globalInsight.isNotEmpty && globalInsight != 'null') ...[
-                Divider(color: Colors.white.withOpacity(0.1), height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.psychology, color: const Color(0xFFE040FB).withOpacity(0.8), size: 16),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          globalInsight,
-                          style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12, height: 1.4),
-                        ),
-                      ),
-                    ],
+                        if (matchingInsight.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(width: 17.5), // Renkli bar ve spacing hizalaması
+                              Icon(Icons.subdirectory_arrow_right, color: Colors.white.withOpacity(0.3), size: 14),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  matchingInsight,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontStyle: FontStyle.italic, height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  // Bağlantı Çizgisi (Ara çizgi veya ok)
+                  if (idx < answers.length - 1)
+                    Container(
+                      height: 24,
+                      width: 1.5,
+                      color: Colors.white.withOpacity(0.15),
+                    )
+                  else if (globalInsight.isNotEmpty && globalInsight != 'null')
+                    SizedBox(
+                      height: 32,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(width: 1.5, height: 12, color: Colors.white.withOpacity(0.15)),
+                          Icon(Icons.keyboard_arrow_down, color: Colors.white.withOpacity(0.3), size: 16),
+                        ],
+                      ),
+                    )
+                ];
+              }),
+              
+              if (globalInsight.isNotEmpty && globalInsight != 'null')
+                 Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF7C6CF3).withOpacity(0.08), // Morumsu özel vurgu
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF7C6CF3).withOpacity(0.2), width: 1.2),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.psychology, color: Color(0xFFB39DDB), size: 18),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            globalInsight,
+                            style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12, height: 1.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
             ],
           ),
         ),

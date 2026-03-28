@@ -206,53 +206,59 @@ Return ONLY valid JSON with this EXACT structure:
   ],
 
   "shadow_self": {
-    "revealed": "2-3 sentences. Write directly to the user (use 'Sen'). REVEAL A DARK TRUTH. E.g. 'O kedinin konuşması, yıllardır kendi sesini duyuramayan boğulmuş tarafının isyanıdır.' No robotic words.",
-    "answer_insight": "1-2 sentences strictly analyzing their Yes/No answers with terrifying accuracy. Make them feel exposed.",
-    "integration_hint": "1 sentence. A haunting but therapeutic hint on how to accept this hidden side."
+    "revealed": "1 short, piercing sentence. Write directly to the user (use 'Sen'). REVEAL A DARK TRUTH. E.g. 'O kedinin konuşması, yıllardır kendi sesini duyuramayan boğulmuş tarafındır.'",
+    "answer_insight": "1 sharp sentence analyzing their Yes/No answers. Make them feel exposed.",
+    "integration_hint": "1 sentence. A therapeutic but actionable hint."
   },
 
   "emotional_layers": {
-    "surface": { "emotion": "The obvious/surface emotion", "explanation": "1 sentence" },
-    "middle": { "emotion": "The emotion beneath the surface", "explanation": "1 sentence" },
-    "deep": { "emotion": "The deepest, often unconscious emotion", "explanation": "1 sentence" },
-    "synthesis": "2-3 sentences weaving all emotional layers. Speak to the user (Sen). Relate this to their deepest fears and hidden desires. Make it poetic but psychologically piercing."
+    "surface": { "emotion": "Surface emotion", "explanation": "1 short sentence" },
+    "middle": { "emotion": "Underlying emotion", "explanation": "1 short sentence" },
+    "deep": { "emotion": "Core unconscious emotion", "explanation": "1 short sentence" },
+    "synthesis": "1-2 extremely short, punchy sentences synthesizing their true emotional state. Bullet-like clarity. Relate to hidden fears."
   },
 
   "brain_science": {
     "primary_region": "The most active brain region (e.g. amygdala, hippocampus, prefrontal cortex, default mode network)",
-    "primary_region_emoji": "🧠 or relevant emoji",
-    "mechanism": "1-2 sentences. ~20 words max. Explain WHAT the brain was doing and WHY using precise neuroscience terminology. Must be highly scientific, explanatory, and clinically serious.",
-    "fascinating_fact": "1 surprising neuroscience fact relevant to this specific dream that will make the dreamer go 'wow'"
+    "primary_region_emoji": "🧠",
+    "mechanism": "1 sentence MAX. Explain WHAT the brain was doing. Use precise neuroscience terminology.",
+    "fascinating_fact": "1 surprising neuroscience fact starting with 'Bilimsel Gerçek:'"
   },
 
   "recurring_pattern": {
-    "detected": true or false,
-    "pattern_name": "A powerful, mystic name for their life loop (e.g. 'Kapanmayan Yara', 'Sessizlik Okyanusu')",
-    "description": "2-3 sentences. Tell them EXACTLY what loop they are trapped in waking life. Speak directly: 'Hayatında sürekli olarak...'. Use striking metaphors. Do NOT use the word 'gösteriyor'.",
-    "resolution_hint": "1 sentence. A mystical yet actionable way to break out of this loop."
+    "detected": true,
+    "pattern_name": "A striking label (e.g. 'Sessizlik Okyanusu')",
+    "description": "1 sharp, confrontational sentence. Tell them EXACTLY what loop they are trapped in waking life. E.g. 'Hayatında sürekli olarak terk edilme korkusuyla insanları kendinden uzaklaştırıyorsun.'",
+    "resolution_hint": "1 brief, actionable escape route."
   },
 
   "ritual": {
-    "title": "A specific, actionable ritual name",
-    "action": "2-3 sentences describing exactly what to do. Must be concrete, doable tonight/tomorrow. Not vague spiritual advice.",
-    "emoji": "🕯️ or relevant emoji",
-    "science_note": "1 sentence on WHY this works (neuroplasticity, memory reconsolidation, etc.)"
+    "title": "A highly specific, 2-3 word actionable ritual name",
+    "action": "1-2 short sentences. EXACTLY what to do tonight. Must be concrete, not vague.",
+    "emoji": "🕯️",
+    "science_note": "1 sharp sentence on WHY this works neurologically."
+  },
+
+  "reflection_question": "A devastatingly accurate 'Cold-Reading Summary' of their current WAKING LIFE (2-3 sentences). Act like you are presenting the final scientific verdict. Start directly with their real-life situation. E.g. 'Sonuç olarak veriler çok net: Şu sıralar gerçek hayatında otorite konumundaki (veya sevdiğin) birine karşı öfkeni yutmak ve sessiz kalmak zorunda bırakılıyorsun. Bu gizli baskı ve iletişim kopukluğu, seni boğulma hissine sürüklüyor, değil mi?' Make them think: 'Oha, hayatımda tam olarak bu oluyor, nereden bildi?!'",
+
+  "reflection_responses": {
+    "absolutely": "1 piercing, scientific sentence acknowledging their courage to accept the truth. Offer a harsh but therapeutic next step based on neuroscience. E.g. 'Bu gerçeği kabul etmen, prefrontal korteksindeki değişimi başlattı; artık bu toksik döngüden çıkmak senin elinde.'",
+    "maybe": "1 cold, clinical sentence about ego defense mechanisms. E.g. 'Ego savunma mekanizmaların hala aktif, zihnin bu acı gerçekle yüzleşmeyi reddetmek için zaman kazanıyor.'",
+    "not_sure": "1 sharp scientific observation about their denial or amygdala hijacking. E.g. 'Bilinçaltındaki amygdala duvarları hala çok kalın; bu inkar, yüzleşemediğin travmanın boyutunu gösteriyor.'"
   },
 
   "cosmic_closing": "A 2-4 line poetic closing message. Short lines. Like the best Tarot closings — haunting, personal, memorable. Use dream-specific imagery. This should give chills.",
 
-  "clarifying_insights": [
-    {
-      "question_id": "q1",
-      "insight": "1 short clinical sentence explaining exactly what this specific 'Yes' or 'No' answer reveals about the dream's hidden meaning."
-    }
-  ],
+  "waking_life_deduction": {
+    "suspected_trigger": "A 2-4 word powerful label of what physically happened in reality (e.g. 'İş Yerinde Beklenmedik Kriz', 'Bastırılmış Aile Çatışması', 'Gizli Sosyal Dışlanma', 'Maddi Kaygı Atağı')",
+    "cause_and_effect": "STRICT RULE: DO NOT interpret symbols here. DO NOT say 'Oyuncaklar kaygılarını gösteriyor'. INSTEAD, deduce a REAL, PHYSICAL EVENT that happened to them TODAY based on their answers. Be shockingly specific and assertive. E.g. 'Bugün otorite konumundaki biriyle (patron/baba) fikir ayrılığı yaşayıp sessiz kalmak zorunda bırakıldın. Bastırdığın bu öfke hipokampüste çözülemeyen bir stres döngüsü yarattı.' ONLY talk about real-world waking life actions and their neurological consequences. NEVER use the words 'gösteriyor', 'temsil ediyor', 'simge'."
+  },
 
   "distribution": {
-    "emotional_load": { "value": 75, "reasoning": "Explain WHAT Emotional Load is (the intensity of affect), then logically explain WHY it got this exact score based on the dream's events. Mention amygdala activation. (2-3 sentences)" },
-    "uncertainty": { "value": 60, "reasoning": "Explain WHAT Narrative Uncertainty is (logical consistency vs dream logic), then logically explain WHY it got this exact score based on the specific transitions in this dream. Mention bizarre mechanics or prefrontal cortex. (2-3 sentences)" },
-    "recent_memory_effect": { "value": 40, "reasoning": "Explain WHAT Recent Memory Effect is (day residues), then logically explain WHY it got this exact score referring to elements in the dream that represent waking life. Mention hippocampus and memory consolidation. (2-3 sentences)" },
-    "brain_activity": { "value": 25, "reasoning": "Explain WHAT Agency/Control is (lucidity and decision-making), then logically explain WHY it got this exact score based on how active/passive the dreamer was. Mention prefrontal cortex self-awareness. (2-3 sentences)" }
+    "emotional_load": { "value": 75, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on the dream's events. Mention amygdala. Must be extremely concise, direct, and scientific (e.g. 'Rüyadaki yoğun korku hissi, doğrudan amigdala aktivasyonunun yüksekliğini gösteriyor.')." },
+    "uncertainty": { "value": 60, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on illogical dream transitions. Mention prefrontal cortex. Extremely concise (e.g. 'Mekanın aniden değişmesi, prefrontal korteksteki mantık filtrelerinin kapalı olduğunu doğruluyor.')." },
+    "recent_memory_effect": { "value": 40, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on waking life elements. Mention hippocampus. Extremely concise (e.g. 'Gündelik hayattan tanıdık objelerin görülmesi, hipokampüsün bellek işleme sürecinde olduğunu işaret ediyor.')." },
+    "brain_activity": { "value": 25, "reasoning": "1 MAX short sentence. Explain exactly WHY it got this score based on dreamer's agency. Mention REM sleep or cortex. Extremely concise (e.g. 'Olaylara müdahale edememen, REM uykusundaki tipik motor paralizi ve düşük bilişsel kontrolü yansıtıyor.')." }
   }
 }
 
@@ -262,7 +268,7 @@ CRITICAL QUALITY RULES:
 3. METAPHORS: Compare their dream to visceral things. Say "Bu kedi senin susturulmuş çığlığındır" instead of "Kedi içesel düşünceleri sembolize eder".
 4. SHOCK FACTOR: The user must read this and think "My god, it saw right through me." Address their fears and unsaid desires directly using "Sen".
 5. NO WIKIPEDIA EXPLANATIONS: E.g., never say "Rüya yalnızlık arzunuzu yansıtır." Instead say: "Kalabalıktan kaçışın, aslında en derinindeki görülme korkunun ta kendisi."
-6. Generate exactly 2-3 symbols, 2-4 scenes, 2-3 zones. All distribution percentages MUST sum to 100.
+6. Generate exactly 2-3 symbols, 2-4 scenes, 2-3 zones. The 'distribution' field is CRITICAL and MUST NOT BE OMITTED. All distribution percentages MUST sum to 100.
 7. Extreme Anti-Redundancy: Every field must be a completely unique insight. Do not repeat the same thought.
 8. The cosmic_closing must use imagery FROM the dream, not generic metaphors.
 9. shadow_self.answer_insight MUST be deeply specific to the answers given.`;
