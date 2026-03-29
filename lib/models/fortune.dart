@@ -347,8 +347,8 @@ class Fortune {
 
     final luckyNumber = Random().nextInt(99) + 1;
     final colors = languageCode == 'tr'
-        ? ['Altın', 'Gümüş', 'Mavi', 'Kırmızı', 'Yeşil', 'Mor', 'Turuncu', 'Pembe']
-        : ['Gold', 'Silver', 'Blue', 'Red', 'Green', 'Purple', 'Orange', 'Pink'];
+        ? ['Altın', 'Gümüş', 'Mavi', 'Kırmızı', 'Yeşil', 'Mor', 'Turuncu', 'Pembe', 'Kahverengi', 'Beyaz', 'Siyah', 'Lacivert']
+        : ['Gold', 'Silver', 'Blue', 'Red', 'Green', 'Purple', 'Orange', 'Pink', 'Brown', 'White', 'Black', 'Navy'];
     final luckyColor = colors[Random().nextInt(colors.length)];
     final luckPercent = 50 + Random().nextInt(51);
 
@@ -378,8 +378,8 @@ class Fortune {
 
     final luckyNumber = Random().nextInt(99) + 1;
     final colors = languageCode == 'tr'
-        ? ['Altın', 'Gümüş', 'Mavi', 'Kırmızı', 'Yeşil', 'Mor', 'Turuncu', 'Pembe']
-        : ['Gold', 'Silver', 'Blue', 'Red', 'Green', 'Purple', 'Orange', 'Pink'];
+        ? ['Altın', 'Gümüş', 'Mavi', 'Kırmızı', 'Yeşil', 'Mor', 'Turuncu', 'Pembe', 'Kahverengi', 'Beyaz', 'Siyah', 'Lacivert']
+        : ['Gold', 'Silver', 'Blue', 'Red', 'Green', 'Purple', 'Orange', 'Pink', 'Brown', 'White', 'Black', 'Navy'];
     final luckyColor = colors[Random().nextInt(colors.length)];
     final luckPercent = 50 + Random().nextInt(51);
 

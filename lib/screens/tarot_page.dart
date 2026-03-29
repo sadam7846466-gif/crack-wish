@@ -13,6 +13,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
+import '../widgets/tarot_share_modal.dart';
 import 'tarot_meanings.dart';
 
 enum RitualState {
@@ -5919,6 +5920,64 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                     _buildPromisesPanel().animate()
                                       .fadeIn(duration: 800.ms, delay: _latestFullReading != null ? 4000.ms : 3300.ms)
                                       .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: _latestFullReading != null ? 4000.ms : 3300.ms, curve: Curves.easeOut),
+                                    const SizedBox(height: 24),
+                                    
+                                    // PAYLAŞ BUTONU
+                                    Center(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          final promises = _latestReading?.promises ?? _latestFullReading?.promises ?? [];
+                                          final cardNames = _selectedCardIndexes.map((i) => _cardName(i)).toList();
+                                          final cardAssets = _selectedCardIndexes.map((i) => _allCards[i].frontAsset).toList();
+                                          final readingText = _latestReading?.generalTheme ?? _latestFullReading?.generalTheme ?? '';
+                                          
+                                          Navigator.of(context).push(
+                                            PageRouteBuilder(
+                                              opaque: false,
+                                              barrierDismissible: true,
+                                              pageBuilder: (context, _, __) => TarotShareModal(
+                                                closingMessage: readingText,
+                                                promises: promises,
+                                                cardNames: cardNames,
+                                                cardAssets: cardAssets,
+                                                isMajorArcana: _isBuyukArkana,
+                                                lang: _isTr ? 'tr' : 'en',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(100),
+                                            color: Colors.white.withOpacity(0.06),
+                                            border: Border.all(
+                                              color: const Color(0xFFE7D6A5).withOpacity(0.3),
+                                              width: 0.8,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.ios_share_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.6), size: 16),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                _isTr ? 'Paylaş' : 'Share',
+                                                style: GoogleFonts.cinzel(
+                                                  color: const Color(0xFFE7D6A5).withOpacity(0.6),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ).animate()
+                                      .fadeIn(duration: 800.ms, delay: _latestFullReading != null ? 4200.ms : 3600.ms)
+                                      .slideY(begin: 0.15, end: 0, duration: 800.ms, delay: _latestFullReading != null ? 4200.ms : 3600.ms, curve: Curves.easeOut),
                                     const SizedBox(height: 32),
                                     // Kartların Gizli Fısıltısı
                                     _buildDailyAdviceCard(
