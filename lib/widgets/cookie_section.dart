@@ -10,6 +10,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../models/fortune.dart';
 import '../services/storage_service.dart';
+import 'share_modal.dart';
 
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
@@ -48,48 +49,88 @@ class _CookieSectionState extends State<CookieSection>
   // Share özelliği
   final ScreenshotController _shareScreenshotController = ScreenshotController();
   bool _isSharing = false;
+  bool _showShareButton = false;
+  bool _isShareButtonPressed = false; // Tıklama/Bounce efekti için
 
   Future<void> _shareFortune() async {
-    if (_isSharing || _currentFortune == null) return;
-    setState(() => _isSharing = true);
-    await Future.delayed(const Duration(milliseconds: 150));
-    try {
-      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-      final image = await _shareScreenshotController.capture(
-        delay: const Duration(milliseconds: 10),
-        pixelRatio: math.max(2.0, pixelRatio),
-      );
-      if (image == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Görsel oluşturulamadı')),
-          );
-        }
-        return;
-      }
-      final directory = await getTemporaryDirectory();
-      final file = await File('${directory.path}/crack_wish_cookie.png').create();
-      await file.writeAsBytes(image);
-      final renderBox = context.findRenderObject() as RenderBox?;
-      final rect = renderBox != null 
-          ? renderBox.localToGlobal(Offset.zero) & renderBox.size 
-          : Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2);
+    if (_currentFortune == null) return;
+    
+    // Cookie ismini dili baz alarak bulalım
+    final String cookieEmoji = widget.selectedCookieEmoji ?? 'spring_wreath';
+    final String lang = Localizations.localeOf(context).languageCode;
+    
+    const tr = {
+      'spring_wreath': 'Bahar Çelengi', 'lucky_clover': 'Şanslı Yonca',
+      'royal_hearts': 'Kraliyet Kalpleri', 'evil_eye': 'Nazar',
+      'pizza_party': 'Pizza Partisi', 'sakura_bloom': 'Sakura',
+      'blue_porcelain': 'Mavi Porselen', 'pink_blossom': 'Pembe Çiçek',
+      'fortune_cat': 'Şans Kedisi', 'wildflower': 'Kır Çiçeği',
+      'cupid_ribbon': 'Aşk Kurdelesi', 'panda_bamboo': 'Panda',
+      'ramadan_cute': 'Ramazan', 'enchanted_forest': 'Büyülü Orman',
+      'golden_arabesque': 'Altın Arabesk', 'midnight_mosaic': 'Gece Mozaiği',
+      'pearl_lace': 'İnci Dantel', 'golden_sakura': 'Altın Sakura',
+      'dragon_phoenix': 'Ejderha & Anka', 'gold_beasts': 'Altın Canavarlar',
+    };
+    const en = {
+      'spring_wreath': 'Spring Wreath', 'lucky_clover': 'Lucky Clover',
+      'royal_hearts': 'Royal Hearts', 'evil_eye': 'Evil Eye',
+      'pizza_party': 'Pizza Party', 'sakura_bloom': 'Sakura Bloom',
+      'blue_porcelain': 'Blue Porcelain', 'pink_blossom': 'Pink Blossom',
+      'fortune_cat': 'Fortune Cat', 'wildflower': 'Wildflower',
+      'cupid_ribbon': 'Cupid Ribbon', 'panda_bamboo': 'Panda Bamboo',
+      'ramadan_cute': 'Ramadan', 'enchanted_forest': 'Enchanted Forest',
+      'golden_arabesque': 'Golden Arabesque', 'midnight_mosaic': 'Midnight Mosaic',
+      'pearl_lace': 'Pearl Lace', 'golden_sakura': 'Golden Sakura',
+      'dragon_phoenix': 'Dragon Phoenix', 'gold_beasts': 'Gold Beasts',
+    };
+    
+    final cookieName = (lang == 'tr' ? tr : en)[cookieEmoji] ?? cookieEmoji;
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: "Günün kurabiyesinden bana bu çıktı! 🥠✨\nSen de kendi kaderini keşfetmek istersen #CrackWish'i indir!",
-        sharePositionOrigin: rect,
-      );
-    } catch (e) {
-      debugPrint('Share error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Paylaşım hatası: $e')),
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.88), // Biraz daha derinlik
+      barrierDismissible: true,
+      barrierLabel: 'ShareOptions',
+      transitionDuration: const Duration(milliseconds: 450), // Daha sakin ve yumuşak süre
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ShareModal(
+          fortune: _currentFortune!,
+          cookieEmoji: cookieEmoji,
+          lang: lang,
+          cookieName: cookieName,
+          imagePath: _cookieImageMap[cookieEmoji],
         );
-      }
-    } finally {
-      if (mounted) setState(() => _isSharing = false);
-    }
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        // Yumuşacık bir kavis (Curve) oluştur: Açılırken easeOutCubic (yavaşlayarak oturur), Kapanırken easeInCubic
+        final curve = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
+        
+        return FadeTransition(
+          opacity: curve, // Parlayarak beliriş
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(curve), // Aşağıdan süzülüş
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.94, end: 1.0).animate(curve), // Kibarca büyüme
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleShareTap() async {
+    if (_isSharing) return; // Çifte tıklamayı veya işlem varken tekrar tetiklemeyi önle
+    
+    // Çok hızlı tıklansa bile (tek tıkta) efekti sonuna kadar göstermeye zorla:
+    if (mounted) setState(() => _isShareButtonPressed = true);
+    await Future.delayed(const Duration(milliseconds: 100)); // Küçülme süresi
+    
+    if (mounted) setState(() => _isShareButtonPressed = false);
+    await Future.delayed(const Duration(milliseconds: 80)); // Geri büyüme hissi başlangıcı
+
+    // Modal ekranına şimdi geç
+    _shareFortune();
   }
 
   // Dışardan (ör. CookieSelector tap) çağrılınca mesajı kapat
@@ -331,6 +372,14 @@ class _CookieSectionState extends State<CookieSection>
       _currentFortune = fortune;
       _isPressed = false;
       _showFortune = true;
+      _showShareButton = false;
+    });
+
+    // Paylaş butonu kağıt açıldıktan 1.2sn sonra yumuşakça gelsin
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted && _showFortune) {
+        setState(() => _showShareButton = true);
+      }
     });
 
     // Kırılma animasyonu bitsin
@@ -569,6 +618,7 @@ class _CookieSectionState extends State<CookieSection>
                 setState(() {
                   _showFortune = false;
                   _currentFortune = null;
+                  _showShareButton = false;
                 });
               },
             ),
@@ -580,41 +630,63 @@ class _CookieSectionState extends State<CookieSection>
             left: 0,
             right: 0,
             child: Center(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: _shareFortune,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                offset: _showShareButton ? Offset.zero : const Offset(0, 1.5),
                 child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: _showFortune ? 1.0 : 0.0,
-                  child: _isSharing
-                      ? const SizedBox(
-                          height: 20, width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.ios_share_rounded, color: Colors.white, size: 14),
-                              SizedBox(width: 4),
-                              Text(
-                                'Paylaş',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                ),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                  opacity: _showShareButton ? 1.0 : 0.0,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapDown: _showShareButton ? (_) => mounted ? setState(() => _isShareButtonPressed = true) : null : null,
+                    onTapUp: _showShareButton ? (_) => mounted ? setState(() => _isShareButtonPressed = false) : null : null,
+                    onTapCancel: () => mounted ? setState(() => _isShareButtonPressed = false) : null,
+                    onTap: _showShareButton ? _handleShareTap : null,
+                    child: AnimatedScale(
+                      scale: _isShareButtonPressed ? 0.88 : 1.0,
+                      duration: const Duration(milliseconds: 150),
+                      curve: Curves.easeOutQuart,
+                      child: _isSharing
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
                               ),
-                            ],
-                          ),
-                        ),
+                              child: const SizedBox(
+                                height: 16, width: 16,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.ios_share_rounded, color: Colors.white, size: 14),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'Paylaş',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1131,28 +1203,29 @@ class _FortunePaperState extends State<_FortunePaper>
                                                     widget.fortune.meaning,
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                      color: Color(0xFF4A3928),
-                                                      fontSize: 11.5,
-                                                      fontWeight: FontWeight.w500,
-                                                      height: 1.3,
-                                                      letterSpacing: 0.1,
+                                                      color: Color(0xFF1E140C), // Adeta bir mürekkep gibi kapkara/koyu sepia
+                                                      fontSize: 12.0, // Font bir tık büyütüldü
+                                                      fontWeight: FontWeight.w600, // Orta incelikten yarı kalına (çok daha net)
+                                                      height: 1.35, // Satır arası biraz ferahlatıldı
+                                                      letterSpacing: 0.2, // Kelimeler arası esneklik verildi
                                                     ),
                                                   ),
                                                   const SizedBox(height: 24),
                                                   Container(
-                                                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                                                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 2),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFFE8DCC6).withOpacity(0.5),
-                                                      borderRadius: BorderRadius.circular(4),
+                                                      color: Colors.white.withOpacity(0.3), // Daha temiz bir zemin
+                                                      border: Border.all(color: const Color(0xFFCBB98A).withOpacity(0.5), width: 0.5), // Keskin sınır
+                                                      borderRadius: BorderRadius.circular(6),
                                                     ),
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                       children: [
-                                                        _LuckyItem(label: l10n.luckyNumber, value: '${widget.fortune.luckyNumber}', icon: Icons.confirmation_number_outlined, compact: true),
-                                                        Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
-                                                        _LuckyItem(label: l10n.luckyColor, value: widget.fortune.luckyColor, icon: Icons.palette_outlined, compact: true),
-                                                        Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
-                                                        _LuckyItem(label: l10n.luckLabel, value: '${widget.fortune.luckPercent}%', icon: Icons.show_chart, compact: true),
+                                                        _LuckyItem(label: l10n.luckyNumber, value: '${widget.fortune.luckyNumber}', icon: Icons.confirmation_number_rounded, compact: true),
+                                                        Container(width: 0.8, height: 10, color: const Color(0xFFB8963E).withOpacity(0.3)), // Daha belirgin ayrım 
+                                                        _LuckyItem(label: l10n.luckyColor, value: widget.fortune.luckyColor, icon: Icons.palette_rounded, compact: true),
+                                                        Container(width: 0.8, height: 10, color: const Color(0xFFB8963E).withOpacity(0.3)),
+                                                        _LuckyItem(label: l10n.luckLabel, value: '${widget.fortune.luckPercent}%', icon: Icons.auto_graph_rounded, compact: true),
                                                       ],
                                                     ),
                                                   ),
@@ -1197,11 +1270,11 @@ class _LuckyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Compact mod için boyut ayarları
-    final double iconSize = compact ? 12 : 20;
-    final double labelSize = compact ? 6 : 8;
-    final double valueSize = compact ? 8 : 11;
-    final double spacing = compact ? 1 : 4;
+    // Compact mod için daha zarif, minik ama "okunabilir" boyut ayarları
+    final double iconSize = compact ? 11 : 20;
+    final double labelSize = compact ? 5.5 : 8;
+    final double valueSize = compact ? 9 : 11;
+    final double spacing = compact ? 1.5 : 4;
 
     return Expanded(
       child: Column(
@@ -1211,7 +1284,7 @@ class _LuckyItem extends StatelessWidget {
             Icon(
               icon,
               size: iconSize,
-              color: const Color(0xFFD4AF37), // Altın ikon
+              color: const Color(0xFF9E7B4F), // Daha koyu, daha okunabilir tok altın/bronz
             ),
             SizedBox(height: spacing),
           ],
@@ -1219,9 +1292,9 @@ class _LuckyItem extends StatelessWidget {
             label.toUpperCase(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: const Color(0xFF8b7aa8),
+              color: const Color(0xFF7A6B63), // Uçuk mor yerine kağıda zıt, tok bir vizon/kahve
               fontSize: labelSize,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w700, // Çok küçük olduğu için weight artırıldı (okunabilirlik)
               letterSpacing: 0.5,
             ),
           ),
@@ -1230,9 +1303,10 @@ class _LuckyItem extends StatelessWidget {
             value,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: const Color(0xFF5a3db0),
+              color: const Color(0xFF2B1636), // Silik mor yerine kapkaranlık, mürekkep moru/siyah (Çok net)
               fontSize: valueSize,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800, // Okunması için ekstra kalın
+              letterSpacing: 0.2,
             ),
           ),
         ],
