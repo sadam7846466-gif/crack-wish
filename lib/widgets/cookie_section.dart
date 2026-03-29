@@ -1,7 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../models/fortune.dart';
@@ -40,6 +44,53 @@ class _CookieSectionState extends State<CookieSection>
   late AnimationController _sparkleController;
   bool _isCracking = false;
   final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // Share özelliği
+  final ScreenshotController _shareScreenshotController = ScreenshotController();
+  bool _isSharing = false;
+
+  Future<void> _shareFortune() async {
+    if (_isSharing || _currentFortune == null) return;
+    setState(() => _isSharing = true);
+    await Future.delayed(const Duration(milliseconds: 150));
+    try {
+      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final image = await _shareScreenshotController.capture(
+        delay: const Duration(milliseconds: 10),
+        pixelRatio: math.max(2.0, pixelRatio),
+      );
+      if (image == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Görsel oluşturulamadı')),
+          );
+        }
+        return;
+      }
+      final directory = await getTemporaryDirectory();
+      final file = await File('${directory.path}/crack_wish_cookie.png').create();
+      await file.writeAsBytes(image);
+      final renderBox = context.findRenderObject() as RenderBox?;
+      final rect = renderBox != null 
+          ? renderBox.localToGlobal(Offset.zero) & renderBox.size 
+          : Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: "Günün kurabiyesinden bana bu çıktı! 🥠✨\nSen de kendi kaderini keşfetmek istersen #CrackWish'i indir!",
+        sharePositionOrigin: rect,
+      );
+    } catch (e) {
+      debugPrint('Share error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Paylaşım hatası: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSharing = false);
+    }
+  }
 
   // Dışardan (ör. CookieSelector tap) çağrılınca mesajı kapat
   void hideFortune() {
@@ -346,6 +397,7 @@ class _CookieSectionState extends State<CookieSection>
                             cookieEmoji:
                                 widget.selectedCookieEmoji ?? 'spring_wreath',
                             onAnimationComplete: () {},
+                            screenshotController: _shareScreenshotController,
                           ),
                         ),
                       ),
@@ -519,6 +571,52 @@ class _CookieSectionState extends State<CookieSection>
                   _currentFortune = null;
                 });
               },
+            ),
+          ),
+        // Paylaş butonu — en üst katmanda, dismiss'in üstünde
+        if (_showFortune && _currentFortune != null)
+          Positioned(
+            bottom: 8,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _shareFortune,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: _showFortune ? 1.0 : 0.0,
+                  child: _isSharing
+                      ? const SizedBox(
+                          height: 20, width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.ios_share_rounded, color: Colors.white, size: 14),
+                              SizedBox(width: 4),
+                              Text(
+                                'Paylaş',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ),
             ),
           ),
       ],
@@ -794,11 +892,13 @@ class _FortunePaper extends StatefulWidget {
   final Fortune fortune;
   final String cookieEmoji; // Seçili cookie emojisi
   final VoidCallback onAnimationComplete;
+  final ScreenshotController? screenshotController;
 
   const _FortunePaper({
     required this.fortune,
     required this.cookieEmoji,
     required this.onAnimationComplete,
+    this.screenshotController,
   });
 
   @override
@@ -932,131 +1032,141 @@ class _FortunePaperState extends State<_FortunePaper>
               child: Opacity(
                 opacity: opacity,
                 child: Center(
-                child: SizedBox(
-                  width: paperWidth,
-                  height: paperHeight,
                   child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
                     children: [
-                      // Gölge (kağıdın arkası)
-                      Positioned.fill(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 2, left: 1),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2 * opacity),
-                                blurRadius: 18,
-                                offset: const Offset(0, 6),
-                                spreadRadius: -2,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Kağıt — yırtık kenarlarla
-                      Positioned.fill(
-                        child: ClipPath(
-                          clipper: _TornPaperClipper(),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            color: const Color(0xFFF2E8D5),
-                            child: Stack(
-                              children: [
-                                // Hafif buruşukluk
-                                Positioned(
-                                  right: 22, top: 14,
-                                  child: Transform.rotate(
-                                    angle: 0.3,
-                                    child: Container(width: 14, height: 0.3, color: Colors.black.withOpacity(0.04)),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 28, bottom: 22,
-                                  child: Transform.rotate(
-                                    angle: -0.15,
-                                    child: Container(width: 16, height: 0.3, color: Colors.black.withOpacity(0.03)),
-                                  ),
-                                ),
-                                // İçerik
-                                Positioned.fill(
-                                  child: Opacity(
-                                    opacity: contentT,
-                                    child: SingleChildScrollView(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Kurabiye görseli
-                                          Builder(
-                                            builder: (context) {
-                                              final imagePath = _cookieImageMap[widget.cookieEmoji];
-                                              if (imagePath != null) {
-                                                return Image.asset(
-                                                  imagePath,
-                                                  width: 28,
-                                                  height: 28,
-                                                  fit: BoxFit.contain,
-                                                  errorBuilder: (_, __, ___) =>
-                                                      Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13),
-                                                );
-                                              }
-                                              return Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13);
-                                            },
-                                          ),
-                                          const SizedBox(height: 2),
-                                          // Kurabiye adı (lokalize)
-                                          Text(
-                                            _cookieNameForPaper(widget.cookieEmoji, Localizations.localeOf(context).languageCode),
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: Color(0xFF5A3D28),
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 0.3,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Container(
-                                            width: 20, height: 0.5,
-                                            color: const Color(0xFFCBB98A).withOpacity(0.5),
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            widget.fortune.meaning,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: Color(0xFF4A3928),
-                                              fontSize: 11.5,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.3,
-                                              letterSpacing: 0.1,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 24),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFE8DCC6).withOpacity(0.5),
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                              children: [
-                                                _LuckyItem(label: l10n.luckyNumber, value: '${widget.fortune.luckyNumber}', icon: Icons.confirmation_number_outlined, compact: true),
-                                                Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
-                                                _LuckyItem(label: l10n.luckyColor, value: widget.fortune.luckyColor, icon: Icons.palette_outlined, compact: true),
-                                                Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
-                                                _LuckyItem(label: l10n.luckLabel, value: '${widget.fortune.luckPercent}%', icon: Icons.show_chart, compact: true),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                      Screenshot(
+                        controller: widget.screenshotController ?? ScreenshotController(),
+                        child: SizedBox(
+                          width: paperWidth,
+                          height: paperHeight,
+                          child: Stack(
+                            children: [
+                              // Gölge (kağıdın arkası)
+                              Positioned.fill(
+                                child: Container(
+                                  margin: const EdgeInsets.only(top: 2, left: 1),
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2 * opacity),
+                                        blurRadius: 18,
+                                        offset: const Offset(0, 6),
+                                        spreadRadius: -2,
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Kağıt — yırtık kenarlarla
+                              Positioned.fill(
+                                child: ClipPath(
+                                  clipper: _TornPaperClipper(),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    color: const Color(0xFFF2E8D5),
+                                    child: Stack(
+                                      children: [
+                                        // Hafif buruşukluk
+                                        Positioned(
+                                          right: 22, top: 14,
+                                          child: Transform.rotate(
+                                            angle: 0.3,
+                                            child: Container(width: 14, height: 0.3, color: Colors.black.withOpacity(0.04)),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 28, bottom: 22,
+                                          child: Transform.rotate(
+                                            angle: -0.15,
+                                            child: Container(width: 16, height: 0.3, color: Colors.black.withOpacity(0.03)),
+                                          ),
+                                        ),
+                                        // İçerik
+                                        Positioned.fill(
+                                          child: Opacity(
+                                            opacity: contentT,
+                                            child: SingleChildScrollView(
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  // Kurabiye görseli
+                                                  Builder(
+                                                    builder: (context) {
+                                                      final imagePath = _cookieImageMap[widget.cookieEmoji];
+                                                      if (imagePath != null) {
+                                                        return Image.asset(
+                                                          imagePath,
+                                                          width: 28,
+                                                          height: 28,
+                                                          fit: BoxFit.contain,
+                                                          errorBuilder: (_, __, ___) =>
+                                                              Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13),
+                                                        );
+                                                      }
+                                                      return Icon(Icons.auto_awesome, color: const Color(0xFFB8963E).withOpacity(0.6), size: 13);
+                                                    },
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  // Kurabiye adı (lokalize)
+                                                  Text(
+                                                    _cookieNameForPaper(widget.cookieEmoji, Localizations.localeOf(context).languageCode),
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF5A3D28),
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.w600,
+                                                      letterSpacing: 0.3,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Container(
+                                                    width: 20, height: 0.5,
+                                                    color: const Color(0xFFCBB98A).withOpacity(0.5),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    widget.fortune.meaning,
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF4A3928),
+                                                      fontSize: 11.5,
+                                                      fontWeight: FontWeight.w500,
+                                                      height: 1.3,
+                                                      letterSpacing: 0.1,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFE8DCC6).withOpacity(0.5),
+                                                      borderRadius: BorderRadius.circular(4),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        _LuckyItem(label: l10n.luckyNumber, value: '${widget.fortune.luckyNumber}', icon: Icons.confirmation_number_outlined, compact: true),
+                                                        Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
+                                                        _LuckyItem(label: l10n.luckyColor, value: widget.fortune.luckyColor, icon: Icons.palette_outlined, compact: true),
+                                                        Container(width: 0.5, height: 12, color: const Color(0xFFCBB98A).withOpacity(0.4)),
+                                                        _LuckyItem(label: l10n.luckLabel, value: '${widget.fortune.luckPercent}%', icon: Icons.show_chart, compact: true),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -1065,7 +1175,6 @@ class _FortunePaperState extends State<_FortunePaper>
                 ),
               ),
             ),
-          ),
           ),
         );
       },

@@ -1004,10 +1004,8 @@ class _DreamPageState extends State<DreamPage>
               ),
             ),
           ),
-          AnimatedOpacity(
+          Opacity(
             opacity: (_showAnalysisOverlay && (_overlayContent == 'results' || _overlayContent == 'analyzing')) ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeOutCubic,
             child: IgnorePointer(
               ignoring: (_showAnalysisOverlay && (_overlayContent == 'results' || _overlayContent == 'analyzing')),
               child: GestureDetector(
@@ -1881,7 +1879,7 @@ class _DreamPageState extends State<DreamPage>
       },
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: _analysisOverlayVisible ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 1000), // Yumu\u015fak a\u00e7\u0131l\u0131\u015f
       curve: Curves.easeOutCubic,
       builder: (context, animValue, child) {
         return ClipRect(
@@ -2297,7 +2295,7 @@ class _DreamPageState extends State<DreamPage>
               index: 7,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(40, 24, 40, 0),
-                child: GestureDetector(
+                child: _AnimatedBounceButton(
                   onTap: _isDreamSaved ? null : () async {
                     setState(() { _isDreamSaved = true; _historyKeyTracker++; });
                     try {
@@ -2327,16 +2325,16 @@ class _DreamPageState extends State<DreamPage>
                       border: Border.all(
                           color: _isDreamSaved
                               ? Colors.green.withOpacity(0.3)
-                              : const Color(0xFFC356FE).withOpacity(0.4),
+                              : Colors.white.withOpacity(0.2), // Mor yerine beyaz
                           width: 1),
                       gradient: LinearGradient(
                         colors: [
                           _isDreamSaved
                               ? Colors.green.withOpacity(0.15)
-                              : const Color(0xFFC356FE).withOpacity(0.15),
+                              : Colors.white.withOpacity(0.08), // Mor yerine beyaz gradyan
                           _isDreamSaved
                               ? Colors.green.withOpacity(0.02)
-                              : Colors.transparent,
+                              : Colors.white.withOpacity(0.01),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -2347,7 +2345,7 @@ class _DreamPageState extends State<DreamPage>
                       children: [
                         Icon(
                           _isDreamSaved ? Icons.check_circle : Icons.bookmark_add_rounded,
-                          color: _isDreamSaved ? Colors.greenAccent : const Color(0xFFE5A9FF),
+                          color: _isDreamSaved ? Colors.greenAccent : Colors.white.withOpacity(0.9), // Açık beyaz
                           size: 18,
                         ),
                         const SizedBox(width: 8),
@@ -2356,7 +2354,7 @@ class _DreamPageState extends State<DreamPage>
                               ? (isTr ? 'KAYDEDİLDİ' : 'SAVED')
                               : (isTr ? 'RÜYAYI KAYDET' : 'SAVE DREAM'),
                           style: TextStyle(
-                            color: _isDreamSaved ? Colors.greenAccent : const Color(0xFFE5A9FF),
+                            color: _isDreamSaved ? Colors.greenAccent : Colors.white.withOpacity(0.9), // Açık beyaz
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.2,
@@ -2376,7 +2374,7 @@ class _DreamPageState extends State<DreamPage>
             index: 7,
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, 8, 40, bottomPadding + 80),
-              child: GestureDetector(
+              child: _AnimatedBounceButton(
                 onTap: () {
                   // Formu sıfırla ve input ekranına dön
                   setState(() {
@@ -3005,7 +3003,7 @@ class _DreamPageState extends State<DreamPage>
               emotionLabelValue = parsed != null ? _emotionLabel(parsed) : emotionName;
             }
 
-            return GestureDetector(
+            return _AnimatedBounceButton(
               onTap: () => _showDreamDetail(dream),
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -3020,31 +3018,25 @@ class _DreamPageState extends State<DreamPage>
                     end: Alignment.bottomRight,
                   ),
                   border: Border.all(
-                    color: isPremium 
-                        ? const Color(0xFFC356FE).withOpacity(0.3) 
-                        : Colors.white.withOpacity(0.08),
+                    color: Colors.white.withOpacity(0.08),
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                    child: Row(
                   children: [
                     Container(
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: isPremium 
-                            ? const Color(0xFFC356FE).withOpacity(0.15) 
-                            : Colors.white.withOpacity(0.05),
+                        color: Colors.white.withOpacity(0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isPremium 
-                              ? const Color(0xFFC356FE).withOpacity(0.3) 
-                              : Colors.transparent,
+                          color: Colors.transparent,
                         ),
                       ),
                       child: Icon(
-                        isPremium ? Icons.auto_awesome : Icons.nights_stay_rounded,
-                        color: isPremium ? const Color(0xFFE5A9FF) : Colors.white.withOpacity(0.7),
+                        _resolveDreamIcon(title),
+                        color: Colors.white.withOpacity(0.7),
                         size: 20,
                       ),
                     ),
@@ -3081,14 +3073,14 @@ class _DreamPageState extends State<DreamPage>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: emotionColor.withOpacity(0.1),
+                          color: Colors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: emotionColor.withOpacity(0.3)),
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
                         ),
                         child: Text(
                           emotionLabelValue,
                           style: TextStyle(
-                            color: emotionColor,
+                            color: Colors.white.withOpacity(0.8),
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
@@ -3112,6 +3104,75 @@ class _DreamPageState extends State<DreamPage>
         );
       },
     );
+  }
+  IconData _resolveDreamIcon(String title) {
+    final t = title.toLowerCase();
+    
+    // TEMEL KORKULAR & KAÇIŞ
+    if (t.contains('karanl') || t.contains('gece') || t.contains('dark') || t.contains('night')) return Icons.nights_stay_rounded;
+    if (t.contains('kork') || t.contains('kabus') || t.contains('canavar') || t.contains('fear')) return Icons.error_outline_rounded;
+    if (t.contains('koş') || t.contains('peşin') || t.contains('takip') || t.contains('kaç')) return Icons.directions_run_rounded;
+    if (t.contains('düş') || t.contains('uçurum') || t.contains('fall')) return Icons.transit_enterexit_rounded;
+    if (t.contains('kaybol') || t.contains('labirent') || t.contains('bulama')) return Icons.help_center_rounded;
+    
+    // DOĞA, ELEMENTLER & UZAY
+    if (t.contains('su') || t.contains('deniz') || t.contains('okyanus') || t.contains('göl')) return Icons.water_drop_rounded;
+    if (t.contains('ateş') || t.contains('yangın') || t.contains('alev') || t.contains('fire')) return Icons.local_fire_department_rounded;
+    if (t.contains('orman') || t.contains('ağaç') || t.contains('doğa') || t.contains('yaprak')) return Icons.park_rounded;
+    if (t.contains('dağ') || t.contains('tepe') || t.contains('tırman') || t.contains('kaya')) return Icons.landscape_rounded;
+    if (t.contains('yağmur') || t.contains('fırtına') || t.contains('şimşek') || t.contains('sel')) return Icons.thunderstorm_rounded;
+    if (t.contains('kar ') || t.contains('kış') || t.contains('soğuk') || t.contains('buz')) return Icons.ac_unit_rounded;
+    if (t.contains('uzay') || t.contains('gezegen') || t.contains('yıldız') || t.contains('ayı')) return Icons.rocket_launch_rounded;
+    if (t.contains('ışık') || t.contains('parlak') || t.contains('güneş')) return Icons.wb_sunny_rounded;
+
+    // YAŞAM, ÖLÜM, DÖNÜŞÜM
+    if (t.contains('ölüm') || t.contains('ölü') || t.contains('mezar') || t.contains('cenaze')) return Icons.blur_on_rounded;
+    if (t.contains('doğum') || t.contains('bebek') || t.contains('hamile')) return Icons.child_care_rounded;
+    if (t.contains('hasta') || t.contains('kan ') || t.contains('yaralan') || t.contains('diş')) return Icons.local_hospital_rounded;
+    if (t.contains('yüzleş') || t.contains('dönüş') || t.contains('ayna') || t.contains('sır')) return Icons.all_inclusive_rounded;
+    if (t.contains('gizem') || t.contains('büyü') || t.contains('cadı') || t.contains('ruh')) return Icons.visibility_outlined;
+
+    // İLİŞKİLER & İNSANLAR
+    if (t.contains('eski sev') || t.contains('aldat') || t.contains('ayrıl')) return Icons.heart_broken_rounded;
+    if (t.contains('aşk') || t.contains('sev') || t.contains('öp') || t.contains('sevgil')) return Icons.favorite_border_rounded;
+    if (t.contains('aile') || t.contains('anne') || t.contains('baba') || t.contains('kardeş')) return Icons.family_restroom_rounded;
+    if (t.contains('arkadaş') || t.contains('dost') || t.contains('kalabalık')) return Icons.groups_rounded;
+    if (t.contains('düğün') || t.contains('parti') || t.contains('kutlama') || t.contains('eğlen')) return Icons.celebration_rounded;
+    if (t.contains('kavga') || t.contains('savaş') || t.contains('silah') || t.contains('dövüş')) return Icons.shield_moon_rounded;
+
+    // NESNELER & YERLER
+    if (t.contains('ev') || t.contains('oda') || t.contains('bina') || t.contains('kapı')) return Icons.other_houses_rounded;
+    if (t.contains('şato') || t.contains('saray') || t.contains('kale')) return Icons.castle_rounded;
+    if (t.contains('araba') || t.contains('kaza') || t.contains('sür') || t.contains('trafik')) return Icons.directions_car_rounded;
+    if (t.contains('uçak') || t.contains('havaliman') || t.contains('uç') || t.contains('kanat')) return Icons.flight_takeoff_rounded;
+    if (t.contains('tren') || t.contains('yol') || t.contains('istasyon')) return Icons.moving_rounded;
+    if (t.contains('okul') || t.contains('sınav') || t.contains('ders') || t.contains('öğretmen')) return Icons.menu_book_rounded;
+    if (t.contains('para') || t.contains('zengin') || t.contains('altın') || t.contains('cüzdan')) return Icons.attach_money_rounded;
+    if (t.contains('yemek') || t.contains('mutfak') || t.contains('aç') || t.contains('restoran')) return Icons.restaurant_rounded;
+    if (t.contains('saat') || t.contains('zaman') || t.contains('geç kal') || t.contains('bekle')) return Icons.schedule_rounded;
+    if (t.contains('müzik') || t.contains('şarkı') || t.contains('dans') || t.contains('konser')) return Icons.music_note_rounded;
+
+    // CANLILAR
+    if (t.contains('hayvan') || t.contains('köpek') || t.contains('kedi')) return Icons.pets_rounded;
+    if (t.contains('yılan')) return Icons.gesture_rounded; // Yılana benzer şekil
+    if (t.contains('kuş') || t.contains('karga')) return Icons.flutter_dash_rounded;
+    if (t.contains('böcek') || t.contains('örümcek')) return Icons.bug_report_rounded;
+
+    // HİÇBİRİNE UYMAZSA - Çeşitlilik sağlayan rastgele ama sabit ikonlar
+    final fallbacks = [
+      Icons.auto_awesome,           // Yıldızlar
+      Icons.toll_rounded,           // Aura/Para
+      Icons.fingerprint_rounded,    // Kimlik/Gizem
+      Icons.hdr_strong_rounded,     // Noktalar/Yol
+      Icons.blur_circular_rounded,  // Duman/Sis
+      Icons.lens_blur_rounded,      // Karışıklık
+      Icons.flare_rounded,          // Işık patlaması
+      Icons.bubble_chart_rounded,   // Baloncuklar
+    ];
+    
+    // Başlığın uzunluğuna veya içeriğine göre her zaman aynı rüyaya aynı ikonu vermek için
+    final hashIndex = title.length % fallbacks.length;
+    return fallbacks[hashIndex];
   }
 
   String _formatDate(String iso) {
@@ -3164,15 +3225,14 @@ class _DreamPageState extends State<DreamPage>
           _isPremiumResult = true;
           _isFromHistory = true; // History'den yüklendiğini işaretle
           
-          // EKSİK KALAN OVERLAY ÇİZİCİLERİ: BUNLAR OLMADAN ŞEFFAF BLOKER OLUŞURYORDU!
           _showAnalysisOverlay = true; 
           _analysisOverlayVisible = true;
           
-          _isWriting = true; // Premium View ana state'i kaplar
+          _isWriting = true;
           _overlayContent = 'results';
           _currentDreamId = dream['id']?.toString();
           _selectedReflectionAction = dream['reflectionAction']?.toString();
-          _isDreamSaved = true; // Kayıttan geldiği için kayıtlı kabul edilir
+          _isDreamSaved = true;
         });
       } catch (e, stack) {
         debugPrint('Parsing error in History Tap: $e\n$stack');
@@ -5968,7 +6028,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
     {
       'percentage': widget.distribution.emotionalLoad / 100.0,
       'title': widget.isTr ? 'Duygusal\nYoğunluk' : 'Emotional\nLoad',
-      'color': const Color(0xFFD500F9),
+      'color': const Color(0xFFDCA4FF), // Yumu\u015fat\u0131lm\u0131\u015f lila/pembe
       'reasoning': widget.distribution.emotionalLoadReasoning,
       'description': widget.isTr
           ? 'Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.'
@@ -5977,7 +6037,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
     {
       'percentage': widget.distribution.uncertainty / 100.0,
       'title': widget.isTr ? 'Anlatısal\nBelirsizlik' : 'Narrative\nUncertainty',
-      'color': const Color(0xFF536DFE),
+      'color': const Color(0xFF9BA6FF), // Yumu\u015fat\u0131lm\u0131\u015f mavi
       'reasoning': widget.distribution.uncertaintyReasoning,
       'description': widget.isTr
           ? 'Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.'
@@ -5986,7 +6046,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
     {
       'percentage': widget.distribution.recentMemoryEffect / 100.0,
       'title': widget.isTr ? 'Yakın\nGeçmiş' : 'Recent\nConnection',
-      'color': const Color(0xFF00BFA5),
+      'color': const Color(0xFF8ADABD), // Yumu\u015fat\u0131lm\u0131\u015f mint ye\u015fili
       'reasoning': widget.distribution.recentMemoryReasoning,
       'description': widget.isTr
           ? 'Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.'
@@ -5995,7 +6055,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
     {
       'percentage': widget.distribution.brainActivity / 100.0,
       'title': widget.isTr ? 'Ajans /\nKontrol' : 'Agency /\nControl',
-      'color': const Color(0xFF4DB6AC),
+      'color': const Color(0xFF86D2E1), // Yumu\u015fat\u0131lm\u0131\u015f cam g\u00f6be\u011fi
       'reasoning': widget.distribution.brainActivityReasoning,
       'description': widget.isTr
           ? 'Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.'
@@ -6588,7 +6648,7 @@ class _ClinicalReflectionQuestionState extends State<_ClinicalReflectionQuestion
     
     final opacity = isAnySelected ? (isSelected ? 1.0 : 0.3) : 1.0;
 
-    return GestureDetector(
+    return _AnimatedBounceButton(
       onTap: () => _onActionSelected(actionKey),
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),
@@ -6892,5 +6952,68 @@ class _PremiumRevealState extends State<_PremiumReveal> with SingleTickerProvide
   @override
   Widget build(BuildContext context) {
     return FadeTransition(opacity: _fade, child: SlideTransition(position: _slide, child: widget.child));
+  }
+}
+
+class _AnimatedBounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  
+  const _AnimatedBounceButton({Key? key, required this.child, this.onTap}) : super(key: key);
+
+  @override
+  State<_AnimatedBounceButton> createState() => _AnimatedBounceButtonState();
+}
+
+class _AnimatedBounceButtonState extends State<_AnimatedBounceButton> {
+  bool _isPressed = false;
+  DateTime? _pressedAt;
+
+  void _handleTapDown(TapDownDetails _) {
+    _pressedAt = DateTime.now();
+    setState(() => _isPressed = true);
+  }
+
+  void _handleTapUp(TapUpDetails _) {
+    final elapsed = DateTime.now().difference(_pressedAt ?? DateTime.now()).inMilliseconds;
+    // Minimum 180ms basılı kalsın ki efekt gözle görülsün
+    final remaining = (180 - elapsed).clamp(0, 180);
+    
+    Future.delayed(Duration(milliseconds: remaining), () {
+      if (!mounted) return;
+      setState(() => _isPressed = false);
+      
+      // Geri sıçrama animasyonunun bitmesini bekle, sonra aksiyonu çalıştır
+      Future.delayed(const Duration(milliseconds: 160), () {
+        if (mounted && widget.onTap != null) {
+          widget.onTap!();
+        }
+      });
+    });
+  }
+
+  void _handleTapCancel() {
+    setState(() => _isPressed = false);
+    _pressedAt = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: widget.onTap != null ? _handleTapDown : null,
+      onTapUp: widget.onTap != null ? _handleTapUp : null,
+      onTapCancel: widget.onTap != null ? _handleTapCancel : null,
+      child: AnimatedScale(
+        scale: _isPressed ? 0.92 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: AnimatedOpacity(
+          opacity: _isPressed ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          child: widget.child,
+        ),
+      ),
+    );
   }
 }
