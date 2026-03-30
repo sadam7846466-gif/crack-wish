@@ -189,20 +189,16 @@ class _BentoGridState extends State<BentoGrid>
                     ),
                     const SizedBox(height: 8),
                     // Motivasyon kartı - dış Stack (gezegen taşabilir)
+                    // MOD KARTI — KİLİTLİ
                     _PressableCardWrapper(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          SwipeFadePageRoute(
-                            page: const MotivationPage(),
-                          ),
-                        );
-                      },
+                      onTap: () {},
                       child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         // İç ClipRRect (roket, astronotlar içeride kalır)
-                        ClipRRect(
+                        Opacity(
+                          opacity: 0.5,
+                          child: ClipRRect(
                           borderRadius: BorderRadius.circular(18),
                           child: Stack(
                             clipBehavior: Clip.hardEdge,
@@ -216,12 +212,11 @@ class _BentoGridState extends State<BentoGrid>
                                 ),
                                 title: l10n.bentoMotivationTitle,
                                 desc: l10n.bentoMotivationDesc,
-                                accent: const Color(0xFF50F0A0), // Parlak neon yeşil
-                                accentSoft: const Color(0xFF208050), // Doygun koyu yeşil
+                                accent: const Color(0xFF50F0A0),
+                                accentSoft: const Color(0xFF208050),
                                 badgeText: l10n.bentoMotivationBadge,
                                 badgeHidden: true,
                               ),
-                              // Roket - SABİT KONUM
                               Positioned(
                                 right: -7 * scale,
                                 top: -20 * scale,
@@ -234,7 +229,6 @@ class _BentoGridState extends State<BentoGrid>
                                   ),
                                 ),
                               ),
-                              // Astronot 2 - SABİT KONUM
                               Positioned(
                                 right: -10 * scale,
                                 bottom: -30 * scale,
@@ -249,7 +243,6 @@ class _BentoGridState extends State<BentoGrid>
                                   ),
                                 ),
                               ),
-                              // Astronot 1 - SABİT KONUM
                               Positioned(
                                 left: -3 * scale,
                                 bottom: -19 * scale,
@@ -267,18 +260,54 @@ class _BentoGridState extends State<BentoGrid>
                             ],
                           ),
                         ),
+                        ),
+                        // "Çok Yakında" overlay
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.35),
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(color: Colors.white.withOpacity(0.15)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.lock_rounded, color: Colors.white.withOpacity(0.9), size: 13),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      l10n.localeName == 'tr' ? 'Yakında' : 'Soon',
+                                      style: GoogleFonts.inter(
+                                        color: Colors.white.withOpacity(0.95),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         // Gezegen - hafif yüzme hareketi
                         Positioned(
                           right: -16 * scale,
                           top: -29 * scale,
                           child: IgnorePointer(
-                            child: _FloatingWidget(
+                            child: Opacity(
+                              opacity: 0.4,
+                              child: _FloatingWidget(
                               child: Image.asset(
                                 'assets/images/motivegezegen.webp',
                                 width: 160 * scale,
                                 height: 160 * scale,
                                 fit: BoxFit.contain,
                               ),
+                            ),
                             ),
                           ),
                         ),
@@ -287,11 +316,14 @@ class _BentoGridState extends State<BentoGrid>
                           left: 55 * scale,
                           top: 37 * scale,
                           child: IgnorePointer(
-                            child: Image.asset(
+                            child: Opacity(
+                              opacity: 0.4,
+                              child: Image.asset(
                               'assets/images/motiveYILDIZ.webp',
                               width: 80 * scale,
                               height: 80 * scale,
                               fit: BoxFit.contain,
+                            ),
                             ),
                           ),
                         ),
@@ -350,47 +382,135 @@ class _BentoGridState extends State<BentoGrid>
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        // Mood Section
-        _MoodCard(),
       ],
     );
   }
 }
 
-class _MoodCard extends StatefulWidget {
-  @override
-  State<_MoodCard> createState() => _MoodCardState();
-}
-
-class _MoodCardState extends State<_MoodCard> {
-  String? _selectedMood;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMood();
-  }
-
-  Future<void> _loadMood() async {
-    final mood = await StorageService.getMood();
-    setState(() {
-      _selectedMood = mood;
-    });
-  }
-
-  Future<void> _selectMood(String mood) async {
-    await StorageService.setMood(mood);
-    setState(() {
-      _selectedMood = mood;
-    });
-  }
-
+class _MoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.localeName == 'tr' ? 'Bu özellik çok yakında aktif olacak ✨' : 'This feature is coming soon ✨',
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.white.withOpacity(0.12),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
+      child: Stack(
+        children: [
+          Opacity(
+            opacity: 0.4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.12),
+                    Colors.white.withOpacity(0.06),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.white.withOpacity(0.18)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.moodQuestion,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textWhite,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _LockedEmojiIcon(icon: CupertinoIcons.cloud_rain_fill),
+                      const SizedBox(width: 6),
+                      _LockedEmojiIcon(icon: CupertinoIcons.cloud_sun_fill),
+                      const SizedBox(width: 6),
+                      _LockedEmojiIcon(icon: CupertinoIcons.smiley_fill),
+                      const SizedBox(width: 6),
+                      _LockedEmojiIcon(icon: Icons.sentiment_very_satisfied_rounded),
+                      const SizedBox(width: 6),
+                      _LockedEmojiIcon(icon: Icons.auto_awesome_rounded),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: Colors.white.withOpacity(0.15)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.lock_rounded, color: Colors.white.withOpacity(0.5), size: 13),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.localeName == 'tr' ? 'Çok Yakında' : 'Coming Soon',
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LockedEmojiIcon extends StatelessWidget {
+  final IconData icon;
+  const _LockedEmojiIcon({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      width: 34,
+      height: 34,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -400,135 +520,12 @@ class _MoodCardState extends State<_MoodCard> {
             Colors.white.withOpacity(0.06),
           ],
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white.withOpacity(0.18)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.moodQuestion,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textWhite,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _MoodEmojiButton(
-                    moodKey: '😢',
-                    icon: CupertinoIcons.cloud_rain_fill,
-                    isSelected: _selectedMood == '😢',
-                    onTap: () => _selectMood('😢'),
-                  ),
-                  const SizedBox(width: 6),
-                  _MoodEmojiButton(
-                    moodKey: '😔',
-                    icon: CupertinoIcons.cloud_sun_fill,
-                    isSelected: _selectedMood == '😔',
-                    onTap: () => _selectMood('😔'),
-                  ),
-                  const SizedBox(width: 6),
-                  _MoodEmojiButton(
-                    moodKey: '😊',
-                    icon: CupertinoIcons.smiley_fill,
-                    isSelected: _selectedMood == '😊',
-                    onTap: () => _selectMood('😊'),
-                  ),
-                  const SizedBox(width: 6),
-                  _MoodEmojiButton(
-                    moodKey: '😄',
-                    icon: Icons.sentiment_very_satisfied_rounded,
-                    isSelected: _selectedMood == '😄',
-                    onTap: () => _selectMood('😄'),
-                  ),
-                  const SizedBox(width: 6),
-                  _MoodEmojiButton(
-                    moodKey: '🤩',
-                    icon: Icons.auto_awesome_rounded,
-                    isSelected: _selectedMood == '🤩',
-                    onTap: () => _selectMood('🤩'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-    );
-  }
-}
-
-class _MoodEmojiButton extends StatelessWidget {
-  final String moodKey;
-  final IconData icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _MoodEmojiButton({
-    required this.moodKey,
-    required this.icon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isSelected
-                    ? [
-                        AppColors.primaryOrange.withOpacity(0.4),
-                        AppColors.primaryOrange.withOpacity(0.2),
-                      ]
-                    : [
-                        Colors.white.withOpacity(0.12),
-                        Colors.white.withOpacity(0.06),
-                      ],
-              ),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected
-                    ? AppColors.primaryOrange.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.18),
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primaryOrange.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: isSelected ? 18 : 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
+      child: Center(
+        child: Icon(icon, size: 16, color: Colors.white.withOpacity(0.4)),
+      ),
     );
   }
 }

@@ -29,18 +29,55 @@ class ShareModal extends StatefulWidget {
   State<ShareModal> createState() => _ShareModalState();
 }
 
-class _ShareModalState extends State<ShareModal> {
+class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
   final ScreenshotController _screenshotController = ScreenshotController();
   bool _isExporting = false;
+  bool _isStoryFormat = true; // true = Hikaye (9:16), false = Gönderi (4:5)
 
-  // Görseli oluştur (ortak method)
+  late final AnimationController _entranceCtrl;
+  late final Animation<double> _fadeAnim;
+  late final Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fadeAnim = CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOut);
+    _scaleAnim = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
+    );
+    _entranceCtrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _entranceCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _dismissModal() async {
+    await _entranceCtrl.reverse();
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  // Görseli oluştur (format'a göre)
   Future<Uint8List?> _generateImage() async {
     try {
+      final height = _isStoryFormat ? 1920.0 : 1350.0;
       return await _screenshotController.captureFromWidget(
-        _buildExportCard(),
+        MediaQuery(
+          data: const MediaQueryData(
+            textScaler: TextScaler.noScaling,
+          ),
+          child: _isStoryFormat ? _buildExportCard() : _buildPostCard(),
+        ),
         context: context,
-        pixelRatio: 1.0,
-        delay: const Duration(milliseconds: 50),
+        pixelRatio: 3.0,
+        targetSize: Size(1080, height),
+        delay: const Duration(milliseconds: 100),
       );
     } catch (e) {
       debugPrint('Image generation error: $e');
@@ -362,36 +399,24 @@ class _ShareModalState extends State<ShareModal> {
 
           // --- İÇERİK KATMANLARI --- //
 
-          // 1. En Üst Kısım: Kurabiye Katmanı (Kesin Olarak Top: 240)
+          // 1. En Üst Kısım: Kurabiye Katmanı (Kesin Olarak Top)
           Positioned(
-            top: 240, left: 0, right: 0,
+            top: 290, left: 0, right: 0,
             child: Center(
               child: SizedBox(
-                width: 400, height: 260,
+                width: 400, height: 300,
                 child: Stack(
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    // Arkasındaki Işık Hüzmesi (Sadece Koyu Temalarda Parıltı)
-                    if (theme.isDark)
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [actualAura.withOpacity(0.45), actualAura.withOpacity(0.0)],
-                              stops: const [0.0, 0.6],
-                            ),
-                          ),
-                        ),
-                      ),
+
                       
                     // Zemin Gölgesi (Aydınlıkta fiziksel kahverengi gölge, Karanlıkta renkli ışık yansıması)
                     Positioned(
-                      bottom: theme.isDark ? 40 : 35, // Aydınlık temada gölge biraz daha alta yayvanca iniyor
+                      bottom: theme.isDark ? 30 : 25, // Aydınlık temada gölge biraz daha alta yayvanca iniyor
                       child: Container(
-                        width: theme.isDark ? 80 : 130, // Aydınlıkta daha geniş temas alanı
-                        height: theme.isDark ? 8 : 14,  // Aydınlıkta elips formu daha belirgin
+                        width: theme.isDark ? 100 : 150, // Aydınlıkta daha geniş temas alanı
+                        height: theme.isDark ? 10 : 16,  // Aydınlıkta elips formu daha belirgin
                         decoration: BoxDecoration(
                           gradient: RadialGradient(
                             colors: theme.isDark
@@ -405,14 +430,14 @@ class _ShareModalState extends State<ShareModal> {
                     
                     // Kurabiye
                     if (widget.imagePath != null)
-                      Image.asset(widget.imagePath!, width: 160, height: 160, fit: BoxFit.contain)
+                      Image.asset(widget.imagePath!, width: 220, height: 220, fit: BoxFit.contain)
                     else 
-                      Text(widget.cookieEmoji, style: const TextStyle(fontSize: 120, fontFamilyFallback: ['Apple Color Emoji'], decoration: TextDecoration.none)),
+                      Text(widget.cookieEmoji, style: const TextStyle(fontSize: 170, fontFamilyFallback: ['Apple Color Emoji'], decoration: TextDecoration.none)),
                     
                     // Mistik Yıldız
                     Positioned(
-                      top: 25, right: 110,
-                      child: Icon(Icons.auto_awesome, color: actualAura.withOpacity(0.9), size: 36),
+                      top: 30, right: 85,
+                      child: Icon(Icons.auto_awesome, color: actualAura.withOpacity(0.9), size: 40),
                     )
                   ],
                 ),
@@ -514,91 +539,324 @@ class _ShareModalState extends State<ShareModal> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      insetPadding: EdgeInsets.zero,
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black.withOpacity(0.4),
-            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 15.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 9:16 KART ALANI (Tıkladığında kapanabilmesi için eklendi)
-                Flexible(
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(), // Butonlar hariç karta tıklanınca kapanır
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.56), // Çok daha kompakt ve orantılı
-                      child: AspectRatio(
-                        aspectRatio: 1080 / 1920,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 40, spreadRadius: 10)],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: FittedBox(
-                              fit: BoxFit.contain, // İçerideki dev 1080p resmi sığdırır
-                              child: _buildExportCard(),
-                            ),
+  // 4:5 Gönderi Kartı (1080x1350)
+  Widget _buildPostCard() {
+    final theme = _getTheme(widget.fortune.luckyColor);
+    final auraBase = _mapFortuneColor(widget.fortune.luckyColor);
+    final actualAura = theme.isDark ? auraBase : theme.aura;
+
+    return Container(
+      width: 1080,
+      height: 1350,
+      decoration: BoxDecoration(
+        color: theme.bgEnd,
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.3),
+          radius: 1.4,
+          colors: [theme.bgStart, theme.bgEnd],
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Vinyet
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.center,
+                  radius: 1.2,
+                  colors: [
+                    Colors.transparent,
+                    theme.isDark ? Colors.black.withOpacity(0.5) : const Color(0xFF2C1919).withOpacity(0.08)
+                  ],
+                  stops: const [0.4, 1.0],
+                ),
+              ),
+            ),
+          ),
+
+          // Yıldız Tozları
+          if (theme.isDark)
+            ...List.generate(8, (i) => Positioned(
+              left: [120.0, 900.0, 200.0, 800.0, 450.0, 650.0, 100.0, 950.0][i],
+              top: [150.0, 250.0, 700.0, 900.0, 100.0, 1100.0, 500.0, 600.0][i],
+              child: Icon(Icons.star, color: actualAura.withOpacity(0.15), size: [10.0, 7.0, 12.0, 8.0, 6.0, 9.0, 11.0, 7.0][i]),
+            )),
+
+          // Kurabiye (üst kısım)
+          Positioned(
+            top: 180, left: 0, right: 0,
+            child: Center(
+              child: SizedBox(
+                width: 350, height: 280,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      bottom: 30,
+                      child: Container(
+                        width: theme.isDark ? 90 : 130,
+                        height: theme.isDark ? 9 : 14,
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: theme.isDark
+                              ? [actualAura.withOpacity(0.7), actualAura.withOpacity(0.0)]
+                              : [const Color(0xFF3B2727).withOpacity(0.3), const Color(0xFF3B2727).withOpacity(0.0)],
+                            stops: const [0.1, 1.0],
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // PREMIUM BUTON GRUBU (2 Buton: İndir + Paylaş)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // İNDİR - Açık çerçeveli krem buton
-                    _buildStyledButton(
-                      label: 'İndir', 
-                      icon: Icons.download_rounded,
-                      bgColor: Colors.transparent,
-                      textColor: const Color(0xFFBBA090),
-                      borderColor: const Color(0xFFBBA090).withOpacity(0.5),
-                      onTap: _saveToGallery,
-                    ),
-                    const SizedBox(width: 12),
-                    // PAYLAŞ - Koyu dolgulu buton
-                    _buildStyledButton(
-                      label: 'Paylaş', 
-                      icon: Icons.ios_share_rounded,
-                      bgColor: const Color(0xFF3A3530),
-                      textColor: Colors.white.withOpacity(0.9),
-                      borderColor: Colors.transparent,
-                      onTap: _shareContent,
+                    if (widget.imagePath != null)
+                      Image.asset(widget.imagePath!, width: 200, height: 200, fit: BoxFit.contain)
+                    else
+                      Text(widget.cookieEmoji, style: const TextStyle(fontSize: 150, fontFamilyFallback: ['Apple Color Emoji'], decoration: TextDecoration.none)),
+                    Positioned(
+                      top: 20, right: 65,
+                      child: Icon(Icons.auto_awesome, color: actualAura.withOpacity(0.9), size: 34),
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+
+          // Mesaj (merkez)
+          Positioned(
+            top: 380, left: 0, right: 0, bottom: 280,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '"',
+                    style: GoogleFonts.lora(
+                      color: theme.quoteText,
+                      fontSize: 80,
+                      fontWeight: FontWeight.w700,
+                      height: 0.4,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                    child: Text(
+                      widget.fortune.meaning,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.lora(
+                        color: theme.mainText,
+                        fontSize: 52,
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.italic,
+                        height: 1.45,
+                        decoration: TextDecoration.none,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // İstatistikler (alt)
+          Positioned(
+            bottom: 160, left: 0, right: 0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(width: 550, height: 1.5, color: theme.separator),
+                const SizedBox(height: 35),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${widget.fortune.luckyNumber}', style: GoogleFonts.montserrat(color: theme.statsText, fontSize: 38, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
+                    const SizedBox(width: 35),
+                    Icon(Icons.flare, color: theme.separator, size: 20),
+                    const SizedBox(width: 35),
+                    Text(widget.fortune.luckyColor, style: GoogleFonts.montserrat(color: theme.statsText, fontSize: 38, fontWeight: FontWeight.w600, letterSpacing: 2.0, decoration: TextDecoration.none)),
+                    const SizedBox(width: 35),
+                    Icon(Icons.flare, color: theme.separator, size: 20),
+                    const SizedBox(width: 35),
+                    Text('%${widget.fortune.luckPercent}', style: GoogleFonts.montserrat(color: theme.statsText, fontSize: 38, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
+                  ],
+                ),
+                const SizedBox(height: 35),
+                Container(width: 550, height: 1.5, color: theme.separator),
               ],
+            ),
+          ),
+
+          // Logo (en alt)
+          Positioned(
+            bottom: 70, left: 0, right: 0,
+            child: Center(
+              child: Text(
+                'CRACK & WISH',
+                style: GoogleFonts.montserrat(
+                  color: theme.brandText,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 18.0,
+                  decoration: TextDecoration.none,
+                ),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final aspectRatio = _isStoryFormat ? 1080.0 / 1920.0 : 1080.0 / 1350.0;
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: ScaleTransition(
+        scale: _scaleAnim,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          insetPadding: EdgeInsets.zero,
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: GestureDetector(
+              onTap: _dismissModal,
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.black.withOpacity(0.4),
+                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildFormatTab('Hikaye', Icons.auto_stories_rounded, _isStoryFormat),
+                                _buildFormatTab('Gönderi', Icons.grid_on_rounded, !_isStoryFormat),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: _dismissModal,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.56),
+                                child: AnimatedSize(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 350),
+                                    switchInCurve: Curves.easeOut,
+                                    switchOutCurve: Curves.easeIn,
+                                    transitionBuilder: (child, animation) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: ScaleTransition(
+                                          scale: Tween<double>(begin: 0.95, end: 1.0).animate(animation),
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                    child: AspectRatio(
+                                      key: ValueKey(_isStoryFormat),
+                                      aspectRatio: aspectRatio,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(32),
+                                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 40, spreadRadius: 10)],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(32),
+                                          child: FittedBox(
+                                            fit: BoxFit.contain,
+                                            child: _isStoryFormat ? _buildExportCard() : _buildPostCard(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildStyledButton(
+                                label: 'İndir',
+                                icon: Icons.download_rounded,
+                                bgColor: Colors.transparent,
+                                textColor: const Color(0xFFBBA090),
+                                borderColor: const Color(0xFFBBA090).withOpacity(0.5),
+                                onTap: _saveToGallery,
+                              ),
+                              const SizedBox(width: 12),
+                              _buildStyledButton(
+                                label: 'Paylaş',
+                                icon: Icons.ios_share_rounded,
+                                bgColor: const Color(0xFF3A3530),
+                                textColor: Colors.white.withOpacity(0.9),
+                                borderColor: Colors.transparent,
+                                onTap: _shareContent,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      ),
+    );
+  }
+
+  Widget _buildFormatTab(String label, IconData icon, bool isSelected) {
+    return _TapButton(
+      onTap: () => setState(() => _isStoryFormat = label == 'Hikaye'),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: isSelected ? Colors.white : Colors.white.withOpacity(0.4), size: 14),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white.withOpacity(0.4),
+              fontSize: 13, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              letterSpacing: 0.3, decoration: TextDecoration.none,
+            )),
+          ],
+        ),
       ),
     );
   }

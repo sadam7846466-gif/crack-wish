@@ -855,7 +855,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMysticalDivider(String symbol) {
+  Widget _buildMysticalDivider(IconData icon) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -873,18 +873,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            symbol,
-            style: TextStyle(
-              color: const Color(0xFFE7D6A5).withOpacity(0.7),
-              fontSize: 16,
-              shadows: [
-                Shadow(
-                  color: const Color(0xFFE7D6A5).withOpacity(0.5),
-                  blurRadius: 4,
-                ),
-              ],
-            ),
+          child: Icon(
+            icon,
+            color: const Color(0xFFE7D6A5).withOpacity(0.7),
+            size: 16,
+            shadows: [
+              Shadow(
+                color: const Color(0xFFE7D6A5).withOpacity(0.5),
+                blurRadius: 4,
+              ),
+            ],
           ),
         ),
         Container(
@@ -2136,11 +2134,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('☽', style: TextStyle(
+                          Icon(Icons.bedtime_rounded, 
                             color: softGold.withValues(alpha: 0.4),
-                            fontSize: 14,
+                            size: 14,
                             shadows: [Shadow(color: softGold.withValues(alpha: 0.3), blurRadius: 6)],
-                          )),
+                          ),
                           const SizedBox(width: 10),
                           Text(
                             _isTr ? 'KARTLARIN FISILTISI' : 'WHISPER OF THE CARDS',
@@ -2158,11 +2156,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          Text('☾', style: TextStyle(
+                          Icon(Icons.bedtime_rounded, 
                             color: softGold.withValues(alpha: 0.4),
-                            fontSize: 14,
+                            size: 14,
                             shadows: [Shadow(color: softGold.withValues(alpha: 0.3), blurRadius: 6)],
-                          )),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -5821,7 +5819,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                         .fadeIn(duration: 800.ms, delay: 900.ms)
                                         .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 900.ms, curve: Curves.easeOut),
                                       const SizedBox(height: 12),
-                                      _buildMysticalDivider('☽').animate()
+                                      _buildMysticalDivider(Icons.bedtime_rounded).animate()
                                         .fadeIn(duration: 600.ms, delay: 1400.ms),
                                       const SizedBox(height: 12),
                                       
@@ -5836,7 +5834,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                         .fadeIn(duration: 800.ms, delay: 1800.ms)
                                         .slideY(begin: 0.2, end: 0, duration: 800.ms, delay: 1800.ms, curve: Curves.easeOut),
                                       const SizedBox(height: 12),
-                                      _buildMysticalDivider('✦').animate()
+                                      _buildMysticalDivider(Icons.auto_awesome).animate()
                                         .fadeIn(duration: 600.ms, delay: 2300.ms),
                                       const SizedBox(height: 12),
                                       
@@ -5865,7 +5863,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                         .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 800.ms, delay: 600.ms, curve: Curves.easeOut),
                                       const SizedBox(height: 16),
 
-                                      _buildMysticalDivider('⊹').animate()
+                                      _buildMysticalDivider(Icons.flare_rounded).animate()
                                         .fadeIn(duration: 600.ms, delay: 1000.ms),
                                       const SizedBox(height: 16),
                                     ],
@@ -5930,7 +5928,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                           final promises = _latestReading?.promises ?? _latestFullReading?.promises ?? [];
                                           final cardNames = _selectedCardIndexes.map((i) => _cardName(i)).toList();
                                           final cardAssets = _selectedCardIndexes.map((i) => _allCards[i].frontAsset).toList();
-                                          final readingText = _latestReading?.generalTheme ?? _latestFullReading?.generalTheme ?? '';
+                                          final generalTheme = _latestReading?.generalTheme ?? _latestFullReading?.generalTheme ?? '';
+                                          final closingMsg = _latestReading?.closingMessage ?? _latestFullReading?.closingMessage ?? '';
+                                          final readingText = '$generalTheme\n\n$closingMsg';
                                           
                                           Navigator.of(context).push(
                                             PageRouteBuilder(

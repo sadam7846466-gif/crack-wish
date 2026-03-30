@@ -650,36 +650,36 @@ class _CookieSectionState extends State<CookieSection>
                       curve: Curves.easeOutQuart,
                       child: _isSharing
                           ? Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
                               ),
                               child: const SizedBox(
-                                height: 16, width: 16,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                height: 14, width: 14,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1.5),
                               ),
                             )
                           : Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Icon(Icons.ios_share_rounded, color: Colors.white, size: 14),
-                                  SizedBox(width: 5),
+                                  Icon(Icons.ios_share_rounded, color: Colors.white, size: 12),
+                                  SizedBox(width: 4),
                                   Text(
                                     'Paylaş',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.5,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ],
@@ -1039,7 +1039,7 @@ class _FortunePaperState extends State<_FortunePaper>
     super.initState();
     _anim = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 800),
     );
     _wave = AnimationController(
       vsync: this,
@@ -1075,7 +1075,7 @@ class _FortunePaperState extends State<_FortunePaper>
         // Yumuşak fazlar — birbirine yumuşakça akar
         final riseT = Curves.easeOutQuart.transform((t / 0.35).clamp(0.0, 1.0));
         final unfoldT = Curves.easeInOutQuart.transform(((t - 0.2) / 0.55).clamp(0.0, 1.0));
-        final contentT = Curves.easeOutCubic.transform(((t - 0.5) / 0.5).clamp(0.0, 1.0));
+        final contentT = Curves.easeOut.transform(((t - 0.75) / 0.25).clamp(0.0, 1.0));
 
         // Boyut: küçük parça → tam boyut (yumuşak geçiş)
         final paperWidth = 24.0 + (unfoldT * (screenWidth * 0.85 - 24.0));
