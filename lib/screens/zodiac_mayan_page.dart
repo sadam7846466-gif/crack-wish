@@ -19,15 +19,17 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
   late AnimationController _auraCtrl;
   
   DateTime _birthDate = DateTime(1999, 12, 20);
+  bool _isDailyEnergyExpanded = false;
+  int _selectedRuhPanel = 0;
 
-  // Verdigris Patina — Antik Bronz & Antik Yeşil
-  static const Color _goldBright = Color(0xFF9A7040); // Antik bronz (bakır pası, sıcak)
+  // Tek Renk Teması — Antik Altın/Bronz & Obsidyen
+  static const Color _goldBright = Color(0xFFB58E58); // Parlak Antik Altın
 
-  static const Color _bg = Color(0xFF080C09);         // Zifiri siyah, hafif yeşil niyansi
-  static const Color _obsidian = Color(0xFF0F1510);   // Koyu obsidyen taş
-  static const Color _obsidianLight = Color(0xFF1A201B); // Hafif açık gölge
-  static const Color _jade = Color(0xFF4A7A5A);       // Verdigris (yaşlanmış bakır yeşili, mat)
-  static const Color _amber = Color(0xFF7A5430);      // Koyu bronz gölge
+  static const Color _bg = Color(0xFF080706);         // Zifiri siyah, hafif sıcak toprak
+  static const Color _obsidian = Color(0xFF14120F);   // Koyu obsidyen taş
+  static const Color _obsidianLight = Color(0xFF1A1815); // Hafif açık gölge
+  static const Color _jade = Color(0xFF967345);       // Antik mat altın (eski yeşil yerine)
+  static const Color _amber = Color(0xFF6B4E2B);      // Koyu bronz gölge/oksit
 
 
   @override
@@ -79,9 +81,9 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     );
   }
 
-  // Antik taş görünümlü kart yapıcısı
-  Widget _buildAncientCard({required Widget child, Color? borderColor, EdgeInsetsGeometry padding = const EdgeInsets.all(20)}) {
+  Widget _buildAncientCard({Key? key, required Widget child, Color? borderColor, EdgeInsetsGeometry padding = const EdgeInsets.all(20)}) {
     return Container(
+      key: key,
       padding: padding,
       decoration: ShapeDecoration(
         color: _obsidian,
@@ -299,67 +301,166 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         ),
         const SizedBox(height: 32),
         
-        // Element/Yön kaldırıldı, sadece Kadim Bilgelik Kartı kaldı
-        
-        // Kadim Bilgelik Kartı (Kapsamlı Açıklama)
-        _buildAncientCard(
-          padding: const EdgeInsets.all(20),
-          borderColor: _jade.withValues(alpha: 0.3),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        // YENİ İNTERAKTİF RUH MÜHRÜ PANELİ
+        Container(
+          height: 64,
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: _obsidianLight.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _goldBright.withValues(alpha: 0.15)),
+          ),
+          child: Row(
             children: [
-              Row(
-                children: [
-                   Icon(Icons.auto_awesome, color: _jade, size: 16),
-                   const SizedBox(width: 8),
-                   Expanded(
-                     child: Text('KADİM BİLGELİK', style: TextStyle(color: _jade, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
-                   ),
-                ]
-              ),
-              const SizedBox(height: 12),
-              Text(
-                n['description'] as String,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, height: 1.6),
-              ),
+              _buildRuhTab(0, "KADİM BİLGELİK", Icons.auto_awesome),
+              _buildRuhTab(1, "FREKANS (${_userTone})", Icons.waves),
+              _buildRuhTab(2, "MİSYON", Icons.local_fire_department_outlined),
             ],
           ),
         ),
         const SizedBox(height: 16),
-
-        // Ton (Kişisel Frekans) Kartı
-        _buildAncientCard(
-          padding: const EdgeInsets.all(20),
-          borderColor: _goldBright.withValues(alpha: 0.3),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                   Icon(Icons.waves, color: _goldBright, size: 16),
-                   const SizedBox(width: 8),
-                   Expanded(
-                     child: Text('GALAKTİK TON ($_userTone)', style: TextStyle(color: _goldBright, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
-                   ),
-                ]
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _userToneData['desc']!,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, height: 1.6),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Ruh Rehberi
-        _buildStoneLabel('RUH REHBERİ', n['spirit'], Icons.pets, baseColor: _goldBright),
-        const SizedBox(height: 16),
         
-        _buildStoneLabel('HAYATTAKİ ROLÜN', n['role'], Icons.star_rounded, borderColor: _goldBright.withValues(alpha: 0.3)),
+        // İÇERİK ANİMASYONU
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 0.05),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          child: _buildRuhPanelContent(n),
+        ),
       ],
     );
+  }
+
+  Widget _buildRuhTab(int index, String title, IconData icon) {
+    bool isSel = _selectedRuhPanel == index;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (_selectedRuhPanel != index) {
+            setState(() => _selectedRuhPanel = index);
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: isSel ? _goldBright.withValues(alpha: 0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: isSel ? _goldBright.withValues(alpha: 0.3) : Colors.transparent),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: isSel ? _goldBright : Colors.white.withValues(alpha: 0.3), size: 16),
+              const SizedBox(height: 4),
+              Text(
+                title, 
+                style: TextStyle(
+                  color: isSel ? _goldBright : Colors.white.withValues(alpha: 0.4), 
+                  fontSize: 9, 
+                  fontWeight: FontWeight.w900, 
+                  letterSpacing: 0.5
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRuhPanelContent(Map<String, dynamic> n) {
+    if (_selectedRuhPanel == 0) {
+      return _buildAncientCard(
+        key: const ValueKey(0),
+        padding: const EdgeInsets.all(24),
+        borderColor: _jade.withValues(alpha: 0.3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                 const Icon(Icons.auto_awesome, color: _jade, size: 16),
+                 const SizedBox(width: 8),
+                 Expanded(
+                   child: Text('KADİM BİLGELİK', style: TextStyle(color: _jade, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                 ),
+              ]
+            ),
+            const SizedBox(height: 16),
+            Text(
+              n['description'] as String,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13, height: 1.6),
+            ),
+          ],
+        ),
+      );
+    } else if (_selectedRuhPanel == 1) {
+      return _buildAncientCard(
+        key: const ValueKey(1),
+        padding: const EdgeInsets.all(24),
+        borderColor: _goldBright.withValues(alpha: 0.3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                 const Icon(Icons.waves, color: _goldBright, size: 16),
+                 const SizedBox(width: 8),
+                 Expanded(
+                   child: Text('GALAKTİK TON ($_userTone)', style: const TextStyle(color: _goldBright, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                 ),
+              ]
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _userToneData['desc']!,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13, height: 1.6),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return _buildAncientCard(
+        key: const ValueKey(2),
+        padding: const EdgeInsets.all(24),
+        borderColor: _amber.withValues(alpha: 0.3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                 const Icon(Icons.local_fire_department_outlined, color: _amber, size: 16),
+                 const SizedBox(width: 8),
+                 Expanded(
+                   child: Text('HAYATTAKİ ROLÜN', style: TextStyle(color: _amber, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                 ),
+              ]
+            ),
+            const SizedBox(height: 16),
+            Text(
+              n['role'] as String,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, height: 1.6, fontStyle: FontStyle.italic),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildStoneLabel(String title, String content, IconData icon, {Color? baseColor, Color? borderColor}) {
@@ -387,7 +488,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
   }
 
   // ══════════════════════════════════════════
-  // FEATURE 1 & 6: GÜNLÜK ENERJİ
+  // FEATURE 1 & 6: GÜNLÜK ENERJİ (KUTSAL TZOLK'İN VE GÜNLÜK HİZALANMA)
   // ══════════════════════════════════════════
   Widget _buildDailyEnergySection() {
     final now = DateTime.now();
@@ -398,107 +499,240 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     
     int seed = _getSeed(now) + _userIdx;
     int genEnergy = _deterministicRandom(seed, 1, 60, 98);
-    int relEnergy = _deterministicRandom(seed, 2, 40, 95);
-    int workEnergy = _deterministicRandom(seed, 3, 50, 99);
-    
     int alignScore = _deterministicRandom(seed, 4, 30, 95);
-    int riskScore = 100 - alignScore + _deterministicRandom(seed, 5, -10, 10).clamp(-20, 20);
-    riskScore = riskScore.clamp(5, 95);
 
-    String advice = alignScore > 65 ? "BUGÜN ÖNE ÇIK VE PARLA" : "GERİ PLANDA KAL VE İZLE";
-    String doWhat = alignScore > 65 ? "Yeni başlangıçlar, fırsat arayışı" : "İç gözlem, erteleme, dinlenme";
-    String dontWhat = alignScore > 65 ? "Fırsatları kaçırmak, pasif kalmak" : "Büyük riskler, kışkırtıcı diyaloglar";
+    String toneTitleRaw = todayToneData['title']!.toLowerCase();
+    String toneTitleClean = toneTitleRaw.replaceAll(RegExp(r'\s*\(\d+\.\s*ton\)', caseSensitive: false), '').trim();
+
+    String goodFor = _generateGoodFor(todayNahual, alignScore);
+    String badFor = _generateBadFor(todayNahual, alignScore);
+    String compatibilityText = _generateShortCompatibility(_userNahual, todayNahual, alignScore, genEnergy);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'KUTSAL TZOLK\'IN ENERJİSİ',
-          style: TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2),
+          'GÜNÜN KUTSAL TZOLK\'İN ENERJİSİ',
+          style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
         const SizedBox(height: 12),
         _buildAncientCard(
           borderColor: _goldBright.withValues(alpha: 0.3),
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.zero,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  _buildNahualIcon(todayIdx, 60, _goldBright),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${todayNahual['name'].toUpperCase()} (TON $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 2)),
-                        Text('${todayNahual['words'].toUpperCase()}\n${todayToneData['title']!.toUpperCase()}', style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 9, fontWeight: FontWeight.w500, letterSpacing: 1.5)),
-                      ],
-                    ),
+              // Mini Takvim (Tzolk'in Döngüsü)
+              _buildTzolkinCalendarStrip(now),
+              
+              // Üst Kısım - Ana Enerji
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  setState(() {
+                    _isDailyEnergyExpanded = !_isDailyEnergyExpanded;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: _goldBright.withValues(alpha: 0.05),
+                    border: Border(bottom: BorderSide(color: _goldBright.withValues(alpha: _isDailyEnergyExpanded ? 0.15 : 0.0))),
                   ),
-                  _buildGeomScore(genEnergy, "GENEL"),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildLinearStoneScore("İLİŞKİ", relEnergy, Colors.pinkAccent),
-                  _buildLinearStoneScore("KARİYER", workEnergy, Colors.lightBlueAccent),
-                ],
-              ),
-              const SizedBox(height: 24),
-              _buildTaskRow(Icons.check_box_outlined, _jade, "YAP", doWhat),
-              const SizedBox(height: 10),
-              _buildTaskRow(Icons.cancel_presentation_outlined, _amber, "ERTELE", dontWhat),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        const Text(
-          'GÜNKÜL HİZALANMA',
-          style: TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2),
-        ),
-        const SizedBox(height: 12),
-        _buildAncientCard(
-          borderColor: alignScore > 65 ? _jade.withValues(alpha: 0.5) : _amber.withValues(alpha: 0.3),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
+                  child: Row(
                     children: [
-                      Text('%$alignScore', style: const TextStyle(color: _jade, fontSize: 36, fontWeight: FontWeight.w900)),
-                      Text('UYUMLU', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+                      _buildNahualIcon(todayIdx, 50, _goldBright),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${todayNahual['name'].toUpperCase()} (TON $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${todayNahual['words'].toUpperCase()} • ${todayToneData['title']!.split('(').first.trim().toUpperCase()}', 
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 1.0, height: 1.3),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16), // Altındaki "GÜÇ" metninin yüksekliğini dengeleyip merkez şeridine oturmasını sağlar
+                            child: _buildGeomScore(
+                              genEnergy, 
+                              "GÜÇ", 
+                              size: 40, 
+                              color: Colors.white.withValues(alpha: 0.95)
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -18, // Oku yatay hiza denkleminden tamamen çıkardık, kapsayıcının padding boşluğunda süzülecek
+                            child: AnimatedRotation(
+                              turns: _isDailyEnergyExpanded ? 0.5 : 0.0,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOutCubic,
+                              child: Icon(Icons.keyboard_arrow_down_rounded, color: _goldBright.withValues(alpha: 0.6), size: 20),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.1)),
-                  Column(
+                ),
+              ),
+              
+              // Alt Kısım - Yeni Tasarım: Kısa Özet ve Yüksek Görsellik
+              AnimatedCrossFade(
+                firstChild: const SizedBox(width: double.infinity, height: 0),
+                secondChild: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('%$riskScore', style: const TextStyle(color: _amber, fontSize: 36, fontWeight: FontWeight.w900)),
-                      Text('RİSKLİ', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+                      // KİŞİSEL REZONANS KUTUSU (Okunabilir Format)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _obsidianLight.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _goldBright.withValues(alpha: 0.15)),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('KİŞİSEL REZONANS', style: TextStyle(color: _goldBright.withValues(alpha: 0.9), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: _goldBright.withValues(alpha: 0.15), 
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text('%$alignScore UYUMLU', style: const TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            _buildSummaryRow(Icons.brightness_5, "GÜNÜN ODAĞI", "${todayNahual['name'].toUpperCase()} - ${todayNahual['words']}"),
+                            const SizedBox(height: 10),
+                            _buildSummaryRow(Icons.fingerprint, "SANA ETKİSİ", compatibilityText),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      
+                      // ZAMANIN İŞARETİ (Maya Nokta/Çizgi Görseli ile)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _jade.withValues(alpha: 0.05),
+                          border: Border.all(color: _jade.withValues(alpha: 0.2)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            // Sol Taraf: Otantik Maya Sayı Görseli
+                            Container(
+                              width: 64, 
+                              height: 64,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle, 
+                                color: _jade.withValues(alpha: 0.1), 
+                                border: Border.all(color: _jade.withValues(alpha: 0.3)),
+                              ),
+                              child: _buildToneVisual(todayTone),
+                            ),
+                            const SizedBox(width: 16),
+                            // Sağ Taraf: Metin
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('ZAMANIN İŞARETİ: $todayTone. TON', style: TextStyle(color: _jade, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                                  const SizedBox(height: 4),
+                                  Text(toneTitleClean.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 6),
+                                  Text(todayToneData['desc']!, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, height: 1.4)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      
+                      // IŞIK VE GÖLGE (Desteklenen / Uzak Durulması Gerekenler)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // GÜNÜN IŞIĞI Kutusu
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft, end: Alignment.bottomRight,
+                                  colors: [_goldBright.withValues(alpha: 0.15), _goldBright.withValues(alpha: 0.02)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: _goldBright.withValues(alpha: 0.3)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.wb_incandescent_outlined, color: _goldBright, size: 24),
+                                  const SizedBox(height: 12),
+                                  const Text('GÜNÜN IŞIĞI', style: TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                                  const SizedBox(height: 8),
+                                  Text(goodFor, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, height: 1.4)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // GÜNÜN GÖLGESİ Kutusu
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft, end: Alignment.bottomRight,
+                                  colors: [_amber.withValues(alpha: 0.15), _amber.withValues(alpha: 0.02)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: _amber.withValues(alpha: 0.3)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.nights_stay_outlined, color: _amber, size: 24),
+                                  const SizedBox(height: 12),
+                                  const Text('GÜNÜN GÖLGESİ', style: TextStyle(color: _amber, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                                  const SizedBox(height: 8),
+                                  Text(badFor, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, height: 1.4)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                decoration: ShapeDecoration(
-                  color: alignScore > 65 ? _jade.withValues(alpha: 0.1) : _amber.withValues(alpha: 0.1),
-                  shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  advice,
-                  style: TextStyle(
-                    color: alignScore > 65 ? _jade : _amber,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 14,
-                    letterSpacing: 2,
-                  ),
-                ),
+                crossFadeState: _isDailyEnergyExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 400),
+                firstCurve: Curves.easeOutCubic,
+                secondCurve: Curves.easeOutCubic,
+                sizeCurve: Curves.easeOutCubic,
               ),
             ],
           ),
@@ -507,77 +741,150 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     );
   }
 
-  Widget _buildGeomScore(int val, String label) {
+  Widget _buildSummaryRow(IconData icon, String title, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 2), // Optik dikey hizalama (cap height ile)
+          child: Icon(icon, color: _goldBright.withValues(alpha: 0.8), size: 16),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: "$title: ", style: TextStyle(color: _goldBright.withValues(alpha: 0.8), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                TextSpan(text: value, style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, height: 1.4, fontWeight: FontWeight.w500)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToneVisual(int tone) {
+    int bars = tone ~/ 5;
+    int dots = tone % 5;
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (dots > 0)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(dots, (i) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              width: 8, height: 8,
+              decoration: const BoxDecoration(color: _jade, shape: BoxShape.circle),
+            )),
+          ),
+        if (dots > 0 && bars > 0) const SizedBox(height: 4),
+        if (bars > 0)
+          for (int i = 0; i < bars; i++)
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 3),
+              width: 32, height: 6,
+              decoration: BoxDecoration(color: _jade, borderRadius: BorderRadius.circular(3)),
+            ),
+      ],
+    );
+  }
+
+  Widget _buildGeomScore(int val, String label, {double size = 50, Color? color}) {
+    Color ringColor = color ?? _goldBright;
     return Column(
       children: [
         Stack(
           alignment: Alignment.center,
           children: [
             SizedBox(
-              width: 50,
-              height: 50,
+              width: size,
+              height: size,
               child: CircularProgressIndicator(
                 value: val / 100,
-                color: _jade,
+                color: ringColor,
                 backgroundColor: Colors.white.withValues(alpha: 0.05),
-                strokeWidth: 6,
+                strokeWidth: size * 0.12,
               ),
             ),
             Text(
               '$val',
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900),
+              style: TextStyle(color: Colors.white, fontSize: size * 0.32, fontWeight: FontWeight.w900),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(label, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1)),
       ],
     );
   }
 
-  Widget _buildLinearStoneScore(String label, int val, Color c) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1)),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Container(
-              width: 80,
-              height: 8,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05)),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: val / 100,
-                child: Container(color: c),
+  Widget _buildTzolkinCalendarStrip(DateTime centerDate) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        border: Border(bottom: BorderSide(color: _goldBright.withValues(alpha: 0.15))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(5, (index) {
+          int offset = index - 2;
+          DateTime d = DateTime(centerDate.year, centerDate.month, centerDate.day + offset);
+          int nIdx = MayanZodiacData.nahualIndex(d);
+          int tone = MayanZodiacData.galacticTone(d);
+          
+          bool isToday = offset == 0;
+          Color itemColor = isToday ? _goldBright : Colors.white.withValues(alpha: 0.3);
+          
+          return Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: isToday ? _goldBright.withValues(alpha: 0.08) : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: isToday ? Border.all(color: _goldBright.withValues(alpha: 0.3)) : null,
+              ),
+              child: Column(
+                children: [
+                   Text(
+                    isToday ? "BUGÜN" : "${d.day}/${d.month}",
+                    style: TextStyle(
+                      color: itemColor,
+                      fontSize: 8,
+                      fontWeight: isToday ? FontWeight.w900 : FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildNahualIcon(nIdx, isToday ? 28 : 20, itemColor),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.waves, size: 8, color: itemColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        'TON $tone',
+                        style: TextStyle(
+                          color: itemColor,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 8),
-            Text('%$val', style: TextStyle(color: c, fontSize: 14, fontWeight: FontWeight.w900)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTaskRow(IconData icon, Color color, String title, String body) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: color, size: 18),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
-              const SizedBox(height: 4),
-              Text(body, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
-            ],
-          ),
-        ),
-      ],
+          );
+        }),
+      ),
     );
   }
 
@@ -716,13 +1023,10 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     
     List<Map<String,dynamic>> dnaList = [
       {'n': MayanZodiacData.nahuales[dnaIndices[0]], 'p': p1, 'c': _goldBright},
-      {'n': MayanZodiacData.nahuales[dnaIndices[1]], 'p': _jade, 'c': _jade},
-      {'n': MayanZodiacData.nahuales[dnaIndices[2]], 'p': p3, 'c': Colors.lightBlueAccent},
-      {'n': MayanZodiacData.nahuales[dnaIndices[3]], 'p': p4, 'c': Colors.pinkAccent},
+      {'n': MayanZodiacData.nahuales[dnaIndices[1]], 'p': p2, 'c': _jade},
+      {'n': MayanZodiacData.nahuales[dnaIndices[2]], 'p': p3, 'c': _goldBright.withValues(alpha: 0.7)},
+      {'n': MayanZodiacData.nahuales[dnaIndices[3]], 'p': p4, 'c': _amber},
     ];
-    
-    String desc1 = dnaList[0]['n']['words'].split('&')[0].trim();
-    String desc2 = dnaList[1]['n']['words'].split('&').last.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,7 +1038,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         
         ...dnaList.map((dna) {
           final n = dna['n'];
-          final p = dna['p'] is Color ? p2 : dna['p'] as int;
+          final p = dna['p'] as int;
           final c = dna['c'] as Color;
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -776,30 +1080,6 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
             ),
           );
         }),
-        
-        const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: ShapeDecoration(
-            color: _goldBright.withValues(alpha: 0.05),
-            shape: BeveledRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: _goldBright.withValues(alpha: 0.2), width: 1.5),
-            ),
-          ),
-          child: Column(
-            children: [
-              const Text('HAKİM ENERJİ SENTEZİ', style: TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2)),
-              const SizedBox(height: 12),
-              Text(
-                '"$desc1 & $desc2"',
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -901,6 +1181,8 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                 data: const CupertinoThemeData(brightness: Brightness.dark),
                 child: CupertinoDatePicker(
                   initialDateTime: _birthDate,
+                  minimumDate: DateTime(1940),
+                  maximumDate: DateTime.now(),
                   mode: CupertinoDatePickerMode.date,
                   onDateTimeChanged: (d) {
                     selY = d.year;
@@ -914,6 +1196,98 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         ),
       ),
     );
+  }
+
+  // ══════════════════════════════════════════
+  // DİNAMİK YORUM ÜRETİCİLERİ
+  // ══════════════════════════════════════════
+  
+  String _generateShortCompatibility(Map<String, dynamic> userNahual, Map<String, dynamic> todayNahual, int alignScore, int genEnergy) {
+    // Rastgeleliği gün ve burç ismine bağlayarak kararlı ama her güne/burca özgü farklılık yaratıyoruz.
+    final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + userNahual['name'].hashCode);
+    
+    final tTheme = todayNahual['words'].toString().split('&').first.trim().toLowerCase();
+    final uTrait = (userNahual['traits'] as List).first.toString().toLowerCase();
+
+    List<String> relationships = [
+      "Senin o $uTrait doğan, günün $tTheme enerjisiyle doğrudan temasa geçiyor.",
+      "Bugün evrenin $tTheme akışı, senin içindeki o eşsiz $uTrait potansiyeli aniden tetikliyor.",
+      "Günün $tTheme teması, ruhundaki o çok tanıdık $uTrait enerjin ile derin bir diyalog kuruyor."
+    ];
+    String relation = relationships[rnd.nextInt(relationships.length)];
+    
+    // Güç ve Uyum Mantığını Harmanlayarak Kullanıcıya Alt Metinden Öğretme
+    List<String> highPowerHighSync = [
+      "Bugün evrensel dalga boyu çok yüksek (%$genEnergy GÜÇ) ve sen bu dev dalgayla tam aynı yönde sörf yapıyorsun! Açılan kapılardan korkusuzca geç.",
+      "Kozmik ivme bugün adeta zirvede (%$genEnergy GÜÇ) ve tamamen senin arkandan itiyor. Hızlanmak ve risk almak için harika bir fırsat.",
+      "Bu güçlü rüzgar (%$genEnergy GÜÇ) senin yelkenlerini tam doğru açıdan dolduruyor. Atılım yapmak için tereddüt etme."
+    ];
+
+    List<String> highPowerLowSync = [
+      "Evrensel akım bugün oldukça şiddetli (%$genEnergy GÜÇ) ama ne yazık ki sana ters esiyor. İnatlaşıp akıntıya kürek çekersen sadece yorulursun, izlemede kal.",
+      "Çevrende çok yoğun ve kırılgan bir enerji dalgası var (%$genEnergy GÜÇ). Bu fırtına sana uymuyor, geri çekilip kendi iç enerjini koru.",
+      "Yüksek ve kaotik bir basınç altındayız (%$genEnergy GÜÇ). Ancak bu akış seninle rezonansta değil, olayları zorlamak yerine akışa teslim ol."
+    ];
+
+    List<String> lowPowerHighSync = [
+      "Kozmik rüzgarlar oldukça sakin (%$genEnergy GÜÇ) ama yelkenlerini tam arkadan dolduruyor. Acele etmeden, huzurun ve eşzamanlılığın tadını çıkar.",
+      "Bugün doğada demlenmiş, yumuşak bir ritim var (%$genEnergy GÜÇ) ve sen bu ritimle tam bir dans içindesin. Küçük sürprizleri kucakla.",
+      "Sakin ama çok derin bir akıştayız (%$genEnergy GÜÇ). Evrenin sana fısıldadığı sinyalleri yakalamak için zihnini boşalt."
+    ];
+
+    List<String> lowPowerLowSync = [
+      "Durgun ancak senin doğanla sürtüşmeyi seven, ufak dirençli bir gündeyiz (%$genEnergy GÜÇ). Dış olayları zorlamak yerine, iç dünyana yönelme zamanı.",
+      "Kozmik enerji zayıf mırıldanıyor (%$genEnergy GÜÇ) ve üstelik farklı bir dilde. Adım atmaktansa, olanı biteni gözlemleyip eski kararlarını gözden geçir.",
+      "Pasif bir enerjinin içindeyiz (%$genEnergy GÜÇ) fakat yine de frekanslar uyuşmuyor. Yavaşla ve yeni bir projeye hiç kalkışmadan dinlen."
+    ];
+
+    String mechanic = "";
+    if (genEnergy >= 80 && alignScore >= 60) mechanic = highPowerHighSync[rnd.nextInt(highPowerHighSync.length)];
+    else if (genEnergy >= 80 && alignScore < 60) mechanic = highPowerLowSync[rnd.nextInt(highPowerLowSync.length)];
+    else if (genEnergy < 80 && alignScore >= 60) mechanic = lowPowerHighSync[rnd.nextInt(lowPowerHighSync.length)];
+    else mechanic = lowPowerLowSync[rnd.nextInt(lowPowerLowSync.length)];
+
+    return "$relation $mechanic";
+  }
+
+  String _generateGoodFor(Map<String, dynamic> todayNahual, int alignScore) {
+    final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode);
+    final words = todayNahual['words'].toString().toLowerCase().split(' & ');
+    final w1 = words.first.trim();
+    final w2 = words.length > 1 ? words.last.trim() : words.first.trim();
+    
+    List<String> highGood = [
+      "$w1 niyetlerini somut bir şekilde eyleme dökmek, yaratım projelerini uçurmak",
+      "tüm odağını $w1 alanına kaydırmak, gizli potansiyelini korkusuzca zirveye çıkarmak",
+      "derinlerdeki $w1 arzularını beslemek ve yeni açılan yollara kucak açmak"
+    ];
+    
+    List<String> lowGood = [
+      "iç dünyanda $w2 arayışına sessizce girmek, pasif kalarak oluşan desenleri izlemek",
+      "eski yüklerden arınıp tamamen $w2 alanına yönelerek şifa depolamak",
+      "zihni yavaşlatıp $w2 konularında demlenmek ve spiritüel bir dinlenme yaşamak"
+    ];
+    
+    return alignScore >= 60 ? highGood[rnd.nextInt(highGood.length)] : lowGood[rnd.nextInt(lowGood.length)];
+  }
+
+  String _generateBadFor(Map<String, dynamic> todayNahual, int alignScore) {
+    final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode + 1);
+    final w1 = todayNahual['words'].toString().toLowerCase().split(' & ').first.trim();
+    
+    List<String> highBad = [
+      "yok yere şüpheye düşüp $w1 fırsatlarını kaçırmak veya eski travmalara tutunmak",
+      "eylemsiz kalmaya direnmek ve oluşan o devasa $w1 ivmesini tembellikle harcamak",
+      "sabit fikirlilik yüzünden önene serilen $w1 akışını tamamen bloke etmek"
+    ];
+    
+    List<String> lowBad = [
+      "hiç hazır olmadığın projelere gereksiz yere atılmak, şartları çok zorlamak",
+      "dürtüsel adımlar atıp mantıksız risklere girmek ve yalan $w1 ilizyonlarına inanmak",
+      "akıntıya karşı inatla kürek çekmek ve evrenin 'artık yavaşla' uyarısına isyan etmek"
+    ];
+    
+    return alignScore >= 60 ? highBad[rnd.nextInt(highBad.length)] : lowBad[rnd.nextInt(lowBad.length)];
   }
 }
 
