@@ -11,6 +11,7 @@ import '../constants/colors.dart';
 import '../models/fortune.dart';
 import '../services/storage_service.dart';
 import 'share_modal.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
@@ -648,41 +649,21 @@ class _CookieSectionState extends State<CookieSection>
                       scale: _isShareButtonPressed ? 0.88 : 1.0,
                       duration: const Duration(milliseconds: 150),
                       curve: Curves.easeOutQuart,
-                      child: _isSharing
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: Container(
+                              width: 36,
+                              height: 36,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.12),
+                                border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
                               ),
-                              child: const SizedBox(
-                                height: 14, width: 14,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1.5),
-                              ),
-                            )
-                          : Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.ios_share_rounded, color: Colors.white, size: 12),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Paylaş',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
+                              child: Center(
+                                child: _isSharing
+                                    ? const SizedBox(
+                                        height: 14, width: 14,
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1.5),
+                                      )
+                                    : Icon(PhosphorIcons.paperPlaneTilt(PhosphorIconsStyle.fill), color: Colors.white, size: 17),
                               ),
                             ),
                     ),
