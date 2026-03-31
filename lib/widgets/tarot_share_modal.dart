@@ -361,17 +361,15 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 
                 const SizedBox(height: 60),
 
-                // Ana mesaj — İki bölümlü zarif tasarım
+                // Ana mesaj — Kartların gerçek yorumu
                 Expanded(
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: Builder(
                         builder: (context) {
-                          // closingMessage'ı iki parçaya ayır (generalTheme \n\n closingMsg)
-                          final parts = widget.closingMessage.split('\n\n');
-                          final themeText = parts.isNotEmpty ? parts[0] : widget.closingMessage;
-                          final poeticText = parts.length > 1 ? parts.sublist(1).join('\n\n') : '';
+                          // Her kartın yorumunu ayrı ayrı göster
+                          final sections = widget.closingMessage.split('\n\n');
 
                           return Column(
                             mainAxisSize: MainAxisSize.min,
@@ -385,61 +383,72 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                   decoration: TextDecoration.none,
                                 ),
                               ),
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 25),
 
-                              // ANA TEMA — Büyük, kalın, etkileyici
-                              Text(
-                                themeText,
-                                textAlign: TextAlign.center,
-                                maxLines: 5,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cormorantGaramond(
-                                  color: Colors.white,
-                                  fontSize: 42,
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.italic,
-                                  height: 1.5,
-                                  letterSpacing: 0.5,
-                                  decoration: TextDecoration.none,
+                              // Her kartın yorumu
+                              for (int i = 0; i < sections.length; i++) ...[
+                                Builder(
+                                  builder: (context) {
+                                    final lines = sections[i].split('\n');
+                                    final title = lines.isNotEmpty ? lines[0] : '';
+                                    final body = lines.length > 1 ? lines.sublist(1).join('\n') : '';
+
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Kart ismi + pozisyon başlığı
+                                        Text(
+                                          title,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.cinzel(
+                                            color: const Color(0xFFE7D6A5),
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 2.0,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                        ),
+                                        if (body.isNotEmpty) ...[
+                                          const SizedBox(height: 12),
+                                          // Yorum metni
+                                          Text(
+                                            body,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 4,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.cormorantGaramond(
+                                              color: Colors.white.withOpacity(0.95),
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle: FontStyle.italic,
+                                              height: 1.45,
+                                              letterSpacing: 0.3,
+                                              decoration: TextDecoration.none,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    );
+                                  },
                                 ),
-                              ),
-
-                              // Şiirsel kapanış (varsa)
-                              if (poeticText.isNotEmpty) ...[
-                                const SizedBox(height: 40),
-
-                                // Dekoratif ayırıcı
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
-                                    const SizedBox(width: 12),
-                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.6), size: 14),
-                                    const SizedBox(width: 12),
-                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 40),
-
-                                // ŞİİRSEL KAPANIŞ — Küçük, ince, mistik
-                                Text(
-                                  poeticText,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 8,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.cormorantGaramond(
-                                    color: Colors.white.withOpacity(0.95),
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.55,
-                                    letterSpacing: 0.3,
-                                    decoration: TextDecoration.none,
+                                // Dekoratif ayırıcı (son kart hariç)
+                                if (i < sections.length - 1) ...[
+                                  const SizedBox(height: 25),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
+                                      const SizedBox(width: 10),
+                                      Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 10),
+                                      const SizedBox(width: 10),
+                                      Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
+                                    ],
                                   ),
-                                ),
+                                  const SizedBox(height: 25),
+                                ],
                               ],
 
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 25),
 
                               // Dekoratif kapanış işareti
                               Text(
@@ -696,65 +705,80 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
 
                 const SizedBox(height: 25),
 
-                // Mesaj — İki bölümlü zarif tasarım (kompakt)
+                // Mesaj — Kartların gerçek yorumu (kompakt)
                 Expanded(
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Builder(
                         builder: (context) {
-                          final parts = widget.closingMessage.split('\n\n');
-                          final themeText = parts.isNotEmpty ? parts[0] : widget.closingMessage;
-                          final poeticText = parts.length > 1 ? parts.sublist(1).join('\n\n') : '';
+                          final sections = widget.closingMessage.split('\n\n');
 
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
                               const SizedBox(height: 16),
-                              Text(
-                                themeText,
-                                textAlign: TextAlign.center,
-                                maxLines: 4,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cormorantGaramond(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.italic,
-                                  height: 1.4,
-                                  letterSpacing: 0.5,
-                                  decoration: TextDecoration.none,
+
+                              for (int i = 0; i < sections.length; i++) ...[
+                                Builder(
+                                  builder: (context) {
+                                    final lines = sections[i].split('\n');
+                                    final title = lines.isNotEmpty ? lines[0] : '';
+                                    final body = lines.length > 1 ? lines.sublist(1).join('\n') : '';
+
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          title,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.cinzel(
+                                            color: const Color(0xFFE7D6A5),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 1.5,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                        ),
+                                        if (body.isNotEmpty) ...[
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            body,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.cormorantGaramond(
+                                              color: Colors.white.withOpacity(0.95),
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle: FontStyle.italic,
+                                              height: 1.4,
+                                              letterSpacing: 0.3,
+                                              decoration: TextDecoration.none,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    );
+                                  },
                                 ),
-                              ),
-                              if (poeticText.isNotEmpty) ...[
-                                const SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
-                                    const SizedBox(width: 10),
-                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.6), size: 10),
-                                    const SizedBox(width: 10),
-                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  poeticText,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 6,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.cormorantGaramond(
-                                    color: Colors.white.withOpacity(0.95),
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.45,
-                                    letterSpacing: 0.3,
-                                    decoration: TextDecoration.none,
+                                if (i < sections.length - 1) ...[
+                                  const SizedBox(height: 18),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(width: 25, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
+                                      const SizedBox(width: 8),
+                                      Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 8),
+                                      const SizedBox(width: 8),
+                                      Container(width: 25, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
+                                    ],
                                   ),
-                                ),
+                                  const SizedBox(height: 18),
+                                ],
                               ],
+
                               const SizedBox(height: 16),
                               Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
                             ],

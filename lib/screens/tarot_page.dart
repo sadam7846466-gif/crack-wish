@@ -5928,9 +5928,36 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                           final promises = _latestReading?.promises ?? _latestFullReading?.promises ?? [];
                                           final cardNames = _selectedCardIndexes.map((i) => _cardName(i)).toList();
                                           final cardAssets = _selectedCardIndexes.map((i) => _allCards[i].frontAsset).toList();
-                                          final generalTheme = _latestReading?.generalTheme ?? _latestFullReading?.generalTheme ?? '';
-                                          final closingMsg = _latestReading?.closingMessage ?? _latestFullReading?.closingMessage ?? '';
-                                          final readingText = '$generalTheme\n\n$closingMsg';
+                                          
+                                          // Gerçek fal özeti oluştur — her kartın pozisyon yorumunun kısa versiyonu
+                                          String readingText;
+                                          if (_latestReading != null) {
+                                            // Major Arcana (3 kart): Geçmiş, Şimdi, Yön
+                                            final past = _latestReading!.pastInfluence;
+                                            final present = _latestReading!.presentEnergy;
+                                            final direction = _latestReading!.directionAdvice;
+                                            // Her yorumun ilk 2 cümlesini al
+                                            String firstSentences(String text, int count) {
+                                              final sentences = text.split(RegExp(r'(?<=[.!?])\s+'));
+                                              return sentences.take(count).join(' ');
+                                            }
+                                            final isTr = _isTr;
+                                            readingText = '${cardNames[0]} — ${isTr ? "Geçmiş" : "Past"}\n${firstSentences(past, 2)}\n\n'
+                                                '${cardNames[1]} — ${isTr ? "Şimdi" : "Present"}\n${firstSentences(present, 2)}\n\n'
+                                                '${cardNames[2]} — ${isTr ? "Yön" : "Direction"}\n${firstSentences(direction, 2)}';
+                                          } else if (_latestFullReading != null) {
+                                            // Full Arcana (7 kart): İlk 3 kartın yorumunu göster
+                                            final readings = _latestFullReading!.cardReadings;
+                                            final lines = <String>[];
+                                            for (int i = 0; i < readings.length && i < 3; i++) {
+                                              final r = readings[i];
+                                              final sentences = r.content.split(RegExp(r'(?<=[.!?])\s+'));
+                                              lines.add('${r.cardName} — ${r.positionTitle}\n${sentences.take(2).join(' ')}');
+                                            }
+                                            readingText = lines.join('\n\n');
+                                          } else {
+                                            readingText = '';
+                                          }
                                           
                                           Navigator.of(context).push(
                                             PageRouteBuilder(
