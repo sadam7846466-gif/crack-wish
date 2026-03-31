@@ -220,15 +220,15 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 Text(
                   widget.isMajorArcana ? '✦  M A J O R   A R C A N A  ✦' : '✦  F U L L   A R C A N A  ✦',
                   style: GoogleFonts.cinzel(
-                    color: const Color(0xFFE7D6A5).withOpacity(0.7),
+                    color: const Color(0xFFE7D6A5).withOpacity(0.95),
                     fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 6.0,
                     decoration: TextDecoration.none,
                   ),
                 ),
                 
-                const SizedBox(height: 80),
+                const SizedBox(height: 120),
 
                 // Kart görselleri (Daha zarif etkileşim ve altın kenarlık)
                 SizedBox(
@@ -380,7 +380,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                               Text(
                                 '✦',
                                 style: TextStyle(
-                                  color: const Color(0xFFE7D6A5).withOpacity(0.4),
+                                  color: const Color(0xFFE7D6A5).withOpacity(0.6),
                                   fontSize: 24,
                                   decoration: TextDecoration.none,
                                 ),
@@ -394,9 +394,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                 maxLines: 5,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.cormorantGaramond(
-                                  color: Colors.white.withOpacity(0.95),
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w700,
                                   fontStyle: FontStyle.italic,
                                   height: 1.5,
                                   letterSpacing: 0.5,
@@ -412,11 +412,11 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.3)),
+                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
                                     const SizedBox(width: 12),
-                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.35), size: 14),
+                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.6), size: 14),
                                     const SizedBox(width: 12),
-                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.3)),
+                                    Container(width: 40, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
                                   ],
                                 ),
 
@@ -429,9 +429,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                   maxLines: 8,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.cormorantGaramond(
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white.withOpacity(0.95),
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.w500,
                                     height: 1.55,
                                     letterSpacing: 0.3,
                                     decoration: TextDecoration.none,
@@ -445,7 +445,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                               Text(
                                 '✦',
                                 style: TextStyle(
-                                  color: const Color(0xFFE7D6A5).withOpacity(0.4),
+                                  color: const Color(0xFFE7D6A5).withOpacity(0.6),
                                   fontSize: 24,
                                   decoration: TextDecoration.none,
                                 ),
@@ -464,9 +464,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   Text(
                     widget.promises.take(3).map((p) => p.toUpperCase()).join('   ✦   '),
                     style: GoogleFonts.cinzel(
-                      color: const Color(0xFFE7D6A5).withOpacity(0.6),
+                      color: const Color(0xFFE7D6A5).withOpacity(0.95),
                       fontSize: 22,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 4.0,
                       decoration: TextDecoration.none,
                     ),
@@ -479,7 +479,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 Text(
                   'CRACK & WISH',
                   style: GoogleFonts.montserrat(
-                    color: const Color(0xFFE7D6A5).withOpacity(0.25),
+                    color: const Color(0xFFE7D6A5).withOpacity(0.5),
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 18.0,
@@ -563,15 +563,15 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 Text(
                   widget.isMajorArcana ? '✦  M A J O R   A R C A N A  ✦' : '✦  F U L L   A R C A N A  ✦',
                   style: GoogleFonts.cinzel(
-                    color: const Color(0xFFE7D6A5).withOpacity(0.7),
+                    color: const Color(0xFFE7D6A5).withOpacity(0.95),
                     fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 5.0,
                     decoration: TextDecoration.none,
                   ),
                 ),
 
-                const SizedBox(height: 50),
+                const SizedBox(height: 60),
 
                 // Kart görselleri (kompakt)
                 SizedBox(
@@ -694,7 +694,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 25),
 
                 // Mesaj — İki bölümlü zarif tasarım (kompakt)
                 Expanded(
@@ -710,53 +710,53 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.4), fontSize: 20, decoration: TextDecoration.none)),
-                              const SizedBox(height: 20),
+                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
+                              const SizedBox(height: 16),
                               Text(
                                 themeText,
                                 textAlign: TextAlign.center,
                                 maxLines: 4,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.cormorantGaramond(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white,
                                   fontSize: 32,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   fontStyle: FontStyle.italic,
-                                  height: 1.45,
+                                  height: 1.4,
                                   letterSpacing: 0.5,
                                   decoration: TextDecoration.none,
                                 ),
                               ),
                               if (poeticText.isNotEmpty) ...[
-                                const SizedBox(height: 25),
+                                const SizedBox(height: 20),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.3)),
+                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
                                     const SizedBox(width: 10),
-                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.35), size: 10),
+                                    Icon(Icons.bedtime_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.6), size: 10),
                                     const SizedBox(width: 10),
-                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.3)),
+                                    Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.5)),
                                   ],
                                 ),
-                                const SizedBox(height: 25),
+                                const SizedBox(height: 20),
                                 Text(
                                   poeticText,
                                   textAlign: TextAlign.center,
                                   maxLines: 6,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.cormorantGaramond(
-                                    color: Colors.white.withOpacity(0.65),
+                                    color: Colors.white.withOpacity(0.95),
                                     fontSize: 26,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.5,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.45,
                                     letterSpacing: 0.3,
                                     decoration: TextDecoration.none,
                                   ),
                                 ),
                               ],
-                              const SizedBox(height: 20),
-                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.4), fontSize: 20, decoration: TextDecoration.none)),
+                              const SizedBox(height: 16),
+                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
                             ],
                           );
                         },
@@ -771,9 +771,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   Text(
                     widget.promises.take(3).map((p) => p.toUpperCase()).join('   ✦   '),
                     style: GoogleFonts.cinzel(
-                      color: const Color(0xFFE7D6A5).withOpacity(0.6),
+                      color: const Color(0xFFE7D6A5).withOpacity(0.95),
                       fontSize: 18,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 3.0,
                       decoration: TextDecoration.none,
                     ),
@@ -786,7 +786,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 Text(
                   'CRACK & WISH',
                   style: GoogleFonts.montserrat(
-                    color: const Color(0xFFE7D6A5).withOpacity(0.25),
+                    color: const Color(0xFFE7D6A5).withOpacity(0.5),
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 14.0,
@@ -849,7 +849,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                       child: GestureDetector(
                         onTap: _dismissModal,
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.56),
+                          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.64),
                           child: AnimatedSize(
                             duration: const Duration(milliseconds: 400),
                             curve: Curves.easeInOut,
