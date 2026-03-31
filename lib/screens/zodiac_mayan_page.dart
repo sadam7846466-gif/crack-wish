@@ -116,13 +116,21 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           Positioned.fill(
             child: _MayanWheelBackground(jade: _jade, gold: _goldBright, bg: _bg),
           ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(child: _buildContent()),
-              ],
+          
+          // Ana İçerik - SafeArea ve Header'dan bağımsız tam ekran scroll
+          Positioned.fill(
+            child: _buildContent(context),
+          ),
+
+          // Header kısmı üste sabitlendi, böylece içerik scroll edilirken
+          // sert bir şekilde kesilmek yerine header'ın arkasından şeffafça ekran dışına kayacak
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: _buildHeader(),
             ),
           ),
         ],
@@ -143,11 +151,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     );
   }
 
+  Widget _buildContent(BuildContext context) {
+    // Eski sistemdeki SafeArea ve Header yüksekliği dinamik olarak padding'e aktarıldı
+    final topPadding = MediaQuery.of(context).padding.top + 65.0;
 
-  Widget _buildContent() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 5, 20, 40),
+      padding: EdgeInsets.fromLTRB(20, topPadding, 20, 40),
       child: Column(
         children: [
           _buildRuhYoluSection(),
@@ -602,7 +612,10 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                         decoration: BoxDecoration(
                           color: _obsidianLight.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _goldBright.withValues(alpha: 0.15)),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.0), // Beyazlık bir tık daha belirgin
+                          boxShadow: [
+                            BoxShadow(color: Colors.white.withValues(alpha: 0.08), blurRadius: 20, spreadRadius: 1), // Işık efekti bir tık artırıldı
+                          ],
                         ),
                         child: Column(
                           children: [
@@ -627,101 +640,86 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 18), // Biraz yukarı taşındı (Üst boşluk azaltıldı)
                       
-                      // ZAMANIN İŞARETİ (Maya Nokta/Çizgi Görseli ile)
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: _jade.withValues(alpha: 0.05),
-                          border: Border.all(color: _jade.withValues(alpha: 0.2)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
+                      // YENİ TASARIM: PURE MINIMAL (Saf Tipografi, Sıfır Çizgi)
+                      Padding(
+                        padding: EdgeInsets.zero, 
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Sol Taraf: Otantik Maya Sayı Görseli
-                            Container(
-                              width: 64, 
-                              height: 64,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle, 
-                                color: _jade.withValues(alpha: 0.1), 
-                                border: Border.all(color: _jade.withValues(alpha: 0.3)),
-                              ),
-                              child: _buildToneVisual(todayTone),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                _buildToneVisual(todayTone, color: _goldBright, dotSize: 3.5, barHeight: 2.5, barWidth: 18),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '${todayTone}. TON  •  ',
+                                          style: GoogleFonts.cinzel(
+                                            color: _goldBright.withValues(alpha: 0.9), 
+                                            fontSize: 12, 
+                                            fontWeight: FontWeight.bold, 
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: toneTitleClean.toUpperCase(),
+                                          style: GoogleFonts.cinzel(
+                                            color: Colors.white, 
+                                            fontSize: 13, 
+                                            fontWeight: FontWeight.bold, 
+                                            letterSpacing: 2.0,
+                                            shadows: [
+                                              Shadow(
+                                                color: Colors.white.withValues(alpha: 0.8), // Işıltı (Glow) efekti
+                                                blurRadius: 10,
+                                              )
+                                            ]
+                                          ),
+                                        ),
+                                      ]
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            // Sağ Taraf: Metin
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('ZAMANIN İŞARETİ: $todayTone. TON', style: TextStyle(color: _jade, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-                                  const SizedBox(height: 4),
-                                  Text(toneTitleClean.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 6),
-                                  Text(todayToneData['desc']!, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, height: 1.4)),
-                                ],
+                            const SizedBox(height: 4), // Kendi içindeki başlık ve açıklama arası iyice yakınlaştırıldı
+                            Text(
+                              todayToneData['desc']!,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8), 
+                                fontSize: 13, 
+                                height: 1.6, 
+                                fontWeight: FontWeight.w300,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 36), // Alttaki interaktif Işık/Gölge kürelerinden uzaklaştırıldı
                       
-                      // IŞIK VE GÖLGE (Desteklenen / Uzak Durulması Gerekenler)
+                      // YEPYENİ İNTERAKTİF IŞIK VE GÖLGE KÜRELERİ (Tıklanabilir Pop-up)
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // GÜNÜN IŞIĞI Kutusu
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft, end: Alignment.bottomRight,
-                                  colors: [_goldBright.withValues(alpha: 0.15), _goldBright.withValues(alpha: 0.02)],
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: _goldBright.withValues(alpha: 0.3)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.wb_incandescent_outlined, color: _goldBright, size: 24),
-                                  const SizedBox(height: 12),
-                                  const Text('GÜNÜN IŞIĞI', style: TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
-                                  const SizedBox(height: 8),
-                                  Text(goodFor, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, height: 1.4)),
-                                ],
-                              ),
-                            ),
+                          _InteractiveDualEnergyButton(
+                            title: 'GÜNÜN IŞIĞI',
+                            description: "Günün Işığı, frekansını yükselten ve seni en parlak versiyonuna taşıyan aydınlık yönündür.\n\nBugünün odaklanman gereken\ndestekleyici etkileri:\n\n$goodFor",
+                            icon: Icons.wb_sunny_rounded,
+                            primaryColor: const Color(0xFFFFEA99), // Daha açık ve göz alıcı parlak kış güneşi/altın tonu
+                            isLight: true,
                           ),
-                          const SizedBox(width: 12),
-                          // GÜNÜN GÖLGESİ Kutusu
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft, end: Alignment.bottomRight,
-                                  colors: [_amber.withValues(alpha: 0.15), _amber.withValues(alpha: 0.02)],
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: _amber.withValues(alpha: 0.3)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.nights_stay_outlined, color: _amber, size: 24),
-                                  const SizedBox(height: 12),
-                                  const Text('GÜNÜN GÖLGESİ', style: TextStyle(color: _amber, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
-                                  const SizedBox(height: 8),
-                                  Text(badFor, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, height: 1.4)),
-                                ],
-                              ),
-                            ),
+                          const SizedBox(width: 32), // İki küre arası daraltıldı
+                          _InteractiveDualEnergyButton(
+                            title: 'GÜNÜN GÖLGESİ',
+                            description: "Evrensel dualite gereği Günün Gölgesi, bilincini esir almak isteyen düşük titreşimli ve gölgeli yönündür.\n\nBugün dikkat etmen ve\nsakınman gereken tuzaklar:\n\n$badFor",
+                            icon: Icons.nights_stay_rounded,
+                            primaryColor: const Color(0xFF90A4AE), // Moonlight Silver (Ayışığı Gümüş)
+                            isLight: false,
                           ),
                         ],
                       ),
@@ -764,9 +762,10 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     );
   }
 
-  Widget _buildToneVisual(int tone) {
+  Widget _buildToneVisual(int tone, {Color? color, double dotSize = 8, double barHeight = 6, double barWidth = 32}) {
     int bars = tone ~/ 5;
     int dots = tone % 5;
+    Color c = color ?? _jade;
     
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -778,17 +777,29 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(dots, (i) => Container(
               margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              width: 8, height: 8,
-              decoration: const BoxDecoration(color: _jade, shape: BoxShape.circle),
+              width: dotSize, height: dotSize,
+              decoration: BoxDecoration(
+                color: c, 
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: c.withValues(alpha: 0.5), blurRadius: 4, spreadRadius: 0)
+                ]
+              ),
             )),
           ),
-        if (dots > 0 && bars > 0) const SizedBox(height: 4),
+        if (dots > 0 && bars > 0) const SizedBox(height: 6),
         if (bars > 0)
           for (int i = 0; i < bars; i++)
             Container(
               margin: const EdgeInsets.symmetric(vertical: 3),
-              width: 32, height: 6,
-              decoration: BoxDecoration(color: _jade, borderRadius: BorderRadius.circular(3)),
+              width: barWidth, height: barHeight,
+              decoration: BoxDecoration(
+                color: c, 
+                borderRadius: BorderRadius.circular(barHeight / 2),
+                boxShadow: [
+                  BoxShadow(color: c.withValues(alpha: 0.5), blurRadius: 4, spreadRadius: 0)
+                ]
+              ),
             ),
       ],
     );
@@ -896,6 +907,8 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     if (DateTime.now().month < _birthDate.month || (DateTime.now().month == _birthDate.month && DateTime.now().day < _birthDate.day)) {
       age--;
     }
+    
+    final todayTone = MayanZodiacData.galacticTone(DateTime.now());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -918,13 +931,20 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text('ENERJİ DALGALANMA GRAFİĞİ', style: TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 2)),
-            Text('30 GÜN', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 10, fontWeight: FontWeight.bold)),
+            const Text('KİŞİSEL ENERJİ UYUMU', style: TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: _jade.withValues(alpha: 0.15), 
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text('14 GÜNLÜK FORECAST', style: TextStyle(color: _jade, fontSize: 10, fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
         const SizedBox(height: 16),
         _buildAncientCard(
-          padding: const EdgeInsets.symmetric(vertical: 24),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 0),
           child: SizedBox(
             height: 180,
             width: double.infinity,
@@ -932,7 +952,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               painter: _WaveGraphPainter(
                 color: _jade,
                 accent: _goldBright,
-                seed: _getSeed(DateTime.now()) + _userIdx,
+                userIdx: _userIdx, // Her burca benzersiz dalga sağlamak için
               ),
             ),
           ),
@@ -1257,15 +1277,15 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     final w2 = words.length > 1 ? words.last.trim() : words.first.trim();
     
     List<String> highGood = [
-      "$w1 niyetlerini somut bir şekilde eyleme dökmek, yaratım projelerini uçurmak",
-      "tüm odağını $w1 alanına kaydırmak, gizli potansiyelini korkusuzca zirveye çıkarmak",
-      "derinlerdeki $w1 arzularını beslemek ve yeni açılan yollara kucak açmak"
+      "${w1.isNotEmpty ? w1[0].toUpperCase() + w1.substring(1) : ''} niyetlerini somut bir şekilde eyleme dökmek, yaratım projelerini uçurmak",
+      "Tüm odağını $w1 alanına kaydırmak, gizli potansiyelini korkusuzca zirveye çıkarmak",
+      "Derinlerdeki $w1 arzularını beslemek ve yeni açılan yollara kucak açmak"
     ];
     
     List<String> lowGood = [
-      "iç dünyanda $w2 arayışına sessizce girmek, pasif kalarak oluşan desenleri izlemek",
-      "eski yüklerden arınıp tamamen $w2 alanına yönelerek şifa depolamak",
-      "zihni yavaşlatıp $w2 konularında demlenmek ve spiritüel bir dinlenme yaşamak"
+      "İç dünyanda $w2 arayışına sessizce girmek, pasif kalarak oluşan desenleri izlemek",
+      "Eski yüklerden arınıp tamamen $w2 alanına yönelerek şifa depolamak",
+      "Zihni yavaşlatıp $w2 konularında demlenmek ve spiritüel bir dinlenme yaşamak"
     ];
     
     return alignScore >= 60 ? highGood[rnd.nextInt(highGood.length)] : lowGood[rnd.nextInt(lowGood.length)];
@@ -1276,15 +1296,15 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     final w1 = todayNahual['words'].toString().toLowerCase().split(' & ').first.trim();
     
     List<String> highBad = [
-      "yok yere şüpheye düşüp $w1 fırsatlarını kaçırmak veya eski travmalara tutunmak",
-      "eylemsiz kalmaya direnmek ve oluşan o devasa $w1 ivmesini tembellikle harcamak",
-      "sabit fikirlilik yüzünden önene serilen $w1 akışını tamamen bloke etmek"
+      "Yok yere şüpheye düşüp $w1 fırsatlarını kaçırmak veya eski travmalara tutunmak",
+      "Eylemsiz kalmaya direnmek ve oluşan o devasa $w1 ivmesini tembellikle harcamak",
+      "Sabit fikirlilik yüzünden önene serilen $w1 akışını tamamen bloke etmek"
     ];
     
     List<String> lowBad = [
-      "hiç hazır olmadığın projelere gereksiz yere atılmak, şartları çok zorlamak",
-      "dürtüsel adımlar atıp mantıksız risklere girmek ve yalan $w1 ilizyonlarına inanmak",
-      "akıntıya karşı inatla kürek çekmek ve evrenin 'artık yavaşla' uyarısına isyan etmek"
+      "Hiç hazır olmadığın projelere gereksiz yere atılmak, şartları çok zorlamak",
+      "Dürtüsel adımlar atıp mantıksız risklere girmek ve yalan $w1 illüzyonlarına inanmak",
+      "Akıntıya karşı inatla kürek çekmek ve evrenin 'artık yavaşla' uyarısına isyan etmek"
     ];
     
     return alignScore >= 60 ? highBad[rnd.nextInt(highBad.length)] : lowBad[rnd.nextInt(lowBad.length)];
@@ -1292,14 +1312,14 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 }
 
 // ══════════════════════════════════════════
-// CUSTOM PAINTER: DALGALANMA GRAFİĞİ (Obsidian Edge)
+// CUSTOM PAINTER: KİŞİSEL BİORİTİM (ENERJİ) GRAFİĞİ
 // ══════════════════════════════════════════
 class _WaveGraphPainter extends CustomPainter {
   final Color color;
   final Color accent;
-  final int seed;
+  final int userIdx;
   
-  _WaveGraphPainter({required this.color, required this.accent, required this.seed});
+  _WaveGraphPainter({required this.color, required this.accent, required this.userIdx});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1308,50 +1328,124 @@ class _WaveGraphPainter extends CustomPainter {
     
     // Keskin ızgara hatları
     final gridPaint = Paint()..color = Colors.white.withValues(alpha: 0.05)..strokeWidth = 1;
-    for(int i=1; i<4; i++) {
-       canvas.drawLine(Offset(0, h*i/4), Offset(w, h*i/4), gridPaint);
+    final targetPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.15)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    // Yatay Referans Çizgileri (Top, Center, Bottom)
+    for(int i=1; i<=3; i++) {
+      double lineY = h * i / 4;
+      // Ortadaki eksen çizgisini biraz daha belirgin yapıyoruz
+      canvas.drawLine(Offset(0, lineY), Offset(w, lineY), i == 2 ? targetPaint : gridPaint);
     }
-    for(int i=1; i<6; i++) {
-       canvas.drawLine(Offset(w*i/6, 0), Offset(w*i/6, h), gridPaint);
+    
+    // Dikey Gün Izgarası (Her gün için ince, 7. gün için belirgin)
+    for(int i=1; i<14; i++) {
+       double lineX = w * i / 13;
+       canvas.drawLine(Offset(lineX, 0), Offset(lineX, h), i == 7 ? targetPaint : gridPaint);
     }
 
-    final path = Path();
-    path.moveTo(0, h/2);
-    
+    // Gerçek Zamanlı Kişisel Uyum (Biorhythm) Hesaplaması
     List<Offset> points = [];
-    for(int i = 0; i <= 30; i++) {
-      double x = (i / 30) * w;
-      double waveStr = math.sin(i * 0.4 + (seed % 10)) * 0.4 
-                     + math.cos(i * 0.2 + (seed % 7)) * 0.3
-                     + math.sin(i * 0.8) * 0.1;
-      double y = h/2 - (waveStr * h/2.2); 
+    int maxToneIndex = 0;
+    int minToneIndex = 0;
+    double maxVal = -999;
+    double minVal = 999;
+    
+    final fillPath = Path();
+    final linePath = Path();
+    
+    int daysSinceEpoch = DateTime.now().difference(DateTime(1970)).inDays;
+
+    for(int i = 0; i <= 13; i++) {
+      int dayAbs = daysSinceEpoch + i;
+      
+      // Mayaların Döngüsel Frekans Matematiği 
+      // Her Nahual'in evrenle olan rezonans dalgası farklıdır (userIdx faz olarak katılır)
+      double wave13 = math.sin(((dayAbs + userIdx * 7) % 13) / 13.0 * 2 * math.pi); // 13 Günlük Galaktik Ton Dalgası
+      double wave20 = math.cos(((dayAbs + userIdx * 11) % 20) / 20.0 * 2 * math.pi); // 20 Günlük Güneş Mührü Dalgası
+      double waveMicro = math.sin(((dayAbs * 2 + userIdx) % 9) / 9.0 * 2 * math.pi); // 9 Lord of the Night Dalgası
+      
+      // Toplam Uyum Puanı (Biorhythm) -1.0 ile 1.0 aralığına normalize
+      double combined = (wave13 * 0.5) + (wave20 * 0.4) + (waveMicro * 0.1); 
+      
+      if (combined > maxVal) { maxVal = combined; maxToneIndex = i; }
+      if (combined < minVal) { minVal = combined; minToneIndex = i; }
+      
+      // Y ekseni: h*0.85 (dip) ile h*0.15 (tepe) arasına yerleştiriyoruz
+      double normalizedY = (combined * -1 + 1.0) / 2.0; // -1 en üstte (küçük y), 1 en altta (büyük y)
+      double y = h * 0.15 + (normalizedY * h * 0.7);
+      
+      double x = (i / 13) * w;
       points.add(Offset(x, y));
     }
 
-    path.moveTo(points[0].dx, points[0].dy);
-    for(int i=0; i<points.length-1; i++) {
-      // Maya'nın eski geometrisini anımsatsın diye line kullanalım (tamamen smooth curve yerine köşeli de olabilir) ama okunaklı olsun diye curve tutalım
+    // Eğri ve Alt Dolgusu 
+    linePath.moveTo(points[0].dx, points[0].dy);
+    fillPath.moveTo(points[0].dx, h);
+    fillPath.lineTo(points[0].dx, points[0].dy);
+
+    for(int i = 0; i < points.length - 1; i++) {
       final p0 = points[i];
       final p1 = points[i+1];
-      path.quadraticBezierTo(p0.dx, p0.dy, (p0.dx + p1.dx)/2, (p0.dy + p1.dy)/2);
+      double ctrlX = (p0.dx + p1.dx) / 2;
+      linePath.cubicTo(ctrlX, p0.dy, ctrlX, p1.dy, p1.dx, p1.dy);
+      fillPath.cubicTo(ctrlX, p0.dy, ctrlX, p1.dy, p1.dx, p1.dy);
     }
-    path.lineTo(points.last.dx, points.last.dy);
+    
+    fillPath.lineTo(points.last.dx, h);
+    fillPath.close();
 
+    // Dinamik Gradient (Grafikteki renk geçişini çok daha okunaklı ve keskin yaptık)
+    canvas.drawPath(
+      fillPath, 
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [color.withValues(alpha: 0.65), color.withValues(alpha: 0.0)],
+        ).createShader(Rect.fromLTRB(0, 0, w, h))
+    );
+
+    // Ana Çizgi Hattı (Daha premium bir kalınlık)
     final linePaint = Paint()
       ..color = color
-      ..strokeWidth = 2
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
-      ..strokeJoin = StrokeJoin.bevel;
+      ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(linePath, linePaint);
 
-    canvas.drawPath(path, linePaint);
-
-    // Kritik noktalar
-    _drawPoint(canvas, points[5], "+5\nYÜKSEK", color);
-    _drawPoint(canvas, points[12], "+12\nDÜŞÜK", const Color(0xFFFF6D00));
-    _drawPoint(canvas, points[20], "+20\nFIRSAT", accent);
+    // Grafik Detayları ve Keskin İşaretçiler
+    
+    // Y ekseni etiketleri (Basitçe referans vermek için noktalama)
+    if (points.isNotEmpty) {
+      _drawLabelRight(canvas, w, h * 0.15, "MAKS", color.withValues(alpha: 0.8));
+      _drawLabelRight(canvas, w, h * 0.85, "MİN", color.withValues(alpha: 0.8));
+    }
+    
+    // Kritik Nokta İşaretlemeleri
+    _drawPoint(canvas, points[0], "BUGÜN\n%${((maxVal - points[0].dy/h) * 100).abs().toInt().clamp(10, 99)} UYUM", Colors.white, w);
+    
+    if (maxToneIndex > 0) {
+      _drawPoint(canvas, points[maxToneIndex], "${maxToneIndex}. GÜN\nZİRVE (!)", accent, w);
+    }
+    
+    if (minToneIndex > 0 && minToneIndex != maxToneIndex) {
+      _drawPoint(canvas, points[minToneIndex], "${minToneIndex}. GÜN\nDİNLEN", const Color(0xFFFF6D00), w);
+    }
   }
 
-  void _drawPoint(Canvas canvas, Offset offset, String text, Color c) {
+  void _drawLabelRight(Canvas canvas, double maxW, double y, String text, Color c) {
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: TextStyle(color: c, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1)),
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout();
+    tp.paint(canvas, Offset(maxW - tp.width - 4, y - tp.height/2));
+  }
+
+  void _drawPoint(Canvas canvas, Offset offset, String text, Color c, double w) {
     canvas.drawRect(Rect.fromCenter(center: offset, width: 8, height: 8), Paint()..color = Colors.black);
     canvas.drawRect(Rect.fromCenter(center: offset, width: 6, height: 6), Paint()..color = c);
 
@@ -1363,7 +1457,12 @@ class _WaveGraphPainter extends CustomPainter {
     tp.layout();
     
     double dyOffset = offset.dy < 60 ? 12 : -tp.height - 8;
-    tp.paint(canvas, Offset(offset.dx - tp.width/2, offset.dy + dyOffset));
+    // Grafiğin kenarlarından metnin dışarı taşmasını engellemek için min/max x ayarı
+    double drawX = offset.dx - tp.width/2;
+    if (drawX < 10) drawX = 10;
+    if (drawX + tp.width > w - 10) drawX = w - tp.width - 10;
+    
+    tp.paint(canvas, Offset(drawX, offset.dy + dyOffset));
   }
 
   @override
@@ -1767,4 +1866,130 @@ class _MayanNavIconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+// YEPYENİ İNTERAKTİF IŞIK VE GÖLGE BUTONLARI (Pop-up Widget)
+class _InteractiveDualEnergyButton extends StatelessWidget {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color primaryColor;
+  final bool isLight;
+
+  const _InteractiveDualEnergyButton({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.primaryColor,
+    required this.isLight,
+  });
+
+  void _showEnergyDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "EnergyPopup",
+      barrierColor: Colors.black.withValues(alpha: 0.85), // Karanlık transparan odak
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: const Color(0xFF141210).withValues(alpha: 0.95), // Obsidian Glass
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1.5),
+                boxShadow: [
+                  BoxShadow(color: primaryColor.withValues(alpha: 0.15), blurRadius: 40, spreadRadius: 0),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.8), blurRadius: 20, spreadRadius: 10),
+                ]
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: primaryColor.withValues(alpha: 0.1),
+                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                      boxShadow: [
+                        BoxShadow(color: primaryColor.withValues(alpha: 0.2), blurRadius: 20)
+                      ]
+                    ),
+                    child: Icon(icon, color: primaryColor, size: 48),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    title,
+                    style: GoogleFonts.cinzel(color: primaryColor, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Container(width: 40, height: 1, color: primaryColor.withValues(alpha: 0.5)),
+                  const SizedBox(height: 20),
+                  Text(
+                    description,
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, height: 1.6, fontWeight: FontWeight.w400),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
+                      child: const Text('KAPAT', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return Transform.scale(
+          scale: 0.9 + 0.1 * anim1.value,
+          child: Opacity(
+            opacity: anim1.value,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showEnergyDialog(context),
+      child: Column(
+        children: [
+          Container(
+            width: 72, height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isLight ? primaryColor.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.4),
+              border: Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1.5),
+              boxShadow: [
+                BoxShadow(color: isLight ? primaryColor.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.6), blurRadius: 15, spreadRadius: 2),
+                if (!isLight) BoxShadow(color: primaryColor.withValues(alpha: 0.15), blurRadius: 8), // Gölgeye ekstra ay ışığı pırıltısı
+              ]
+            ),
+            child: Icon(icon, color: primaryColor, size: 30),
+          ),
+          const SizedBox(height: 12),
+          Text(title, style: TextStyle(color: primaryColor.withValues(alpha: 0.9), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        ],
+      ),
+    );
+  }
 }
