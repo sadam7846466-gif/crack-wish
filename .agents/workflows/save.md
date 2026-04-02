@@ -11,15 +11,16 @@ Bu workflow projedeki değişiklikleri GitHub'a kaydeder.
 
 1. Önce son değişiklikleri çek (çakışma olmasın):
 ```bash
-cd /Users/yusun/vlucky_flutter && git stash && git pull origin main --rebase && git stash pop || true
+cd /Users/sdmgmz/crack-wish && git stash && git pull origin main --rebase && git stash pop || true
 ```
 
 2. Değişiklikleri hazırla ve commit yap:
 ```bash
-cd /Users/yusun/vlucky_flutter && git add -A && git commit -m "💾 gamze güncelleme $(date '+%d-%m-%Y %H:%M')"
+cd /Users/sdmgmz/crack-wish && git add -A && git commit -m "💾 sadam güncelleme $(date '+%d-%m-%Y %H:%M')"
 ```
 
 3. GitHub'a gönder:
 ```bash
-cd /Users/yusun/vlucky_flutter && git push origin main
+cd /Users/sdmgmz/crack-wish && git push origin main
 ```
+

@@ -90,7 +90,7 @@ class _CookieSectionState extends State<CookieSection>
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.88), // Biraz daha derinlik
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierLabel: 'ShareOptions',
       transitionDuration: const Duration(milliseconds: 450), // Daha sakin ve yumuşak süre
       pageBuilder: (context, animation, secondaryAnimation) {

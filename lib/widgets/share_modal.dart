@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -38,6 +39,10 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
   late final Animation<double> _fadeAnim;
   late final Animation<double> _scaleAnim;
 
+  // Pre-cached images
+  Uint8List? _cachedStoryImage;
+  Uint8List? _cachedPostImage;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +55,36 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
       CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
     );
     _entranceCtrl.forward();
+    // Pre-generate images in background
+    _preCacheImages();
+  }
+
+  Future<void> _preCacheImages() async {
+    // Wait for widget to be fully built
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
+    _cachedStoryImage = await _renderImage(true);
+    if (!mounted) return;
+    _cachedPostImage = await _renderImage(false);
+  }
+
+  Future<Uint8List?> _renderImage(bool story) async {
+    try {
+      final height = story ? 1920.0 : 1350.0;
+      return await _screenshotController.captureFromWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.noScaling),
+          child: story ? _buildExportCard() : _buildPostCard(),
+        ),
+        context: context,
+        pixelRatio: 2.0,
+        targetSize: Size(1080, height),
+        delay: Duration.zero,
+      );
+    } catch (e) {
+      debugPrint('Image render error: $e');
+      return null;
+    }
   }
 
   @override
@@ -63,25 +98,12 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
     if (mounted) Navigator.of(context).pop();
   }
 
-  // Görseli oluştur (format'a göre)
-  Future<Uint8List?> _generateImage() async {
-    try {
-      final height = _isStoryFormat ? 1920.0 : 1350.0;
-      return await _screenshotController.captureFromWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            textScaler: TextScaler.noScaling,
-          ),
-          child: _isStoryFormat ? _buildExportCard() : _buildPostCard(),
-        ),
-        context: context,
-        pixelRatio: 3.0,
-        targetSize: Size(1080, height),
-        delay: const Duration(milliseconds: 100),
-      );
-    } catch (e) {
-      debugPrint('Image generation error: $e');
-      return null;
+  Future<Uint8List?> _getImage() async {
+    // Return cached or generate on demand
+    if (_isStoryFormat) {
+      return _cachedStoryImage ??= await _renderImage(true);
+    } else {
+      return _cachedPostImage ??= await _renderImage(false);
     }
   }
 
@@ -89,15 +111,14 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
   void _saveToGallery() async {
     if (_isExporting) return;
     setState(() => _isExporting = true);
-    await Future.delayed(const Duration(milliseconds: 100));
     
     try {
-      final image = await _generateImage();
+      final image = await _getImage();
       if (image == null) return;
       
       final result = await ImageGallerySaverPlus.saveImage(
         image,
-        quality: 100,
+        quality: 95,
         name: 'crack_wish_${DateTime.now().millisecondsSinceEpoch}',
       );
       
@@ -126,14 +147,13 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
     }
   }
 
-  // PAYLAŞ: Yerel paylaşım menüsü (Instagram, WhatsApp, TikTok, X - hepsi burada)
+  // PAYLAŞ: Yerel paylaşım menüsü
   void _shareContent() async {
     if (_isExporting) return;
     setState(() => _isExporting = true);
-    await Future.delayed(const Duration(milliseconds: 100));
     
     try {
-      final image = await _generateImage();
+      final image = await _getImage();
       if (image == null) return;
 
       final directory = await getTemporaryDirectory();
@@ -450,19 +470,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Alıntı Başlangıcı (Tırnak)
-                Text(
-                  '"', 
-                  style: GoogleFonts.lora( // Lora fontu ekranda en net okunan serif fontlardandır
-                    color: theme.quoteText, 
-                    fontSize: 100, 
-                    fontWeight: FontWeight.w700, 
-                    height: 0.4, 
-                    decoration: TextDecoration.none
-                  )
-                ),
-                
-                const SizedBox(height: 60),
+
                 
                 // Fortune Mesajı
                 Padding(
@@ -630,17 +638,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '"',
-                    style: GoogleFonts.lora(
-                      color: theme.quoteText,
-                      fontSize: 80,
-                      fontWeight: FontWeight.w700,
-                      height: 0.4,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 100.0),
                     child: Text(
@@ -905,22 +903,31 @@ class _TapButton extends StatefulWidget {
 
 class _TapButtonState extends State<_TapButton> {
   bool _pressed = false;
+  DateTime? _pressTime;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
+      onTapDown: (_) {
+        _pressTime = DateTime.now();
+        setState(() => _pressed = true);
+        HapticFeedback.lightImpact();
+      },
+      onTapUp: (_) async {
+        final elapsed = DateTime.now().difference(_pressTime ?? DateTime.now());
+        final remaining = const Duration(milliseconds: 150) - elapsed;
+        if (remaining > Duration.zero) await Future.delayed(remaining);
+        if (mounted) setState(() => _pressed = false);
         widget.onTap?.call();
       },
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
-        scale: _pressed ? 0.92 : 1.0,
-        duration: const Duration(milliseconds: 100),
+        scale: _pressed ? 0.85 : 1.0,
+        duration: const Duration(milliseconds: 80),
+        curve: Curves.easeOutCubic,
         child: AnimatedOpacity(
-          opacity: _pressed ? 0.7 : 1.0,
-          duration: const Duration(milliseconds: 100),
+          opacity: _pressed ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 80),
           child: widget.child,
         ),
       ),

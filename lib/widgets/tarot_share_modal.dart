@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -39,6 +40,10 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
   late final Animation<double> _fadeAnim;
   late final Animation<double> _scaleAnim;
 
+  // Pre-cached images
+  Uint8List? _cachedStoryImage;
+  Uint8List? _cachedPostImage;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +56,34 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
       CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
     );
     _entranceCtrl.forward();
+    _preCacheImages();
+  }
+
+  Future<void> _preCacheImages() async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
+    _cachedStoryImage = await _renderImage(true);
+    if (!mounted) return;
+    _cachedPostImage = await _renderImage(false);
+  }
+
+  Future<Uint8List?> _renderImage(bool story) async {
+    try {
+      final height = story ? 1920.0 : 1350.0;
+      return await _screenshotController.captureFromWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.noScaling),
+          child: story ? _buildExportCard() : _buildPostCard(),
+        ),
+        context: context,
+        pixelRatio: 2.0,
+        targetSize: Size(1080, height),
+        delay: Duration.zero,
+      );
+    } catch (e) {
+      debugPrint('Image render error: $e');
+      return null;
+    }
   }
 
   @override
@@ -64,39 +97,25 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
     if (mounted) Navigator.of(context).pop();
   }
 
-  Future<Uint8List?> _generateImage() async {
-    try {
-      final height = _isStoryFormat ? 1920.0 : 1350.0;
-      return await _screenshotController.captureFromWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            textScaler: TextScaler.noScaling,
-          ),
-          child: _isStoryFormat ? _buildExportCard() : _buildPostCard(),
-        ),
-        context: context,
-        pixelRatio: 3.0,
-        targetSize: Size(1080, height),
-        delay: const Duration(milliseconds: 100),
-      );
-    } catch (e) {
-      debugPrint('Image generation error: $e');
-      return null;
+  Future<Uint8List?> _getImage() async {
+    if (_isStoryFormat) {
+      return _cachedStoryImage ??= await _renderImage(true);
+    } else {
+      return _cachedPostImage ??= await _renderImage(false);
     }
   }
 
   void _saveToGallery() async {
     if (_isExporting) return;
     setState(() => _isExporting = true);
-    await Future.delayed(const Duration(milliseconds: 100));
     
     try {
-      final image = await _generateImage();
+      final image = await _getImage();
       if (image == null) return;
       
       final result = await ImageGallerySaverPlus.saveImage(
         image,
-        quality: 100,
+        quality: 95,
         name: 'crack_wish_tarot_${DateTime.now().millisecondsSinceEpoch}',
       );
       
@@ -128,10 +147,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
   void _shareContent() async {
     if (_isExporting) return;
     setState(() => _isExporting = true);
-    await Future.delayed(const Duration(milliseconds: 100));
     
     try {
-      final image = await _generateImage();
+      final image = await _getImage();
       if (image == null) return;
 
       final directory = await getTemporaryDirectory();
@@ -214,11 +232,11 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
             padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 110),
             child: Column(
               children: [
-                const SizedBox(height: 130),
+                const SizedBox(height: 60),
                 
                 // Tepedeki zarif etiket (Kutu yerine sadece metin)
                 Text(
-                  widget.isMajorArcana ? '✦  M A J O R   A R C A N A  ✦' : '✦  F U L L   A R C A N A  ✦',
+                  widget.isMajorArcana ? '◆  M A J O R   A R C A N A  ◆' : '◆  F U L L   A R C A N A  ◆',
                   style: GoogleFonts.cinzel(
                     color: const Color(0xFFE7D6A5).withOpacity(0.95),
                     fontSize: 22,
@@ -228,7 +246,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   ),
                 ),
                 
-                const SizedBox(height: 120),
+                const SizedBox(height: 70),
 
                 // Kart görselleri (Daha zarif etkileşim ve altın kenarlık)
                 SizedBox(
@@ -342,7 +360,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   ),
                 ),
 
-                const SizedBox(height: 70),
+                const SizedBox(height: 40),
                 
                 // İnce minimalist ayırıcı
                 Container(
@@ -359,109 +377,34 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                   ),
                 ),
                 
-                const SizedBox(height: 60),
+                const SizedBox(height: 30),
 
-                // Ana mesaj — Kartların gerçek yorumu
+                // Ana mesaj — Kartların gizli fısıltısı
                 Expanded(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: Builder(
-                        builder: (context) {
-                          // Her kartın yorumunu ayrı ayrı göster
-                          final sections = widget.closingMessage.split('\n\n');
-
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Dekoratif açılış işareti
-                              Text(
-                                '✦',
-                                style: TextStyle(
-                                  color: const Color(0xFFE7D6A5).withOpacity(0.6),
-                                  fontSize: 24,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                              const SizedBox(height: 25),
-
-                              // Her kartın yorumu
-                              for (int i = 0; i < sections.length; i++) ...[
-                                Builder(
-                                  builder: (context) {
-                                    final lines = sections[i].split('\n');
-                                    final title = lines.isNotEmpty ? lines[0] : '';
-                                    final body = lines.length > 1 ? lines.sublist(1).join('\n') : '';
-
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Kart ismi + pozisyon başlığı
-                                        Text(
-                                          title,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.cinzel(
-                                            color: const Color(0xFFE7D6A5),
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 2.0,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                        ),
-                                        if (body.isNotEmpty) ...[
-                                          const SizedBox(height: 12),
-                                          // Yorum metni
-                                          Text(
-                                            body,
-                                            textAlign: TextAlign.center,
-                                            maxLines: 4,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.cormorantGaramond(
-                                              color: Colors.white.withOpacity(0.95),
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle: FontStyle.italic,
-                                              height: 1.45,
-                                              letterSpacing: 0.3,
-                                              decoration: TextDecoration.none,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    );
-                                  },
-                                ),
-                                // Dekoratif ayırıcı (son kart hariç)
-                                if (i < sections.length - 1) ...[
-                                  const SizedBox(height: 25),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
-                                      const SizedBox(width: 10),
-                                      Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 10),
-                                      const SizedBox(width: 10),
-                                      Container(width: 30, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 25),
-                                ],
-                              ],
-
-                              const SizedBox(height: 25),
-
-                              // Dekoratif kapanış işareti
-                              Text(
-                                '✦',
-                                style: TextStyle(
-                                  color: const Color(0xFFE7D6A5).withOpacity(0.6),
-                                  fontSize: 24,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                      padding: const EdgeInsets.symmetric(horizontal: 65),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 28),
+                          const SizedBox(height: 35),
+                          Text(
+                            widget.closingMessage,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.lora(
+                              color: Colors.white.withOpacity(0.95),
+                              fontSize: 52,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic,
+                              height: 1.5,
+                              letterSpacing: 0.3,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          const SizedBox(height: 35),
+                          Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 28),
+                        ],
                       ),
                     ),
                   ),
@@ -471,7 +414,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 if (widget.promises.isNotEmpty) ...[
                   const SizedBox(height: 30),
                   Text(
-                    widget.promises.take(3).map((p) => p.toUpperCase()).join('   ✦   '),
+                    widget.promises.take(3).map((p) => p.toUpperCase()).join('   ◆   '),
                     style: GoogleFonts.cinzel(
                       color: const Color(0xFFE7D6A5).withOpacity(0.95),
                       fontSize: 22,
@@ -570,7 +513,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
 
                 // Etiket
                 Text(
-                  widget.isMajorArcana ? '✦  M A J O R   A R C A N A  ✦' : '✦  F U L L   A R C A N A  ✦',
+                  widget.isMajorArcana ? '◆  M A J O R   A R C A N A  ◆' : '◆  F U L L   A R C A N A  ◆',
                   style: GoogleFonts.cinzel(
                     color: const Color(0xFFE7D6A5).withOpacity(0.95),
                     fontSize: 18,
@@ -705,85 +648,32 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
 
                 const SizedBox(height: 25),
 
-                // Mesaj — Kartların gerçek yorumu (kompakt)
+                // Mesaj — Tek güçlü fısıltı
                 Expanded(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: Builder(
-                        builder: (context) {
-                          final sections = widget.closingMessage.split('\n\n');
-
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
-                              const SizedBox(height: 16),
-
-                              for (int i = 0; i < sections.length; i++) ...[
-                                Builder(
-                                  builder: (context) {
-                                    final lines = sections[i].split('\n');
-                                    final title = lines.isNotEmpty ? lines[0] : '';
-                                    final body = lines.length > 1 ? lines.sublist(1).join('\n') : '';
-
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          title,
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.cinzel(
-                                            color: const Color(0xFFE7D6A5),
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 1.5,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                        ),
-                                        if (body.isNotEmpty) ...[
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            body,
-                                            textAlign: TextAlign.center,
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.cormorantGaramond(
-                                              color: Colors.white.withOpacity(0.95),
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle: FontStyle.italic,
-                                              height: 1.4,
-                                              letterSpacing: 0.3,
-                                              decoration: TextDecoration.none,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    );
-                                  },
-                                ),
-                                if (i < sections.length - 1) ...[
-                                  const SizedBox(height: 18),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(width: 25, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 8),
-                                      const SizedBox(width: 8),
-                                      Container(width: 25, height: 0.5, color: const Color(0xFFE7D6A5).withOpacity(0.4)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 18),
-                                ],
-                              ],
-
-                              const SizedBox(height: 16),
-                              Text('✦', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.6), fontSize: 20, decoration: TextDecoration.none)),
-                            ],
-                          );
-                        },
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 22),
+                          const SizedBox(height: 16),
+                          Text(
+                            widget.closingMessage,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.lora(
+                              color: Colors.white.withOpacity(0.95),
+                              fontSize: 42,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic,
+                              height: 1.45,
+                              letterSpacing: 0.3,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 22),
+                        ],
                       ),
                     ),
                   ),
@@ -793,7 +683,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 if (widget.promises.isNotEmpty) ...[
                   const SizedBox(height: 20),
                   Text(
-                    widget.promises.take(3).map((p) => p.toUpperCase()).join('   ✦   '),
+                    widget.promises.take(3).map((p) => p.toUpperCase()).join('   ◆   '),
                     style: GoogleFonts.cinzel(
                       color: const Color(0xFFE7D6A5).withOpacity(0.95),
                       fontSize: 18,
@@ -931,7 +821,13 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.download_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.7), size: 14),
+                                if (_isExporting)
+                                  Opacity(
+                                    opacity: 0.4,
+                                    child: Icon(Icons.download_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.7), size: 14),
+                                  )
+                                else
+                                  Icon(Icons.download_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.7), size: 14),
                                 const SizedBox(width: 6),
                                 Text('İndir', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
                               ],
@@ -950,7 +846,13 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.ios_share_rounded, color: Colors.white.withOpacity(0.85), size: 14),
+                                if (_isExporting)
+                                  Opacity(
+                                    opacity: 0.4,
+                                    child: Icon(Icons.ios_share_rounded, color: Colors.white.withOpacity(0.85), size: 14),
+                                  )
+                                else
+                                  Icon(Icons.ios_share_rounded, color: Colors.white.withOpacity(0.85), size: 14),
                                 const SizedBox(width: 6),
                                 Text('Paylaş', style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
                               ],
@@ -1010,22 +912,31 @@ class _TarotTapButton extends StatefulWidget {
 
 class _TarotTapButtonState extends State<_TarotTapButton> {
   bool _pressed = false;
+  DateTime? _pressTime;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
+      onTapDown: (_) {
+        _pressTime = DateTime.now();
+        setState(() => _pressed = true);
+        HapticFeedback.lightImpact();
+      },
+      onTapUp: (_) async {
+        final elapsed = DateTime.now().difference(_pressTime ?? DateTime.now());
+        final remaining = const Duration(milliseconds: 150) - elapsed;
+        if (remaining > Duration.zero) await Future.delayed(remaining);
+        if (mounted) setState(() => _pressed = false);
         widget.onTap?.call();
       },
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
-        scale: _pressed ? 0.92 : 1.0,
-        duration: const Duration(milliseconds: 100),
+        scale: _pressed ? 0.85 : 1.0,
+        duration: const Duration(milliseconds: 80),
+        curve: Curves.easeOutCubic,
         child: AnimatedOpacity(
-          opacity: _pressed ? 0.7 : 1.0,
-          duration: const Duration(milliseconds: 100),
+          opacity: _pressed ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 80),
           child: widget.child,
         ),
       ),

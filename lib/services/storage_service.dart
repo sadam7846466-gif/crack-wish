@@ -136,6 +136,16 @@ class StorageService {
     await prefs.setString(_keyUserName, name);
   }
 
+  static Future<String?> getAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_avatar');
+  }
+
+  static Future<void> setAvatar(String avatarPath) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_avatar', avatarPath);
+  }
+
   static Future<String?> getZodiacSign() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_keyZodiacSign);
