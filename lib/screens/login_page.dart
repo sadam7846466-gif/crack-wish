@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart'; // Varsayılan anasayfa dosyana göre ayarlanmalı
+import '../screens/root_shell.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       if (response != null && mounted) {
         // Giriş başarılı, Anasayfaya gönder
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()), // Kendi ana ekran yönlendirmeni buraya koy
+          MaterialPageRoute(builder: (_) => const RootShell()),
         );
       }
     } catch (e) {
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       if (response != null && mounted) {
         // Giriş başarılı, Anasayfaya gönder
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const RootShell()),
         );
       }
     } catch (e) {
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   void _continueAsGuest() {
     // Misafir (Anonim) olarak devam et
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const RootShell()),
     );
   }
 
@@ -246,7 +246,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: color.withOpacity(opacity),
-        filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(opacity * 0.6),
+            blurRadius: 80,
+            spreadRadius: 40,
+          ),
+        ],
       ),
     );
   }

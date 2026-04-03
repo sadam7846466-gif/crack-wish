@@ -18,9 +18,12 @@ class StoryShareCard extends StatelessWidget {
     return Container(
       width: 1080,
       height: 1920,
-      decoration: BoxDecoration(
-        gradient: LinearBindingGradient(),
-        // some amazing styling
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+        ),
       ),
     );
   }

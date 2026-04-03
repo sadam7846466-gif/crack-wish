@@ -4,6 +4,7 @@ import '../widgets/glass_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
+import '../services/storage_service.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -20,6 +21,28 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _newCookieAlarm = true;
   bool _friendsAlarm = true;
   bool _dailyReminders = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final settings = await StorageService.getNotificationSettings();
+    if (!mounted) return;
+    setState(() {
+      _announcements = settings['announcements'] ?? true;
+      _voices = settings['voices'] ?? false;
+      _newCookieAlarm = settings['newCookieAlarm'] ?? true;
+      _friendsAlarm = settings['friendsAlarm'] ?? true;
+      _dailyReminders = settings['dailyReminders'] ?? false;
+    });
+  }
+
+  void _updateSetting(String key, bool value) {
+    StorageService.setNotificationSetting(key, value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +108,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             Positioned.fill(
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                 child: Container(color: Colors.transparent),
               ),
             ),
@@ -140,8 +163,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             title: 'Duyurular',
                             subtitle: 'Yeni özellikler ve güncellemeler',
                             value: _announcements,
-                            onChanged: (v) =>
-                                setState(() => _announcements = v),
+                            onChanged: (v) {
+                              setState(() => _announcements = v);
+                              _updateSetting('announcements', v);
+                            },
                           ),
                           const SizedBox(height: 12),
                           _NotifToggle(
@@ -150,7 +175,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             title: 'Sesler',
                             subtitle: 'Sesli bildirim uyarıları',
                             value: _voices,
-                            onChanged: (v) => setState(() => _voices = v),
+                            onChanged: (v) {
+                              setState(() => _voices = v);
+                              _updateSetting('voices', v);
+                            },
                           ),
                           const SizedBox(height: 12),
                           _NotifToggle(
@@ -159,8 +187,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             title: 'Yeni Kurabiye Alarmı',
                             subtitle: 'Yeni fortune cookie geldiğinde',
                             value: _newCookieAlarm,
-                            onChanged: (v) =>
-                                setState(() => _newCookieAlarm = v),
+                            onChanged: (v) {
+                              setState(() => _newCookieAlarm = v);
+                              _updateSetting('newCookieAlarm', v);
+                            },
                           ),
                           const SizedBox(height: 12),
                           _NotifToggle(
@@ -169,8 +199,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             title: 'Arkadaş Alarmı',
                             subtitle: 'Baykuş ağından yeni bağlantılar',
                             value: _friendsAlarm,
-                            onChanged: (v) =>
-                                setState(() => _friendsAlarm = v),
+                            onChanged: (v) {
+                              setState(() => _friendsAlarm = v);
+                              _updateSetting('friendsAlarm', v);
+                            },
                           ),
                           const SizedBox(height: 12),
                           _NotifToggle(
@@ -179,8 +211,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             title: 'Günlük Hatırlatıcılar',
                             subtitle: 'Günlük kurabiyeni almayı unutma',
                             value: _dailyReminders,
-                            onChanged: (v) =>
-                                setState(() => _dailyReminders = v),
+                            onChanged: (v) {
+                              setState(() => _dailyReminders = v);
+                              _updateSetting('dailyReminders', v);
+                            },
                           ),
                         ],
                       ),

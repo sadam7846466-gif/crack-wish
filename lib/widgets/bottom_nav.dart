@@ -16,7 +16,7 @@ class BottomNav extends StatelessWidget {
 
     final tabs = [
       _TabItem(icon: Icons.home_rounded, label: l10n.navHome),
-      _TabItem(icon: Icons.apps_rounded, label: l10n.navCollection),
+      // _TabItem(icon: Icons.apps_rounded, label: l10n.navCollection), // Koleksiyon geçici olarak gizlendi
       _TabItem(icon: Icons.person_rounded, label: l10n.navProfile),
     ];
 

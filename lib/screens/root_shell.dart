@@ -17,11 +17,11 @@ class RootShell extends StatefulWidget {
 }
 
 class _RootShellState extends State<RootShell> {
-  late int _currentIndex = widget.initialIndex.clamp(0, 2);
+  late int _currentIndex = widget.initialIndex.clamp(0, 1); // Artık 2 değil 1 (sadece Home ve Profil)
 
   late final List<Widget> _tabs = [
     HomePage(showBottomNav: false, onNavTapOverride: _handleNavTap),
-    CollectionPage(showBottomNav: false, onNavTapOverride: _handleNavTap),
+    // CollectionPage(showBottomNav: false, onNavTapOverride: _handleNavTap), // Koleksiyon askıya alındı
     ProfilePage(showBottomNav: false, onNavTapOverride: _handleNavTap),
   ];
 

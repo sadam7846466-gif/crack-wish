@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -16,6 +17,7 @@ import 'home_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
+import '../models/cookie_card.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -42,6 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int _totalTarots = 0;
   int _totalDreams = 0;
   int _streakDays = 0;
+  int _soulStones = 3; // Krediler için state
   bool _isLoading = true;
 
   @override
@@ -60,27 +63,32 @@ class _ProfilePageState extends State<ProfilePage> {
       _totalCookies = (snapshot['totalCookies'] as int?) ?? 0;
       _totalTarots = (snapshot['totalTarots'] as int?) ?? 0;
       _totalDreams = (snapshot['totalDreams'] as int?) ?? 0;
+      _soulStones = (snapshot['soulStones'] as int?) ?? 3;
       _streakDays = streak;
       _userAvatar = avatar;
       _isLoading = false;
     });
   }
 
-  // ── Kullanıcı seviyesi hesapla ──
+  // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
   String _getUserLevel(String lang) {
-    final total = _totalCookies + _totalTarots + _totalDreams;
+    // Aura hesaplaması
+    final int aura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5);
+    
     if (lang == 'tr') {
-      if (total == 0) return 'Yeni Başlayan';
-      if (total <= 10) return 'Acemi Kahin';
-      if (total <= 50) return 'Çırak Kahin';
-      if (total <= 100) return 'Deneyimli Kahin';
-      return 'Usta Kahin';
+      if (aura < 100) return '🌱 Yeni Başlayan';
+      if (aura < 500) return '🕯️ Acemi Kahin';
+      if (aura < 1500) return '🔮 Çırak Kahin';
+      if (aura < 5000) return '🧿 Bilge Kahin';
+      if (aura < 10000) return '🔱 Usta Kahin';
+      return '👑 Yüce Başbüyücü';
     } else {
-      if (total == 0) return 'Newcomer';
-      if (total <= 10) return 'Novice Seer';
-      if (total <= 50) return 'Apprentice Seer';
-      if (total <= 100) return 'Experienced Seer';
-      return 'Master Seer';
+      if (aura < 100) return '🌱 Newcomer';
+      if (aura < 500) return '🕯️ Novice Seer';
+      if (aura < 1500) return '🔮 Apprentice Seer';
+      if (aura < 5000) return '🧿 Wise Seer';
+      if (aura < 10000) return '🔱 Master Seer';
+      return '👑 Grandmaster';
     }
   }
 
@@ -349,100 +357,143 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ── Profil ayarları ──
-  void _openProfileSettings() {
+  void _openProfileSettings() async {
     final lang = Localizations.localeOf(context).languageCode;
+    final savedBirthDate = await StorageService.getBirthDate();
+
+    if (!mounted) return;
+
+    DateTime? currentBirthDate = savedBirthDate;
+
+    String formatDate(DateTime? d) {
+      if (d == null) return lang == 'tr' ? 'Ayarlanmadı' : 'Not set';
+      return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+    }
+
+    String getZodiacFromDate(DateTime? d) {
+      if (d == null) return lang == 'tr' ? 'Otomatik' : 'Automatic';
+      final month = d.month;
+      final day = d.day;
+      final signs = lang == 'tr'
+          ? ['Oğlak', 'Kova', 'Balık', 'Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak']
+          : ['Capricorn', 'Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'];
+      const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
+      return day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {
-        return Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1F2A),
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1F2A),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                lang == 'tr' ? 'Profil Ayarları' : 'Profile Settings',
-                style: const TextStyle(
-                  color: AppColors.textWhite,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // İsim
-              _SettingsRow(
-                icon: Icons.person_rounded,
-                label: lang == 'tr' ? 'İsim' : 'Name',
-                value: _userName.isNotEmpty
-                    ? _userName
-                    : (lang == 'tr' ? 'Ayarlanmadı' : 'Not set'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _editProfile();
-                },
-              ),
-              const SizedBox(height: 12),
-              // Doğum Tarihi
-              _SettingsRow(
-                icon: Icons.cake_rounded,
-                label: lang == 'tr' ? 'Doğum Tarihi' : 'Birth Date',
-                value: lang == 'tr' ? 'Ayarlanmadı' : 'Not set',
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: ctx,
-                    initialDate: DateTime(2000, 1, 1),
-                    firstDate: DateTime(1940),
-                    lastDate: DateTime.now(),
-                    builder: (context, child) {
-                      return Theme(
-                        data: ThemeData.dark().copyWith(
-                          colorScheme: const ColorScheme.dark(
-                            primary: AppColors.primaryOrange,
-                            surface: Color(0xFF0F1F2A),
-                          ),
-                        ),
-                        child: child!,
-                      );
+                  const SizedBox(height: 20),
+                  Text(
+                    lang == 'tr' ? 'Profil Ayarları' : 'Profile Settings',
+                    style: const TextStyle(
+                      color: AppColors.textWhite,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // İsim
+                  _SettingsRow(
+                    icon: Icons.person_rounded,
+                    label: lang == 'tr' ? 'İsim' : 'Name',
+                    value: _userName.isNotEmpty
+                        ? _userName
+                        : (lang == 'tr' ? 'Ayarlanmadı' : 'Not set'),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _editProfile();
                     },
-                  );
-                  if (picked != null) {
-                    await StorageService.setBirthDate(picked);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  }
-                },
+                  ),
+                  const SizedBox(height: 12),
+                  // Doğum Tarihi
+                  _SettingsRow(
+                    icon: Icons.cake_rounded,
+                    label: lang == 'tr' ? 'Doğum Tarihi' : 'Birth Date',
+                    value: formatDate(currentBirthDate),
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: ctx,
+                        initialDate: currentBirthDate ?? DateTime(2000, 1, 1),
+                        firstDate: DateTime(1940),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: ThemeData.dark().copyWith(
+                              colorScheme: const ColorScheme.dark(
+                                primary: AppColors.primaryOrange,
+                                surface: Color(0xFF0F1F2A),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        await StorageService.setBirthDate(picked);
+                        final zodiac = getZodiacFromDate(picked);
+                        await StorageService.setZodiacSign(zodiac);
+                        setModalState(() => currentBirthDate = picked);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  // Burç
+                  _SettingsRow(
+                    icon: Icons.stars_rounded,
+                    label: lang == 'tr' ? 'Burcun' : 'Zodiac Sign',
+                    value: getZodiacFromDate(currentBirthDate),
+                    onTap: () {
+                      if (currentBirthDate == null) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              lang == 'tr'
+                                  ? 'Doğum tarihini ayarla, burcun otomatik belirlensin!'
+                                  : 'Set your birth date to auto-detect your zodiac sign!',
+                              style: const TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                            backgroundColor: const Color(0xFF1A1A2E),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 12),
-              // Burç
-              _SettingsRow(
-                icon: Icons.stars_rounded,
-                label: lang == 'tr' ? 'Burcun' : 'Zodiac Sign',
-                value: lang == 'tr' ? 'Otomatik' : 'Automatic',
-                onTap: () {
-                  Navigator.pop(ctx);
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -972,46 +1023,45 @@ info@crackandwish.com''',
             decoration: BoxDecoration(gradient: palette.bgGradient),
             child: Stack(
               children: [
-                // Mottled overlay (aynı arka plan)
+                // Mottled overlay
                 Positioned.fill(
                   child: RepaintBoundary(
                     child: CustomPaint(painter: _mottledPainter),
                   ),
                 ),
-                SafeArea(
-                  bottom: false,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+                SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 100),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // ── 1. PROFİL KARTI ──
-                        _ProfileCard(
+                        // ── 1. HERO PROFIL KARTI (Arch-top glassmorphism + Stats) ──
+                        _BentoHeroCard(
                           userName: _userName,
                           userAvatar: _userAvatar,
                           levelTitle: _getUserLevel(lang),
+                          isLoading: _isLoading,
+                          onEditTap: _editProfile,
+                          profileTitle: l10n.profileUserTitle,
                           totalCookies: _totalCookies,
                           totalTarots: _totalTarots,
                           totalDreams: _totalDreams,
                           streakDays: _streakDays,
-                          isLoading: _isLoading,
-                          onEditTap: _editProfile,
-                          cookieLabel: l10n.statCookies,
-                          tarotLabel: lang == 'tr' ? 'Tarot' : 'Tarot',
-                          dreamLabel: l10n.statDreams,
-                          streakLabel: l10n.statStreakDays,
+                          soulStones: _soulStones,
                         ),
-                        const SizedBox(height: 20),
+                        // Note: Bireysel bento stat kartları (2x2 grid) kaldırıldı,
+                        // istatistikler artık _BentoHeroCard'ın içerisinde yuvarlak ikonlar olarak yer alıyor.
+                        const SizedBox(height: 24),
 
-                        // ── 2. PREMİUM BANNER ──
-                        GestureDetector(
+                        // ── 3. PREMİUM BANNER ──
+                        _BentoPremiumBanner(
+                          lang: lang,
                           onTap: () {
                             HapticFeedback.lightImpact();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Row(
                                   children: [
-                                    const Text('👑', style: TextStyle(fontSize: 18)),
+                                    const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFFD166), size: 18),
                                     const SizedBox(width: 8),
                                     Text(
                                       lang == 'tr'
@@ -1028,185 +1078,162 @@ info@crackandwish.com''',
                               ),
                             );
                           },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFFFFD166),
-                                  Color(0xFFFF9A5C),
-                                  Color(0xFFFF6B6B),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(22),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFFFD166).withOpacity(0.25),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.25),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.workspace_premium_rounded,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.3,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        lang == 'tr'
-                                            ? 'Sınırsız kurabiye ve özel özellikler'
-                                            : 'Unlimited cookies and exclusive features',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.8),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Colors.white.withOpacity(0.8),
-                                  size: 18,
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
+                        const SizedBox(height: 20),
 
-                        const SizedBox(height: 32),
-
-                        // ── 3. GENEL ──
+                        // ── 4. QUICK ACTIONS (2x2 Bento Grid) ──
                         _SectionLabel(lang == 'tr' ? 'Genel' : 'General'),
-                        const SizedBox(height: 12),
-                        _ProfileMenuItem(
-                          icon: Icons.language_rounded,
-                          iconBgColor: const Color(0xFF5A8BFF),
-                          title: l10n.language,
-                          trailing: l10n.languageValue(languageValue),
-                          onTap: _openLanguagePicker,
-                        ),
                         const SizedBox(height: 10),
-                        _ProfileMenuItem(
-                          icon: Icons.notifications_none_rounded,
-                          iconBgColor: const Color(0xFFFF6B6B),
-                          title: lang == 'tr' ? 'Bildirimler' : 'Notifications',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              SwipeFadePageRoute(
-                                page: const NotificationSettingsPage(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.language_rounded,
+                                iconColor: const Color(0xFF5A8BFF),
+                                label: l10n.language,
+                                subtitle: languageValue,
+                                onTap: _openLanguagePicker,
                               ),
-                            );
-                          },
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.notifications_none_rounded,
+                                iconColor: const Color(0xFFFF6B6B),
+                                label: lang == 'tr' ? 'Bildirimler' : 'Notifications',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SwipeFadePageRoute(
+                                      page: const NotificationSettingsPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
-                        _ProfileMenuItem(
-                          icon: Icons.person_outline_rounded,
-                          iconBgColor: const Color(0xFF7B61FF),
-                          title: lang == 'tr' ? 'Profil Ayarları' : 'Profile Settings',
-                          onTap: _openProfileSettings,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.person_outline_rounded,
+                                iconColor: const Color(0xFF7B61FF),
+                                label: lang == 'tr' ? 'Profil Ayarları' : 'Profile Settings',
+                                onTap: _openProfileSettings,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.palette_outlined,
+                                iconColor: const Color(0xFF2DD4BF),
+                                label: lang == 'tr' ? 'Tema' : 'Theme',
+                                subtitle: 'Midnight',
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        lang == 'tr'
+                                            ? 'Yeni temalar çok yakında!'
+                                            : 'New themes coming soon!',
+                                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                                      ),
+                                      backgroundColor: const Color(0xFF1A1A2E),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
-                        // ── 4. PAYLAŞ & DESTEK ──
+                        // ── 5. PAYLAŞ & DESTEK (Compact Row) ──
                         _SectionLabel(
                           lang == 'tr' ? 'Paylaş & Destek' : 'Share & Support',
                         ),
-                        const SizedBox(height: 12),
-                        _ProfileMenuItem(
-                          icon: Icons.share_rounded,
-                          iconBgColor: const Color(0xFF2DD4BF),
-                          title: lang == 'tr'
-                              ? 'Arkadaşlarınla Paylaş'
-                              : 'Share with Friends',
-                          onTap: _shareApp,
-                        ),
                         const SizedBox(height: 10),
-                        _ProfileMenuItem(
-                          icon: Icons.star_border_rounded,
-                          iconBgColor: const Color(0xFFFFD166),
-                          title: lang == 'tr'
-                              ? 'Uygulamayı Değerlendir'
-                              : 'Rate the App',
-                          onTap: _rateApp,
-                        ),
-                        const SizedBox(height: 10),
-                        _ProfileMenuItem(
-                          icon: Icons.help_outline_rounded,
-                          iconBgColor: const Color(0xFFC084FC),
-                          title: lang == 'tr'
-                              ? 'Yardım Merkezi'
-                              : 'Help Center',
-                          onTap: _openHelpCenter,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.share_rounded,
+                                iconColor: const Color(0xFF2DD4BF),
+                                label: lang == 'tr' ? 'Paylaş' : 'Share',
+                                onTap: _shareApp,
+                                compact: true,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.star_border_rounded,
+                                iconColor: const Color(0xFFFFD166),
+                                label: lang == 'tr' ? 'Değerlendir' : 'Rate',
+                                onTap: _rateApp,
+                                compact: true,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.help_outline_rounded,
+                                iconColor: const Color(0xFFC084FC),
+                                label: lang == 'tr' ? 'Yardım' : 'Help',
+                                onTap: _openHelpCenter,
+                                compact: true,
+                              ),
+                            ),
+                          ],
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
-                        // ── 5. YASAL ──
+                        // ── 6. YASAL ──
                         _SectionLabel(lang == 'tr' ? 'Yasal' : 'Legal'),
-                        const SizedBox(height: 12),
-                        _ProfileMenuItem(
-                          icon: Icons.shield_outlined,
-                          iconBgColor: const Color(0xFF4CAF50),
-                          title: lang == 'tr'
-                              ? 'Gizlilik Politikası'
-                              : 'Privacy Policy',
-                          onTap: _openPrivacyPolicy,
-                        ),
                         const SizedBox(height: 10),
-                        _ProfileMenuItem(
-                          icon: Icons.description_outlined,
-                          iconBgColor: const Color(0xFF78909C),
-                          title: lang == 'tr'
-                              ? 'Kullanım Koşulları'
-                              : 'Terms of Service',
-                          onTap: _openTermsOfService,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.shield_outlined,
+                                iconColor: const Color(0xFF4CAF50),
+                                label: lang == 'tr' ? 'Gizlilik' : 'Privacy',
+                                onTap: _openPrivacyPolicy,
+                                compact: true,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.description_outlined,
+                                iconColor: const Color(0xFF78909C),
+                                label: lang == 'tr' ? 'Koşullar' : 'Terms',
+                                onTap: _openTermsOfService,
+                                compact: true,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.logout_rounded,
+                                iconColor: const Color(0xFFFF4D4D),
+                                label: lang == 'tr' ? 'Çıkış' : 'Sign Out',
+                                onTap: _signOut,
+                                compact: true,
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 32),
-
-                        // ── 6. ÇIKIŞ YAP ──
-                        _ProfileMenuItem(
-                          icon: Icons.logout_rounded,
-                          iconBgColor: const Color(0xFFFF4D4D),
-                          title: lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
-                          isDestructive: true,
-                          onTap: _signOut,
-                        ),
-
-                        const SizedBox(height: 40),
 
                         // ── 7. VERSİYON ──
                         Center(
@@ -1220,7 +1247,7 @@ info@crackandwish.com''',
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         Center(
                           child: Text(
                             lang == 'tr'
@@ -1237,7 +1264,6 @@ info@crackandwish.com''',
                       ],
                     ),
                   ),
-                ),
               ],
             ),
           );
@@ -1251,304 +1277,966 @@ info@crackandwish.com''',
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROFİL KARTI (Avatar + İsim + Level + 4 İstatistik)
+// BENTO HERO CARD (Arch-top Avatar + Name + Level)
 // ═══════════════════════════════════════════════════════════════
 
-class _ProfileCard extends StatelessWidget {
+class _BentoHeroCard extends StatelessWidget {
   final String userName;
   final String userAvatar;
   final String levelTitle;
+  final bool isLoading;
+  final VoidCallback onEditTap;
+  final String profileTitle;
   final int totalCookies;
   final int totalTarots;
   final int totalDreams;
   final int streakDays;
-  final bool isLoading;
-  final VoidCallback onEditTap;
-  final String cookieLabel;
-  final String tarotLabel;
-  final String dreamLabel;
-  final String streakLabel;
+  final int soulStones;
 
-  const _ProfileCard({
+  const _BentoHeroCard({
     required this.userName,
     required this.userAvatar,
     required this.levelTitle,
+    required this.isLoading,
+    required this.onEditTap,
+    required this.profileTitle,
     required this.totalCookies,
     required this.totalTarots,
     required this.totalDreams,
     required this.streakDays,
-    required this.isLoading,
-    required this.onEditTap,
-    required this.cookieLabel,
-    required this.tarotLabel,
-    required this.dreamLabel,
-    required this.streakLabel,
+    required this.soulStones,
   });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final displayName = userName.isNotEmpty ? userName : l10n.profileUserTitle;
+    final displayName = userName.isNotEmpty ? userName : profileTitle;
+    
+    // Aura Puanı (XP) Hesaplama Modeli - Enflasyon Düzeltmesi (Daha değerli puanlar)
+    final int auraPoints = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5);
+    
+    // Kısaltma: Örn. 1250 -> 1.2k
+    final String formattedAura = auraPoints >= 1000 
+        ? '${(auraPoints / 1000).toStringAsFixed(1)}k' 
+        : auraPoints.toString();
 
-    return GlassCard(
-      useOwnLayer: true,
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 28),
-      shape: const LiquidRoundedSuperellipse(borderRadius: 28),
-      settings: const LiquidGlassSettings(
-        thickness: 30,
-        blur: 8,
-        glassColor: Colors.transparent,
-        chromaticAberration: 0.15,
-        lightIntensity: 0.8,
-        ambientStrength: 0.7,
-        refractiveIndex: 1.3,
-        saturation: 1.1,
-      ),
-      child: Column(
-        children: [
-          // ── Avatar ──
-          GestureDetector(
-            onTap: onEditTap,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Outer Glow
-                Container(
-                  width: 104,
-                  height: 104,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryOrange.withOpacity(0.25),
-                        blurRadius: 32,
-                        spreadRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.1),
-                        blurRadius: 60,
-                        spreadRadius: 15,
-                      ),
-                    ],
-                  ),
-                ),
-                // Inner Glass Ring
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.primaryOrange.withOpacity(0.35),
-                      width: 2.5,
-                    ),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.15),
-                        Colors.white.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 16,
-                        spreadRadius: -4,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Padding(
-                      padding: const EdgeInsets.all(18),
-                      child: Image.asset(
-                        userAvatar,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                // Tiny Edit Badge
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F1F2A),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.15),
-                        width: 2,
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.edit_rounded,
-                        color: AppColors.primaryOrange.withOpacity(0.9),
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // ── İsim (düzenlenebilir) ──
-          GestureDetector(
-            onTap: onEditTap,
-            child: Text(
-              displayName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFFFFD166),
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-
-          // ── Level başlığı ──
-          Text(
-            levelTitle,
-            style: TextStyle(
-              color: AppColors.textWhite.withOpacity(0.55),
-              fontSize: 13,
-              fontStyle: FontStyle.italic,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 28),
-
-          // ── 4 İstatistik ──
-          if (isLoading)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.textWhite.withOpacity(0.3),
-                ),
-              ),
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: _ProfileStat(
-                    value: totalCookies,
-                    label: cookieLabel,
-                    icon: Icons.bakery_dining_rounded,
-                  ),
-                ),
-                _VerticalDivider(),
-                Expanded(
-                  child: _ProfileStat(
-                    value: totalTarots,
-                    label: tarotLabel,
-                    icon: Icons.auto_awesome_rounded,
-                  ),
-                ),
-                _VerticalDivider(),
-                Expanded(
-                  child: _ProfileStat(
-                    value: totalDreams,
-                    label: dreamLabel,
-                    icon: Icons.nights_stay_rounded,
-                  ),
-                ),
-                _VerticalDivider(),
-                Expanded(
-                  child: _ProfileStat(
-                    value: streakDays,
-                    label: streakLabel,
-                    icon: Icons.local_fire_department_rounded,
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _VerticalDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      width: 1,
-      height: 36,
-      color: Colors.white.withOpacity(0.08),
-    );
-  }
-}
-
-class _ProfileStat extends StatelessWidget {
-  final int value;
-  final String label;
-  final IconData icon;
-
-  const _ProfileStat({
-    required this.value,
-    required this.label,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TweenAnimationBuilder<int>(
-          tween: IntTween(begin: 0, end: value),
-          duration: const Duration(milliseconds: 1600),
-          curve: Curves.easeOutCubic,
-          builder: (context, val, child) {
-            return Text(
-              val.toString(),
-              style: const TextStyle(
-                color: AppColors.textWhite,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: AppColors.textWhite.withOpacity(0.55),
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppColors.textWhite.withOpacity(0.45),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
-              ),
+      margin: const EdgeInsets.only(bottom: 40), // Kartın dışına taşan butonlar için yer
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.bottomCenter,
+        children: [
+          // ── ANA CAM KART ──
+          Padding(
+            padding: const EdgeInsets.only(bottom: 36), // Butonların sığacağı resmi hit-test alanı
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(36),
+          color: const Color(0xFF1E1E1E).withOpacity(0.55), // Apple Dark Liquid Material
+          border: Border.all(
+            color: Colors.white.withOpacity(0.12), // Apple Signature Rim Light
+            width: 0.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
             ),
           ],
         ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            // İç gradientleri tamamen sildik, malzemenin kendi pürüzsüz dokusu konuşsun.
+            child: Column(
+              children: [
+                // ── Üstteki İnce Header (Görseldeki "Next session..." benzeri) ──
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.auto_awesome_rounded, color: Colors.white.withOpacity(0.8), size: 14),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Crack & Wish",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // ── Devasa Avatar ve Yoğun Işık Halesi ──
+                _BentoTouch(
+                  onTap: onEditTap,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // 3. Keskin parlak çerçeve (Görseldeki yansıyan çember)
+                      Container(
+                        width: 174,
+                        height: 174,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFD4A574).withOpacity(0.4),
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      // Avatar container devasa
+                      Container(
+                        width: 160,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.15),
+                              Colors.white.withOpacity(0.02),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 24,
+                              spreadRadius: -4,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Padding(
+                            padding: const EdgeInsets.all(22),
+                            child: Image.asset(
+                              userAvatar,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Edit badge silindi, görseldeki gibi avatar tertemiz kaldı
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ── Name ve Subtitle (Tıklanabilir) ──
+                _BentoTouch(
+                  onTap: onEditTap,
+                  child: Container(
+                    color: Colors.transparent, // Tıklama alanı için
+                    child: Column(
+                      children: [
+                        Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w400, // Görseldeki gibi ince zarif
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // ── Subtitle (Ride ready gibi) ──
+                        Text(
+                          levelTitle,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // ── GAMIFICATION BADGE'LERİ (Premium Ekosistem) ──
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _GlassBadge(
+                      icon: Icons.auto_awesome,
+                      label: "$formattedAura Aura",
+                      color: const Color(0xFFC084FC),
+                      onTap: () => _showStatModal(context, "Aura Puanı", auraPoints, Icons.auto_awesome, const Color(0xFFC084FC)),
+                    ),
+                    const SizedBox(width: 10),
+                    _GlassBadge(
+                      icon: Icons.diamond_rounded,
+                      label: "$soulStones Ruh Taşı",
+                      color: const Color(0xFF4EE6C5),
+                      onTap: () => _showStatModal(context, "Kalan Ruh Taşı", soulStones, Icons.diamond_rounded, const Color(0xFF4EE6C5)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 38), // Kartın alt boşluğu (butonların yarısı buraya gelecek)
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+
+    // ── KARTIN ALT SINIRINA ASILI YUVARLAK STAT BUTONLARI ──
+    Positioned(
+      bottom: 0, // HitTest alanının (Padding) dibine oturttuk, Overflow yok!
+      left: 14,
+      right: 14,
+      child: isLoading
+          ? const Center(
+              child: SizedBox(
+                height: 72,
+                child: CircularProgressIndicator(color: Colors.white24),
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _HeroStatCircle(
+                  icon: Icons.bakery_dining_rounded,
+                  iconColor: const Color(0xFFFFD166),
+                  value: totalCookies,
+                  onTap: () => _showStatModal(context, "Açılan Kurabiyeler", totalCookies, Icons.bakery_dining_rounded, const Color(0xFFFFD166)),
+                ),
+                _HeroStatCircle(
+                  icon: Icons.auto_awesome_rounded,
+                  iconColor: const Color(0xFFC084FC),
+                  value: totalTarots,
+                  onTap: () => _showStatModal(context, "Tarot Falları", totalTarots, Icons.auto_awesome_rounded, const Color(0xFFC084FC)),
+                ),
+                _HeroStatCircle(
+                  icon: Icons.nights_stay_rounded,
+                  iconColor: const Color(0xFF5A8BFF),
+                  value: totalDreams,
+                  hasDot: true, // Görseldeki o meşhur neon nokta!
+                  onTap: () => _showStatModal(context, "Rüya Analizleri", totalDreams, Icons.nights_stay_rounded, const Color(0xFF5A8BFF)),
+                ),
+                _HeroStatCircle(
+                  icon: Icons.local_fire_department_rounded,
+                  iconColor: const Color(0xFFFF6B6B),
+                  value: streakDays,
+                  onTap: () => _showStatModal(context, "Günlük Seri", streakDays, Icons.local_fire_department_rounded, const Color(0xFFFF6B6B)),
+                ),
+              ],
+            ),
+    ),
+          ],
+        ),
+      );
+  }
+
+  void _showStatModal(BuildContext context, String title, int value, IconData icon, Color color) {
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      barrierDismissible: true,
+      barrierLabel: 'StatModal',
+      transitionDuration: const Duration(milliseconds: 200), // Daha hızlı, tok bir his
+      transitionBuilder: (context, anim1, anim2, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8 * anim1.value, sigmaY: 8 * anim1.value),
+          child: Transform.scale(
+            // %95'ten %100'e çok soft ve hızlı kayarak büyüyecek
+            scale: Curves.easeOutCubic.transform(anim1.value) * 0.05 + 0.95, 
+            child: FadeTransition(
+              opacity: anim1,
+              child: child,
+            ),
+          ),
+        );
+      },
+      pageBuilder: (context, anim1, anim2) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 340,
+            height: 460, // BÜTÜN PANELLER İÇİN STANDART SABİT BOYUT!
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E).withOpacity(0.9), // Apple Dark Material esintili
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 40, offset: const Offset(0, 20)),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withOpacity(0.1),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                "$value",
+                style: TextStyle(color: color, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 1),
+              ),
+              const SizedBox(height: 12), // Spacer kaldırıldı, bütün içerikler yukarı çekildi!
+              if (title == "Aura Puanı") ...[
+                // Aura için özel gelişim çubuğu ve açıklama
+                Text(
+                  "Uygulama içindeki mistik seviyeni ve rütbeni belirleyen puan.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 24),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    height: 8,
+                    width: double.infinity,
+                    color: Colors.white.withOpacity(0.1),
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: value >= 120 ? 1.0 : (value % 120) / 120.0, // Her 120'de sıfırlanıp 1 taş doldurulacak
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(color: color.withOpacity(0.5), blurRadius: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "🎁 1 Ruh Taşı üretimine ${120 - (value % 120)} Aura kaldı!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Not: Premium üyeler Ruh Taşı kazanmak için Aura kasmaz, kotaları otomatik yüklenir.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, height: 1.3),
+                ),
+              ] else if (title == "Kalan Ruh Taşı") ...[
+                // Ruh Taşı için özel açıklama
+                Text(
+                  "Klinik düzey rüya analizi ve derin ruhsal okumalar yaptırmak için gereken mistik krediniz.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "Premium üye olarak her ay sınırsız analiz havuzunu açabilirsin.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: const Color(0xFFD4A574).withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600),
+                ),
+              ] else if (title == "Açılan Kurabiyeler") ...[
+                // KURABİYE KOLEKSİYONU
+                Text(
+                  "Mesajlar sihirlidir ve uçar gider. Eşsiz koleksiyon kurabiyeleri ise hep seninle kalır.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                const Expanded(child: _ProfileCookieCarousel()), // Özel kaydırmalı koleksiyon bileşeni
+              ] else if (title == "Tarot Falları") ...[
+                // TAROT GEÇMİŞİ
+                Text(
+                  "Geçmiş kader okumalarını ve kartlarının anlamlarını dilediğin zaman hatırla.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.history_edu_rounded, color: Color(0xFFC084FC), size: 16),
+                      const SizedBox(width: 6),
+                      const Flexible(
+                        child: Text(
+                          "👑 Tarot Arşivi ➔",
+                          style: TextStyle(color: Color(0xFFFFD166), fontSize: 13, fontWeight: FontWeight.w700),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (title == "Rüya Analizleri") ...[
+                // RÜYA GÜNLÜĞÜ
+                Text(
+                  "Bilinçaltının şifreleri. Klinik analizlerin ve geçmiş kabus/rüya kayıtların.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF5A8BFF).withOpacity(0.3), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.menu_book_rounded, color: Color(0xFF5A8BFF), size: 16),
+                      const SizedBox(width: 6),
+                      const Flexible(
+                        child: Text(
+                          "👑 Rüya Günlüğü ➔", // "Günlüğünü Aç" çok uzundu, kısalttık
+                          style: TextStyle(color: Color(0xFFFFD166), fontSize: 13, fontWeight: FontWeight.w700),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (title == "Günlük Seri") ...[
+                // STREAK TAKVİMİ
+                Text(
+                  "Zinciri kırma! Her gün uygulamayı ziyaret ederek Aura çarpanını yüksek tut.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFFFF6B6B).withOpacity(0.2), Colors.transparent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF6B6B), size: 16),
+                          const SizedBox(width: 8),
+                          Text("Yarınki Bonus: +5 Aura", style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ), // Container bitişi
+        ), // GestureDetector bitişi
+      ), // Dialog bitişi
+    ); // showDialog bitişi
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GLASS BADGE (Aura & Ruh Taşı Hap Butonları)
+// ═══════════════════════════════════════════════════════════════
+
+class _GlassBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _GlassBadge({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _BentoTouch(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08), // Daha ince açık cam
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: color, size: 14),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HERO STAT CIRCLE (4 Stat İçin Yuvarlak Cam Butonlar)
+// ═══════════════════════════════════════════════════════════════
+
+class _HeroStatCircle extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final int value;
+  final bool hasDot; // Neon dot for aesthetic match
+  final VoidCallback onTap;
+
+  const _HeroStatCircle({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+    this.hasDot = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _BentoTouch(
+      onTap: onTap,
+      child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Tamponlanmış, koyu renkli buzlu cam (Görseldeki "1-1" etki)
+        ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            child: Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF1E1E1E).withOpacity(0.55), // Apple Dark Liquid Material
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.12), // İncecik metalik zar
+                  width: 0.5,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: iconColor.withOpacity(0.95), size: 18), // İkon boyutu kibarlaştı
+                  const SizedBox(height: 5),
+                  TweenAnimationBuilder<int>(
+                    tween: IntTween(begin: 0, end: value),
+                    duration: const Duration(milliseconds: 1600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, child) {
+                      return Text(
+                        val.toString(),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.85),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400, // Görsel diline uygun, çok ince rakamlar
+                          letterSpacing: 0.8,
+                          height: 1.0,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // Neon Nokta (Görseldeki gibi şeffaf çerçevenin üst sınırına tünemiş, turuncu altın ışık)
+        if (hasDot)
+          Positioned(
+            top: 2,
+            right: 2,
+            child: Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFFFB347), // Görseldeki şeftali/altın sarısı
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFB347).withOpacity(0.8),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.8),
+                    blurRadius: 2,
+                    spreadRadius: -1, // İç parlama efekti (core glow)
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
+    ),
+  );
+}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DİNAMİK TIKLAMA EFEKTİ (Apple Luxury Bounce)
+// ═══════════════════════════════════════════════════════════════
+
+class _BentoTouch extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _BentoTouch({required this.child, required this.onTap});
+
+  @override
+  State<_BentoTouch> createState() => _BentoTouchState();
+}
+
+class _BentoTouchState extends State<_BentoTouch> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque, // Hayati önem
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      // onTapUp tarafını sildik, küçülmeden dönme işlemini tamamen onTap'in koreografisine bağladık
+      onTap: () async {
+        HapticFeedback.lightImpact(); 
+
+        // Eğer kullanıcı aşırı hızlı bastıysa butonu zorla küçültülmüş moda al
+        if (!_pressed && mounted) setState(() => _pressed = true);
+        
+        // Küçülme animasyonunun gözle net görülmesi için ufak bir tampon bekleme
+        await Future.delayed(const Duration(milliseconds: 80));
+        
+        // Yay gibi eski haline dön (Genişle)
+        if (mounted) setState(() => _pressed = false);
+        
+        // Büyüme animasyonunun (150ms) tamamlanmasına ramak kala pencereyi/aksiyonu tetikle!
+        // Eskiden bu anında oluyordu, o yüzden sen butona bastığın an pencere ekranı kapattığı için efekt yarıda kesiliyordu.
+        await Future.delayed(const Duration(milliseconds: 140));
+        
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        scale: _pressed ? 0.90 : 1.0, 
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutBack, 
+        child: AnimatedOpacity(
+          opacity: _pressed ? 0.6 : 1.0, 
+          duration: const Duration(milliseconds: 100),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BENTO ACTION TILE (Frosted Glass Aksiyon Kartı)
+// ═══════════════════════════════════════════════════════════════
+
+class _BentoActionTile extends StatefulWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final bool compact;
+
+  const _BentoActionTile({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.onTap,
+    this.subtitle,
+    this.compact = false,
+  });
+
+  @override
+  State<_BentoActionTile> createState() => _BentoActionTileState();
+}
+
+class _BentoActionTileState extends State<_BentoActionTile> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.96 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: EdgeInsets.all(widget.compact ? 14 : 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.07),
+                    Colors.white.withOpacity(0.02),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.06),
+                  width: 0.5,
+                ),
+              ),
+              child: widget.compact
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: widget.iconColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Icon(widget.icon, color: widget.iconColor.withOpacity(0.85), size: 19),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: widget.iconColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: widget.iconColor.withOpacity(0.15),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Center(
+                            child: Icon(widget.icon, color: widget.iconColor.withOpacity(0.85), size: 20),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        if (widget.subtitle != null) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            widget.subtitle!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.35),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BENTO PREMIUM BANNER
+// ═══════════════════════════════════════════════════════════════
+
+class _BentoPremiumBanner extends StatefulWidget {
+  final String lang;
+  final VoidCallback onTap;
+
+  const _BentoPremiumBanner({
+    required this.lang,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoPremiumBanner> createState() => _BentoPremiumBannerState();
+}
+
+class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFFD4A574).withOpacity(0.25),
+                    const Color(0xFFFFD166).withOpacity(0.10),
+                    const Color(0xFFFF9A5C).withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFFD4A574).withOpacity(0.2),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD4A574), Color(0xFFB8956A)],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFD4A574).withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.workspace_premium_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium',
+                          style: const TextStyle(
+                            color: Color(0xFFD4A574),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          widget.lang == 'tr'
+                              ? 'Sınırsız kurabiye ve özel özellikler'
+                              : 'Unlimited cookies and exclusive features',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.45),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: const Color(0xFFD4A574).withOpacity(0.5),
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -1608,115 +2296,6 @@ class _SettingsRow extends StatelessWidget {
               Icons.chevron_right_rounded,
               color: AppColors.textWhite.withOpacity(0.2),
               size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileMenuItem extends StatelessWidget {
-  final IconData icon;
-  final Color iconBgColor;
-  final String title;
-  final String? trailing;
-  final VoidCallback onTap;
-  final bool isDestructive;
-
-  const _ProfileMenuItem({
-    required this.icon,
-    required this.iconBgColor,
-    required this.title,
-    required this.onTap,
-    this.trailing,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withOpacity(0.05),
-              Colors.white.withOpacity(0.01),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    iconBgColor.withOpacity(0.25),
-                    iconBgColor.withOpacity(0.05),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(
-                  color: iconBgColor.withOpacity(0.3),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: iconBgColor.withOpacity(0.2),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Icon(icon, color: iconBgColor.withOpacity(0.9), size: 20),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: isDestructive
-                      ? const Color(0xFFFF4D4D)
-                      : AppColors.textWhite.withOpacity(0.95),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-            if (trailing != null) ...[
-              Text(
-                trailing!,
-                style: TextStyle(
-                  color: AppColors.textWhite.withOpacity(0.4),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 6),
-            ],
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: AppColors.textWhite.withOpacity(0.2),
-              size: 14,
             ),
           ],
         ),
@@ -1912,4 +2491,219 @@ class _MottledPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KİŞİSEL KURABİYE KOLEKSİYONU KAYDIRICI EKRANI (PROFIL MODAL İÇİ)
+// ═══════════════════════════════════════════════════════════════
+
+class _ProfileCookieCarousel extends StatefulWidget {
+  const _ProfileCookieCarousel();
+
+  @override
+  State<_ProfileCookieCarousel> createState() => _ProfileCookieCarouselState();
+}
+
+class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
+  List<CookieCard> _ownedCookies = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOwnedCookies();
+  }
+
+  Future<void> _loadOwnedCookies() async {
+    final collection = await StorageService.getCookieCollection();
+    final owned = collection.where((c) => c.firstObtainedDate != null).toList();
+    // En çok çıkandan aza sırala
+    owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
+    if (mounted) {
+      setState(() {
+        _ownedCookies = owned;
+        _loading = false;
+      });
+    }
+  }
+
+  void _showCookieActionMenu(CookieCard cookie, BuildContext context) {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 84,
+                height: 84,
+                child: Image.asset(
+                  'assets/images/cookies/${cookie.id}.webp',
+                  errorBuilder: (_, __, ___) => const Icon(Icons.bakery_dining_rounded, color: Color(0xFFFFD166), size: 40),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "Koleksiyon Kurabiyesi",
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Bu nadir parçadan toplam ${cookie.countObtained} adet buldun.",
+                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _actionBtn(Icons.push_pin_rounded, "📌 Sabitle", () {
+                    // TODO: Sabitleme (Pin) entegrasyonu
+                    HapticFeedback.lightImpact();
+                    Navigator.pop(ctx);
+                  }),
+                  _actionBtn(Icons.send_rounded, "✉️ Gönder", () {
+                    // TODO: Mektupla kurabiye gönderme ekranına pasla
+                    HapticFeedback.lightImpact();
+                    Navigator.pop(ctx);
+                  }),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _actionBtn(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.5),
+        ),
+        child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const SizedBox(height: 90, child: Center(child: CircularProgressIndicator(color: Colors.white24)));
+    }
+    if (_ownedCookies.isEmpty) {
+      return Container(
+        height: 90,
+        alignment: Alignment.center,
+        child: Text(
+          "Henüz koleksiyonunda eşsiz kurabiye yok.\nAna sayfadan kurabiye kırarak siftah yap!",
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Text(
+          "Sahip Olduğun Kurabiyeler (${_ownedCookies.length})",
+          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 14),
+        Expanded(
+          child: ShaderMask(
+            shaderCallback: (Rect bounds) {
+              return const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.white, Colors.white, Colors.transparent],
+                stops: [0.0, 0.05, 0.85, 1.0],
+              ).createShader(bounds);
+            },
+            blendMode: BlendMode.dstIn,
+            child: GridView.builder(
+              padding: const EdgeInsets.only(top: 10, bottom: 24),
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // 4 sütunlu zarif Grid
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.0, // Tam kare oran, kurabiyeler nefes alsın
+              ),
+              itemCount: _ownedCookies.length,
+              itemBuilder: (context, index) {
+                final cookie = _ownedCookies[index];
+                return _BentoTouch(
+                  onTap: () => _showCookieActionMenu(cookie, context),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Arka Plan Mistik Işıması (Glow Ekranı)
+                      Center(
+                        child: Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.white.withOpacity(0.08), blurRadius: 18, spreadRadius: 2),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Kurabiye Görseli
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Image.asset(
+                            'assets/images/cookies/${cookie.id}.webp',
+                            errorBuilder: (_, __, ___) => const Icon(Icons.bakery_dining_rounded, color: Color(0xFFFFD166)),
+                          ),
+                        ),
+                      ),
+                      // Minimal x Adet Rozeti (Sağ Alt) Sadece birden fazlaysa göster
+                      if (cookie.countObtained > 1)
+                        Positioned(
+                          right: 2,
+                          bottom: 2,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.65), // Çok hafif, siyah transparan
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              "x${cookie.countObtained}",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.85),
+                                fontSize: 8, // İyice küçüldü
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.1,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+            },
+          ),
+        ), // ShaderMask bitti
+        ), // Expanded bitti
+      ],
+    );
+  }
 }

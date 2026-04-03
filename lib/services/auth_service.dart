@@ -36,24 +36,29 @@ class AuthService {
       const String webClientId = 'SENIN_GOOGLE_WEB_CLIENT_ID'; 
       const String iosClientId = 'SENIN_GOOGLE_IOS_CLIENT_ID';
 
-      final GoogleSignIn googleSignIn = GoogleSignIn(
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize(
         serverClientId: webClientId,
         clientId: defaultTargetPlatform == TargetPlatform.iOS ? iosClientId : null,
-        scopes: ['email', 'profile'],
       );
 
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) {
-        return null; // Kullanıcı iptal etti
-      }
+      final googleUser = await googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
 
-      final googleAuth = await googleUser.authentication;
-      final accessToken = googleAuth.accessToken;
-      final idToken = googleAuth.idToken;
+      // idToken — authentication property'den
+      final idToken = googleUser.authentication.idToken;
 
       if (idToken == null) {
         throw 'No ID Token found.';
       }
+
+      // accessToken — authorization üzerinden (opsiyonel, scope hint ile)
+      String? accessToken;
+      final clientAuth = await googleUser.authorizationClient.authorizationForScopes(
+        ['email', 'profile'],
+      );
+      accessToken = clientAuth?.accessToken;
 
       // Supabase'e Google Token'ını kullanarak giriş yap
       final response = await _supabase.auth.signInWithIdToken(

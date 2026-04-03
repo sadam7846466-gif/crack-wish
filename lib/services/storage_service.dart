@@ -16,6 +16,7 @@ class StorageService {
   static const String _keyBirthDate = 'birth_date';
   static const String _keyCurrentMood = 'current_mood';
   static const String _keyStreakDays = 'streak_days';
+  static const String _keySoulStones = 'soul_stones'; // Ruh Taşı (Premium Kredi)
   static const String _keyLastCookieDate = 'last_cookie_date';
   static const String _keyMood = 'mood';
   static const String _keyDreams = 'dreams';
@@ -42,6 +43,24 @@ class StorageService {
   static const String _keySelectedCookie = 'selected_cookie';
   static const String _keyInstallId = 'install_id';
   static const String _keyCompletedCosmicTasks = 'completed_cosmic_tasks';
+
+  // ── PREMIUM EKONOMİ (Ruh Taşı / Soul Stones) ──
+  static Future<int> getSoulStones() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_keySoulStones)) {
+      // Yeni kullanıcılara hoşgeldin hediyesi olarak 3 Ruh Taşı ver
+      await prefs.setInt(_keySoulStones, 3);
+      return 3;
+    }
+    return prefs.getInt(_keySoulStones) ?? 0;
+  }
+
+  static Future<void> updateSoulStones(int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await getSoulStones();
+    final newValue = (current + amount).clamp(0, 9999);
+    await prefs.setInt(_keySoulStones, newValue);
+  }
 
   // ── Cihaza özel benzersiz ID (ilk kurulumda oluşturulur) ──
   static Future<int> getInstallId() async {
@@ -226,6 +245,7 @@ class StorageService {
       'totalDreams': prefs.getInt(_keyTotalDreams) ?? 0,
       'totalTarots': prefs.getInt(_keyTotalTarots) ?? 0,
       'longestStreak': prefs.getInt(_keyLongestStreak) ?? 0,
+      'soulStones': prefs.getInt(_keySoulStones) ?? 3, // Eğer boşsa default hediye miktarını alıyoruz gibi düşün ama getSoulStones handle ediyor, buraya direkt yansıtalım.
       'userName': prefs.getString(_keyUserName),
       'zodiacSign': prefs.getString(_keyZodiacSign),
       'currentMood':
@@ -940,5 +960,29 @@ class StorageService {
     // Maksimum toplam boost: +40 puan
     boosts[traitName] = (current + amount).clamp(0, 40);
     await prefs.setString(_keyTraitBoosts, jsonEncode(boosts));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // NOTIFICATION SETTINGS (Bildirim Ayarları)
+  // ═══════════════════════════════════════════════════════════════
+
+  static const String _keyNotifPrefix = 'notif_';
+
+  /// Tüm bildirim ayarlarını oku
+  static Future<Map<String, bool>> getNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'announcements': prefs.getBool('${_keyNotifPrefix}announcements') ?? true,
+      'voices': prefs.getBool('${_keyNotifPrefix}voices') ?? false,
+      'newCookieAlarm': prefs.getBool('${_keyNotifPrefix}newCookieAlarm') ?? true,
+      'friendsAlarm': prefs.getBool('${_keyNotifPrefix}friendsAlarm') ?? true,
+      'dailyReminders': prefs.getBool('${_keyNotifPrefix}dailyReminders') ?? false,
+    };
+  }
+
+  /// Tek bir bildirim ayarını kaydet
+  static Future<void> setNotificationSetting(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('${_keyNotifPrefix}$key', value);
   }
 }

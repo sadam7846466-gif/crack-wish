@@ -1231,6 +1231,7 @@ class _DreamPageState extends State<DreamPage>
                     child: TextField(
                       focusNode: _dreamFocusNode,
                       controller: _dreamController,
+                      onTapOutside: (_) => _dreamFocusNode.unfocus(),
                       minLines: 7,
                       maxLines: 7,
                       style: const TextStyle(
