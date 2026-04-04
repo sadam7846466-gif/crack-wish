@@ -43,6 +43,7 @@ class StorageService {
   static const String _keySelectedCookie = 'selected_cookie';
   static const String _keyInstallId = 'install_id';
   static const String _keyCompletedCosmicTasks = 'completed_cosmic_tasks';
+  static const String _keySpentAura = 'spent_aura'; // Ruh Taşı çeviriminde harcanan Aura
 
   // ── PREMIUM EKONOMİ (Ruh Taşı / Soul Stones) ──
   static Future<int> getSoulStones() async {
@@ -62,6 +63,23 @@ class StorageService {
     await prefs.setInt(_keySoulStones, newValue);
   }
 
+  // ── AURA HARCAMA (Ruh Taşı Çevirimi) ──
+  static Future<int> getSpentAura() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keySpentAura) ?? 0;
+  }
+
+  /// Aura harcayarak Ruh Taşı üret. Başarılıysa true döner.
+  static Future<bool> convertAuraToSoulStone({required int currentTotalAura, int cost = 100}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final spent = prefs.getInt(_keySpentAura) ?? 0;
+    final available = currentTotalAura - spent;
+    if (available < cost) return false; // Yeterli Aura yok
+    await prefs.setInt(_keySpentAura, spent + cost);
+    await updateSoulStones(1); // +1 Ruh Taşı
+    return true;
+  }
+
   // ── Cihaza özel benzersiz ID (ilk kurulumda oluşturulur) ──
   static Future<int> getInstallId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -71,6 +89,25 @@ class StorageService {
       await prefs.setInt(_keyInstallId, id);
     }
     return id;
+  }
+
+  static const String _keyInstallDate = 'install_date';
+
+  static Future<DateTime> getInstallDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    var dateString = prefs.getString(_keyInstallDate);
+    if (dateString == null) {
+      final now = DateTime.now();
+      final streak = prefs.getInt(_keyLongestStreak) ?? 0;
+      final currentStreak = prefs.getInt(_keyStreakDays) ?? 0;
+      final maxDays = currentStreak > streak ? currentStreak : streak;
+      
+      // Tahmini en eski gün
+      final installDate = now.subtract(Duration(days: maxDays));
+      await prefs.setString(_keyInstallDate, installDate.toIso8601String());
+      return installDate;
+    }
+    return DateTime.parse(dateString);
   }
 
   // ── Seçili kurabiye (kalıcı) ──

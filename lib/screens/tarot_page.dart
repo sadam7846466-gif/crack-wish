@@ -15,6 +15,7 @@ import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
 import '../widgets/tarot_share_modal.dart';
 import 'tarot_meanings.dart';
+import '../services/user_stats_service.dart';
 
 enum RitualState {
   gateCheck,
@@ -833,6 +834,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _updateCtaText();
     await _updateStreakOnCompleteRead();
     if (!mounted) return;
+    
+    // ── Tarot İstatistik Kaydı (TÜM seçilen kartları kaydet) ──
+    // _selectedCategory: 0=Büyük Arkana, 1=Kupalar, 2=Asalar, 3=Kılıçlar, 4=Tılsımlar, null=Tam Deste
+    final deckTypes = ['Büyük Arkana', 'Kupalar', 'Asalar', 'Kılıçlar', 'Tılsımlar'];
+    final category = (_selectedCategory != null && _selectedCategory! < deckTypes.length) ? deckTypes[_selectedCategory!] : 'Genel';
+    for (final idx in _selectedCardIndexes) {
+      final name = _cardName(idx);
+      final asset = _allCards[idx].frontAsset;
+      await UserStatsService.addTarotReading(name, category, '', cardAsset: asset);
+    }
     
     // Yorum zaten RitualState.revealed ile fullscreen blur üstünde gösteriliyor
   }
