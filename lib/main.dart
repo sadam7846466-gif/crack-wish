@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,6 +8,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'constants/theme.dart';
 import 'screens/splash_screen.dart';
 import 'services/locale_controller.dart';
+import 'services/storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +19,23 @@ Future<void> main() async {
   await LiquidGlassWidgets.initialize();
   final localeController = LocaleController();
   await localeController.load();
+  // Günlük giriş kaydı — takvimde ateş ikonu için
+  StorageService.recordAppOpenToday();
+  
+  // ── TEST: Eski günlere henüz toplanmamış yeni ateşler koyalım ──
+  final now = DateTime.now();
+  for (int i = 5; i <= 9; i++) { // 5 ile 9 gün öncesi
+    final d = now.subtract(Duration(days: i));
+    final key = "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+    final prefs = await SharedPreferences.getInstance();
+    final days = prefs.getStringList('app_open_days') ?? [];
+    if (!days.contains(key)) {
+      days.add(key);
+      await prefs.setStringList('app_open_days', days);
+    }
+  }
+  // ── TEST SONU ──
+  
   runApp(MyApp(localeController: localeController));
 }
 

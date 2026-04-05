@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -44,16 +45,23 @@ class StorageService {
   static const String _keyInstallId = 'install_id';
   static const String _keyCompletedCosmicTasks = 'completed_cosmic_tasks';
   static const String _keySpentAura = 'spent_aura'; // Ruh Taşı çeviriminde harcanan Aura
+  static const String _keyAppOpenDays = 'app_open_days'; // Uygulamanın açıldığı günler (Set<String>)
+  static const String _keyClaimedAuraDays = 'claimed_aura_days'; // Aura toplanan günler (Set<String>)
 
   // ── PREMIUM EKONOMİ (Ruh Taşı / Soul Stones) ──
+  static final ValueNotifier<int> soulStonesNotifier = ValueNotifier<int>(0);
+
   static Future<int> getSoulStones() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey(_keySoulStones)) {
       // Yeni kullanıcılara hoşgeldin hediyesi olarak 3 Ruh Taşı ver
       await prefs.setInt(_keySoulStones, 3);
+      soulStonesNotifier.value = 3;
       return 3;
     }
-    return prefs.getInt(_keySoulStones) ?? 0;
+    final val = prefs.getInt(_keySoulStones) ?? 0;
+    soulStonesNotifier.value = val;
+    return val;
   }
 
   static Future<void> updateSoulStones(int amount) async {
@@ -61,6 +69,20 @@ class StorageService {
     final current = await getSoulStones();
     final newValue = (current + amount).clamp(0, 9999);
     await prefs.setInt(_keySoulStones, newValue);
+    soulStonesNotifier.value = newValue;
+  }
+
+  static Future<bool> deductSoulStones(int amount) async {
+    if (amount <= 0) return false;
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_keySoulStones) ?? 0;
+    if (current >= amount) {
+      final newValue = current - amount;
+      await prefs.setInt(_keySoulStones, newValue);
+      soulStonesNotifier.value = newValue;
+      return true;
+    }
+    return false;
   }
 
   // ── AURA HARCAMA (Ruh Taşı Çevirimi) ──
@@ -331,6 +353,110 @@ class StorageService {
     }
 
     await prefs.setString(_keyLastCookieDate, today);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GÜNLÜK GİRİŞ TAKİBİ (App Open Days + Aura Claim)
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Bugünü "uygulama açıldı" olarak kaydet
+  static Future<void> recordAppOpenToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    final days = prefs.getStringList(_keyAppOpenDays) ?? [];
+    if (!days.contains(today)) {
+      days.add(today);
+      await prefs.setStringList(_keyAppOpenDays, days);
+    }
+    // Streak'i de güncelle
+    await _updateStreak();
+  }
+
+  /// Uygulamanın açıldığı tüm günleri döndür
+  static Future<Set<String>> getAppOpenDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final days = prefs.getStringList(_keyAppOpenDays) ?? [];
+    return days.toSet();
+  }
+
+  /// Belirli bir gün için +1 Aura topla (takvimden tıklama)
+  /// Başarılıysa true döner, zaten toplanmışsa false
+  static Future<bool> claimDailyAura(String dateKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    final claimed = prefs.getStringList(_keyClaimedAuraDays) ?? [];
+    if (claimed.contains(dateKey)) return false; // Zaten toplandı
+
+    // Aura'yı ekle — negatif spent aura ile simüle ediyoruz
+    // Aslında doğrudan "bonus aura" olarak ekliyoruz
+    final bonusAura = prefs.getInt('daily_bonus_aura') ?? 0;
+    await prefs.setInt('daily_bonus_aura', bonusAura + 1);
+
+    // Günü claimed olarak işaretle
+    claimed.add(dateKey);
+    await prefs.setStringList(_keyClaimedAuraDays, claimed);
+    return true;
+  }
+
+  /// Toplanan bonus aura miktarını döndür
+  static Future<int> getDailyBonusAura() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('daily_bonus_aura') ?? 0;
+  }
+
+  /// Ekstra Aura vermek için genel yardımcı metod (Premium bonusları vb.)
+  static Future<void> addBonusAura(int amount) async {
+    if (amount <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt('daily_bonus_aura') ?? 0;
+    await prefs.setInt('daily_bonus_aura', current + amount);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HEDEF / MILESTONE SİSTEMİ
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Hangi hedeflerin (gün sayılarının) ödülünün toplandığını döndürür (ör: [7, 14])
+  static Future<List<int>> getClaimedMilestones() async {
+    final prefs = await SharedPreferences.getInstance();
+    final strings = prefs.getStringList('claimed_milestones') ?? [];
+    return strings.map((e) => int.tryParse(e) ?? 0).where((e) => e > 0).toList();
+  }
+
+  /// Belirtilen hedef için ödülü topla ve 'toplandı' olarak işaretle
+  static Future<bool> claimMilestone(int threshold) async {
+    final prefs = await SharedPreferences.getInstance();
+    final strings = prefs.getStringList('claimed_milestones') ?? [];
+    if (strings.contains(threshold.toString())) return false; // Zaten toplanmış
+
+    // Ödülü ver
+    if (threshold == 7) {
+      await prefs.setInt('daily_bonus_aura', (prefs.getInt('daily_bonus_aura') ?? 0) + 15);
+    } else if (threshold == 14) {
+      await prefs.setInt('daily_bonus_aura', (prefs.getInt('daily_bonus_aura') ?? 0) + 30);
+    } else if (threshold == 30) {
+      final soulstones = await getSoulStones();
+      await prefs.setInt(_keySoulStones, soulstones + 1);
+    } else if (threshold == 50) {
+      final soulstones = await getSoulStones();
+      await prefs.setInt(_keySoulStones, soulstones + 2);
+    } else if (threshold == 100) {
+      final soulstones = await getSoulStones();
+      await prefs.setInt(_keySoulStones, soulstones + 3);
+    } else if (threshold == 365) {
+      final soulstones = await getSoulStones();
+      await prefs.setInt(_keySoulStones, soulstones + 5);
+    }
+
+    strings.add(threshold.toString());
+    await prefs.setStringList('claimed_milestones', strings);
+    return true;
+  }
+
+  /// Aura toplanan günleri döndür
+  static Future<Set<String>> getClaimedAuraDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final claimed = prefs.getStringList(_keyClaimedAuraDays) ?? [];
+    return claimed.toSet();
   }
 
   static Future<String?> getMood() async {

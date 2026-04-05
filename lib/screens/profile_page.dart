@@ -47,8 +47,8 @@ class _ProfilePageState extends State<ProfilePage> {
   int _totalTarots = 0;
   int _totalDreams = 0;
   int _streakDays = 0;
-  int _soulStones = 3; // Krediler için state
   int _spentAura = 0; // Ruh Taşı çeviriminde harcanmış Aura
+  int _bonusAura = 0; // Günlük takvimden ve hedeflerden gelen ekstra Aura
   bool _isLoading = true;
   bool _isPremiumUser = false;
 
@@ -62,19 +62,19 @@ class _ProfilePageState extends State<ProfilePage> {
     final snapshot = await StorageService.getUserSnapshot();
     final streak = await StorageService.getStreakDays();
     final avatar = await StorageService.getAvatar() ?? 'assets/images/owl.webp';
+    final bonusAura = await StorageService.getDailyBonusAura();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('spent_aura', 0); // TEST İÇİN SIFIRLADIK
-    await prefs.setInt('soul_stones', 0); // RUH TAŞI SIFIRLANDI
+    
     final spentAura = await StorageService.getSpentAura();
     final tarotCount = await UserStatsService.getTotalTarotReadings();
     if (!mounted) return;
     setState(() {
       _userName = (snapshot['userName'] as String?) ?? '';
-      _totalCookies = 1000; // TEST İÇİN 1000 AURA GEÇİCİ
+      _totalCookies = (snapshot['totalCookies'] as int?) ?? 0;
       _totalTarots = tarotCount;
       _totalDreams = (snapshot['totalDreams'] as int?) ?? 0;
-      _soulStones = 0; // LOCAL STATE'DE DE SIFIRLANDI
-      _spentAura = 0; // TEST İÇİN GEÇİCİ
+      _spentAura = spentAura;
+      _bonusAura = bonusAura;
       _streakDays = streak;
       _userAvatar = avatar;
       _isLoading = false;
@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
   // Emoji yerine Material Icon kullanıyoruz — her cihazda çalışır.
   ({IconData icon, Color color, String title}) _getUserLevel(String lang) {
-    final int aura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5);
+    final int aura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5) + _bonusAura;
     
     if (lang == 'tr') {
       if (aura < 100) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Yeni Başlayan');
@@ -1050,48 +1050,56 @@ info@crackandwish.com''',
                         Builder(
                           builder: (context) {
                             final level = _getUserLevel(lang);
-                            return _BentoHeroCard(
-                          userName: _userName,
-                          userAvatar: _userAvatar,
-                          levelTitle: level.title,
-                          levelIcon: level.icon,
-                          levelColor: level.color,
-                          isLoading: _isLoading,
-                          isPremium: _isPremiumUser,
-                          onAvatarLongPress: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            setState(() => _isPremiumUser = !_isPremiumUser);
-                            await prefs.setBool('is_premium_test_mode', _isPremiumUser);
-                            HapticFeedback.heavyImpact();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('TEST MODU: Elite Üyelik ${_isPremiumUser ? "AKTİF 💎" : "KAPALI 🛑"}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: Colors.black87));
-                            }
-                          },
-                          onEditTap: _editProfile,
-                          profileTitle: l10n.profileUserTitle,
-                          totalCookies: _totalCookies,
-                          totalTarots: _totalTarots,
-                          totalDreams: _totalDreams,
-                          streakDays: _streakDays,
-                          soulStones: _soulStones,
-                          spentAura: _spentAura,
-                          onConvertAura: () async {
-                            final totalAura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5);
-                            final success = await StorageService.convertAuraToSoulStone(currentTotalAura: totalAura);
-                            if (success && mounted) {
-                              setState(() {
-                                _soulStones += 1;
-                                _spentAura += 100;
-                              });
-                              HapticFeedback.heavyImpact();
-                            }
-                            return success;
-                          },
-                        );
+                            return ValueListenableBuilder<int>(
+                              valueListenable: StorageService.soulStonesNotifier,
+                              builder: (context, currentSoulStones, child) {
+                                return _BentoHeroCard(
+                                  userName: _userName,
+                                  userAvatar: _userAvatar,
+                                  levelTitle: level.title,
+                                  levelIcon: level.icon,
+                                  levelColor: level.color,
+                                  isLoading: _isLoading,
+                                  isPremium: _isPremiumUser,
+                                  onAvatarLongPress: () async {
+                                    final prefs = await SharedPreferences.getInstance();
+                                    setState(() => _isPremiumUser = !_isPremiumUser);
+                                    await prefs.setBool('is_premium_test_mode', _isPremiumUser);
+                                    HapticFeedback.heavyImpact();
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('TEST MODU: Elite Üyelik ${_isPremiumUser ? "AKTİF 💎" : "KAPALI 🛑"}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: Colors.black87));
+                                    }
+                                  },
+                                  onEditTap: _editProfile,
+                                  profileTitle: l10n.profileUserTitle,
+                                  totalCookies: _totalCookies,
+                                  totalTarots: _totalTarots,
+                                  totalDreams: _totalDreams,
+                                  streakDays: _streakDays,
+                                  soulStones: currentSoulStones,
+                                  spentAura: _spentAura,
+                                  bonusAura: _bonusAura,
+                                  onConvertAura: () async {
+                                    final totalAura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5) + _bonusAura;
+                                    final success = await StorageService.convertAuraToSoulStone(currentTotalAura: totalAura);
+                                    if (success && mounted) {
+                                      setState(() {
+                                        _spentAura += 100;
+                                      });
+                                      HapticFeedback.heavyImpact();
+                                    }
+                                    return success;
+                                  },
+                                  onAuraClaimed: () {
+                                    setState(() {
+                                      _bonusAura += 1;
+                                    });
+                                  },
+                                );
+                              },
+                            );
                           },
                         ),
-                        // Note: Bireysel bento stat kartları (2x2 grid) kaldırıldı,
-                        // istatistikler artık _BentoHeroCard'ın içerisinde yuvarlak ikonlar olarak yer alıyor.
                         const SizedBox(height: 24),
 
                         // ── 3. PREMİUM BANNER ──
@@ -1298,7 +1306,9 @@ class _BentoHeroCard extends StatelessWidget {
   final int streakDays;
   final int soulStones;
   final int spentAura;
+  final int bonusAura;
   final Future<bool> Function() onConvertAura;
+  final VoidCallback? onAuraClaimed;
 
   const _BentoHeroCard({
     required this.userName,
@@ -1317,40 +1327,39 @@ class _BentoHeroCard extends StatelessWidget {
     required this.streakDays,
     required this.soulStones,
     required this.spentAura,
+    required this.bonusAura,
     required this.onConvertAura,
+    this.onAuraClaimed,
   });
 
   @override
   Widget build(BuildContext context) {
     final displayName = userName.isNotEmpty ? userName : profileTitle;
     
-    // Aura Puanı (XP) Hesaplama Modeli
-    final int auraPoints = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5);
-    final int availableAura = auraPoints - spentAura; // Kullanılabilir Aura (harcanan düşüldü)
+    final int auraPoints = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5) + bonusAura;
+    final int availableAura = auraPoints - spentAura; 
     
-    // Kısaltma: Örn. 1250 -> 1.2k — Badge'de kullanılabilir aura gösterilir
     final String formattedAura = availableAura >= 1000 
         ? '${(availableAura / 1000).toStringAsFixed(1)}k' 
         : availableAura.toString();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 40), // Kartın dışına taşan butonlar için yer
+      margin: const EdgeInsets.only(bottom: 40),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
-          // ── ANA CAM KART ──
           Padding(
-            padding: const EdgeInsets.only(bottom: 36), // Butonların sığacağı resmi hit-test alanı
+            padding: const EdgeInsets.only(bottom: 36),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(36),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(36),
-          color: const Color(0xFF1E1E1E).withOpacity(0.55), // Apple Dark Liquid Material
+          color: const Color(0xFF1E1E1E).withOpacity(0.55),
           border: Border.all(
-            color: Colors.white.withOpacity(0.12), // Apple Signature Rim Light
+            color: Colors.white.withOpacity(0.12),
             width: 0.5,
           ),
           boxShadow: [
@@ -1365,10 +1374,8 @@ class _BentoHeroCard extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            // İç gradientleri tamamen sildik, malzemenin kendi pürüzsüz dokusu konuşsun.
             child: Column(
               children: [
-                // ── Üstteki İnce Header (Görseldeki "Next session..." benzeri) ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1387,13 +1394,11 @@ class _BentoHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // ── Devasa Avatar ve Yoğun Işık Halesi ──
                 _BentoTouch(
                   onTap: onEditTap,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // 3. Keskin parlak çerçeve (Görseldeki yansıyan çember)
                       Container(
                         width: 174,
                         height: 174,
@@ -1405,7 +1410,6 @@ class _BentoHeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Avatar container devasa
                       Container(
                         width: 160,
                         height: 160,
@@ -1441,17 +1445,15 @@ class _BentoHeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Edit badge silindi, görseldeki gibi avatar tertemiz kaldı
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // ── Name ve Subtitle (Tıklanabilir) ──
                 _BentoTouch(
                   onTap: onEditTap,
                   child: Container(
-                    color: Colors.transparent, // Tıklama alanı için
+                    color: Colors.transparent,
                     child: Column(
                       children: [
                         Text(
@@ -1461,12 +1463,11 @@ class _BentoHeroCard extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
-                            fontWeight: FontWeight.w400, // Görseldeki gibi ince zarif
+                            fontWeight: FontWeight.w400,
                             letterSpacing: 0.3,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        // ── Subtitle (Icon + Title) ──
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -1487,7 +1488,6 @@ class _BentoHeroCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // ── GAMIFICATION BADGE'LERİ (Premium Ekosistem) ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1506,7 +1506,7 @@ class _BentoHeroCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 38), // Kartın alt boşluğu (butonların yarısı buraya gelecek)
+                const SizedBox(height: 38),
               ],
             ),
           ),
@@ -1515,9 +1515,8 @@ class _BentoHeroCard extends StatelessWidget {
     ),
   ),
 
-    // ── KARTIN ALT SINIRINA ASILI YUVARLAK STAT BUTONLARI ──
     Positioned(
-      bottom: 0, // HitTest alanının (Padding) dibine oturttuk, Overflow yok!
+      bottom: 0,
       left: 14,
       right: 14,
       child: isLoading
@@ -1546,7 +1545,7 @@ class _BentoHeroCard extends StatelessWidget {
                   icon: Icons.nights_stay_rounded,
                   iconColor: const Color(0xFF5A8BFF),
                   value: totalDreams,
-                  hasDot: true, // Görseldeki o meşhur neon nokta!
+                  hasDot: true,
                   onTap: () => _showStatModal(context, "Rüya Analizleri", totalDreams, Icons.nights_stay_rounded, const Color(0xFF5A8BFF)),
                 ),
                 _HeroStatCircle(
@@ -1584,22 +1583,14 @@ class _BentoHeroCard extends StatelessWidget {
   }
 
   void _showStatModal(BuildContext context, String title, int value, IconData icon, Color color) {
-    int modalAuraTotal = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5);
+    int modalAuraTotal = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5) + bonusAura;
     int modalSpentAura = spentAura;
     int modalSoulStones = soulStones;
-    const int conversionCost = 200; // Kullanıcı sadakat dengesi: Aylık ~2.5 Taş (Free) / ~7.5 Taş (Elite)
+    const int conversionCost = 200;
     bool showSuccess = false;
-    int selectedStoreIndex = -1; // Hiçbiri seçili değil, tıklandığında değişecek
+    int selectedStoreIndex = -1;
     
-    // Geçici MOCK veriler (Backend entegrasyonuna kadar, toplanabilir auralar)
-    int unclaimedDreamAura = 3; 
-    int unclaimedTarotAura = 0; // Bugün henüz tarot bakmadı
-    int unclaimedCookieAura = 1;
-    int unclaimedStreakAura = 5;
-    int unclaimedOwlAura = 2; // Baykuş - Mektup gönderimi
-    int unclaimedRewardAura = 10; // Özel ödül
-    int unclaimedSoulStone = 1; // Hediye Ruh Taşı
-    int dreamTimeFilter = 7; // Varsayılan: Son 7 Gün
+    int dreamTimeFilter = 7;
 
     showGeneralDialog(
       context: context,
@@ -1629,7 +1620,7 @@ class _BentoHeroCard extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Container(
                 width: 320,
-                height: 320, // KESİN BİR ŞEKİLDE SABİT - HİÇBİR ZAMAN DEĞİŞMEYECEK
+                height: 320,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
@@ -1643,7 +1634,7 @@ class _BentoHeroCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12), // Menü bar ile birebir (buzlu cam aydınlığı)
+                        color: Colors.white.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
                       ),
@@ -1651,8 +1642,7 @@ class _BentoHeroCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16), // İçeriği yukarı taşımak için üst boşluk
-                    // ── Başlık ──
+                    const SizedBox(height: 16),
                     if (title == "Aura Puanı")
                       Image.asset("assets/images/aura_core.png", width: 56, height: 56, fit: BoxFit.contain)
                     else
@@ -1699,15 +1689,9 @@ class _BentoHeroCard extends StatelessWidget {
                       ),
                     const SizedBox(height: 6),
 
-                    // ════════════════════════════════════════════
-                    // AURA PUANI PANELİ (Minimalist)
-                    // ════════════════════════════════════════════
                     if (title == "Aura Puanı") ...[
-                      
-                      // ── ÇEVİR BUTONU VE BAŞARI EFEKTİ (Sabit Boyutlu) ──
                       Column(
                         children: [
-                          // Bilgi satırı
                           if (canConvert || showSuccess)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 4),
@@ -1783,14 +1767,13 @@ class _BentoHeroCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // ── RUH TAŞI BAKİYESİ ──
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           AnimatedScale(
                             scale: showSuccess ? 1.3 : 1.0,
                             duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOutBack, // Daha hızlı ve belirgin pop efekti
+                            curve: Curves.easeOutBack,
                             child: Icon(
                               Icons.diamond_rounded, 
                               color: showSuccess ? const Color(0xFF10B981) : const Color(0xFF4EE6C5), 
@@ -1808,11 +1791,10 @@ class _BentoHeroCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 4),
 
-                      // ── TOPLANABİLİR AURALAR (Tıkla ve Ana Bakiyeye Ekle!) ──
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4), // Kutuyu taşmaması için daraltıldı
+                        padding: const EdgeInsets.symmetric(vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.02),
                           borderRadius: BorderRadius.circular(16),
@@ -1824,67 +1806,39 @@ class _BentoHeroCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Row(
                             children: [
-                              _buildAuraSource(Icons.nights_stay_rounded, "Rüya", unclaimedDreamAura, () {
-                                if (unclaimedDreamAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedDreamAura;
-                                    unclaimedDreamAura = 0; // Toplandı!
-                                  });
+                              _buildAuraSource(Icons.nights_stay_rounded, "Rüya", 3, () {
+                                HapticFeedback.selectionClick();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Her rüya analizi +3 Aura kazandırır', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), duration: const Duration(milliseconds: 1500)));
                                 }
                               }),
-                              _buildAuraSource(Icons.auto_awesome, "Fal", unclaimedTarotAura, () {
-                                if (unclaimedTarotAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedTarotAura;
-                                    unclaimedTarotAura = 0; // Toplandı!
-                                  });
+                              _buildAuraSource(Icons.auto_awesome, "Fal", 2, () {
+                                HapticFeedback.selectionClick();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Her Tarot açılımı +2 Aura kazandırır', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), duration: const Duration(milliseconds: 1500)));
                                 }
                               }),
-                              _buildAuraSource(Icons.cookie, "Kurabiye", unclaimedCookieAura, () {
-                                if (unclaimedCookieAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedCookieAura;
-                                    unclaimedCookieAura = 0; // Toplandı!
-                                  });
+                              _buildAuraSource(Icons.cookie, "Kurabiye", 1, () {
+                                HapticFeedback.selectionClick();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Her şans kurabiyesi +1 Aura kazandırır', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), duration: const Duration(milliseconds: 1500)));
                                 }
                               }),
-                              _buildAuraSource(Icons.local_fire_department_rounded, "Seri", unclaimedStreakAura, () {
-                                if (unclaimedStreakAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedStreakAura;
-                                    unclaimedStreakAura = 0; // Toplandı!
-                                  });
+                              _buildAuraSource(Icons.mail_rounded, "Baykuş", 2, () {
+                                HapticFeedback.selectionClick();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Baykuş mektuplarını keşfetmek +2 Aura kazandırır', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), duration: const Duration(milliseconds: 1500)));
                                 }
                               }),
-                              _buildAuraSource(Icons.mail_rounded, "Baykuş", unclaimedOwlAura, () {
-                                if (unclaimedOwlAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedOwlAura;
-                                    unclaimedOwlAura = 0; // Toplandı!
-                                  });
-                                }
-                              }),
-                              _buildAuraSource(Icons.card_giftcard_rounded, "Ödül", unclaimedRewardAura, () {
-                                if (unclaimedRewardAura > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalAuraTotal += unclaimedRewardAura;
-                                    unclaimedRewardAura = 0; // Toplandı!
-                                  });
-                                }
-                              }),
-                              _buildAuraSource(Icons.diamond_rounded, "Ruh Taşı", unclaimedSoulStone, () {
-                                if (unclaimedSoulStone > 0) {
-                                  HapticFeedback.heavyImpact();
-                                  setModalState(() {
-                                    modalSoulStones += unclaimedSoulStone;
-                                    unclaimedSoulStone = 0; // Toplandı!
-                                  });
+                              _buildAuraSource(Icons.diamond_rounded, "Ruh Taşı", 0, () {
+                                HapticFeedback.selectionClick();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Auraları düzenli olarak Ruh Taşına dönüştürebilirsin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), duration: const Duration(milliseconds: 1500)));
                                 }
                               }, color: const Color(0xFFFFD700)),
                             ],
@@ -1892,9 +1846,6 @@ class _BentoHeroCard extends StatelessWidget {
                         ),
                       ),
 
-                    // ════════════════════════════════════════════
-                    // KALAN RUH TAŞI PANELİ
-                    // ════════════════════════════════════════════
                     ] else if (title == "Kalan Ruh Taşı") ...[
                       Text(
                         "Not: Aura Puanı panelinden\npuanlarınızı Ruh Taşına dönüştürebilirsiniz.",
@@ -1917,7 +1868,6 @@ class _BentoHeroCard extends StatelessWidget {
                         child: InkWell(
                           onTap: selectedStoreIndex != -1 ? () {
                             HapticFeedback.heavyImpact();
-                            // Satın alma akışı tetiklenecek
                           } : null,
                           borderRadius: BorderRadius.circular(24),
                           child: AnimatedContainer(
@@ -1938,9 +1888,6 @@ class _BentoHeroCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text("Elite üyeler her gün 5 bedava Ruh Taşı kazanır.", textAlign: TextAlign.center, style: TextStyle(color: const Color(0xFFFFD700).withOpacity(0.8), fontSize: 9)),
 
-                    // ════════════════════════════════════════════
-                    // DİĞER PANELLER
-                    // ════════════════════════════════════════════
                     ] else if (title == "Açılan Kurabiyeler") ...[
                       const SizedBox(height: 4),
                       Expanded(child: const _ProfileCookieCarousel()),
@@ -1950,7 +1897,6 @@ class _BentoHeroCard extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // ── MİSTİK KADER KARTI (Sol Taraf) ──
                             Expanded(
                               flex: 4,
                               child: FutureBuilder<SignatureResult?>(
@@ -1958,7 +1904,6 @@ class _BentoHeroCard extends StatelessWidget {
                                 builder: (context, snapshot) {
                                   final result = snapshot.data;
                                   final bool isLocked = result == null;
-                                  // Eski/yeni kayıt fark etmez, her zaman doğru asset yolunu çözer
                                   final String cardImagePath = isLocked ? '' : resolveCardAsset(result.cardName, result.cardAsset);
                                   
                                   return Column(
@@ -2037,10 +1982,8 @@ class _BentoHeroCard extends StatelessWidget {
                                     final int count = discovered.length;
                                     const int totalCards = 78;
                                     
-                                    // Tüm 78 kartın asset listesi (sıralı)
                                     final allAssets = getAllCardAssets();
                                     
-                                    // Seviye unvanı + renk
                                     String rank;
                                     Color rankColor;
                                     if (count == 0) { rank = "Keşfedilmemiş"; rankColor = Colors.white.withOpacity(0.3); }
@@ -2054,7 +1997,6 @@ class _BentoHeroCard extends StatelessWidget {
                                     return Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        // ── Başlık + Sayı ──
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
@@ -2073,7 +2015,6 @@ class _BentoHeroCard extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 10),
                                         
-                                        // ── 78 Kart Grid Haritası ──
                                         Wrap(
                                           spacing: 2.5,
                                           runSpacing: 2.5,
@@ -2125,7 +2066,6 @@ class _BentoHeroCard extends StatelessWidget {
                               if (lastTitle.length > 25) lastTitle = "${lastTitle.substring(0, 22)}...";
                             }
 
-                            // ── ZAMAN FİLTRESİ ──
                             List<Map<String, dynamic>> filteredDreams = dreams;
                             if (dreamTimeFilter > 0) {
                               final limitDate = DateTime.now().subtract(Duration(days: dreamTimeFilter));
@@ -2139,7 +2079,6 @@ class _BentoHeroCard extends StatelessWidget {
                             
                             final totalCount = filteredDreams.length;
                             
-                            // Duygusal İstatistik Hesaplama (Baskın Duyguyu Bulma)
                             Map<String, int> emotionCounts = {};
                             for (var d in filteredDreams) {
                               String? em = d['emotion']?.toString() ?? d['mood']?.toString();
@@ -2154,7 +2093,6 @@ class _BentoHeroCard extends StatelessWidget {
                               var topEmotion = sorted.first;
                               int pct = ((topEmotion.value / totalCount) * 100).toInt();
                               
-                              // Basit Çeviri
                               Map<String, String> trMap = {
                                 'fear': 'Korku', 'anxiety': 'Kaygı', 'joy': 'Neşe', 
                                 'sadness': 'Hüzün', 'confusion': 'Karmaşa', 'peace': 'Huzur',
@@ -2186,7 +2124,6 @@ class _BentoHeroCard extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  // ── ZAMAN FİLTRESİ SEKMELERİ ──
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -2199,7 +2136,6 @@ class _BentoHeroCard extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 12),
 
-                                  // ── KİŞİSEL BİLİNÇALTI ÖZETİ (Insight) ──
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
@@ -2240,7 +2176,6 @@ class _BentoHeroCard extends StatelessWidget {
                                   
                                   const SizedBox(height: 6),
                                   
-                                  // ── BİLİNÇALTI DAĞILIMI (DUYGU GRAFİĞİ) ──
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                     child: Row(
@@ -2307,28 +2242,33 @@ class _BentoHeroCard extends StatelessWidget {
                         ),
                       ),
                     ] else if (title == "Günlük Seri") ...[
-                      FutureBuilder<DateTime>(
-                        future: StorageService.getInstallDate(),
+                      FutureBuilder<List<dynamic>>(
+                        future: Future.wait([
+                          StorageService.getInstallDate(),
+                          StorageService.getAppOpenDays(),
+                          StorageService.getClaimedAuraDays(),
+                        ]),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Expanded(child: Center(child: CircularProgressIndicator(color: Color(0xFFFF6B6B))));
                           }
                           
-                          final installDate = snapshot.data!;
+                          final installDate = snapshot.data![0] as DateTime;
+                          final appOpenDays = snapshot.data![1] as Set<String>;
+                          final claimedDays = snapshot.data![2] as Set<String>;
                           final now = DateTime.now();
                           final nowNorm = DateTime(now.year, now.month, now.day);
-                          // Streak başlangıç tarihi
-                          final streakStartDate = nowNorm.subtract(Duration(days: value > 0 ? value - 1 : 0));
                           
                           int totalMonths = (now.year - installDate.year) * 12 + now.month - installDate.month + 1;
                           if (totalMonths < 1) totalMonths = 1;
 
+                          final totalOpenDays = appOpenDays.length;
                           int nextTarget = 7;
-                          if (value >= 7) nextTarget = 14;
-                          if (value >= 14) nextTarget = 30;
-                          if (value >= 30) nextTarget = 50;
-                          if (value >= 50) nextTarget = 100;
-                          if (value >= 100) nextTarget = 365;
+                          if (totalOpenDays >= 7) nextTarget = 14;
+                          if (totalOpenDays >= 14) nextTarget = 30;
+                          if (totalOpenDays >= 30) nextTarget = 50;
+                          if (totalOpenDays >= 50) nextTarget = 100;
+                          if (totalOpenDays >= 100) nextTarget = 365;
 
                           final monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
                           final weekDays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
@@ -2352,7 +2292,7 @@ class _BentoHeroCard extends StatelessWidget {
 
                                 for (var day in weekDays) {
                                   calendarDays.add(
-                                    Center(child: Text(day, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9, fontWeight: FontWeight.bold))),
+                                    Center(child: Text(day, style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 12, fontWeight: FontWeight.bold))),
                                   );
                                 }
 
@@ -2363,32 +2303,28 @@ class _BentoHeroCard extends StatelessWidget {
                                 for (int i = 1; i <= daysInMonth; i++) {
                                   final testDate = DateTime(targetYear, targetMonth, i);
                                   final isToday = testDate.year == nowNorm.year && testDate.month == nowNorm.month && testDate.day == nowNorm.day;
-                                  
-                                  // Streak tarihi içinde mi?
-                                  bool isStreakDay = false;
-                                  if (value > 0) {
-                                    isStreakDay = testDate.compareTo(streakStartDate) >= 0 && testDate.compareTo(nowNorm) <= 0;
-                                  }
+                                  final isFuture = testDate.isAfter(nowNorm);
+                                  final dateKey = "${targetYear.toString().padLeft(4, '0')}-${targetMonth.toString().padLeft(2, '0')}-${i.toString().padLeft(2, '0')}";
+                                  final isAppOpenDay = appOpenDays.contains(dateKey);
+                                  final isClaimed = claimedDays.contains(dateKey);
 
                                   calendarDays.add(
-                                    Container(
-                                      margin: const EdgeInsets.all(2),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isToday 
-                                          ? const Color(0xFFFF6B6B).withOpacity(0.15) 
-                                          : (isStreakDay ? const Color(0xFFFF6B6B).withOpacity(0.08) : Colors.transparent),
-                                        border: isToday ? Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.5), width: 1) : null,
-                                      ),
-                                      child: Center(
-                                        child: isStreakDay
-                                          ? const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF6B6B), size: 12)
-                                          : Text("$i", style: TextStyle(
-                                              color: isToday ? const Color(0xFFFF6B6B) : Colors.white.withOpacity(0.5), 
-                                              fontSize: 10, 
-                                              fontWeight: isToday ? FontWeight.bold : FontWeight.w500
-                                            )),
-                                      ),
+                                    _ClaimableFireCell(
+                                      day: i,
+                                      isToday: isToday,
+                                      isFuture: isFuture,
+                                      isAppOpenDay: isAppOpenDay,
+                                      isClaimed: isClaimed,
+                                      dateKey: dateKey,
+                                      onClaimed: () {
+                                        setModalState(() {
+                                          claimedDays.add(dateKey);
+                                          modalAuraTotal += 1;
+                                        });
+                                        if (onAuraClaimed != null) {
+                                          onAuraClaimed!();
+                                        }
+                                      },
                                     ),
                                   );
                                 }
@@ -2402,12 +2338,12 @@ class _BentoHeroCard extends StatelessWidget {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text("${monthNames[targetMonth - 1]} $targetYear", style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                                            Text("${monthNames[targetMonth - 1]} $targetYear", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                                             Row(
                                               children: [
-                                                const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF6B6B), size: 10),
+                                                const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF6B6B), size: 12),
                                                 const SizedBox(width: 4),
-                                                Text("$nextTarget Gün Hedef!", style: TextStyle(color: const Color(0xFFFF6B6B).withOpacity(0.8), fontSize: 9, fontWeight: FontWeight.w600)),
+                                                Text("$nextTarget Gün Hedefi", style: TextStyle(color: const Color(0xFFFF6B6B).withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.w600)),
                                               ],
                                             ),
                                           ],
@@ -2417,10 +2353,9 @@ class _BentoHeroCard extends StatelessWidget {
                                         child: LayoutBuilder(
                                           builder: (context, constraints) {
                                             final rowCount = (calendarDays.length / 7).ceil();
-                                            const spacing = 4.0; // Boşlukları daraltarak kazanıyoruz
+                                            const spacing = 5.0;
                                             final totalSpacing = spacing * (rowCount - 1);
                                             double itemHeight = (constraints.maxHeight - totalSpacing) / rowCount;
-                                            // Asla taşmaması için minimum limit koymuyoruz, kalan yerin tamamını alacak
 
                                             return GridView.builder(
                                               padding: EdgeInsets.zero,
@@ -2438,7 +2373,7 @@ class _BentoHeroCard extends StatelessWidget {
                                           }
                                         ),
                                       ),
-                                      const SizedBox(height: 6), // Alt boşluğu azalttım
+                                      const SizedBox(height: 6),
                                     ],
                                   ),
                                 );
@@ -2467,7 +2402,7 @@ class _BentoHeroCard extends StatelessWidget {
       onTap: hasAura ? onTap : null,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: 72, // Scroll içerisinde standart boyut
+        width: 72,
         margin: const EdgeInsets.symmetric(horizontal: 2),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -2492,78 +2427,6 @@ class _BentoHeroCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTarotHistoryRow(IconData icon, String title, String time, Color color) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: color, size: 14),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
-              Text(time, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildElementBar(String name, int count, int total, Color color) {
-    final pct = total > 0 ? count / total : 0.0;
-    return Row(
-      children: [
-        SizedBox(width: 34, child: Text(name, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 7))),
-        Expanded(
-          child: Container(
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(2),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: pct.clamp(0.0, 1.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        SizedBox(width: 18, child: Text("${(pct * 100).round()}%", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 6), textAlign: TextAlign.right)),
-      ],
-    );
-  }
-
-  Widget _buildMiniStat(IconData icon, String value, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: color.withOpacity(0.08),
-        border: Border.all(color: color.withOpacity(0.12), width: 0.5),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 12),
-          const SizedBox(height: 2),
-          Text(value, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 10, fontWeight: FontWeight.bold)),
-          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 6)),
-        ],
-      ),
-    );
-  }
-
-
   Widget _buildSoulStoreCard(BuildContext context, String countText, String price, Color color, {bool isPopular = false, required bool isSelected, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: () {
@@ -2574,7 +2437,7 @@ class _BentoHeroCard extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.2) : color.withOpacity(0.04), // Seçiliyken parlak
+          color: isSelected ? color.withOpacity(0.2) : color.withOpacity(0.04),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: isSelected ? color : color.withOpacity(0.1), width: isSelected ? 1.5 : 0.5),
           boxShadow: isSelected ? [BoxShadow(color: color.withOpacity(0.4), blurRadius: 10, spreadRadius: 0)] : [],
@@ -2602,39 +2465,6 @@ class _BentoHeroCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ICON INFO TILE (Ruh Taşı paneli bilgi satırı)
-// ═══════════════════════════════════════════════════════════════
-
-class _IconInfoTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-
-  const _IconInfoTile({required this.icon, required this.iconColor, required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(color: iconColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-        child: Icon(icon, color: iconColor, size: 14),
-      ),
-      const SizedBox(width: 10),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
-        Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
-      ])),
-    ]);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GLASS BADGE (Aura & Ruh Taşı Hap Butonları)
-// ═══════════════════════════════════════════════════════════════
-
 class _GlassBadge extends StatelessWidget {
   final IconData? icon;
   final String? imagePath;
@@ -2661,7 +2491,7 @@ class _GlassBadge extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08), // Daha ince açık cam
+              color: Colors.white.withOpacity(0.08),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
             ),
@@ -2698,15 +2528,11 @@ class _GlassBadge extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// HERO STAT CIRCLE (4 Stat İçin Yuvarlak Cam Butonlar)
-// ═══════════════════════════════════════════════════════════════
-
 class _HeroStatCircle extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final int value;
-  final bool hasDot; // Neon dot for aesthetic match
+  final bool hasDot;
   final VoidCallback onTap;
 
   const _HeroStatCircle({
@@ -2724,7 +2550,6 @@ class _HeroStatCircle extends StatelessWidget {
       child: Stack(
       clipBehavior: Clip.none,
       children: [
-        // Tamponlanmış, koyu renkli buzlu cam (Görseldeki "1-1" etki)
         ClipOval(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
@@ -2733,16 +2558,16 @@ class _HeroStatCircle extends StatelessWidget {
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF1E1E1E).withOpacity(0.55), // Apple Dark Liquid Material
+                color: const Color(0xFF1E1E1E).withOpacity(0.55),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.12), // İncecik metalik zar
+                  color: Colors.white.withOpacity(0.12),
                   width: 0.5,
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: iconColor.withOpacity(0.95), size: 18), // İkon boyutu kibarlaştı
+                  Icon(icon, color: iconColor.withOpacity(0.95), size: 18),
                   const SizedBox(height: 5),
                   TweenAnimationBuilder<int>(
                     tween: IntTween(begin: 0, end: value),
@@ -2754,7 +2579,7 @@ class _HeroStatCircle extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.85),
                           fontSize: 13,
-                          fontWeight: FontWeight.w400, // Görsel diline uygun, çok ince rakamlar
+                          fontWeight: FontWeight.w400,
                           letterSpacing: 0.8,
                           height: 1.0,
                         ),
@@ -2766,7 +2591,6 @@ class _HeroStatCircle extends StatelessWidget {
             ),
           ),
         ),
-        // Neon Nokta (Görseldeki gibi şeffaf çerçevenin üst sınırına tünemiş, turuncu altın ışık)
         if (hasDot)
           Positioned(
             top: 2,
@@ -2776,7 +2600,7 @@ class _HeroStatCircle extends StatelessWidget {
               height: 14,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFFB347), // Görseldeki şeftali/altın sarısı
+                color: const Color(0xFFFFB347),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFFFFB347).withOpacity(0.8),
@@ -2786,7 +2610,7 @@ class _HeroStatCircle extends StatelessWidget {
                   BoxShadow(
                     color: Colors.white.withOpacity(0.8),
                     blurRadius: 2,
-                    spreadRadius: -1, // İç parlama efekti (core glow)
+                    spreadRadius: -1,
                   ),
                 ],
               ),
@@ -2797,10 +2621,6 @@ class _HeroStatCircle extends StatelessWidget {
   );
 }
 }
-
-// ═══════════════════════════════════════════════════════════════
-// DİNAMİK TIKLAMA EFEKTİ (Apple Luxury Bounce)
-// ═══════════════════════════════════════════════════════════════
 
 class _BentoTouch extends StatefulWidget {
   final Widget child;
@@ -2818,24 +2638,18 @@ class _BentoTouchState extends State<_BentoTouch> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque, // Hayati önem
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _pressed = true),
       onTapCancel: () => setState(() => _pressed = false),
-      // onTapUp tarafını sildik, küçülmeden dönme işlemini tamamen onTap'in koreografisine bağladık
       onTap: () async {
         HapticFeedback.lightImpact(); 
 
-        // Eğer kullanıcı aşırı hızlı bastıysa butonu zorla küçültülmüş moda al
         if (!_pressed && mounted) setState(() => _pressed = true);
         
-        // Küçülme animasyonunun gözle net görülmesi için ufak bir tampon bekleme
         await Future.delayed(const Duration(milliseconds: 80));
         
-        // Yay gibi eski haline dön (Genişle)
         if (mounted) setState(() => _pressed = false);
         
-        // Büyüme animasyonunun (150ms) tamamlanmasına ramak kala pencereyi/aksiyonu tetikle!
-        // Eskiden bu anında oluyordu, o yüzden sen butona bastığın an pencere ekranı kapattığı için efekt yarıda kesiliyordu.
         await Future.delayed(const Duration(milliseconds: 140));
         
         widget.onTap();
@@ -2853,10 +2667,6 @@ class _BentoTouchState extends State<_BentoTouch> {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════
-// BENTO ACTION TILE (Frosted Glass Aksiyon Kartı)
-// ═══════════════════════════════════════════════════════════════
 
 class _BentoActionTile extends StatefulWidget {
   final IconData icon;
@@ -3003,10 +2813,6 @@ class _BentoActionTileState extends State<_BentoActionTile> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BENTO PREMIUM BANNER
-// ═══════════════════════════════════════════════════════════════
-
 class _BentoPremiumBanner extends StatefulWidget {
   final String lang;
   final VoidCallback onTap;
@@ -3124,10 +2930,6 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// PAYLAŞILAN WIDGET'LAR
-// ═══════════════════════════════════════════════════════════════
-
 class _SettingsRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -3215,10 +3017,6 @@ class _LanguageOption {
 
   const _LanguageOption(this.locale, this.label);
 }
-
-// ═══════════════════════════════════════════════════════════════
-// TEMA GALERİSİ (dışarıdan referans ediliyor — sakla)
-// ═══════════════════════════════════════════════════════════════
 
 class ThemeGalleryPage extends StatelessWidget {
   final List<String> options;
@@ -3633,6 +3431,177 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
           ),
         ), // Expanded bitti
       ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAIMABLE FIRE CELL (Takvim Ateş Hücresi — Tıklanabilir Ödül)
+// ═══════════════════════════════════════════════════════════════
+
+class _ClaimableFireCell extends StatefulWidget {
+  final int day;
+  final bool isToday;
+  final bool isFuture;
+  final bool isAppOpenDay;
+  final bool isClaimed;
+  final String dateKey;
+  final VoidCallback? onClaimed;
+
+  const _ClaimableFireCell({
+    required this.day,
+    required this.isToday,
+    required this.isFuture,
+    required this.isAppOpenDay,
+    required this.isClaimed,
+    required this.dateKey,
+    this.onClaimed,
+  });
+
+  @override
+  State<_ClaimableFireCell> createState() => _ClaimableFireCellState();
+}
+
+class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProviderStateMixin {
+  late AnimationController _bounceController;
+  late AnimationController _flyController;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _flyUpAnim;
+  late Animation<double> _flyFadeAnim;
+  bool _justClaimed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.6), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 0.6, end: 1.15), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 30),
+    ]).animate(CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut));
+
+    _flyController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _flyUpAnim = Tween<double>(begin: 0, end: -40).animate(
+      CurvedAnimation(parent: _flyController, curve: Curves.easeOutCubic),
+    );
+    _flyFadeAnim = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _flyController, curve: const Interval(0.3, 1.0, curve: Curves.easeOut)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _bounceController.dispose();
+    _flyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleTap() async {
+    if (!widget.isAppOpenDay || widget.isClaimed || widget.isFuture || _justClaimed) return;
+
+    // Bounce efekti
+    _bounceController.forward(from: 0);
+    HapticFeedback.mediumImpact();
+
+    final success = await StorageService.claimDailyAura(widget.dateKey);
+    if (success && mounted) {
+      setState(() => _justClaimed = true);
+      
+      // Uçuş animasyonu
+      _flyController.forward(from: 0);
+      
+      widget.onClaimed?.call();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool claimed = widget.isClaimed || _justClaimed;
+    final bool canClaim = widget.isAppOpenDay && !claimed && !widget.isFuture;
+
+    return GestureDetector(
+      onTap: canClaim ? _handleTap : null,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_bounceController, _flyController]),
+        builder: (context, child) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Ana hücre
+              Transform.scale(
+                scale: _bounceController.isAnimating ? _scaleAnim.value : 1.0,
+                child: Container(
+                  margin: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.isToday 
+                      ? const Color(0xFFFF6B6B).withOpacity(0.15) 
+                      : (widget.isAppOpenDay && !claimed ? const Color(0xFFFF6B6B).withOpacity(0.08) : Colors.transparent),
+                    border: widget.isToday ? Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.5), width: 1) : null,
+                  ),
+                  child: Center(
+                    child: widget.isAppOpenDay
+                      ? Icon(
+                          Icons.local_fire_department_rounded, 
+                          color: claimed 
+                            ? Colors.white.withOpacity(0.15)
+                            : const Color(0xFFFF6B6B),
+                          size: 18,
+                        )
+                      : Text("${widget.day}", style: TextStyle(
+                          color: widget.isFuture 
+                            ? Colors.white.withOpacity(0.2) 
+                            : (widget.isToday ? const Color(0xFFFF6B6B) : Colors.white.withOpacity(0.65)), 
+                          fontSize: 14, 
+                          fontWeight: widget.isToday ? FontWeight.bold : FontWeight.w500
+                        )),
+                  ),
+                ),
+              ),
+              // Uçan ateş efekti
+              if (_justClaimed && _flyController.isAnimating)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: _flyUpAnim.value,
+                  child: Opacity(
+                    opacity: _flyFadeAnim.value,
+                    child: const Center(
+                      child: Icon(
+                        Icons.local_fire_department_rounded, 
+                        color: Color(0xFFFF6B6B), 
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+              // Parıltı efekti
+              if (_justClaimed && _flyController.isAnimating)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: _flyUpAnim.value - 4,
+                  child: Opacity(
+                    opacity: _flyFadeAnim.value * 0.6,
+                    child: const Center(
+                      child: Icon(
+                        Icons.auto_awesome, 
+                        color: Color(0xFFFFC107), 
+                        size: 12,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

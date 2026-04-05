@@ -66,6 +66,139 @@ class _HomePageState extends State<HomePage> {
     _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
+    
+    // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkMilestones();
+    });
+  }
+
+  Future<void> _checkMilestones() async {
+    final appOpenDays = await StorageService.getAppOpenDays();
+    final claimedMilestones = await StorageService.getClaimedMilestones();
+    
+    final int totalDays = appOpenDays.length;
+    final List<int> thresholds = [7, 14, 30, 50, 100, 365];
+    
+    for (final threshold in thresholds) {
+      if (totalDays >= threshold && !claimedMilestones.contains(threshold)) {
+        // Hedefe ulaşılmış ve toplanmamış!
+        if (mounted) {
+          _showMilestoneCelebration(threshold);
+        }
+        break; // Aynı anda sadece bir tane kutla (en düşüğü önce)
+      }
+    }
+  }
+
+  void _showMilestoneCelebration(int threshold) {
+    HapticFeedback.heavyImpact();
+    
+    String rewardText = "";
+    IconData rewardIcon = Icons.auto_awesome;
+    Color rewardColor = const Color(0xFFC084FC);
+    
+    if (threshold == 7) { rewardText = "+15 Aura"; }
+    else if (threshold == 14) { rewardText = "+30 Aura"; }
+    else if (threshold == 30) { rewardText = "+1 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 50) { rewardText = "+2 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 100) { rewardText = "+3 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 365) { rewardText = "+5 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      barrierDismissible: false,
+      barrierLabel: 'MilestoneModal',
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 10 * anim1.value, sigmaY: 10 * anim1.value),
+          child: Transform.scale(
+            scale: Curves.easeOutBack.transform(anim1.value),
+            child: FadeTransition(opacity: anim1, child: child),
+          ),
+        );
+      },
+      pageBuilder: (context, anim1, anim2) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+            boxShadow: [
+              BoxShadow(color: rewardColor.withOpacity(0.2), blurRadius: 40, spreadRadius: -5),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: rewardColor.withOpacity(0.15),
+                ),
+                child: Icon(Icons.local_fire_department_rounded, color: const Color(0xFFFF6B6B), size: 48),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "İnanılmaz Odak!",
+                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Günlük serin tam $threshold güne ulaştı.\nBağlılığın için evren seni ödüllendiriyor.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 24),
+              
+              // Ödül Kutusu
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: rewardColor.withOpacity(0.3), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(rewardIcon, color: rewardColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(rewardText, style: TextStyle(color: rewardColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 28),
+              GestureDetector(
+                onTap: () async {
+                  HapticFeedback.mediumImpact();
+                  await StorageService.claimMilestone(threshold);
+                  if (mounted) Navigator.pop(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Center(
+                    child: Text("Ödülü Topla", style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadSelectedCookie() async {

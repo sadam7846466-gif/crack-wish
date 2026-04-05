@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'dart:async';
@@ -17,6 +18,7 @@ import '../services/supabase_dream_service.dart';
 import '../models/emotion.dart';
 import '../models/dream_analysis.dart';
 import '../models/dream_input.dart';
+import 'premium_paywall_page.dart';
 import '../models/clarification_answer.dart';
 import '../widgets/stars_background.dart';
 
@@ -356,6 +358,7 @@ class _DreamPageState extends State<DreamPage>
   bool _localizedSeedsReady = false;
   int _currentTipIndex = 0; // Biliyor muydun? için sabit index
   List<Map<String, dynamic>> _premiumAnswers = []; // Kullanıcının verdiği premium cevaplar
+  bool _isPremiumUser = false;
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
     'REM uykusunda mantık merkezleri baskılanır, bu yüzden rüyalar mantıksız görünür.',
@@ -410,6 +413,16 @@ class _DreamPageState extends State<DreamPage>
     _emotionOrder = List<Emotion>.from(Emotion.values);
     _emotionOrder.shuffle(math.Random());
     _currentTipIndex = math.Random().nextInt(50); // Biliyor muydun? sabit tip
+    _loadPremiumStatus();
+  }
+
+  Future<void> _loadPremiumStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+      });
+    }
   }
 
   @override
@@ -515,10 +528,102 @@ class _DreamPageState extends State<DreamPage>
     super.dispose();
   }
 
+  Future<bool> _checkAndDeductPremiumAccess() async {
+    if (_isPremiumUser) return true; // Elite users pass freely
+
+    int soulStones = await StorageService.getSoulStones();
+
+    bool? confirm = await showGeneralDialog<bool>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'SpendStone',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                         Icon(Icons.diamond_rounded, color: soulStones >= 1 ? const Color(0xFFFFD700) : Colors.white.withOpacity(0.3), size: 48),
+                         const SizedBox(height: 16),
+                         Text(_isTr ? "Klinik Analiz Kapısı" : "Clinical Analysis Gate", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                         const SizedBox(height: 8),
+                         Text(_isTr ? "Mevcut Ruh Taşın: $soulStones\n\nBu klinik seviye derin psikolojik analiz için içeriye giriş izni." : "Current Soul Stones: $soulStones\n\nPermission to enter for this clinical-level deep psychoanalysis.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4)),
+                         const SizedBox(height: 24),
+                         Row(
+                           children: [
+                             Expanded(child: ElevatedButton(
+                               style: ElevatedButton.styleFrom(
+                                 backgroundColor: soulStones >= 1 ? const Color(0xFF22D3EE).withOpacity(0.15) : Colors.white.withOpacity(0.05),
+                                 elevation: 0,
+                                 padding: EdgeInsets.zero,
+                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: soulStones >= 1 ? const Color(0xFF22D3EE).withOpacity(0.4) : Colors.white.withOpacity(0.1))),
+                               ),
+                               onPressed: soulStones >= 1 ? () => Navigator.pop(context, true) : () {},
+                               child: FittedBox(
+                                 fit: BoxFit.scaleDown,
+                                 child: Text(_isTr ? "1 Ruh Taşı Kullan" : "Use 1 Stone", style: TextStyle(color: soulStones >= 1 ? const Color(0xFF22D3EE) : Colors.white30, fontWeight: FontWeight.bold)),
+                               ),
+                             )),
+                             const SizedBox(width: 8),
+                             Expanded(child: ElevatedButton(
+                               style: ElevatedButton.styleFrom(
+                                 backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                 elevation: 0,
+                                 padding: EdgeInsets.zero,
+                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4))),
+                               ),
+                               onPressed: () {
+                                 Navigator.pop(context, false);
+                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                               },
+                               child: FittedBox(
+                                 fit: BoxFit.scaleDown,
+                                 child: Text(_isTr ? "Elite Abone Ol" : "Get Elite", style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
+                               ),
+                             )),
+                           ],
+                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirm == true && soulStones >= 1) {
+      await StorageService.deductSoulStones(1);
+      return true;
+    }
+    return false;
+  }
+
   Future<bool> _interpretDreamPremium() async {
     final trimmed = _dreamController.text.trim();
     if (trimmed.length < 15) return false;
     if (_selectedEmotion == null) return false;
+
+    bool canAccess = await _checkAndDeductPremiumAccess();
+    if (!canAccess) return false;
 
     final messages = _educationalMessagesFor();
     final randomMessage = messages[math.Random().nextInt(messages.length)];
