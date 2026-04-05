@@ -369,7 +369,7 @@ class MayanZodiacData {
     {'title': 'Varoluşsal (4. Ton)', 'desc': 'Biçimi ve Temeli temsil eder. Düşüncelerine şekil verir, eylemlerin için sağlam bir temel kurar.'},
     {'title': 'Ahenkli (5. Ton)', 'desc': 'Gücü ve Karizmayı temsil eder. Kendi gücünü kabullenmeni, merkezinden çevrene ışık saçmanı sağlar.'},
     {'title': 'Ritmik (6. Ton)', 'desc': 'Akışı ve Dengeyi temsil eder. Kaos içinde düzeni bulmanı, ilişkilerinde uyum yaratmanı sağlar.'},
-    {'title': 'Rezonans (7. Ton)', 'desc': 'İlham ve Mistik Kanallığı temsil eder. Evrenle uyumlanmayı, sezgileri en üst düzeye çıkarmayı destekler.'},
+    {'title': 'Rezonans (7. Ton)', 'desc': 'İlham ve Ruhsal Bağlantıyı temsil eder. Evrenle uyumlanmayı, sezgileri en üst düzeye çıkarmayı destekler.'},
     {'title': 'Galaktik (8. Ton)', 'desc': 'Bütünlüğü ve Sonsuzluğu temsil eder. Kendi doğruna sadık kalmanı ve adaletli olmanı şekillendirir.'},
     {'title': 'Güneş (9. Ton)', 'desc': 'Genişlemeyi ve Sabrı temsil eder. Geleceğe yönelik niyetlerini harekete geçiren, nabız gibi atan güçtür.'},
     {'title': 'Gezegensel (10. Ton)', 'desc': 'Tezahürü ve Üretimi temsil eder. İçsel potansiyelini somut bir kusursuzlukla dış dünyaya yansıtmanı sağlar.'},

@@ -58,8 +58,7 @@ class _GuidanceBookletButtonState extends State<GuidanceBookletButton> {
 
   void _showDialog() {
     final isTr = _isTr;
-    final items = List<GuidanceItem>.from(widget.items)..shuffle(Random());
-    final selected = items.take(widget.showCount).toList();
+    final selected = widget.items;
 
     showGeneralDialog(
       context: context,

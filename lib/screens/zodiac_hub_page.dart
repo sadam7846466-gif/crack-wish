@@ -71,46 +71,25 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                     dialogTitleEn: 'Zodiac Guide',
                     items: const [
                       GuidanceItem(
-                        titleTr: '3 Kadim Gelenek',
-                        titleEn: '3 Ancient Traditions',
-                        descTr: 'Batı Zodiyağı, Çin Astrolojisi ve Maya Takvimi — binlerce yıllık üç farklı gelenek, yıldızları ve zamanı farklı yorumlasa da ortak amaçları aynı: insanın iç dünyasını anlamak.',
-                        descEn: 'Western Zodiac, Chinese Astrology, and Maya Calendar — three traditions spanning millennia. Though they interpret stars and time differently, they share a common goal: understanding the inner self.',
-                        icon: Icons.auto_awesome,
+                        titleTr: 'Batı Astrolojisi',
+                        titleEn: 'Western Astrology',
+                        descTr: 'Gökyüzü haritasına kazınmış kimliğiniz. Doğum anınızdaki ışıklar potansiyelinizi ve temel karakterinizi aydınlatır.',
+                        descEn: 'Your identity carved into the sky map. The lights at your birth illuminate your potential and core character.',
+                        icon: Icons.flare_outlined,
                       ),
                       GuidanceItem(
-                        titleTr: 'Batı Zodiyağı',
-                        titleEn: 'Western Zodiac',
-                        descTr: 'Güneşin doğum anındaki konumuna göre 12 burç belirlenir. Her burç, kişiliğinizin farklı yönlerini — güçlü yanlarınızı, zorluklarınızı ve duygusal eğilimlerinizi yansıtır.',
-                        descEn: 'Based on the sun\'s position at birth, 12 signs are determined. Each reflects different aspects of your personality — strengths, challenges, and emotional tendencies.',
-                        icon: Icons.wb_sunny_outlined,
+                        titleTr: 'Asya Astrolojisi',
+                        titleEn: 'Asian Astrology',
+                        descTr: '12 yıllık evrensel döngüler. Doğum yılınızdaki hayvan figürü, ruhunuza yüklenen kader bağlarını ve yaşam heyecanını açıklar.',
+                        descEn: '12-year universal cycles. The animal of your birth year explains fateful bonds and excitement imprinted on your soul.',
+                        icon: Icons.brightness_medium_outlined,
                       ),
                       GuidanceItem(
-                        titleTr: 'Çin Astrolojisi',
-                        titleEn: 'Chinese Astrology',
-                        descTr: '12 yıllık döngülerle çalışan bu sistem, doğum yılınıza göre bir hayvan burcu atar. Her hayvan, karakterinizi, uyumlu ilişkilerinizi ve yaşam enerjinizi temsil eder.',
-                        descEn: 'Working in 12-year cycles, this system assigns an animal sign based on your birth year. Each animal represents your character, compatible relationships, and life energy.',
-                        icon: Icons.pets_outlined,
-                      ),
-                      GuidanceItem(
-                        titleTr: 'Maya Takvimi',
-                        titleEn: 'Maya Calendar',
-                        descTr: '20 Nahual (gün işareti) ve 13 galaktik tondan oluşan Tzolkin takvimi, doğum gününüze göre kozmik misyonunuzu ortaya koyar. En kadim astroloji sistemlerinden biridir.',
-                        descEn: 'The Tzolkin calendar, composed of 20 Nahuales (day signs) and 13 galactic tones, reveals your cosmic mission based on your birth day. One of the most ancient astrology systems.',
-                        icon: Icons.calendar_today_outlined,
-                      ),
-                      GuidanceItem(
-                        titleTr: 'Element Sistemi',
-                        titleEn: 'Element System',
-                        descTr: 'Her üç gelenek de elementleri kullanır: Ateş, Su, Toprak, Hava. Elementiniz, enerjinizin doğasını ve ruhani yöneliminizi belirler.',
-                        descEn: 'All three traditions use elements: Fire, Water, Earth, Air. Your element determines the nature of your energy and spiritual orientation.',
-                        icon: Icons.local_fire_department_outlined,
-                      ),
-                      GuidanceItem(
-                        titleTr: 'Bilimsel Not',
-                        titleEn: 'Scientific Note',
-                        descTr: 'Astroloji bilimsel olarak kanıtlanmış bir yöntem değildir, ancak binlerce yıldır insanların kendini tanıma yolculuğuna eşlik eden güçlü bir sembolik dildir.',
-                        descEn: 'Astrology is not a scientifically proven method, but it is a powerful symbolic language that has accompanied humanity\'s self-discovery journey for thousands of years.',
-                        icon: Icons.science_outlined,
+                        titleTr: 'Maya Astrolojisi',
+                        titleEn: 'Mayan Astrology',
+                        descTr: 'Doğanın kusursuz matematiği. 20 mühür ve 13 tonun birleşimi, evrendeki ritminizi ve "Kozmik Misyonunuzu" söyler.',
+                        descEn: 'Flawless mathematics of nature. The union of 20 seals and 13 tones reveals your rhythm and "Cosmic Mission".',
+                        icon: Icons.filter_vintage_outlined,
                       ),
                     ],
                   ),
@@ -120,7 +99,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             
             // ── ÜÇ ÇARK (Tek ekrana sığması için kompakt tasarlandı) ──
             _animWrap(_t1, _wheelSection(
-              wheelSize: wheelSize, label: 'BATI ZODYAK', 
+              wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
               painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
               onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacPage())),
             )),
@@ -132,7 +111,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             )),
             const SizedBox(height: 36),
             _animWrap(_t3, _wheelSection(
-              wheelSize: wheelSize, label: 'MAYA TAKVİMİ', 
+              wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
               painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
               onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacMayanPage())),
             )),
@@ -863,45 +842,61 @@ class _MayanWheelPainter extends CustomPainter {
     canvas.drawCircle(Offset.zero, centerFaceR, pLine..strokeWidth = 1.2);
     canvas.drawCircle(Offset.zero, centerFaceR - 4, pLine..strokeWidth = 0.5);
     
-    _drawRusticSunCenter(canvas, centerFaceR * 0.85, g.withOpacity(0.85));
+    _drawTrueMayanHunabKu(canvas, centerFaceR * 0.85, g.withOpacity(0.85));
 
     canvas.restore();
   }
 
-  void _drawRusticSunCenter(Canvas c, double r, Color g) {
-    final pLine = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 2.0..strokeCap=StrokeCap.round;
-    final pFill = Paint()..color = g..style = PaintingStyle.fill;
-    
-    // Kafa çerçevesi (Oval)
-    c.drawOval(Rect.fromCenter(center: Offset(0, -r*0.1), width: r*1.5, height: r*1.2), pLine);
-    
-    // Klasik dışa sarkan dil
-    c.drawRect(Rect.fromCenter(center: Offset(0, r*0.6), width: r*0.4, height: r*0.6), pLine);
-    c.drawLine(Offset(0, r*0.4), Offset(0, r*0.8), pLine); // Dilin dikey yırtığı
-    // Dilin etrafındaki çene takısı
-    c.drawArc(Rect.fromCenter(center: Offset(0, r*0.1), width: r*1.6, height: r*1.5), 0.2, math.pi-0.4, false, pLine);
+  void _drawTrueMayanHunabKu(Canvas c, double r, Color g) {
+    // KUSURSUZ MAYA GEOMETRİSİ: HUNAB KU (Galaktik Kelebek / Zamanın En Saf Hali)
+    // Organik, kutsal bir insan/tanrı yüzünü basit kod çizgileriyle çizmek karikatürleşip, 
+    // saygısız bir görüntü (uncanny valley) yarattığı için mutlak ve saygın geometriye dönüldü.
+    final pLine = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 2.0..strokeCap = StrokeCap.round;
+    final pFill = Paint()..color = g.withValues(alpha: 0.15)..style = PaintingStyle.fill;
+    final pGlow = Paint()..color = g.withValues(alpha: 0.1)..style = PaintingStyle.fill..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
 
-    // Dev, açık, yuvarlak Maya gözleri
-    c.drawCircle(Offset(-r*0.35, -r*0.2), r*0.25, pLine);
-    c.drawCircle(Offset(r*0.35, -r*0.2), r*0.25, pLine);
-    c.drawCircle(Offset(-r*0.35, -r*0.2), r*0.08, pFill);
-    c.drawCircle(Offset(r*0.35, -r*0.2), r*0.08, pFill);
+    // Kutsal Parlama Güzelliği
+    c.drawCircle(Offset.zero, r * 0.45, pGlow);
+    c.drawCircle(Offset.zero, r * 0.45, pFill);
 
-    // Burun - V şeklinde yatay
-    c.drawLine(Offset(-r*0.2, 0), Offset(0, r*0.25), pLine);
-    c.drawLine(Offset(r*0.2, 0), Offset(0, r*0.25), pLine);
+    // İç Çember (Sonsuzluk ve Bütünlük)
+    c.drawCircle(Offset.zero, r * 0.45, pLine);
 
-    // Alın Takısı (3 nokta ve çizgi)
-    c.drawLine(Offset(-r*0.4, -r*0.5), Offset(r*0.4, -r*0.5), pLine);
-    c.drawCircle(Offset(0, -r*0.65), r*0.06, pFill);
-    c.drawCircle(Offset(-r*0.25, -r*0.65), r*0.06, pFill);
-    c.drawCircle(Offset(r*0.25, -r*0.65), r*0.06, pFill);
-    
-    // Yandan sarkan dev küpeler
-    c.drawRect(Rect.fromCenter(center: Offset(-r*0.9, 0), width: r*0.3, height: r*0.6), pLine);
-    c.drawRect(Rect.fromCenter(center: Offset(r*0.9, 0), width: r*0.3, height: r*0.6), pLine);
-    c.drawCircle(Offset(-r*0.9, 0), r*0.08, pFill);
-    c.drawCircle(Offset(r*0.9, 0), r*0.08, pFill);
+    // "S" formundaki bölünme (Maya Yin-Yang yapısı - İlahi Denge)
+    final dualPath = Path()
+      ..moveTo(0, -r * 0.45)
+      ..cubicTo(-r * 0.4, -r * 0.15, r * 0.4, r * 0.15, 0, r * 0.45);
+    c.drawPath(dualPath, pLine..strokeWidth = 2.5);
+
+    // Kozmik Denge Noktaları (Gözler/Tohumlar)
+    c.drawCircle(Offset(-r * 0.2, -r * 0.15), r * 0.07, Paint()..color = g..style = PaintingStyle.fill);
+    c.drawCircle(Offset(r * 0.2, r * 0.15), r * 0.07, Paint()..color = g..style = PaintingStyle.fill);
+
+    // Zamanın 4 Kozmik Yönü (Kelebeğin / Evrenin açılan yaprakları)
+    for (int i = 0; i < 4; i++) {
+        c.save();
+        c.rotate(i * math.pi / 2);
+        
+        // Zarafeti artırılmış yaprak / ışın hatları
+        final petalPath = Path()
+          ..moveTo(-r * 0.12, -r * 0.5)
+          ..quadraticBezierTo(-r * 0.2, -r * 0.8, 0, -r * 0.95) // Tepeye tırmanan sivri yapı
+          ..quadraticBezierTo(r * 0.2, -r * 0.8, r * 0.12, -r * 0.5);
+          
+        c.drawPath(petalPath, pLine..strokeWidth = 1.6);
+        c.drawPath(petalPath, pFill);
+        
+        // Taç yaprak merkezindeki zarif iç çizgi
+        c.drawLine(Offset(0, -r * 0.52), Offset(0, -r * 0.88), pLine..strokeWidth = 1.0);
+        
+        // Ara yönler (4 Köşegen)
+        c.restore();
+        c.save();
+        c.rotate(i * math.pi / 2 + math.pi / 4);
+        c.drawLine(Offset(0, r * 0.5), Offset(0, r * 0.75), pLine..strokeWidth = 1.8);
+        c.drawCircle(Offset(0, r * 0.8), r * 0.04, Paint()..color = g..style = PaintingStyle.fill);
+        c.restore();
+    }
   }
 
   void _drawAuthenticNawal(Canvas c, int i, double h, Color g) {
