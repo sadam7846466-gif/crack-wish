@@ -274,9 +274,13 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   static const _kAdCredits = 'tarot_ad_credits_v1';
   static const _kAdWatchCount = 'tarot_ad_watch_count_v1';
   static const _kAdWatchDate = 'tarot_ad_watch_date_v1';
-  static const _kMaxDailyAds = 3;
+  static const _kMaxDailyAds = 2;
   static const _kEliteSoulStoneDate = 'tarot_elite_soul_date_v1';
   static const _kDailyEliteSoulStones = 5;
+
+  static const _kPremiumReadsCount = 'tarot_premium_reads_count_v1';
+  static const _kPremiumReadsDate = 'tarot_premium_reads_date_v1';
+  static const _kMaxPremiumReads = 3;
 
   static const _kStreak = 'tarot_streak_v1';
   static const _kLastReadDate = 'tarot_last_read_date_v1';
@@ -294,6 +298,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   bool _dailyFreeUsed = false;
   int _adCredits = 0;
   int _dailyAdWatchCount = 0;
+  int _premiumReadsUsed = 0;
   int _streak = 1;
   bool _isBusy = false;
   bool _isPremiumUser = false;
@@ -507,14 +512,27 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       _dailyAdWatchCount = _prefs.getInt(_kAdWatchCount) ?? 0;
     }
 
+    // Premium major arcana okumaları sıfırlama
+    final premiumReadsDate = _prefs.getString(_kPremiumReadsDate);
+    if (premiumReadsDate != today) {
+      _premiumReadsUsed = 0;
+      _prefs.setInt(_kPremiumReadsCount, 0);
+      _prefs.setString(_kPremiumReadsDate, today);
+    } else {
+      _premiumReadsUsed = _prefs.getInt(_kPremiumReadsCount) ?? 0;
+    }
+
     // Elite kullanıcıya günlük 5 Ruh Taşı yenile
     if (_isPremiumUser) {
       final eliteSoulDate = _prefs.getString(_kEliteSoulStoneDate);
       if (eliteSoulDate != today) {
-        // Yeni gün: Ruh Taşlarını 5'e set et
+        // Yeni gün: Ruh Taşlarını 5'e tamamla (eğer 5'ten azsa)
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('soul_stones', _kDailyEliteSoulStones);
-        StorageService.soulStonesNotifier.value = _kDailyEliteSoulStones;
+        final currentStones = prefs.getInt('soul_stones') ?? 0;
+        if (currentStones < _kDailyEliteSoulStones) {
+          await prefs.setInt('soul_stones', _kDailyEliteSoulStones);
+          StorageService.soulStonesNotifier.value = _kDailyEliteSoulStones;
+        }
         await _prefs.setString(_kEliteSoulStoneDate, today);
       }
     }
@@ -630,111 +648,35 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       barrierColor: Colors.black.withOpacity(0.6),
       transitionDuration: const Duration(milliseconds: 400),
       transitionBuilder: (context, a1, a2, child) {
-        return FadeTransition(
-          opacity: a1,
-          child: ScaleTransition(
-            scale: CurvedAnimation(parent: a1, curve: Curves.easeOutBack),
-            child: child,
-          ),
-        );
+        return FadeTransition(opacity: a1, child: child);
       },
       pageBuilder: (context, _, __) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if (context.mounted) Navigator.of(context).pop(true);
+        });
+
         return Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1030).withOpacity(0.85),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.12),
-                    width: 0.8,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF6C3FA0).withOpacity(0.3),
-                      blurRadius: 40,
-                      spreadRadius: 5,
-                    ),
-                  ],
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(color: Color(0xFFE2C48E), strokeWidth: 3),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Icon
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            const Color(0xFFE2C48E).withOpacity(0.25),
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.auto_awesome,
-                        color: const Color(0xFFE2C48E).withOpacity(0.8),
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Title
-                    Text(
-                      _t('Bugünlük Ücretsiz Hakkın Bitti', 'Daily Free Reading Used'),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cormorantGaramond(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Subtitle
-                    Text(
-                      _t(
-                        'Kısa bir reklam izleyerek yeni bir okuma hakkı kazanabilirsin.',
-                        'Watch a short ad to earn another reading.',
-                      ),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Watch Ad Button
-                    _AdWatchButton(
-                      label: _t('Reklam İzle  ▶', 'Watch Ad  ▶'),
-                      onComplete: () {
-                        Navigator.of(context).pop(true);
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    // Close
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(false),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          _t('Vazgeç', 'Cancel'),
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.35),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+                Text(
+                  _t('Sponsorlu İçerik Oynatılıyor...', 'Playing Sponsored Content...'),
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-              ),
+                const SizedBox(height: 8),
+                Text(
+                  _t('Ödülünüz birazdan tanımlanacak', 'Your reward will be granted shortly'),
+                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                ),
+              ],
             ),
           ),
         );
@@ -840,14 +782,21 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
 
   Future<bool> _ensureAllowance() async {
-    if (_isPremiumUser) return true;
+    if (_isPremiumUser) {
+      return _premiumReadsUsed < _kMaxPremiumReads;
+    }
     if (!_dailyFreeUsed) return true;
     if (_adCredits > 0) return true;
     return false;
   }
 
   Future<void> _consumeAllowanceOnCommit() async {
-    if (_isPremiumUser) return;
+    if (_isPremiumUser) {
+      _premiumReadsUsed += 1;
+      await _prefs.setInt(_kPremiumReadsCount, _premiumReadsUsed);
+      if (mounted) _setStateSafe(() {});
+      return;
+    }
     if (!_dailyFreeUsed) {
       _dailyFreeUsed = true;
       final today = DateTime.now().toIso8601String().split('T')[0];
@@ -863,6 +812,21 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   Future<bool> _checkAndDeductPremiumAccess() async {
     // Elite kullanıcı da Ruh Taşı harcar (günlük 5 yenilenir)
     int soulStones = await StorageService.getSoulStones();
+
+    // Eğer ruh taşı bittiyse (hem premium hem ücretsiz için) hiçbir işe yaramayan pasif onay paneli yerine yol gösterici paneli göster.
+    if (soulStones <= 0) {
+      await _showSoulStoneInfoPanel();
+      return false;
+    }
+
+    // Taş var ve Elite ise: Panel göstermeden ışık hızında işlem onayı
+    if (_isPremiumUser) {
+      await StorageService.deductSoulStones(1);
+      return true;
+    }
+
+    // Taş var ve Ücretsiz kullanıcı ise: Klasik Kozmik Bilgelik Kapısı onay paneli
+
     bool? confirm = await showGeneralDialog<bool>(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -894,9 +858,24 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                          const SizedBox(height: 12),
                          Text(_isTr ? "Kozmik Bilgelik Kapısı" : "Cosmic Wisdom Gate", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                          const SizedBox(height: 6),
-                         Text(
-                           _isTr ? "$soulStones Ruh Taşın var" : "$soulStones Soul Stones remaining",
-                           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                         Container(
+                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                           decoration: BoxDecoration(
+                             color: const Color(0xFF22D3EE).withOpacity(0.12),
+                             borderRadius: BorderRadius.circular(12),
+                             border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 1),
+                           ),
+                           child: Row(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
+                               const SizedBox(width: 6),
+                               Text(
+                                 _isTr ? "$soulStones Ruh Taşın var" : "$soulStones Soul Stones remaining",
+                                 style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600),
+                               ),
+                             ],
+                           ),
                          ),
                          const SizedBox(height: 16),
                          // Info rows
@@ -931,23 +910,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                child: FittedBox(
                                  fit: BoxFit.scaleDown,
                                  child: Text(_isTr ? "1 Ruh Taşı Kullan" : "Use 1 Stone", style: TextStyle(color: soulStones >= 1 ? const Color(0xFF22D3EE) : Colors.white30, fontWeight: FontWeight.bold)),
-                               ),
-                             )),
-                             const SizedBox(width: 8),
-                             Expanded(child: ElevatedButton(
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
-                                 elevation: 0,
-                                 padding: EdgeInsets.zero,
-                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4))),
-                               ),
-                               onPressed: () {
-                                 Navigator.pop(context, false);
-                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
-                               },
-                               child: FittedBox(
-                                 fit: BoxFit.scaleDown,
-                                 child: Text(_isTr ? "Elite Abone Ol" : "Get Elite", style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
                                ),
                              )),
                            ],
@@ -2651,8 +2613,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   Future<void> _showCreditInfoPanel() async {
     final isTr = _isTr;
-    final hasCredit = !_dailyFreeUsed || _adCredits > 0;
-    final creditCount = !_dailyFreeUsed ? 1 : _adCredits;
+    final hasCredit = _isPremiumUser ? (_premiumReadsUsed < _kMaxPremiumReads) : (!_dailyFreeUsed || _adCredits > 0);
+    final creditCount = _isPremiumUser ? (_kMaxPremiumReads - _premiumReadsUsed) : (!_dailyFreeUsed ? 1 : _adCredits);
+
     await showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -2673,78 +2636,106 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: _isPremiumUser ? const Color(0xFFE2C48E).withOpacity(0.08) : Colors.white.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      border: Border.all(color: _isPremiumUser ? const Color(0xFFE2C48E).withOpacity(0.35) : Colors.white.withOpacity(0.25), width: 0.5),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                         Icon(Icons.auto_awesome, color: hasCredit ? const Color(0xFFE2C48E) : Colors.white.withOpacity(0.3), size: 48),
+                         Icon(_isPremiumUser ? Icons.workspace_premium : Icons.auto_awesome, color: hasCredit ? const Color(0xFFE2C48E) : Colors.white.withOpacity(0.3), size: 48),
                          const SizedBox(height: 12),
-                         Text(isTr ? "Okuma Hakların" : "Your Reading Credits", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                         const SizedBox(height: 6),
                          Text(
-                           isTr ? "$creditCount okuma hakkın var" : "$creditCount credits remaining",
+                           isTr ? (_isPremiumUser ? "Elite Okuma Hakların" : "Okuma Hakların") : (_isPremiumUser ? "Elite Credits" : "Your Reading Credits"),
+                           style: TextStyle(color: _isPremiumUser ? const Color(0xFFE2C48E) : Colors.white, fontSize: 20, fontWeight: FontWeight.bold)
+                         ),
+                         const SizedBox(height: 8),
+                         _isPremiumUser ? Container(
+                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                           decoration: BoxDecoration(
+                             color: const Color(0xFFE2C48E).withOpacity(0.12),
+                             borderRadius: BorderRadius.circular(12),
+                             border: Border.all(color: const Color(0xFFE2C48E).withOpacity(0.3), width: 1),
+                           ),
+                           child: Row(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               const Icon(Icons.stars, size: 14, color: Color(0xFFE2C48E)),
+                               const SizedBox(width: 6),
+                               Text(
+                                 creditCount > 0 
+                                     ? (isTr ? "$creditCount okuma hakkın var" : "$creditCount credits remaining")
+                                     : (isTr ? "Bugünlük hakkın bitti" : "Daily limit reached"),
+                                 style: const TextStyle(color: Color(0xFFE2C48E), fontSize: 13, fontWeight: FontWeight.w600),
+                               ),
+                             ],
+                           ),
+                         ) : Text(
+                           creditCount > 0 
+                               ? (isTr ? "$creditCount okuma hakkın var" : "$creditCount credits remaining")
+                               : (_dailyAdWatchCount < _kMaxDailyAds 
+                                   ? (isTr ? "0 okuma hakkın var" : "0 credits remaining") 
+                                   : (isTr ? "Bugünlük hakkın bitti" : "Daily limit reached")),
                            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
                          ),
                          const SizedBox(height: 16),
                          // Info rows
-                         _creditInfoRow(
-                           Icons.wb_sunny_outlined,
-                           isTr ? "Her gün 1 ücretsiz okuma hakkın var" : "1 free reading every day",
-                           !_dailyFreeUsed,
-                         ),
-                         const SizedBox(height: 10),
-                         _creditInfoRow(
-                           Icons.play_circle_outline,
-                           isTr ? "Reklam ile ek hak kazan ($_dailyAdWatchCount/$_kMaxDailyAds)" : "Watch ads for credits ($_dailyAdWatchCount/$_kMaxDailyAds)",
-                           _dailyAdWatchCount < _kMaxDailyAds,
-                         ),
-                         const SizedBox(height: 10),
-                         _creditInfoRow(
-                           Icons.refresh,
-                           isTr ? "Haklar her gece sıfırlanır" : "Credits reset every night",
-                           false,
-                         ),
-                         const SizedBox(height: 20),
-                         Row(
-                           children: [
-                             Expanded(child: ElevatedButton(
+                         if (_isPremiumUser) ...[
+                           _creditInfoRow(
+                             Icons.star_border,
+                             isTr ? "Günlük $_kMaxPremiumReads Major Arcana hakkı" : "$_kMaxPremiumReads daily Major Arcana reads",
+                             true,
+                           ),
+                           const SizedBox(height: 10),
+                           _creditInfoRow(
+                             Icons.not_interested,
+                             isTr ? "Reklam izleme zorunluluğu yok" : "No need to watch ads",
+                             true,
+                           ),
+                           const SizedBox(height: 10),
+                           _creditInfoRow(
+                             Icons.refresh,
+                             isTr ? "Haklar her gece sıfırlanır" : "Credits reset every night",
+                             false,
+                           ),
+                         ] else ...[
+                           _creditInfoRow(
+                             Icons.wb_sunny_outlined,
+                             isTr ? "Her gün 1 ücretsiz okuma" : "1 free reading every day",
+                             !_dailyFreeUsed,
+                           ),
+                           const SizedBox(height: 10),
+                           _creditInfoRow(
+                             Icons.play_circle_outline,
+                             isTr ? "Reklam ile ek hak ($_dailyAdWatchCount/$_kMaxDailyAds)" : "Watch ads for credits ($_dailyAdWatchCount/$_kMaxDailyAds)",
+                             _dailyAdWatchCount < _kMaxDailyAds,
+                           ),
+                           const SizedBox(height: 10),
+                           _creditInfoRow(
+                             Icons.refresh,
+                             isTr ? "Haklar her gece sıfırlanır" : "Credits reset every night",
+                             false,
+                           ),
+                         ],
+                         if (!_isPremiumUser) ...[
+                           const SizedBox(height: 20),
+                           SizedBox(
+                             width: double.infinity,
+                             height: 48,
+                             child: ElevatedButton(
                                style: ElevatedButton.styleFrom(
                                  backgroundColor: _dailyAdWatchCount < _kMaxDailyAds ? const Color(0xFFE2C48E).withOpacity(0.15) : Colors.white.withOpacity(0.05),
                                  elevation: 0,
-                                 padding: EdgeInsets.zero,
                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: _dailyAdWatchCount < _kMaxDailyAds ? const Color(0xFFE2C48E).withOpacity(0.4) : Colors.white.withOpacity(0.1))),
                                ),
                                onPressed: _dailyAdWatchCount < _kMaxDailyAds ? () {
                                  Navigator.pop(context);
                                  _showAdPopup();
                                } : null,
-                               child: FittedBox(
-                                 fit: BoxFit.scaleDown,
-                                 child: Text(isTr ? "Reklam İzle" : "Watch Ad", style: TextStyle(color: _dailyAdWatchCount < _kMaxDailyAds ? const Color(0xFFE2C48E) : Colors.white30, fontWeight: FontWeight.bold)),
-                               ),
-                             )),
-                             const SizedBox(width: 8),
-                             Expanded(child: ElevatedButton(
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: const Color(0xFFE2C48E).withOpacity(0.15),
-                                 elevation: 0,
-                                 padding: EdgeInsets.zero,
-                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFFE2C48E).withOpacity(0.4))),
-                               ),
-                               onPressed: () {
-                                 Navigator.pop(context);
-                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
-                               },
-                               child: FittedBox(
-                                 fit: BoxFit.scaleDown,
-                                 child: Text(isTr ? "Elite Abone Ol" : "Get Elite", style: TextStyle(color: const Color(0xFFE2C48E), fontWeight: FontWeight.bold)),
-                               ),
-                             )),
-                           ],
-                         ),
+                               child: Text(isTr ? "Reklam İzle" : "Watch Ad", style: TextStyle(color: _dailyAdWatchCount < _kMaxDailyAds ? const Color(0xFFE2C48E) : Colors.white30, fontWeight: FontWeight.bold, fontSize: 16)),
+                             ),
+                           ),
+                         ],
                       ],
                     ),
                   ),
@@ -2789,9 +2780,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: _isPremiumUser ? const Color(0xFF22D3EE).withOpacity(0.08) : Colors.white.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      border: Border.all(color: _isPremiumUser ? const Color(0xFF22D3EE).withOpacity(0.35) : Colors.white.withOpacity(0.25), width: 0.5),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -2800,9 +2791,26 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                          const SizedBox(height: 12),
                          Text(_isTr ? "Ruh Taşların" : "Your Soul Stones", style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                          const SizedBox(height: 6),
-                         Text(
-                           _isTr ? "$soulStones Ruh Taşın var" : "$soulStones Soul Stones remaining",
-                           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                         Container(
+                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                           decoration: BoxDecoration(
+                             color: const Color(0xFF22D3EE).withOpacity(0.12),
+                             borderRadius: BorderRadius.circular(12),
+                             border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 1),
+                           ),
+                           child: Row(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
+                               const SizedBox(width: 6),
+                               Text(
+                                 soulStones > 0 
+                                     ? (_isTr ? "$soulStones Ruh Taşın var" : "$soulStones Soul Stones remaining")
+                                     : (_isTr ? "Ruh Taşın bitti" : "Out of Soul Stones"),
+                                 style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600),
+                               ),
+                             ],
+                           ),
                          ),
                          const SizedBox(height: 16),
                          _premiumInfoRow(
@@ -2819,11 +2827,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                          const SizedBox(height: 10),
                          _premiumInfoRow(
                            Icons.workspace_premium,
-                           _isTr ? "Elite ile günlük 5 Ruh Taşı" : "5 daily Soul Stones with Elite",
-                           false,
+                           _isPremiumUser 
+                               ? (_isTr ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir" : "Elite refils 5 Soul Stones nightly")
+                               : (_isTr ? "Elite ile her gece 5 Ruh Taşı kazan" : "Get 5 daily Soul Stones with Elite"),
+                           _isPremiumUser,
                          ),
-                         const SizedBox(height: 20),
-                         ElevatedButton(
+
+                         if (!_isPremiumUser) ...[
+                           const SizedBox(height: 20),
+                           ElevatedButton(
                                style: ElevatedButton.styleFrom(
                                  backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
                                  elevation: 0,
@@ -2835,7 +2847,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                                },
                                child: Text(_isTr ? "Elite Abone Ol" : "Get Elite", style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
-                             ),
+                           ),
+                         ],
                       ],
                     ),
                   ),
@@ -5315,8 +5328,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                           builder: (ctx, snap) {
                                             if (_isBuyukArkana) {
                                               // Major Arcana: altın renk, günlük hak + reklam kredisi
-                                              final count = !_dailyFreeUsed ? 1 : _adCredits;
-                                              final hasCredit = !_dailyFreeUsed || _adCredits > 0;
+                                              int count;
+                                              bool hasCredit;
+                                              if (_isPremiumUser) {
+                                                count = _kMaxPremiumReads - _premiumReadsUsed;
+                                                hasCredit = count > 0;
+                                              } else {
+                                                count = !_dailyFreeUsed ? 1 : _adCredits;
+                                                hasCredit = !_dailyFreeUsed || _adCredits > 0;
+                                              }
                                               return Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 mainAxisSize: MainAxisSize.min,

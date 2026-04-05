@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.4),
-      barrierDismissible: false,
+      barrierDismissible: true,
       barrierLabel: 'MilestoneModal',
       transitionDuration: const Duration(milliseconds: 300),
       transitionBuilder: (context, anim1, anim2, child) {

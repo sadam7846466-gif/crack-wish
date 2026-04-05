@@ -411,6 +411,53 @@ class StorageService {
     await prefs.setInt('daily_bonus_aura', current + amount);
   }
 
+  // ── AURA KAYNAK TOPLAMA (Source Claim) ──
+  static const String _keyClaimedAuraSources = 'claimed_aura_sources';
+  static const String _keyClaimedAuraSourcesDate = 'claimed_aura_sources_date';
+
+  /// Bugün toplanan aura kaynaklarını döndür (günlük sıfırlanır)
+  static Future<Set<String>> getClaimedAuraSources() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedDate = prefs.getString(_keyClaimedAuraSourcesDate) ?? '';
+    final today = _todayKey();
+    if (savedDate != today) {
+      // Yeni gün: kayıtları sıfırla
+      await prefs.setStringList(_keyClaimedAuraSources, []);
+      await prefs.setString(_keyClaimedAuraSourcesDate, today);
+      return {};
+    }
+    final list = prefs.getStringList(_keyClaimedAuraSources) ?? [];
+    return list.toSet();
+  }
+
+  /// Bir aura kaynağını toplandı olarak işaretle
+  static Future<void> claimAuraSource(String sourceKey, int auraAmount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    // Gün kontrolü
+    final savedDate = prefs.getString(_keyClaimedAuraSourcesDate) ?? '';
+    List<String> list;
+    if (savedDate != today) {
+      list = [];
+      await prefs.setString(_keyClaimedAuraSourcesDate, today);
+    } else {
+      list = prefs.getStringList(_keyClaimedAuraSources) ?? [];
+    }
+    if (list.contains(sourceKey)) return; // Zaten toplandı
+    list.add(sourceKey);
+    await prefs.setStringList(_keyClaimedAuraSources, list);
+    // Bonus aura'yı da kaydet
+    await addBonusAura(auraAmount);
+  }
+
+  /// Bugün toplanan toplam kaynak bonus'unu hesapla
+  static Future<int> getTodaySourceBonus() async {
+    // Bu değer addBonusAura ile zaten kaydediliyor,
+    // günlük kaynak toplamını ayrı takip etmek istemiyoruz
+    // claimedSources set'i yeterli
+    return 0; // Placeholder - asıl bonus daily_bonus_aura'da
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // HEDEF / MILESTONE SİSTEMİ
   // ═══════════════════════════════════════════════════════════════
@@ -846,6 +893,37 @@ class StorageService {
     }
     // Streak kırıldı
     return 0;
+  }
+
+  // ── GÖRÜLMÜŞ KURABİYE TAKİBİ ──
+  static const String _keySeenCookieIds = 'seen_cookie_ids';
+
+  /// Görülmüş kurabiye ID'lerini döndür
+  static Future<Set<String>> getSeenCookieIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_keySeenCookieIds) ?? [];
+    return list.toSet();
+  }
+
+  /// Bir kurabiyeyi görüldü olarak işaretle
+  static Future<void> markCookieSeen(String cookieId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_keySeenCookieIds) ?? [];
+    if (!list.contains(cookieId)) {
+      list.add(cookieId);
+      await prefs.setStringList(_keySeenCookieIds, list);
+    }
+  }
+
+  /// Görülmemiş (yeni) kurabiye var mı kontrol et
+  static Future<bool> hasUnseenCookies() async {
+    final collection = await getCookieCollection();
+    final seen = await getSeenCookieIds();
+    // countObtained > 0 olan ama görülmemiş kurabiye varsa true
+    for (final c in collection) {
+      if (c.countObtained > 0 && !seen.contains(c.id)) return true;
+    }
+    return false;
   }
 
   static Future<int> updateMotivationStreak() async {
