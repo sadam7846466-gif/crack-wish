@@ -1712,6 +1712,9 @@ class _DreamPageState extends State<DreamPage>
                   ],
                 ),
                 const SizedBox(height: 30),
+                // ── Hak Göstergesi ──
+                _buildDreamCreditsIndicator(),
+                const SizedBox(height: 14),
                 // Submit Buttons (Standard & Premium)
                 ValueListenableBuilder<bool>(
                   valueListenable: _hasDreamTextNotifier,
@@ -2035,6 +2038,92 @@ class _DreamPageState extends State<DreamPage>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDreamCreditsIndicator() {
+    final standardCredits = _isPremiumUser
+        ? (_kMaxPremiumReads - _dreamPremiumReadsUsed)
+        : (!_dreamDailyFreeUsed ? 1 : _dreamAdCredits);
+    final soulStones = StorageService.soulStonesNotifier;
+
+    return GestureDetector(
+      onTap: () => _showDreamCreditPanel(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Standart Yorum Hakkı
+            Icon(
+              Icons.nights_stay_rounded,
+              size: 14,
+              color: standardCredits > 0
+                  ? AppColors.primaryPurple.withOpacity(0.8)
+                  : Colors.white.withOpacity(0.25),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              _isPremiumUser
+                  ? (_isTr ? '$standardCredits/$_kMaxPremiumReads yorum' : '$standardCredits/$_kMaxPremiumReads reads')
+                  : (_isTr ? '$standardCredits yorum hakkı' : '$standardCredits credits'),
+              style: TextStyle(
+                color: standardCredits > 0
+                    ? Colors.white.withOpacity(0.6)
+                    : Colors.white.withOpacity(0.25),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              width: 1,
+              height: 14,
+              color: Colors.white.withOpacity(0.1),
+            ),
+            // Ruh Taşı
+            ValueListenableBuilder<int>(
+              valueListenable: soulStones,
+              builder: (_, stones, __) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.diamond_outlined,
+                      size: 13,
+                      color: stones > 0
+                          ? const Color(0xFF22D3EE).withOpacity(0.7)
+                          : Colors.white.withOpacity(0.25),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isTr ? '$stones Ruh Taşı' : '$stones Stones',
+                      style: TextStyle(
+                        color: stones > 0
+                            ? const Color(0xFF22D3EE).withOpacity(0.6)
+                            : Colors.white.withOpacity(0.25),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.info_outline_rounded,
+              size: 12,
+              color: Colors.white.withOpacity(0.2),
+            ),
+          ],
+        ),
       ),
     );
   }
