@@ -3321,7 +3321,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     height: 400,
-                    alignment: Alignment.center,
+                    alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFFE2C48E).withOpacity(0.08)
@@ -3335,7 +3335,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Icon(
                           _isPremiumUser
@@ -3477,7 +3477,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           ),
                         ],
                         if (!_isPremiumUser) ...[
-                          const SizedBox(height: 20),
+                          const Spacer(),
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -3573,7 +3573,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     height: 400,
-                    alignment: Alignment.center,
+                    height: 400,
+                    alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFF22D3EE).withOpacity(0.08)
@@ -3587,7 +3588,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Icon(
                           Icons.diamond_rounded,
@@ -3675,7 +3676,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         ),
 
                         if (!_isPremiumUser) ...[
-                          const SizedBox(height: 20),
+                          const Spacer(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(

@@ -1096,7 +1096,7 @@ class _DreamPageState extends State<DreamPage>
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     height: 400,
-                    alignment: Alignment.center,
+                    alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFF22D3EE).withOpacity(0.08)
@@ -1110,7 +1110,7 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Icon(
                           Icons.diamond_rounded,
@@ -1198,7 +1198,7 @@ class _DreamPageState extends State<DreamPage>
                         ),
 
                         if (!_isPremiumUser) ...[
-                          const SizedBox(height: 20),
+                          const Spacer(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(
@@ -1333,7 +1333,7 @@ class _DreamPageState extends State<DreamPage>
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     height: 400,
-                    alignment: Alignment.center,
+                    alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? AppColors.primaryPurple.withOpacity(0.08)
@@ -1347,7 +1347,7 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Icon(
                           Icons.nights_stay_rounded,
@@ -1487,7 +1487,7 @@ class _DreamPageState extends State<DreamPage>
                           ),
                         ],
                         if (!_isPremiumUser) ...[
-                          const SizedBox(height: 20),
+                          const Spacer(),
                           SizedBox(
                             width: double.infinity,
                             height: 48,
