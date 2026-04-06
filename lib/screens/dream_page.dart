@@ -1237,6 +1237,7 @@ class _DreamPageState extends State<DreamPage>
                         child: _TabButton(
                           label: _l10n.dreamTabHistory,
                           isActive: _currentTab == 1,
+                          isPremium: true,
                           onTap: () {
                             HapticFeedback.selectionClick();
                             setState(() => _currentTab = 1);
@@ -3862,16 +3863,24 @@ class _InterpretationSection {
 class _TabButton extends StatelessWidget {
   final String label;
   final bool isActive;
+  final bool isPremium;
   final VoidCallback onTap;
 
   const _TabButton({
     required this.label,
     required this.isActive,
+    this.isPremium = false,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Premium tab uses cyan accent (same as Full Arcana in Tarot)
+    final premiumColor = const Color(0xFF22D3EE);
+    final glowCol = isPremium
+        ? premiumColor.withOpacity(isActive ? 0.45 : 0.18)
+        : AppColors.primaryPurple.withOpacity(isActive ? 0.45 : 0.18);
+
     return GlassButton.custom(
       width: double.infinity,
       height: 48,
@@ -3882,7 +3891,7 @@ class _TabButton extends StatelessWidget {
       interactionScale: 0.98,
       stretch: 0.2,
       resistance: 0.08,
-      glowColor: AppColors.primaryPurple.withOpacity(isActive ? 0.45 : 0.18),
+      glowColor: glowCol,
       glowRadius: isActive ? 2.2 : 1.4,
       settings: const LiquidGlassSettings(
         thickness: 18,
@@ -3905,26 +3914,82 @@ class _TabButton extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: isActive
-                        ? [
-                            AppColors.primaryPurple.withOpacity(0.16),
-                            AppColors.primaryTeal.withOpacity(0.12),
-                          ]
-                        : [
-                            Colors.white.withOpacity(0.06),
-                            Colors.white.withOpacity(0.02),
-                          ],
+                        ? (isPremium
+                            ? [
+                                premiumColor.withOpacity(0.18),
+                                premiumColor.withOpacity(0.04),
+                                Colors.white.withOpacity(0.01),
+                                premiumColor.withOpacity(0.10),
+                              ]
+                            : [
+                                AppColors.primaryPurple.withOpacity(0.16),
+                                AppColors.primaryTeal.withOpacity(0.12),
+                              ])
+                        : (isPremium
+                            ? [
+                                premiumColor.withOpacity(0.08),
+                                premiumColor.withOpacity(0.02),
+                                Colors.white.withOpacity(0.01),
+                                premiumColor.withOpacity(0.04),
+                              ]
+                            : [
+                                Colors.white.withOpacity(0.06),
+                                Colors.white.withOpacity(0.02),
+                              ]),
                   ),
+                  border: isPremium ? Border.all(
+                    color: isActive
+                        ? premiumColor.withOpacity(0.55)
+                        : premiumColor.withOpacity(0.15),
+                    width: isActive ? 1.2 : 0.8,
+                  ) : null,
+                  borderRadius: BorderRadius.circular(28),
                 ),
               ),
             ),
-            Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isActive ? AppColors.textWhite : AppColors.textWhite70,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+            // Premium: subtle top highlight
+            if (isPremium)
+              Positioned(
+                top: 2, left: 16, right: 16,
+                child: Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.0),
+                        premiumColor.withOpacity(isActive ? 0.12 : 0.05),
+                        Colors.white.withOpacity(0.0),
+                      ],
+                    ),
+                  ),
                 ),
+              ),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: isActive
+                          ? (isPremium ? Colors.white : AppColors.textWhite)
+                          : (isPremium ? premiumColor.withOpacity(0.6) : AppColors.textWhite70),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (isPremium) ...[
+                    const SizedBox(width: 5),
+                    Icon(
+                      Icons.diamond_outlined,
+                      size: 13,
+                      color: isActive
+                          ? premiumColor
+                          : premiumColor.withOpacity(0.4),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
