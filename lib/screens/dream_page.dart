@@ -1728,117 +1728,121 @@ class _DreamPageState extends State<DreamPage>
                         // Header
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
-                          child: Stack(
-                            alignment: Alignment.center,
+                          child: Row(
                             children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: GlassBackButton(),
-                              ),
-                              Text(
-                                _l10n.dreamTitle,
-                                style: TextStyle(
-                                  color: AppColors.textWhite,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GuidanceBookletButton(
-                                      dialogTitleTr: 'Rüya Rehberi',
-                                      dialogTitleEn: 'Dream Guide',
-                                      items: const [
-                                        GuidanceItem(
-                                          titleTr: 'Rüya Nedir?',
-                                          titleEn: 'What Are Dreams?',
-                                          descTr:
-                                              'Rüyalar, beynin uyku sırasında anıları düzenlemesi, duyguları işlemesi ve bilinçaltı süreçleri aktif etmesidir. Bilimsel olarak REM uykusu sırasında oluşurlar.',
-                                          descEn:
-                                              'Dreams are the brain\'s way of organizing memories, processing emotions, and activating subconscious processes during sleep. They form during REM sleep.',
-                                          icon: Icons.nights_stay_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Neden Rüya Yazmalıyız?',
-                                          titleEn: 'Why Write Dreams?',
-                                          descTr:
-                                              'Rüya günlüğü tutmak, hatırlama yeteneğinizi güçlendirir ve bilinçaltınızdaki kalıpları görmenize yardımcı olur. Düzenli yazım, kendinizi daha iyi tanımanızı sağlar.',
-                                          descEn:
-                                              'Keeping a dream journal strengthens your recall ability and helps you see patterns in your subconscious. Regular writing helps you know yourself better.',
-                                          icon: Icons.edit_note_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Duygu Seçimi Neden Önemli?',
-                                          titleEn: 'Why Does Emotion Matter?',
-                                          descTr:
-                                              'Rüya sırasında hissettikleriniz, yorumun yönünü belirler. Aynı rüya farklı duygularla farklı anlamlar taşır. Duygu seçimi, analizi kişiselleştirir.',
-                                          descEn:
-                                              'What you felt during the dream shapes the interpretation. The same dream carries different meanings with different emotions. Emotion selection personalizes the analysis.',
-                                          icon: Icons.psychology_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Semboller ve Arketipler',
-                                          titleEn: 'Symbols and Archetypes',
-                                          descTr:
-                                              'Su, uçmak, düşmek, diş — bunlar evrensel rüya sembolleridir. Her biri bilinçaltının farklı mesajlarını taşır. Yorumlar bu sembolleri analiz eder.',
-                                          descEn:
-                                              'Water, flying, falling, teeth — these are universal dream symbols. Each carries different messages from the subconscious. Interpretations analyze these symbols.',
-                                          icon: Icons.auto_stories_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Bilimsel Yaklaşım',
-                                          titleEn: 'Scientific Approach',
-                                          descTr:
-                                              'Rüya analizi, psikolojik kuramlar (Freud, Jung) ve modern nörobilim bulgularını harmanlayarak yapılır. Kesin gelecek tahmini değil, zihinsel süreçlerinizi anlamanıza yardımcı olur.',
-                                          descEn:
-                                              'Dream analysis blends psychological theories (Freud, Jung) with modern neuroscience. It doesn\'t predict the future, but helps you understand your mental processes.',
-                                          icon: Icons.science_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Tekrarlayan Rüyalar',
-                                          titleEn: 'Recurring Dreams',
-                                          descTr:
-                                              'Aynı rüyayı tekrar görmek, çözülmemiş duygusal konulara işaret eder. Bu rüyaları takip etmek, iç dünyanızdaki kalıpları keşfetmenize yardımcı olur.',
-                                          descEn:
-                                              'Seeing the same dream repeatedly points to unresolved emotional issues. Tracking these dreams helps you discover patterns in your inner world.',
-                                          icon: Icons.replay_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Rüya Dağılım Çizelgesi',
-                                          titleEn: 'Dream Distribution Chart',
-                                          descTr:
-                                              'Analiz sonucundaki çizelge, rüyanızın duygusal yük, belirsizlik, yakın geçmiş ve beyin aktivitesi oranlarını gösterir. Bu, rüyanızın hangi kaynaklardan beslendiğini anlatır.',
-                                          descEn:
-                                              'The chart in the analysis shows emotional load, uncertainty, recent past, and brain activity ratios. This explains what feeds your dream.',
-                                          icon: Icons.pie_chart_outline,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Gece ve Sabah Farkı',
-                                          titleEn: 'Night vs Morning',
-                                          descTr:
-                                              'Sabah uyanır uyanmaz yazılan rüyalar daha detaylı hatırlanır. Gün içinde detaylar hızla kaybolur. En iyi zaman: uyandıktan sonraki ilk 5 dakika.',
-                                          descEn:
-                                              'Dreams written right after waking are remembered in more detail. Details fade quickly during the day. Best time: the first 5 minutes after waking.',
-                                          icon: Icons.wb_sunny_outlined,
-                                        ),
-                                        GuidanceItem(
-                                          titleTr: 'Rüya Güvenliğiniz',
-                                          titleEn: 'Your Dream Privacy',
-                                          descTr:
-                                              'Yazdığınız rüyalar cihazınızda saklanır. Analiz sırasında yapay zeka ile paylaşılan metin, saklanmaz ve üçüncü taraflarla paylaşılmaz.',
-                                          descEn:
-                                              'Your written dreams are stored on your device. Text shared with AI during analysis is not stored and not shared with third parties.',
-                                          icon: Icons.lock_outline,
-                                        ),
-                                      ],
+                              GlassBackButton(),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      _l10n.dreamTitle,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: AppColors.textWhite,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    _buildTopBarCreditButton(),
-                                  ],
+                                  ),
                                 ),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GuidanceBookletButton(
+                                    dialogTitleTr: 'Rüya Rehberi',
+                                    dialogTitleEn: 'Dream Guide',
+                                    items: const [
+                                      GuidanceItem(
+                                        titleTr: 'Rüya Nedir?',
+                                        titleEn: 'What Are Dreams?',
+                                        descTr:
+                                            'Rüyalar, beynin uyku sırasında anıları düzenlemesi, duyguları işlemesi ve bilinçaltı süreçleri aktif etmesidir. Bilimsel olarak REM uykusu sırasında oluşurlar.',
+                                        descEn:
+                                            'Dreams are the brain\'s way of organizing memories, processing emotions, and activating subconscious processes during sleep. They form during REM sleep.',
+                                        icon: Icons.nights_stay_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Neden Rüya Yazmalıyız?',
+                                        titleEn: 'Why Write Dreams?',
+                                        descTr:
+                                            'Rüya günlüğü tutmak, hatırlama yeteneğinizi güçlendirir ve bilinçaltınızdaki kalıpları görmenize yardımcı olur. Düzenli yazım, kendinizi daha iyi tanımanızı sağlar.',
+                                        descEn:
+                                            'Keeping a dream journal strengthens your recall ability and helps you see patterns in your subconscious. Regular writing helps you know yourself better.',
+                                        icon: Icons.edit_note_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Duygu Seçimi Neden Önemli?',
+                                        titleEn: 'Why Does Emotion Matter?',
+                                        descTr:
+                                            'Rüya sırasında hissettikleriniz, yorumun yönünü belirler. Aynı rüya farklı duygularla farklı anlamlar taşır. Duygu seçimi, analizi kişiselleştirir.',
+                                        descEn:
+                                            'What you felt during the dream shapes the interpretation. The same dream carries different meanings with different emotions. Emotion selection personalizes the analysis.',
+                                        icon: Icons.psychology_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Semboller ve Arketipler',
+                                        titleEn: 'Symbols and Archetypes',
+                                        descTr:
+                                            'Su, uçmak, düşmek, diş — bunlar evrensel rüya sembolleridir. Her biri bilinçaltının farklı mesajlarını taşır. Yorumlar bu sembolleri analiz eder.',
+                                        descEn:
+                                            'Water, flying, falling, teeth — these are universal dream symbols. Each carries different messages from the subconscious. Interpretations analyze these symbols.',
+                                        icon: Icons.auto_stories_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Bilimsel Yaklaşım',
+                                        titleEn: 'Scientific Approach',
+                                        descTr:
+                                            'Rüya analizi, psikolojik kuramlar (Freud, Jung) ve modern nörobilim bulgularını harmanlayarak yapılır. Kesin gelecek tahmini değil, zihinsel süreçlerinizi anlamanıza yardımcı olur.',
+                                        descEn:
+                                            'Dream analysis blends psychological theories (Freud, Jung) with modern neuroscience. It doesn\'t predict the future, but helps you understand your mental processes.',
+                                        icon: Icons.science_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Tekrarlayan Rüyalar',
+                                        titleEn: 'Recurring Dreams',
+                                        descTr:
+                                            'Aynı rüyayı tekrar görmek, çözülmemiş duygusal konulara işaret eder. Bu rüyaları takip etmek, iç dünyanızdaki kalıpları keşfetmenize yardımcı olur.',
+                                        descEn:
+                                            'Seeing the same dream repeatedly points to unresolved emotional issues. Tracking these dreams helps you discover patterns in your inner world.',
+                                        icon: Icons.replay_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Rüya Dağılım Çizelgesi',
+                                        titleEn: 'Dream Distribution Chart',
+                                        descTr:
+                                            'Analiz sonucundaki çizelge, rüyanızın duygusal yük, belirsizlik, yakın geçmiş ve beyin aktivitesi oranlarını gösterir. Bu, rüyanızın hangi kaynaklardan beslendiğini anlatır.',
+                                        descEn:
+                                            'The chart in the analysis shows emotional load, uncertainty, recent past, and brain activity ratios. This explains what feeds your dream.',
+                                        icon: Icons.pie_chart_outline,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Gece ve Sabah Farkı',
+                                        titleEn: 'Night vs Morning',
+                                        descTr:
+                                            'Sabah uyanır uyanmaz yazılan rüyalar daha detaylı hatırlanır. Gün içinde detaylar hızla kaybolur. En iyi zaman: uyandıktan sonraki ilk 5 dakika.',
+                                        descEn:
+                                            'Dreams written right after waking are remembered in more detail. Details fade quickly during the day. Best time: the first 5 minutes after waking.',
+                                        icon: Icons.wb_sunny_outlined,
+                                      ),
+                                      GuidanceItem(
+                                        titleTr: 'Rüya Güvenliğiniz',
+                                        titleEn: 'Your Dream Privacy',
+                                        descTr:
+                                            'Yazdığınız rüyalar cihazınızda saklanır. Analiz sırasında yapay zeka ile paylaşılan metin, saklanmaz ve üçüncü taraflarla paylaşılmaz.',
+                                        descEn:
+                                            'Your written dreams are stored on your device. Text shared with AI during analysis is not stored and not shared with third parties.',
+                                        icon: Icons.lock_outline,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  _buildTopBarCreditButton(),
+                                ],
                               ),
                             ],
                           ),
