@@ -2551,7 +2551,7 @@ class _BentoHeroCard extends StatelessWidget {
                  ),
                     // ── Info Button (top-right) ──
                     Positioned(
-                      top: 8,
+                      top: 16,
                       right: 4,
                       child: GestureDetector(
                         onTap: () {
