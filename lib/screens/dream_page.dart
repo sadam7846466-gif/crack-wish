@@ -1836,7 +1836,7 @@ class _DreamPageState extends State<DreamPage>
                                       ],
                                     ),
                                     const SizedBox(width: 8),
-                                    _buildTopBarCreditButton(isPremium: false),
+                                    _buildTopBarCreditButton(),
                                   ],
                                 ),
                               ),
@@ -2356,65 +2356,31 @@ class _DreamPageState extends State<DreamPage>
     );
   }
 
-  Widget _buildTopBarCreditButton({required bool isPremium}) {
-    return GestureDetector(
-      onTap: () {
-        if (isPremium) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PremiumPaywallPage()),
-          );
-        } else {
-          _showDreamCreditPanel();
-        }
-      },
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.10),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isPremium
-                    ? const Color(0xFF22D3EE).withOpacity(0.3)
-                    : AppColors.primaryPurple.withOpacity(0.3),
-                width: 0.6,
-              ),
+  Widget _buildTopBarCreditButton() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          height: 38,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.10),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.primaryPurple.withOpacity(0.3),
+              width: 0.6,
             ),
-            child: isPremium
-                ? ValueListenableBuilder<int>(
-                    valueListenable: StorageService.soulStonesNotifier,
-                    builder: (_, stones, __) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.diamond_outlined,
-                            size: 11,
-                            color: stones > 0
-                                ? const Color(0xFF22D3EE).withOpacity(0.9)
-                                : Colors.white.withOpacity(0.25),
-                          ),
-                          const SizedBox(width: 1),
-                          Text(
-                            '$stones',
-                            style: TextStyle(
-                              color: stones > 0
-                                  ? const Color(0xFF22D3EE).withOpacity(0.9)
-                                  : Colors.white.withOpacity(0.3),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                : Builder(
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // NORMAL CREDIT HALF
+              GestureDetector(
+                onTap: _showDreamCreditPanel,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Builder(
                     builder: (_) {
                       int count;
                       bool hasCredit;
@@ -2426,24 +2392,22 @@ class _DreamPageState extends State<DreamPage>
                         hasCredit = !_dreamDailyFreeUsed || _dreamAdCredits > 0;
                       }
                       return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.nights_stay_rounded,
-                            size: 11,
+                            size: 13,
                             color: hasCredit
                                 ? AppColors.primaryPurple.withOpacity(0.9)
                                 : Colors.white.withOpacity(0.25),
                           ),
-                          const SizedBox(width: 1),
+                          const SizedBox(width: 4),
                           Text(
                             '$count',
                             style: TextStyle(
                               color: hasCredit
                                   ? AppColors.primaryPurple.withOpacity(0.9)
                                   : Colors.white.withOpacity(0.3),
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -2451,6 +2415,59 @@ class _DreamPageState extends State<DreamPage>
                       );
                     },
                   ),
+                ),
+              ),
+
+              // DIVIDER
+              Container(
+                width: 1,
+                height: 20,
+                color: Colors.white.withOpacity(0.15),
+              ),
+
+              // PREMIUM / SOUL STONE HALF
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PremiumPaywallPage(),
+                    ),
+                  );
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: StorageService.soulStonesNotifier,
+                    builder: (_, stones, __) {
+                      return Row(
+                        children: [
+                          Icon(
+                            Icons.diamond_outlined,
+                            size: 13,
+                            color: stones > 0
+                                ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                : Colors.white.withOpacity(0.25),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _isPremiumUser ? '∞' : '$stones',
+                            style: TextStyle(
+                              color: stones > 0 || _isPremiumUser
+                                  ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                  : Colors.white.withOpacity(0.3),
+                              fontSize: _isPremiumUser ? 16 : 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
