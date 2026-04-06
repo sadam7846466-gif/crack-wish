@@ -2615,8 +2615,9 @@ class _DreamPageState extends State<DreamPage>
                   ),
                   splashColor: Colors.white.withOpacity(0.15),
                   highlightColor: Colors.white.withOpacity(0.05),
-                  onTap: () {
+                  onTap: () async {
                     HapticFeedback.lightImpact();
+                    await Future.delayed(const Duration(milliseconds: 120));
                     _showDreamCreditPanel();
                   },
                   child: Container(
@@ -2677,8 +2678,9 @@ class _DreamPageState extends State<DreamPage>
                   ),
                   splashColor: const Color(0xFF22D3EE).withOpacity(0.15),
                   highlightColor: const Color(0xFF22D3EE).withOpacity(0.05),
-                  onTap: () {
+                  onTap: () async {
                     HapticFeedback.lightImpact();
+                    await Future.delayed(const Duration(milliseconds: 120));
                     _showSoulStoneInfoPanel();
                   },
                   child: Container(
