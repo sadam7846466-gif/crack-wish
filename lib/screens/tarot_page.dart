@@ -3994,9 +3994,16 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     // Play card flip sound (non-blocking)
     _playCardFlipSound();
     
+    // Capture deck version to detect stale callbacks after deck switch
+    final deckVersion = _deckRebuildKey;
+    
     // Fire animation in background - don't block next selection
     _animateCardToSlot(cardKey, _slotKeys[slotIndex], index).then((_) {
       if (!mounted) return;
+      // If deck was rebuilt (user switched arcana), discard this stale callback
+      if (_deckRebuildKey != deckVersion) {
+        return;
+      }
       _reservedSlotCount--;
       setState(() {
         _selectedTablePositions.add(index);
@@ -5894,6 +5901,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                     builder: (context) {
                                                       final animGlow = 1.0 - _slotGlowControllers[i].value;
                                                       final totalGlow = (0.2 + animGlow * 0.8).clamp(0.0, 1.0);
+                                                      // Bounds-safe access to prevent RangeError during deck switch
+                                                      final pos = _selectedTablePositions[i];
+                                                      final cardIdx = (pos >= 0 && pos < _tableCards.length)
+                                                          ? _tableCards[pos]
+                                                          : 0;
                                                       return Container(
                                                         key: _slotKeys[i],
                                                         width: cardW,
@@ -5909,7 +5921,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                         ),
                                                         child: ClipRRect(
                                                           borderRadius: BorderRadius.circular(12),
-                                                          child: _buildCardFront(_tableCards[_selectedTablePositions[i]]),
+                                                          child: _buildCardFront(cardIdx),
                                                         ),
                                                       );
                                                     }
@@ -6009,7 +6021,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                                   duration: const Duration(milliseconds: 400),
                                                   child: Text(
                                                     isFilled 
-                                                        ? _cardName(_tableCards[_selectedTablePositions[i]])
+                                                        ? (() {
+                                                            final pos = _selectedTablePositions[i];
+                                                            final cIdx = (pos >= 0 && pos < _tableCards.length) ? _tableCards[pos] : 0;
+                                                            return _cardName(cIdx);
+                                                          })()
                                                         : slotLabels[i],
                                                     key: ValueKey(isFilled 
                                                         ? 'card_${_selectedTablePositions[i]}' 
