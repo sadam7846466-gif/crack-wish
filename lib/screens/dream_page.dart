@@ -1470,14 +1470,7 @@ class _DreamPageState extends State<DreamPage>
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildTopBarCreditButton(isPremium: false),
-                              const SizedBox(width: 8),
-                              _buildTopBarCreditButton(isPremium: true),
-                              const SizedBox(width: 8),
-                              GuidanceBookletButton(
+                          child: GuidanceBookletButton(
                             dialogTitleTr: 'Rüya Rehberi',
                             dialogTitleEn: 'Dream Guide',
                             items: const [
@@ -1544,8 +1537,6 @@ class _DreamPageState extends State<DreamPage>
                                 descEn: 'Your written dreams are stored on your device. Text shared with AI during analysis is not stored and not shared with third parties.',
                                 icon: Icons.lock_outline,
                               ),
-                            ],
-                          ),
                             ],
                           ),
                         ),
