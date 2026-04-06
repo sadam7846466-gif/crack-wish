@@ -3210,6 +3210,14 @@ class _DreamPageState extends State<DreamPage>
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                    if (!_isPremiumUser) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.lock_outline_rounded,
+                        size: 14,
+                        color: const Color(0xFF22D3EE).withOpacity(0.4),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -3299,7 +3307,155 @@ class _DreamPageState extends State<DreamPage>
     }
   }
 
-  void _showDreamDetail(Map<String, dynamic> dream) {
+  Future<void> _showDreamDetail(Map<String, dynamic> dream) async {
+    // ── Premium Kapısı: Ücretsiz kullanıcılar rüya detaylarını açamaz ──
+    if (!_isPremiumUser) {
+      final soulStones = await StorageService.getSoulStones();
+      if (!mounted) return;
+      
+      final bool? confirm = await showGeneralDialog<bool>(
+        context: context,
+        barrierColor: Colors.black.withOpacity(0.5),
+        barrierDismissible: true,
+        barrierLabel: 'DreamDetailGate',
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, anim1, anim2) {
+          return Center(
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.lock_outline_rounded,
+                              color: const Color(0xFF22D3EE).withOpacity(0.9),
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              _isTr ? 'Rüya Arşivi' : 'Dream Archive',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _isTr
+                                  ? 'Geçmiş rüya analizlerini görüntülemek için Elite abonelik veya Ruh Taşı gereklidir.\n\nMevcut Ruh Taşın: $soulStones'
+                                  : 'Viewing past dream analyses requires Elite subscription or Soul Stones.\n\nCurrent Soul Stones: $soulStones',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: soulStones >= 1
+                                          ? const Color(0xFF22D3EE).withOpacity(0.15)
+                                          : Colors.white.withOpacity(0.05),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: soulStones >= 1
+                                              ? const Color(0xFF22D3EE).withOpacity(0.4)
+                                              : Colors.white.withOpacity(0.1),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: soulStones >= 1 ? () => Navigator.pop(context, true) : null,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        _isTr ? '1 Ruh Taşı Kullan' : 'Use 1 Stone',
+                                        style: TextStyle(
+                                          color: soulStones >= 1
+                                              ? const Color(0xFF22D3EE)
+                                              : Colors.white30,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: const Color(0xFF22D3EE).withOpacity(0.4),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context, false);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const PremiumPaywallPage()),
+                                      );
+                                    },
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        _isTr ? 'Elite Abone Ol' : 'Get Elite',
+                                        style: const TextStyle(
+                                          color: Color(0xFF22D3EE),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+
+      if (confirm == true && soulStones >= 1) {
+        await StorageService.deductSoulStones(1);
+      } else {
+        return; // İptal veya yetersiz taş
+      }
+    }
+
     if (dream['isPremium'] == true && dream['premiumData'] != null) {
       // Premium rüya ise doğrudan analiz ekranına atla
       try {
