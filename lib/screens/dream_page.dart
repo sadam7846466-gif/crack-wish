@@ -2709,12 +2709,12 @@ class _DreamPageState extends State<DreamPage>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              _isPremiumUser ? '∞' : '$stones',
+                              '$stones',
                               style: TextStyle(
-                                color: stones > 0 || _isPremiumUser
+                                color: stones > 0
                                     ? const Color(0xFF22D3EE).withOpacity(0.9)
                                     : Colors.white.withOpacity(0.3),
-                                fontSize: _isPremiumUser ? 16 : 13,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
