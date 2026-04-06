@@ -1242,8 +1242,8 @@ class _DreamPageState extends State<DreamPage>
                           _dreamCreditInfoRow(
                             Icons.play_circle_outline,
                             _isTr
-                                ? "Reklam ile ek hak ($_dreamDailyAdWatchCount/$_kMaxDailyAds)"
-                                : "Watch ads for credits ($_dreamDailyAdWatchCount/$_kMaxDailyAds)",
+                                ? "Reklam ile ek $_kMaxDailyAds hak (${math.min(_dreamDailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)"
+                                : "Watch ads for $_kMaxDailyAds extra credits (${math.min(_dreamDailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)",
                             _dreamDailyAdWatchCount < _kMaxDailyAds,
                           ),
                           const SizedBox(height: 10),

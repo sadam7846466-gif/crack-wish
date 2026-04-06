@@ -3461,8 +3461,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                           _creditInfoRow(
                             Icons.play_circle_outline,
                             isTr
-                                ? "Reklam ile ek hak ($_dailyAdWatchCount/$_kMaxDailyAds)"
-                                : "Watch ads for credits ($_dailyAdWatchCount/$_kMaxDailyAds)",
+                                ? "Reklam ile ek $_kMaxDailyAds hak (${min(_dailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)"
+                                : "Watch ads for $_kMaxDailyAds extra credits (${min(_dailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)",
                             _dailyAdWatchCount < _kMaxDailyAds,
                           ),
                           const SizedBox(height: 10),
