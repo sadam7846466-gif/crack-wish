@@ -3320,6 +3320,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
+                    constraints: const BoxConstraints(minHeight: 460),
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFFE2C48E).withOpacity(0.08)
@@ -3333,7 +3334,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           _isPremiumUser
@@ -3570,6 +3572,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
+                    constraints: const BoxConstraints(minHeight: 460),
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFF22D3EE).withOpacity(0.08)
@@ -3583,7 +3586,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.diamond_rounded,

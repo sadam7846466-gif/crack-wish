@@ -1095,6 +1095,7 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
+                    constraints: const BoxConstraints(minHeight: 460),
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFF22D3EE).withOpacity(0.08)
@@ -1108,7 +1109,8 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.diamond_rounded,
@@ -1330,6 +1332,7 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
+                    constraints: const BoxConstraints(minHeight: 460),
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? AppColors.primaryPurple.withOpacity(0.08)
@@ -1343,7 +1346,8 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.nights_stay_rounded,
@@ -2621,7 +2625,8 @@ class _DreamPageState extends State<DreamPage>
                     _showDreamCreditPanel();
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 62,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     height: double.infinity,
                     alignment: Alignment.center,
                     child: Builder(
@@ -2637,6 +2642,7 @@ class _DreamPageState extends State<DreamPage>
                               !_dreamDailyFreeUsed || _dreamAdCredits > 0;
                         }
                         return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.nights_stay_rounded,
@@ -2684,13 +2690,15 @@ class _DreamPageState extends State<DreamPage>
                     _showSoulStoneInfoPanel();
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 62,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     height: double.infinity,
                     alignment: Alignment.center,
                     child: ValueListenableBuilder<int>(
                       valueListenable: StorageService.soulStonesNotifier,
                       builder: (_, stones, __) {
                         return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.diamond_outlined,
