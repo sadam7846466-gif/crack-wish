@@ -3320,7 +3320,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    height: 400,
+                    height: 350,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
@@ -3572,7 +3572,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    height: 400,
+                    height: 350,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
