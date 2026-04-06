@@ -941,10 +941,21 @@ class _DreamPageState extends State<DreamPage>
     }
   }
 
+  Widget _dreamCreditInfoRow(IconData icon, String text, bool active) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: active ? AppColors.primaryPurple : Colors.white.withOpacity(0.3)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(text, style: TextStyle(color: active ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.4), fontSize: 13)),
+        ),
+      ],
+    );
+  }
+
   Future<bool> _showDreamCreditPanel() async {
     if (!mounted) return false;
 
-    // Günlük reklam sınırı kontrolü
     if (_dreamDailyAdWatchCount >= _kMaxDailyAds) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
@@ -961,6 +972,10 @@ class _DreamPageState extends State<DreamPage>
     final hasCredit = _isPremiumUser
         ? (_dreamPremiumReadsUsed < _kMaxPremiumReads)
         : (!_dreamDailyFreeUsed || _dreamAdCredits > 0);
+        
+    int creditCount = _isPremiumUser 
+        ? (_kMaxPremiumReads - _dreamPremiumReadsUsed) 
+        : (!_dreamDailyFreeUsed ? 1 : _dreamAdCredits);
 
     final bool? result = await showGeneralDialog<bool>(
       context: context,
@@ -969,100 +984,133 @@ class _DreamPageState extends State<DreamPage>
       barrierLabel: 'DreamCredit',
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
+        final panelW = MediaQuery.of(context).size.width * 0.85;
         return Center(
-          child: ScaleTransition(
-            scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Material(
-                type: MaterialType.transparency,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.nights_stay_rounded, color: AppColors.primaryPurple.withOpacity(0.9), size: 48),
-                          const SizedBox(height: 16),
-                          Text(
-                            _isTr ? 'Okuma Hakları' : 'Reading Credits',
-                            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          child: SizedBox(
+            width: panelW,
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: _isPremiumUser ? AppColors.primaryPurple.withOpacity(0.08) : Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: _isPremiumUser ? AppColors.primaryPurple.withOpacity(0.35) : Colors.white.withOpacity(0.25), width: 0.5),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.nights_stay_rounded, color: hasCredit ? AppColors.primaryPurple : Colors.white.withOpacity(0.3), size: 48),
+                        const SizedBox(height: 12),
+                        Text(
+                          _isTr ? (_isPremiumUser ? "Elite Okuma Hakların" : "Okuma Hakların") : (_isPremiumUser ? "Elite Credits" : "Your Reading Credits"),
+                          style: TextStyle(color: _isPremiumUser ? AppColors.primaryPurple : Colors.white, fontSize: 20, fontWeight: FontWeight.bold)
+                        ),
+                        const SizedBox(height: 8),
+                        _isPremiumUser ? Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryPurple.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.primaryPurple.withOpacity(0.3), width: 1),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _isTr
-                                ? 'Günlük ücretsiz hakkın doldu.\n\nReklam izleyerek ek yorum hakkı kazanabilirsin ($_dreamDailyAdWatchCount/$_kMaxDailyAds reklam izlendi).'
-                                : 'Your daily free credit is used.\n\nWatch an ad to earn an extra reading ($_dreamDailyAdWatchCount/$_kMaxDailyAds ads watched).',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-                          ),
-                          const SizedBox(height: 24),
-                          Row(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryPurple.withOpacity(0.15),
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      side: BorderSide(color: AppColors.primaryPurple.withOpacity(0.4)),
-                                    ),
-                                  ),
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.play_circle_outline, size: 16, color: AppColors.primaryPurple),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        _isTr ? 'Reklam İzle' : 'Watch Ad',
-                                        style: TextStyle(color: AppColors.primaryPurple, fontWeight: FontWeight.bold, fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context, false);
-                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
-                                  },
-                                  child: Text(
-                                    _isTr ? 'Elite Abone Ol' : 'Get Elite',
-                                    style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold, fontSize: 13),
-                                  ),
-                                ),
+                              Icon(Icons.stars, size: 14, color: AppColors.primaryPurple),
+                              const SizedBox(width: 6),
+                              Text(
+                                creditCount > 0 
+                                    ? (_isTr ? "$creditCount okuma hakkın var" : "$creditCount credits remaining")
+                                    : (_isTr ? "Bugünlük hakkın bitti" : "Daily limit reached"),
+                                style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
+                        ) : Text(
+                          creditCount > 0 
+                              ? (_isTr ? "$creditCount okuma hakkın var" : "$creditCount credits remaining")
+                              : (_dreamDailyAdWatchCount < _kMaxDailyAds 
+                                  ? (_isTr ? "0 okuma hakkın var" : "0 credits remaining") 
+                                  : (_isTr ? "Bugünlük hakkın bitti" : "Daily limit reached")),
+                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        // Info rows
+                        if (_isPremiumUser) ...[
+                          _dreamCreditInfoRow(
+                            Icons.star_border,
+                            _isTr ? "Günlük $_kMaxPremiumReads Rüya Yorumu hakkı" : "$_kMaxPremiumReads daily Dream interpretations",
+                            true,
+                          ),
+                          const SizedBox(height: 10),
+                          _dreamCreditInfoRow(
+                            Icons.not_interested,
+                            _isTr ? "Reklam izleme zorunluluğu yok" : "No need to watch ads",
+                            true,
+                          ),
+                          const SizedBox(height: 10),
+                          _dreamCreditInfoRow(
+                            Icons.refresh,
+                            _isTr ? "Haklar her gece sıfırlanır" : "Credits reset every night",
+                            false,
+                          ),
+                        ] else ...[
+                          _dreamCreditInfoRow(
+                            Icons.nights_stay_outlined,
+                            _isTr ? "Her gün 1 ücretsiz yorum" : "1 free interpretation every day",
+                            !_dreamDailyFreeUsed,
+                          ),
+                          const SizedBox(height: 10),
+                          _dreamCreditInfoRow(
+                            Icons.play_circle_outline,
+                            _isTr ? "Reklam ile ek hak ($_dreamDailyAdWatchCount/$_kMaxDailyAds)" : "Watch ads for credits ($_dreamDailyAdWatchCount/$_kMaxDailyAds)",
+                            _dreamDailyAdWatchCount < _kMaxDailyAds,
+                          ),
+                          const SizedBox(height: 10),
+                          _dreamCreditInfoRow(
+                            Icons.refresh,
+                            _isTr ? "Haklar her gece sıfırlanır" : "Credits reset every night",
+                            false,
+                          ),
                         ],
-                      ),
+                        if (!_isPremiumUser) ...[
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _dreamDailyAdWatchCount < _kMaxDailyAds ? AppColors.primaryPurple.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: _dreamDailyAdWatchCount < _kMaxDailyAds ? AppColors.primaryPurple.withOpacity(0.4) : Colors.white.withOpacity(0.1))),
+                              ),
+                              onPressed: _dreamDailyAdWatchCount < _kMaxDailyAds ? () {
+                                Navigator.pop(context, true);
+                              } : null,
+                              child: Text(_isTr ? "Reklam İzle" : "Watch Ad", style: TextStyle(color: _dreamDailyAdWatchCount < _kMaxDailyAds ? AppColors.primaryPurple : Colors.white30, fontWeight: FontWeight.bold, fontSize: 16)),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            child: child,
           ),
         );
       },
