@@ -3573,7 +3573,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     height: 400,
-                    height: 400,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
