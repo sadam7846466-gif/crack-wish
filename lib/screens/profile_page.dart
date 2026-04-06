@@ -1727,7 +1727,9 @@ class _BentoHeroCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
                       ),
-                      child: Column(
+                      child: Stack(
+                  children: [
+                    Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -2547,11 +2549,96 @@ class _BentoHeroCard extends StatelessWidget {
                     ],
                   ],
                  ),
-               ),
+                    // ── Info Button (top-right) ──
+                    Positioned(
+                      top: 8,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          final isTr = Localizations.localeOf(context).languageCode == 'tr';
+                          String infoText;
+                          if (title == "Günlük Seri" || title == "Daily Streak") {
+                            infoText = isTr
+                                ? "Her gün uygulamayı açarak serini sürdür.\nBelirli günlerde bonus Aura kazan!"
+                                : "Keep your streak by opening the app daily.\nEarn bonus Aura at milestones!";
+                          } else if (title == "Rüya Analizleri" || title == "Dream Analysis") {
+                            infoText = isTr
+                                ? "Rüyalarının duygu dağılımını ve\nhaftalık psikolojik özetini görüntüle."
+                                : "View your dream emotion distribution\nand weekly psychological summary.";
+                          } else if (title == "Tarot Falları" || title == "Tarot Readings") {
+                            infoText = isTr
+                                ? "İmza kartını keşfet ve 78 kartlık\nkoleksiyonunu tamamla."
+                                : "Discover your signature card and\ncomplete your 78-card collection.";
+                          } else if (title == "Açılan Kurabiyeler" || title == "Fortune Cookies") {
+                            infoText = isTr
+                                ? "Açtığın tüm kurabiyelerin koleksiyonu.\nNadir tasarımları topla!"
+                                : "Your fortune cookie collection.\nCollect rare designs!";
+                          } else if (title == "Aura Puanı" || title == "Aura Points") {
+                            infoText = isTr
+                                ? "Aktivitelerden Aura kazan.\n200 Aura = 1 Ruh Taşı."
+                                : "Earn Aura from activities.\n200 Aura = 1 Soul Stone.";
+                          } else if (title == "Kalan Ruh Taşı" || title == "Soul Stones") {
+                            infoText = isTr
+                                ? "Derin analiz için gerekli.\nAura dönüşümü veya satın al."
+                                : "Required for deep analysis.\nConvert Aura or purchase.";
+                          } else {
+                            infoText = title;
+                          }
+                          showDialog(
+                            context: context,
+                            barrierColor: Colors.transparent,
+                            builder: (_) => Center(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 40),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1E1E1E).withOpacity(0.92),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.5),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(icon, color: color, size: 24),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      infoText,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.85),
+                                        fontSize: 13,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.08),
+                          ),
+                          child: Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.white.withOpacity(0.35),
+                            size: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                ),
               ),
              ),
             ),
+            )
+           )
            );
           },
         ),
