@@ -2602,96 +2602,120 @@ class _DreamPageState extends State<DreamPage>
               width: 0.6,
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // NORMAL CREDIT HALF
-              GestureDetector(
-                onTap: _showDreamCreditPanel,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Builder(
-                    builder: (_) {
-                      int count;
-                      bool hasCredit;
-                      if (_isPremiumUser) {
-                        count = _kMaxPremiumReads - _dreamPremiumReadsUsed;
-                        hasCredit = count > 0;
-                      } else {
-                        count = !_dreamDailyFreeUsed ? 1 : _dreamAdCredits;
-                        hasCredit = !_dreamDailyFreeUsed || _dreamAdCredits > 0;
-                      }
-                      return Row(
-                        children: [
-                          Icon(
-                            Icons.nights_stay_rounded,
-                            size: 13,
-                            color: hasCredit
-                                ? AppColors.primaryPurple.withOpacity(0.9)
-                                : Colors.white.withOpacity(0.25),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$count',
-                            style: TextStyle(
+          child: Material(
+            type: MaterialType.transparency,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // NORMAL CREDIT HALF
+                InkWell(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  ),
+                  splashColor: Colors.white.withOpacity(0.15),
+                  highlightColor: Colors.white.withOpacity(0.05),
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    _showDreamCreditPanel();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    height: double.infinity,
+                    alignment: Alignment.center,
+                    child: Builder(
+                      builder: (_) {
+                        int count;
+                        bool hasCredit;
+                        if (_isPremiumUser) {
+                          count = _kMaxPremiumReads - _dreamPremiumReadsUsed;
+                          hasCredit = count > 0;
+                        } else {
+                          count = !_dreamDailyFreeUsed ? 1 : _dreamAdCredits;
+                          hasCredit =
+                              !_dreamDailyFreeUsed || _dreamAdCredits > 0;
+                        }
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.nights_stay_rounded,
+                              size: 13,
                               color: hasCredit
                                   ? AppColors.primaryPurple.withOpacity(0.9)
-                                  : Colors.white.withOpacity(0.3),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                                  : Colors.white.withOpacity(0.25),
                             ),
-                          ),
-                        ],
-                      );
-                    },
+                            const SizedBox(width: 4),
+                            Text(
+                              '$count',
+                              style: TextStyle(
+                                color: hasCredit
+                                    ? AppColors.primaryPurple.withOpacity(0.9)
+                                    : Colors.white.withOpacity(0.3),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
 
-              // DIVIDER
-              Container(
-                width: 1,
-                height: 20,
-                color: Colors.white.withOpacity(0.15),
-              ),
+                // DIVIDER
+                Container(
+                  width: 1,
+                  height: 20,
+                  color: Colors.white.withOpacity(0.15),
+                ),
 
-              // PREMIUM / SOUL STONE HALF
-              GestureDetector(
-                onTap: _showSoulStoneInfoPanel,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: StorageService.soulStonesNotifier,
-                    builder: (_, stones, __) {
-                      return Row(
-                        children: [
-                          Icon(
-                            Icons.diamond_outlined,
-                            size: 13,
-                            color: stones > 0
-                                ? const Color(0xFF22D3EE).withOpacity(0.9)
-                                : Colors.white.withOpacity(0.25),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _isPremiumUser ? '∞' : '$stones',
-                            style: TextStyle(
-                              color: stones > 0 || _isPremiumUser
+                // PREMIUM / SOUL STONE HALF
+                InkWell(
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                  splashColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                  highlightColor: const Color(0xFF22D3EE).withOpacity(0.05),
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    _showSoulStoneInfoPanel();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    height: double.infinity,
+                    alignment: Alignment.center,
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: StorageService.soulStonesNotifier,
+                      builder: (_, stones, __) {
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.diamond_outlined,
+                              size: 13,
+                              color: stones > 0
                                   ? const Color(0xFF22D3EE).withOpacity(0.9)
-                                  : Colors.white.withOpacity(0.3),
-                              fontSize: _isPremiumUser ? 16 : 13,
-                              fontWeight: FontWeight.w600,
+                                  : Colors.white.withOpacity(0.25),
                             ),
-                          ),
-                        ],
-                      );
-                    },
+                            const SizedBox(width: 4),
+                            Text(
+                              _isPremiumUser ? '∞' : '$stones',
+                              style: TextStyle(
+                                color: stones > 0 || _isPremiumUser
+                                    ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                    : Colors.white.withOpacity(0.3),
+                                fontSize: _isPremiumUser ? 16 : 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
