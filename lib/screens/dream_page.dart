@@ -1095,7 +1095,7 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    height: _isPremiumUser ? 300 : 360,
+                    height: _isPremiumUser ? 320 : 360,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
@@ -1332,7 +1332,7 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    height: _isPremiumUser ? 300 : 360,
+                    height: _isPremiumUser ? 320 : 360,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
