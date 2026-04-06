@@ -1073,6 +1073,233 @@ class _DreamPageState extends State<DreamPage>
     );
   }
 
+  Future<void> _showSoulStoneInfoPanel() async {
+    final soulStones = await StorageService.getSoulStones();
+    if (!mounted) return;
+    await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'SoulStoneInfo',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        final panelW = MediaQuery.of(context).size.width * 0.85;
+        return Center(
+          child: SizedBox(
+            width: panelW,
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: _isPremiumUser
+                          ? const Color(0xFF22D3EE).withOpacity(0.08)
+                          : Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: _isPremiumUser
+                            ? const Color(0xFF22D3EE).withOpacity(0.35)
+                            : Colors.white.withOpacity(0.25),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.diamond_rounded,
+                          color: soulStones >= 1
+                              ? const Color(0xFF22D3EE)
+                              : Colors.white.withOpacity(0.3),
+                          size: 48,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _isTr ? "Ruh Taşların" : "Your Soul Stones",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22D3EE).withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF22D3EE).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.diamond_outlined,
+                                size: 14,
+                                color: Color(0xFF22D3EE),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                soulStones > 0
+                                    ? (_isTr
+                                          ? "$soulStones Ruh Taşın var"
+                                          : "$soulStones Soul Stones remaining")
+                                    : (_isTr
+                                          ? "Ruh Taşın bitti"
+                                          : "Out of Soul Stones"),
+                                style: const TextStyle(
+                                  color: Color(0xFF22D3EE),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _premiumInfoRow(
+                          Icons.auto_awesome,
+                          _isTr
+                              ? "Derin Analiz için gerekli"
+                              : "Required for Deep Analysis",
+                          true,
+                        ),
+                        const SizedBox(height: 10),
+                        _premiumInfoRow(
+                          Icons.diamond_outlined,
+                          _isTr
+                              ? "Her analiz 1 Ruh Taşı harcar"
+                              : "Each analysis costs 1 Soul Stone",
+                          soulStones >= 1,
+                        ),
+                        const SizedBox(height: 10),
+                        _premiumInfoRow(
+                          Icons.workspace_premium,
+                          _isPremiumUser
+                              ? (_isTr
+                                    ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
+                                    : "Elite refils 5 Soul Stones nightly")
+                              : (_isTr
+                                    ? "Elite ile her gece 5 Ruh Taşı kazan"
+                                    : "Get 5 daily Soul Stones with Elite"),
+                          _isPremiumUser,
+                        ),
+
+                        if (!_isPremiumUser) ...[
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(
+                                0xFF22D3EE,
+                              ).withOpacity(0.15),
+                              elevation: 0,
+                              minimumSize: const Size(double.infinity, 44),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: const Color(
+                                    0xFF22D3EE,
+                                  ).withOpacity(0.4),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PremiumPaywallPage(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              _isTr ? "Elite Abone Ol" : "Get Elite",
+                              style: const TextStyle(
+                                color: Color(0xFF22D3EE),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: const SizedBox.expand(),
+            ),
+            FadeTransition(
+              opacity: anim1,
+              child: ScaleTransition(
+                scale: CurvedAnimation(
+                  parent: anim1,
+                  curve: Curves.easeOutBack,
+                ),
+                child: child,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _premiumInfoRow(IconData icon, String text, bool isActive) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive
+                ? const Color(0xFF22D3EE).withOpacity(0.12)
+                : Colors.white.withOpacity(0.05),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: isActive
+                ? const Color(0xFF22D3EE).withOpacity(0.8)
+                : Colors.white.withOpacity(0.3),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isActive
+                  ? Colors.white.withOpacity(0.75)
+                  : Colors.white.withOpacity(0.4),
+              fontSize: 13,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<bool> _showDreamCreditPanel() async {
     if (!mounted) return false;
 
@@ -2431,14 +2658,7 @@ class _DreamPageState extends State<DreamPage>
 
               // PREMIUM / SOUL STONE HALF
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PremiumPaywallPage(),
-                    ),
-                  );
-                },
+                onTap: _showSoulStoneInfoPanel,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
