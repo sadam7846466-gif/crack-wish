@@ -1470,7 +1470,14 @@ class _DreamPageState extends State<DreamPage>
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: GuidanceBookletButton(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildTopBarCreditButton(isPremium: false),
+                              const SizedBox(width: 8),
+                              _buildTopBarCreditButton(isPremium: true),
+                              const SizedBox(width: 8),
+                              GuidanceBookletButton(
                             dialogTitleTr: 'Rüya Rehberi',
                             dialogTitleEn: 'Dream Guide',
                             items: const [
@@ -1537,6 +1544,8 @@ class _DreamPageState extends State<DreamPage>
                                 descEn: 'Your written dreams are stored on your device. Text shared with AI during analysis is not stored and not shared with third parties.',
                                 icon: Icons.lock_outline,
                               ),
+                            ],
+                          ),
                             ],
                           ),
                         ),
@@ -1712,9 +1721,6 @@ class _DreamPageState extends State<DreamPage>
                   ],
                 ),
                 const SizedBox(height: 30),
-                // ── Hak Göstergesi ──
-                _buildDreamCreditsIndicator(),
-                const SizedBox(height: 14),
                 // Submit Buttons (Standard & Premium)
                 ValueListenableBuilder<bool>(
                   valueListenable: _hasDreamTextNotifier,
@@ -2042,87 +2048,99 @@ class _DreamPageState extends State<DreamPage>
     );
   }
 
-  Widget _buildDreamCreditsIndicator() {
-    final standardCredits = _isPremiumUser
-        ? (_kMaxPremiumReads - _dreamPremiumReadsUsed)
-        : (!_dreamDailyFreeUsed ? 1 : _dreamAdCredits);
-    final soulStones = StorageService.soulStonesNotifier;
-
+  Widget _buildTopBarCreditButton({required bool isPremium}) {
     return GestureDetector(
-      onTap: () => _showDreamCreditPanel(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Standart Yorum Hakkı
-            Icon(
-              Icons.nights_stay_rounded,
-              size: 14,
-              color: standardCredits > 0
-                  ? AppColors.primaryPurple.withOpacity(0.8)
-                  : Colors.white.withOpacity(0.25),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              _isPremiumUser
-                  ? (_isTr ? '$standardCredits/$_kMaxPremiumReads yorum' : '$standardCredits/$_kMaxPremiumReads reads')
-                  : (_isTr ? '$standardCredits yorum hakkı' : '$standardCredits credits'),
-              style: TextStyle(
-                color: standardCredits > 0
-                    ? Colors.white.withOpacity(0.6)
-                    : Colors.white.withOpacity(0.25),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+      onTap: () {
+        if (isPremium) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+        } else {
+          _showDreamCreditPanel();
+        }
+      },
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.10),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isPremium
+                    ? const Color(0xFF22D3EE).withOpacity(0.3)
+                    : AppColors.primaryPurple.withOpacity(0.3),
+                width: 0.6,
               ),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10),
-              width: 1,
-              height: 14,
-              color: Colors.white.withOpacity(0.1),
-            ),
-            // Ruh Taşı
-            ValueListenableBuilder<int>(
-              valueListenable: soulStones,
-              builder: (_, stones, __) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.diamond_outlined,
-                      size: 13,
-                      color: stones > 0
-                          ? const Color(0xFF22D3EE).withOpacity(0.7)
-                          : Colors.white.withOpacity(0.25),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _isTr ? '$stones Ruh Taşı' : '$stones Stones',
-                      style: TextStyle(
-                        color: stones > 0
-                            ? const Color(0xFF22D3EE).withOpacity(0.6)
-                            : Colors.white.withOpacity(0.25),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(width: 6),
-            Icon(
-              Icons.info_outline_rounded,
-              size: 12,
-              color: Colors.white.withOpacity(0.2),
-            ),
-          ],
+            child: isPremium
+                ? ValueListenableBuilder<int>(
+                    valueListenable: StorageService.soulStonesNotifier,
+                    builder: (_, stones, __) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.diamond_outlined,
+                            size: 11,
+                            color: stones > 0
+                                ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                : Colors.white.withOpacity(0.25),
+                          ),
+                          const SizedBox(width: 1),
+                          Text(
+                            '$stones',
+                            style: TextStyle(
+                              color: stones > 0
+                                  ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                  : Colors.white.withOpacity(0.3),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                : Builder(
+                    builder: (_) {
+                      int count;
+                      bool hasCredit;
+                      if (_isPremiumUser) {
+                        count = _kMaxPremiumReads - _dreamPremiumReadsUsed;
+                        hasCredit = count > 0;
+                      } else {
+                        count = !_dreamDailyFreeUsed ? 1 : _dreamAdCredits;
+                        hasCredit = !_dreamDailyFreeUsed || _dreamAdCredits > 0;
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.nights_stay_rounded,
+                            size: 11,
+                            color: hasCredit
+                                ? AppColors.primaryPurple.withOpacity(0.9)
+                                : Colors.white.withOpacity(0.25),
+                          ),
+                          const SizedBox(width: 1),
+                          Text(
+                            '$count',
+                            style: TextStyle(
+                              color: hasCredit
+                                  ? AppColors.primaryPurple.withOpacity(0.9)
+                                  : Colors.white.withOpacity(0.3),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+          ),
         ),
       ),
     );
