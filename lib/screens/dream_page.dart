@@ -956,19 +956,6 @@ class _DreamPageState extends State<DreamPage>
   Future<bool> _showDreamCreditPanel() async {
     if (!mounted) return false;
 
-    if (_dreamDailyAdWatchCount >= _kMaxDailyAds) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          _isTr
-              ? 'Bugünlük reklam hakkın doldu ($_kMaxDailyAds/$_kMaxDailyAds). Yarın tekrar dene!'
-              : 'Daily ad limit reached ($_kMaxDailyAds/$_kMaxDailyAds). Try again tomorrow!',
-        ),
-        backgroundColor: const Color(0xFF7C3AED),
-        duration: const Duration(seconds: 3),
-      ));
-      return false;
-    }
-
     final hasCredit = _isPremiumUser
         ? (_dreamPremiumReadsUsed < _kMaxPremiumReads)
         : (!_dreamDailyFreeUsed || _dreamAdCredits > 0);
