@@ -360,6 +360,20 @@ class _DreamPageState extends State<DreamPage>
   int _currentTipIndex = 0; // Biliyor muydun? için sabit index
   List<Map<String, dynamic>> _premiumAnswers = []; // Kullanıcının verdiği premium cevaplar
   bool _isPremiumUser = false;
+
+  // ── STANDART YORUM EKONOMİSİ (Tarot modeli) ──
+  static const _kDreamFreeDate = 'dream_free_date_v1';
+  static const _kDreamAdCredits = 'dream_ad_credits_v1';
+  static const _kDreamAdWatchCount = 'dream_ad_watch_count_v1';
+  static const _kDreamAdWatchDate = 'dream_ad_watch_date_v1';
+  static const _kDreamPremiumReadsCount = 'dream_premium_reads_count_v1';
+  static const _kDreamPremiumReadsDate = 'dream_premium_reads_date_v1';
+  static const _kMaxDailyAds = 2;
+  static const _kMaxPremiumReads = 3;
+  bool _dreamDailyFreeUsed = false;
+  int _dreamAdCredits = 0;
+  int _dreamDailyAdWatchCount = 0;
+  int _dreamPremiumReadsUsed = 0;
   // Bilimsel eğitici metinler (loading sırasında gösterilecek)
   static const List<String> _educationalMessagesTr = [
     'REM uykusunda mantık merkezleri baskılanır, bu yüzden rüyalar mantıksız görünür.',
@@ -420,8 +434,35 @@ class _DreamPageState extends State<DreamPage>
   Future<void> _loadPremiumStatus() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
+      final today = DateTime.now().toIso8601String().split('T')[0];
       setState(() {
         _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+
+        // Günlük ücretsiz hak kontrolü
+        _dreamDailyFreeUsed = (prefs.getString(_kDreamFreeDate) == today);
+        _dreamAdCredits = prefs.getInt(_kDreamAdCredits) ?? 0;
+
+        // Günlük reklam sayacı sıfırlama
+        final adDate = prefs.getString(_kDreamAdWatchDate) ?? '';
+        if (adDate != today) {
+          _dreamDailyAdWatchCount = 0;
+          _dreamAdCredits = 0;
+          prefs.setInt(_kDreamAdCredits, 0);
+          prefs.setInt(_kDreamAdWatchCount, 0);
+          prefs.setString(_kDreamAdWatchDate, today);
+        } else {
+          _dreamDailyAdWatchCount = prefs.getInt(_kDreamAdWatchCount) ?? 0;
+        }
+
+        // Elite günlük okuma sayacı
+        final premReadsDate = prefs.getString(_kDreamPremiumReadsDate) ?? '';
+        if (premReadsDate != today) {
+          _dreamPremiumReadsUsed = 0;
+          prefs.setInt(_kDreamPremiumReadsCount, 0);
+          prefs.setString(_kDreamPremiumReadsDate, today);
+        } else {
+          _dreamPremiumReadsUsed = prefs.getInt(_kDreamPremiumReadsCount) ?? 0;
+        }
       });
     }
   }
@@ -530,10 +571,99 @@ class _DreamPageState extends State<DreamPage>
   }
 
   Future<bool> _checkAndDeductPremiumAccess() async {
-    if (_isPremiumUser) return true; // Elite users pass freely
-
+    // Herkes (Elite dahil) Ruh Taşı harcar
     int soulStones = await StorageService.getSoulStones();
 
+    // Ruh Taşı bittiyse — paywall yönlendir
+    if (soulStones <= 0) {
+      if (!mounted) return false;
+      await showGeneralDialog<void>(
+        context: context,
+        barrierColor: Colors.black.withOpacity(0.5),
+        barrierDismissible: true,
+        barrierLabel: 'NoStones',
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, anim1, anim2) {
+          return Center(
+            child: ScaleTransition(
+              scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.diamond_rounded, color: Colors.white.withOpacity(0.3), size: 48),
+                            const SizedBox(height: 16),
+                            Text(
+                              _isTr ? 'Ruh Taşı Gerekli' : 'Soul Stone Required',
+                              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _isTr
+                                  ? 'Derin analiz için Ruh Taşı gereklidir.\n\nRuh Taşlarını Aura puanlarını dönüştürerek veya Elite abonelik ile kazanabilirsin.'
+                                  : 'Soul Stones are required for deep analysis.\n\nYou can earn Soul Stones by converting Aura points or with Elite subscription.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                            ),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                },
+                                child: Text(
+                                  _isTr ? 'Elite Abone Ol' : 'Get Elite',
+                                  style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+      return false;
+    }
+
+    // Elite kullanıcı: sessizce harcar (dialog yok)
+    if (_isPremiumUser) {
+      await StorageService.deductSoulStones(1);
+      return true;
+    }
+
+    // Ücretsiz kullanıcı: onay dialogu göster
+    if (!mounted) return false;
     bool? confirm = await showGeneralDialog<bool>(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -542,65 +672,77 @@ class _DreamPageState extends State<DreamPage>
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
         return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Material(
-              type: MaterialType.transparency,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                         Icon(Icons.diamond_rounded, color: soulStones >= 1 ? const Color(0xFFFFD700) : Colors.white.withOpacity(0.3), size: 48),
-                         const SizedBox(height: 16),
-                         Text(_isTr ? "Klinik Analiz Kapısı" : "Clinical Analysis Gate", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                         const SizedBox(height: 8),
-                         Text(_isTr ? "Mevcut Ruh Taşın: $soulStones\n\nBu klinik seviye derin psikolojik analiz için içeriye giriş izni." : "Current Soul Stones: $soulStones\n\nPermission to enter for this clinical-level deep psychoanalysis.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4)),
-                         const SizedBox(height: 24),
-                         Row(
-                           children: [
-                             Expanded(child: ElevatedButton(
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: soulStones >= 1 ? const Color(0xFF22D3EE).withOpacity(0.15) : Colors.white.withOpacity(0.05),
-                                 elevation: 0,
-                                 padding: EdgeInsets.zero,
-                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: soulStones >= 1 ? const Color(0xFF22D3EE).withOpacity(0.4) : Colors.white.withOpacity(0.1))),
-                               ),
-                               onPressed: soulStones >= 1 ? () => Navigator.pop(context, true) : () {},
-                               child: FittedBox(
-                                 fit: BoxFit.scaleDown,
-                                 child: Text(_isTr ? "1 Ruh Taşı Kullan" : "Use 1 Stone", style: TextStyle(color: soulStones >= 1 ? const Color(0xFF22D3EE) : Colors.white30, fontWeight: FontWeight.bold)),
-                               ),
-                             )),
-                             const SizedBox(width: 8),
-                             Expanded(child: ElevatedButton(
-                               style: ElevatedButton.styleFrom(
-                                 backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
-                                 elevation: 0,
-                                 padding: EdgeInsets.zero,
-                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4))),
-                               ),
-                               onPressed: () {
-                                 Navigator.pop(context, false);
-                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
-                               },
-                               child: FittedBox(
-                                 fit: BoxFit.scaleDown,
-                                 child: Text(_isTr ? "Elite Abone Ol" : "Get Elite", style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
-                               ),
-                             )),
-                           ],
-                         ),
-                      ],
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Material(
+                type: MaterialType.transparency,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                           Icon(Icons.diamond_rounded, color: const Color(0xFFFFD700), size: 48),
+                           const SizedBox(height: 16),
+                           Text(
+                             _isTr ? 'Klinik Analiz Kapısı' : 'Clinical Analysis Gate',
+                             style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                           ),
+                           const SizedBox(height: 8),
+                           Text(
+                             _isTr
+                                 ? 'Mevcut Ruh Taşın: $soulStones\n\nBu klinik seviye derin psikolojik analiz için 1 Ruh Taşı harcanır.'
+                                 : 'Current Soul Stones: $soulStones\n\nThis clinical-level deep psychoanalysis costs 1 Soul Stone.',
+                             textAlign: TextAlign.center,
+                             style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                           ),
+                           const SizedBox(height: 24),
+                           Row(
+                             children: [
+                               Expanded(child: ElevatedButton(
+                                 style: ElevatedButton.styleFrom(
+                                   backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                   elevation: 0,
+                                   padding: const EdgeInsets.symmetric(vertical: 14),
+                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4))),
+                                 ),
+                                 onPressed: () => Navigator.pop(context, true),
+                                 child: FittedBox(
+                                   fit: BoxFit.scaleDown,
+                                   child: Text(_isTr ? '1 Ruh Taşı Kullan' : 'Use 1 Stone', style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
+                                 ),
+                               )),
+                               const SizedBox(width: 8),
+                               Expanded(child: ElevatedButton(
+                                 style: ElevatedButton.styleFrom(
+                                   backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                   elevation: 0,
+                                   padding: const EdgeInsets.symmetric(vertical: 14),
+                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4))),
+                                 ),
+                                 onPressed: () {
+                                   Navigator.pop(context, false);
+                                   Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                 },
+                                 child: FittedBox(
+                                   fit: BoxFit.scaleDown,
+                                   child: Text(_isTr ? 'Elite Abone Ol' : 'Get Elite', style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
+                                 ),
+                               )),
+                             ],
+                           ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -611,7 +753,7 @@ class _DreamPageState extends State<DreamPage>
       },
     );
 
-    if (confirm == true && soulStones >= 1) {
+    if (confirm == true) {
       await StorageService.deductSoulStones(1);
       return true;
     }
@@ -768,6 +910,181 @@ class _DreamPageState extends State<DreamPage>
     return true;
   }
 
+  // ── STANDART YORUM GÜNLÜK HAK SİSTEMİ ──
+  bool _ensureDreamAllowance() {
+    if (_isPremiumUser) {
+      return _dreamPremiumReadsUsed < _kMaxPremiumReads;
+    }
+    if (!_dreamDailyFreeUsed) return true;
+    if (_dreamAdCredits > 0) return true;
+    return false;
+  }
+
+  Future<void> _consumeDreamAllowance() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+
+    if (_isPremiumUser) {
+      _dreamPremiumReadsUsed += 1;
+      await prefs.setInt(_kDreamPremiumReadsCount, _dreamPremiumReadsUsed);
+      if (mounted) setState(() {});
+      return;
+    }
+    if (!_dreamDailyFreeUsed) {
+      _dreamDailyFreeUsed = true;
+      await prefs.setString(_kDreamFreeDate, today);
+      if (mounted) setState(() {});
+    } else if (_dreamAdCredits > 0) {
+      _dreamAdCredits -= 1;
+      await prefs.setInt(_kDreamAdCredits, _dreamAdCredits);
+      if (mounted) setState(() {});
+    }
+  }
+
+  Future<bool> _showDreamCreditPanel() async {
+    if (!mounted) return false;
+
+    // Günlük reklam sınırı kontrolü
+    if (_dreamDailyAdWatchCount >= _kMaxDailyAds) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          _isTr
+              ? 'Bugünlük reklam hakkın doldu ($_kMaxDailyAds/$_kMaxDailyAds). Yarın tekrar dene!'
+              : 'Daily ad limit reached ($_kMaxDailyAds/$_kMaxDailyAds). Try again tomorrow!',
+        ),
+        backgroundColor: const Color(0xFF7C3AED),
+        duration: const Duration(seconds: 3),
+      ));
+      return false;
+    }
+
+    final hasCredit = _isPremiumUser
+        ? (_dreamPremiumReadsUsed < _kMaxPremiumReads)
+        : (!_dreamDailyFreeUsed || _dreamAdCredits > 0);
+
+    final bool? result = await showGeneralDialog<bool>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'DreamCredit',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Material(
+                type: MaterialType.transparency,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.nights_stay_rounded, color: AppColors.primaryPurple.withOpacity(0.9), size: 48),
+                          const SizedBox(height: 16),
+                          Text(
+                            _isTr ? 'Okuma Hakları' : 'Reading Credits',
+                            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _isTr
+                                ? 'Günlük ücretsiz hakkın doldu.\n\nReklam izleyerek ek yorum hakkı kazanabilirsin ($_dreamDailyAdWatchCount/$_kMaxDailyAds reklam izlendi).'
+                                : 'Your daily free credit is used.\n\nWatch an ad to earn an extra reading ($_dreamDailyAdWatchCount/$_kMaxDailyAds ads watched).',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryPurple.withOpacity(0.15),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      side: BorderSide(color: AppColors.primaryPurple.withOpacity(0.4)),
+                                    ),
+                                  ),
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.play_circle_outline, size: 16, color: AppColors.primaryPurple),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        _isTr ? 'Reklam İzle' : 'Watch Ad',
+                                        style: TextStyle(color: AppColors.primaryPurple, fontWeight: FontWeight.bold, fontSize: 13),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                  },
+                                  child: Text(
+                                    _isTr ? 'Elite Abone Ol' : 'Get Elite',
+                                    style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold, fontSize: 13),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result == true) {
+      // TODO: Gerçek reklam SDK entegrasyonu buraya gelecek
+      // Şimdilik simüle ediyoruz (2 saniye bekleme)
+      // await AdManager.showRewardedAd();
+      await Future.delayed(const Duration(seconds: 2));
+
+      final prefs = await SharedPreferences.getInstance();
+      _dreamAdCredits += 1;
+      _dreamDailyAdWatchCount += 1;
+      await prefs.setInt(_kDreamAdCredits, _dreamAdCredits);
+      await prefs.setInt(_kDreamAdWatchCount, _dreamDailyAdWatchCount);
+      if (mounted) setState(() {});
+      return true;
+    }
+    return false;
+  }
+
   Future<bool> _interpretDream({bool skipOverlaySetup = false}) async {
     final trimmed = _dreamController.text.trim();
     if (trimmed.length < 15) {
@@ -775,6 +1092,12 @@ class _DreamPageState extends State<DreamPage>
     }
     if (_selectedEmotion == null) {
       return false;
+    }
+
+    // ── Günlük hak kontrolü ──
+    if (!_ensureDreamAllowance()) {
+      final gotCredit = await _showDreamCreditPanel();
+      if (!gotCredit || !_ensureDreamAllowance()) return false;
     }
 
     _isPremiumResult = false; // Reset premium flag for standard interpretation
@@ -870,6 +1193,7 @@ class _DreamPageState extends State<DreamPage>
     _advice = _generalAnalysis;
 
     // Standart Rüyalar artık analiz geçmişine kaydedilmiyor (Sadece Premium kaydedilecek)
+    await _consumeDreamAllowance();
     await StorageService.setDreamDoneToday();
 
     if (mounted) {
