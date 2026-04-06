@@ -2625,7 +2625,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
         final panelW = MediaQuery.of(context).size.width * 0.85;
-        return Center(
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: const SizedBox(),
+              ),
+            ),
+            Center(
           child: SizedBox(
             width: panelW,
             child: Material(
@@ -2744,8 +2752,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               ),
             ),
           ),
-        );
-      },
+        ),
+      ],
+    );
+  },
       transitionBuilder: (context, anim1, anim2, child) {
         return FadeTransition(
           opacity: anim1,
@@ -2769,7 +2779,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
         final panelW = MediaQuery.of(context).size.width * 0.85;
-        return Center(
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: const SizedBox(),
+              ),
+            ),
+            Center(
           child: SizedBox(
             width: panelW,
             child: Material(
@@ -2857,8 +2875,10 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               ),
             ),
           ),
-        );
-      },
+        ),
+      ],
+    );
+  },
       transitionBuilder: (context, anim1, anim2, child) {
         return FadeTransition(
           opacity: anim1,

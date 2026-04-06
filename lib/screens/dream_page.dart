@@ -972,7 +972,15 @@ class _DreamPageState extends State<DreamPage>
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, anim1, anim2) {
         final panelW = MediaQuery.of(context).size.width * 0.85;
-        return Center(
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: const SizedBox(),
+              ),
+            ),
+            Center(
           child: SizedBox(
             width: panelW,
             child: Material(
@@ -1090,8 +1098,10 @@ class _DreamPageState extends State<DreamPage>
               ),
             ),
           ),
-        );
-      },
+        ),
+      ],
+    );
+  },
       transitionBuilder: (context, anim1, anim2, child) {
         return FadeTransition(
           opacity: anim1,
