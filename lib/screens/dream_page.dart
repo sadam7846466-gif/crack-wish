@@ -1095,7 +1095,8 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    constraints: const BoxConstraints(minHeight: 460),
+                    height: 460,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? const Color(0xFF22D3EE).withOpacity(0.08)
@@ -1109,8 +1110,7 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.diamond_rounded,
@@ -1332,7 +1332,8 @@ class _DreamPageState extends State<DreamPage>
                   filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                   child: Container(
                     padding: const EdgeInsets.all(24),
-                    constraints: const BoxConstraints(minHeight: 460),
+                    height: 460,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
                           ? AppColors.primaryPurple.withOpacity(0.08)
@@ -1346,8 +1347,7 @@ class _DreamPageState extends State<DreamPage>
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.nights_stay_rounded,
