@@ -1403,6 +1403,7 @@ class _DreamPageState extends State<DreamPage>
                       required List<Color> halfGradients,
                       required Color customGlowColor,
                       required VoidCallback onTap,
+                      bool isPremium = false,
                       List<Gradient>? extraGradientLayers,
                     }) {
                       return GlassButton.custom(
@@ -1540,13 +1541,26 @@ class _DreamPageState extends State<DreamPage>
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      title,
-                                      style: const TextStyle(
-                                        color: AppColors.textWhite,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          title,
+                                          style: const TextStyle(
+                                            color: AppColors.textWhite,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        if (isPremium) ...[
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            Icons.diamond_outlined,
+                                            size: 12,
+                                            color: customGlowColor.withOpacity(0.8),
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
@@ -1677,6 +1691,7 @@ class _DreamPageState extends State<DreamPage>
                               activeGradients: premiumActiveColors,
                               halfGradients: premiumHalfColors,
                               customGlowColor: const Color(0xFF22D3EE),
+                              isPremium: true,
                               extraGradientLayers: gemLayers,
                               onTap: () async {
                                 await _interpretDreamPremium(); 
