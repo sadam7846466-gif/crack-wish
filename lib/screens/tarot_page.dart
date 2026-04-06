@@ -765,6 +765,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _slotEntranceCtrl.forward(from: 0.0);
     _setStateSafe(() {
       _deckRebuildKey++;
+      _isBusy = false;
       _state = RitualState.selecting;
     });
     _updateCtaText();
@@ -3955,10 +3956,11 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   void _playCardFlipSound() async {
     try {
-      final player = AudioPlayer();
-      player.setPlayerMode(PlayerMode.mediaPlayer);
-      await player.play(AssetSource('sounds/kartsesi1.wav'));
-      player.onPlayerComplete.listen((_) => player.dispose());
+      if (_cardFlipPlayer.state == PlayerState.playing) {
+        await _cardFlipPlayer.stop();
+      }
+      await _cardFlipPlayer.setPlayerMode(PlayerMode.lowLatency);
+      await _cardFlipPlayer.play(AssetSource('sounds/kartsesi1.wav'));
     } catch (e) {
       debugPrint('Sound error: $e');
     }

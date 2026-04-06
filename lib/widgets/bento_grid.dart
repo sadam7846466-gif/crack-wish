@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
@@ -76,7 +77,11 @@ class _BentoGridState extends State<BentoGrid>
                         _BentoCard(
                           compact: true,
                           contentBottom: false,
-                          iconWidget: Image.asset('assets/images/tarot/taroticon.webp', width: 28, height: 28),
+                          iconWidget: const Icon(
+                            Icons.amp_stories_rounded,
+                            size: 24,
+                            color: AppColors.textWhite,
+                          ),
                           title: l10n.bentoTarotTitle,
                           desc: l10n.bentoTarotDesc,
                           accent: const Color(0xFFC48DFF), // Parlak canlı mor-lila
@@ -115,11 +120,13 @@ class _BentoGridState extends State<BentoGrid>
                               },
                               child: Transform.rotate(
                                 angle: -0.08,
-                                child: Image.asset(
-                                  'assets/images/tarot/tarotbuton_buyuktarot.webp',
-                                  width: 258,
-                                  height: 258,
-                                  fit: BoxFit.contain,
+                                child: RepaintBoundary(
+                                  child: Image.asset(
+                                    'assets/images/tarot/tarotbuton_buyuktarot.webp',
+                                    width: 258,
+                                    height: 258,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
                             ),
@@ -150,8 +157,8 @@ class _BentoGridState extends State<BentoGrid>
                         _BentoCard(
                           compact: true,
                           iconWidget: const Icon(
-                            CupertinoIcons.cloud_fill,
-                            size: 16,
+                            Icons.nights_stay_rounded,
+                            size: 18,
                             color: AppColors.textWhite,
                           ),
                           title: l10n.bentoDreamTitle,
@@ -165,11 +172,13 @@ class _BentoGridState extends State<BentoGrid>
                           right: -26,
                           top: 6,
                           child: IgnorePointer(
-                            child: Image.asset(
-                              'assets/images/ruyabulut.webp',
-                              width: 175,
-                              height: 102,
-                              fit: BoxFit.contain,
+                            child: RepaintBoundary(
+                              child: Image.asset(
+                                'assets/images/ruyabulut.webp',
+                                width: 175,
+                                height: 102,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ),
@@ -234,11 +243,13 @@ class _BentoGridState extends State<BentoGrid>
                                 bottom: -30 * scale,
                                 child: IgnorePointer(
                                   child: FloatingAstronaut2(
-                                    child: Image.asset(
-                                      'assets/images/motiveastronot2.webp',
-                                      width: 160 * scale,
-                                      height: 160 * scale,
-                                      fit: BoxFit.contain,
+                                    child: RepaintBoundary(
+                                      child: Image.asset(
+                                        'assets/images/motiveastronot2.webp',
+                                        width: 160 * scale,
+                                        height: 160 * scale,
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -248,11 +259,13 @@ class _BentoGridState extends State<BentoGrid>
                                 bottom: -19 * scale,
                                 child: IgnorePointer(
                                   child: FloatingAstronaut1(
-                                    child: Image.asset(
-                                      'assets/images/motiveastronot1.webp',
-                                      width: 180 * scale,
-                                      height: 180 * scale,
-                                      fit: BoxFit.contain,
+                                    child: RepaintBoundary(
+                                      child: Image.asset(
+                                        'assets/images/motiveastronot1.webp',
+                                        width: 180 * scale,
+                                        height: 180 * scale,
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -301,12 +314,14 @@ class _BentoGridState extends State<BentoGrid>
                             child: Opacity(
                               opacity: 0.4,
                               child: _FloatingWidget(
-                              child: Image.asset(
-                                'assets/images/motivegezegen.webp',
-                                width: 160 * scale,
-                                height: 160 * scale,
-                                fit: BoxFit.contain,
-                              ),
+                                child: RepaintBoundary(
+                                  child: Image.asset(
+                                    'assets/images/motivegezegen.webp',
+                                    width: 160 * scale,
+                                    height: 160 * scale,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                             ),
                             ),
                           ),
@@ -364,11 +379,13 @@ class _BentoGridState extends State<BentoGrid>
                           top: -3 * scale,
                           child: IgnorePointer(
                             child: _SlowRotatingWidget(
-                              child: Image.asset(
-                                'assets/images/zodiac.webp',
-                                width: 120 * scale,
-                                height: 120 * scale,
-                                fit: BoxFit.contain,
+                              child: RepaintBoundary(
+                                child: Image.asset(
+                                  'assets/images/zodiac.webp',
+                                  width: 120 * scale,
+                                  height: 120 * scale,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
@@ -780,7 +797,10 @@ class _InteractiveCardState extends State<_InteractiveCard>
     final hasTap = widget.onTap != null;
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTapDown: hasTap ? (_) => widget.onPressedChange(true) : null,
+      onTapDown: hasTap ? (_) {
+        HapticFeedback.lightImpact();
+        widget.onPressedChange(true);
+      } : null,
       onTapCancel: hasTap ? () => widget.onPressedChange(false) : null,
       onTapUp: hasTap ? (_) {} : null,
       onTap: hasTap ? () {

@@ -1577,6 +1577,7 @@ class _BentoHeroCard extends StatelessWidget {
                     return _HeroStatCircle(
                       icon: Icons.bakery_dining_rounded,
                       iconColor: const Color(0xFFFFD166),
+                      imagePath: 'assets/icons/splash_cookie.png',
                       value: totalCookies,
                       hasDot: hasNew,
                       onTap: () => _showStatModal(context, "Açılan Kurabiyeler", totalCookies, Icons.bakery_dining_rounded, const Color(0xFFFFD166)),
@@ -1584,11 +1585,11 @@ class _BentoHeroCard extends StatelessWidget {
                   },
                 ),
                 _HeroStatCircle(
-                  icon: Icons.auto_awesome_rounded,
+                  icon: Icons.amp_stories_rounded,
                   iconColor: const Color(0xFFC084FC),
                   value: totalTarots,
                   isLocked: !isPremium,
-                  onTap: () => _showStatModal(context, "Tarot Falları", totalTarots, Icons.auto_awesome_rounded, const Color(0xFFC084FC)),
+                  onTap: () => _showStatModal(context, "Tarot Falları", totalTarots, Icons.amp_stories_rounded, const Color(0xFFC084FC)),
                 ),
                 _HeroStatCircle(
                   icon: Icons.nights_stay_rounded,
@@ -1733,6 +1734,8 @@ class _BentoHeroCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     if (title == "Aura Puanı")
                       Image.asset("assets/images/aura_core.png", width: 56, height: 56, fit: BoxFit.contain)
+                    else if (title == "Açılan Kurabiyeler")
+                      Image.asset("assets/icons/splash_cookie.png", width: 48, height: 48, fit: BoxFit.contain)
                     else
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 0),
@@ -2693,6 +2696,7 @@ class _GlassBadge extends StatelessWidget {
 class _HeroStatCircle extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
+  final String? imagePath;
   final int value;
   final bool hasDot;
   final bool isLocked;
@@ -2701,6 +2705,7 @@ class _HeroStatCircle extends StatelessWidget {
   const _HeroStatCircle({
     required this.icon,
     required this.iconColor,
+    this.imagePath,
     required this.value,
     this.hasDot = false,
     this.isLocked = false,
@@ -2737,7 +2742,25 @@ class _HeroStatCircle extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(icon, color: iconColor.withOpacity(0.95), size: 18),
+                      SizedBox(
+                        height: 32,
+                        child: Center(
+                          child: imagePath != null
+                            ? Image.asset(
+                                imagePath!,
+                                width: 36,
+                                height: 36,
+                                fit: BoxFit.contain,
+                                color: iconColor,
+                                errorBuilder: (_, __, ___) => Icon(icon, color: iconColor.withOpacity(0.95), size: 30),
+                              )
+                            : Icon(
+                                icon, 
+                                color: iconColor.withOpacity(0.95), 
+                                size: icon == Icons.amp_stories_rounded ? 32 : 30,
+                              ),
+                        ),
+                      ),
                       const SizedBox(height: 5),
                       TweenAnimationBuilder<int>(
                         tween: IntTween(begin: 0, end: value),

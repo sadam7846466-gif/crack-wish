@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/guidance_booklet.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -1225,7 +1226,10 @@ class _DreamPageState extends State<DreamPage>
                         child: _TabButton(
                           label: _l10n.dreamTabNew,
                           isActive: _currentTab == 0,
-                          onTap: () => setState(() => _currentTab = 0),
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _currentTab = 0);
+                          },
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -1233,7 +1237,10 @@ class _DreamPageState extends State<DreamPage>
                         child: _TabButton(
                           label: _l10n.dreamTabHistory,
                           isActive: _currentTab == 1,
-                          onTap: () => setState(() => _currentTab = 1),
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _currentTab = 1);
+                          },
                         ),
                       ),
                     ],

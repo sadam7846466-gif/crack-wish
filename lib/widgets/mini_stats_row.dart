@@ -356,18 +356,14 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     final theme = _themes[_themeIndex];
     final talisman = _talismans[_talismanIndex];
 
-    // Sabitlenmiş kurabiyenin görseli (swipe ile değişmez)
-    final cookieImagePath = _cookieImageMap[_pinnedCookieId];
-    Widget? cookieIconWidget;
-    if (cookieImagePath != null) {
-      cookieIconWidget = Image.asset(
-        cookieImagePath,
-        width: 22,
-        height: 22,
-        fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji'])),
-      );
-    }
+    // App kurabiye ikonu (splash_cookie)
+    final cookieIconWidget = Image.asset(
+      'assets/icons/splash_cookie.png',
+      width: 22,
+      height: 22,
+      fit: BoxFit.contain,
+      errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji'])),
+    );
 
     // Tılsım görseli
     final talismanImagePath = talisman['image'];
@@ -542,37 +538,18 @@ class _StatOverlayState extends State<_StatOverlay>
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
-        child: GlassContainer(
-          useOwnLayer: true,
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
           height: 245,
-          settings: const LiquidGlassSettings(
-            thickness: 18,
-            blur: 2,
-            glassColor: Colors.transparent,
-            chromaticAberration: 0.1,
-            lightIntensity: 0.7,
-            ambientStrength: 0.6,
-            refractiveIndex: 1.2,
-            saturation: 1.0,
-          ),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(26, 14, 26, 28),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.14),
-                  Colors.white.withOpacity(0.06),
-                ],
-              ),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.35),
-                width: 0.8,
-              ),
+          padding: const EdgeInsets.fromLTRB(26, 14, 26, 28),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.25),
+              width: 0.5,
             ),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -614,7 +591,6 @@ class _StatOverlayState extends State<_StatOverlay>
             ],
           ),
         ),
-      ),
       ),
     );
   }
@@ -1211,35 +1187,16 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
-        child: GlassContainer(
-          useOwnLayer: true,
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
           height: 245,
-          settings: const LiquidGlassSettings(
-            thickness: 18,
-            blur: 2,
-            glassColor: Colors.transparent,
-            chromaticAberration: 0.1,
-            lightIntensity: 0.7,
-            ambientStrength: 0.6,
-            refractiveIndex: 1.2,
-            saturation: 1.0,
-          ),
-          child: Container(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.14),
-                Colors.white.withOpacity(0.06),
-              ],
-            ),
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.35),
-              width: 0.8,
+              color: Colors.white.withOpacity(0.25),
+              width: 0.5,
             ),
           ),
           child: Column(
@@ -1379,7 +1336,6 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
             ],
           ),
         ),
-      ),
       ),
     );
   }
