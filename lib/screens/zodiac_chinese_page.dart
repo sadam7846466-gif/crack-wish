@@ -16,12 +16,29 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     with TickerProviderStateMixin {
   late AnimationController _ctrl;
   late AnimationController _auraCtrl;
+  late PageController _pageController;
+  late ScrollController _profileScrollCtrl;
+  late AnimationController _careerCtrl;
+  bool _careerAnimated = false;
   int _animalIdx = 6;
   int _activeSection = 0;
+  bool _canPop = false;
+  
+  void _handleBack() {
+    setState(() => _canPop = true);
+    Future.microtask(() {
+      if (mounted) Navigator.of(context).pop();
+    });
+  }
+
   DateTime _birthDate = DateTime(1999, 12, 20);
   String _userElement = 'Su';
   String _userYinYang = 'Yin';
   int _selectedCompat = -1;
+  bool _showCompatibilityWidget = false;
+  bool _podiumDone = false;
+  bool _panel2Done = false;
+  late AnimationController _wheelCtrl;
 
   // Asya tarzı renk paleti
   static const Color _crimson = Color(0xFFB91C1C);
@@ -93,6 +110,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _activeSection);
+    _profileScrollCtrl = ScrollController()..addListener(() {
+      if (_profileScrollCtrl.offset > 350 && !_careerAnimated) {
+        setState(() => _careerAnimated = true);
+        _careerCtrl.forward();
+      }
+    });
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -101,6 +125,14 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       vsync: this,
       duration: const Duration(milliseconds: 3000),
     )..repeat(reverse: true);
+    _careerCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+    _wheelCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 18),
+    )..repeat();
     _loadUser();
   }
 
@@ -118,6 +150,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   @override
   void dispose() {
+    _wheelCtrl.dispose();
+    _profileScrollCtrl.dispose();
+    _careerCtrl.dispose();
+    _pageController.dispose();
     _auraCtrl.dispose();
     _ctrl.dispose();
     super.dispose();
@@ -127,8 +163,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _handleBack();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: _bg,
       body: Stack(
         children: [
           // Arka plan: Dev Yin-Yang atmosferi
@@ -148,6 +191,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -159,7 +203,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         children: [
           // Geri butonu — bağımsız cam daire
           GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: _handleBack,
             child: ClipOval(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -218,7 +262,14 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final iconColor = sel ? _goldL : Colors.white.withOpacity(0.45);
     final iconSize = sel ? 20.0 : 16.0;
     return GestureDetector(
-      onTap: () => setState(() => _activeSection = i),
+      onTap: () {
+        setState(() => _activeSection = i);
+        _pageController.animateToPage(
+          i,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+        );
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
@@ -335,32 +386,41 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   // ── CONTENT ROUTER ──
   Widget _buildContent() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: SingleChildScrollView(
-        key: ValueKey(_activeSection),
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-        child: _sectionWidget(),
-      ),
+    return PageView(
+      controller: _pageController,
+      onPageChanged: (index) {
+        setState(() => _activeSection = index);
+      },
+      physics: const BouncingScrollPhysics(),
+      children: [
+        SingleChildScrollView(
+          controller: _profileScrollCtrl,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          child: _profileSection(),
+        ),
+        SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          child: _compatibilitySection(),
+        ),
+        SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          child: _dailySection(),
+        ),
+        SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          child: _yearSection(),
+        ),
+        SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          child: _elementSection(),
+        ),
+      ],
     );
-  }
-
-  Widget _sectionWidget() {
-    switch (_activeSection) {
-      case 0:
-        return _profileSection();
-      case 1:
-        return _compatibilitySection();
-      case 2:
-        return _dailySection();
-      case 3:
-        return _yearSection();
-      case 4:
-        return _elementSection();
-      default:
-        return _profileSection();
-    }
   }
 
   // ══════════════════════════════════════════
@@ -836,9 +896,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
         const SizedBox(height: 40),
 
-        // ── Karakter Profili — yeni tasarım ──
-        Builder(
-          builder: (_) {
+        // ── Kariyer Haritası — Yenilenmiş Tasarım (Süper Güç tasarımı kullanılarak) ──
+        AnimatedBuilder(
+          animation: _careerCtrl,
+          builder: (context, _) {
+            final curve = Curves.easeOutCubic.transform(_careerCtrl.value);
             final stats = _getRpgStats(_animalIdx);
             // En yüksek stat'ı bul
             final sorted = stats.entries.toList()
@@ -851,6 +913,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
             // Klasik altın tonu — daha az turuncu, champagne
             const _accent = Color(0xFFCBB270); // Yumuşak champagne-altın
             const _accentL = Color(0xFFE8D9B0); // Açık champagne
+            
+            final careers = a['careers'] as List<String>;
+            final careerAdvice = a['careerAdvice'] as String;
+
             return ClipRRect(
               borderRadius: BorderRadius.circular(24),
               child: BackdropFilter(
@@ -882,13 +948,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ),
                   child: Column(
                     children: [
-                      // Süper güç başlığı
+                      // Kariyer başlığı
                       Text(
-                        'Süper Gücün',
+                        'Kariyer Haritası',
                         style: TextStyle(
-                          color: _accent.withOpacity(0.5),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          color: _accent.withOpacity(0.7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
                           letterSpacing: 2,
                         ),
                       ),
@@ -923,7 +989,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                   width: 120,
                                   height: 120,
                                   child: CircularProgressIndicator(
-                                    value: (hero.value['val'] as int) / 100,
+                                    value: ((hero.value['val'] as int) / 100) * curve,
                                     strokeWidth: 5,
                                     backgroundColor: Colors.white.withOpacity(
                                       0.05,
@@ -944,16 +1010,19 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     SizedBox(
                                       width: 30,
                                       height: 30,
-                                      child: CustomPaint(
-                                        painter: _StatIconPainter(
-                                          statKey: hero.key,
-                                          color: _accentL,
+                                      child: Opacity(
+                                        opacity: curve.clamp(0.0, 1.0),
+                                        child: CustomPaint(
+                                          painter: _StatIconPainter(
+                                            statKey: hero.key,
+                                            color: _accentL,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '${hero.value['val']}%',
+                                      '${((hero.value['val'] as int) * curve).toInt()}%',
                                       style: const TextStyle(
                                         color: _accentL,
                                         fontSize: 22,
@@ -961,22 +1030,27 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                       ),
                                     ),
                                   ],
-                                ), // Column children end
+                                ),
                               ],
                             ),
-                          ), // inner Stack + SizedBox end
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            child: Opacity(
+                              opacity: curve.clamp(0.0, 1.0),
+                              child: Text(
+                                hero.key,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.40),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
-                      ), // outer Stack end
-                      const SizedBox(height: 8),
-                      Text(
-                        hero.key,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
                       // Diğer 4 stat — mini circles
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -994,7 +1068,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                       width: 44,
                                       height: 44,
                                       child: CircularProgressIndicator(
-                                        value: val / 100,
+                                        value: (val / 100) * curve,
                                         strokeWidth: 3,
                                         backgroundColor: Colors.white
                                             .withOpacity(0.05),
@@ -1011,10 +1085,13 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     SizedBox(
                                       width: 16,
                                       height: 16,
-                                      child: CustomPaint(
-                                        painter: _StatIconPainter(
-                                          statKey: e.key,
-                                          color: _accentL.withOpacity(0.8),
+                                      child: Opacity(
+                                        opacity: curve.clamp(0.0, 1.0),
+                                        child: CustomPaint(
+                                          painter: _StatIconPainter(
+                                            statKey: e.key,
+                                            color: _accentL.withOpacity(0.8),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1023,7 +1100,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                '${val}%',
+                                '${(val * curve).toInt()}%',
                                 style: const TextStyle(
                                   color: _accentL,
                                   fontSize: 11,
@@ -1031,11 +1108,14 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                e.key,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.35),
-                                  fontSize: 9,
+                              Opacity(
+                                opacity: curve.clamp(0.0, 1.0),
+                                child: Text(
+                                  e.key,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.35),
+                                    fontSize: 9,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1058,11 +1138,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                         ),
                       ),
-                      // Güçlü & Gelişim — iki sütun karşılaşma
+                      // Alt kısım — iki sütun (Potansiyel Meslekler vs Kariyer Rehberi)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Sol — Güçlü yönler
+                          // Sol — Potansiyel Meslekler
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1070,19 +1150,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 Row(
                                   children: [
                                     Icon(
-                                      Icons.shield_outlined,
+                                      Icons.work_outline_rounded,
                                       size: 12,
-                                      color: const Color(
-                                        0xFFCBB270,
-                                      ).withOpacity(0.6),
+                                      color: const Color(0xFFCBB270).withOpacity(0.6),
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      'Güçlü Yönler',
+                                      'Potansiyel Meslekler',
                                       style: TextStyle(
-                                        color: const Color(
-                                          0xFFCBB270,
-                                        ).withOpacity(0.5),
+                                        color: const Color(0xFFCBB270).withOpacity(0.5),
                                         fontSize: 9,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 1,
@@ -1091,35 +1167,28 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                ...strengths
-                                    .take(4)
+                                ...careers
+                                    .take(5)
                                     .toList()
                                     .asMap()
                                     .entries
                                     .map(
                                       (e) => Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 5,
-                                        ),
+                                        padding: const EdgeInsets.only(bottom: 6),
                                         child: Row(
                                           children: [
                                             Container(
                                               width: 16,
                                               height: 16,
                                               decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                color: const Color(
-                                                  0xFFCBB270,
-                                                ).withOpacity(0.08),
+                                                borderRadius: BorderRadius.circular(4),
+                                                color: const Color(0xFFCBB270).withOpacity(0.08),
                                               ),
                                               child: Center(
                                                 child: Text(
                                                   '${e.key + 1}',
                                                   style: TextStyle(
-                                                    color: const Color(
-                                                      0xFFCBB270,
-                                                    ).withOpacity(0.5),
+                                                    color: const Color(0xFFCBB270).withOpacity(0.5),
                                                     fontSize: 8,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -1131,8 +1200,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                               child: Text(
                                                 e.value,
                                                 style: TextStyle(
-                                                  color: Colors.white
-                                                      .withOpacity(0.65),
+                                                  color: Colors.white.withOpacity(0.75),
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -1150,7 +1218,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Container(
                               width: 0.5,
-                              height: 85,
+                              height: 110,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
@@ -1163,7 +1231,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               ),
                             ),
                           ),
-                          // Sağ — Gelişim alanları
+                          // Sağ — Kariyer Rehberi (Advice)
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1171,19 +1239,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 Row(
                                   children: [
                                     Icon(
-                                      Icons.trending_up_rounded,
+                                      Icons.lightbulb_outline_rounded,
                                       size: 12,
-                                      color: const Color(
-                                        0xFFB85C5C,
-                                      ).withOpacity(0.6),
+                                      color: const Color(0xFFCBB270).withOpacity(0.6),
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      'Gelişim Alanı',
+                                      'Kariyer Rehberi',
                                       style: TextStyle(
-                                        color: const Color(
-                                          0xFFB85C5C,
-                                        ).withOpacity(0.5),
+                                        color: const Color(0xFFCBB270).withOpacity(0.5),
                                         fontSize: 9,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 1,
@@ -1192,57 +1256,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                ...weaknesses
-                                    .take(3)
-                                    .toList()
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (e) => Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 5,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 16,
-                                              height: 16,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                color: const Color(
-                                                  0xFFB85C5C,
-                                                ).withOpacity(0.08),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '${e.key + 1}',
-                                                  style: TextStyle(
-                                                    color: const Color(
-                                                      0xFFB85C5C,
-                                                    ).withOpacity(0.5),
-                                                    fontSize: 8,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                e.value,
-                                                style: TextStyle(
-                                                  color: Colors.white
-                                                      .withOpacity(0.65),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                Text(
+                                  careerAdvice,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.65),
+                                    fontSize: 10,
+                                    height: 1.5,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1254,208 +1276,6 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
             );
           },
-        ),
-        const SizedBox(height: 20),
-        // Kariyer — Kader Yolu Tasarımı
-        _glass(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CustomPaint(
-                      painter: _CareerIconPainter(color: _gold),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Kariyer Haritası',
-                    style: TextStyle(
-                      color: Color(0xFFE8DCC8),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              // Tavsiye — editöryal alıntı stili
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Sol dekoratif çizgi
-                  Container(
-                    width: 2,
-                    height: 40,
-                    margin: const EdgeInsets.only(top: 2, right: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          _gold.withOpacity(0.6),
-                          _gold.withOpacity(0.08),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Metin
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          a['careerAdvice'] as String,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 13,
-                            height: 1.6,
-                            fontStyle: FontStyle.italic,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Takımyıldız Haritası
-              Builder(
-                builder: (_) {
-                  final careers = a['careers'] as List<String>;
-                  const careerDesc = <String, String>{
-                    'Finans Uzmanı': 'Stratejik zekanız finansta parlar',
-                    'Girişimci': 'Yaratıcı vizyonunuz sizi öne çıkarır',
-                    'Muhasebeci': 'Detaycı yapınız mükemmellik getirir',
-                    'Avukat': 'Adaletçi ruhunuz hakkı savunur',
-                    'Yazar': 'İç dünyanızı kelimelere dökme yeteneği',
-                    'Mühendis': 'Analitik zihniniz çözümler üretir',
-                    'Çiftçi': 'Doğayla uyumunuz bereket getirir',
-                    'Bankacı': 'Güvenilir yapınız değer kazanır',
-                    'Mimar': 'Hayal gücünüz yapılara hayat verir',
-                    'Cerrah': 'Kararlılığınız hayat kurtarır',
-                    'Asker': 'Cesaretiniz sınır tanımaz',
-                    'Komutan': 'Doğal liderliğiniz yolları açar',
-                    'CEO': 'Vizyoner bakışınız zirveye taşır',
-                    'Sporcu': 'Enerjiniz sizi öne çıkarır',
-                    'Gazeteci': 'Cesaretle gerçeği bulursunuz',
-                    'Sanatçı': 'Ruhunuzun derinliği eserlere yansır',
-                    'Diplomat': 'İnce zekânız köprüler kurar',
-                    'Psikolog': 'Empati gücünüz ruhlara dokunur',
-                    'Tasarımcı': 'Estetik bakışınız fark yaratır',
-                    'Müzisyen': 'Duygularınız melodilerde hayat bulur',
-                    'Politikacı': 'Karizmanız kitleleri etkiler',
-                    'Yatırımcı': 'Önseziniz fırsatları yakalar',
-                    'Lider': 'İlham vererek yönlendirirsiniz',
-                    'Bilim İnsanı': 'Meraklı zihniniz keşifler yapar',
-                    'Filozof': 'Derin düşünceleriniz anlam arar',
-                    'Dedektif': 'Keskin gözleminiz gizemi çözer',
-                    'Danışman': 'Bilgeliğiniz yol gösterir',
-                    'Pilot': 'Özgür ruhunuz göklerde huzur bulur',
-                    'Satıcı': 'İkna gücünüz eşsizdir',
-                    'Komedyen': 'Neşeniz hayata renk katar',
-                    'Rehber': 'Enerjiniz keşfe çıkarır',
-                    'Ressam': 'Duyarlılığınız tuvale yansır',
-                    'Terapi Uzmanı': 'Şefkatiniz iyileşme getirir',
-                    'Aşçı': 'Yaratıcılığınız lezzetlerde gizli',
-                    'Yazılımcı': 'Zekânız dijitalde iz bırakır',
-                    'Stand-up Komedyen': 'Zekice espriniz güldürür',
-                    'Mucit': 'Fikirleriniz dünyayı değiştirir',
-                    'Pazarlamacı': 'Stratejik kreativite gücünüz',
-                    'Askeri Komutan': 'Disiplin ve cesaretiniz birleşir',
-                    'Kalite Kontrolcü': 'Mükemmeliyetiniz standart belirler',
-                    'Polis': 'Adalet duygunuz toplumu korur',
-                    'Doktor': 'Şefkat ve bilginiz hayat kurtarır',
-                    'Öğretmen': 'Bilgeliğiniz nesillere ışık tutar',
-                    'Sosyal Hizmet Uzmanı': 'Empati gücünüz merhem olur',
-                    'Hayırsever': 'Cömert kalbiniz güzelleştirir',
-                    'Hemşire': 'Şefkatiniz umut olur',
-                    'Veteriner': 'Doğa sevginiz şifa verir',
-                    'Otelci': 'Misafirperverliğiniz büyüler',
-                  };
-                  const accent = Color(0xFFCBB270);
-                  return Column(
-                    children: [
-                      for (int i = 0; i < careers.length; i++) ...[
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              // Sol içerik (çift index'te göster)
-                              Expanded(
-                                child: i.isEven
-                                    ? _careerNode(
-                                        careers[i],
-                                        careerDesc[careers[i]] ?? '',
-                                        accent,
-                                        CrossAxisAlignment.end,
-                                      )
-                                    : const SizedBox(),
-                              ),
-                              // Orta çizgi + düğüm
-                              SizedBox(
-                                width: 32,
-                                child: Column(
-                                  children: [
-                                    if (i > 0)
-                                      Container(
-                                        width: 1,
-                                        height: 8,
-                                        color: accent.withOpacity(0.12),
-                                      ),
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: accent.withOpacity(0.3),
-                                        border: Border.all(
-                                          color: accent.withOpacity(0.6),
-                                          width: 1,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: accent.withOpacity(0.2),
-                                            blurRadius: 8,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    if (i < careers.length - 1)
-                                      Expanded(
-                                        child: Container(
-                                          width: 1,
-                                          color: accent.withOpacity(0.08),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              // Sağ içerik (tek index'te göster)
-                              Expanded(
-                                child: i.isOdd
-                                    ? _careerNode(
-                                        careers[i],
-                                        careerDesc[careers[i]] ?? '',
-                                        accent,
-                                        CrossAxisAlignment.start,
-                                      )
-                                    : const SizedBox(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
         ),
       ],
     );
@@ -2548,251 +2368,381 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     'Burç Uyum Haritası',
                     style: TextStyle(
                       color: Color(0xFFE8DCC8),
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${a['name']} burcunun en uyumlu burçları',
+                    '${a['name']} burcunun astral bağları',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.4),
-                      fontSize: 12,
+                      fontSize: 11,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 22),
-                  // ── TOP 3 PODIUM — açıklamalı + özel ikon ──
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // 2. sıra
-                      if (best.length > 1)
-                        Expanded(
-                          child: _podiumFull(
-                            best[1],
-                            '🥈',
-                            const Color(0xFFC0C0C0),
-                            45,
-                            'Kalp kalbe bağ',
-                          ),
-                        ),
-                      if (best.length <= 1) const Expanded(child: SizedBox()),
-                      const SizedBox(width: 6),
-                      // 1. sıra
-                      Expanded(
-                        child: _podiumFull(
-                          best[0],
-                          '🥇',
-                          const Color(0xFFD4A017),
-                          65,
-                          'Ruh eşiniz',
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      // 3. sıra
-                      if (good.isNotEmpty)
-                        Expanded(
-                          child: _podiumFull(
-                            good[0],
-                            '🥉',
-                            const Color(0xFFCD7F32),
-                            30,
-                            'Güçlü çekim',
-                          ),
-                        ),
-                      if (good.isEmpty) const Expanded(child: SizedBox()),
-                    ],
-                  ),
                   const SizedBox(height: 18),
-                  // Ayırıcı
-                  Container(
-                    height: 0.5,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          const Color(0xFFD4A017).withOpacity(0.15),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                  // ── İYİ UYUM — panel stili ──
-                  if (good.length > 1) ...[
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: const Color(0xFFD4A017).withOpacity(0.03),
-                        border: Border.all(
-                          color: const Color(0xFFD4A017).withOpacity(0.1),
-                          width: 0.5,
-                        ),
-                      ),
+                  // ── TOP 3 PODIUM ──
+                  if (!_showCompatibilityWidget)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _showCompatibilityWidget = true;
+                          _podiumDone = false;
+                        });
+                        Future.delayed(const Duration(milliseconds: 3300), () {
+                          if (mounted) setState(() => _podiumDone = true);
+                        });
+                        Future.delayed(const Duration(milliseconds: 3700), () {
+                          if (mounted) setState(() => _panel2Done = true);
+                        });
+                      },
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.lightbulb_outline_rounded,
-                                color: const Color(0xFFD4A017).withOpacity(0.5),
-                                size: 14,
+                          // ── Ayırıcı çizgi ──
+                          Container(
+                            height: 0.5,
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  const Color(0xFFD4A017).withOpacity(0.3),
+                                  Colors.transparent,
+                                ],
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Aklınızda Bulunsun',
-                                style: TextStyle(
-                                  color: const Color(
-                                    0xFFD4A017,
-                                  ).withOpacity(0.6),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                'Alternatif bir seçenek',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.25),
-                                  fontSize: 9,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          ...good.sublist(1).map((i) {
-                            final gAnimal = ChineseZodiacData.animals[i];
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 6),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: const Color(
-                                  0xFFD4A017,
-                                ).withOpacity(0.03),
-                                border: Border.all(
-                                  color: const Color(
-                                    0xFFD4A017,
-                                  ).withOpacity(0.08),
-                                  width: 0.5,
+                          // ── Zodiac Çarkı — dönen ikon ──
+                          AnimatedBuilder(
+                            animation: _wheelCtrl,
+                            builder: (context, _) => SizedBox(
+                              width: 120,
+                              height: 120,
+                              child: CustomPaint(
+                                painter: _ZodiacWheelPainter(
+                                  outerAngle: _wheelCtrl.value * 2 * math.pi,
+                                  innerAngle: -_wheelCtrl.value * 2 * math.pi * 0.5,
                                 ),
                               ),
-                              child: Row(
-                                children: [
-                                  _animalIcon(i, 42),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          gAnimal['name'] as String,
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(
-                                              0.8,
-                                            ),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Kaderiniz yıldızlarda gizli',
+                            style: TextStyle(
+                              color: const Color(0xFFE8DCC8).withOpacity(0.7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.8,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // ── Premium cam buton ──
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(0xFFD4A017).withOpacity(0.15),
+                                  const Color(0xFFD4A017).withOpacity(0.05),
+                                ],
+                              ),
+                              border: Border.all(
+                                color: const Color(0xFFD4A017).withOpacity(0.55),
+                                width: 0.8,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFD4A017).withOpacity(0.12),
+                                  blurRadius: 20,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Analizi Başlat',
+                                  style: TextStyle(
+                                    color: const Color(0xFFD4A017).withOpacity(0.9),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 10,
+                                  color: const Color(0xFFD4A017).withOpacity(0.7),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          // ── Dekoratif yıldız ornament ──
+                          Text(
+                            '✦   ✦   ✦',
+                            style: TextStyle(
+                              color: const Color(0xFFD4A017).withOpacity(0.25),
+                              fontSize: 10,
+                              letterSpacing: 4,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    )
+                  else
+                    Column(
+                      children: [
+                        // ── PODIUM — sadece barlar animasyonlu ──
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0.0, end: 1.0),
+                          curve: Curves.easeInOut,
+                          duration: const Duration(milliseconds: 4200),
+                          builder: (context, val, child) {
+                            // 0.00 → 0.62 : Uyumlu dalgalanma (2600ms)
+                            // 0.62 → 1.00 : Yavaşça perdeler açılır (1600ms)
+                            final tEval   = (val / 0.62).clamp(0.0, 1.0);
+                            final tReveal = ((val - 0.62) / 0.38).clamp(0.0, 1.0);
+                            final decay = math.pow(1.0 - tEval, 2.0).toDouble();
+                            // Tek temel frekans — üç bar 120° faz farkıyla birlikte dalgalanır
+                            final t = tEval * math.pi * 5.0;
+                            final double hGold   = 65 + math.sin(t + 0.0)               * 42 * decay;
+                            final double hSilver = 45 + math.sin(t + math.pi * 2 / 3)   * 32 * decay;
+                            final double hBronze = 30 + math.sin(t + math.pi * 4 / 3)   * 22 * decay;
+                            // Sonuçlar yavaşça perde açılır gibi belirir
+                            final pReveal = Curves.easeOutQuart.transform(tReveal);
+                            // Sabit yükseklik: panel asla oynamıyor, sadece barlar içeride büyüyüp küçülüyor
+                            return ClipRect(
+                              child: SizedBox(
+                                height: 220,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (best.length > 1)
+                                      Expanded(
+                                        child: _podiumFull(
+                                          best[1], '🥈', const Color(0xFFC0C0C0), 45, 'Kalp kalbe bağ',
+                                          animH: hSilver < 0 ? 0 : hSilver,
+                                          contentOpacity: pReveal,
+                                        ),
+                                      ),
+                                    if (best.length <= 1) const Expanded(child: SizedBox()),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: _podiumFull(
+                                        best[0], '🥇', const Color(0xFFD4A017), 65, 'Ruh eşiniz',
+                                        animH: hGold < 0 ? 0 : hGold,
+                                        contentOpacity: pReveal,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    if (good.isNotEmpty)
+                                      Expanded(
+                                        child: _podiumFull(
+                                          good[0], '🥉', const Color(0xFFCD7F32), 30, 'Güçlü çekim',
+                                          animH: hBronze < 0 ? 0 : hBronze,
+                                          contentOpacity: pReveal,
+                                        ),
+                                      ),
+                                    if (good.isEmpty) const Expanded(child: SizedBox()),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 18),
+                        // ── Paneller sadece podium bittikten sonra görünür ──
+                        if (_podiumDone) ...[
+                        // ── İYİ UYUM (Aklınızda Bulunsun) Paneli ──
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0.0, end: 1.0),
+                          curve: Curves.easeOutCubic,
+                          duration: const Duration(milliseconds: 400),
+                          builder: (context, p1, _) => ClipRect(
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              heightFactor: p1,
+                              child: Opacity(
+                                opacity: p1,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - p1)),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: 0.5,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.transparent,
+                                              const Color(0xFFD4A017).withOpacity(0.15),
+                                              Colors.transparent,
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Yolunuza çıkarsa fırsatı kaçırmayın',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(
-                                              0.3,
+                                      ),
+                                      if (good.length > 1) ...[
+                                        const SizedBox(height: 14),
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12),
+                                            color: const Color(0xFFD4A017).withOpacity(0.03),
+                                            border: Border.all(
+                                              color: const Color(0xFFD4A017).withOpacity(0.1),
+                                              width: 0.5,
                                             ),
-                                            fontSize: 10,
-                                            fontStyle: FontStyle.italic,
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(Icons.lightbulb_outline_rounded,
+                                                      color: const Color(0xFFD4A017).withOpacity(0.5), size: 14),
+                                                  const SizedBox(width: 6),
+                                                  Text('Aklınızda Bulunsun',
+                                                      style: TextStyle(
+                                                          color: const Color(0xFFD4A017).withOpacity(0.6),
+                                                          fontSize: 12, fontWeight: FontWeight.w700)),
+                                                  const Spacer(),
+                                                  Text('Alternatif bir seçenek',
+                                                      style: TextStyle(
+                                                          color: Colors.white.withOpacity(0.25),
+                                                          fontSize: 9, fontStyle: FontStyle.italic)),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 10),
+                                              ...good.sublist(1).map((i) {
+                                                final gAnimal = ChineseZodiacData.animals[i];
+                                                return Container(
+                                                  margin: const EdgeInsets.only(bottom: 6),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: const Color(0xFFD4A017).withOpacity(0.03),
+                                                    border: Border.all(
+                                                        color: const Color(0xFFD4A017).withOpacity(0.08), width: 0.5),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      _animalIcon(i, 42),
+                                                      const SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(gAnimal['name'] as String,
+                                                                style: TextStyle(
+                                                                    color: Colors.white.withOpacity(0.8),
+                                                                    fontSize: 13, fontWeight: FontWeight.w700)),
+                                                            const SizedBox(height: 2),
+                                                            Text('Yolunuza çıkarsa fırsatı kaçırmayın',
+                                                                style: TextStyle(
+                                                                    color: Colors.white.withOpacity(0.3),
+                                                                    fontSize: 10, fontStyle: FontStyle.italic)),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }),
+                                            ],
                                           ),
                                         ),
                                       ],
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  ],
-                  // ── ZORLAYICI — ✗ çarpı işaretli ──
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: const Color(0xFFFF3D00).withOpacity(0.04),
-                      border: Border.all(
-                        color: const Color(0xFFFF3D00).withOpacity(0.12),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.warning_amber_rounded,
-                              color: const Color(0xFFFF3D00).withOpacity(0.5),
-                              size: 14,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Dikkat — Zorlayıcı',
-                              style: TextStyle(
-                                color: const Color(0xFFFF3D00).withOpacity(0.7),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                            const Spacer(),
-                            Text(
-                              'Ekstra sabır gerekir',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.2),
-                                fontSize: 9,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: bad
-                              .map(
-                                (i) => Expanded(
+                        // ── ZORLAYICI Paneli ── — kısa stagger ile
+                        if (_panel2Done)
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0.0, end: 1.0),
+                          curve: Curves.easeOutCubic,
+                          duration: const Duration(milliseconds: 400),
+                          builder: (context, p2, _) => ClipRect(
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              heightFactor: p2,
+                              child: Opacity(
+                                opacity: p2,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - p2)),
                                   child: Column(
                                     children: [
-                                      _animalIcon(i, 42, opacity: 0.4),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        ChineseZodiacData.animals[i]['name']
-                                            as String,
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.4),
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
+                                      const SizedBox(height: 14),
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: const Color(0xFFFF3D00).withOpacity(0.04),
+                                          border: Border.all(
+                                              color: const Color(0xFFFF3D00).withOpacity(0.12), width: 0.5),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(Icons.warning_amber_rounded,
+                                                    color: const Color(0xFFFF3D00).withOpacity(0.5), size: 14),
+                                                const SizedBox(width: 6),
+                                                Text('Dikkat — Zorlayıcı',
+                                                    style: TextStyle(
+                                                        color: const Color(0xFFFF3D00).withOpacity(0.7),
+                                                        fontSize: 11, fontWeight: FontWeight.w700)),
+                                                const Spacer(),
+                                                Text('Ekstra sabır gerekir',
+                                                    style: TextStyle(
+                                                        color: Colors.white.withOpacity(0.2),
+                                                        fontSize: 9, fontStyle: FontStyle.italic)),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Row(
+                                              children: bad
+                                                  .map((i) => Expanded(
+                                                        child: Column(
+                                                          children: [
+                                                            _animalIcon(i, 42, opacity: 0.4),
+                                                            const SizedBox(height: 4),
+                                                            Text(
+                                                              ChineseZodiacData.animals[i]['name'] as String,
+                                                              style: TextStyle(
+                                                                  color: Colors.white.withOpacity(0.4),
+                                                                  fontSize: 10, fontWeight: FontWeight.w600),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ))
+                                                  .toList(),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ),
+                          ),
                         ),
+                      ],  // if (_podiumDone)
                       ],
                     ),
-                  ),
                 ],
               ),
             ),
@@ -5610,36 +5560,46 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     String medal,
     Color c,
     double pillarH,
-    String desc,
-  ) {
+    String desc, {
+    double contentOpacity = 1.0,
+    double? animH,
+  }) {
     final animal = ChineseZodiacData.animals[animalIdx];
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _animalIcon(animalIdx, 42),
-        const SizedBox(height: 3),
-        Text(
-          animal['name'] as String,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Text(medal, style: const TextStyle(fontSize: 12)),
-        Text(
-          desc,
-          style: TextStyle(
-            color: c.withOpacity(0.5),
-            fontSize: 8,
-            fontWeight: FontWeight.w600,
-            fontStyle: FontStyle.italic,
+        Opacity(
+          opacity: contentOpacity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _animalIcon(animalIdx, 42),
+              const SizedBox(height: 3),
+              Text(
+                animal['name'] as String,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(medal, style: const TextStyle(fontSize: 12)),
+              Text(
+                desc,
+                style: TextStyle(
+                  color: c.withOpacity(0.5),
+                  fontSize: 8,
+                  fontWeight: FontWeight.w600,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 4),
         Container(
           width: double.infinity,
-          height: pillarH,
+          height: animH ?? pillarH,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
             gradient: LinearGradient(
@@ -10131,6 +10091,118 @@ class _AnimalIconPainter extends CustomPainter {
 
 // Uyum tablosu kategorileri
 enum _CompatCatType { love, friend, work, comm }
+
+// CTA — Zodyak Çarkı (animasyonlu)
+class _ZodiacWheelPainter extends CustomPainter {
+  final double outerAngle; // dış halka + tikler — saat yönü
+  final double innerAngle; // iç yıldız — ters yön
+  const _ZodiacWheelPainter({this.outerAngle = 0, this.innerAngle = 0});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final center = Offset(cx, cy);
+    const gold = Color(0xFFD4A017);
+
+    // Radyal aura (sabit)
+    canvas.drawCircle(
+      center, cx,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [gold.withOpacity(0.10), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: center, radius: cx)),
+    );
+
+    // ── Orta halka (sabit) ──
+    canvas.drawCircle(center, cx * 0.62,
+      Paint()..color = gold.withOpacity(0.12)..style = PaintingStyle.stroke..strokeWidth = 0.5);
+
+    // ── Dış katman: halka + tik çizgiler + nokta (döner) ──
+    canvas.save();
+    canvas.translate(cx, cy);
+    canvas.rotate(outerAngle);
+    canvas.translate(-cx, -cy);
+
+    // Dış halka
+    canvas.drawCircle(center, cx - 2,
+      Paint()..color = gold.withOpacity(0.35)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+
+    // 12 tik
+    for (int i = 0; i < 12; i++) {
+      final angle = (i * 30 - 90) * math.pi / 180;
+      final isMajor = i % 3 == 0;
+      canvas.drawLine(
+        Offset(cx + (cx - 2) * math.cos(angle), cy + (cx - 2) * math.sin(angle)),
+        Offset(cx + (isMajor ? cx * 0.74 : cx * 0.84) * math.cos(angle),
+               cy + (isMajor ? cx * 0.74 : cx * 0.84) * math.sin(angle)),
+        Paint()
+          ..color = gold.withOpacity(isMajor ? 0.55 : 0.22)
+          ..strokeWidth = isMajor ? 1.2 : 0.6,
+      );
+    }
+
+    // 12 ara nokta
+    for (int i = 0; i < 12; i++) {
+      final angle = (i * 30 - 90 + 15) * math.pi / 180;
+      canvas.drawCircle(
+        Offset(cx + cx * 0.73 * math.cos(angle), cy + cx * 0.73 * math.sin(angle)),
+        1.8, Paint()..color = gold.withOpacity(0.45),
+      );
+    }
+
+    canvas.restore();
+
+    // ── İç katman: iç halka + 4 kardinal + 6-noktalı yıldız (ters döner) ──
+    canvas.save();
+    canvas.translate(cx, cy);
+    canvas.rotate(innerAngle);
+    canvas.translate(-cx, -cy);
+
+    // İç halka
+    canvas.drawCircle(center, cx * 0.28,
+      Paint()..color = gold.withOpacity(0.45)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+
+    // 4 kardinal
+    for (int i = 0; i < 4; i++) {
+      final angle = (i * 90 - 90) * math.pi / 180;
+      canvas.drawLine(
+        Offset(cx + cx * 0.28 * math.cos(angle), cy + cx * 0.28 * math.sin(angle)),
+        Offset(cx + cx * 0.62 * math.cos(angle), cy + cx * 0.62 * math.sin(angle)),
+        Paint()..color = gold.withOpacity(0.18)..strokeWidth = 0.5,
+      );
+    }
+
+    // 6-noktalı yıldız burst
+    for (int i = 0; i < 6; i++) {
+      final angle = (i * 60 - 90) * math.pi / 180;
+      canvas.drawLine(
+        center,
+        Offset(cx + cx * 0.24 * math.cos(angle), cy + cx * 0.24 * math.sin(angle)),
+        Paint()..color = gold.withOpacity(0.35)..strokeWidth = 0.8,
+      );
+    }
+
+    canvas.restore();
+
+    // ── Merkez nokta (sabit) ──
+    canvas.drawCircle(center, 3.5, Paint()..color = gold.withOpacity(0.8));
+    canvas.drawCircle(center, 5.5,
+      Paint()..color = gold.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+  }
+
+  @override
+  bool shouldRepaint(_ZodiacWheelPainter old) =>
+      old.outerAngle != outerAngle || old.innerAngle != innerAngle;
+}
+
+// CTA — Takımyıldızı altın parlaklık efekti (eski, artık kullanılmıyor ama referans için)
+class _ConstellationGlowPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {}
+  @override
+  bool shouldRepaint(_ConstellationGlowPainter old) => false;
+}
 
 // Detaylı Uyum Tablosu — Özel grafik ikonu
 class _CompatChartIconPainter extends CustomPainter {

@@ -1058,18 +1058,22 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     DateTime selectedTargetDate = DateTime.now().add(Duration(days: dayIndex));
     int syncScore = _calculateDailyScores(selectedTargetDate)['alignScore']!;
     
-    int daysSinceEpoch = selectedTargetDate.difference(DateTime(1970)).inDays;
-    // 3'lü rotasyon kullanılarak ayni frekans bandında art arda MÜKERRER metin çıkması matematiksel olarak engelleniyor
-    int vIdx = daysSinceEpoch % 3; 
-
     Map<String, dynamic> userNahual = MayanZodiacData.nahuales[_userIdx];
     String signName = userNahual['name'].toString().split(' ').first; 
     String mainTrait = userNahual['words'].toString().split(',').first.split('&').first.trim().toUpperCase(); 
     
     String actionTitle = "";
     String actionDesc = "";
+    int vIdx = 0;
 
     if (syncScore >= 80) {
+      if (syncScore >= 94) {
+        vIdx = 2; // Yaratım frekansı (En yüksek)
+      } else if (syncScore >= 87) {
+        vIdx = 1; // Kozmik Çekim (Orta)
+      } else {
+        vIdx = 0; // Uyanış (Zirve başlangıcı)
+      }
       List<String> titles = ["ZİRVE: $mainTrait UYANIŞI", "ZİRVE: KOZMİK ÇEKİM", "ZİRVE: YARATIM FREKANSI"];
       List<String> descs = [
         "Kozmik hizalanman en üst seviyede. $signName ruhunun taşıdığı potansiyeli cesurca sahneye koymak, yeni atılımlar yapmak ve kilitli kapıları kırmak için harika bir gün. Rüzgar tamamen arkanda.",
@@ -1079,6 +1083,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
     } else if (syncScore >= 55) {
+      if (syncScore >= 72) {
+        vIdx = 2; // Ritmik Uyum (Zirveye en yakın)
+      } else if (syncScore >= 64) {
+        vIdx = 1; // Denge ve İlerleme (Orta)
+      } else {
+        vIdx = 0; // Akış ve Güven (Pozitif başlangıcı)
+      }
       List<String> titles = ["POZİTİF: AKIŞ VE GÜVEN", "POZİTİF: DENGE VE İLERLEME", "POZİTİF: RİTMİK UYUM"];
       List<String> descs = [
         "Ritim seninle oldukça uyumlu. Çaba harcamadan pürüzsüz ilerleyecek işlerine odaklan. İçindeki $signName sezgilerine güvenerek, dengeni koruyan eylemler ve iletişimler kurabilirsin.",
@@ -1088,6 +1099,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
     } else if (syncScore >= 35) {
+      if (syncScore >= 49) {
+        vIdx = 0; // Gözlem ve Hazırlık (Pozitife en yakın, 0. index)
+      } else if (syncScore >= 42) {
+        vIdx = 1; // Sabır ve Değerlendirme (Orta Nötr, 1. index)
+      } else {
+        vIdx = 2; // İçsel Toparlanma (Dibe eğilimli Nötr, 2. index)
+      }
       List<String> titles = ["NÖTR: GÖZLEM VE HAZIRLIK", "NÖTR: SABIR VE DEĞERLENDİRME", "NÖTR: İÇSEL TOPARLANMA"];
       List<String> descs = [
         "Evrensel dalga yavaşlıyor. Büyük veya riskli adımlar atmaktan ziyade, mevcut durumunu koruman, geçmiş projelerini gözden geçirmen ve sabırla beklemen gereken hazırlık aşaması.",
@@ -1097,6 +1115,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
     } else {
+      if (syncScore >= 24) {
+        vIdx = 0; // İçsel Yenilenme (Nötre en yakın, 0. index)
+      } else if (syncScore >= 12) {
+        vIdx = 1; // Kozmik Dinlenme (Orta Dip, 1. index)
+      } else {
+        vIdx = 2; // Gölge ve Şifa (En dip, 2. index)
+      }
       List<String> titles = ["DİP: İÇSEL YENİLENME", "DİP: KOZMİK DİNLENME", "DİP: GÖLGE VE ŞİFA"];
       List<String> descs = [
         "Enerjin tamamen içe çekiliyor. Çevrendeki evrensel frekanslar bugün $signName doğanla doğrudan çatışabilir. Olayları zorlayıp akıntıya kürek çekmek yerine, inzivaya çekilip ruhsal olarak şarj ol.",
