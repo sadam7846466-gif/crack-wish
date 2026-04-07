@@ -280,24 +280,24 @@ class _BentoGridState extends State<BentoGrid>
                             borderRadius: BorderRadius.circular(18),
                             child: Center(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.35),
+                                  color: Colors.black.withOpacity(0.4),
                                   borderRadius: BorderRadius.circular(100),
-                                  border: Border.all(color: Colors.white.withOpacity(0.15)),
+                                  border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.lock_rounded, color: Colors.white.withOpacity(0.9), size: 13),
-                                    const SizedBox(width: 5),
+                                    Icon(Icons.lock_outline_rounded, color: Colors.white.withOpacity(0.9), size: 14),
+                                    const SizedBox(width: 6),
                                     Text(
-                                      l10n.localeName == 'tr' ? 'Yakında' : 'Soon',
+                                      l10n.localeName == 'tr' ? 'Mühürlü' : 'Sealed',
                                       style: GoogleFonts.inter(
                                         color: Colors.white.withOpacity(0.95),
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1.2,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.5,
                                       ),
                                     ),
                                   ],
@@ -417,7 +417,7 @@ class _MoodCard extends StatelessWidget {
                 const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  l10n.localeName == 'tr' ? 'Bu özellik çok yakında aktif olacak ✨' : 'This feature is coming soon ✨',
+                  l10n.localeName == 'tr' ? 'Bu alan henüz keşfedilmeyi bekliyor ✨' : 'This realm is waiting to be explored ✨',
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ],
@@ -499,7 +499,7 @@ class _MoodCard extends StatelessWidget {
                       Icon(Icons.lock_rounded, color: Colors.white.withOpacity(0.5), size: 13),
                       const SizedBox(width: 6),
                       Text(
-                        l10n.localeName == 'tr' ? 'Çok Yakında' : 'Coming Soon',
+                        l10n.localeName == 'tr' ? 'Mühürlü' : 'Sealed',
                         style: GoogleFonts.inter(
                           color: Colors.white.withOpacity(0.6),
                           fontSize: 12,

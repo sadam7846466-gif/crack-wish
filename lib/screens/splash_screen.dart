@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'root_shell.dart';
 import 'welcome_screen.dart';
+import 'onboarding_page.dart';
 import '../services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -46,10 +47,11 @@ class _SplashScreenState extends State<SplashScreen>
         _navigating = true;
         final seen = await StorageService.hasSeenWelcome();
         if (!mounted) return;
+        
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) =>
-                seen ? const RootShell() : const WelcomeScreen(),
+            // DEV MODE: Her seferinde açılış ekranını göster
+            pageBuilder: (_, __, ___) => const WelcomeScreen(), 
             transitionsBuilder: (_, a, __, child) => child,
             transitionDuration: Duration.zero,
           ),

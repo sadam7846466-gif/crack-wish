@@ -1050,22 +1050,33 @@ class _DreamPageState extends State<DreamPage>
   Widget _dreamCreditInfoRow(IconData icon, String text, bool active) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: active
-              ? AppColors.primaryPurple
-              : Colors.white.withOpacity(0.3),
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: active
+                ? AppColors.primaryPurple.withOpacity(0.12)
+                : Colors.white.withOpacity(0.05),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: active
+                ? AppColors.primaryPurple.withOpacity(0.8)
+                : Colors.white.withOpacity(0.3),
+          ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
               color: active
-                  ? Colors.white.withOpacity(0.9)
+                  ? Colors.white.withOpacity(0.75)
                   : Colors.white.withOpacity(0.4),
               fontSize: 13,
+              height: 1.3,
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
+import '../data/daily_quotes.dart';
 
 class QuoteBanner extends StatelessWidget {
   const QuoteBanner({super.key});
@@ -8,6 +9,10 @@ class QuoteBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final int daysSinceEpoch = DateTime.now().millisecondsSinceEpoch ~/ 86400000;
+    final int quoteIndex = daysSinceEpoch % DailyQuotes.pool.length;
+    final String activeQuote = DailyQuotes.pool[quoteIndex][l10n.localeName == 'tr' ? 'tr' : 'en']!;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -54,8 +59,8 @@ class QuoteBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.quoteOfDayText,
-                    style: TextStyle(
+                    activeQuote,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontStyle: FontStyle.italic,

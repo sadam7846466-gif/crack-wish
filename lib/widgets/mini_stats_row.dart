@@ -9,6 +9,7 @@ import '../constants/colors.dart';
 import '../services/storage_service.dart';
 import '../models/cookie_card.dart';
 import '../screens/owl_letter_page.dart';
+import '../utils/cosmic_calendar.dart';
 
 class MiniStatsRow extends StatefulWidget {
   final VoidCallback? onRefresh;
@@ -33,18 +34,51 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
 
   // Günün teması
   static const _themes = [
-    {'emoji': '💕', 'tr': 'Aşk', 'en': 'Love',
+    {'emoji': '💕', 'tr': 'Bugün Aşk Günü', 'en': 'Today is Love Day',
      'descTr': 'Bugün kalbinin sesini dinle. Sevgi enerjin yüksek, yakınlarına vakit ayır.',
      'descEn': 'Listen to your heart today. Your love energy is high, spend time with loved ones.'},
-    {'emoji': '💰', 'tr': 'Para', 'en': 'Money',
+    {'emoji': '💰', 'tr': 'Bugün Para Günü', 'en': 'Today is Money Day',
      'descTr': 'Finansal fırsatlar kapında. Küçük adımlar büyük kazançlar getirebilir.',
      'descEn': 'Financial opportunities await. Small steps can lead to big gains.'},
-    {'emoji': '🚀', 'tr': 'Kariyer', 'en': 'Career',
+    {'emoji': '🚀', 'tr': 'Bugün Kariyer Günü', 'en': 'Today is Career Day',
      'descTr': 'Bugün kariyerinde yeni kapılar açılabilir. Cesur ol ve fırsatları değerlendir.',
      'descEn': 'New doors may open in your career today. Be bold and seize opportunities.'},
-    {'emoji': '🌿', 'tr': 'Sağlık', 'en': 'Health',
+    {'emoji': '🌿', 'tr': 'Bugün Sağlık Günü', 'en': 'Today is Health Day',
      'descTr': 'Bedenine ve ruhuna iyi bak. Bugün kendine vakit ayırman gereken bir gün.',
      'descEn': 'Take care of your body and soul. Today is a day to focus on yourself.'},
+    {'emoji': '🧘', 'tr': 'Bugün Huzur Günü', 'en': 'Today is Peace Day',
+     'descTr': 'Zihnindeki fırtınaları dindir. Bugün içsel dinginliğine odaklan.',
+     'descEn': 'Calm the storms in your mind. Focus on your inner peace today.'},
+    {'emoji': '🍀', 'tr': 'Bugün Şans Günü', 'en': 'Today is Lucky Day',
+     'descTr': 'Evren bugün benden yana de! Beklenmedik tesadüfler kapını çalabilir.',
+     'descEn': 'The universe is on your side! Unexpected coincidences may knock on your door.'},
+    {'emoji': '💡', 'tr': 'Bugün İlham Günü', 'en': 'Today is Inspiration Day',
+     'descTr': 'Yaratıcı enerjin tavan yapıyor. Uzun zamandır aradığın o fikir bugün gelebilir.',
+     'descEn': 'Your creative energy is peaking. The idea you’ve been looking for may arrive today.'},
+    {'emoji': '🧭', 'tr': 'Bugün Macera Günü', 'en': 'Today is Adventure Day',
+     'descTr': 'Konfor alanından çıkmanın tam vakti. Bugün yeni bir yolculuğa adım at.',
+     'descEn': 'Time to step out of your comfort zone. Embark on a new journey today.'},
+    {'emoji': '⚖️', 'tr': 'Bugün Denge Günü', 'en': 'Today is Balance Day',
+     'descTr': 'Hayatındaki teraziyi eşitleme zamanı. Mantığın ve duyguların omuz omuza.',
+     'descEn': 'Time to balance the scales in your life. Logic and emotions are side by side.'},
+    {'emoji': '🦉', 'tr': 'Bugün Bilgelik Günü', 'en': 'Today is Wisdom Day',
+     'descTr': 'Geçmişin derslerini bugüne taşı. Vereceğin kararlar ustaca olacak.',
+     'descEn': 'Bring lessons of the past into the present. Your decisions will be masterful.'},
+    {'emoji': '💧', 'tr': 'Bugün Yenilik Günü', 'en': 'Today is Renewal Day',
+     'descTr': 'Kötü enerjileri su gibi akıt gitsin. Taze bir başlangıcın tam ortasındasın.',
+     'descEn': 'Let bad energy flow away like water. You are in the midst of a fresh start.'},
+    {'emoji': '🎯', 'tr': 'Bugün Odak Günü', 'en': 'Today is Focus Day',
+     'descTr': 'Hedefin tam karşında. Dış sesleri kıs ve sadece yapman gerekene odaklan.',
+     'descEn': 'Your goal is right in front of you. Mute the outside noise and focus.'},
+    {'emoji': '🔥', 'tr': 'Bugün Cesaret Günü', 'en': 'Today is Courage Day',
+     'descTr': 'İçindeki ateşi hisset! Bugün ertelediğin zorlu bir adımı atmanın tam günü.',
+     'descEn': 'Feel the fire inside! Today is the day to take that difficult step you postponed.'},
+    {'emoji': '🏆', 'tr': 'Bugün Başarı Günü', 'en': 'Today is Success Day',
+     'descTr': 'Ufak zaferlerini kutla. Bugün ektiğin tohumların meyvesini topluyorsun.',
+     'descEn': 'Celebrate your small victories. You are reaping the fruits of your labor today.'},
+    {'emoji': '🤝', 'tr': 'Bugün Dostluk Günü', 'en': 'Today is Friendship Day',
+     'descTr': 'Eski bir dosta merhaba de. Bugün bağları güçlendirmek ruhuna çok iyi gelecek.',
+     'descEn': 'Say hello to an old friend. Strengthening bonds will heal your soul today.'},
   ];
 
   // Tılsımlar
@@ -194,6 +228,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
 
   late int _themeIndex;
   late int _talismanIndex;
+  CosmicDayEvent? _specialEvent;
 
   @override
   void initState() {
@@ -201,6 +236,13 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     _pickDailyValues();
     _loadStats();
     _loadPinnedCookie();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = AppLocalizations.of(context)!.localeName;
+    _specialEvent = CosmicCalendar.getEventForDate(DateTime.now(), locale);
   }
 
   Future<void> _loadPinnedCookie() async {
@@ -222,7 +264,9 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     final now = DateTime.now();
     final daySeed = now.year * 10000 + now.month * 100 + now.day;
     final rng = Random(daySeed);
-    _themeIndex = rng.nextInt(_themes.length);
+    
+    // Rastgele Astrolojik Temalardan (Örn: Aşk, Para, Huzur) birini seç.
+    _themeIndex = rng.nextInt(_themes.length); 
     _talismanIndex = Random().nextInt(_talismans.length);
   }
 
@@ -239,15 +283,22 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
 
   Widget _themeIconWidget(int index) {
     switch (index) {
-      case 0:
-        return const Icon(Icons.favorite_rounded, size: 16, color: Colors.white);
-      case 1:
-        return const Icon(Icons.savings_rounded, size: 16, color: Colors.white);
-      case 2:
-        return const Icon(Icons.rocket_launch_rounded, size: 16, color: Colors.white);
-      case 3:
-      default:
-        return const Icon(Icons.spa_rounded, size: 16, color: Colors.white);
+      case 0: return const Icon(Icons.favorite_rounded, size: 18, color: Colors.white);
+      case 1: return const Icon(Icons.savings_rounded, size: 18, color: Colors.white);
+      case 2: return const Icon(Icons.rocket_launch_rounded, size: 18, color: Colors.white);
+      case 3: return const Icon(Icons.spa_rounded, size: 18, color: Colors.white);
+      case 4: return const Icon(Icons.self_improvement_rounded, size: 18, color: Colors.white);
+      case 5: return const Icon(Icons.star_rounded, size: 18, color: Colors.white);
+      case 6: return const Icon(Icons.lightbulb_rounded, size: 18, color: Colors.white);
+      case 7: return const Icon(Icons.explore_rounded, size: 18, color: Colors.white);
+      case 8: return const Icon(Icons.balance_rounded, size: 18, color: Colors.white);
+      case 9: return const Icon(Icons.menu_book_rounded, size: 18, color: Colors.white);
+      case 10: return const Icon(Icons.water_drop_rounded, size: 18, color: Colors.white);
+      case 11: return const Icon(Icons.track_changes_rounded, size: 18, color: Colors.white);
+      case 12: return const Icon(Icons.whatshot_rounded, size: 18, color: Colors.white);
+      case 13: return const Icon(Icons.emoji_events_rounded, size: 18, color: Colors.white);
+      case 14: return const Icon(Icons.people_alt_rounded, size: 18, color: Colors.white);
+      default: return const Icon(Icons.auto_awesome_rounded, size: 18, color: Colors.white);
     }
   }
 
@@ -274,12 +325,21 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     final isTr = l10n.localeName == 'tr';
 
     String emoji, title, desc;
+    Widget? displayIcon;
     String? imagePath;
     if (index == 0) {
-      final t = _themes[_themeIndex];
-      emoji = t['emoji']!;
-      title = isTr ? t['tr']! : t['en']!;
-      desc = isTr ? t['descTr']! : t['descEn']!;
+      if (_specialEvent != null) {
+        emoji = _specialEvent!.emoji;
+        displayIcon = _specialEvent!.iconWidget;
+        title = isTr ? _specialEvent!.trTitle : _specialEvent!.enTitle;
+        desc = isTr ? _specialEvent!.descTr : _specialEvent!.descEn;
+      } else {
+        final t = _themes[_themeIndex];
+        emoji = t['emoji']!;
+        displayIcon = _themeIconWidget(_themeIndex);
+        title = isTr ? t['tr']! : t['en']!;
+        desc = isTr ? t['descTr']! : t['descEn']!;
+      }
     } else if (index == 1) {
       // Koleksiyon overlay'ı — özel kurabiye grid göster
       Navigator.of(context).push(
@@ -318,7 +378,9 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
         pageBuilder: (context, _, __) => _StatOverlay(
           topY: topY,
           btnCenterX: btnCenterX,
-          emoji: emoji,
+          displayIcon: index == 0 
+              ? displayIcon 
+              : Text(emoji, style: const TextStyle(fontSize: 44, fontFamilyFallback: ['Apple Color Emoji'])),
           imagePath: imagePath,
           title: title,
           description: desc,
@@ -359,27 +421,19 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
     // App kurabiye ikonu (splash_cookie)
     final cookieIconWidget = Image.asset(
       'assets/icons/splash_cookie.png',
-      width: 22,
-      height: 22,
+      width: 20,
+      height: 20,
       fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 20, fontFamilyFallback: ['Apple Color Emoji'])),
+      errorBuilder: (_, __, ___) => const Text('🥠', style: TextStyle(fontSize: 18, fontFamilyFallback: ['Apple Color Emoji'])),
     );
 
-    // Tılsım görseli
-    final talismanImagePath = talisman['image'];
-    Widget? talismanIconWidget;
-    if (talismanImagePath != null) {
-      talismanIconWidget = ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.asset(
-          talismanImagePath,
-          width: 26,
-          height: 26,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Text(talisman['emoji']!, style: const TextStyle(fontSize: 16, fontFamilyFallback: ['Apple Color Emoji'])),
-        ),
-      );
-    }
+    // Tılsım butonu için gizemli, temiz ve jenerik bir vektör ikonu kullanıyoruz
+    // Dışarıda sadece ikon görünür, kullanıcı tıklayınca asıl resim şöleni içeride başlar (Sürpriz/Gizem)!
+    Widget talismanIconWidget = const Icon(
+      Icons.nightlight_round, 
+      size: 18, 
+      color: Colors.white
+    );
 
     return Row(
       key: _rowKey,
@@ -387,8 +441,8 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
         Expanded(
           child: _MiniStatCard(
             key: _key0,
-            icon: theme['emoji']!,
-            iconWidget: _themeIconWidget(_themeIndex),
+            icon: _specialEvent != null ? _specialEvent!.emoji : theme['emoji']!,
+            iconWidget: _specialEvent != null ? _specialEvent!.iconWidget : _themeIconWidget(_themeIndex),
             label: l10n.statTheme,
             onTap: () => _openOverlay(0),
           ),
@@ -422,7 +476,7 @@ class _MiniStatsRowState extends State<MiniStatsRow> {
 class _StatOverlay extends StatefulWidget {
   final double topY;
   final double btnCenterX;
-  final String emoji;
+  final Widget? displayIcon;
   final String? imagePath;
   final String title;
   final String description;
@@ -430,7 +484,7 @@ class _StatOverlay extends StatefulWidget {
   const _StatOverlay({
     required this.topY,
     required this.btnCenterX,
-    required this.emoji,
+    this.displayIcon,
     this.imagePath,
     required this.title,
     required this.description,
@@ -562,12 +616,21 @@ class _StatOverlayState extends State<_StatOverlay>
                   child: Image.asset(
                     widget.imagePath!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Text(widget.emoji, style: const TextStyle(fontSize: 40, fontFamilyFallback: ['Apple Color Emoji'])),
+                    errorBuilder: (_, __, ___) => widget.displayIcon ?? const Icon(Icons.stars_rounded, size: 44, color: Colors.white),
                   ),
                 )
               else
-                Text(widget.emoji, style: const TextStyle(fontSize: 44, fontFamilyFallback: ['Apple Color Emoji'])),
-              const SizedBox(height: 12),
+                SizedBox(
+                  width: 84,
+                  height: 84,
+                  child: Center(
+                    child: Transform.scale(
+                      scale: 4.4, // İkonun büyük (~80) gözükmesi için ölçekliyoruz (18 * 4.4 = 79.2)
+                      child: widget.displayIcon ?? const Icon(Icons.stars_rounded, size: 24, color: Colors.white),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
@@ -748,15 +811,17 @@ class _MiniStatCardState extends State<_MiniStatCard>
                         ),
                         const SizedBox(width: 6),
                         Flexible(
-                          child: Text(
-                            widget.label,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: AppColors.textWhite,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.label,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: AppColors.textWhite,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),

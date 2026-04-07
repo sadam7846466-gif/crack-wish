@@ -703,6 +703,20 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   }
 
   @override
+  void reassemble() {
+    super.reassemble();
+    // ⚠️ DEV TEST: Her "R" (Hot Reload) basıldığında otomatik 5 Ruh Taşı tanımlar
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('soul_stones', 5).then((_) {
+        try {
+          StorageService.soulStonesNotifier.value = 5;
+          debugPrint('💎 DEV MODE: Hot reload ile hesaba 5 Ruh Taşı yüklendi!');
+        } catch (_) {}
+      });
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final code = Localizations.localeOf(context).languageCode;
@@ -1345,11 +1359,61 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     });
 
     // --- Saspans (Yorumlama / Bekleme) Hissi ---
-    _setMiniStatus(
-      _t('Kaderin fısıltısı dinleniyor...', 'Listening to whispers of fate...'),
-      ms: 800,
+    // Kozmik hesaplama hissiyatı veren tam ekran overlay
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 1500),
+      pageBuilder: (context, _, __) {
+        return _InterpretingOverlay(
+          isTr: _isTr, 
+          cardCount: _selectedCardIndexes.length,
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curve = CurvedAnimation(parent: anim1, curve: Curves.easeInOutCubic);
+        return AnimatedBuilder(
+          animation: anim1,
+          builder: (context, _) {
+            final val = curve.value;
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(
+                      sigmaX: 20 * val, 
+                      sigmaY: 20 * val,
+                    ),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.6 * val),
+                    ),
+                  ),
+                ),
+                Opacity(
+                  opacity: val,
+                  child: Transform.scale(
+                    scale: 0.4 + (0.6 * val),
+                    child: child,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
-    await Future.delayed(const Duration(milliseconds: 400));
+
+    // Yorumun derinliğini ve "yapay zeka analiz" hissini maksimize etmek için
+    // süre en az 8 saniye, en çok 20 saniye olacak şekilde rastgele belirleniyor.
+    final randomWaitMs = 8000 + Random().nextInt(12001); // 8,000ms - 20,000ms arası
+    await Future.delayed(Duration(milliseconds: randomWaitMs));
+    if (!mounted) return;
+    
+    // Overlay'i kapat
+    Navigator.of(context, rootNavigator: true).pop();
+    // Tamamen ekrandan kaybolması için FAZLASIYLA bekleyip öyle ana sonuca geçiyoruz
+    await Future.delayed(const Duration(milliseconds: 1600));
     if (!mounted) return;
     // -------------------------------------------
 
@@ -12317,3 +12381,135 @@ class _TapAnimButtonState extends State<_TapAnimButton> {
     );
   }
 }
+
+class _InterpretingOverlay extends StatefulWidget {
+  final bool isTr;
+  final int cardCount;
+  const _InterpretingOverlay({required this.isTr, required this.cardCount});
+
+  @override
+  State<_InterpretingOverlay> createState() => _InterpretingOverlayState();
+}
+
+class _InterpretingOverlayState extends State<_InterpretingOverlay> with TickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+  late AnimationController _dotCtrl;
+  late final List<IconData> _randomIcons;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2500))..repeat(reverse: true);
+    _dotCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000))..repeat();
+    
+    final icons = [
+      Icons.auto_awesome,
+      Icons.brightness_3,
+      Icons.brightness_7,
+      Icons.nights_stay,
+      Icons.star_border,
+      Icons.flare,
+      Icons.ac_unit,
+      Icons.waves,
+      Icons.flash_on,
+      Icons.wb_sunny,
+      Icons.spa,
+      Icons.all_inclusive,
+    ];
+    icons.shuffle();
+    _randomIcons = icons.take(widget.cardCount).toList();
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    _dotCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              AnimatedBuilder(
+                animation: _pulseCtrl,
+                builder: (context, child) {
+                   final spreadVal = Curves.easeInOutSine.transform(_pulseCtrl.value); // 0.0 -> 1.0 (Soft curve)
+                   final n = widget.cardCount;
+                   final gap = n == 3 ? 0.5 : 0.25;
+                   final center = (n - 1) / 2.0;
+
+                   Widget buildCard(double angle, int iconIndex) {
+                     return Transform.rotate(
+                       angle: angle,
+                       alignment: Alignment.bottomCenter,
+                       child: Container(
+                         width: 55,
+                         height: 90,
+                         decoration: BoxDecoration(
+                           color: const Color(0xFFE2E8F0).withOpacity(0.15),
+                           borderRadius: BorderRadius.circular(6),
+                           border: Border.all(
+                             color: Colors.white.withOpacity(0.2 + 0.1 * spreadVal), 
+                             width: 1.0,
+                           ),
+                           boxShadow: [
+                             BoxShadow(
+                               color: Colors.black.withOpacity(0.15),
+                               blurRadius: 20,
+                               spreadRadius: 2,
+                             )
+                           ]
+                         ),
+                         child: Center(
+                           child: Icon(_randomIcons[iconIndex], color: Colors.white.withOpacity(0.6), size: 20),
+                         ),
+                       ),
+                     );
+                   }
+
+                   return SizedBox(
+                     width: n > 3 ? 240 : 140,
+                     height: 100,
+                     child: Stack(
+                       alignment: Alignment.center,
+                       children: List.generate(n, (i) {
+                         final angle = (i - center) * gap * spreadVal;
+                         return buildCard(angle, i);
+                       }),
+                     ),
+                   );
+                }
+              ),
+              const SizedBox(height: 32),
+              AnimatedBuilder(
+                animation: _dotCtrl,
+                builder: (context, child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(3, (index) {
+                      // Dalganın soldan sağa akması için fazı (-) yapıyoruz
+                      final val = sin((_dotCtrl.value * pi * 2) - (index * 1.5));
+                      final opacity = ((val + 1) / 2).clamp(0.2, 1.0);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: CircleAvatar(
+                          radius: 3,
+                          backgroundColor: Colors.white.withOpacity(opacity),
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+              ],
+        ),
+      ),
+    );
+  }
+}
+

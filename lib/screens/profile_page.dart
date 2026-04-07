@@ -13,9 +13,12 @@ import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
 import '../widgets/glass_back_button.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'premium_paywall_page.dart';
+import 'welcome_screen.dart';
 import 'notification_settings_page.dart';
 import 'home_page.dart';
+import 'onboarding_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
@@ -145,13 +148,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final avatars = [
       'assets/images/owl.webp',
-      'assets/images/cookies/sakura_bloom.webp',
-      'assets/images/cookies/midnight_mosaic.webp',
-      'assets/images/cookies/dragon_phoenix.webp',
-      'assets/images/ruyabulut.webp',
-      'assets/images/NAZAR.webp',
-      'assets/images/motiveYILDIZ.webp',
-      'assets/images/cookies/pearl_lace.webp',
     ];
 
     showModalBottomSheet(
@@ -165,186 +161,185 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(ctx).viewInsets.bottom,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0F1F2A),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      blurRadius: 40,
-                      spreadRadius: -5,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF16151A).withOpacity(0.85),
+                          const Color(0xFF0D0C11).withOpacity(0.95),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
+                      border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
                     ),
-                  ],
-                ),
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                    padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 48,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      lang == 'tr' ? 'Profilini Düzenle' : 'Edit Profile',
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      lang == 'tr'
-                          ? 'Sihirli avatarını seç ve adını belirle.'
-                          : 'Choose your magical avatar and set your name.',
-                      style: TextStyle(
-                        color: AppColors.textWhite.withOpacity(0.45),
-                        fontSize: 14,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    
-                    // Avatar Seçimi
-                    SizedBox(
-                      height: 86,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: avatars.length,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final avatar = avatars[index];
-                          final isSelected = avatar == selectedAvatar;
-                          return GestureDetector(
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              setModalState(() => selectedAvatar = avatar);
+                        const SizedBox(height: 28),
+                        Text(
+                          lang == 'tr' ? 'Profilini Düzenle' : 'Edit Profile',
+                          style: const TextStyle(
+                            color: AppColors.textWhite,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          lang == 'tr'
+                              ? 'Sihirli avatarını seç.'
+                              : 'Choose your magical avatar.',
+                          style: TextStyle(
+                            color: AppColors.textWhite.withOpacity(0.5),
+                            fontSize: 15,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        
+                        // Avatar Seçimi
+                        SizedBox(
+                          height: 104,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: avatars.length,
+                            physics: const BouncingScrollPhysics(),
+                            clipBehavior: Clip.none,
+                            itemBuilder: (context, index) {
+                              final avatar = avatars[index];
+                              final isSelected = avatar == selectedAvatar;
+                              return GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  setModalState(() => selectedAvatar = avatar);
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOutCubic,
+                                  margin: const EdgeInsets.only(right: 20),
+                                  width: isSelected ? 104 : 90,
+                                  height: isSelected ? 104 : 90,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected ? AppColors.primaryOrange.withOpacity(0.9) : Colors.white.withOpacity(0.08),
+                                      width: isSelected ? 3 : 1,
+                                    ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: AppColors.primaryOrange.withOpacity(0.35),
+                                              blurRadius: 24,
+                                              spreadRadius: 4,
+                                            )
+                                          ]
+                                        : [],
+                                    gradient: LinearGradient(
+                                      colors: isSelected
+                                          ? [
+                                              AppColors.primaryOrange.withOpacity(0.15),
+                                              Colors.black.withOpacity(0.3),
+                                            ]
+                                          : [
+                                              Colors.white.withOpacity(0.08),
+                                              Colors.white.withOpacity(0.02),
+                                            ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                        (avatar.contains('cookies') || avatar.contains('owl'))
+                                            ? (isSelected ? 16.0 : 20.0)
+                                            : 0.0,
+                                      ),
+                                      child: Image.asset(
+                                        avatar,
+                                        fit: (avatar.contains('cookies') || avatar.contains('owl'))
+                                            ? BoxFit.contain
+                                            : BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
                             },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 250),
-                              margin: const EdgeInsets.only(right: 16),
-                              width: 86,
-                              height: 86,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected ? AppColors.primaryOrange : Colors.transparent,
-                                  width: 2.5,
-                                ),
-                                boxShadow: isSelected
-                                    ? [
-                                        BoxShadow(
-                                          color: AppColors.primaryOrange.withOpacity(0.25),
-                                          blurRadius: 16,
-                                          spreadRadius: 2,
-                                        )
-                                      ]
-                                    : null,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.12),
-                                    Colors.white.withOpacity(0.04),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        
+                        // Kaydet Butonu
+                        GestureDetector(
+                          onTap: () async {
+                            HapticFeedback.mediumImpact();
+                            
+                            await StorageService.setAvatar(selectedAvatar);
+
+                            if (mounted) {
+                              setState(() {
+                                _userAvatar = selectedAvatar;
+                              });
+                            }
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primaryOrange,
+                                  Color(0xFFFF7A00),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Image.asset(
-                                  avatar,
-                                  fit: BoxFit.contain,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryOrange.withOpacity(0.4),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 6),
+                                )
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                lang == 'tr' ? 'Mührü Onayla' : 'Seal Profile',
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: 0.6,
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // İsim
-                    TextField(
-                      controller: controller,
-                      autofocus: false,
-                      maxLength: 20,
-                      textCapitalization: TextCapitalization.words,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      decoration: InputDecoration(
-                        hintText: lang == 'tr' ? 'Kahinin adı...' : 'Seer\'s name...',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.25)),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.06),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: AppColors.primaryOrange,
-                            width: 1.5,
                           ),
                         ),
-                        counterStyle: TextStyle(color: Colors.white.withOpacity(0.25)),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    
-                    // Kaydet
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          HapticFeedback.mediumImpact();
-                          final name = controller.text.trim();
-                          
-                          if (name.isNotEmpty) await StorageService.setUserName(name);
-                          await StorageService.setAvatar(selectedAvatar);
-
-                          if (mounted) {
-                            setState(() {
-                              if (name.isNotEmpty) _userName = name;
-                              _userAvatar = selectedAvatar;
-                            });
-                          }
-                          if (ctx.mounted) Navigator.pop(ctx);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryOrange,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          lang == 'tr' ? 'Kaydet' : 'Save Profile',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -401,8 +396,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // ── Profil ayarları ──
-  void _openProfileSettings() async {
+  // ── Kozmik Harita (Otomatik Burç Hesaplayıcı) ──
+  void _openCosmicChart() async {
     final lang = Localizations.localeOf(context).languageCode;
     final savedBirthDate = await StorageService.getBirthDate();
 
@@ -410,13 +405,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     DateTime? currentBirthDate = savedBirthDate;
 
-    String formatDate(DateTime? d) {
-      if (d == null) return lang == 'tr' ? 'Ayarlanmadı' : 'Not set';
-      return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
-    }
-
-    String getZodiacFromDate(DateTime? d) {
-      if (d == null) return lang == 'tr' ? 'Otomatik' : 'Automatic';
+    String getWesternZodiac(DateTime? d) {
+      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
       final month = d.month;
       final day = d.day;
       final signs = lang == 'tr'
@@ -424,6 +414,25 @@ class _ProfilePageState extends State<ProfilePage> {
           : ['Capricorn', 'Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'];
       const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
       return day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+    }
+
+    String getChineseZodiac(DateTime? d) {
+      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
+      final animals = lang == 'tr'
+          ? ['Fare', 'Öküz', 'Kaplan', 'Tavşan', 'Ejderha', 'Yılan', 'At', 'Keçi', 'Maymun', 'Horoz', 'Köpek', 'Domuz']
+          : ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
+      // Very basic approximation: (Year - 4) % 12
+      return animals[(d.year - 4) % 12];
+    }
+
+    String getMayanZodiac(DateTime? d) {
+      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
+      final mayanSigns = lang == 'tr'
+          ? ['Timsah', 'Rüzgar', 'Gece', 'Tohum', 'Yılan', 'Ölüm', 'Geyik', 'Yıldız', 'Su', 'Köpek', 'Maymun', 'Yol', 'Saz', 'Jaguar', 'Kartal', 'Baykuş', 'Toprak', 'Ayna', 'Fırtına', 'Güneş']
+          : ['Crocodile', 'Wind', 'Night', 'Seed', 'Serpent', 'Death', 'Deer', 'Star', 'Water', 'Dog', 'Monkey', 'Road', 'Reed', 'Jaguar', 'Eagle', 'Owl', 'Earth', 'Mirror', 'Storm', 'Sun'];
+      // Just a pseudo-calculation for fun, a real Tzolk'in requires complex math
+      final pseudoIndex = (d.month * d.day + d.year) % 20;
+      return mayanSigns[pseudoIndex];
     }
 
     showModalBottomSheet(
@@ -435,59 +444,68 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (ctx, setModalState) {
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF0F1F2A),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(24)),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF16151A).withOpacity(0.85),
+                    const Color(0xFF0D0C11).withOpacity(0.95),
+                  ],
+                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                 border: Border.all(color: Colors.white.withOpacity(0.1)),
               ),
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+              padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 4,
+                      width: 48,
+                      height: 5,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 28),
                   Text(
-                    lang == 'tr' ? 'Profil Ayarları' : 'Profile Settings',
+                    lang == 'tr' ? 'Kozmik Haritan' : 'Cosmic Chart',
                     style: const TextStyle(
                       color: AppColors.textWhite,
-                      fontSize: 18,
+                      fontSize: 24,
                       fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  // İsim
-                  _SettingsRow(
-                    icon: Icons.person_rounded,
-                    label: lang == 'tr' ? 'İsim' : 'Name',
-                    value: _userName.isNotEmpty
-                        ? _userName
-                        : (lang == 'tr' ? 'Ayarlanmadı' : 'Not set'),
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _editProfile();
-                    },
+                  const SizedBox(height: 8),
+                  Text(
+                    lang == 'tr'
+                        ? 'Dünyaya iniş tarihini gir, evrensel sırlarını çözelim.'
+                        : 'Enter your arrival date, let cosmos reveal your secrets.',
+                    style: TextStyle(
+                      color: AppColors.textWhite.withOpacity(0.5),
+                      fontSize: 14,
+                      letterSpacing: 0.2,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  // Doğum Tarihi
+                  const SizedBox(height: 32),
+                  
+                  // Doğum Tarihi Seçici Row
                   _SettingsRow(
-                    icon: Icons.cake_rounded,
-                    label: lang == 'tr' ? 'Doğum Tarihi' : 'Birth Date',
-                    value: formatDate(currentBirthDate),
+                    icon: Icons.calendar_month_rounded,
+                    label: lang == 'tr' ? 'Dünyaya İniş' : 'Arrival Date',
+                    value: currentBirthDate == null
+                        ? (lang == 'tr' ? 'Belirle' : 'Set Date')
+                        : '${currentBirthDate!.day.toString().padLeft(2, '0')}.${currentBirthDate!.month.toString().padLeft(2, '0')}.${currentBirthDate!.year}',
                     onTap: () async {
+                      HapticFeedback.lightImpact();
                       final picked = await showDatePicker(
                         context: ctx,
                         initialDate: currentBirthDate ?? DateTime(2000, 1, 1),
-                        firstDate: DateTime(1940),
+                        firstDate: DateTime(1920),
                         lastDate: DateTime.now(),
                         builder: (context, child) {
                           return Theme(
@@ -503,44 +521,84 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                       if (picked != null) {
                         await StorageService.setBirthDate(picked);
-                        final zodiac = getZodiacFromDate(picked);
-                        await StorageService.setZodiacSign(zodiac);
+                        await StorageService.setZodiacSign(getWesternZodiac(picked));
                         setModalState(() => currentBirthDate = picked);
                       }
                     },
                   ),
-                  const SizedBox(height: 12),
-                  // Burç
-                  _SettingsRow(
-                    icon: Icons.stars_rounded,
-                    label: lang == 'tr' ? 'Burcun' : 'Zodiac Sign',
-                    value: getZodiacFromDate(currentBirthDate),
-                    onTap: () {
-                      if (currentBirthDate == null) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              lang == 'tr'
-                                  ? 'Doğum tarihini ayarla, burcun otomatik belirlensin!'
-                                  : 'Set your birth date to auto-detect your zodiac sign!',
-                              style: const TextStyle(color: Colors.white, fontSize: 13),
-                            ),
-                            backgroundColor: const Color(0xFF1A1A2E),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            duration: const Duration(seconds: 2),
+                  const SizedBox(height: 24),
+                  
+                  // Kozmik Sonuçlar (Only show if date is selected)
+                  if (currentBirthDate != null)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildZodiacInfo(
+                            icon: Icons.auto_awesome_rounded,
+                            title: lang == 'tr' ? 'Batı Astrolojisi' : 'Western Zodiac',
+                            value: getWesternZodiac(currentBirthDate),
+                            color: const Color(0xFFC084FC),
                           ),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20),
+                          const Divider(height: 32, color: Colors.white10),
+                          _buildZodiacInfo(
+                            icon: Icons.pentagon_rounded,
+                            title: lang == 'tr' ? 'Çin Burcu' : 'Chinese Zodiac',
+                            value: getChineseZodiac(currentBirthDate),
+                            color: const Color(0xFFFF6B6B),
+                          ),
+                          const Divider(height: 32, color: Colors.white10),
+                          _buildZodiacInfo(
+                            icon: Icons.light_mode_rounded,
+                            title: lang == 'tr' ? 'Maya İşareti' : 'Mayan Sign',
+                            value: getMayanZodiac(currentBirthDate),
+                            color: const Color(0xFF2DD4BF),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 10),
                 ],
               ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildZodiacInfo({required IconData icon, required String title, required String value, required Color color}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -691,9 +749,31 @@ info@crackandwish.com''',
                   const SizedBox(width: 12),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         Navigator.pop(ctx);
-                        // TODO: Auth entegrasyonunda gerçek sign-out eklenecek
+                        
+                        // Clear Supabase session if any
+                        try {
+                          await Supabase.instance.client.auth.signOut();
+                        } catch(e) {
+                          debugPrint("SignOut Error: $e");
+                        }
+                        
+                        // Reset Welcome state
+                        await StorageService.setHasSeenWelcome(false);
+                        
+                        // Navigate to WelcomeScreen and reset stack
+                        if (mounted) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => const WelcomeScreen(),
+                              transitionsBuilder: (_, anim, __, child) =>
+                                  FadeTransition(opacity: anim, child: child),
+                              transitionDuration: const Duration(milliseconds: 600),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       },
                       child: Container(
                         height: 48,
@@ -1160,10 +1240,65 @@ info@crackandwish.com''',
                             );
                           },
                         ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.redAccent),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Text(
+                              '🛠️ TEST: Login/Onboarding Ekranına Git',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 20),
 
                         // ── 4. QUICK ACTIONS (2x2 Bento Grid) ──
                         _SectionLabel(lang == 'tr' ? 'Genel' : 'General'),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.local_post_office_rounded,
+                                iconColor: const Color(0xFFD4AF37), // Altın rengi Baykuş Postası
+                                label: lang == 'tr' ? 'Baykuş Postası' : 'Owl Mail',
+                                onTap: () {
+                                  // TODO: Arkadaş Ekle / Kurabiye Gönder modalı eklenecek
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        lang == 'tr' ? 'Baykuş postası hazırlanıyor! Yakında...' : 'Owl mail is preparing! Coming soon...',
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: const Color(0xFF16151A),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.insights_rounded,
+                                iconColor: const Color(0xFFC084FC),
+                                label: lang == 'tr' ? 'Kozmik Haritan' : 'Cosmic Chart',
+                                onTap: _openCosmicChart,
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 10),
                         Row(
                           children: [
@@ -1190,19 +1325,6 @@ info@crackandwish.com''',
                                     ),
                                   );
                                 },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.person_outline_rounded,
-                                iconColor: const Color(0xFF7B61FF),
-                                label: lang == 'tr' ? 'Hesap Ayarları' : 'Account Settings',
-                                onTap: _openProfileSettings,
                               ),
                             ),
                           ],
@@ -1262,7 +1384,6 @@ info@crackandwish.com''',
                                 iconColor: const Color(0xFF4CAF50),
                                 label: lang == 'tr' ? 'Gizlilik & Koşullar' : 'Privacy & Terms',
                                 onTap: _openPrivacyPolicy,
-                                compact: true,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1272,12 +1393,30 @@ info@crackandwish.com''',
                                 iconColor: const Color(0xFFFF4D4D),
                                 label: lang == 'tr' ? 'Çıkış' : 'Sign Out',
                                 onTap: _signOut,
-                                compact: true,
                               ),
                             ),
                           ],
                         ),
 
+                        const SizedBox(height: 32),
+
+                        // ── DEV ──
+                        _SectionLabel('Dahili Test (Sonra Silinecek)'),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.rocket_launch_rounded,
+                                iconColor: const Color(0xFFF7941D),
+                                label: 'Onboarding Test',
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OnboardingPage()));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 32),
 
                         // ── 7. VERSİYON ──
@@ -1385,7 +1524,7 @@ class _BentoHeroCard extends StatelessWidget {
         : availableAura.toString();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 40),
+      margin: const EdgeInsets.only(bottom: 8),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
@@ -1477,10 +1616,14 @@ class _BentoHeroCard extends StatelessWidget {
                           onLongPress: onAvatarLongPress,
                           child: ClipOval(
                             child: Padding(
-                              padding: const EdgeInsets.all(22),
+                              padding: EdgeInsets.all(
+                                (userAvatar.contains('cookies') || userAvatar.contains('owl')) ? 22.0 : 0.0,
+                              ),
                               child: Image.asset(
                                 userAvatar,
-                                fit: BoxFit.contain,
+                                fit: (userAvatar.contains('cookies') || userAvatar.contains('owl'))
+                                    ? BoxFit.contain
+                                    : BoxFit.cover,
                               ),
                             ),
                           ),
@@ -2906,8 +3049,10 @@ class _BentoActionTileState extends State<_BentoActionTile> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
             child: Container(
-              height: widget.compact ? 100 : 124,
-              padding: EdgeInsets.all(widget.compact ? 12 : 16),
+              height: widget.compact ? 84 : 72,
+              padding: EdgeInsets.symmetric(
+                  horizontal: widget.compact ? 8 : 16,
+                  vertical: widget.compact ? 12 : 0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -2929,17 +3074,17 @@ class _BentoActionTileState extends State<_BentoActionTile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 38,
-                          height: 38,
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             color: widget.iconColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
-                            child: Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 19),
+                            child: Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 16),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const Spacer(),
                         Text(
                           widget.label,
                           maxLines: 1,
@@ -2947,58 +3092,65 @@ class _BentoActionTileState extends State<_BentoActionTile> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.2,
                           ),
                         ),
                       ],
                     )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          width: 40,
-                          height: 40,
+                          width: 36,
+                          height: 36,
                           decoration: BoxDecoration(
-                            color: widget.iconColor.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(12),
+                            color: widget.iconColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: widget.iconColor.withOpacity(0.15),
+                              color: widget.iconColor.withValues(alpha: 0.15),
                               width: 0.5,
                             ),
                           ),
                           child: Center(
-                            child: Icon(widget.icon, color: widget.iconColor.withOpacity(0.85), size: 20),
+                            child: Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 18),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          widget.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.2,
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                              if (widget.subtitle != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  widget.subtitle!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.4),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        if (widget.subtitle != null) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            widget.subtitle!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.35),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
                       ],
                     ),
             ),

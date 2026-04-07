@@ -1648,18 +1648,21 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                 const SizedBox(height: 18),
                 // ── Özellik listesi ──
                 _buildFeatureRow(
-                  '✨',
+                  PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
                   isTr ? 'Özel şans mesajları' : 'Exclusive fortune messages',
+                  const Color(0xFFFFD700),
                 ),
                 const SizedBox(height: 10),
                 _buildFeatureRow(
-                  '🎭',
+                  PhosphorIcons.magicWand(PhosphorIconsStyle.fill),
                   isTr ? 'Benzersiz kırılma animasyonu' : 'Unique cracking animation',
+                  const Color(0xFFE8A0FF),
                 ),
                 const SizedBox(height: 10),
                 _buildFeatureRow(
-                  '⭐',
+                  PhosphorIcons.star(PhosphorIconsStyle.fill),
                   isTr ? '3x koleksiyon puanı' : '3x collection points',
+                  const Color(0xFFF7941D),
                 ),
                 const SizedBox(height: 22),
                 // ── Fiyat + Satın Al Butonu ──
@@ -1716,7 +1719,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
     );
   }
 
-  Widget _buildFeatureRow(String icon, String text) {
+  Widget _buildFeatureRow(IconData icon, String text, Color iconColor) {
     return Row(
       children: [
         Container(
@@ -1731,7 +1734,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
             ),
           ),
           child: Center(
-            child: Text(icon, style: const TextStyle(fontSize: 15, fontFamilyFallback: ['Apple Color Emoji'])),
+            child: Icon(icon, size: 16, color: iconColor),
           ),
         ),
         const SizedBox(width: 12),

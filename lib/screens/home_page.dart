@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   int _unreadOwlCount = 0;
   bool _owlPressed = false;
   late String _randomSubtitle;
+  String? _userName;
   static final _mottledPainter = _MottledPainter();
 
   static const _subtitles = [
@@ -66,11 +67,19 @@ class _HomePageState extends State<HomePage> {
     _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
+    _loadUserName();
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkMilestones();
     });
+  }
+
+  Future<void> _loadUserName() async {
+    final name = await StorageService.getUserName();
+    if (mounted) {
+      setState(() => _userName = name);
+    }
   }
 
   Future<void> _checkMilestones() async {
@@ -442,44 +451,94 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHeader(AppLocalizations l10n) {
+    final isTr = l10n.localeName == 'tr';
+    final hour = DateTime.now().hour;
+    
+    String greeting;
+    String timeSubtitle;
+    IconData timeIcon;
+    Color timeColor;
+    
+    if (hour >= 5 && hour < 12) {
+      greeting = isTr ? 'Günaydın' : 'Good Morning';
+      timeSubtitle = isTr ? 'Kahvenin yanına taze bir mesaj geldi.' : 'Fresh message with your coffee.';
+      timeIcon = Icons.wb_twilight_rounded; // Gündoğumu
+      timeColor = const Color(0xFFFFB74D); // Soft Orange
+    } else if (hour >= 12 && hour < 18) {
+      greeting = isTr ? 'İyi Günler' : 'Good Afternoon';
+      timeSubtitle = isTr ? 'Günün koşturmacasına sihirli bir mola.' : 'A magical break in your day.';
+      timeIcon = Icons.wb_sunny_rounded; // Dolu, tok bir güneş
+      timeColor = const Color(0xFFFFD54F); // Soft Amber
+    } else if (hour >= 18 && hour < 22) {
+      greeting = isTr ? 'İyi Akşamlar' : 'Good Evening';
+      timeSubtitle = isTr ? 'Günün yorgunluğunu atacak tatlı bir kehanet.' : 'A sweet prophecy to unwind.';
+      timeIcon = Icons.nights_stay_rounded; // Ay ve bulut (İhtişamlı)
+      timeColor = const Color(0xFF9FA8DA); // Soft Indigo
+    } else {
+      greeting = isTr ? 'İyi Geceler' : 'Good Night';
+      timeSubtitle = isTr ? 'Yıldızlar bu gece senin için parlıyor.' : 'The stars shine for you tonight.';
+      timeIcon = Icons.bedtime_rounded; // Tok ve net bir Hilal Ay
+      timeColor = const Color(0xFF90CAF9); // Soft Blue
+    }
+
+    // Eğer isim çok uzunsa ve ekrana sığmıyorsa sadece ilk ismi alalım
+    String displayName = _userName ?? '';
+    if (displayName.trim().isNotEmpty) {
+      displayName = displayName.trim().split(' ').first;
+      greeting = '$greeting, $displayName';
+    }
+
+    // Yarı rastgele, yarı zamana özel bir alt başlık
+    final showTimeSubtitle = math.Random().nextBool(); // %50 ihtimalle zamana özel, %50 rastgele mottolar
+    final finalSubtitle = showTimeSubtitle ? timeSubtitle : _randomSubtitle;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.homeGreeting.replaceAll('👋', '').trimRight(),
-                  style: const TextStyle(
-                    color: AppColors.textWhite,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      greeting,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textWhite,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                const Icon(
-                  Icons.waving_hand_rounded,
-                  size: 20,
-                  color: AppColors.textWhite,
-                ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              _randomSubtitle,
-              style: TextStyle(
-                color: AppColors.textGrey.withOpacity(0.8),
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                height: 1.3,
+                  const SizedBox(width: 8),
+                  Icon(
+                    timeIcon,
+                    size: 20,
+                    color: timeColor,
+                  ),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                finalSubtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppColors.textGrey.withOpacity(0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 12),
         // Baykuş butonu — tıklanınca buzlu cam mektup paneli açılır
         GestureDetector(
           onTapDown: (_) => setState(() => _owlPressed = true),

@@ -66,8 +66,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     final screen = MediaQuery.of(context).size;
     final br = widget.buttonRect;
 
-    const panelW = 340.0;
-    final panelH = (screen.height * 0.55).clamp(300.0, 460.0);
+    final panelW = (screen.width * 0.9).clamp(320.0, 400.0);
+    final panelH = (screen.height * 0.72).clamp(400.0, 700.0);
     final centerX = (screen.width - panelW) / 2;
     final centerY = (screen.height - panelH) / 2;
 
@@ -255,6 +255,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   Widget _buildContactsTab(Rect br) {
     return Column(
       children: [
+        _buildMyProfilePlate(),
+        const SizedBox(height: 16),
         // Arama çubuğu
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
@@ -297,6 +299,70 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         // Liste
         Expanded(child: _buildContactsList(br)),
       ],
+    );
+  }
+
+  Widget _buildMyProfilePlate() {
+    final user = _service.currentUser;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.05),
+            Colors.white.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withOpacity(0.2),
+              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+            ),
+            child: Center(
+              child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 24),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<String?>(
+                  future: StorageService.getUserName(),
+                  initialData: user.name,
+                  builder: (context, snapshot) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data ?? user.name,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.95),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -437,7 +503,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
                 child: Center(
-                  child: Text(req.from.emoji, style: const TextStyle(fontSize: 22)),
+                  child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
               ),
               const SizedBox(width: 12),
@@ -778,7 +844,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                         ),
                         child: Center(
-                          child: Text(sender.emoji, style: const TextStyle(fontSize: 22)),
+                          child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1401,82 +1467,119 @@ class _ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.05),
-                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+    Widget content = Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(10),
+      decoration: isAppUser ? BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF6B429C).withOpacity(0.15),
+            Colors.transparent,
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        border: Border.all(color: const Color(0xFF6B429C).withOpacity(0.25), width: 1.0),
+      ) : null,
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+              border: Border.all(color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.6) : Colors.white.withOpacity(0.1), width: 1.0),
+              boxShadow: isAppUser ? [
+                BoxShadow(color: const Color(0xFF6B429C).withOpacity(0.3), blurRadius: 8, spreadRadius: 1)
+              ] : [],
+            ),
+            child: Center(
+              child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.95),
+                    fontSize: 14,
+                    fontWeight: isAppUser ? FontWeight.w700 : FontWeight.w500,
+                    letterSpacing: 0.3,
+                  ),
                 ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _BouncingNode(
-                onTap: () {
-                  if (isAppUser) {
-                    _showLetterPaper(context);
-                  } else {
-                    HapticFeedback.lightImpact();
-                  }
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: isAppUser 
-                            ? const Color(0xFF4A6A8A).withOpacity(0.15) // Şık buz mavisi mat zemin
-                            : Colors.white.withOpacity(0.04),
-                        border: Border.all(
-                          color: isAppUser ? const Color(0xFF6DAEE8).withOpacity(0.35) : Colors.white.withOpacity(0.2), // Parlak buz mavisi çerçeve
-                          width: 0.8
-                        ),
-                      ),
-                      child: Text(
-                        isAppUser ? 'Mektup Yaz' : 'Davet Et',
+                if (isAppUser) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.auto_awesome, color: const Color(0xFFFFD700).withOpacity(0.8), size: 10),
+                      const SizedBox(width: 4),
+                      Text(
+                        name.length % 2 == 0 ? 'Mistik Kahin' : 'Rüya Gözlemcisi',
                         style: TextStyle(
-                          color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
-                          fontSize: 11,
-                          fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
-                          letterSpacing: 0.3,
+                          color: const Color(0xFFFFD700).withOpacity(0.8),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
                         ),
                       ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          _BouncingNode(
+            onTap: () {
+              if (isAppUser) {
+                _showLetterPaper(context);
+              } else {
+                HapticFeedback.lightImpact();
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: isAppUser 
+                        ? const Color(0xFF4A6A8A).withOpacity(0.15) 
+                        : Colors.white.withOpacity(0.04),
+                    border: Border.all(
+                      color: isAppUser ? const Color(0xFF6DAEE8).withOpacity(0.35) : Colors.white.withOpacity(0.2), 
+                      width: 0.8
+                    ),
+                  ),
+                  child: Text(
+                    isAppUser ? 'Mektup Yaz' : 'Davet Et',
+                    style: TextStyle(
+                      color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
+                      fontSize: 11,
+                      fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
+                      letterSpacing: 0.3,
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        Divider(color: Colors.white.withOpacity(0.05), height: 1),
+        ],
+      ),
+    );
+
+    return Column(
+      children: [
+        content,
+        if (!isAppUser) Divider(color: Colors.white.withOpacity(0.05), height: 1),
       ],
     );
   }

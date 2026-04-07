@@ -36,8 +36,15 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
+      body: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+            HapticFeedback.lightImpact();
+            Navigator.pop(context);
+          }
+        },
+        child: Stack(
+          children: [
           // ── TÜM SAYFA BUZLU CAM EFEKTİ ──
           Positioned.fill(
             child: BackdropFilter(
@@ -118,12 +125,10 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
 
                 // ── MERKEZİ İÇERİK (Sığarsa kaymaz, taşarsa kayar) ──
                 Expanded(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(), // Ekran sığıyorsa sekmeyi engeller, lüks hissi korur.
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(), // Ekran sığıyorsa sekmeyi engeller, lüks hissi korur.
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                         child: Column(
                           children: [
@@ -177,11 +182,10 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                       ),
                     ),
                   ),
-                ),
 
                 // ── ALT BUTON VE YASAL METİN (SABİT) ──
-                FadeTransition(
-                  opacity: _fadeAnimation,
+                SlideTransition(
+                  position: _slideAnimation,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
                     child: Column(
@@ -223,6 +227,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
             ),
           ),
         ],
+      ),
       ),
     );
   }
