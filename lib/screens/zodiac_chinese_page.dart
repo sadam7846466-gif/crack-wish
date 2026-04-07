@@ -52,7 +52,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     {'icon': '💞', 'label': 'Kader'},
     {'icon': '⭐', 'label': 'Günlük'},
     {'icon': '🐴', 'label': '2026'},
-    {'icon': '🌊', 'label': 'Elementler'},
+    {'icon': '☯️', 'label': 'Feng Shui'},
   ];
 
   // 12 hayvan dosya isimleri (sırayla)
@@ -834,36 +834,27 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           ),
         ),
         const SizedBox(height: 10),
-        // Yıllar — tıklanabilir
+        // Yıllar (cam çerçeve görünümünde ama inaktif)
         Center(
-          child: GestureDetector(
-            onTap: _showYearPicker,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: _gold.withOpacity(0.12)),
-                color: _gold.withOpacity(0.04),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    a['years'] as String,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: _gold.withOpacity(0.5),
-                      fontSize: 11,
-                    ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _gold.withOpacity(0.12)),
+              color: _gold.withOpacity(0.04),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  a['years'] as String,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _gold.withOpacity(0.5),
+                    fontSize: 11,
                   ),
-                  const SizedBox(width: 6),
-                  Icon(
-                    Icons.edit_outlined,
-                    size: 11,
-                    color: _gold.withOpacity(0.3),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -1476,7 +1467,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             width: 32,
                             height: 32,
                             child: CustomPaint(
-                              painter: _YearFlameIconPainter(),
+                              painter: _ElementIconPainter(
+                                element: 'Ateş',
+                                color: const Color(0xFFE53935),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -1660,10 +1654,14 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       children: [
                         // ── Kozmik köprü ──
                         Positioned.fill(
-                          child: CustomPaint(
-                            painter: _CosmicBridgePainter(
-                              leftColor: myElColor.withOpacity(0.25),
-                              rightColor: yearElColor.withOpacity(0.25),
+                          child: AnimatedBuilder(
+                            animation: _auraCtrl,
+                            builder: (context, _) => CustomPaint(
+                              painter: _CosmicBridgePainter(
+                                leftColor: myElColor.withOpacity(0.25),
+                                rightColor: yearElColor.withOpacity(0.25),
+                                pulse: _auraCtrl.value,
+                              ),
                             ),
                           ),
                         ),
@@ -1894,134 +1892,24 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-              ...ChineseZodiacData.yearSeasonalAdvice[_animalIdx].map(
-                (s) => _adviceRow(s[0], s[1], s[2]),
+              const SizedBox(height: 16),
+              _SeasonalCompassInteractive(
+                data: ChineseZodiacData.yearSeasonalAdvice[_animalIdx],
+                gold: _gold,
+                goldL: _goldL,
               ),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        // ── 2026 Zamanlama Rehberi ──
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 22,
-                height: 22,
-                child: CustomPaint(
-                  painter: _HourglassIconPainter(
-                    color: _goldL.withOpacity(0.7),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                '2026 Zamanlama Rehberi',
-                style: TextStyle(
-                  color: Color(0xFFE8DCC8),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+        const SizedBox(height: 24),
+        _TimingGuideInteractive(
+          timingGuideItems: ChineseZodiacData.yearTimingGuide[_animalIdx],
+          gold: _gold,
+          goldL: _goldL,
         ),
-        const SizedBox(height: 12),
-        ..._buildTimingCards(),
       ],
     );
-  }
-
-  List<Widget> _buildTimingCards() {
-    final guideItems = ChineseZodiacData.yearTimingGuide[_animalIdx];
-    final colors = [
-      const Color(0xFFE53935),
-      const Color(0xFFFF9800),
-      const Color(0xFFFFEB3B),
-      const Color(0xFF4CAF50),
-      const Color(0xFF2E7D32),
-    ];
-    final labels = ['Uygun Değil', 'Dikkatli Ol', 'Nötr', 'Uygun', 'Çok Uygun'];
-    return guideItems.map((item) {
-      final emoji = item[0] as String;
-      final label = item[1] as String;
-      final score = item[2] as int;
-      final sc = colors[score - 1];
-      return Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: sc.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: sc.withOpacity(0.2)),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 28,
-              height: 28,
-              child: Center(
-                child: SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CustomPaint(
-                    painter: _TimingIconPainter(emoji: emoji, color: sc),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: List.generate(
-                      5,
-                      (i) => Container(
-                        width: 20,
-                        height: 5,
-                        margin: const EdgeInsets.only(right: 3),
-                        decoration: BoxDecoration(
-                          color: i < score ? sc : Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: sc.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                labels[score - 1],
-                style: TextStyle(
-                  color: sc,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList();
   }
 
   // ══════════════════════════════════════════
@@ -3165,6 +3053,31 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 14),
+                            // ── Yıllar ──
+                            Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: c.withOpacity(0.04),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: c.withOpacity(0.12),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${other['name']} Yılları:\n${other['years']}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 10,
+                                    height: 1.5,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ),
+                            ),
                             const SizedBox(height: 20),
                             // Dekoratif ayırıcı
                             Container(
@@ -3894,6 +3807,62 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Container(
+                height: 0.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      _gold.withOpacity(0.2),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Builder(
+                builder: (context) {
+                  final hourStr = fortune['luckyHour'] as String;
+                  final hour = int.tryParse(hourStr.split(':').first) ?? 12;
+                  final IconData timeIcon;
+                  if (hour >= 6 && hour < 12) {
+                    timeIcon = Icons.wb_sunny_outlined;
+                  } else if (hour >= 12 && hour < 17) {
+                    timeIcon = Icons.wb_sunny_rounded;
+                  } else if (hour >= 17 && hour < 20) {
+                    timeIcon = Icons.wb_twilight_rounded;
+                  } else {
+                    timeIcon = Icons.nightlight_round_outlined;
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(timeIcon, color: _goldL.withOpacity(0.5), size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Şanslı Saatin:',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        hourStr,
+                        style: TextStyle(
+                          color: _goldL,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -3999,328 +3968,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
         const SizedBox(height: 16),
 
-        // ── 6) Şanslı Saat · Sayılar · Renkler — Üçlü Elegant Kart ──
-        ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withOpacity(0.14),
-                    Colors.white.withOpacity(0.06),
-                    Colors.white.withOpacity(0.04),
-                  ],
-                ),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.18),
-                  width: 0.7,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
-                    blurRadius: 30,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ── Başlık ──
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 28,
-                          height: 0.5,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                _gold.withOpacity(0.3),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '✦',
-                          style: TextStyle(
-                            color: _goldL.withOpacity(0.3),
-                            fontSize: 8,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Şans Rehberin',
-                          style: TextStyle(
-                            color: _goldL.withOpacity(0.45),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '✦',
-                          style: TextStyle(
-                            color: _goldL.withOpacity(0.3),
-                            fontSize: 8,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 28,
-                          height: 0.5,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                _gold.withOpacity(0.3),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // ── 3 sütunlu içerik ──
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        // ── Şanslı Saat ──
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
-                            child: Builder(
-                              builder: (context) {
-                                final hourStr = fortune['luckyHour'] as String;
-                                final hour =
-                                    int.tryParse(hourStr.split(':').first) ??
-                                    12;
-                                final IconData timeIcon;
-                                if (hour >= 6 && hour < 12) {
-                                  timeIcon = Icons.wb_sunny_outlined;
-                                } else if (hour >= 12 && hour < 17) {
-                                  timeIcon = Icons.wb_sunny_rounded;
-                                } else if (hour >= 17 && hour < 20) {
-                                  timeIcon = Icons.wb_twilight_rounded;
-                                } else {
-                                  timeIcon = Icons.nightlight_round_outlined;
-                                }
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Saat',
-                                      style: TextStyle(
-                                        color: _goldL.withOpacity(0.4),
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      hourStr,
-                                      style: TextStyle(
-                                        color: _goldL,
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Icon(
-                                      timeIcon,
-                                      color: _goldL.withOpacity(0.35),
-                                      size: 18,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        // Dikey ayırıcı
-                        Container(
-                          width: 0.7,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                _gold.withOpacity(0.15),
-                                _gold.withOpacity(0.15),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.1, 0.3, 0.7, 0.9],
-                            ),
-                          ),
-                        ),
-                        // ── Şanslı Sayılar ──
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Sayılar',
-                                  style: TextStyle(
-                                    color: _goldL.withOpacity(0.4),
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  alignment: WrapAlignment.center,
-                                  children:
-                                      (_animal['luckyNumbers'] as List<int>)
-                                          .map(
-                                            (n) => Container(
-                                              width: 32,
-                                              height: 32,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: _gold.withOpacity(
-                                                    0.25,
-                                                  ),
-                                                  width: 0.8,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '$n',
-                                                  style: TextStyle(
-                                                    color: _goldL,
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Dikey ayırıcı
-                        Container(
-                          width: 0.7,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                _gold.withOpacity(0.15),
-                                _gold.withOpacity(0.15),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.1, 0.3, 0.7, 0.9],
-                            ),
-                          ),
-                        ),
-                        // ── Şanslı Renkler ──
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Renkler',
-                                  style: TextStyle(
-                                    color: _goldL.withOpacity(0.4),
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                ...(_animal['luckyColors'] as List<String>).map(
-                                  (c) {
-                                    final clr = _colorFromName(c);
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 3,
-                                      ),
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 26,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            13,
-                                          ),
-                                          color: clr.withOpacity(0.3),
-                                          border: Border.all(
-                                            color: clr.withOpacity(0.5),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 6,
-                                              height: 6,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: clr,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              c,
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(
-                                                  0.85,
-                                                ),
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 0.3,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // ── 7) Günün Meydan Okuması — Kompakt Görev Kartı ──
+        // ── 6) Günün Meydan Okuması — Kompakt Görev Kartı ──
         _glass(
           child: Row(
             children: [
@@ -4786,17 +4434,17 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   // Motto
   String _getAnimalMotto(int idx) => const [
-    'Gecenin en karanlık anında bile yolunu bulan, dünyayı sessizce yeniden şekillendiren ruhtur. Küçük adımlar, büyük imparatorluklar kurar.',
+    'Gecenin en karanlık anında bile yolunu bulan, dünyayı sessizce yeniden şekillendiren eşsiz bir ruha sahipsin. Küçük adımların, büyük imparatorluklar kurar.',
     'Toprağın derinliklerine kök salan ağaç, fırtınalara meydan okur. Senin gücün sabırda — zamanın kendisi senin müttefikindir.',
     'Ormanın kalbinde uyuyan bir volkan gibisin. Kükrediğinde dağlar titrer, ama asıl gücün — kontrollü sessizliğindedir.',
     'Ay ışığında açan çiçekler gibi, senin güzelliğin sessizlikte gizli. Dünyanın kaosunda huzuru yaratan nadir ruhlardansın.',
     'Gökyüzü senin tahtın, yıldızlar senin tacın. Sıradan olanla yetinmeyen ruhun, kaderi dönüştürme gücü taşır.',
-    'Bin yıllık bilgeliği taşıyan ruhun, zamanın ötesinden fısıldar. Her kıvrımında bir sır, her bakışında bir kehanet saklıdır.',
+    'Bin yıllık bilgeliği taşıyan ruhun büyük bir gizemle parlıyor. Her adımında bir sır, her bakışında çözülmeyi bekleyen bir kehanet saklıyorsun.',
     'Ufkun ötesinde bir özgürlük çağrısı duyarsın — rüzgâr senin şarkını söyler, yollar senin için açılır.',
     'Evrenin güzelliğini görebilen nadir bir göze sahipsin. Ellerinin dokunduğu her şey sanata, ruhunun değdiği her an şiire dönüşür.',
     'Kaostan düzen, karmaşadan çözüm yaratırsın. Zekân bir kılıç, esprin bir zırh — hayatı büyük bir oyuna dönüştüren ustasın.',
     'Şafak sökmeden önce uyanır, karanlıkta ışığı ilk sen görürsün. Cesaretin ve doğruluğun, yeni çağların habercisidir.',
-    'Kalbinde taşıdığın sadakat ateşi, sönmeyen bir meşaledir. Sevdiklerinin kalkanı, kaybolmuşların pusolası — ruhun saf altındır.',
+    'Kalbinde taşıdığın sadakat ateşi, sönmeyen bir meşaledir. Sevdiklerinin kalkanı, kaybolmuşların pusulası — ruhun saf altındır.',
     'Cömertliğin sınır tanımaz, kalbin bir okyanus kadar geniştir. Varlığınla dünyayı ısıtan, dokunduğun her ruha şifa veren bir ışıksın.',
   ][idx];
 
@@ -6836,7 +6484,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     _timerCtrl =
         AnimationController(
           vsync: this,
-          duration: const Duration(milliseconds: 4500),
+          duration: const Duration(milliseconds: 8000),
         )..addStatusListener((s) {
           if (s == AnimationStatus.completed) _advance();
         });
@@ -7325,8 +6973,8 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                             color: widget.gold.withOpacity(0.35),
                           ),
                         ],
-                      ), // outer Row children end
-                    ), // 3rd GestureDetector end
+                      ),
+                    ),
                   ],
                 ), // Padding's Row children end
               ), // Padding end
@@ -11289,7 +10937,13 @@ class _MoodIconPainter extends CustomPainter {
 class _CosmicBridgePainter extends CustomPainter {
   final Color leftColor;
   final Color rightColor;
-  _CosmicBridgePainter({required this.leftColor, required this.rightColor});
+  final double pulse;
+
+  _CosmicBridgePainter({
+    required this.leftColor,
+    required this.rightColor,
+    required this.pulse,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -11297,68 +10951,101 @@ class _CosmicBridgePainter extends CustomPainter {
     final cy = size.height * 0.42;
     final mx = w / 2; // merkez
 
-    // Sol dal — kullanıcı tarafından merkeze
-    final pLeft = Paint()
-      ..shader = LinearGradient(
-        colors: [leftColor, leftColor.withOpacity(0.05)],
-      ).createShader(Rect.fromLTWH(0, 0, mx, size.height))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0
-      ..strokeCap = StrokeCap.round;
-    final leftArc = Path()
-      ..moveTo(w * 0.2, cy + 4)
-      ..cubicTo(w * 0.3, cy - 14, w * 0.4, cy - 6, mx, cy);
-    canvas.drawPath(leftArc, pLeft);
-    // Alt dal
-    final leftArc2 = Path()
-      ..moveTo(w * 0.2, cy + 8)
-      ..cubicTo(w * 0.3, cy + 20, w * 0.4, cy + 10, mx, cy);
-    canvas.drawPath(leftArc2, pLeft..strokeWidth = 0.6);
+    final vib = math.sin(pulse * math.pi * 2);
+    
+    // Yavaşlatılmış, meditatif bir sonsuzluk döngüsü (progress 0.0 -> 1.0, 6.5 saniye)
+    final time = DateTime.now().millisecondsSinceEpoch;
+    final progress = (time % 6500) / 6500.0;
 
-    // Sağ dal — merkez'den At tarafına
-    final pRight = Paint()
-      ..shader = LinearGradient(
-        colors: [rightColor.withOpacity(0.05), rightColor],
-      ).createShader(Rect.fromLTWH(mx, 0, mx, size.height))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0
-      ..strokeCap = StrokeCap.round;
-    final rightArc = Path()
-      ..moveTo(mx, cy)
-      ..cubicTo(w * 0.6, cy - 6, w * 0.7, cy - 14, w * 0.8, cy + 4);
-    canvas.drawPath(rightArc, pRight);
-    // Alt dal
-    final rightArc2 = Path()
-      ..moveTo(mx, cy)
-      ..cubicTo(w * 0.6, cy + 10, w * 0.7, cy + 20, w * 0.8, cy + 8);
-    canvas.drawPath(rightArc2, pRight..strokeWidth = 0.6);
+    // Tek bir 'Sonsuzluk' (Infinity/Lemniscate) Yolu oluşturuyoruz
+    final infinityPath = Path()
+      ..moveTo(w * 0.2, cy)
+      // 1. Sol Üst -> Merkez (Yukarıdan gelip merkeze iner)
+      ..cubicTo(w * 0.3, cy - 14 - (vib * 3), w * 0.4, cy - 6 + (vib * 3), mx, cy)
+      // 2. Merkez -> Sağ Alt (Merkezden aşağı sağa iner)
+      ..cubicTo(w * 0.6, cy + 10 - (vib * 2), w * 0.7, cy + 20 + (vib * 2), w * 0.8, cy)
+      // 3. Sağ Üst -> Merkez (Dönüş: Yukarıdan gelip merkeze iner)
+      ..cubicTo(w * 0.7, cy - 14 + (vib * 3), w * 0.6, cy - 6 - (vib * 3), mx, cy)
+      // 4. Merkez -> Sol Alt (Dönüş: Merkezden aşağı sola ilerler)
+      ..cubicTo(w * 0.4, cy + 10 - (vib * 2), w * 0.3, cy + 20 + (vib * 2), w * 0.2, cy);
 
-    // Merkez birleşme noktası
+    // Tüm sonsuzluk gövdesi çizimi (silik arka plan köprü)
+    final pLine = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          leftColor.withOpacity(0.0),
+          leftColor.withOpacity(0.4),
+          rightColor.withOpacity(0.4),
+          rightColor.withOpacity(0.0),
+        ],
+        stops: const [0.0, 0.4, 0.6, 1.0],
+      ).createShader(Rect.fromLTWH(w * 0.2, 0, w * 0.6, size.height))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8 + (pulse * 0.6)
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(infinityPath, pLine);
+
+    // Tek bir yörüngede ilerleyen parlak enerji partikülü ve kuyruğu
+    final metrics = infinityPath.computeMetrics().toList();
+    if (metrics.isNotEmpty) {
+      final metric = metrics.first;
+      final length = metric.length;
+
+      // Parçacık çizici yardımcı fonskiyon (Kuyruk solukluk oranı vs)
+      void drawParticle(double localProgress, double sizeMult, double opacityMult) {
+        final normP = localProgress % 1.0;
+        final safeP = normP < 0 ? normP + 1.0 : normP;
+        
+        final tangent = metric.getTangentForOffset(length * safeP);
+        if (tangent != null) {
+          final pos = tangent.position;
+          // Çizgi üzerindeki X konumuna göre renk uydur (Solda sol renk, sağda sağ renk)
+          final colorT = ((pos.dx - (w * 0.2)) / (w * 0.6)).clamp(0.0, 1.0);
+          final color = Color.lerp(leftColor, rightColor, colorT)!;
+
+          // Parıldama (Dış Hale)
+          canvas.drawCircle(
+            pos,
+            sizeMult * (4.0 + (pulse * 1.5)),
+            Paint()
+              ..color = color.withOpacity(0.7 * opacityMult)
+              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0),
+          );
+          // Çekirdek ışığı
+          canvas.drawCircle(
+            pos,
+            sizeMult * 2.0,
+            Paint()..color = Colors.white.withOpacity(opacityMult),
+          );
+        }
+      }
+
+      // Kayan ana top
+      drawParticle(progress, 1.0, 1.0);
+      // Peşinden gelen sönümlenen kuyruk parçacıkları
+      drawParticle(progress - 0.02, 0.8, 0.6);
+      drawParticle(progress - 0.04, 0.5, 0.3);
+      drawParticle(progress - 0.06, 0.3, 0.1);
+    }
+
+    // Merkez birleşme noktası — Sinerji Merkezi
     final mergeP = Paint()
-      ..color = Color.lerp(leftColor, rightColor, 0.5)!.withOpacity(0.3)
+      ..color = Color.lerp(leftColor, rightColor, 0.5)!.withOpacity(0.2 + pulse * 0.2)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(Offset(mx, cy), 2.5, mergeP);
     canvas.drawCircle(
       Offset(mx, cy),
-      5,
-      mergeP..color = mergeP.color.withOpacity(0.1),
+      6 + (pulse * 3),
+      mergeP..color = mergeP.color.withOpacity(0.08 + pulse * 0.1),
     );
-
-    // Dekoratif yıldız noktaları
-    final dotP = Paint()..style = PaintingStyle.fill;
-    final dots = [0.28, 0.36, 0.64, 0.72];
-    for (int i = 0; i < dots.length; i++) {
-      final t = dots[i];
-      final x = w * t;
-      final yOff = math.sin((t - 0.2) * math.pi * 1.6) * 10;
-      final y = cy - yOff;
-      dotP.color = Color.lerp(leftColor, rightColor, t)!.withOpacity(0.35);
-      canvas.drawCircle(Offset(x, y), 1.0, dotP);
-    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CosmicBridgePainter oldDelegate) =>
+      oldDelegate.pulse != pulse ||
+      oldDelegate.leftColor != leftColor ||
+      oldDelegate.rightColor != rightColor;
 }
 
 // ── Etkileşim Yıldız İkonu ──
@@ -11412,9 +11099,519 @@ class _InteractionStarPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+// ── 2026 Zamanlama Rehberi (İnteraktif) ──
+class _TimingGuideInteractive extends StatefulWidget {
+  final List<List<dynamic>> timingGuideItems;
+  final Color gold;
+  final Color goldL;
+
+  const _TimingGuideInteractive({
+    Key? key,
+    required this.timingGuideItems,
+    required this.gold,
+    required this.goldL,
+  }) : super(key: key);
+
+  @override
+  State<_TimingGuideInteractive> createState() => _TimingGuideInteractiveState();
+}
+
+class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
+    with SingleTickerProviderStateMixin {
+  bool _isRevealed = false;
+  late AnimationController _sandCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _sandCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3000),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _sandCtrl.dispose();
+    super.dispose();
+  }
+
+  Widget _buildIntroCard() {
+    return GestureDetector(
+      onTap: () {
+        setState(() => _isRevealed = true);
+      },
+      child: Container(
+        key: const ValueKey('intro'),
+        width: double.infinity,
+        height: 220,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.03),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: widget.goldL.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            )
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _sandCtrl,
+              builder: (context, _) {
+                // Kum saati dönüşü
+                // Yarı dönüşü (pi) tam tur olarak ayarlıyoruz böylece döngü pürüzsüz oluyor
+                final rot = _sandCtrl.value * math.pi;
+                return Transform.rotate(
+                  angle: rot,
+                  child: CustomPaint(
+                    size: const Size(40, 40),
+                    painter: _HourglassIconPainter(color: widget.goldL),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '2026 ZAMANLAMA REHBERİ',
+              style: TextStyle(
+                color: widget.goldL,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2.0,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Yıl boyunca sizi bekleyen fırsat\nve risk dönemlerini analiz edin.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    widget.goldL.withOpacity(0.15),
+                    widget.gold.withOpacity(0.35),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: widget.goldL.withOpacity(0.4)),
+              ),
+              child: const Text(
+                'Rehberi Aç',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultPanel() {
+    final colors = [
+      const Color(0xFFE53935),
+      const Color(0xFFFF9800),
+      const Color(0xFFFFEB3B),
+      const Color(0xFF4CAF50),
+      const Color(0xFF2E7D32),
+    ];
+    final labels = ['Uygun Değil', 'Dikkatli Ol', 'Nötr', 'Uygun', 'Çok Uygun'];
+
+    return Column(
+      key: const ValueKey('result'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 22,
+                height: 22,
+                child: CustomPaint(
+                  painter: _HourglassIconPainter(
+                    color: widget.goldL.withOpacity(0.7),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '2026 Zamanlama Rehberi',
+                style: TextStyle(
+                  color: Color(0xFFE8DCC8),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ...widget.timingGuideItems.map((item) {
+          final emoji = item[0] as String;
+          final label = item[1] as String;
+          final score = item[2] as int;
+          final sc = colors[score - 1];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: sc.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: sc.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: Center(
+                    child: SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CustomPaint(
+                        painter: _TimingIconPainter(emoji: emoji, color: sc),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: List.generate(
+                          5,
+                          (i) => Container(
+                            width: 20,
+                            height: 5,
+                            margin: const EdgeInsets.only(right: 3),
+                            decoration: BoxDecoration(
+                              color: i < score ? sc : Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: sc.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    labels[score - 1],
+                    style: TextStyle(
+                      color: sc,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 600),
+      transitionBuilder: (child, animation) {
+        final rotate = Tween(begin: math.pi / 2, end: 0.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+        );
+        return AnimatedBuilder(
+          animation: rotate,
+          child: child,
+          builder: (context, w) {
+            return Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001) // 3D Derinlik efekti
+                ..rotateX(rotate.value), // X ekseninde dikey flip (yaprak döner gibi)
+              alignment: Alignment.center,
+              child: child,
+            );
+          },
+        );
+      },
+      child: _isRevealed ? _buildResultPanel() : _buildIntroCard(),
+    );
+  }
+}
+
 // ── Mevsim İkonları ──
 // ── Pusula İkonu (Mevsimlik Pusula başlığı) ──
 // ── Zamanlama Rehberi İkonları ──
+// ── İnteraktif Mevsimlik Pusula Widget'ı ──
+class _SeasonalCompassInteractive extends StatefulWidget {
+  final List<List<String>> data;
+  final Color gold;
+  final Color goldL;
+  const _SeasonalCompassInteractive({
+    Key? key,
+    required this.data,
+    required this.gold,
+    required this.goldL,
+  }) : super(key: key);
+
+  @override
+  State<_SeasonalCompassInteractive> createState() => _SeasonalCompassInteractiveState();
+}
+
+class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive> {
+  int _sel = 0; // 0=İlkbahar(Sağ), 1=Yaz(Alt), 2=Sonbahar(Sol), 3=Kış(Üst)
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.data.length < 4) return const SizedBox();
+    final selData = widget.data[_sel];
+
+    return Column(
+      children: [
+        Center(
+          child: GestureDetector(
+            onTapUp: (details) {
+              const compSize = 220.0;
+              final center = const Offset(compSize / 2, compSize / 2);
+              final dx = details.localPosition.dx - center.dx;
+              final dy = details.localPosition.dy - center.dy;
+              if (dx * dx + dy * dy > (compSize / 2) * (compSize / 2)) return; // Çember dışı
+              
+              double angle = math.atan2(dy, dx);
+              if (angle < 0) angle += 2 * math.pi;
+              
+              double shifted = (angle + math.pi / 4) % (2 * math.pi);
+              int index = (shifted / (math.pi / 2)).floor();
+              setState(() => _sel = index);
+            },
+            child: SizedBox(
+              width: 220,
+              height: 220,
+              child: CustomPaint(
+                painter: _CompassPiePainter(
+                  selectedIndex: _sel,
+                  goldL: widget.goldL,
+                  gold: widget.gold,
+                  icons: widget.data.map((e) => e[0]).toList(),
+                  labels: widget.data.map((e) => e[1]).toList(),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            key: ValueKey(_sel),
+            width: double.infinity,
+            height: 142, // Metnin alt kısmının kırpılmasını ve gizli (...) lekeleri bırakmasını önlemek için uzatıldı
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: widget.goldL.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center, // Yazıları ortalayarak alt boşluğu dağıt
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      selData[0],
+                      style: const TextStyle(fontSize: 22), // Kuçültüldü
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      selData[1].toUpperCase(),
+                      style: TextStyle(
+                        color: widget.goldL,
+                        fontSize: 14, // Küçültüldü
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.5, // Biraz daraltıldı
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8), // Boşluğu optimize ettik
+                Text(
+                  selData[2],
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 13.5, // Küçültüldü
+                    height: 1.5,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CompassPiePainter extends CustomPainter {
+  final int selectedIndex;
+  final Color goldL;
+  final Color gold;
+  final List<String> icons;
+  final List<String> labels;
+
+  _CompassPiePainter({
+    required this.selectedIndex,
+    required this.goldL,
+    required this.gold,
+    required this.icons,
+    required this.labels,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Dış koruyucu çember
+    canvas.drawCircle(
+      center, 
+      radius, 
+      Paint()
+        ..color = goldL.withOpacity(0.1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0
+    );
+
+    for (int i = 0; i < 4; i++) {
+      final isSelected = i == selectedIndex;
+      final startAngle = -math.pi / 4 + i * (math.pi / 2);
+      final sweepAngle = math.pi / 2;
+
+      final path = Path()
+        ..moveTo(center.dx, center.dy)
+        ..arcTo(
+          Rect.fromCircle(center: center, radius: radius - 4),
+          startAngle,
+          sweepAngle,
+          false,
+        )
+        ..close();
+
+      // Dilim içi dolgu
+      final fillP = Paint()
+        ..color = isSelected ? goldL.withOpacity(0.15) : Colors.white.withOpacity(0.01)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(path, fillP);
+
+      if (isSelected) {
+        fillP.shader = RadialGradient(
+          colors: [gold.withOpacity(0.5), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: center, radius: radius));
+        canvas.drawPath(path, fillP);
+      }
+
+      // Dilim kenarlıkları
+      final strokeP = Paint()
+        ..color = isSelected ? goldL.withOpacity(0.8) : goldL.withOpacity(0.15)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = isSelected ? 1.5 : 0.8;
+      canvas.drawPath(path, strokeP);
+
+      // İkon ve Etiket
+      final midAngle = startAngle + sweepAngle / 2;
+      final textR = radius * 0.65;
+      final cx = center.dx + math.cos(midAngle) * textR;
+      final cy = center.dy + math.sin(midAngle) * textR;
+
+      final tp = TextPainter(textDirection: TextDirection.ltr);
+      // İkon
+      tp.text = TextSpan(
+        text: icons[i],
+        style: TextStyle(
+          fontSize: isSelected ? 22 : 16, // Küçültüldü
+          shadows: isSelected ? [Shadow(color: goldL, blurRadius: 15)] : null,
+        ),
+      );
+      tp.layout();
+      tp.paint(canvas, Offset(cx - tp.width / 2, cy - tp.height / 2 - 8)); // Biraz daha merkeze alındı
+
+      // Etiket
+      tp.text = TextSpan(
+        text: labels[i],
+        style: TextStyle(
+          color: isSelected ? goldL : Colors.white.withOpacity(0.4),
+          fontSize: isSelected ? 11 : 9, // Küçültüldü
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          letterSpacing: 0.5, // Biraz daraltıldı
+        ),
+      );
+      tp.layout();
+      tp.paint(canvas, Offset(cx - tp.width / 2, cy + 6));
+    }
+
+    // Pusula Göbeği (Merkez Ekseni)
+    canvas.drawCircle(center, 22, Paint()..color = const Color(0xFF161623));
+    canvas.drawCircle(
+      center, 
+      22, 
+      Paint()
+        ..color = goldL.withOpacity(0.6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+    );
+    canvas.drawCircle(center, 8, Paint()..color = goldL);
+    canvas.drawCircle(center, 3, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CompassPiePainter oldDelegate) =>
+      oldDelegate.selectedIndex != selectedIndex;
+}
+
 class _TimingIconPainter extends CustomPainter {
   final String emoji;
   final Color color;

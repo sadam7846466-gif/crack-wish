@@ -34,7 +34,7 @@ class ChineseZodiacData {
       'traits': ['Zeki', 'Çevik', 'Becerikli', 'Çalışkan', 'Kurnaz'],
       'strengths': ['Keskin zekâ', 'Çabuk uyum', 'Stratejik düşünce', 'Sosyal beceri', 'Fırsatçı göz'],
       'weaknesses': ['Aşırı hesapçı', 'Kurnazlık', 'Güvensizlik', 'Stres eğilimi'],
-      'personality': 'Sıçan ruhunu taşıyanlar, evrenin en keskin gözlemcileridir. Başkalarının göremediği fırsatları sezinler, karanlıkta bile yolunu bulan bir iç pusulaya sahiptirler. Zekâları yalnızca analitik değil — sezgisel bir derinlik taşır. Bir odaya girdiklerinde enerjiyi okur, insanların söylemediklerini duyar ve zamanın ruhunu yakalarlar. Bu güç onları sessiz ama sarsılmaz liderler yapar.',
+      'personality': 'Evrenin en keskin gözlemcilerinden birisin. Başkalarının göremediği fırsatları tıpkı bir gölge gibi sezer, karanlıkta bile yolunu bulan nadir bir iç pusulaya sahip olursun. Zekân sadece analitik değil; aynı zamanda sezgisel bir derinlik taşıyor. Bir odaya girdiğinde enerjiyi anında okur, söylenmemiş kelimeleri bile kolayca duyarsın. Bu sessiz ama sarsılmaz gücün, seni doğal bir lider yapıyor.',
       'love': 'Aşkta duygusal ve sadık. Partneri için fedakarlık yapar ama duygularını göstermekte zorlanır.',
       'bestMatch': [4, 8], // Ejderha, Maymun
       'goodMatch': [1, 6], // Öküz, At  
@@ -55,7 +55,7 @@ class ChineseZodiacData {
       'traits': ['Güvenilir', 'Sabırlı', 'Güçlü', 'Kararlı', 'Sadık'],
       'strengths': ['Sarsılmaz irade', 'Dayanıklılık', 'Güvenilirlik', 'Çalışkanlık', 'Pratik zekâ'],
       'weaknesses': ['İnatçılık', 'Değişime direnç', 'Duygusal kapalılık', 'Aşırı geleneksellik'],
-      'personality': 'Öküz ruhunu taşıyanlar, zamanın kendisiyle yarışmayan bilge ruhlardır. Onlar için hayat bir sprint değil, bir maratondur — ve her adımı bilinçle atarlar. Toprak gibi sağlam, dağ gibi heybetli duruşları, etraflarındaki insanlara derin bir güven verir. Sözleri azdır ama her biri altın değerindedir. Fırtınalar geçer, modalar değişir — ama Öküz ruhunun inşa ettiği temeller sonsuza kadar ayakta kalır.',
+      'personality': 'Zamanla yarışmaya ihtiyaç duymayan, bilge ve köklü bir ruha sahipsin. Senin için hayat kısa bir koşu değil, adımlarını bilinçle attığın uzun bir yolculuktur. Toprak gibi sağlam, dağ gibi heybetli duruşun etrafındaki herkese eşsiz bir güven hissi aşılar. Belki az konuşursun, fakat ağzından çıkan her söz altın değerindedir. Dışarıda kopan fırtınalar ve değişen dünyalar umurunda olmaz; senin inşa ettiğin temeller daima ayakta kalır.',
       'love': 'Aşkta sadık ve güvenilir. Uzun vadeli ilişkilere değer verir. Duygularını göstermekte ağır kalır ama sevgisi derindir.',
       'bestMatch': [5, 9], // Yılan, Horoz
       'goodMatch': [0, 3], // Sıçan, Tavşan
@@ -76,7 +76,7 @@ class ChineseZodiacData {
       'traits': ['Cesur', 'Tutkulu', 'Maceracı', 'Bağımsız', 'Karizmatik'],
       'strengths': ['Cesaret', 'Liderlik', 'Karizma', 'Adalet duygusu', 'Koruyuculuk'],
       'weaknesses': ['Saldırganlık', 'Sabırsızlık', 'Dikbaşlılık', 'Riskli kararlar'],
-      'personality': 'Kaplan ruhunu taşıyanlar, içlerinde uykuya dalmış bir volkan barındırır. Sakin görünürler ama gözlerinin ardında fırtınalar kopar. Adalet duyguları pusula gibi nettir — haksızlık gördüklerinde sessiz kalamazlar. Kalabalıklarda bile yalnız durabilecek cesarete sahiptirler. Bir Kaplanın sadakati nadirdir ama kazanıldığında — ölümsüzdür. Onlar doğanın aristokratlarıdır; kükremedikleri zamanlarda bile varlıkları hissedilir.',
+      'personality': 'İçinde her an uyanmaya hazır bir heybet barındırıyorsun. Dışarıdan en sakin göründüğün anlarda bile gözlerinin ardında büyük fırtınalar saklıyorsun. Adalet duygun o kadar net ki, en ufak bir haksızlıkta bile sessiz kalmak senin doğana tamamen aykırıdır. Gerekirse bütün bir kalabalığa tek başına karşı durabilecek cesareti ruhunda taşıyorsun. Sadakatini kazanmak zordur, ancak bir kere verdiğinde ömürlüktür. Kükremene gerek kalmadan dahi o güçlü auranla her zaman fark edilirsin.',
       'love': 'Aşkta tutkulu ve koruyucu. Partnerini bir kraliçe/kral gibi korur. Bağımsızlığına düşkündür.',
       'bestMatch': [6, 10], // At, Köpek
       'goodMatch': [4, 8], // Ejderha, Maymun
@@ -97,7 +97,7 @@ class ChineseZodiacData {
       'traits': ['Zarif', 'Nazik', 'Barışçıl', 'Duyarlı', 'Sanatsal'],
       'strengths': ['Zarafet', 'Diplomasi', 'Sezgi gücü', 'Sanatsal yetenek', 'Empati'],
       'weaknesses': ['Aşırı hassasiyet', 'Kaçınmacılık', 'Kararsızlık', 'Çekingenlik'],
-      'personality': 'Tavşan ruhunu taşıyanlar, evrenin en hassas antenlerine sahiptir. Bir odanın enerjisini, bir bakışın ardındaki duyguyu, söylenmemiş kelimeleri algılarlar. Zerafetleri yüzeysel değil — ruhlarının derinliklerinden gelen bir uyumdur. Kaosun ortasında bile iç huzurlarını koruyabilirler. Sanatı, güzelliği ve inceliği sadece takdir etmezler — onlar bu kavramları yaşarlar. Sessiz güçleri, fırtınayı bile sakinleştirme yeteneğindedir.',
+      'personality': 'Evrenin fısıltılarını duyabilen eşsiz bir duyarlılığa sahipsin. Bir bakışın ardındaki gizli duyguyu ve odaya hakim olan o anki enerjiyi hemen hissedersin. Zarafetin sonradan öğrenme değil, ruhunun derinliklerinden gelen oldukça doğal bir ahenktir. Dünya ne kadar kaotik olursa olsun, içindeki o kırılgan ama sarsılmaz huzuru çok iyi koruyabiliyorsun. Ek olarak güzelliği ve inceliği sadece uzaktan izlemez, her hücrenle yaşarsın. Sessiz ancak sarmalayıcı gücün fırtınaları bile dindirecek kapasitededir.',
       'love': 'Aşkta romantik ve zarif. Uyumlu ve huzurlu ilişkiler arar. Çatışmadan kaçınır.',
       'bestMatch': [7, 11], // Keçi, Domuz
       'goodMatch': [1, 10], // Öküz, Köpek
@@ -118,7 +118,7 @@ class ChineseZodiacData {
       'traits': ['Güçlü', 'Asil', 'Enerjik', 'Karizmatik', 'Şanslı'],
       'strengths': ['Doğal karizma', 'Güç', 'Cesaret', 'Şans', 'Vizyon'],
       'weaknesses': ['Kibir', 'Sabırsızlık', 'Agresiflik', 'Otoriter tavır'],
-      'personality': 'Ejderha ruhunu taşıyanlar, kaderin özel olarak işaretlediği ruhlardır. İçlerinde antik bir ateş yanar — hem yaratıcı hem dönüştürücü. Sıradan hayattan tatmin olmazlar çünkü ruhları büyüklük için kodlanmıştır. Bir Ejderhanın varlığı odayı doldurur, enerjisi bulaşıcıdır ve vizyonu çağının ötesindedir. Onlar kral yaratıcıları, imparatorluk kurucuları ve çağ değiştiricileridir.',
+      'personality': 'Kaderin baştan ihtişamla işaretlediği, asil ve son derece vizyoner bir karaktere sahipsin. İçinde sürekli yanan, hem yeni ufuklar yaratan hem de etrafını değiştiren kadim bir ateş taşıyorsun. Sıradanlık veya küçük hesaplar sana yetmez; çünkü varlığın başlı başına büyüklük için adanmıştır. Bulunduğun her ortamı kendi yüksek enerjinle doldurup insanlara ilham vermekte bir ustasın. Sen basit kuralları takip eden biri değil, okyanusları aşıp çağ atlatan güçlü vizyonerlerden birisin.',
       'love': 'Aşkta tutkulu ve dominant. Güçlü bir partner ister. Sevgisini büyük jestlerle gösterir.',
       'bestMatch': [0, 8], // Sıçan, Maymun
       'goodMatch': [2, 9], // Kaplan, Horoz
@@ -139,7 +139,7 @@ class ChineseZodiacData {
       'traits': ['Bilge', 'Gizemli', 'Sezgisel', 'Zarif', 'Stratejik'],
       'strengths': ['Derin bilgelik', 'Strateji', 'Sezgi', 'Zarafet', 'Analitik düşünce'],
       'weaknesses': ['Şüphecilik', 'Kıskançlık', 'Gizlilik', 'Soğukluk'],
-      'personality': 'Yılan ruhunu taşıyanlar, zamanın ötesinden gelen bir bilgelikle doğarlar. Yüzeyin altını görür, kelimelerin ardındaki niyeti sezerler. Mistik bir çekicilikleri vardır — insanlar onları tam olarak çözemez ama etkilenmekten kendilerini alamaz. Düşünceleri derin, stratejileri çok katmanlı, sezgileri neredeyse doğaüstüdür. Bir Yılan ruhunun sessizliği, bin kelimenin söylediklerinden daha çok şey anlatır.',
+      'personality': 'Zamanın çok ötesinden gelen büyüleyici bir bilgelikle etrafını aydınlatıyorsun. Yüzeydeki basit yalanlara ve illüzyonlara aldanmaz, gözlerin ve sözlerin ardındaki asıl niyeti şıp diye sezersin. Sende insanları anında büyüleyen mistik, inanılmaz gizemli bir çekim var. Seni kimse tam olarak çözemez ama etkinden de hiç kimse kurtulamaz. Stratejilerin zekice hesaplanmış, sezgilerin ise sınır tanımayan bir öngörü barındırıyor. Geriye çekilip sessiz kaldığın anlar aslında kelimelerden çok daha yüksek sesle konuşur.',
       'love': 'Aşkta gizemli ve derin. Tam güvenmedikçe kalbini açmaz. Ama sevince sonsuz sadakatle bağlanır.',
       'bestMatch': [1, 9], // Öküz, Horoz
       'goodMatch': [4, 0], // Ejderha, Sıçan
@@ -160,7 +160,7 @@ class ChineseZodiacData {
       'traits': ['Enerjik', 'Özgür', 'Neşeli', 'Sosyal', 'Atletik'],
       'strengths': ['Sınırsız enerji', 'Özgürlük ruhu', 'Sosyal beceri', 'Atletizm', 'Neşe'],
       'weaknesses': ['Sabırsızlık', 'Kararsızlık', 'Bağlanma korkusu', 'Aşırı hareketlilik'],
-      'personality': 'At ruhunu taşıyanlar, rüzgârın bedene bürünmüş halidir. Özgürlükleri yalnızca fiziksel değil — ruhsal bir ihtiyaçtır. Duvarlar onları bunaltır, rutinler onları soldurur. Ama koştuklarında — ah, koştuklarında dünya durur ve izler. Enerjileri güneş gibidir: yanlarında olmak insanları canlandırır, ısıtır ve ilham verir. Bir At ruhunun neşesi sahte değildir — yaşamın kendisine duyulan derin bir aşktan doğar.',
+      'personality': 'Beden bulmuş, durdurulamaz ve heyecanlı bir rüzgâr gibisin. Özgürlük senin için sadece bir sözcük değil; tıpkı nefes almak kadar elzem, bedensel ve ruhsal bir ihtiyaçtır. Dar kalıplar, monoton rutinler ve önündeki gereksiz sınırlar senin o parlak ateşini asla söndüremez. Harekete geçtiğinde, hedefine doğru koşmaya başladığında tüm dünya yavaşlar ve sadece seni izler. Yüzündeki o benzersiz neşe tamamen doğaldır, içten gelir ve çevrendeki herkesi sıcacık bir güneş gibi canlandırmaya fazlasıyla yeter.',
       'love': 'Aşkta heyecan ve macera arar. Bağımsızlığına düşkün, ama doğru kişiyi bulunca tam bağlanır.',
       'bestMatch': [2, 10], // Kaplan, Köpek
       'goodMatch': [7, 11], // Keçi, Domuz
@@ -181,7 +181,7 @@ class ChineseZodiacData {
       'traits': ['Yaratıcı', 'Şefkatli', 'Hassas', 'Sakinleştirici', 'Estetik'],
       'strengths': ['Yaratıcılık', 'Sanatsal ruh', 'Şefkat', 'Estetik anlayış', 'Huzur verme'],
       'weaknesses': ['Aşırı hassasiyet', 'Bağımlılık', 'Kararsızlık', 'Endişe eğilimi'],
-      'personality': 'Keçi ruhunu taşıyanlar, evrenin şiirini duyan nadir ruhlardır. Bir günbatımında başkalarının göremediği renkleri, bir melodide gizli duyguları fark ederler. Yaratıcılıkları yalnızca bir yetenek değil — dünyayı algılama biçimleridir. Hassasiyetleri zayıflık değil, evrenle kurdukları derin bağın göstergesidir. Bir Keçi ruhunun dokunduğu her şey — bir yemek, bir söz, bir bakış — sanata dönüşür.',
+      'personality': 'Evrenin narin şiirini kalbinde en yoğun şekilde duyan, ruhu baştan aşağı estetikle yıkanmış özel birisin. Sıradan bir günbatımında bile başkalarının es geçtiği en tatlı tonları fark edebilir, ufak bir melodideki saklı duygularla derinden bağ kurabilirsin. Hassasiyetin kesinlikle bir zayıflık değildir; bu, senin dünya ile ne kadar mucizevi bir seviyede temas hâlinde olduğunun dev bir kanıtıdır. Ellerinin dokunduğu, aklının uğradığı her bir detay ve hatta küçük bir söz bile anında yaşayan bir sanata dönüşür.',
       'love': 'Aşkta romantik ve duygusal. Güven ve sıcaklık arar. Koruma altında hissedildikçe açılır.',
       'bestMatch': [3, 11], // Tavşan, Domuz
       'goodMatch': [6, 2], // At, Kaplan
@@ -202,7 +202,7 @@ class ChineseZodiacData {
       'traits': ['Zeki', 'Esprili', 'Yaratıcı', 'Kurnaz', 'Girişimci'],
       'strengths': ['Parlak zekâ', 'Espri yeteneği', 'Yaratıcılık', 'Problem çözme', 'Esneklik'],
       'weaknesses': ['Sabırsızlık', 'Kurnazlık', 'Güvenilmezlik', 'Çabuk sıkılma'],
-      'personality': 'Maymun ruhunu taşıyanlar, evrenin jokerleridir. Zekâları öyle hızlı çalışır ki, başkaları daha sorunu anlamadan onlar çoktan üç çözüm üretmiştir. Esprileri sadece güldürmez — hakikati maskeler arkasından fısıldar. Sıkılmak onlar için varoluşsal bir tehlikedir; bu yüzden hayatı sürekli yeniden icat ederler. Bir Maymun ruhunun yanında asla sıkılmazsınız — çünkü onlar sihirbaz gibidir: her an bir sonraki numarayı hazırlarlar.',
+      'personality': 'Zekan öylesine atik ve çok boyutlu ki, adeta evrenin zapt edilemez jokeri sensin. Diğerleri daha bir problemin girişini anlamaya çalışırken, sen zihninin kıvrak odalarında o sorunu üç farklı şekilden aşıp çoktan bitirmiş olursun. Mizah anlayışın sadece bulunduğun ortamı eğlendirmekten ibaret değil; güldürürken acı gerçekleri harika maskelerle fısıldayabilme sanatıdır. Sıradanlıktan ölümüne nefret edersin. Senin yanında olan birinin hayatı tıpkı sahnedeki bir sihirbazı izlemek gibi sürekli heyecan, sürekli şaşırtmaca doludur.',
       'love': 'Aşkta eğlenceli ve heyecanlı. Sıkılmaktan korkar. Zeki ve esprili bir partner arar.',
       'bestMatch': [0, 4], // Sıçan, Ejderha
       'goodMatch': [5, 11], // Yılan, Domuz
@@ -223,7 +223,7 @@ class ChineseZodiacData {
       'traits': ['Gözlemci', 'Çalışkan', 'Cesur', 'Pratik', 'Detaycı'],
       'strengths': ['Keskin gözlem', 'Çalışkanlık', 'Dürüstlük', 'Pratiklik', 'Organizasyon'],
       'weaknesses': ['Eleştiricilik', 'Kibirlilik', 'Aşırı titizlik', 'Baskınlık'],
-      'personality': 'Horoz ruhunu taşıyanlar, karanlığın içinde ışığı ilk gören ve haber veren ruhlardır. Gözleri bir kartal kadar keskin, standartları bir kuyumcu kadar yüksektir. Mükemmeliyetçilikleri yüzeysel bir titizlik değil — dünyaya sundukları her şeyin onurlarını yansıtması gerektiğine dair derin bir inançtır. Cesurdurlar — doğruyu söylemekten çekinmezler, popüler olmasa bile.',
+      'personality': 'Karanlığın tüm şehri boğduğu anlarda bile sabahın o ilk umut verici ışığını rahatlıkla gören, uyanık ve zinde bir ruhun var. Gözlerin en usta avcıdan keskin, kendine koyduğun çıta ise bir kuyumcu terazisinden bile daha hassastır. Senin mükemmeliyetçiliğin geçici bir kapris değil, yapıp ettiklerinin bizzat kendi klaslığını yansıtması gerektiğine duyduğun sağlam bir güvendir. İnandığın bir eleştiriyi, başkalarının ne düşündüğüne zerre kadar aldırış etmeden dimdik ve oldukça cesur bir üslupla yüzlerine vurabilirsin.',
       'love': 'Aşkta dürüst ve doğrudan. net iletişim kurar ama bazen aşırı eleştirel olabilir.',
       'bestMatch': [1, 5], // Öküz, Yılan
       'goodMatch': [4, 8], // Ejderha, Maymun
@@ -244,7 +244,7 @@ class ChineseZodiacData {
       'traits': ['Sadık', 'Dürüst', 'Koruyucu', 'Cesur', 'Adil'],
       'strengths': ['Sadakat', 'Dürüstlük', 'Koruma içgüdüsü', 'Adalet duygusu', 'Cesaret'],
       'weaknesses': ['Endişe eğilimi', 'Karamsar bakış', 'Aşırı korumacılık', 'Güvensizlik'],
-      'personality': 'Köpek ruhunu taşıyanlar, evrenin vicdanıdır. İçlerinde taşıdıkları adalet ateşi, haksızlık karşısında asla sönmez. Sadakatleri kör değildir — bilinçli bir seçimdir. Sevdiklerini yalnızca korumakla kalmazlar; onların en iyi versiyonlarını görmelerini sağlarlar. Bir Köpek ruhunun dostluğu, bu dünyadaki en değerli hazinelerden biridir — çünkü koşulsuz, sarsılmaz ve sonsuzdur.',
+      'personality': 'Şaşmaz bir vicdan pusulasıyla var olmuş, çevrendekilerin paha biçilemez manevi şövalyesi gibisin. İçinde kök salmış o büyük adalet duygun, en küçük bir haksızlığın bile üstünü örtmene izin vermez ve hemen bir tepki yaratır. Senin herhangi birine sunduğun sadakat asla körü körüne değildir; baştan sona iradenin çok bilinçli bir lütfudur. Sevdiğin insanlara kalkan olmakla yetinmez, onları en iddialı ve mutlu hallerine taşımak için dev bir destek verirsin. O koşulsuz dostluğun, gerçekten kazananın asla kaybetmek istemeyeceği bir hazinedir.',
       'love': 'Aşkta sadık ve koruyucu. Güven en önemli değeridir. Sevdiklerini her koşulda savunur.',
       'bestMatch': [2, 6], // Kaplan, At
       'goodMatch': [3, 11], // Tavşan, Domuz
@@ -265,7 +265,7 @@ class ChineseZodiacData {
       'traits': ['Cömert', 'Şefkatli', 'Neşeli', 'Eğlenceli', 'Nazik'],
       'strengths': ['Cömertlik', 'Sıcaklık', 'Neşe', 'Güçlü iç dünya', 'Sadakat'],
       'weaknesses': ['Saflık', 'Aşırı güven', 'Tembel eğilim', 'Savurganlık'],
-      'personality': 'Domuz ruhunu taşıyanlar, evrenin en saf kalpli varlıklarıdır. Cömertlikleri hesapsız, sevgileri koşulsuzdur. Bir odaya girdiklerinde görünmez bir sıcaklık yayılır — sanki güneş doğmuş gibi. Saflıkları zayıflık değil, dünyaya inatla iyilik sunma cesaretidir. Bir Domuz ruhunun sofrasında herkes yer bulur, kalbinde herkes sığınak bulur. Onlar hayatın tadını en derinden alan ve bunu cömertçe paylaşan ruhlardır.',
+      'personality': 'Kimsenin dokunamadığı kadar merhametli bir kalple, etrafına ışık ve sıcaklık yayan devasa bir auraya sahipsin. Ruhundan taşan o muazzam cömertliğinin hesabı yoktur, sevgini de zerre esirgemeden tertemiz bir akışla sunarsın. Sen odaya girdiğinde etrafta görünmeyen, rahatlatıcı bir huzur dalgası başlar; adeta herkesi güneş gibi ısıtırsın. Gösterdiğin iyi niyet bir zayıflık değil, aksine bu dünyaya her defasında yeniden iyilik sunacak kadar büyük bir meydan okumadır. Değdiğin her ruha kucak açıp sofra kuran cömertliğin eşsizdir.',
       'love': 'Aşkta sıcak ve cömert. Sevgisini bolca gösterir. Güvene çok değer verir.',
       'bestMatch': [3, 7], // Tavşan, Keçi
       'goodMatch': [2, 6], // Kaplan, At
@@ -347,62 +347,62 @@ class ChineseZodiacData {
   static const List<List<List<String>>> yearSeasonalAdvice = [
     // 0-Sıçan
     [['🌱', 'İlkbahar', 'Temkinli başlangıçlar yapın. Küçük ama sağlam adımlar atın, finansal planlarınızı gözden geçirin.'],
-     ['☀️', 'Yaz', 'Sosyal ağınızı genişletin. Stratejik ortaklıklar kurmak için ideal dönem.'],
+     ['🌞', 'Yaz', 'Sosyal ağınızı genişletin. Stratejik ortaklıklar kurmak için ideal dönem.'],
      ['🍂', 'Sonbahar', 'Birikiminizi değerlendirin. Yatırımlarınızı analiz edin, gereksiz harcamaları kesin.'],
      ['❄️', 'Kış', 'Geri çekilin ve gözlem yapın. Yeni yıl için güçlü bir strateji oluşturun.']],
     // 1-Öküz
     [['🌱', 'İlkbahar', 'Alışkanlıklarınızı yeniden yapılandırın. Değişime kapınızı aralayın, küçük adımlarla başlayın.'],
-     ['☀️', 'Yaz', 'Beceri geliştirmeye odaklanın. Yeni bir kurs veya eğitim programına katılın.'],
+     ['🌞', 'Yaz', 'Beceri geliştirmeye odaklanın. Yeni bir kurs veya eğitim programına katılın.'],
      ['🍂', 'Sonbahar', 'Emeğinizin karşılığını almaya başlayacaksınız. Sabrınız ödüllendirilir.'],
      ['❄️', 'Kış', 'Sevdiklerinizle kaliteli vakit geçirin. Sağlığınıza ekstra özen gösterin.']],
     // 2-Kaplan
     [['🌱', 'İlkbahar', 'Büyük projelere cesurca başlayın! At yılı enerjisi sizinle tam uyumlu.'],
-     ['☀️', 'Yaz', 'Zirve döneminiz. Kariyerde atılım yapın, risk almaktan korkmayın.'],
+     ['🌞', 'Yaz', 'Zirve döneminiz. Kariyerde atılım yapın, risk almaktan korkmayın.'],
      ['🍂', 'Sonbahar', 'Kazanımlarınızı pekiştirin. Ekibinizi güçlendirin ve delegasyon yapın.'],
      ['❄️', 'Kış', 'Enerjinizi koruyun, kendinizi yenileyin. Gelecek yıl için vizyonunuzu netleştirin.']],
     // 3-Tavşan
     [['🌱', 'İlkbahar', 'Yeni sosyal çevreler edinin. Sanatsal projelere başlamak için mükemmel zamanlama.'],
-     ['☀️', 'Yaz', 'İlişkileriniz güçleniyor. Romantik dönem — kalbinizin sesini dinleyin.'],
+     ['🌞', 'Yaz', 'İlişkileriniz güçleniyor. Romantik dönem — kalbinizin sesini dinleyin.'],
      ['🍂', 'Sonbahar', 'Yaratıcılığınızı maddi değere dönüştürün. Estetik projelerde parlayın.'],
      ['❄️', 'Kış', 'İç dünyanıza çekilin, meditasyon ve sanat ile ruhunuzu besleyin.']],
     // 4-Ejderha
     [['🌱', 'İlkbahar', 'Büyük hedeflerinize koşun. Liderlik fırsatları kendini gösterecek.'],
-     ['☀️', 'Yaz', 'En güçlü döneminiz! Büyük yatırımlar ve iş kurmak için altın zaman.'],
+     ['🌞', 'Yaz', 'En güçlü döneminiz! Büyük yatırımlar ve iş kurmak için altın zaman.'],
      ['🍂', 'Sonbahar', 'İmparatorluğunuzu genişletin. Yeni pazarlara ve alanlara açılın.'],
      ['❄️', 'Kış', 'Stratejik geri çekilme. Acele etmeyin, büyük hamleleri ilkbahara saklayın.']],
     // 5-Yılan
     [['🌱', 'İlkbahar', 'Sezgileriniz güçlü ama acele etmeyin. Araştırma ve analiz döneminiz.'],
-     ['☀️', 'Yaz', 'Gizli fırsatları keşfedin. Başkalarının göremediği detaylar avantajınız.'],
+     ['🌞', 'Yaz', 'Gizli fırsatları keşfedin. Başkalarının göremediği detaylar avantajınız.'],
      ['🍂', 'Sonbahar', 'Stratejik hamleler için uygun. Uzun vadeli planlarınızı devreye sokun.'],
      ['❄️', 'Kış', 'Bilgeliğinizi derinleştirin. Okuyun, öğrenin, kendinizi geliştirin.']],
     // 6-At
     [['🌱', 'İlkbahar', 'Kendi yılınız başladı! Kırmızı aksesuar ile şansınızı artırın. Yeni sayfa açın.'],
-     ['☀️', 'Yaz', 'Enerjiniz zirvede ama Ben Nian dikkat gerektirir — ani kararlardan kaçının.'],
+     ['🌞', 'Yaz', 'Enerjiniz zirvede ama Ben Nian dikkat gerektirir — ani kararlardan kaçının.'],
      ['🍂', 'Sonbahar', 'Dengeyi bulun. Özgürlük ve sorumluluk arasındaki ince çizgiyi koruyun.'],
      ['❄️', 'Kış', 'Yılı güçlü kapatın. Tempolu ama bilinçli hareket edin, yeni yıla hazırlanın.']],
     // 7-Keçi
     [['🌱', 'İlkbahar', 'Yaratıcılığınız çiçek açıyor. Sanat, müzik veya tasarım projelerine başlayın.'],
-     ['☀️', 'Yaz', 'İlişkilerde güzel gelişmeler. Sevdiklerinizle bağlarınızı güçlendirin.'],
+     ['🌞', 'Yaz', 'İlişkilerde güzel gelişmeler. Sevdiklerinizle bağlarınızı güçlendirin.'],
      ['🍂', 'Sonbahar', 'Eserlerinizi dünyayla paylaşın. Sergi veya lansman için ideal dönem.'],
      ['❄️', 'Kış', 'Ruhunuzu dinlendirin. Sıcak bir ortamda yaratıcı ilhamınızı yenileyin.']],
     // 8-Maymun
     [['🌱', 'İlkbahar', 'Zekanızı iş fikirlerine dönüştürün. Girişimcilik ruhunuz ateşleniyor.'],
-     ['☀️', 'Yaz', 'Hızlı hareket edin ama dürtüsel olmayın. Fırsatlar bol, seçici olun.'],
+     ['🌞', 'Yaz', 'Hızlı hareket edin ama dürtüsel olmayın. Fırsatlar bol, seçici olun.'],
      ['🍂', 'Sonbahar', 'Sosyal ağınız genişliyor. Network etkinliklerine katılın ve yeni kapılar açın.'],
      ['❄️', 'Kış', 'Yenilikçi projelerinizi planlayın. Teknolojiyle ilgili yatırımlar şanslı.']],
     // 9-Horoz
     [['🌱', 'İlkbahar', 'Kariyer atılımı için harekete geçin. Disiplininiz ve titizliğiniz ödüllendirilecek.'],
-     ['☀️', 'Yaz', 'Maddi kazanç dönemi. Çalışkanlığınızın meyvelerini toplamaya başlayın.'],
+     ['🌞', 'Yaz', 'Maddi kazanç dönemi. Çalışkanlığınızın meyvelerini toplamaya başlayın.'],
      ['🍂', 'Sonbahar', 'Organizasyon yeteneklerinizi kullanarak büyük projeleri tamamlayın.'],
      ['❄️', 'Kış', 'Detaylara odaklanın, eksikleri giderin. Mükemmeliyetçiliğiniz sizi öne taşır.']],
     // 10-Köpek
     [['🌱', 'İlkbahar', 'Sadakatiniz ve dürüstlüğünüz kapılar açıyor. Güvenilir ortaklıklar kurun.'],
-     ['☀️', 'Yaz', 'İlişkileriniz derinleşiyor. Romantik dönem — cesur adımlar atın.'],
+     ['🌞', 'Yaz', 'İlişkileriniz derinleşiyor. Romantik dönem — cesur adımlar atın.'],
      ['🍂', 'Sonbahar', 'Topluma katkı sağlayan projelerde yer alın. Vicdanınız sizi doğru yönlendirir.'],
      ['❄️', 'Kış', 'Ailenizle bağlarınızı güçlendirin. Sıcaklık ve huzur arayışı ön planda.']],
     // 11-Domuz
     [['🌱', 'İlkbahar', 'Cömertliğinizi akıllıca yönlendirin. Yardım ederken kendinizi de unutmayın.'],
-     ['☀️', 'Yaz', 'Sosyal hayatınız parlak! Eğlence ve kutlamalar sizi bekliyor.'],
+     ['🌞', 'Yaz', 'Sosyal hayatınız parlak! Eğlence ve kutlamalar sizi bekliyor.'],
      ['🍂', 'Sonbahar', 'Bütçenizi gözden geçirin. Biriktirme zamanı — lüks harcamaları erteleyin.'],
      ['❄️', 'Kış', 'Ev ve aile odaklı bir dönem. Sevdiklerinizle sıcak anlar yaşayın.']],
   ];

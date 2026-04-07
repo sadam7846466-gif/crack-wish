@@ -1478,7 +1478,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                     quality: s['quality'] as String,
                                     color: _gold,
                                   ),
-                                  'Modalite',
+                                  'Ruh Hali',
                                   s['quality'] as String,
                                 ),
                               ),
@@ -1489,284 +1489,12 @@ class _ZodiacPageState extends State<ZodiacPage>
                         const SizedBox(height: 28),
 
                         // ── KOZMİK REHBERİN — Günlük Fal + Kişilik Birleşik Kart ──
+                        // ── KOZMİK REHBERİN — Günlük Fal + Kişilik Birleşik Kart ──
                         _fadeIn(
                           500,
-                          Container(
-                            padding: const EdgeInsets.all(0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(28),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white.withOpacity(0.08),
-                                  Colors.white.withOpacity(0.03),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: _gold.withOpacity(0.12),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                // ── Üst dekoratif şerit ──
-                                Container(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    24,
-                                    20,
-                                    24,
-                                    16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(28),
-                                    ),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        _gold.withOpacity(0.06),
-                                        Colors.transparent,
-                                        _gold.withOpacity(0.06),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      // Custom yıldız ikonu
-                                      SizedBox(
-                                        width: 28,
-                                        height: 28,
-                                        child: CustomPaint(
-                                          painter: _CosmicStarPainter(
-                                            color: _gold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            ShaderMask(
-                                              shaderCallback: (b) =>
-                                                  const LinearGradient(
-                                                    colors: [
-                                                      Color(0xFFE8D5B7),
-                                                      Color(0xFFFFE8A1),
-                                                      Color(0xFFFFD060),
-                                                    ],
-                                                  ).createShader(b),
-                                              child: Text(
-                                                'KOZMİK REHBERİN',
-                                                style: GoogleFonts.cinzel(
-                                                  color: Colors.white,
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w700,
-                                                  letterSpacing: 2,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'Bugünün mesajı & ruhsal portre',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(
-                                                  0.3,
-                                                ),
-                                                fontSize: 11,
-                                                letterSpacing: 0.3,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // ── Günlük mesaj bölümü ──
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    20,
-                                    0,
-                                    20,
-                                    20,
-                                  ),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(18),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      color: _gold.withOpacity(0.04),
-                                      border: Border.all(
-                                        color: _gold.withOpacity(0.08),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: 3,
-                                              height: 14,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(2),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                  colors: [
-                                                    _gold.withOpacity(0.6),
-                                                    _gold.withOpacity(0.1),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              'Günün Fısıltısı',
-                                              style: GoogleFonts.cinzel(
-                                                color: _gold.withOpacity(0.8),
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 1,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          s['dailyHoroscope'] as String,
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(
-                                              0.8,
-                                            ),
-                                            fontSize: 14,
-                                            height: 1.7,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // ── İnce dekoratif ayırıcı ──
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          height: 0.3,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.transparent,
-                                                _gold.withOpacity(0.2),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                        ),
-                                        child: SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CustomPaint(
-                                            painter: _CosmicEyePainter(
-                                              color: _gold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          height: 0.3,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                _gold.withOpacity(0.2),
-                                                Colors.transparent,
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // ── Kişilik portresi bölümü ──
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    24,
-                                    16,
-                                    24,
-                                    24,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 3,
-                                            height: 14,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(2),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                                colors: [
-                                                  _gold.withOpacity(0.6),
-                                                  _gold.withOpacity(0.1),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            'Ruhsal Portre',
-                                            style: GoogleFonts.cinzel(
-                                              color: _gold.withOpacity(0.8),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Text(
-                                        s['description'] as String,
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.75),
-                                          fontSize: 14,
-                                          height: 1.75,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          _CosmicGuideInteractive(
+                            s: s,
+                            goldColor: _gold,
                           ),
                         ),
 
@@ -4218,7 +3946,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         // | SÜPER GÜÇLERİN
                         // ═══════════════════════════
                         _sectionHeader('SÜPER GÜÇLERİN', _warmGold),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
 
                         // Zigzag layout — güçlü yanlar
                         ...List.generate(strengths.length, (i) {
@@ -4237,9 +3965,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         }),
 
                         // ── Göz ayırıcı ──
-                        const SizedBox(
-                          height: 16,
-                        ), // Üstteki öğenin 24px kendi boşluğu var, toplam 40px
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             Expanded(
@@ -4282,14 +4008,12 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 40,
-                        ), // Alttaki başlığa olan mesafe de tam 40px
+                        const SizedBox(height: 20), 
                         // ═══════════════════════════
                         // | BÜYÜME ALANLARIN
                         // ═══════════════════════════
                         _sectionHeader('BÜYÜME ALANLARIN', _coolBlue),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
 
                         // Zigzag layout — zayıf yanlar
                         ...List.generate(weaknesses.length, (i) {
@@ -4398,7 +4122,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           '$pct',
           style: GoogleFonts.cinzel(
             color: color,
-            fontSize: 26,
+            fontSize: 22, // Küçültüldü
             fontWeight: FontWeight.w700,
             height: 1.0,
           ),
@@ -4408,7 +4132,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           '%',
           style: GoogleFonts.cinzel(
             color: color.withOpacity(0.5),
-            fontSize: 14,
+            fontSize: 12, // Küçültüldü
             fontWeight: FontWeight.w700,
             height: 1.0,
           ),
@@ -4424,17 +4148,17 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       children: [
         // Track
         Container(
-          height: 12, // Daha kalın
+          height: 8, // İnceltildi
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
         // Dolu Kısım
         FractionallySizedBox(
           widthFactor: pct / 100.0,
           child: Container(
-            height: 12, // Daha kalın
+            height: 8, // İnceltildi
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
               gradient: LinearGradient(
@@ -4462,7 +4186,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
     );
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 12), // Tek sayfayı aşmadan yaymak için dengeli ayar
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -4473,8 +4197,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       SizedBox(
-                        height:
-                            46, // Sabit yükseklik, iki satıra taşan özellik isimleri (örn: "Düzen ve organizasyon") için genişletildi
+                        height: 28, // Sıkışmadan dengeli okuma alanı
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -4484,7 +4207,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                                 textAlign: TextAlign.left,
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 13,
+                                  fontSize: 12, // Denge sağlandı
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -4493,17 +4216,17 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       barWidget,
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       Text(
                         hint,
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 11,
-                          fontStyle: FontStyle.normal,
-                          height: 1.4,
+                          color: Colors.white.withOpacity(0.55),
+                          fontSize: 10, // Denge sağlandı
+                          fontStyle: FontStyle.normal, // Düz normale dönüldü
+                          height: 1.25,
                         ),
                       ),
                     ],
@@ -4524,8 +4247,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        height:
-                            46, // Sol taraf ile aynı yükseklik (çok satırlılar için)
+                        height: 28, // Sıkışmadan dengeli okuma alanı
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -4536,7 +4258,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 13,
+                                  fontSize: 12, // Denge sağlandı
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -4544,17 +4266,17 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       barWidget,
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       Text(
                         hint,
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 11,
-                          fontStyle: FontStyle.normal,
-                          height: 1.4,
+                          color: Colors.white.withOpacity(0.55),
+                          fontSize: 10, // Denge sağlandı
+                          fontStyle: FontStyle.normal, // Düz normale dönüldü
+                          height: 1.25,
                         ),
                       ),
                     ],
@@ -7151,3 +6873,472 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
     );
   }
 }
+
+// ── ── Kozmik Rehber İnteraktif Paneli ── ──
+class _CosmicGuideInteractive extends StatefulWidget {
+  final Map<String, dynamic> s;
+  final Color goldColor;
+
+  const _CosmicGuideInteractive({
+    Key? key,
+    required this.s,
+    required this.goldColor,
+  }) : super(key: key);
+
+  @override
+  State<_CosmicGuideInteractive> createState() => _CosmicGuideInteractiveState();
+}
+
+class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
+    with SingleTickerProviderStateMixin {
+  bool _isOpened = false;
+  late AnimationController _pulseCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2500))
+      ..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  String _formatCurrentDate() {
+    final d = DateTime.now();
+    return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  }
+
+  Widget _buildIntroCard() {
+    final _gold = widget.goldColor;
+    return GestureDetector(
+      key: const ValueKey('intro'),
+      onTap: () {
+        setState(() => _isOpened = true);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          gradient: LinearGradient(
+            colors: [
+              _gold.withOpacity(0.08),
+              _gold.withOpacity(0.02),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          border: Border.all(color: _gold.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            AnimatedBuilder(
+              animation: _pulseCtrl,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1.0 + (_pulseCtrl.value * 0.05),
+                  child: Opacity(
+                    opacity: 0.8 + (_pulseCtrl.value * 0.2),
+                    child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: CustomPaint(
+                        painter: _CosmicStarPainter(color: _gold),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'KOZMİK REHBERİN',
+              style: GoogleFonts.cinzel(
+                color: _gold,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // YENİ: TARİH BADGE'İ BAŞLANGIÇ PANELİNDE
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: _gold.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: _gold.withOpacity(0.25),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.calendar_today, color: _gold.withOpacity(0.7), size: 12),
+                  const SizedBox(width: 6),
+                  Text(
+                    _formatCurrentDate(),
+                    style: TextStyle(
+                      color: _gold.withOpacity(0.9),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Bugünün fısıltısını hisset ve\nruhsal portrenin sırlarını çöz.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.6),
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(
+                color: _gold.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _gold.withOpacity(0.4)),
+              ),
+              child: const Text(
+                'Rehberi Arala',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpanded() {
+    final _gold = widget.goldColor;
+    final s = widget.s;
+    return Container(
+      key: const ValueKey('expanded'),
+      padding: const EdgeInsets.all(0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.08),
+            Colors.white.withOpacity(0.03),
+          ],
+        ),
+        border: Border.all(
+          color: _gold.withOpacity(0.12),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // ── Üst dekoratif şerit ──
+          Container(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(28),
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  _gold.withOpacity(0.06),
+                  Colors.transparent,
+                  _gold.withOpacity(0.06),
+                ],
+              ),
+            ),
+            child: Row(
+              children: [
+                // Custom yıldız ikonu
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CustomPaint(
+                    painter: _CosmicStarPainter(color: _gold),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (b) => const LinearGradient(
+                          colors: [
+                            Color(0xFFE8D5B7),
+                            Color(0xFFFFE8A1),
+                            Color(0xFFFFD060),
+                          ],
+                        ).createShader(b),
+                        child: Text(
+                          'KOZMİK REHBERİN',
+                          style: GoogleFonts.cinzel(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Bugünün mesajı & ruhsal portre',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 11,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Günlük mesaj bölümü ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                color: _gold.withOpacity(0.04),
+                border: Border.all(color: _gold.withOpacity(0.08)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 3,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              _gold.withOpacity(0.6),
+                              _gold.withOpacity(0.1),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Günün Fısıltısı',
+                        style: GoogleFonts.cinzel(
+                          color: _gold.withOpacity(0.8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // YENİ: TARİH BİLGİSİ EKLENDİ
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _gold.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: _gold.withOpacity(0.2),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Text(
+                          _formatCurrentDate(),
+                          style: TextStyle(
+                            color: _gold.withOpacity(0.9),
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    s['dailyHoroscope'] as String,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                      height: 1.7,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── İnce dekoratif ayırıcı ──
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 0.3,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          _gold.withOpacity(0.2),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CustomPaint(
+                      painter: _CosmicEyePainter(color: _gold),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 0.3,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _gold.withOpacity(0.2),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Kişilik portresi bölümü ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 3,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            _gold.withOpacity(0.6),
+                            _gold.withOpacity(0.1),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Ruhsal Portre',
+                      style: GoogleFonts.cinzel(
+                        color: _gold.withOpacity(0.8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  s['description'] as String,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.75),
+                    fontSize: 14,
+                    height: 1.75,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 850),
+      switchInCurve: Curves.easeOutBack, // Hafifçe yayılan açılış
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final rotate = Tween(begin: math.pi / 2, end: 0.0).animate(animation);
+        final scale = Tween(begin: 0.85, end: 1.0).animate(animation);
+        final fade = Tween(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: const Interval(0.2, 1.0)),
+        );
+        
+        return AnimatedBuilder(
+          animation: animation,
+          child: child,
+          builder: (context, w) {
+            return FadeTransition(
+              opacity: fade,
+              child: Transform(
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0012)
+                  ..scale(scale.value)
+                  ..rotateX(rotate.value),
+                alignment: Alignment.center,
+                child: child,
+              ),
+            );
+          },
+        );
+      },
+      child: _isOpened ? _buildExpanded() : _buildIntroCard(),
+    );
+  }
+}
+
