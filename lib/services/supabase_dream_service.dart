@@ -34,7 +34,7 @@ class SupabaseDreamService {
               'locale': locale,
             }),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 45));
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return DreamInterpretationResult.error(
@@ -72,7 +72,7 @@ class SupabaseDreamService {
               'step': 'questions',
             }),
           )
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return DeepAnalysisQuestions.error('Sunucu hatası');
@@ -92,53 +92,72 @@ class SupabaseDreamService {
     required String locale,
     required List<dynamic> answers,
   }) async {
-    try {
-      final reqBody = jsonEncode({
-        'dreamText': dreamText,
-        'emotion': emotion,
-        'locale': locale,
-        'step': 'analyze',
-        'answers': answers,
-      });
-      debugPrint('🔮 [PREMIUM] Request body: $reqBody');
+    const maxRetries = 2; // 1 asıl + 1 retry
+    const timeout = Duration(seconds: 120); // API ~42s sürebilir, ağ yavaşlığına karşı 120s
 
-      final response = await _client
-          .post(
-            Uri.parse('$_supabaseUrl/functions/v1/analyze-dream-premium'),
-            headers: _headers,
-            body: reqBody,
-          )
-          .timeout(const Duration(seconds: 60));
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final reqBody = jsonEncode({
+          'dreamText': dreamText,
+          'emotion': emotion,
+          'locale': locale,
+          'step': 'analyze',
+          'answers': answers,
+        });
+        debugPrint('🔮 [PREMIUM] Attempt $attempt/$maxRetries — Request body: $reqBody');
 
-      final rawText = utf8.decode(response.bodyBytes);
-      debugPrint('🔮 [PREMIUM] Status: ${response.statusCode}');
-      debugPrint('🔮 [PREMIUM] Raw response (first 500): ${rawText.substring(0, rawText.length > 500 ? 500 : rawText.length)}');
+        final response = await _client
+            .post(
+              Uri.parse('$_supabaseUrl/functions/v1/analyze-dream-premium'),
+              headers: _headers,
+              body: reqBody,
+            )
+            .timeout(timeout);
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        debugPrint('🔮 [PREMIUM] ERROR: Status ${response.statusCode} — $rawText');
-        return DeepAnalysisResult.error('Sunucu hatası: ${response.statusCode}');
+        final rawText = utf8.decode(response.bodyBytes);
+        debugPrint('🔮 [PREMIUM] Status: ${response.statusCode}');
+        debugPrint('🔮 [PREMIUM] Raw response (first 500): ${rawText.substring(0, rawText.length > 500 ? 500 : rawText.length)}');
+
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          debugPrint('🔮 [PREMIUM] ERROR: Status ${response.statusCode} — $rawText');
+          // Server error — retry if we have attempts left
+          if (attempt < maxRetries) {
+            debugPrint('🔮 [PREMIUM] Retrying in 2s...');
+            await Future.delayed(const Duration(seconds: 2));
+            continue;
+          }
+          return DeepAnalysisResult.error('Sunucu hatası: ${response.statusCode}');
+        }
+
+        final body = jsonDecode(rawText) as Map<String, dynamic>;
+
+        if (body.containsKey('error')) {
+          debugPrint('🔮 [PREMIUM] API Error: ${body['error']}');
+          return DeepAnalysisResult.error(body['error'].toString());
+        }
+
+        debugPrint('🔮 [PREMIUM] Keys: ${body.keys.toList()}');
+        debugPrint('🔮 [PREMIUM] title: ${body['title']}');
+        debugPrint('🔮 [PREMIUM] subconsciousMap null? ${body['subconscious_map'] == null}');
+        debugPrint('🔮 [PREMIUM] archetype null? ${body['archetype'] == null}');
+        debugPrint('🔮 [PREMIUM] symbols: ${body['symbols']}');
+        debugPrint('🔮 [PREMIUM] cosmicClosing: ${body['cosmic_closing']}');
+
+        return DeepAnalysisResult.fromJson(body);
+      } catch (e, stack) {
+        debugPrint('🔮 [PREMIUM] EXCEPTION (attempt $attempt): $e');
+        debugPrint('🔮 [PREMIUM] Stack: $stack');
+        // Timeout or connection error — retry if we have attempts left
+        if (attempt < maxRetries) {
+          debugPrint('🔮 [PREMIUM] Retrying in 2s...');
+          await Future.delayed(const Duration(seconds: 2));
+          continue;
+        }
+        return DeepAnalysisResult.error('Bağlantı hatası: $e');
       }
-
-      final body = jsonDecode(rawText) as Map<String, dynamic>;
-
-      if (body.containsKey('error')) {
-        debugPrint('🔮 [PREMIUM] API Error: ${body['error']}');
-        return DeepAnalysisResult.error(body['error'].toString());
-      }
-
-      debugPrint('🔮 [PREMIUM] Keys: ${body.keys.toList()}');
-      debugPrint('🔮 [PREMIUM] title: ${body['title']}');
-      debugPrint('🔮 [PREMIUM] subconsciousMap null? ${body['subconscious_map'] == null}');
-      debugPrint('🔮 [PREMIUM] archetype null? ${body['archetype'] == null}');
-      debugPrint('🔮 [PREMIUM] symbols: ${body['symbols']}');
-      debugPrint('🔮 [PREMIUM] cosmicClosing: ${body['cosmic_closing']}');
-
-      return DeepAnalysisResult.fromJson(body);
-    } catch (e, stack) {
-      debugPrint('🔮 [PREMIUM] EXCEPTION: $e');
-      debugPrint('🔮 [PREMIUM] Stack: $stack');
-      return DeepAnalysisResult.error('Bağlantı hatası: $e');
     }
+    // Bu noktaya ulaşmamalı ama güvenlik için:
+    return DeepAnalysisResult.error('Beklenmeyen hata');
   }
 }
 

@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../models/fortune.dart';
@@ -46,6 +48,19 @@ class _CookieSectionState extends State<CookieSection>
   late AnimationController _sparkleController;
   bool _isCracking = false;
   final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // ── Günlük kurabiye hakkı ──
+  int _cracksToday = _cachedCracksToday;
+  bool _dailyLimitReached = _cachedDailyLimitReached;
+  bool _isPremiumUser = false;
+  bool _showAdOverlay = false;
+  bool _showLimitOverlay = false;
+
+  // Statik cache: widget rebuild olsa bile flickerlamasın
+  static int _cachedCracksToday = 0;
+  static bool _cachedDailyLimitReached = false;
+  static bool _cacheLoaded = false;
+  static bool _debugResetDone = false;
 
   // Share özelliği
   final ScreenshotController _shareScreenshotController = ScreenshotController();
@@ -147,29 +162,26 @@ class _CookieSectionState extends State<CookieSection>
   @override
   void initState() {
     super.initState();
+    // Önce cache’ten yükle (flicker olmasın), sonra async doğrula
+    if (_cacheLoaded) {
+      _cracksToday = _cachedCracksToday;
+      _dailyLimitReached = _cachedDailyLimitReached;
+    }
+    _loadDailyCookieCredits();
     
-    // Bounded Animation: 0'dan 2*pi'ye sürekli döngü
-    // Sinüs/Kosinüs fonksiyonları 2*pi periyodunda tekrar ettiği için
-    // 0 ile 2*pi arasında repeat yapmak "sonsuz" ve "kesintisiz" bir döngü oluşturur.
+    // Bounded Animation: 0’dan 2*pi’ye sürekli döngü
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5), // Daha yavaş = daha az GPU yükü
-      upperBound: 2 * math.pi, // Loop noktası
+      duration: const Duration(seconds: 5),
+      upperBound: 2 * math.pi,
     );
-    
-    // Sürekli tekrar et
     _animationController.repeat();
-
-    // Glow animasyonu (2s, easeInOut, ileri-geri) -> Bunu değiştirmiyoruz
-
-
-
 
     // Glow animasyonu (2s, easeInOut, ileri-geri)
     _glowController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-      value: 0.5, // Sabit glow seviyesi
+      value: 0.5,
     );
     _glowAnimation = CurvedAnimation(
       parent: _glowController,
@@ -182,20 +194,27 @@ class _CookieSectionState extends State<CookieSection>
       duration: const Duration(milliseconds: 500),
     );
 
-    // Crack animasyonu - Daha hızlı ve vurucu (Snap etkisi)
+    // Crack animasyonu
     _crackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350), // 800ms -> 350ms (daha ani)
+      duration: const Duration(milliseconds: 350),
     );
 
-    // ... (diğer controllerlar aynı kalabilir)
-
-
-    // Sparkle animasyonu - sürekli repeat kaldırıldı (performans)
+    // Sparkle animasyonu
     _sparkleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant CookieSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Kurabiye seçimi değiştiğinde state’i koru (cache’ten oku)
+    if (oldWidget.selectedCookieEmoji != widget.selectedCookieEmoji) {
+      _cracksToday = _cachedCracksToday;
+      _dailyLimitReached = _cachedDailyLimitReached;
+    }
   }
 
   @override
@@ -335,7 +354,37 @@ class _CookieSectionState extends State<CookieSection>
     'gold_beasts',
   };
 
-  void _onCookieTap() {
+  Future<void> _loadDailyCookieCredits() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+
+    // Debug: Hot restart'ta hakları sıfırla (SADECE 1 KEZ per session)
+    // Production'da bu blok çalışmaz
+    assert(() {
+      if (!_debugResetDone) {
+        _debugResetDone = true;
+        prefs.setInt('cookie_cracks_today', 0);
+        _cachedCracksToday = 0;
+        _cachedDailyLimitReached = false;
+        _cacheLoaded = false;
+      }
+      return true;
+    }());
+
+    final cracks = await StorageService.getCookieCracksToday();
+    // Statik cache güncelle (tüm instance’lar için)
+    _cachedCracksToday = cracks;
+    _cachedDailyLimitReached = !_isPremiumUser && cracks >= StorageService.kMaxDailyCookieCracks;
+    _cacheLoaded = true;
+    if (mounted) {
+      setState(() {
+        _cracksToday = cracks;
+        _dailyLimitReached = _cachedDailyLimitReached;
+      });
+    }
+  }
+
+  void _onCookieTap() async {
     if (_showFortune) return;
 
     // Ücretli kurabiye kontrolü
@@ -345,16 +394,56 @@ class _CookieSectionState extends State<CookieSection>
       return;
     }
 
+    // ── Günlük limit kontrolü ──
+    if (!_isPremiumUser) {
+      final cracksUsed = await StorageService.getCookieCracksToday();
+
+      // Limit doldu
+      if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
+        HapticFeedback.heavyImpact();
+        setState(() => _showLimitOverlay = true);
+        return;
+      }
+
+      // 2. ve 3. hak: reklam gerekli
+      if (cracksUsed >= 1) {
+        // Overlay göster, kullanıcı kararı bekle
+        setState(() => _showAdOverlay = true);
+        return;
+      }
+    }
+
+    _performCrack();
+  }
+
+  // ── Reklam overlay'dan "izle" a tıklandı ──
+  void _onAdAccepted() {
+    setState(() => _showAdOverlay = false);
+    _performCrack();
+  }
+
+  // ── Reklam overlay'dan "vazgeç" a tıklandı ──
+  void _onAdDeclined() {
+    setState(() => _showAdOverlay = false);
+  }
+
+  // ── Limit overlay'dan "tamam" a tıklandı ──
+  void _onLimitDismissed() {
+    setState(() => _showLimitOverlay = false);
+  }
+
+  // ── Gerçek kurabiye kırma işlemi ──
+  void _performCrack() async {
+    final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
+
     setState(() => _isPressed = true);
 
-    // Fortune ANINDA oluştur (beklemeden!)
     final fortune = Fortune.getRandomFortuneInstant(
       languageCode: Localizations.localeOf(context).languageCode,
     );
 
     _playSound('cookie_tap.mp3');
 
-    // Crack animasyonu başlat
     setState(() => _isCracking = true);
     _crackController.forward(from: 0);
 
@@ -365,25 +454,31 @@ class _CookieSectionState extends State<CookieSection>
       _playSound('cookie_sparkle.mp3');
     });
 
+    await StorageService.recordCookieCrack();
     StorageService.incrementCookieCount();
     StorageService.incrementCookieCard(cookieId);
 
-    // Kağıt HEMEN çıksın — kurabiyenin arkasında, kırılınca görünecek
+    final newCracks = await StorageService.getCookieCracksToday();
+    final limitReached = !_isPremiumUser && newCracks >= StorageService.kMaxDailyCookieCracks;
+    // Cache güncelle
+    _cachedCracksToday = newCracks;
+    _cachedDailyLimitReached = limitReached;
+
     setState(() {
       _currentFortune = fortune;
       _isPressed = false;
       _showFortune = true;
       _showShareButton = false;
+      _cracksToday = newCracks;
+      _dailyLimitReached = limitReached;
     });
 
-    // Paylaş butonu kağıt açıldıktan 1.2sn sonra yumuşakça gelsin
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted && _showFortune) {
         setState(() => _showShareButton = true);
       }
     });
 
-    // Kırılma animasyonu bitsin
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
         setState(() => _isCracking = false);
@@ -391,6 +486,120 @@ class _CookieSectionState extends State<CookieSection>
     });
   }
 
+  // ── Reklam overlay içeriği (buzlu cam / glassmorphism) ──
+  Widget _buildAdOverlayContent() {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
+        child: Container(
+          width: 200,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, spreadRadius: -4),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFF7941D).withOpacity(0.18),
+                  border: Border.all(color: const Color(0xFFF7941D).withOpacity(0.3), width: 0.5),
+                ),
+                child: const Icon(Icons.play_arrow_rounded, color: Color(0xFFF7941D), size: 20),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isTr ? 'Reklam izle, kır!' : 'Watch ad, crack!',
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: _onAdAccepted,
+                child: Container(
+                  width: double.infinity, height: 38,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF7941D), Color(0xFFFF6B00)],
+                    ),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          isTr ? 'İzle' : 'Watch',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Limit overlay içeriği (buzlu cam / glassmorphism) ──
+  Widget _buildLimitOverlayContent() {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
+        child: Container(
+          width: 200,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, spreadRadius: -4),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
+                ),
+                child: Icon(Icons.nightlight_round, color: Colors.white.withOpacity(0.5), size: 18),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isTr ? 'Bugünlük bu kadar' : 'That\'s all for today',
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isTr ? 'Yarın yeni haklar gelecek' : 'New cookies tomorrow',
+                style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   void _showPremiumDialog() {
     final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
     final imagePath = _cookieImageMap[cookieId];
@@ -453,7 +662,20 @@ class _CookieSectionState extends State<CookieSection>
                       ),
 
                     // 2. KURABİYE — kağıdın ÜSTÜNDE
-                    IgnorePointer(
+                    // Günlük limit dolduğunda greyscale + soluk
+                    AnimatedOpacity(
+                      opacity: _dailyLimitReached ? 0.4 : 1.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: ColorFiltered(
+                        colorFilter: _dailyLimitReached
+                            ? const ColorFilter.matrix(<double>[
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0.2126, 0.7152, 0.0722, 0, 0,
+                                0, 0, 0, 1, 0,
+                              ])
+                            : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
+                        child: IgnorePointer(
                       ignoring:
                           _showFortune, // Paper çıktığında cookie tıklanamaz ama görünür kalır
                       child: AnimatedBuilder(
@@ -569,7 +791,9 @@ class _CookieSectionState extends State<CookieSection>
                           );
                         },
                       ),
-                    ),
+                    ),  // IgnorePointer
+                    ),  // ColorFiltered
+                    ),  // AnimatedOpacity
                     // 3. Dışına tıklayınca kapatan alan (en üstte)
                     if (_showFortune && _currentFortune != null)
                       Positioned.fill(
@@ -583,30 +807,110 @@ class _CookieSectionState extends State<CookieSection>
                           },
                         ),
                       ),
+                    // ── 4. REKLAM OVERLAY — kurabiyenin tam üstünde, herhangi yere tıkla kapat ──
+                    if (_showAdOverlay)
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _onAdDeclined,
+                          child: Center(
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOutBack,
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: Opacity(opacity: value.clamp(0.0, 1.0), child: child),
+                                );
+                              },
+                              child: _buildAdOverlayContent(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    // ── 5. LİMİT OVERLAY — kurabiyenin tam üstünde, herhangi yere tıkla kapat ──
+                    if (_showLimitOverlay)
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _onLimitDismissed,
+                          child: Center(
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOutBack,
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: Opacity(opacity: value.clamp(0.0, 1.0), child: child),
+                                );
+                              },
+                              child: _buildLimitOverlayContent(),
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
               if (!widget.hideLabels) ...[
               const SizedBox(height: 10),
               Text(
-                l10n.dailyCookieTitle,
+                _dailyLimitReached
+                    ? (Localizations.localeOf(context).languageCode == 'tr' ? 'Yarın Gel' : 'Come Back Tomorrow')
+                    : l10n.dailyCookieTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppColors.textWhite,
+                  color: _dailyLimitReached ? AppColors.textWhite.withOpacity(0.4) : AppColors.textWhite,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.dailyCookieSubtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textWhite.withOpacity(0.6),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
+              const SizedBox(height: 8),
+              // Günlük hak göstergesi: 3 nokta (● ● ●)
+              if (!_isPremiumUser)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(StorageService.kMaxDailyCookieCracks, (i) {
+                    final isUsed = i < _cracksToday;
+                    final isNextFree = !isUsed && i == 0;
+                    final needsAd = !isUsed && i > 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeOutCubic,
+                        width: isUsed ? 8 : 10,
+                        height: isUsed ? 8 : 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isUsed
+                              ? Colors.white.withOpacity(0.15)
+                              : isNextFree || _cracksToday == 0
+                                  ? const Color(0xFFF7941D)
+                                  : const Color(0xFFF7941D).withOpacity(0.5),
+                          border: !isUsed && needsAd && _cracksToday > 0
+                              ? Border.all(color: const Color(0xFFF7941D).withOpacity(0.4), width: 1)
+                              : null,
+                          boxShadow: !isUsed
+                              ? [BoxShadow(color: const Color(0xFFF7941D).withOpacity(0.3), blurRadius: 6)]
+                              : null,
+                        ),
+                      ),
+                    );
+                  }),
+                )
+              else
+                Text(
+                  l10n.dailyCookieSubtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textWhite.withOpacity(0.6),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
               ],
             ],
           ),

@@ -362,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                     behavior: HitTestBehavior.translucent,
                     onTap: _hideFortune,
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                       clipBehavior: Clip.none,
                       child: Transform.translate(
                         offset: const Offset(0, 0),
@@ -404,17 +404,10 @@ class _HomePageState extends State<HomePage> {
                             Transform.translate(
                               offset: const Offset(0, -60),
                               child: RepaintBoundary(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 0,
-                                  ),
-                                  child: CookieSelector(
-                                    key: const ValueKey(
-                                      'cookie_selector_fixed',
-                                    ),
-                                    initialSelectedIndex: _selectedCookieIndex,
-                                    onCookieSelected: _onCookieSelected,
-                                  ),
+                                child: CookieSelector(
+                                  key: const ValueKey('cookie_selector_fixed'),
+                                  initialSelectedIndex: _selectedCookieIndex,
+                                  onCookieSelected: _onCookieSelected,
                                 ),
                               ),
                             ),
@@ -428,7 +421,6 @@ class _HomePageState extends State<HomePage> {
                                   const SizedBox(height: 16),
                                   const QuoteBanner(),
                                   const DailyHoroscopeCard(),
-                                  const SizedBox(height: 0),
                                 ],
                               ),
                             ),

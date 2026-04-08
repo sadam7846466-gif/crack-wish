@@ -324,6 +324,66 @@ class StorageService {
     await _updateStreak();
   }
 
+  // ── GÜNLÜK KURABİYE HAKKI SİSTEMİ ──
+  // Free: 3 hak/gün (1 ücretsiz + 2 reklam izleyerek)
+  // Premium: Sınırsız
+  static const int kMaxDailyCookieCracks = 3;
+  static const String _keyCookieCracksToday = 'cookie_cracks_today';
+  static const String _keyCookieCracksDate = 'cookie_cracks_date';
+
+  /// Bugün kaç kurabiye kırıldı
+  static Future<int> getCookieCracksToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedDate = prefs.getString(_keyCookieCracksDate) ?? '';
+    final today = _todayKey();
+    if (savedDate != today) {
+      // Yeni gün: sıfırla
+      await prefs.setInt(_keyCookieCracksToday, 0);
+      await prefs.setString(_keyCookieCracksDate, today);
+      return 0;
+    }
+    return prefs.getInt(_keyCookieCracksToday) ?? 0;
+  }
+
+  /// Kalan kurabiye hakkı
+  static Future<int> getRemainingCookieCracks() async {
+    final used = await getCookieCracksToday();
+    return (kMaxDailyCookieCracks - used).clamp(0, kMaxDailyCookieCracks);
+  }
+
+  /// Kurabiye kırılabilir mi? (hak var mı)
+  static Future<bool> canCrackCookie() async {
+    final used = await getCookieCracksToday();
+    return used < kMaxDailyCookieCracks;
+  }
+
+  /// İlk hak ücretsiz mi? (0 kırılmışsa evet)
+  static Future<bool> isNextCrackFree() async {
+    final used = await getCookieCracksToday();
+    return used == 0;
+  }
+
+  /// Reklam gerekli mi? (2. ve 3. hak için)
+  static Future<bool> doesNextCrackRequireAd() async {
+    final used = await getCookieCracksToday();
+    return used >= 1 && used < kMaxDailyCookieCracks;
+  }
+
+  /// Kurabiye kırıldığını kaydet
+  static Future<void> recordCookieCrack() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    final savedDate = prefs.getString(_keyCookieCracksDate) ?? '';
+    int current;
+    if (savedDate != today) {
+      current = 0;
+      await prefs.setString(_keyCookieCracksDate, today);
+    } else {
+      current = prefs.getInt(_keyCookieCracksToday) ?? 0;
+    }
+    await prefs.setInt(_keyCookieCracksToday, current + 1);
+  }
+
   static Future<int> getStreakDays() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyStreakDays) ?? 0;
