@@ -982,35 +982,38 @@ class _ZodiacPageState extends State<ZodiacPage>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.92,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(32),
-              ),
-              border: Border(
-                top: BorderSide(color: _gold.withOpacity(0.25), width: 0.8),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 40,
-                  offset: const Offset(0, -8),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.4,
+        maxChildSize: 0.92,
+        expand: false,
+        builder: (_, scrollController) => ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
                 ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+                border: Border(
+                  top: BorderSide(color: _gold.withOpacity(0.25), width: 0.8),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 40,
+                    offset: const Offset(0, -8),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   const SizedBox(height: 12),
                   Container(
                     width: 36,
@@ -1131,7 +1134,7 @@ class _ZodiacPageState extends State<ZodiacPage>
           ),
         ),
       ),
-    );
+    ));
   }
 
   @override
@@ -1955,157 +1958,17 @@ class _ZodiacPageState extends State<ZodiacPage>
           ),
           const SizedBox(height: 6),
           Text(
-            'Kendi burcunu seç ve yıldızların ne dediğini gör',
+            'Yıldızların rehberliğinde ikili enerjini keşfet',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 11,
             ),
           ),
           const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _gold.withOpacity(0.3),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _gold.withOpacity(0.1),
-                          blurRadius: 20,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        currentSignData['image'] as String,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    currentSignData['nameEn'].toString().toUpperCase(),
-                    style: GoogleFonts.cinzel(
-                      color: _gold,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 26),
-                child: Icon(
-                  Icons.all_inclusive,
-                  color: _gold.withOpacity(0.6),
-                  size: 28,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => _showZodiacPickerForCompatibility(currentSignData),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: CustomPaint(
-                        painter: _DashedCirclePainter(color: _gold),
-                        child: Center(
-                          child: Text(
-                            '?',
-                            style: GoogleFonts.cinzel(
-                              color: _gold,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _gold.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _gold.withOpacity(0.3)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _gold.withOpacity(0.15),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'BURÇ SEÇ',
-                            style: TextStyle(
-                              color: _gold,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(Icons.auto_awesome, color: _gold, size: 12),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _gold.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _gold.withOpacity(0.3)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _gold.withOpacity(0.15),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ARKADAŞ SEÇ',
-                            style: TextStyle(
-                              color: _gold,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(Icons.auto_awesome, color: _gold, size: 12),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          _CosmicHarmonyAnimation(
+            color: _gold,
+            currentSignData: currentSignData,
+            onPickFriend: () => _showZodiacPickerForCompatibility(currentSignData),
           ),
         ],
       ),
@@ -6177,12 +6040,9 @@ class _CombinedRadarPainter extends CustomPainter {
 class _ArcGaugePainter extends CustomPainter {
   final double value; // 0.0 – 1.0
   final Color color;
-  final Color textColor;
-
   _ArcGaugePainter({
     required this.value,
     required this.color,
-    required this.textColor,
   });
 
   @override
@@ -6246,20 +6106,7 @@ class _ArcGaugePainter extends CustomPainter {
       Paint()..color = color.withOpacity(0.8),
     );
 
-    // Merkez yüzde yazısı
-    final pct = (value * 100).round();
-    final tp = TextPainter(
-      text: TextSpan(
-        text: '$pct',
-        style: TextStyle(
-          color: textColor.withOpacity(0.9),
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(canvas, Offset(cx - tp.width / 2, cy - tp.height / 2));
+    // İstenmeyen / çift çizilen "Merkez yüzde yazısı" kısmı kaldırıldı
   }
 
   @override
@@ -6725,8 +6572,6 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                               painter: _ArcGaugePainter(
                                 value: (widget.c.value * widget.pct) / 100,
                                 color: Colors.white.withOpacity(0.85),
-                                textColor: Colors
-                                    .transparent, // We use icon instead of text
                               ),
                             ),
                           ),
@@ -7342,3 +7187,321 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
   }
 }
 
+class _CosmicHarmonyAnimation extends StatefulWidget {
+  final Color color;
+  final Map<String, dynamic> currentSignData;
+  final VoidCallback onPickFriend;
+
+  const _CosmicHarmonyAnimation({
+    required this.color,
+    required this.currentSignData,
+    required this.onPickFriend,
+  });
+
+  @override
+  State<_CosmicHarmonyAnimation> createState() => _CosmicHarmonyAnimationState();
+}
+
+class _CosmicHarmonyAnimationState extends State<_CosmicHarmonyAnimation> with SingleTickerProviderStateMixin {
+  late AnimationController _c;
+  bool _isInteracting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = AnimationController(vsync: this, duration: const Duration(seconds: 40))..repeat();
+  }
+
+  @override
+  void dispose() { 
+    _c.dispose(); 
+    super.dispose(); 
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onPanDown: (_) => setState(() => _isInteracting = true),
+      onPanEnd: (_) => setState(() => _isInteracting = false),
+      onPanCancel: () => setState(() => _isInteracting = false),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: _isInteracting ? 1.0 : 0.0),
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.elasticOut,
+        builder: (context, interactVal, child) {
+          return AnimatedBuilder(
+            animation: _c,
+            builder: (_, __) {
+              final spin = _c.value;
+              
+              // Daha yavaş ve dingin nabız (40 saniyede aheste dalgalanmalar)
+              final magneticPulse = (math.sin(spin * math.pi * 16) + 1.0) / 2.0;
+
+              // Havada çok hafif yavaş yörüngesel süzülme
+              final leftFloat = Offset(0, math.cos(spin * math.pi * 8) * 4);
+              final rightFloat = Offset(0, math.sin(spin * math.pi * 8 + math.pi) * 4);
+              
+              // Çekim mesafesi aynı kalabilir ama geçişi daha soft
+              final pullDist = (magneticPulse * 16.0) + (interactVal * 20.0);
+              final totalIntensity = math.min(1.0, (magneticPulse * 0.3) + interactVal);
+
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: _HarmonyPainter(
+                        color: widget.color,
+                        spin: spin,
+                        interact: interactVal,
+                        magneticPulse: magneticPulse,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Transform.translate(
+                        offset: leftFloat + Offset(pullDist, 0),
+                        child: Transform.scale(
+                          scale: 1.0 + (totalIntensity * 0.06),
+                          child: _buildLeft(totalIntensity),
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      Transform.translate(
+                        offset: rightFloat + Offset(-pullDist, 0),
+                        child: Transform.scale(
+                          scale: 1.0 + (totalIntensity * 0.06),
+                          child: _buildRight(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }
+          );
+        }
+      ),
+    );
+  }
+
+  Widget _buildLeft(double totalIntensity) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: widget.color.withOpacity(0.3 + (totalIntensity * 0.3)), width: 1.5 + (totalIntensity * 0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withOpacity(0.1 + (totalIntensity * 0.2)),
+                blurRadius: 20 + (totalIntensity * 15),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              widget.currentSignData['image'] as String,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          widget.currentSignData['nameEn'].toString().toUpperCase(),
+          style: GoogleFonts.cinzel(
+            color: widget.color,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRight() {
+    return GestureDetector(
+      onTap: widget.onPickFriend,
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: CustomPaint(
+              painter: _DashedCirclePainter(color: widget.color),
+              child: Center(
+                child: Text(
+                  '?',
+                  style: GoogleFonts.cinzel(
+                    color: widget.color,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          _btn('BURÇ SEÇ'),
+          const SizedBox(height: 8),
+          _btn('ARKADAŞ SEÇ'),
+        ],
+      ),
+    );
+  }
+
+  Widget _btn(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: widget.color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: widget.color.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: widget.color.withOpacity(0.15),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: widget.color,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Icon(Icons.auto_awesome, color: widget.color, size: 12),
+        ],
+      ),
+    );
+  }
+}
+
+class _HarmonyPainter extends CustomPainter {
+  final Color color;
+  final double spin; 
+  final double interact; 
+  final double magneticPulse;
+
+  _HarmonyPainter({
+    required this.color, 
+    required this.spin, 
+    required this.interact,
+    required this.magneticPulse,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cX = size.width / 2;
+    final cY = 40.0;
+    
+    final totalIntensity = math.min(1.0, (magneticPulse * 0.3) + interact);
+
+    canvas.save();
+    canvas.translate(cX, cY);
+
+    // Ethereal çok ince yıldız tozu arka planı (Daha dingin)
+    final numStars = 12;
+    for (int i = 0; i < numStars; i++) {
+      final angle = (i * math.pi * 2 / numStars) + (spin * math.pi * 2);
+      final radius = 20.0 + math.sin(spin * math.pi * 8 + i) * 8.0;
+      final starPos = Offset(math.cos(angle) * radius, math.sin(angle) * radius);
+      canvas.drawCircle(starPos, 0.8, Paint()..color = color.withOpacity(0.05 + totalIntensity * 0.15));
+    }
+
+    // Avatar Yansıma Ağı (Cosmic Web)
+    // Avatarların koordinatları tahmini baseDist - pullDist şeklindedir
+    final baseDist = size.width * 0.28;
+    final pullDist = (magneticPulse * 16.0) + (interact * 20.0);
+    // Y Süzülme miktarları State ile uyumlu
+    final leftY = math.cos(spin * math.pi * 8) * 4;
+    final rightY = math.sin(spin * math.pi * 8 + math.pi) * 4;
+    
+    final pL = Offset(-baseDist + pullDist, leftY);
+    final pR = Offset(baseDist - pullDist, rightY);
+
+    // Ağ Düğümleri (Cosmic Web Nodes) daha sakin yer değiştirir
+    final tVal = spin * math.pi * 2;
+    
+    Offset makeNode(double baseX, double baseY, double freq1, double freq2, double phase) {
+      // Çekim gücüne bağlı merkeze daralma (ağ sıkışır)
+      final pullX = -baseX * 0.25 * totalIntensity;
+      final pullY = -baseY * 0.25 * totalIntensity;
+      return Offset(
+        baseX + pullX + math.sin(tVal * freq1 + phase) * 6.0,
+        baseY + pullY + math.cos(tVal * freq2 + phase) * 6.0,
+      );
+    }
+
+    // Modern / mistik takımyıldız dizilimi
+    final n1 = makeNode(-30, -20, 2.0, 3.0, 0.0);
+    final n2 = makeNode(-20,  22, 3.0, 2.0, 1.0);
+    final n3 = makeNode(  0,   0, 1.5, 2.5, 2.0); // Kalp/Çekirdek Düğümü
+    final n4 = makeNode( 30, -20, 2.5, 1.5, 3.0);
+    final n5 = makeNode( 20,  22, 2.0, 3.0, 4.0);
+
+    final linePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8 + totalIntensity * 1.2
+      ..color = color.withOpacity(0.20 + totalIntensity * 0.40);
+
+    void connect(Offset a, Offset b) {
+      canvas.drawLine(a, b, linePaint);
+    }
+
+    // Taraf bağları
+    connect(pL, n1);
+    connect(pL, n2);
+    connect(pL, n3); // Ana taşıyıcı hat
+    
+    connect(pR, n3); // Ana taşıyıcı hat
+    connect(pR, n4);
+    connect(pR, n5);
+
+    // Kendi içindeki örgü ağı (Geometrik Pleiades ağı)
+    connect(n1, n3);
+    connect(n2, n3);
+    connect(n4, n3);
+    connect(n5, n3);
+    connect(n1, n2); // Sol kanat dış zar
+    connect(n4, n5); // Sağ kanat dış zar
+
+    // Düğümlerdeki ışıltılı kozmik yıldızlar
+    void drawNodeStar(Offset pos, double baseR) {
+      final pr = baseR + totalIntensity * 1.5;
+      canvas.drawCircle(pos, pr, Paint()..color = Color.lerp(color, Colors.white, totalIntensity)!);
+      
+      final glowR = pr * 3.5 + totalIntensity * 8.0;
+      canvas.drawCircle(pos, glowR, Paint()
+        ..shader = RadialGradient(
+          colors: [color.withOpacity(0.4 + totalIntensity * 0.5), color.withOpacity(0)]
+        ).createShader(Rect.fromCircle(center: pos, radius: glowR)));
+    }
+
+    drawNodeStar(n1, 1.2);
+    drawNodeStar(n2, 1.0);
+    drawNodeStar(n3, 2.5); // Merkez en parlaktır
+    drawNodeStar(n4, 1.2);
+    drawNodeStar(n5, 1.0);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _HarmonyPainter old) => 
+      old.spin != spin || old.interact != interact || old.magneticPulse != magneticPulse;
+}

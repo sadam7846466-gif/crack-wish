@@ -1030,7 +1030,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             child: Opacity(
                               opacity: curve.clamp(0.0, 1.0),
                               child: Text(
-                                hero.key,
+                                careers.isNotEmpty ? careers[0] : hero.key,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.40),
                                   fontSize: 12,
@@ -1045,8 +1045,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       // Diğer 4 stat — mini circles
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: others.map((e) {
+                        children: others.asMap().entries.map((entry) {
+                          final idx = entry.key;
+                          final e = entry.value;
                           final val = e.value['val'] as int;
+                          final careerLabel = (idx + 1 < careers.length) ? careers[idx + 1] : e.key;
                           return Column(
                             children: [
                               SizedBox(
@@ -1102,7 +1105,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               Opacity(
                                 opacity: curve.clamp(0.0, 1.0),
                                 child: Text(
-                                  e.key,
+                                  careerLabel,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.35),
                                     fontSize: 9,
@@ -1129,137 +1132,43 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                         ),
                       ),
-                      // Alt kısım — iki sütun (Potansiyel Meslekler vs Kariyer Rehberi)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Sol — Potansiyel Meslekler
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      // Alt kısım — Kariyer Rehberi (Tam Genişlik)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.work_outline_rounded,
-                                      size: 12,
-                                      color: const Color(0xFFCBB270).withOpacity(0.6),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      'Potansiyel Meslekler',
-                                      style: TextStyle(
-                                        color: const Color(0xFFCBB270).withOpacity(0.5),
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ],
+                                Icon(
+                                  Icons.lightbulb_outline_rounded,
+                                  size: 14,
+                                  color: const Color(0xFFCBB270).withOpacity(0.6),
                                 ),
-                                const SizedBox(height: 8),
-                                ...careers
-                                    .take(5)
-                                    .toList()
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (e) => Padding(
-                                        padding: const EdgeInsets.only(bottom: 6),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 16,
-                                              height: 16,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(4),
-                                                color: const Color(0xFFCBB270).withOpacity(0.08),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '${e.key + 1}',
-                                                  style: TextStyle(
-                                                    color: const Color(0xFFCBB270).withOpacity(0.5),
-                                                    fontSize: 8,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                e.value,
-                                                style: TextStyle(
-                                                  color: Colors.white.withOpacity(0.75),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                              ],
-                            ),
-                          ),
-                          // Orta — ayırıcı çizgi
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Container(
-                              width: 0.5,
-                              height: 110,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white.withOpacity(0.08),
-                                    Colors.transparent,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Sağ — Kariyer Rehberi (Advice)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.lightbulb_outline_rounded,
-                                      size: 12,
-                                      color: const Color(0xFFCBB270).withOpacity(0.6),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      'Kariyer Rehberi',
-                                      style: TextStyle(
-                                        color: const Color(0xFFCBB270).withOpacity(0.5),
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
+                                const SizedBox(width: 8),
                                 Text(
-                                  careerAdvice,
+                                  'Kariyer Rehberi',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.65),
+                                    color: const Color(0xFFCBB270).withOpacity(0.6),
                                     fontSize: 10,
-                                    height: 1.5,
-                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 12),
+                            Text(
+                              careerAdvice,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 11,
+                                height: 1.6,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -4466,11 +4375,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     ];
     final s = stats[idx];
     return {
-      'Zekâ': {'val': s['z']},
-      'Güç': {'val': s['g']},
-      'Şefkat': {'val': s['s']},
-      'Enerji': {'val': s['e']},
-      'Sezgi': {'val': s['i']},
+      'Analitik': {'val': s['z']},
+      'Liderlik': {'val': s['g']},
+      'İletişim': {'val': s['s']},
+      'İnisiyatif': {'val': s['e']},
+      'Vizyon': {'val': s['i']},
     };
   }
 
@@ -6067,19 +5976,19 @@ class _StatIconPainter extends CustomPainter {
     final r = size.width * 0.42;
 
     switch (statKey) {
-      case 'Sezgi':
+      case 'Vizyon':
         _drawEye(canvas, cx, cy, r, p);
         break;
-      case 'Zekâ':
+      case 'Analitik':
         _drawBrain(canvas, cx, cy, r, p);
         break;
-      case 'Şefkat':
+      case 'İletişim':
         _drawLotus(canvas, cx, cy, r, p);
         break;
-      case 'Enerji':
+      case 'İnisiyatif':
         _drawFlame(canvas, cx, cy, r, p);
         break;
-      case 'Güç':
+      case 'Liderlik':
         _drawFist(canvas, cx, cy, r, p);
         break;
     }
