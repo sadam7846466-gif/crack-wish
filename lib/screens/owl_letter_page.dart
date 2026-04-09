@@ -91,17 +91,17 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
             return Stack(
               children: [
-                // Arka plan karartma (hafif)
+                // Arka plan karartma (Çok Yoğun)
                 Positioned.fill(
                   child: GestureDetector(
                     onTap: _close,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(
-                        sigmaX: 12 * t,
-                        sigmaY: 12 * t,
+                        sigmaX: 40 * t,
+                        sigmaY: 40 * t,
                       ),
                       child: Container(
-                        color: Colors.black.withOpacity(0.25 * t),
+                        color: Colors.black.withOpacity(0.70 * t),
                       ),
                     ),
                   ),
@@ -154,7 +154,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             ),
                           ],
                         ),
-                        child: ClipRect(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(radius),
                           child: Opacity(
                             opacity: t.clamp(0.0, 1.0),
                             child: OverflowBox(
@@ -164,138 +165,148 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                               minHeight: panelH,
                               maxHeight: panelH,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                padding: const EdgeInsets.only(top: 16, bottom: 0),
                                 child: Column(
-                                children: [
-                                  // Baykuş
-                                  Image.asset('assets/images/owl.webp', width: 48, height: 48),
-                                  const SizedBox(height: 10),
-                                  // Arkadaşlarım ve Gelen Mektup yan yana (Sleek Reference Design)
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _AnimatedMenuItem(
-                                          label: 'Arkadaşlarım',
-                                          isSelected: _selectedTab == 0,
-                                          onTap: () {
-                                            if (_selectedTab != 0) {
-                                              setState(() => _selectedTab = 0);
-                                              _pageCtrl.animateToPage(0, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
-                                            }
-                                          },
-                                        ),
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                                      child: Column(
+                                        children: [
+                                          // Baykuş
+                                          Image.asset('assets/images/owl.webp', width: 48, height: 48),
+                                          const SizedBox(height: 10),
+                                          // Sabit Profil Paneli (Tüm sekmelerin üstünde)
+                                          _buildMyProfilePlate(),
+                                          const SizedBox(height: 16),
+                                          // Arkadaşlarım ve Gelen Mektup yan yana (Sleek Reference Design)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _AnimatedMenuItem(
+                                                  label: 'Arkadaşlarım',
+                                                  isSelected: _selectedTab == 0,
+                                                  onTap: () {
+                                                    if (_selectedTab != 0) {
+                                                      setState(() => _selectedTab = 0);
+                                                      _pageCtrl.animateToPage(0, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: _AnimatedMenuItem(
+                                                  label: 'Bağlantılar',
+                                                  isSelected: _selectedTab == 1,
+                                                  onTap: () {
+                                                    if (_selectedTab != 1) {
+                                                      setState(() => _selectedTab = 1);
+                                                      _pageCtrl.animateToPage(1, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: _AnimatedMenuItem(
+                                                  label: 'Gelen Mektup',
+                                                  isSelected: _selectedTab == 2,
+                                                  onTap: () {
+                                                    if (_selectedTab != 2) {
+                                                      setState(() => _selectedTab = 2);
+                                                      _pageCtrl.animateToPage(2, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 16),
+                                          _buildGlobalSearchBar(),
+                                        ],
                                       ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _AnimatedMenuItem(
-                                          label: 'Bağlantılar',
-                                          isSelected: _selectedTab == 1,
-                                          onTap: () {
-                                            if (_selectedTab != 1) {
-                                              setState(() => _selectedTab = 1);
-                                              _pageCtrl.animateToPage(1, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _AnimatedMenuItem(
-                                          label: 'Gelen Mektup',
-                                          isSelected: _selectedTab == 2,
-                                          onTap: () {
-                                            if (_selectedTab != 2) {
-                                              setState(() => _selectedTab = 2);
-                                              _pageCtrl.animateToPage(2, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  // İçerik - PageView (Tamamen Pürüzsüz Slide)
-                                  Expanded(
-                                    child: PageView(
-                                      controller: _pageCtrl,
-                                      physics: const ClampingScrollPhysics(),
-                                      onPageChanged: (idx) {
-                                        if (_selectedTab != idx) {
-                                          setState(() => _selectedTab = idx);
-                                        }
-                                      },
-                                      children: [
-                                        _buildContactsTab(br),
-                                        _buildDiscoverTab(br),
-                                        _buildInboxTab(br),
-                                      ],
                                     ),
-                                  ),
-                                ],
+                                    // İçerik - PageView (Tamamen Pürüzsüz Slide)
+                                    Expanded(
+                                      child: PageView(
+                                        controller: _pageCtrl,
+                                        physics: const ClampingScrollPhysics(),
+                                        onPageChanged: (idx) {
+                                          if (_selectedTab != idx) {
+                                            setState(() => _selectedTab = idx);
+                                          }
+                                        },
+                                        children: [
+                                          Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: _buildContactsTab(br)),
+                                          Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: _buildDiscoverTab(br)),
+                                          Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: _buildInboxTab(br)),
+                                        ],
+                                      ),
+                                    ), // end Expanded
+                                  ], // end Column.children
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      ),
                     ),
-                  ),
-                  ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                      ), // end ClipRRect
+                    ), // end AnimatedOpacity
+                  ), // end IgnorePointer
+                ), // end Positioned
+              ], // end Stack children
+            ); // end Stack
+          }, // end AnimatedBuilder builder
+        ), // end AnimatedBuilder
+      ), // end Material
+    ); // end PopScope
+  }
+
+
+  Widget _buildGlobalSearchBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.black.withOpacity(0.20),
+        border: Border.all(color: Colors.white.withOpacity(0.05), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.35), size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: _searchCtrl,
+              onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+              style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
+              decoration: InputDecoration(
+                hintText: 'Arkadaş ara...',
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
+          ),
+          if (_searchQuery.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _searchCtrl.clear();
+                setState(() => _searchQuery = '');
+              },
+              child: Icon(Icons.close_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+            ),
+        ],
       ),
     );
   }
 
-
   Widget _buildContactsTab(Rect br) {
     return Column(
       children: [
-        _buildMyProfilePlate(),
-        const SizedBox(height: 16),
-        // Arama çubuğu
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.black.withOpacity(0.20),
-            border: Border.all(color: Colors.white.withOpacity(0.05), width: 0.5),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.35), size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
-                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
-                  decoration: InputDecoration(
-                    hintText: 'Arkadaş ara...',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-              if (_searchQuery.isNotEmpty)
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    _searchCtrl.clear();
-                    setState(() => _searchQuery = '');
-                  },
-                  child: Icon(Icons.close_rounded, color: Colors.white.withOpacity(0.4), size: 14),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
         // Liste
         Expanded(child: _buildContactsList(br)),
       ],
@@ -305,7 +316,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   Widget _buildMyProfilePlate() {
     final user = _service.currentUser;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(10), // ContactItem ile aynı padding
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
@@ -319,24 +330,25 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
       ),
       child: Row(
+        // crossAxisAlignment kaldırıldı, çünkü merkeze hizalanacak tıpkı ContactItem gibi
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 44, // 48'den 44'e düşürüldü (ContactItem boyutu)
+            height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.black.withOpacity(0.2),
               border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
             ),
             child: Center(
-              child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 24),
+              child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22), // 24'ten 22'ye düşürüldü
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12), // 14 yerine 12 (ContactItem ile aynı)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center, // start yerine center
               children: [
                 FutureBuilder<String?>(
                   future: StorageService.getUserName(),
@@ -351,6 +363,16 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             color: Colors.white.withOpacity(0.95),
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '${(snapshot.data ?? user.name).toLowerCase().replaceAll(' ', '')}01',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -370,34 +392,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   Widget _buildDiscoverTab(Rect br) {
     return Column(
       children: [
-        // Bağlantılar için Arama Çubuğu
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.black.withOpacity(0.20),
-            border: Border.all(color: Colors.white.withOpacity(0.05), width: 0.5),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.person_search_rounded, color: Colors.white.withOpacity(0.35), size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
-                  decoration: InputDecoration(
-                    hintText: 'Kişilerini bul veya davet et...',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
         Expanded(
           child: Center(
             child: Column(
@@ -455,7 +449,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     }
 
     return ListView(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
       children: [
         // Gelen istekler
         if (requests.isNotEmpty && _searchQuery.isEmpty) ...[
@@ -746,10 +740,15 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildInbox(Rect br) {
-    final letters = _service.inbox;
-    final pending = _service.pendingLetters;
+    final letters = _searchQuery.isEmpty 
+        ? _service.inbox 
+        : _service.inbox.where((l) => l.from.name.toLowerCase().contains(_searchQuery)).toList();
+        
+    final pending = _searchQuery.isEmpty 
+        ? _service.pendingLetters 
+        : _service.pendingLetters.where((l) => l.from.name.toLowerCase().contains(_searchQuery)).toList();
 
-    if (letters.isEmpty && pending.isEmpty) {
+    if (_service.inbox.isEmpty && _service.pendingLetters.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -760,6 +759,17 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               'Henüz mektup yok',
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
+          ],
+        ),
+      );
+    }
+
+    if (letters.isEmpty && pending.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Sonuç bulunamadı', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
           ],
         ),
       );
@@ -780,7 +790,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     });
 
     return ListView(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
       children: [
         if (pending.isNotEmpty) ...[
           ...pending.map((l) => Padding(
@@ -1075,10 +1085,15 @@ class _ReceivedLetterView extends StatefulWidget {
 }
 
 class _ReceivedLetterViewState extends State<_ReceivedLetterView>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _cookieCtrl;
   late Animation<double> _cookieScale;
   bool _claimed = false;
+
+  late AnimationController _openCtrl;
+  late Animation<double> _flapAnim;
+  late Animation<double> _slideAnim;
+  late Animation<double> _envFadeAnim;
 
   static const Map<String, String> _cookieImageMap = {
     'spring_wreath': 'assets/images/cookies/spring_wreath.webp',
@@ -1112,9 +1127,30 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
       duration: const Duration(milliseconds: 600),
     );
     _cookieScale = CurvedAnimation(parent: _cookieCtrl, curve: Curves.elasticOut);
+    
+    _openCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+    _flapAnim = CurvedAnimation(parent: _openCtrl, curve: const Interval(0.0, 0.3, curve: Curves.easeOutCubic));
+    _slideAnim = Tween<double>(begin: 140.0, end: 0.0).animate(
+      CurvedAnimation(parent: _openCtrl, curve: const Interval(0.25, 0.75, curve: Curves.easeOutBack))
+    );
+    _envFadeAnim = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _openCtrl, curve: const Interval(0.6, 0.9, curve: Curves.easeInOut))
+    );
+
+    // Açılış animasyonunu başlat
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _openCtrl.forward();
+        HapticFeedback.lightImpact(); // Zarf açılma efekti için ufak titreşim
+      }
+    });
+
     // Kurabiye varsa giriş animasyonu
     if (widget.cookieId != null && !_claimed) {
-      Future.delayed(const Duration(milliseconds: 400), () {
+      Future.delayed(const Duration(milliseconds: 2000), () {
         if (mounted) _cookieCtrl.forward();
       });
     }
@@ -1122,6 +1158,7 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
 
   @override
   void dispose() {
+    _openCtrl.dispose();
     _cookieCtrl.dispose();
     super.dispose();
   }
@@ -1138,19 +1175,83 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
     final hasCookie = widget.cookieId != null;
     final imgPath = hasCookie ? _cookieImageMap[widget.cookieId] : null;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
-      child: SizedBox(
-        width: screenWidth * 0.85,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 176,
-              child: Stack(
-                children: [
+    final envW = screenWidth * 0.85;
+    final envH = 180.0;
+    final flapH = envH * 0.78;
+
+    return AnimatedBuilder(
+      animation: _openCtrl,
+      builder: (context, _) {
+        final fFlap = _flapAnim.value;
+        final fSlide = _slideAnim.value;
+        final fFade = _envFadeAnim.value;
+        
+        final envelopeBack = Container(
+          width: envW, height: envH,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF8D6E63), Color(0xFF4E342E)]),
+          ),
+        );
+
+        final envelopeFrontPocket = Container(
+          width: envW, height: envH,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFEFEBE9), Color(0xFFD7CCC8)]),
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+          ),
+        );
+
+        final envelopeFlap = Transform(
+          alignment: Alignment.topCenter,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.003)
+            ..rotateX(math.pi * fFlap),
+          child: ClipPath(
+            clipper: _EnvelopeFlapClipper(),
+            child: Container(
+              width: envW, height: flapH,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: fFlap > 0.5 ? const [Color(0xFFFAFAFA), Color(0xFFEFEBE9)] : const [Color(0xFF6D4C41), Color(0xFF5D4037)],
+                ),
+                boxShadow: fFlap < 0.3 ? [const BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 4))] : null,
+              ),
+            ),
+          ),
+        );
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
+          child: SizedBox(
+            width: envW,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // Arka Zarf (Sıfırıncı Katman - giderek kaybolur)
+                if (fFade > 0)
+                  Positioned(
+                    top: 0,
+                    child: Opacity(opacity: fFade, child: envelopeBack),
+                  ),
+
+                // Asıl Mektup (Birinci Katman - zarf açılınca yukarı çıkar)
+                Transform.translate(
+                  offset: Offset(0, fFade > 0 ? fSlide : 0),
+                  child: Opacity(
+                    opacity: fFade == 1.0 ? 0.0 : 1.0, 
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: 176,
+                          child: Stack(
+                            children: [
                   Positioned.fill(
                     child: Container(
                       margin: const EdgeInsets.only(top: 2, left: 1),
@@ -1174,30 +1275,12 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                children: [
-                                  const Spacer(),
-                                  Column(
-                                    children: [
-                                      Text(widget.senderEmoji, style: const TextStyle(fontSize: 16)),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        widget.senderName,
-                                        style: const TextStyle(
-                                          color: Color(0xFF4A3928),
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 10),
                               Expanded(
-                                child: Center(
+                                child: SingleChildScrollView(
+                                  physics: const BouncingScrollPhysics(),
                                   child: Text(
                                     widget.message,
                                     textAlign: TextAlign.center,
@@ -1205,10 +1288,24 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                                       color: Color(0xFF4A3928),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
-                                      fontFamily: 'Roboto',
                                       height: 1.6,
                                       letterSpacing: 0.1,
                                     ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              // Gönderenin imzası sağ alt köşede olur
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '~ ${widget.senderName}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF4A3928),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.italic,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ),
@@ -1317,40 +1414,82 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
             ],
             // Yanıtla Butonu (Herkeste çıkmalı)
             const SizedBox(height: 16),
-            _BouncingNode(
-              onTap: () {
-                HapticFeedback.mediumImpact();
-                widget.onReply?.call();
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white.withOpacity(0.05),
-                      border: Border.all(color: Colors.white.withOpacity(0.2)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit_rounded, color: Colors.white.withOpacity(0.9), size: 16),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Mektup Yaz',
-                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    splashColor: Colors.white.withOpacity(0.4),
+                    highlightColor: Colors.white.withOpacity(0.3),
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      widget.onReply?.call();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Opacity(
+                        opacity: 0.9,
+                        child: Image.asset(
+                          'assets/images/letter_icon.png', 
+                          width: 28, 
+                          height: 28, 
+                          fit: BoxFit.contain,
+                          color: Colors.white,
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 24), // İki buton arası boşluk
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    splashColor: Colors.white.withOpacity(0.4),
+                    highlightColor: Colors.white.withOpacity(0.3),
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      // BURAYA DAHA SONRA SHARE_PLUS PAKETİ İLE SS ALMA EKLENECEK
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Transform.rotate(
+                        angle: -0.5, // Uçağın ucunu biraz daha yukarı dikerek havalı bir paylaşma duruşu
+                        child: Icon(
+                          Icons.send_rounded,
+                          color: Colors.white.withOpacity(0.9),
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
                       ],
                     ),
                   ),
                 ),
-              ),
+                
+                // Ön Zarf Cebi ve Kapak (İfade bitince şeffaflaşıp kaybolur)
+                if (fFade > 0)
+                  Positioned(
+                    top: 0,
+                    child: Opacity(opacity: fFade, child: envelopeFrontPocket),
+                  ),
+                  
+                if (fFade > 0)
+                  Positioned(
+                    top: 0,
+                    child: Opacity(opacity: fFade, child: envelopeFlap),
+                  ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -1548,26 +1687,54 @@ class _ContactItem extends StatelessWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: EdgeInsets.symmetric(horizontal: isAppUser ? 8 : 14, vertical: isAppUser ? 4 : 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: isAppUser 
-                        ? const Color(0xFF4A6A8A).withOpacity(0.15) 
+                        ? Colors.transparent 
                         : Colors.white.withOpacity(0.04),
-                    border: Border.all(
-                      color: isAppUser ? const Color(0xFF6DAEE8).withOpacity(0.35) : Colors.white.withOpacity(0.2), 
-                      width: 0.8
-                    ),
+                    border: isAppUser 
+                        ? null 
+                        : Border.all(
+                            color: Colors.white.withOpacity(0.2), 
+                            width: 0.8,
+                          ),
                   ),
-                  child: Text(
-                    isAppUser ? 'Mektup Yaz' : 'Davet Et',
-                    style: TextStyle(
-                      color: isAppUser ? Colors.white : Colors.white.withOpacity(0.9),
-                      fontSize: 11,
-                      fontWeight: isAppUser ? FontWeight.w600 : FontWeight.w500,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+                  child: isAppUser
+                      ? Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            splashColor: Colors.white.withOpacity(0.4),
+                            highlightColor: Colors.white.withOpacity(0.3),
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              _showLetterPaper(context);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Opacity(
+                                opacity: 0.9,
+                                child: Image.asset(
+                                  'assets/images/letter_icon.png', 
+                                  width: 24, 
+                                  height: 24, 
+                                  fit: BoxFit.contain,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Text(
+                          'Davet Et',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -1806,7 +1973,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                     const Spacer(),
                     Column(
                       children: [
-                        Text(widget.recipientEmoji, style: const TextStyle(fontSize: 16)),
+                        const Icon(Icons.auto_awesome_rounded, color: Color(0xFFB0A484), size: 16),
                         const SizedBox(height: 2),
                         Text(
                           widget.recipientName,
@@ -2463,7 +2630,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                         const Spacer(),
                                         Column(
                                           children: [
-                                            Text(widget.recipientEmoji, style: const TextStyle(fontSize: 16)),
+                                            const Icon(Icons.auto_awesome_rounded, color: Color(0xFFB0A484), size: 16),
                                             const SizedBox(height: 2),
                                             Text(
                                               widget.recipientName,
@@ -2496,7 +2663,6 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                                 color: Color(0xFF4A3928),
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w500,
-                                                fontFamily: 'Roboto',
                                                 height: 1.6,
                                                 letterSpacing: 0.1,
                                               ),
@@ -2621,15 +2787,22 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                               width: 0.8,
                             ),
                           ),
-                          child: Text(
-                            _selectedCookieId != null ? '🦉 Baykuşa Ver 🥠' : '🦉 Baykuşa Ver',
-                            style: TextStyle(
-                              color: _hasText
-                                  ? const Color(0xFFFF8A3D)
-                                  : Colors.white.withOpacity(0.3),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.send_rounded, color: _hasText ? const Color(0xFFFF8A3D) : Colors.white.withOpacity(0.3), size: 12),
+                              const SizedBox(width: 6),
+                              Text(
+                                _selectedCookieId != null ? 'Gönder (Tılsımlı)' : 'Gönder',
+                                style: TextStyle(
+                                  color: _hasText
+                                      ? const Color(0xFFFF8A3D)
+                                      : Colors.white.withOpacity(0.3),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -2668,8 +2841,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  Icon(Icons.card_giftcard_rounded, color: _selectedCookieId != null ? Colors.white : Colors.white.withOpacity(0.6), size: 12),
+                                  const SizedBox(width: 6),
                                   Text(
-                                    _selectedCookieId != null ? '🥠 Eklendi' : '🥠 Kurabiye Ekle',
+                                    _selectedCookieId != null ? 'Tılsım Eklendi' : 'Tılsım Ekle',
                                     style: TextStyle(
                                       color: _selectedCookieId != null
                                           ? Colors.white
@@ -2756,7 +2931,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                         children: [
                                           imgPath != null
                                               ? Image.asset(imgPath, width: 28, height: 28, fit: BoxFit.contain)
-                                              : const Text('🥠', style: TextStyle(fontSize: 18)),
+                                              : const Icon(Icons.stars_rounded, color: Colors.white54, size: 24),
                                           const SizedBox(height: 2),
                                           Text(
                                             'x${cookie.countObtained}',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -488,66 +489,38 @@ class _CookieSectionState extends State<CookieSection>
 
   // ── Reklam overlay içeriği (buzlu cam / glassmorphism) ──
   Widget _buildAdOverlayContent() {
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
-        child: Container(
-          width: 200,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, spreadRadius: -4),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFF7941D).withOpacity(0.18),
-                  border: Border.all(color: const Color(0xFFF7941D).withOpacity(0.3), width: 0.5),
-                ),
-                child: const Icon(Icons.play_arrow_rounded, color: Color(0xFFF7941D), size: 20),
+    return GestureDetector(
+      onTap: _onAdAccepted,
+      child: Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          // Normal beyaz cam efekti (Daha görünür ve belirgin)
+          color: Colors.white.withOpacity(0.35), 
+          border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5), 
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20), // Yüksek blur (gerçekçi cam)
+            child: Center(
+              child: Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white.withOpacity(0.95), // Saf parlak beyaz
+                size: 42,
+                shadows: [
+                  // Sadece çok soft, zarif bir beyaz parlama
+                  Shadow(color: Colors.white.withOpacity(0.4), blurRadius: 15),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                isTr ? 'Reklam izle, kır!' : 'Watch ad, crack!',
-                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: _onAdAccepted,
-                child: Container(
-                  width: double.infinity, height: 38,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFF7941D), Color(0xFFFF6B00)],
-                    ),
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
-                          isTr ? 'İzle' : 'Watch',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -556,49 +529,7 @@ class _CookieSectionState extends State<CookieSection>
 
   // ── Limit overlay içeriği (buzlu cam / glassmorphism) ──
   Widget _buildLimitOverlayContent() {
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
-        child: Container(
-          width: 200,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, spreadRadius: -4),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.1),
-                  border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
-                ),
-                child: Icon(Icons.nightlight_round, color: Colors.white.withOpacity(0.5), size: 18),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                isTr ? 'Bugünlük bu kadar' : 'That\'s all for today',
-                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                isTr ? 'Yarın yeni haklar gelecek' : 'New cookies tomorrow',
-                style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 11),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return const _CircularLimitOverlay();
   }
   void _showPremiumDialog() {
     final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
@@ -662,12 +593,12 @@ class _CookieSectionState extends State<CookieSection>
                       ),
 
                     // 2. KURABİYE — kağıdın ÜSTÜNDE
-                    // Günlük limit dolduğunda greyscale + soluk
+                    // Reklam beklenirken renkleri koruyup sadece hafif kararır. Hak bitince renksiz (greyscale) olur.
                     AnimatedOpacity(
-                      opacity: _dailyLimitReached ? 0.4 : 1.0,
+                      opacity: _showLimitOverlay ? 0.35 : (_showAdOverlay ? 0.55 : (_dailyLimitReached ? 0.4 : 1.0)),
                       duration: const Duration(milliseconds: 500),
                       child: ColorFiltered(
-                        colorFilter: _dailyLimitReached
+                        colorFilter: (_dailyLimitReached || _showLimitOverlay)
                             ? const ColorFilter.matrix(<double>[
                                 0.2126, 0.7152, 0.0722, 0, 0,
                                 0.2126, 0.7152, 0.0722, 0, 0,
@@ -858,18 +789,29 @@ class _CookieSectionState extends State<CookieSection>
               const SizedBox(height: 10),
               Text(
                 _dailyLimitReached
-                    ? (Localizations.localeOf(context).languageCode == 'tr' ? 'Yarın Gel' : 'Come Back Tomorrow')
+                    ? (Localizations.localeOf(context).languageCode == 'tr' ? 'Gün Tamamlandı' : 'Day Completed')
                     : l10n.dailyCookieTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: _dailyLimitReached ? AppColors.textWhite.withOpacity(0.4) : AppColors.textWhite,
+                  color: _dailyLimitReached ? AppColors.textWhite.withOpacity(0.5) : AppColors.textWhite,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 8),
-              // Günlük hak göstergesi: 3 nokta (● ● ●)
-              if (!_isPremiumUser)
+              if (_dailyLimitReached)
+                Text(
+                  Localizations.localeOf(context).languageCode == 'tr' 
+                      ? 'Yarın yeni şanslarla tekrar buluşalım.' 
+                      : 'See you tomorrow with new cookies.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textWhite.withOpacity(0.4),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              else if (!_isPremiumUser)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(StorageService.kMaxDailyCookieCracks, (i) {
@@ -2054,6 +1996,91 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CircularLimitOverlay extends StatefulWidget {
+  const _CircularLimitOverlay();
+
+  @override
+  State<_CircularLimitOverlay> createState() => _CircularLimitOverlayState();
+}
+
+class _CircularLimitOverlayState extends State<_CircularLimitOverlay> {
+  late Timer _timer;
+  double _progress = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateProgress();
+    // 5 saniyede bir güncellese bile progress pürüzsüz artar
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _updateProgress();
+    });
+  }
+
+  void _updateProgress() {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final nextMidnight = startOfDay.add(const Duration(days: 1));
+    
+    final totalSeconds = nextMidnight.difference(startOfDay).inSeconds;
+    final elapsedSeconds = now.difference(startOfDay).inSeconds;
+    
+    if (mounted) {
+      setState(() {
+        _progress = elapsedSeconds / totalSeconds;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1E1E2C).withOpacity(0.65),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 30,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Center(
+                child: Icon(
+                  Icons.nights_stay_rounded,
+                  color: Colors.white.withOpacity(0.9),
+                  size: 34, // Gece ikonu
+                ),
+              ),
+            ),
+          ),
+          CircularProgressIndicator(
+            value: _progress,
+            strokeWidth: 1.5,
+            backgroundColor: Colors.white.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.9)),
+          ),
+        ],
+      ),
     );
   }
 }

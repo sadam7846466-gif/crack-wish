@@ -9,6 +9,7 @@ import '../screens/tarot_page.dart';
 import '../screens/dream_page.dart';
 import '../screens/zodiac_hub_page.dart';
 import '../screens/motivation_page.dart';
+import '../screens/coffee_page.dart';
 import '../services/storage_service.dart';
 import '../widgets/fade_page_route.dart';
 import '../widgets/windy_nazar.dart';
@@ -197,153 +198,83 @@ class _BentoGridState extends State<BentoGrid>
                     ),
                     ),
                     const SizedBox(height: 8),
-                    // Motivasyon kartı - dış Stack (gezegen taşabilir)
-                    // MOD KARTI — KİLİTLİ
+                    // Kahve Falı Kartı
                     _PressableCardWrapper(
-                      onTap: () {},
+                      onTap: () {
+                        // Yeni Kahve sayfasına yönlendireceğiz
+                        Navigator.push(
+                          context,
+                          SwipeFadePageRoute(
+                            page: const CoffeePage(),
+                          ),
+                        );
+                      },
                       child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // İç ClipRRect (roket, astronotlar içeride kalır)
-                        Opacity(
-                          opacity: 0.5,
-                          child: ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: Stack(
-                            clipBehavior: Clip.hardEdge,
-                            children: [
-                              _BentoCard(
-                                compact: true,
-                                iconWidget: const Icon(
+                        clipBehavior: Clip.none,
+                        children: [
+                          _BentoCard(
+                            compact: true,
+                            iconWidget: const Icon(
+                              Icons.coffee_rounded,
+                              size: 16,
+                              color: AppColors.textWhite,
+                            ),
+                            title: l10n.localeName == 'tr' ? 'Kahve Falı' : 'Coffee Reading',
+                            desc: l10n.localeName == 'tr' ? 'Telvelerin dili' : 'Whispers of grounds',
+                            accent: const Color(0xFFD4A373), // Sütlü kahve
+                            accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
+                            badgeText: l10n.localeName == 'tr' ? 'YENİ' : 'NEW',
+                            badgeHidden: false, // Badge'i açtım!
+                          ),
+                          // Büyük kahve arka plan ikonu
+                          Positioned(
+                            right: -20 * scale,
+                            bottom: -20 * scale,
+                            child: IgnorePointer(
+                              child: Opacity(
+                                opacity: 0.15,
+                                child: Transform.rotate(
+                                  angle: -0.2,
+                                  child: const Icon(
+                                    Icons.coffee_rounded,
+                                    size: 140,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Küçük yıldız dekorasyonları
+                          Positioned(
+                            left: 80 * scale,
+                            top: 20 * scale,
+                            child: IgnorePointer(
+                              child: Opacity(
+                                opacity: 0.25,
+                                child: const Icon(
+                                  Icons.star_rounded,
+                                  size: 24,
+                                  color: Colors.amberAccent,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: 40 * scale,
+                            top: 10 * scale,
+                            child: IgnorePointer(
+                              child: Opacity(
+                                opacity: 0.2,
+                                child: const Icon(
                                   Icons.auto_awesome_rounded,
-                                  size: 16,
-                                  color: AppColors.textWhite,
-                                ),
-                                title: l10n.bentoMotivationTitle,
-                                desc: l10n.bentoMotivationDesc,
-                                accent: const Color(0xFF50F0A0),
-                                accentSoft: const Color(0xFF208050),
-                                badgeText: l10n.bentoMotivationBadge,
-                                badgeHidden: true,
-                              ),
-                              Positioned(
-                                right: -7 * scale,
-                                top: -20 * scale,
-                                child: IgnorePointer(
-                                  child: Image.asset(
-                                    'assets/images/motiveroket.webp',
-                                    width: 185 * scale,
-                                    height: 185 * scale,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: -10 * scale,
-                                bottom: -30 * scale,
-                                child: IgnorePointer(
-                                  child: FloatingAstronaut2(
-                                    child: RepaintBoundary(
-                                      child: Image.asset(
-                                        'assets/images/motiveastronot2.webp',
-                                        width: 160 * scale,
-                                        height: 160 * scale,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: -3 * scale,
-                                bottom: -19 * scale,
-                                child: IgnorePointer(
-                                  child: FloatingAstronaut1(
-                                    child: RepaintBoundary(
-                                      child: Image.asset(
-                                        'assets/images/motiveastronot1.webp',
-                                        width: 180 * scale,
-                                        height: 180 * scale,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        ),
-                        // "Çok Yakında" overlay
-                        Positioned.fill(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.4),
-                                  borderRadius: BorderRadius.circular(100),
-                                  border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.lock_outline_rounded, color: Colors.white.withOpacity(0.9), size: 14),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      l10n.localeName == 'tr' ? 'Mühürlü' : 'Sealed',
-                                      style: GoogleFonts.inter(
-                                        color: Colors.white.withOpacity(0.95),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                  ],
+                                  size: 32,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        // Gezegen - hafif yüzme hareketi
-                        Positioned(
-                          right: -16 * scale,
-                          top: -29 * scale,
-                          child: IgnorePointer(
-                            child: Opacity(
-                              opacity: 0.4,
-                              child: _FloatingWidget(
-                                child: RepaintBoundary(
-                                  child: Image.asset(
-                                    'assets/images/motivegezegen.webp',
-                                    width: 160 * scale,
-                                    height: 160 * scale,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                            ),
-                            ),
-                          ),
-                        ),
-                        // Yıldız - SABİT KONUM
-                        Positioned(
-                          left: 55 * scale,
-                          top: 37 * scale,
-                          child: IgnorePointer(
-                            child: Opacity(
-                              opacity: 0.4,
-                              child: Image.asset(
-                              'assets/images/motiveYILDIZ.webp',
-                              width: 80 * scale,
-                              height: 80 * scale,
-                              fit: BoxFit.contain,
-                            ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 8),
                     // Burç kartı - zodyak görseli ile
