@@ -2000,85 +2000,31 @@ class _DreamPageState extends State<DreamPage>
                                     dialogTitleEn: 'Dream Guide',
                                     items: const [
                                       GuidanceItem(
-                                        titleTr: 'Rüya Nedir?',
-                                        titleEn: 'What Are Dreams?',
+                                        titleTr: 'Bilinçaltının Şifresi',
+                                        titleEn: 'Code of Subconscious',
                                         descTr:
-                                            'Rüyalar, beynin uyku sırasında anıları düzenlemesi, duyguları işlemesi ve bilinçaltı süreçleri aktif etmesidir. Bilimsel olarak REM uykusu sırasında oluşurlar.',
+                                            'Rüyalar rastgele görüntüler değildir; bastırdığınız duyguların ve zihinsel yüklerin sembolik bir dışavurumudur.',
                                         descEn:
-                                            'Dreams are the brain\'s way of organizing memories, processing emotions, and activating subconscious processes during sleep. They form during REM sleep.',
-                                        icon: Icons.nights_stay_outlined,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Neden Rüya Yazmalıyız?',
-                                        titleEn: 'Why Write Dreams?',
-                                        descTr:
-                                            'Rüya günlüğü tutmak, hatırlama yeteneğinizi güçlendirir ve bilinçaltınızdaki kalıpları görmenize yardımcı olur. Düzenli yazım, kendinizi daha iyi tanımanızı sağlar.',
-                                        descEn:
-                                            'Keeping a dream journal strengthens your recall ability and helps you see patterns in your subconscious. Regular writing helps you know yourself better.',
-                                        icon: Icons.edit_note_outlined,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Duygu Seçimi Neden Önemli?',
-                                        titleEn: 'Why Does Emotion Matter?',
-                                        descTr:
-                                            'Rüya sırasında hissettikleriniz, yorumun yönünü belirler. Aynı rüya farklı duygularla farklı anlamlar taşır. Duygu seçimi, analizi kişiselleştirir.',
-                                        descEn:
-                                            'What you felt during the dream shapes the interpretation. The same dream carries different meanings with different emotions. Emotion selection personalizes the analysis.',
+                                            'Dreams are not random images; they are a symbolic expression of suppressed emotions and mental loads.',
                                         icon: Icons.psychology_outlined,
                                       ),
                                       GuidanceItem(
-                                        titleTr: 'Semboller ve Arketipler',
-                                        titleEn: 'Symbols and Archetypes',
+                                        titleTr: 'Kaydetmenin Gücü',
+                                        titleEn: 'Power of Recording',
                                         descTr:
-                                            'Su, uçmak, düşmek, diş — bunlar evrensel rüya sembolleridir. Her biri bilinçaltının farklı mesajlarını taşır. Yorumlar bu sembolleri analiz eder.',
+                                            'Rüyalarınızı uyandıktan hemen sonra not almak, zihninizin size gönderdiği mesajları kalıcı hale getirir.',
                                         descEn:
-                                            'Water, flying, falling, teeth — these are universal dream symbols. Each carries different messages from the subconscious. Interpretations analyze these symbols.',
-                                        icon: Icons.auto_stories_outlined,
+                                            'Noting your dreams right after waking up makes the messages your mind sent you permanent.',
+                                        icon: Icons.edit_note_outlined,
                                       ),
                                       GuidanceItem(
-                                        titleTr: 'Bilimsel Yaklaşım',
-                                        titleEn: 'Scientific Approach',
+                                        titleTr: 'Hissiyatın Önemi',
+                                        titleEn: 'Importance of Feeling',
                                         descTr:
-                                            'Rüya analizi, psikolojik kuramlar (Freud, Jung) ve modern nörobilim bulgularını harmanlayarak yapılır. Kesin gelecek tahmini değil, zihinsel süreçlerinizi anlamanıza yardımcı olur.',
+                                            'Bir rüyanın asıl anlamı detaylarında değil, hissettiklerinizde gizlidir. Duygu, şifreyi çözen en güçlü anahtardır.',
                                         descEn:
-                                            'Dream analysis blends psychological theories (Freud, Jung) with modern neuroscience. It doesn\'t predict the future, but helps you understand your mental processes.',
-                                        icon: Icons.science_outlined,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Tekrarlayan Rüyalar',
-                                        titleEn: 'Recurring Dreams',
-                                        descTr:
-                                            'Aynı rüyayı tekrar görmek, çözülmemiş duygusal konulara işaret eder. Bu rüyaları takip etmek, iç dünyanızdaki kalıpları keşfetmenize yardımcı olur.',
-                                        descEn:
-                                            'Seeing the same dream repeatedly points to unresolved emotional issues. Tracking these dreams helps you discover patterns in your inner world.',
-                                        icon: Icons.replay_outlined,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Rüya Dağılım Çizelgesi',
-                                        titleEn: 'Dream Distribution Chart',
-                                        descTr:
-                                            'Analiz sonucundaki çizelge, rüyanızın duygusal yük, belirsizlik, yakın geçmiş ve beyin aktivitesi oranlarını gösterir. Bu, rüyanızın hangi kaynaklardan beslendiğini anlatır.',
-                                        descEn:
-                                            'The chart in the analysis shows emotional load, uncertainty, recent past, and brain activity ratios. This explains what feeds your dream.',
-                                        icon: Icons.pie_chart_outline,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Gece ve Sabah Farkı',
-                                        titleEn: 'Night vs Morning',
-                                        descTr:
-                                            'Sabah uyanır uyanmaz yazılan rüyalar daha detaylı hatırlanır. Gün içinde detaylar hızla kaybolur. En iyi zaman: uyandıktan sonraki ilk 5 dakika.',
-                                        descEn:
-                                            'Dreams written right after waking are remembered in more detail. Details fade quickly during the day. Best time: the first 5 minutes after waking.',
-                                        icon: Icons.wb_sunny_outlined,
-                                      ),
-                                      GuidanceItem(
-                                        titleTr: 'Rüya Güvenliğiniz',
-                                        titleEn: 'Your Dream Privacy',
-                                        descTr:
-                                            'Yazdığınız rüyalar cihazınızda saklanır. Analiz sırasında yapay zeka ile paylaşılan metin, saklanmaz ve üçüncü taraflarla paylaşılmaz.',
-                                        descEn:
-                                            'Your written dreams are stored on your device. Text shared with AI during analysis is not stored and not shared with third parties.',
-                                        icon: Icons.lock_outline,
+                                            'The true meaning of a dream is hidden in what you felt. Emotion is the strongest key to decode it.',
+                                        icon: Icons.favorite_border_outlined,
                                       ),
                                     ],
                                   ),
@@ -2138,35 +2084,52 @@ class _DreamPageState extends State<DreamPage>
   }
 
   Widget _buildNewDreamTab() {
-    final activeColors = [
-      const Color(0xFFBBA8FF),
-      const Color(0xFFC4B4FF),
-      const Color(0xFFCCC0FF),
-      const Color(0xFFD3CBFF),
-      const Color(0xFFC5D6FF),
-      const Color(0xFFB3E0FF),
-      const Color(0xFFAAE5FF),
-    ].map((c) => c.withOpacity(0.55)).toList();
-    final halfColors = [
-      const Color(0xFFCDBEFF),
-      const Color(0xFFD4C8FF),
-      const Color(0xFFDAD0FF),
-      const Color(0xFFDFD9FF),
-      const Color(0xFFD5E2FF),
-      const Color(0xFFC8EAFF),
-      const Color(0xFFC0EDFF),
-    ].map((color) => color.withOpacity(0.38)).toList();
-    final inactiveBaseColors = [
-      const Color(0xFFC9B8FF),
-      const Color(0xFFD2C4FF),
-      const Color(0xFFDDD1FF),
-      const Color(0xFFE7E0FF),
-      const Color(0xFFDCE7FF),
-      const Color(0xFFCFEFFF),
-      const Color(0xFFC5F2FF),
+    // Zengin, Doygun ve Canlı Klasik Yorum Renkleri (Mystic Amethyst & Indigo)
+    // Zengin ama Yumuşak Pürüzsüz Panel (Soft Periwinkle & Mystic Violet)
+    final activeColors = List.filled(
+      7,
+      const Color(0xFF2B1D3D).withOpacity(0.50), // Tok mistik mor taban
+    );
+
+    final halfColors = List.filled(
+      7,
+      const Color(0xFF2B1D3D).withOpacity(0.25),
+    );
+
+    final inactiveBaseColors = List.filled(
+      7,
+      const Color(0xFF2B1D3D),
+    );
+    
+    // Klasik Yorum için Pürüzsüz Radyal Katmanlar
+    final standardLayers = <Gradient>[
+      // Üst sol Yumuşak Menekşe/Periwinkle
+      RadialGradient(
+        center: const Alignment(-0.8, -0.6),
+        radius: 2.0,
+        colors: [
+          const Color(0xFF9068FC).withOpacity(0.35),
+          const Color(0xFF9068FC).withOpacity(0.12),
+          const Color(0xFF9068FC).withOpacity(0.02),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.35, 0.65, 1.0],
+      ),
+      // Alt sağ Camsı İndigo Parıltısı
+      RadialGradient(
+        center: const Alignment(0.8, 0.7),
+        radius: 1.5,
+        colors: [
+          const Color(0xFF8C9EFF).withOpacity(0.28),
+          const Color(0xFF8C9EFF).withOpacity(0.08),
+          const Color(0xFF8C9EFF).withOpacity(0.01),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.3, 0.6, 1.0],
+      ),
     ];
     final inactiveColors = inactiveBaseColors
-        .map((color) => color.withOpacity(0.45))
+        .map((color) => color.withOpacity(0.20))
         .toList();
 
     return SingleChildScrollView(
@@ -2438,9 +2401,7 @@ class _DreamPageState extends State<DreamPage>
                                           Icon(
                                             Icons.diamond_outlined,
                                             size: 12,
-                                            color: customGlowColor.withOpacity(
-                                              0.8,
-                                            ),
+                                            color: const Color(0xFF22D3EE).withOpacity(0.9), // App-wide signature Diamond Blue
                                           ),
                                         ],
                                       ],
@@ -2463,86 +2424,38 @@ class _DreamPageState extends State<DreamPage>
                       );
                     }
 
-                    // Kuzey Işıkları (Aurora Borealis)
+                    // 💎 Yumuşatılmış Günbatımı (Soft Rose & Peach)
                     final premiumActiveColors = List.filled(
                       7,
-                      const Color(0xFF1A1535).withOpacity(0.25),
+                      const Color(0xFF25101A).withOpacity(0.40), // Yumuşak koyu bordo taban
                     );
                     final premiumHalfColors = List.filled(
                       7,
-                      const Color(0xFF1A1535).withOpacity(0.15),
+                      const Color(0xFF25101A).withOpacity(0.20),
                     );
 
-                    // Aurora katmanları (yumuşak geçişli)
+                    // Ahenkli, sıcak ve göz yormayan yansımalar
                     final gemLayers = <Gradient>[
-                      // Aurora yeşili — ana dalga
+                      // Üst sol Yumuşak Gül Pembesi (Soft Rose)
                       RadialGradient(
-                        center: const Alignment(-0.3, -0.2),
-                        radius: 1.8,
+                        center: const Alignment(-0.8, -0.6),
+                        radius: 2.0,
                         colors: [
-                          const Color(0xFF00E676).withOpacity(0.28),
-                          const Color(0xFF00E676).withOpacity(0.12),
-                          const Color(0xFF00E676).withOpacity(0.03),
+                          const Color(0xFFE91E63).withOpacity(0.22), // Soft Rose Pink
+                          const Color(0xFFE91E63).withOpacity(0.08),
+                          const Color(0xFFE91E63).withOpacity(0.01),
                           Colors.transparent,
                         ],
-                        stops: const [0.0, 0.25, 0.55, 1.0],
+                        stops: const [0.0, 0.35, 0.65, 1.0],
                       ),
-                      // Teal dalga — sağ
+                      // Alt sağ Tatlı Şeftali (Soft Peach)
                       RadialGradient(
-                        center: const Alignment(0.5, 0.0),
-                        radius: 1.7,
-                        colors: [
-                          const Color(0xFF22D3EE).withOpacity(0.25),
-                          const Color(0xFF22D3EE).withOpacity(0.10),
-                          const Color(0xFF22D3EE).withOpacity(0.03),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.25, 0.55, 1.0],
-                      ),
-                      // Mor parıltı — sağ üst
-                      RadialGradient(
-                        center: const Alignment(0.6, -0.4),
+                        center: const Alignment(0.8, 0.7),
                         radius: 1.5,
                         colors: [
-                          const Color(0xFF7C3AED).withOpacity(0.28),
-                          const Color(0xFF7C3AED).withOpacity(0.12),
-                          const Color(0xFF7C3AED).withOpacity(0.03),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.25, 0.55, 1.0],
-                      ),
-                      // Yeşil-teal karışım — alt
-                      RadialGradient(
-                        center: const Alignment(0.0, 0.5),
-                        radius: 1.6,
-                        colors: [
-                          const Color(0xFF2DD4BF).withOpacity(0.22),
-                          const Color(0xFF2DD4BF).withOpacity(0.10),
-                          const Color(0xFF2DD4BF).withOpacity(0.03),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.25, 0.55, 1.0],
-                      ),
-                      // Magenta dokunuş — sol alt
-                      RadialGradient(
-                        center: const Alignment(-0.5, 0.3),
-                        radius: 1.2,
-                        colors: [
-                          const Color(0xFFD946EF).withOpacity(0.18),
-                          const Color(0xFFD946EF).withOpacity(0.07),
-                          const Color(0xFFD946EF).withOpacity(0.02),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.25, 0.55, 1.0],
-                      ),
-                      // İndigo derinlik — geniş
-                      RadialGradient(
-                        center: const Alignment(-0.6, -0.5),
-                        radius: 1.8,
-                        colors: [
-                          const Color(0xFF4338CA).withOpacity(0.20),
-                          const Color(0xFF4338CA).withOpacity(0.08),
-                          const Color(0xFF4338CA).withOpacity(0.02),
+                          const Color(0xFFFF8A65).withOpacity(0.18), // Soft Peach
+                          const Color(0xFFFF8A65).withOpacity(0.05),
+                          const Color(0xFFFF8A65).withOpacity(0.01),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.3, 0.6, 1.0],
@@ -2561,7 +2474,8 @@ class _DreamPageState extends State<DreamPage>
                               subtitle: _l10n.dreamAnalyzeEstimate,
                               activeGradients: activeColors,
                               halfGradients: halfColors,
-                              customGlowColor: const Color(0xFF7C6CF3),
+                              customGlowColor: const Color(0xFF9068FC),
+                              extraGradientLayers: standardLayers,
                               onTap: () async {
                                 await _interpretDream(); // normal
                               },
@@ -2577,7 +2491,7 @@ class _DreamPageState extends State<DreamPage>
                                   : 'Discover secrets',
                               activeGradients: premiumActiveColors,
                               halfGradients: premiumHalfColors,
-                              customGlowColor: const Color(0xFF22D3EE),
+                              customGlowColor: const Color(0xFFF48FB1), // Soft Rose Glow
                               isPremium: true,
                               extraGradientLayers: gemLayers,
                               onTap: () async {

@@ -32,15 +32,17 @@ class _DailyTipCardState extends State<DailyTipCard> {
     final tarotDone = await StorageService.isTarotDoneToday();
     final zodiacDone = await StorageService.isZodiacDoneToday();
 
+    final available = <_SuggestionType>[];
+    if (!dreamDone) available.add(_SuggestionType.dream);
+    if (!tarotDone) available.add(_SuggestionType.tarot);
+    if (!zodiacDone) available.add(_SuggestionType.zodiac);
+
     _SuggestionType next;
-    if (!dreamDone) {
-      next = _SuggestionType.dream;
-    } else if (!tarotDone) {
-      next = _SuggestionType.tarot;
-    } else if (!zodiacDone) {
-      next = _SuggestionType.zodiac;
-    } else {
+    if (available.isEmpty) {
       next = _SuggestionType.allDone;
+    } else {
+      available.shuffle();
+      next = available.first;
     }
 
     if (mounted) {
@@ -129,8 +131,8 @@ class _DailyTipCardState extends State<DailyTipCard> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColors.primaryOrange.withOpacity(0.25),
-                          AppColors.primaryOrange.withOpacity(0.10),
+                          const Color(0xFF11998E).withOpacity(0.20), // Elegant Emerald
+                          const Color(0xFF38EF7D).withOpacity(0.08), // Bright Mint
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
@@ -148,16 +150,20 @@ class _DailyTipCardState extends State<DailyTipCard> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: AppColors.orangeGradient,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primaryOrange.withOpacity(0.42),
+                          color: const Color(0xFF38EF7D).withOpacity(0.42),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.star_rounded, color: Colors.white, size: 24),
+                    child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(

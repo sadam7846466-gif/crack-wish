@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/glass_back_button.dart';
+import '../widgets/swipe_back_wrapper.dart';
 import '../services/storage_service.dart';
 import 'compatibility_content.dart';
 
@@ -1723,17 +1724,13 @@ class _ZodiacPageState extends State<ZodiacPage>
             padding: const EdgeInsets.fromLTRB(22, 4, 22, 20),
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) =>
-                      _ZodiacDetailPage(
-                        sign: s,
-                        gold: _gold,
-                        boosts: _traitBoosts,
-                        onBoostUpdated: _loadUserData,
-                      ),
-                  transitionsBuilder: (_, a, __, child) =>
-                      FadeTransition(opacity: a, child: child),
-                  transitionDuration: const Duration(milliseconds: 400),
+                CupertinoPageRoute(
+                  builder: (_) => _ZodiacDetailPage(
+                    sign: s,
+                    gold: _gold,
+                    boosts: _traitBoosts,
+                    onBoostUpdated: _loadUserData,
+                  ),
                 ),
               ),
               child: Container(
@@ -3669,10 +3666,11 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           'Aktif dinleme tekniklerini öğrenerek iletişimini güçlendir.',
     };
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1210),
-      body: Stack(
-        children: [
+    return SwipeBackWrapper(
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F1210),
+        body: Stack(
+          children: [
           // Arka plan gradient
           Positioned.fill(
             child: DecoratedBox(
@@ -3925,7 +3923,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   // ── Bölüm başlığı ──
@@ -6236,10 +6234,11 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
 
     final avg = (lovePct + friendPct + commPct + workPct + funPct) / 5.0;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1210),
-      body: Stack(
-        children: [
+    return SwipeBackWrapper(
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F1210),
+        body: Stack(
+          children: [
           // Background
           Positioned.fill(
             child: Container(
@@ -6375,7 +6374,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildAvatar(Map<String, dynamic> s) {

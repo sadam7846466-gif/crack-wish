@@ -3945,7 +3945,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                                 color: Colors.white.withOpacity(0.2),
                               ),
                               const SizedBox(height: 16),
-                              ..._getRandomGuidanceItems(),
+                              ..._getGuidanceItems(),
                             ],
                           ),
                         ),
@@ -3972,74 +3972,30 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  List<Widget> _getRandomGuidanceItems() {
-    final allItems = [
+  List<Widget> _getGuidanceItems() {
+    return [
       _buildGuidanceItem(
         _isTr ? 'İçsel Bir Ayna' : 'An Inner Mirror',
         _isTr
-            ? 'Mistik Tarot, kesin bir gelecek söylemek yerine kendi içine tutulan bir aynadır. Zihnindeki karmaşayı, korkularını ve gerçek umutlarını semboller aracılığıyla gün yüzüne çıkarır.'
-            : 'Mystical Tarot is a mirror reflecting your inner self. It brings your hidden fears, hopes, and confusion to light through symbols.',
+            ? 'Tarot geleceği dikte etmez; kendi içindeki gizli gerçekleri ve cevapları açığa çıkaran bir aynadır.'
+            : 'Tarot does not dictate the future; it is a mirror reflecting the hidden truths and answers within you.',
         Icons.visibility_outlined,
       ),
       _buildGuidanceItem(
-        _isTr ? 'Objektif Perspektif' : 'Objective Perspective',
+        _isTr ? 'Sembollerin Gücü' : 'Power of Symbols',
         _isTr
-            ? 'Olayların içindeyken büyük resmi göremeyiz. Kartlar seni olayın dışına çıkartıp, durumu daha bilge ve tarafsız bir gözle değerlendirmeni sağlar.'
-            : 'When you are in the middle of events, it is hard to see the big picture. Cards pull you out and let you observe with a wise, objective eye.',
-        Icons.landscape_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Rehberlik ve Eylem' : 'Guidance and Action',
-        _isTr
-            ? 'Tarot seni çaresiz hissettirmez; "Senin elinde ne güç var?" sorusuna odaklanır. Şimdiki durumunu analiz eder ve en doğru eylemi sana nazikçe fısıldar.'
-            : 'Tarot focuses on "What power do you hold?". It analyzes your present and gently whispers the best action to take.',
-        Icons.explore_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Bilinçaltının Sesi' : 'Voice of the Subconscious',
-        _isTr
-            ? 'Kartlar, bilinçaltında sakladığın cevapları yüzeye çıkarır. Aslında cevabı zaten biliyorsun; kartlar sadece onu hatırlatır.'
-            : 'Cards bring answers hidden in your subconscious to the surface. You already know the answer; cards simply remind you.',
-        Icons.psychology_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Sembollerin Dili' : 'Language of Symbols',
-        _isTr
-            ? 'Her kart, binlerce yıllık arketipsel bir sembol taşır. Bu semboller evrenseldir ve ruhunun derinliklerine hitap eder.'
-            : 'Each card carries an archetypal symbol thousands of years old. These symbols are universal and speak to the depths of your soul.',
+            ? 'Seçtiğin kartlar tesadüf değildir. Evrensel semboller anlık enerjinle uyumlanarak sana yol gösterir.'
+            : 'The cards you pick are not random. Universal symbols align with your current energy to guide your path.',
         Icons.auto_stories_outlined,
       ),
       _buildGuidanceItem(
-        _isTr ? 'Zamanın Akışı' : 'Flow of Time',
+        _isTr ? 'Nasıl Başlamalı?' : 'How to Begin?',
         _isTr
-            ? 'Geçmiş seni şekillendirdi, şimdi seni tanımlar, gelecek ise senin ellerinde. Kartlar bu üç zamanın arasındaki köprüyü kurar.'
-            : 'The past shaped you, the present defines you, and the future is in your hands. Cards build the bridge between these three times.',
-        Icons.timeline_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Cesarete Davet' : 'Invitation to Courage',
-        _isTr
-            ? 'Bazen en zor kart, en gerekli mesajı taşır. Rahatsız eden bir yorum, aslında büyümenin kapısını aralıyor olabilir.'
-            : 'Sometimes the hardest card carries the most needed message. An uncomfortable interpretation may be opening the door to growth.',
-        Icons.local_fire_department_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Dönüşüm Gücü' : 'Power of Transformation',
-        _isTr
-            ? 'Her çekim, bir dönüşüm fırsatıdır. Kartlar sana ne olduğunu değil, ne olabileceğini gösterir. Değişim senin içinde başlar.'
-            : 'Every reading is an opportunity for transformation. Cards show not what is, but what can be. Change begins within you.',
-        Icons.change_circle_outlined,
-      ),
-      _buildGuidanceItem(
-        _isTr ? 'Sezgisel Bilgelik' : 'Intuitive Wisdom',
-        _isTr
-            ? 'Mantık sınırlıdır ama sezgi sınırsızdır. Kartları seçerken hissettiğin çekim, bilinçaltının sana yol göstermesidir.'
-            : 'Logic is limited but intuition is boundless. The pull you feel when choosing cards is your subconscious guiding you.',
+            ? 'Derin bir nefes al, asıl soruna tamamen odaklan ve kartını seçerken yalnızca içgüdülerine güven.'
+            : 'Take a deep breath, focus entirely on your core inquiry, and trust only your intuition while selecting your card.',
         Icons.self_improvement_outlined,
       ),
     ];
-    allItems.shuffle(Random());
-    return allItems.take(3).toList();
   }
 
   Widget _buildGuidanceItem(String title, String desc, IconData icon) {
