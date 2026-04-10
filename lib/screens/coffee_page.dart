@@ -443,39 +443,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(flex: 1),
-                    AnimatedBuilder(
-                      animation: _floatCtrl,
-                      builder: (context, child) {
-                        final dy = (Curves.easeInOutSine.transform(_floatCtrl.value) * 15) - 7.5;
-                        return Transform.translate(
-                          offset: Offset(0, dy),
-                          child: child,
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(1000),
-                        child: Container(
-                          width: 150, // Biraz ufaltıldı ki her ekrana sığsın
-                          height: 150,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFD4A373).withOpacity(0.1),
-                                blurRadius: 40,
-                                spreadRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Image.asset(
-                            'assets/images/turkish_coffee_cup.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+                    const Spacer(),
+                    
+                    // KULLANICI BURAYA KENDİ İSTEDİĞİ GÖRSELİ/ANİMASYONU EKLEYECEK
+                    
                     Text(
                       'Fal Öncesi Ritüeli',
                       style: GoogleFonts.inter(
@@ -505,7 +476,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     const SizedBox(height: 12),
                     _buildRitualRow(Icons.flip_camera_android_rounded, 'Ters Çevir, Soğut', 'Fincanı ters kapatıp dileğini dile ve soğumasını bekle.'),
                     
-                    const Spacer(flex: 2),
+                    const Spacer(),
                     
                     // Kilit veya Normal Buton
                     GestureDetector(

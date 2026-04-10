@@ -1279,17 +1279,20 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                             children: [
                               const SizedBox(height: 10),
                               Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  child: Text(
-                                    widget.message,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Color(0xFF4A3928),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.6,
-                                      letterSpacing: 0.1,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Text(
+                                      widget.message,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Color(0xFF4A3928),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.6,
+                                        letterSpacing: 0.1,
+                                      ),
                                     ),
                                   ),
                                 ),
