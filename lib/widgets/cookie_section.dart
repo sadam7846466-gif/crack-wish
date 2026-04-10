@@ -13,6 +13,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../models/fortune.dart';
 import '../services/storage_service.dart';
+import '../services/ad_service.dart';
 import 'share_modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -170,6 +171,9 @@ class _CookieSectionState extends State<CookieSection>
     }
     _loadDailyCookieCredits();
     
+    // Reklamı arka planda önden yükleyelim:
+    AdService().loadRewardedAd();
+
     // Bounded Animation: 0’dan 2*pi’ye sürekli döngü
     _animationController = AnimationController(
       vsync: this,
@@ -375,7 +379,7 @@ class _CookieSectionState extends State<CookieSection>
     final cracks = await StorageService.getCookieCracksToday();
     // Statik cache güncelle (tüm instance’lar için)
     _cachedCracksToday = cracks;
-    _cachedDailyLimitReached = !_isPremiumUser && cracks >= StorageService.kMaxDailyCookieCracks;
+    _cachedDailyLimitReached = cracks >= StorageService.kMaxDailyCookieCracks;
     _cacheLoaded = true;
     if (mounted) {
       setState(() {
@@ -395,24 +399,22 @@ class _CookieSectionState extends State<CookieSection>
       return;
     }
 
-    // ── Günlük limit kontrolü ──
-    if (!_isPremiumUser) {
-      final cracksUsed = await StorageService.getCookieCracksToday();
+    // ── Günlük limit kontrolü (Herkes için 3/gün) ──
+    final cracksUsed = await StorageService.getCookieCracksToday();
 
-      // Limit doldu
-      if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
-        HapticFeedback.heavyImpact();
-        setState(() => _showLimitOverlay = true);
-        return;
-      }
-
-      // 2. ve 3. hak: reklam gerekli
-      if (cracksUsed >= 1) {
-        // Overlay göster, kullanıcı kararı bekle
-        setState(() => _showAdOverlay = true);
-        return;
-      }
+    // Limit doldu (hem ücretsiz hem premium için)
+    if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
+      HapticFeedback.heavyImpact();
+      setState(() => _showLimitOverlay = true);
+      return;
     }
+
+    // Ücretsiz kullanıcı: 2. ve 3. hak için reklam gerekli
+    if (!_isPremiumUser && cracksUsed >= 1) {
+      setState(() => _showAdOverlay = true);
+      return;
+    }
+    // Premium kullanıcı: reklam yok, doğrudan devam
 
     _performCrack();
   }
@@ -420,7 +422,17 @@ class _CookieSectionState extends State<CookieSection>
   // ── Reklam overlay'dan "izle" a tıklandı ──
   void _onAdAccepted() {
     setState(() => _showAdOverlay = false);
-    _performCrack();
+    
+    AdService().showRewardedAd(
+      () {
+        // Kullanıcı reklamı başarıyla izledi ve ödülü hak etti:
+        _performCrack();
+      },
+      () {
+        // Kullanıcı reklamı kapattı veya hata oluştu
+        // Bilgi verilebilir veya sessiz kalınabilir
+      }
+    );
   }
 
   // ── Reklam overlay'dan "vazgeç" a tıklandı ──
@@ -460,7 +472,7 @@ class _CookieSectionState extends State<CookieSection>
     StorageService.incrementCookieCard(cookieId);
 
     final newCracks = await StorageService.getCookieCracksToday();
-    final limitReached = !_isPremiumUser && newCracks >= StorageService.kMaxDailyCookieCracks;
+    final limitReached = newCracks >= StorageService.kMaxDailyCookieCracks;
     // Cache güncelle
     _cachedCracksToday = newCracks;
     _cachedDailyLimitReached = limitReached;
@@ -608,7 +620,7 @@ class _CookieSectionState extends State<CookieSection>
                             : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
                         child: IgnorePointer(
                       ignoring:
-                          _showFortune, // Paper çıktığında cookie tıklanamaz ama görünür kalır
+                          _showFortune || _showAdOverlay || _showLimitOverlay, // Overlay açıkken kurabiyeye alttan tıklanamaz
                       child: AnimatedBuilder(
                         animation: Listenable.merge([
                           _glowAnimation,

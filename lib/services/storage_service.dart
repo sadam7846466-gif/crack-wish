@@ -48,6 +48,15 @@ class StorageService {
   static const String _keyAppOpenDays = 'app_open_days'; // Uygulamanın açıldığı günler (Set<String>)
   static const String _keyClaimedAuraDays = 'claimed_aura_days'; // Aura toplanan günler (Set<String>)
 
+  // ── ONBOARDING / PROFILING KEYS ──
+  static const String _keyBirthTime = 'birth_time';
+  static const String _keyLifeFocus = 'life_focus';
+  static const String _keyRelationship = 'relationship_status';
+  static const String _keyDreamFrequency = 'dream_frequency';
+  static const String _keyAuraColor = 'aura_color';
+  static const String _keySleepPattern = 'sleep_pattern';
+  static const String _keyMatchPreference = 'match_preference';
+
   // ── PREMIUM EKONOMİ (Ruh Taşı / Soul Stones) ──
   static final ValueNotifier<int> soulStonesNotifier = ValueNotifier<int>(0);
 
@@ -246,6 +255,71 @@ class StorageService {
     await prefs.setString(_keyBirthDate, date.toIso8601String());
   }
 
+  // ── YENİ ONBOARDING PROFİL BİLGİLERİ ──
+
+  static Future<String?> getBirthTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyBirthTime);
+  }
+  static Future<void> setBirthTime(String time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBirthTime, time);
+  }
+
+  static Future<String?> getLifeFocus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyLifeFocus);
+  }
+  static Future<void> setLifeFocus(String focus) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLifeFocus, focus);
+  }
+
+  static Future<String?> getRelationshipStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyRelationship);
+  }
+  static Future<void> setRelationshipStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyRelationship, status);
+  }
+
+  static Future<String?> getDreamFrequency() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyDreamFrequency);
+  }
+  static Future<void> setDreamFrequency(String freq) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyDreamFrequency, freq);
+  }
+
+  static Future<int?> getAuraColor() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyAuraColor);
+  }
+  static Future<void> setAuraColor(int colorValue) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyAuraColor, colorValue);
+  }
+
+  static Future<String?> getSleepPattern() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySleepPattern);
+  }
+  static Future<void> setSleepPattern(String pattern) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySleepPattern, pattern);
+  }
+
+  static Future<bool?> getMatchPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyMatchPreference);
+  }
+  static Future<void> setMatchPreference(bool isOpen) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyMatchPreference, isOpen);
+  }
+
   static String _todayKey() =>
       DateTime.now().toIso8601String().split('T')[0];
 
@@ -326,7 +400,7 @@ class StorageService {
 
   // ── GÜNLÜK KURABİYE HAKKI SİSTEMİ ──
   // Free: 3 hak/gün (1 ücretsiz + 2 reklam izleyerek)
-  // Premium: Sınırsız
+  // Premium: 3 hak/gün (reklamsız)
   static const int kMaxDailyCookieCracks = 3;
   static const String _keyCookieCracksToday = 'cookie_cracks_today';
   static const String _keyCookieCracksDate = 'cookie_cracks_date';
@@ -382,6 +456,41 @@ class StorageService {
       current = prefs.getInt(_keyCookieCracksToday) ?? 0;
     }
     await prefs.setInt(_keyCookieCracksToday, current + 1);
+  }
+
+  // ── GÜNLÜK BAYKUŞ MEKTUBU HAKKI SİSTEMİ ──
+  // Free: 3 hak/gün (1 ücretsiz + 2 reklam izleyerek)
+  // Premium: 3 hak/gün (reklamsız)
+  static const int kMaxDailyLetters = 3;
+  static const String _keyLettersSentToday = 'letters_sent_today';
+  static const String _keyLettersSentDate = 'letters_sent_date';
+
+  /// Bugün kaç mektup gönderildi
+  static Future<int> getLettersSentToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedDate = prefs.getString(_keyLettersSentDate) ?? '';
+    final today = _todayKey();
+    if (savedDate != today) {
+      await prefs.setInt(_keyLettersSentToday, 0);
+      await prefs.setString(_keyLettersSentDate, today);
+      return 0;
+    }
+    return prefs.getInt(_keyLettersSentToday) ?? 0;
+  }
+
+  /// Mektup gönderildiğini kaydet
+  static Future<void> recordLetterSent() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+    final savedDate = prefs.getString(_keyLettersSentDate) ?? '';
+    int current;
+    if (savedDate != today) {
+      current = 0;
+      await prefs.setString(_keyLettersSentDate, today);
+    } else {
+      current = prefs.getInt(_keyLettersSentToday) ?? 0;
+    }
+    await prefs.setInt(_keyLettersSentToday, current + 1);
   }
 
   static Future<int> getStreakDays() async {

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/mock_owl_service.dart';
+import '../services/ad_service.dart';
 import '../models/owl_models.dart';
 import '../models/cookie_card.dart';
 import '../services/storage_service.dart';
@@ -1656,24 +1659,6 @@ class _ContactItem extends StatelessWidget {
                     letterSpacing: 0.3,
                   ),
                 ),
-                if (isAppUser) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.auto_awesome, color: const Color(0xFFFFD700).withOpacity(0.8), size: 10),
-                      const SizedBox(width: 4),
-                      Text(
-                        name.length % 2 == 0 ? 'Mistik Kahin' : 'Rüya Gözlemcisi',
-                        style: TextStyle(
-                          color: const Color(0xFFFFD700).withOpacity(0.8),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ],
             ),
           ),
@@ -1904,6 +1889,41 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
   void _send() async {
     HapticFeedback.mediumImpact();
     FocusScope.of(context).unfocus();
+
+    // ── Günlük mektup limit kontrolü ──
+    final sentToday = await StorageService.getLettersSentToday();
+    final prefs = await SharedPreferences.getInstance();
+    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+
+    // Limit doldu (herkes için 3/gün)
+    if (sentToday >= StorageService.kMaxDailyLetters) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Bugünlük mektup hakkın doldu! Yarın tekrar dene.'),
+            backgroundColor: Colors.black87,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Ücretsiz kullanıcı: 2. ve 3. mektup için reklam gerekli
+    if (!isPremium && sentToday >= 1) {
+      final adCompleter = Completer<bool>();
+      AdService().showRewardedAd(
+        () { if (!adCompleter.isCompleted) adCompleter.complete(true); },
+        () { if (!adCompleter.isCompleted) adCompleter.complete(false); },
+      );
+      final adWatched = await adCompleter.future;
+      if (!adWatched) return; // Reklam izlemedi, gönderme
+    }
+
+    // Mektup gönderimini kaydet
+    await StorageService.recordLetterSent();
+
     setState(() {
       _isSending = true;
       _isFolding = true;

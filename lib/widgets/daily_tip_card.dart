@@ -1,6 +1,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
@@ -92,20 +93,47 @@ class _DailyTipCardState extends State<DailyTipCard> {
       _SuggestionType.zodiac => l10n.dailySuggestionZodiacSubtitle,
       _SuggestionType.allDone => l10n.dailySuggestionAllDoneSubtitle,
     };
+
+    final IconData iconData = switch (suggestion) {
+      _SuggestionType.dream => Icons.nights_stay_rounded,
+      _SuggestionType.tarot => Icons.style_rounded,
+      _SuggestionType.zodiac => Icons.brightness_high_rounded,
+      _SuggestionType.allDone => Icons.check_circle_rounded,
+    };
+
+    final List<Color> accentColors = switch (suggestion) {
+      _SuggestionType.dream => [const Color(0xFF8B5CF6), const Color(0xFFC084FC)], // Purples
+      _SuggestionType.tarot => [const Color(0xFFD97706), const Color(0xFFFBBF24)], // Ambers/Golds
+      _SuggestionType.zodiac => [const Color(0xFFE11D48), const Color(0xFFFB7185)], // Rose/Crimson
+      _SuggestionType.allDone => [const Color(0xFF11998E), const Color(0xFF38EF7D)], // Emerald
+    };
+
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTapDown: (_) => setState(() => _pressed = true),
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) {
+        HapticFeedback.lightImpact();
+        setState(() => _pressed = true);
+      },
       onTapCancel: () => setState(() => _pressed = false),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTap: _go,
+      onTapUp: (_) {},
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        setState(() => _pressed = true);
+        Future.delayed(const Duration(milliseconds: 120), () {
+          if (mounted) {
+            setState(() => _pressed = false);
+            _go();
+          }
+        });
+      },
       child: AnimatedScale(
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOut,
-        scale: _pressed ? 0.975 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+        scale: _pressed ? 0.94 : 1.0,
         child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 140),
-          curve: Curves.easeOut,
-          opacity: _pressed ? 0.93 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          curve: _pressed ? Curves.easeInCubic : Curves.easeOutCubic,
+          opacity: _pressed ? 0.85 : 1.0,
           child: Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: ClipRRect(
@@ -131,8 +159,8 @@ class _DailyTipCardState extends State<DailyTipCard> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF11998E).withOpacity(0.20), // Elegant Emerald
-                          const Color(0xFF38EF7D).withOpacity(0.08), // Bright Mint
+                          accentColors[0].withOpacity(0.20),
+                          accentColors[1].withOpacity(0.08),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
@@ -145,25 +173,24 @@ class _DailyTipCardState extends State<DailyTipCard> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF38EF7D).withOpacity(0.42),
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: accentColors,
+                    ).createShader(bounds),
+                    child: Icon(
+                      iconData,
+                      color: Colors.white,
+                      size: 38,
+                      shadows: [
+                        Shadow(
+                          color: accentColors[1].withOpacity(0.5),
                           blurRadius: 12,
-                          offset: const Offset(0, 4),
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(

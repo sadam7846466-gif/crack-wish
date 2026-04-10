@@ -4,10 +4,12 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'constants/theme.dart';
 import 'screens/splash_screen.dart';
 import 'services/locale_controller.dart';
+import 'services/ad_service.dart';
 import 'services/storage_service.dart';
 
 Future<void> main() async {
@@ -16,6 +18,9 @@ Future<void> main() async {
     url: 'https://zzheonrmioxbiinvomsw.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aGVvbnJtaW94YmlpbnZvbXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI3MTAsImV4cCI6MjA4OTgwODcxMH0.ur8u0vCa9x-nRKdKhS_xL6c56jpmXjU9FXa2CCHnaWU',
   );
+  await MobileAds.instance.initialize();
+  // Uygulama açılır açılmaz ilk reklamı arka planda yükle (kullanıcı beklemesim):
+  AdService().loadRewardedAd();
   await LiquidGlassWidgets.initialize();
   final localeController = LocaleController();
   await localeController.load();
@@ -32,6 +37,17 @@ Future<void> main() async {
     if (!days.contains(key)) {
       days.add(key);
       await prefs.setStringList('app_open_days', days);
+    }
+  }
+  // ── TEST SONU ──
+  
+  // ── TEST: ZODIAC KİLİTLERİNİ VE ANİMASYONLARI SIFIRLA (R için) ──
+  final prefsMain = await SharedPreferences.getInstance();
+  for (String k in prefsMain.getKeys().toList()) {
+    if (k.startsWith('zodiac_unlocked_') || 
+        k.startsWith('chinese_auto_stagger_') ||
+        k.startsWith('chinese_intro_played_')) {
+      await prefsMain.remove(k);
     }
   }
   // ── TEST SONU ──

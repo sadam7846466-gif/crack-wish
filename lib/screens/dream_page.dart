@@ -14,6 +14,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../services/storage_service.dart';
+import '../services/ad_service.dart';
 import '../services/dream_analysis_service.dart';
 import '../services/supabase_dream_service.dart';
 import '../models/emotion.dart';
@@ -1571,10 +1572,14 @@ class _DreamPageState extends State<DreamPage>
     );
 
     if (result == true) {
-      // TODO: Gerçek reklam SDK entegrasyonu buraya gelecek
-      // Şimdilik simüle ediyoruz (2 saniye bekleme)
-      // await AdManager.showRewardedAd();
-      await Future.delayed(const Duration(seconds: 2));
+      // Gerçek Google Rewarded Ad göster
+      final adCompleter = Completer<bool>();
+      AdService().showRewardedAd(
+        () { if (!adCompleter.isCompleted) adCompleter.complete(true); },   // Ödül kazanıldı
+        () { if (!adCompleter.isCompleted) adCompleter.complete(false); },  // Reklam kapatıldı
+      );
+      final adWatched = await adCompleter.future;
+      if (!adWatched) return false;
 
       final prefs = await SharedPreferences.getInstance();
       _dreamAdCredits += 1;
@@ -1955,9 +1960,9 @@ class _DreamPageState extends State<DreamPage>
                   behavior: HitTestBehavior.translucent,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
-                    ),
+                    physics: _currentTab == 0 
+                        ? const NeverScrollableScrollPhysics() 
+                        : const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                     padding: EdgeInsets.fromLTRB(
                       20,
                       MediaQuery.of(context).padding.top + 12,
@@ -2133,6 +2138,7 @@ class _DreamPageState extends State<DreamPage>
         .toList();
 
     return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

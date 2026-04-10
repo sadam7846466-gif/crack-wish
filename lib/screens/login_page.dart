@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/storage_service.dart';
 import '../screens/root_shell.dart';
+import '../screens/onboarding_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -32,15 +34,29 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
+  Future<void> _routeUser() async {
+    final userName = await StorageService.getUserName();
+    if (!mounted) return;
+    
+    // Eğer isim yoksa (veya test için boşsa) yeni profil oluşturma sihirbazına (Onboarding) gönder
+    if (userName == null || userName.isEmpty) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const OnboardingPage()),
+      );
+    } else {
+      // Zaten profili varsa ana menüye dön
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const RootShell()),
+      );
+    }
+  }
+
   Future<void> _handleGoogleSignIn() async {
     setState(() => _isLoading = true);
     try {
       final response = await AuthService().signInWithGoogle();
       if (response != null && mounted) {
-        // Giriş başarılı, Anasayfaya gönder
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const RootShell()),
-        );
+        await _routeUser();
       }
     } catch (e) {
       _showError('Google Girişi Başarısız: $e');
@@ -54,10 +70,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     try {
       final response = await AuthService().signInWithApple();
       if (response != null && mounted) {
-        // Giriş başarılı, Anasayfaya gönder
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const RootShell()),
-        );
+        await _routeUser();
       }
     } catch (e) {
       _showError('Apple Girişi Başarısız: $e');
@@ -66,11 +79,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     }
   }
 
-  void _continueAsGuest() {
-    // Misafir (Anonim) olarak devam et
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const RootShell()),
-    );
+  void _continueAsGuest() async {
+    await _routeUser();
   }
 
   void _showError(String message) {

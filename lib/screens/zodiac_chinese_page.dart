@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'dart:math' as math;
+import 'package:flutter_animate/flutter_animate.dart';
 import '../widgets/glass_back_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import 'chinese_zodiac_data.dart';
 
@@ -107,6 +109,36 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     );
   }
 
+  // Animasyon için
+  bool _isFirstOpenDay = false;
+  final Set<int> _staggeredTabsSession = {};
+
+  Widget _staggeredColumn({required int tabIndex, required List<Widget> children, ScrollController? controller}) {
+    // Scroll edilince animasyonun tembel (lazy) tetiklenmesi için ListView kullanıyoruz
+    final topPadding = MediaQuery.of(context).padding.top + 90; // Top tab padding + safe area
+    final insets = EdgeInsets.fromLTRB(20, topPadding, 20, 120);
+    
+    final alignedChildren = children.map((c) => Align(alignment: Alignment.centerLeft, child: c)).toList();
+    if (!_isFirstOpenDay || _staggeredTabsSession.contains(tabIndex)) {
+      return ListView(
+        controller: controller,
+        physics: const BouncingScrollPhysics(),
+        padding: insets,
+        children: alignedChildren,
+      );
+    }
+    return ListView(
+      controller: controller,
+      physics: const BouncingScrollPhysics(),
+      padding: insets,
+      children: alignedChildren.animate(
+        interval: 80.ms,
+        onComplete: (_) => _staggeredTabsSession.add(tabIndex),
+      ).fadeIn(duration: 400.ms, curve: Curves.easeOut)
+       .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutCubic),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -134,6 +166,19 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       duration: const Duration(seconds: 18),
     )..repeat();
     _loadUser();
+    _checkIntroAnimation();
+  }
+
+  Future<void> _checkIntroAnimation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final key = 'chinese_auto_stagger_$today';
+    final hasPlayed = prefs.getBool(key) ?? false;
+
+    if (!hasPlayed) {
+      await prefs.setBool(key, true);
+      if (mounted) setState(() => _isFirstOpenDay = true);
+    }
   }
 
   Future<void> _loadUser() async {
@@ -172,26 +217,54 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       },
       child: Scaffold(
         backgroundColor: _bg,
-      body: Stack(
-        children: [
-          // Arka plan: Dev Yin-Yang atmosferi
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _YinYangBgPainter(crimson: _crimson, gold: _gold),
+        body: Stack(
+          children: [
+            // Arka plan: Dev Yin-Yang atmosferi
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _YinYangBgPainter(crimson: _crimson, gold: _gold),
+              ),
             ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                _buildSectionTabs(),
-                Expanded(child: _buildContent()),
-              ],
+            
+            // İçerik: Sayfanın en tepesinden başlayıp sekmelerin ALTINDAN (arkasından) kayar
+            Positioned.fill(
+              child: _buildContent(),
             ),
-          ),
-        ],
+
+            // Üst Kayan Tab Menüsü (Glassmorphism effect)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          _bg.withOpacity(0.9),
+                          _bg.withOpacity(0.5),
+                          _bg.withOpacity(0.0),
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: _buildSectionTabs(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -393,32 +466,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
       },
       physics: const BouncingScrollPhysics(),
       children: [
-        SingleChildScrollView(
-          controller: _profileScrollCtrl,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-          child: _profileSection(),
-        ),
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-          child: _compatibilitySection(),
-        ),
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-          child: _dailySection(),
-        ),
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-          child: _yearSection(),
-        ),
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-          child: _elementSection(),
-        ),
+        _profileSection(controller: _profileScrollCtrl),
+        _compatibilitySection(),
+        _dailySection(),
+        _yearSection(),
+        _elementSection(),
       ],
     );
   }
@@ -666,13 +718,14 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   // ══════════════════════════════════════════
   // 0) PROFİL
   // ══════════════════════════════════════════
-  Widget _profileSection() {
+  Widget _profileSection({ScrollController? controller}) {
     final a = _animal;
     final traits = a['traits'] as List<String>;
     final strengths = a['strengths'] as List<String>;
     final weaknesses = a['weaknesses'] as List<String>;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _staggeredColumn(
+      tabIndex: 0,
+      controller: controller,
       children: [
         // Hero — Çarpıcı mistik aura ile hayvan figürü
         Center(
@@ -1045,77 +1098,80 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       // Diğer 4 stat — mini circles
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: others.asMap().entries.map((entry) {
                           final idx = entry.key;
                           final e = entry.value;
                           final val = e.value['val'] as int;
                           final careerLabel = (idx + 1 < careers.length) ? careers[idx + 1] : e.key;
-                          return Column(
-                            children: [
-                              SizedBox(
-                                width: 44,
-                                height: 44,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 44,
-                                      height: 44,
-                                      child: CircularProgressIndicator(
-                                        value: (val / 100) * curve,
-                                        strokeWidth: 3,
-                                        backgroundColor: Colors.white
-                                            .withOpacity(0.05),
-                                        valueColor: AlwaysStoppedAnimation(
-                                          Color.lerp(
-                                            _crimson,
-                                            _accent,
-                                            val / 100,
-                                          )!,
+                          return Expanded(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: 44,
+                                  height: 44,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 44,
+                                        height: 44,
+                                        child: CircularProgressIndicator(
+                                          value: (val / 100) * curve,
+                                          strokeWidth: 3,
+                                          backgroundColor: Colors.white
+                                              .withOpacity(0.05),
+                                          valueColor: AlwaysStoppedAnimation(
+                                            Color.lerp(
+                                              _crimson,
+                                              _accent,
+                                              val / 100,
+                                            )!,
+                                          ),
+                                          strokeCap: StrokeCap.round,
                                         ),
-                                        strokeCap: StrokeCap.round,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: Opacity(
-                                        opacity: curve.clamp(0.0, 1.0),
-                                        child: CustomPaint(
-                                          painter: _StatIconPainter(
-                                            statKey: e.key,
-                                            color: _accentL.withOpacity(0.8),
+                                      SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: Opacity(
+                                          opacity: curve.clamp(0.0, 1.0),
+                                          child: CustomPaint(
+                                            painter: _StatIconPainter(
+                                              statKey: e.key,
+                                              color: _accentL.withOpacity(0.8),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                '${(val * curve).toInt()}%',
-                                style: const TextStyle(
-                                  color: _accentL,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Opacity(
-                                opacity: curve.clamp(0.0, 1.0),
-                                child: Text(
-                                  careerLabel,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.35),
-                                    fontSize: 9,
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 6),
+                                Text(
+                                  '${(val * curve).toInt()}%',
+                                  style: const TextStyle(
+                                    color: _accentL,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  careerLabel,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.4),
+                                    fontSize: 9,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         }).toList(),
                       ),
+
                       // Ayırıcı
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
@@ -1187,8 +1243,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   Widget _yearSection() {
     final yearAnimal = ChineseZodiacData.animals[6]; // At
     final interaction = ChineseZodiacData.yearInteractions[_animalIdx];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _staggeredColumn(
+      tabIndex: 3,
       children: [
         // ── Birleşik Hero + Enerji Paneli ──
         _glass(
@@ -1846,8 +1902,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final yyBonus = isYin ? 3 : 4;
     final harmonyScore = (baseScore + elBonus + yyBonus).clamp(0, 100);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _staggeredColumn(
+      tabIndex: 4,
       children: [
         // ── BİRLEŞTİRİLMİŞ HERO (ELEMENT & YIN-YANG) PANELI ──
         _YinYangInteractivePanel(
@@ -1939,8 +1995,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final best = (a['bestMatch'] as List<int>);
     final good = (a['goodMatch'] as List<int>);
     final bad = (a['conflict'] as List<int>);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _staggeredColumn(
+      tabIndex: 1,
       children: [
         const SizedBox(height: 12),
         // Aşk & İlişki — 💌 Aşk Mektubu
@@ -3474,8 +3530,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     final fortune = ChineseZodiacData.getDayFortune(_animalIdx, now);
     final c = fortune['color'] as Color;
     final mood = fortune['mood'] as Map<String, String>;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _staggeredColumn(
+      tabIndex: 2,
       children: [
         const SizedBox(height: 12),
 

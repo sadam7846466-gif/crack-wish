@@ -72,5 +72,7 @@
 	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
 </dict>
 </plist>

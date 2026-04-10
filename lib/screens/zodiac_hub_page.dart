@@ -3,10 +3,15 @@ import 'dart:math' as math;
 import 'dart:ui';
 import '../widgets/glass_back_button.dart';
 import '../widgets/guidance_booklet.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../widgets/fade_page_route.dart';
 import 'zodiac_page.dart';
 import 'zodiac_chinese_page.dart';
 import 'zodiac_mayan_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/storage_service.dart';
+import 'premium_paywall_page.dart';
 
 class ZodiacHubPage extends StatefulWidget {
   const ZodiacHubPage({super.key});
@@ -25,18 +30,499 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   static const Color _goldD = Color(0xFFB07020);
   static const Color _bg = Color(0xFF0F1210);
 
+  bool _isPremiumUser = false;
+
   @override
   void initState() {
     super.initState();
-    _spin = AnimationController(vsync: this, duration: const Duration(seconds: 180)); // Şimdilik durduruldu
+    _spin = AnimationController(vsync: this, duration: const Duration(seconds: 180));
     _entrance = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..forward();
     _t1 = CurvedAnimation(parent: _entrance, curve: const Interval(0, .4, curve: Curves.easeOutCubic));
     _t2 = CurvedAnimation(parent: _entrance, curve: const Interval(.15, .55, curve: Curves.easeOutCubic));
     _t3 = CurvedAnimation(parent: _entrance, curve: const Interval(.3, .7, curve: Curves.easeOutCubic));
+    _initPremiumState();
+  }
+
+  Future<void> _initPremiumState() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+      });
+    }
   }
 
   @override
   void dispose() { _spin.dispose(); _entrance.dispose(); super.dispose(); }
+
+  Widget _premiumInfoRow(IconData icon, String text, bool isActive) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive
+                ? const Color(0xFF22D3EE).withOpacity(0.12)
+                : Colors.white.withOpacity(0.05),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: isActive
+                ? const Color(0xFF22D3EE).withOpacity(0.8)
+                : Colors.white.withOpacity(0.3),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isActive
+                  ? Colors.white.withOpacity(0.75)
+                  : Colors.white.withOpacity(0.4),
+              fontSize: 13,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showSoulStoneInfoPanel() async {
+    final soulStones = await StorageService.getSoulStones();
+    if (!mounted) return;
+    await showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'SoulStoneInfo',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        final panelW = MediaQuery.of(context).size.width * 0.85;
+        return Center(
+          child: SizedBox(
+            width: panelW,
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    height: _isPremiumUser ? 320 : 360,
+                    alignment: Alignment.topCenter,
+                    decoration: BoxDecoration(
+                      color: _isPremiumUser
+                          ? const Color(0xFF22D3EE).withOpacity(0.08)
+                          : Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: _isPremiumUser
+                            ? const Color(0xFF22D3EE).withOpacity(0.35)
+                            : Colors.white.withOpacity(0.25),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Icon(
+                          Icons.diamond_rounded,
+                          color: soulStones >= 1
+                              ? const Color(0xFF22D3EE)
+                              : Colors.white.withOpacity(0.3),
+                          size: 48,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Ruh Taşların",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22D3EE).withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF22D3EE).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.diamond_outlined,
+                                size: 14,
+                                color: Color(0xFF22D3EE),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                soulStones > 0
+                                      ? "$soulStones Ruh Taşın var"
+                                      : "Ruh Taşın bitti",
+                                style: const TextStyle(
+                                  color: Color(0xFF22D3EE),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _premiumInfoRow(
+                          Icons.auto_awesome,
+                          "Kozmik Kapı'dan geçiş izni",
+                          true,
+                        ),
+                        const SizedBox(height: 10),
+                        _premiumInfoRow(
+                          Icons.diamond_outlined,
+                          "Her astroloji 1 Ruh Taşı harcar",
+                          soulStones >= 1,
+                        ),
+                        const SizedBox(height: 10),
+                        _premiumInfoRow(
+                          Icons.workspace_premium,
+                          _isPremiumUser
+                                ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
+                                : "Elite ile her gece 5 Ruh Taşı kazan",
+                          _isPremiumUser,
+                        ),
+
+                        if (!_isPremiumUser) ...[
+                          const Spacer(),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(
+                                0xFF22D3EE,
+                              ).withOpacity(0.15),
+                              elevation: 0,
+                              minimumSize: const Size(double.infinity, 44),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: const Color(
+                                    0xFF22D3EE,
+                                  ).withOpacity(0.4),
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PremiumPaywallPage(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Elite Abone Ol",
+                              style: TextStyle(
+                                color: Color(0xFF22D3EE),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: const SizedBox.expand(),
+            ),
+            FadeTransition(
+              opacity: anim1,
+              child: ScaleTransition(
+                scale: CurvedAnimation(
+                  parent: anim1,
+                  curve: Curves.easeOutBack,
+                ),
+                child: child,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // --- Premium Modal Gösterimi ---
+  Future<void> _playPortalOpenRitual(String title, IconData icon) async {
+    BuildContext? dialogCtx;
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 600),
+      pageBuilder: (context, anim1, anim2) {
+        dialogCtx = context;
+        return Material(
+          color: Colors.transparent,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: const Color(0xFF22D3EE), size: 70)
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.3, 1.3), duration: 800.ms, curve: Curves.easeInOut)
+                    .shimmer(duration: 1000.ms, color: Colors.white, size: 2),
+                const SizedBox(height: 30),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 3),
+                ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
+                const SizedBox(height: 20),
+                const Text(
+                  'KAPI AÇILIYOR...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFF22D3EE), fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 4),
+                ).animate(delay: 300.ms).fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
+              ],
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(opacity: anim1, child: child);
+      },
+    );
+
+    HapticFeedback.mediumImpact();
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+    HapticFeedback.lightImpact();
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+    HapticFeedback.heavyImpact();
+    await Future.delayed(const Duration(milliseconds: 1400));
+    
+    if (dialogCtx != null && mounted) {
+      Navigator.pop(dialogCtx!);
+    }
+  }
+
+  Future<void> _handlePremiumAccess(BuildContext context, String moduleKey, VoidCallback onUnlock) async {
+    // 1. Günlük kilit açık mı kontrolü
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final unlockKey = 'zodiac_unlocked_${moduleKey}_$today';
+    final isUnlocked = prefs.getBool(unlockKey) ?? false;
+
+    // 2. Bugün kilit ZATEN AÇILMIŞSA direkt gir (Premium da olsa, ücretsiz de olsa).
+    if (isUnlocked) {
+      onUnlock();
+      return;
+    }
+
+    // 3. Kullanıcı Premium (Elite) ise, paneli göstermeden "doğrudan Ruh Taşı kullanıma" çalış.
+    if (_isPremiumUser) {
+      bool success = await StorageService.deductSoulStones(1);
+      if (success) {
+        await prefs.setBool(unlockKey, true);
+        HapticFeedback.lightImpact(); // Başarılı, hızlı geçiş hissi.
+        onUnlock();
+        return;
+      }
+      // Eğer Premium olmasına rağmen taş kalmadıysa, mecburen alttaki paneli göster ki yetersiz bakiye olduğunu görsün.
+    }
+    
+    // 4. Ücretsiz kullanıcıysa VEYA Premium olup taşı bitenlerse KADİM BİLGELİĞİN KAPISI panelini göster!
+    if (!context.mounted) return;
+    
+    // Ücretsiz kullanıcı için Merkezi Kilit Modalı (Tarot tarzı)
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'PremiumAccess',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogCtx, anim1, anim2) {
+        return StatefulBuilder(
+          builder: (stContext, setState) {
+            final panelW = MediaQuery.of(stContext).size.width * 0.85;
+            return Center(
+              child: SizedBox(
+                width: panelW,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.25), 
+                            width: 0.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 40,
+                              spreadRadius: -5,
+                            ),
+                          ],
+                        ),
+                        child: ValueListenableBuilder<int>(
+                          valueListenable: StorageService.soulStonesNotifier,
+                          builder: (context, soulStones, _) {
+                            final hasEnough = soulStones >= 1;
+                            return Column(
+                              key: const ValueKey('pay_wall'),
+                              mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.diamond_rounded, 
+                                            color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), 
+                                            size: 48
+                                          ),
+                                          const SizedBox(height: 12),
+                                          const Text(
+                                            'Kozmik Bilgelik Kapısı',
+                                            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF22D3EE).withOpacity(0.12),
+                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 1),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  "$soulStones Ruh Taşın var",
+                                                  style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          _premiumInfoRow(
+                                            Icons.auto_awesome,
+                                            "Burç derinlikleri için giriş izni",
+                                            true,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _premiumInfoRow(
+                                            Icons.diamond_outlined,
+                                            "Her astroloji haritası 1 Ruh Taşı harcar",
+                                            hasEnough,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _premiumInfoRow(
+                                            Icons.workspace_premium,
+                                            _isPremiumUser
+                                                ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
+                                                : "Elite ile her gece 5 Ruh Taşı kazan",
+                                            _isPremiumUser,
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: hasEnough
+                                                        ? const Color(0xFF22D3EE).withOpacity(0.15)
+                                                        : Colors.white.withOpacity(0.05),
+                                                    elevation: 0,
+                                                    padding: const EdgeInsets.symmetric(vertical: 0),
+                                                    minimumSize: const Size(double.infinity, 48),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      side: BorderSide(
+                                                        color: hasEnough
+                                                            ? const Color(0xFF22D3EE).withOpacity(0.4)
+                                                            : Colors.white.withOpacity(0.1),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  onPressed: hasEnough ? () async {
+                                                    final success = await StorageService.deductSoulStones(1);
+                                                    if (success) {
+                                                      await prefs.setBool(unlockKey, true); // O gün için açıldı
+                                                      if (context.mounted) {
+                                                        Navigator.pop(dialogCtx);
+                                                        onUnlock();
+                                                      }
+                                                    }
+                                                  } : () {},
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      "1 Ruh Taşı Kullan",
+                                                      style: TextStyle(
+                                                        color: hasEnough
+                                                            ? const Color(0xFF22D3EE)
+                                                            : Colors.white30,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                            ],
+                          );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+          },
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,20 +538,82 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
           center: const Alignment(0, -0.6), radius: 1.6,
           colors: [_goldD.withOpacity(0.2), _bg], stops: const [0, 1],
         ))),
-        SafeArea(top: false, bottom: false, child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + 10,
-            bottom: 40,
+
+        // Kaydırılabilir Çarklar (Yumuşak üst sınır)
+        Positioned.fill(
+          child: ShaderMask(
+            shaderCallback: (Rect rect) {
+              return LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.4),
+                  Colors.black,
+                  Colors.black,
+                ],
+                stops: const [0.0, 0.05, 0.08, 1.0],
+              ).createShader(rect);
+            },
+            blendMode: BlendMode.dstIn,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 30,
+                bottom: 40,
+              ),
+              child: Column(children: [
+                const SizedBox(height: 10),
+                // ── ÜÇ ÇARK (Tek ekrana sığması için kompakt tasarlandı) ──
+                _animWrap(_t1, _wheelSection(
+                  wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
+                  painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  onTap: () async {
+                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', Icons.auto_awesome_outlined);
+                    if (!mounted) return;
+                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacPage()));
+                  },
+                )),
+                const SizedBox(height: 28),
+                _animWrap(_t2, _wheelSection(
+                  wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
+                  painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  isPremium: true,
+                  onTap: () => _handlePremiumAccess(context, 'asian', () async {
+                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', Icons.brightness_medium_outlined);
+                    if (!mounted) return;
+                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacChinesePage()));
+                  }),
+                )),
+                const SizedBox(height: 28),
+                _animWrap(_t3, _wheelSection(
+                  wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
+                  painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  isPremium: true,
+                  onTap: () => _handlePremiumAccess(context, 'mayan', () async {
+                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', Icons.filter_vintage_outlined);
+                    if (!mounted) return;
+                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacMayanPage()));
+                  }),
+                )),
+                const SizedBox(height: 40),
+              ]),
+            ),
           ),
-          child: Column(children: [
-            // Üst Bar (Geri Butonu)
-            _animWrap(_t1, Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ),
+
+        // Sabit Üst Bar (Geri Butonu ve Rehber)
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 10,
+          left: 20,
+          right: 20,
+          child: _animWrap(_t1, Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const GlassBackButton(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const GlassBackButton(),
                   GuidanceBookletButton(
                     dialogTitleTr: 'Burç Rehberi',
                     dialogTitleEn: 'Zodiac Guide',
@@ -93,30 +641,60 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                       ),
                     ],
                   ),
+                  const SizedBox(width: 12),
+                  ValueListenableBuilder<int>(
+                    valueListenable: StorageService.soulStonesNotifier,
+                    builder: (context, soulStones, _) {
+                      return GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showSoulStoneInfoPanel();
+                        },
+                        child: ClipOval(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.10),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF22D3EE).withOpacity(0.3),
+                                  width: 0.6,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.diamond_outlined, 
+                                    size: 11, 
+                                    color: soulStones > 0 ? const Color(0xFF22D3EE).withOpacity(0.9) : Colors.white.withOpacity(0.3)
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    '$soulStones',
+                                    style: TextStyle(
+                                      color: soulStones > 0 ? const Color(0xFF22D3EE).withOpacity(0.9) : Colors.white.withOpacity(0.3),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
-            )),
-            
-            // ── ÜÇ ÇARK (Tek ekrana sığması için kompakt tasarlandı) ──
-            _animWrap(_t1, _wheelSection(
-              wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
-              painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
-              onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacPage())),
-            )),
-            const SizedBox(height: 36),
-            _animWrap(_t2, _wheelSection(
-              wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
-              painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
-              onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacChinesePage())),
-            )),
-            const SizedBox(height: 36),
-            _animWrap(_t3, _wheelSection(
-              wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
-              painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
-              onTap: () => Navigator.push(context, SwipeFadePageRoute(page: const ZodiacMayanPage())),
-            )),
-          ]),
-        )),
+            ],
+          )),
+        ),
       ]),
     );
   }
@@ -125,11 +703,27 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     opacity: a, child: SlideTransition(
       position: Tween<Offset>(begin: const Offset(0, .12), end: Offset.zero).animate(a), child: child));
 
-  Widget _wheelSection({required double wheelSize, required String label,
-    required CustomPainter Function(double progress) painter, required VoidCallback onTap}) {
+  Widget _wheelSection({
+    required double wheelSize, 
+    required String label,
+    required CustomPainter Function(double progress) painter, 
+    required VoidCallback onTap,
+    bool isPremium = false,
+  }) {
     return Column(children: [
-        // Çark Etiketi
-        Text(label, style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 3)),
+        // Çark Etiketi ve Ruh Taşı İkonu (Merkez bozulmasın diye Stack kullanıldı)
+        Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            Text(label, style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 3)),
+            if (isPremium)
+              Positioned(
+                right: -20,
+                child: const Icon(Icons.diamond_outlined, color: Color(0xFF22D3EE), size: 14),
+              ),
+          ],
+        ),
         const SizedBox(height: 6),
         // Çarkın Kendisi - Artık buton (ripple efektli)
         Material(

@@ -1242,8 +1242,12 @@ info@crackandwish.com''',
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
+                          onTap: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.remove('user_name'); // Clear name to trigger onboarding!
+                            if (mounted) {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
+                            }
                           },
                           child: Container(
                             width: double.infinity,
@@ -1255,7 +1259,7 @@ info@crackandwish.com''',
                             ),
                             alignment: Alignment.center,
                             child: const Text(
-                              '🛠️ TEST: Login/Onboarding Ekranına Git',
+                              '🛠️ TEST (Profili Sıfırla): Login Ekranına Git',
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),

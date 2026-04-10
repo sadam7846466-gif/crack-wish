@@ -17,6 +17,8 @@ import '../widgets/tarot_share_modal.dart';
 import 'tarot_meanings.dart';
 import '../services/user_stats_service.dart';
 import '../services/storage_service.dart';
+import '../services/ad_service.dart';
+import '../constants/colors.dart';
 import 'premium_paywall_page.dart';
 
 enum RitualState {
@@ -933,63 +935,44 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       );
       return false;
     }
-    final result = await showGeneralDialog<bool>(
+    // Import AdService in the file header if not already there, but we can assume it's imported or use absolute path
+    // Wait, better to just use AdService and import it at top of file
+    final completer = Completer<bool>();
+    
+    // Kısa bir yüklenme göstergesi
+    showDialog(
       context: context,
-      barrierDismissible: true,
-      barrierLabel: 'ad_popup',
-      barrierColor: Colors.black.withOpacity(0.6),
-      transitionDuration: const Duration(milliseconds: 400),
-      transitionBuilder: (context, a1, a2, child) {
-        return FadeTransition(opacity: a1, child: child);
-      },
-      pageBuilder: (context, _, __) {
-        Future.delayed(const Duration(seconds: 3), () {
-          if (context.mounted) Navigator.of(context).pop(true);
-        });
-
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: CircularProgressIndicator(
-                    color: Color(0xFFE2C48E),
-                    strokeWidth: 3,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  _t(
-                    'Sponsorlu İçerik Oynatılıyor...',
-                    'Playing Sponsored Content...',
-                  ),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _t(
-                    'Ödülünüz birazdan tanımlanacak',
-                    'Your reward will be granted shortly',
-                  ),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
+      barrierDismissible: false,
+      builder: (ctx) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2C48E).withOpacity(0.3)),
           ),
-        );
-      },
+          child: const CircularProgressIndicator(color: Color(0xFFE2C48E)),
+        ),
+      ),
     );
+
+    // Loading'i reklam açılmadan önce kapat (çift pop sorununu önler)
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (context.mounted) Navigator.of(context).pop();
+
+    AdService().showRewardedAd(
+      () {
+        // Kullanıcı reklamı izledi ve ödülü kazandı
+        if (!completer.isCompleted) completer.complete(true);
+      },
+      () {
+        // Kullanıcı reklamı kapattı (ödül zaten verilmişse tekrar complete etme)
+        if (!completer.isCompleted) completer.complete(false);
+      }
+    );
+    
+    final result = await completer.future;
+    
     if (result == true) {
       // Grant ad credit
       _adCredits += 1;
@@ -1333,18 +1316,24 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     } else {
       final allowed = await _ensureAllowance();
       if (!allowed) {
-        await _showCreditInfoPanel();
-        if (mounted) {
-          _setStateSafe(() {
-            if (_selectedTablePositions.isNotEmpty) {
-              int lastPos = _selectedTablePositions.removeLast();
-              _hiddenCards.remove(lastPos);
-              _reservedSlotCount = 0;
-              _state = RitualState.selecting;
-            }
-          });
+        final gotCredit = await _showCreditInfoPanel();
+        if (gotCredit) {
+          // Reklam izledi ve hak kazandı — devam et!
+          await _consumeAllowanceOnCommit();
+        } else {
+          // Hak yok — son kartı geri al
+          if (mounted) {
+            _setStateSafe(() {
+              if (_selectedTablePositions.isNotEmpty) {
+                int lastPos = _selectedTablePositions.removeLast();
+                _hiddenCards.remove(lastPos);
+                _reservedSlotCount = 0;
+                _state = RitualState.selecting;
+              }
+            });
+          }
+          return;
         }
-        return;
       } else {
         await _consumeAllowanceOnCommit();
       }
@@ -3356,7 +3345,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     );
   }
 
-  Future<void> _showCreditInfoPanel() async {
+  Future<bool> _showCreditInfoPanel() async {
     final isTr = _isTr;
     final hasCredit = _isPremiumUser
         ? (_premiumReadsUsed < _kMaxPremiumReads)
@@ -3364,6 +3353,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     final creditCount = _isPremiumUser
         ? (_kMaxPremiumReads - _premiumReadsUsed)
         : (!_dailyFreeUsed ? 1 : _adCredits);
+
+    bool userWantsAd = false;
 
     await showGeneralDialog(
       context: context,
@@ -3565,8 +3556,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                               ),
                               onPressed: _dailyAdWatchCount < _kMaxDailyAds
                                   ? () {
+                                      userWantsAd = true;
                                       Navigator.pop(context);
-                                      _showAdPopup();
                                     }
                                   : null,
                               child: Text(
@@ -3612,6 +3603,13 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         );
       },
     );
+
+    // Panel kapandıktan sonra: kullanıcı "Reklam İzle"ye bastıysa reklam göster
+    if (userWantsAd) {
+      final adResult = await _showAdPopup();
+      return adResult;
+    }
+    return false;
   }
 
   Future<void> _showSoulStoneInfoPanel() async {
