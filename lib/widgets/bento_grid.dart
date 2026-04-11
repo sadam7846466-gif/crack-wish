@@ -348,7 +348,7 @@ class _MoodCard extends StatelessWidget {
                 const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  l10n.localeName == 'tr' ? 'Bu alan henüz keşfedilmeyi bekliyor ✨' : 'This realm is waiting to be explored ✨',
+                  l10n.localeName == 'tr' ? 'Bu alan henüz keşfedilmeyi bekliyor...' : 'This realm is waiting to be explored...',
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ],

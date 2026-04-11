@@ -1087,13 +1087,24 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                               ),
                             ),
                             alignment: Alignment.center,
-                            child: Text(
-                              isTr ? '📌 Sabitle' : '📌 Pin',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(hovered == 0 ? 1.0 : 0.9),
-                                fontSize: 11,
-                                fontWeight: hovered == 0 ? FontWeight.w700 : FontWeight.w500,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.push_pin_rounded,
+                                  size: 13,
+                                  color: Colors.white.withOpacity(hovered == 0 ? 1.0 : 0.9),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isTr ? 'Sabitle' : 'Pin',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(hovered == 0 ? 1.0 : 0.9),
+                                    fontSize: 11,
+                                    fontWeight: hovered == 0 ? FontWeight.w700 : FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -1114,13 +1125,24 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                               ),
                             ),
                             alignment: Alignment.center,
-                            child: Text(
-                              isTr ? '✉️ Gönder' : '✉️ Send',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(hovered == 1 ? 1.0 : 0.9),
-                                fontSize: 11,
-                                fontWeight: hovered == 1 ? FontWeight.w700 : FontWeight.w500,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.send_rounded,
+                                  size: 13,
+                                  color: Colors.white.withOpacity(hovered == 1 ? 1.0 : 0.9),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isTr ? 'Gönder' : 'Send',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(hovered == 1 ? 1.0 : 0.9),
+                                    fontSize: 11,
+                                    fontWeight: hovered == 1 ? FontWeight.w700 : FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

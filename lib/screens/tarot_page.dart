@@ -18,7 +18,6 @@ import 'tarot_meanings.dart';
 import '../services/user_stats_service.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
-import '../constants/colors.dart';
 import 'premium_paywall_page.dart';
 
 enum RitualState {
@@ -704,19 +703,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     _bootstrap();
   }
 
-  @override
-  void reassemble() {
-    super.reassemble();
-    // ⚠️ DEV TEST: Her "R" (Hot Reload) basıldığında otomatik 5 Ruh Taşı tanımlar
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setInt('soul_stones', 5).then((_) {
-        try {
-          StorageService.soulStonesNotifier.value = 5;
-          debugPrint('💎 DEV MODE: Hot reload ile hesaba 5 Ruh Taşı yüklendi!');
-        } catch (_) {}
-      });
-    });
-  }
+
 
   @override
   void didChangeDependencies() {
@@ -747,13 +734,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
   Future<void> _bootstrap() async {
     _prefs = await SharedPreferences.getInstance();
 
-    // ⚠️ DEBUG: Günlük hakları sıfırla (test sonrası kaldır!)
-    await _prefs.remove(_kLastFreeDate);
-    await _prefs.remove(_kAdCredits);
-    await _prefs.remove(_kAdWatchCount);
-    await _prefs.remove(_kAdWatchDate);
-    debugPrint('🔄 DEBUG: Tarot günlük haklar sıfırlandı!');
-    // ⚠️ DEBUG SONU
+
 
     await _loadGateAndStreak();
     _setStateSafe(() => _state = RitualState.idle);
@@ -815,20 +796,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       _premiumReadsUsed = _prefs.getInt(_kPremiumReadsCount) ?? 0;
     }
 
-    // Elite kullanıcıya günlük 5 Ruh Taşı yenile
-    if (_isPremiumUser) {
-      final eliteSoulDate = _prefs.getString(_kEliteSoulStoneDate);
-      if (eliteSoulDate != today) {
-        // Yeni gün: Ruh Taşlarını 5'e tamamla (eğer 5'ten azsa)
-        final prefs = await SharedPreferences.getInstance();
-        final currentStones = prefs.getInt('soul_stones') ?? 0;
-        if (currentStones < _kDailyEliteSoulStones) {
-          await prefs.setInt('soul_stones', _kDailyEliteSoulStones);
-          StorageService.soulStonesNotifier.value = _kDailyEliteSoulStones;
-        }
-        await _prefs.setString(_kEliteSoulStoneDate, today);
-      }
-    }
+    // Günlük Elite Ruh Taşlarını yenile (merkezi sistem)
+    await StorageService.getSoulStones();
   }
 
   // ======================

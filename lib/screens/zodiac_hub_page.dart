@@ -11,6 +11,7 @@ import 'zodiac_chinese_page.dart';
 import 'zodiac_mayan_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
+import '../services/ad_service.dart';
 import 'premium_paywall_page.dart';
 
 class ZodiacHubPage extends StatefulWidget {
@@ -273,59 +274,71 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   }
 
   // --- Premium Modal Gösterimi ---
-  Future<void> _playPortalOpenRitual(String title, IconData icon) async {
-    BuildContext? dialogCtx;
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      barrierDismissible: false,
-      transitionDuration: const Duration(milliseconds: 600),
-      pageBuilder: (context, anim1, anim2) {
-        dialogCtx = context;
-        return Material(
-          color: Colors.transparent,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: const Color(0xFF22D3EE), size: 70)
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.3, 1.3), duration: 800.ms, curve: Curves.easeInOut)
-                    .shimmer(duration: 1000.ms, color: Colors.white, size: 2),
-                const SizedBox(height: 30),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 3),
-                ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
-                const SizedBox(height: 20),
-                const Text(
-                  'KAPI AÇILIYOR...',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF22D3EE), fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 4),
-                ).animate(delay: 300.ms).fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
-              ],
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, anim1, anim2, child) {
-        return FadeTransition(opacity: anim1, child: child);
-      },
-    );
-
-    HapticFeedback.mediumImpact();
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
+  Future<void> _playPortalOpenRitual(String title, CustomPainter Function(double) painterBuilder, double wheelSize, Widget targetPage) async {
     HapticFeedback.lightImpact();
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    HapticFeedback.heavyImpact();
-    await Future.delayed(const Duration(milliseconds: 1400));
-    
-    if (dialogCtx != null && mounted) {
-      Navigator.pop(dialogCtx!);
-    }
+    Future.delayed(const Duration(milliseconds: 800), () => HapticFeedback.mediumImpact());
+    Future.delayed(const Duration(milliseconds: 1600), () => HapticFeedback.heavyImpact());
+
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 2600),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (context, anim1, anim2) {
+          final isForward = anim1.status == AnimationStatus.forward || anim1.status == AnimationStatus.completed;
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              // ARKA PLANDA BELİRECEK OLAN YENİ SAYFA
+              FadeTransition(
+                opacity: isForward 
+                    ? CurvedAnimation(parent: anim1, curve: const Interval(0.4, 1.0, curve: Curves.easeIn))
+                    : anim1, // Geri dönüşte standart fade out
+                child: targetPage,
+              ),
+
+              // ÖN PLANDA DEV ÇARK (Sadece ileri gidiyorken çalışır, geri gelişte asla görünmez)
+              if (isForward)
+                IgnorePointer(
+                  child: FadeTransition(
+                    // Animasyonun 2. yarısında çark çok yavaşça ve pamuk gibi eriyerek kaybolur (1.0 -> 0.0)
+                    opacity: Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+                      parent: anim1,
+                      curve: const Interval(0.60, 1.0, curve: Curves.easeInOut), 
+                    )),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(color: Colors.black87),
+                        
+                        Hero(
+                          tag: 'wheel_$title',
+                          child: SizedBox(
+                            width: wheelSize,
+                            height: wheelSize,
+                            child: AnimatedBuilder(
+                              animation: _spin,
+                              builder: (c, _) => CustomPaint(
+                                size: Size(wheelSize, wheelSize),
+                                painter: painterBuilder(_spin.value),
+                              ),
+                            ),
+                          )
+                          .animate(onComplete: (controller) => controller.stop()) // Tıklama başına sadece 1 kere oynat!
+                          .scale(begin: const Offset(1, 1), end: const Offset(7.5, 7.5), duration: 2600.ms, curve: Curves.easeInOutCubic)
+                          .rotate(begin: 0, end: 1.5, duration: 2600.ms, curve: Curves.easeInOutCubic)
+                          .fadeOut(delay: 1000.ms, duration: 1600.ms, curve: Curves.easeInOut), // Uzuuun ve pamuk gibi bir erime
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   Future<void> _handlePremiumAccess(BuildContext context, String moduleKey, VoidCallback onUnlock) async {
@@ -455,48 +468,105 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                           const SizedBox(height: 20),
                                           Row(
                                             children: [
-                                              Expanded(
-                                                child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: hasEnough
-                                                        ? const Color(0xFF22D3EE).withOpacity(0.15)
-                                                        : Colors.white.withOpacity(0.05),
-                                                    elevation: 0,
-                                                    padding: const EdgeInsets.symmetric(vertical: 0),
-                                                    minimumSize: const Size(double.infinity, 48),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(16),
-                                                      side: BorderSide(
-                                                        color: hasEnough
-                                                            ? const Color(0xFF22D3EE).withOpacity(0.4)
-                                                            : Colors.white.withOpacity(0.1),
+                                              if (hasEnough)
+                                                Expanded(
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                                      elevation: 0,
+                                                      padding: const EdgeInsets.symmetric(vertical: 0),
+                                                      minimumSize: const Size(double.infinity, 48),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        side: BorderSide(
+                                                          color: const Color(0xFF22D3EE).withOpacity(0.4),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onPressed: () async {
+                                                      final success = await StorageService.deductSoulStones(1);
+                                                      if (success) {
+                                                        await prefs.setBool(unlockKey, true); // O gün için açıldı
+                                                        if (context.mounted) {
+                                                          Navigator.pop(dialogCtx);
+                                                          onUnlock();
+                                                        }
+                                                      }
+                                                    },
+                                                    child: const FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      child: Text(
+                                                        "1 Ruh Taşı Kullan",
+                                                        style: TextStyle(
+                                                          color: Color(0xFF22D3EE),
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                  onPressed: hasEnough ? () async {
-                                                    final success = await StorageService.deductSoulStones(1);
-                                                    if (success) {
-                                                      await prefs.setBool(unlockKey, true); // O gün için açıldı
-                                                      if (context.mounted) {
-                                                        Navigator.pop(dialogCtx);
-                                                        onUnlock();
-                                                      }
-                                                    }
-                                                  } : () {},
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    child: Text(
-                                                      "1 Ruh Taşı Kullan",
-                                                      style: TextStyle(
-                                                        color: hasEnough
-                                                            ? const Color(0xFF22D3EE)
-                                                            : Colors.white30,
-                                                        fontWeight: FontWeight.bold,
+                                                )
+                                              else ...[
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.white.withOpacity(0.08),
+                                                      elevation: 0,
+                                                      minimumSize: const Size(double.infinity, 48),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      AdService().showRewardedAd(() async {
+                                                        await StorageService.addSoulStones(1);
+                                                        final success = await StorageService.deductSoulStones(1);
+                                                        if (success) {
+                                                          await prefs.setBool(unlockKey, true);
+                                                          if (context.mounted) {
+                                                            Navigator.pop(dialogCtx);
+                                                            onUnlock();
+                                                          }
+                                                        }
+                                                      }, () {});
+                                                    },
+                                                    icon: Icon(Icons.play_circle_filled_rounded, color: Colors.white.withOpacity(0.7), size: 18),
+                                                    label: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      child: Text(
+                                                        "Reklam İzle",
+                                                        style: TextStyle(color: Colors.white.withOpacity(0.9), fontWeight: FontWeight.bold),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                                      elevation: 0,
+                                                      minimumSize: const Size(double.infinity, 48),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(16),
+                                                        side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.pop(dialogCtx);
+                                                      Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                                    },
+                                                    icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
+                                                    label: const FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      child: Text(
+                                                        "Elite Al",
+                                                        style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ],
                                           ),
                             ],
@@ -569,9 +639,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
                   painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   onTap: () async {
-                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', Icons.auto_awesome_outlined);
-                    if (!mounted) return;
-                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacPage()));
+                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
                   },
                 )),
                 const SizedBox(height: 28),
@@ -580,9 +648,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   onTap: () => _handlePremiumAccess(context, 'asian', () async {
-                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', Icons.brightness_medium_outlined);
-                    if (!mounted) return;
-                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacChinesePage()));
+                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
                   }),
                 )),
                 const SizedBox(height: 28),
@@ -591,9 +657,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   onTap: () => _handlePremiumAccess(context, 'mayan', () async {
-                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', Icons.filter_vintage_outlined);
-                    if (!mounted) return;
-                    Navigator.push(context, SwipeFadePageRoute(page: const ZodiacMayanPage()));
+                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
                   }),
                 )),
                 const SizedBox(height: 40),
@@ -726,18 +790,21 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
         ),
         const SizedBox(height: 6),
         // Çarkın Kendisi - Artık buton (ripple efektli)
-        Material(
-          color: Colors.transparent,
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            splashColor: _goldL.withOpacity(0.15),
-            highlightColor: _goldD.withOpacity(0.1),
-            child: SizedBox(width: wheelSize, height: wheelSize, child: AnimatedBuilder(
-              animation: _spin,
-              builder: (c, _) => CustomPaint(size: Size(wheelSize, wheelSize), painter: painter(_spin.value)),
-            )),
+        Hero(
+          tag: 'wheel_$label',
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onTap,
+              splashColor: _goldL.withOpacity(0.15),
+              highlightColor: _goldD.withOpacity(0.1),
+              child: SizedBox(width: wheelSize, height: wheelSize, child: AnimatedBuilder(
+                animation: _spin,
+                builder: (c, _) => CustomPaint(size: Size(wheelSize, wheelSize), painter: painter(_spin.value)),
+              )),
+            ),
           ),
         ),
     ]);

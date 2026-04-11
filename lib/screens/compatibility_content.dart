@@ -139,4 +139,107 @@ class CompatibilityContent {
       advice: "İçgüdülerinizi izleyin.",
     );
   }
+
+  static CompatibilityContent getAdvanced(String category, int pct) {
+    bool high = pct >= 75;
+    bool mid = pct >= 50 && pct < 75;
+
+    if (category == 'karmic') {
+      if (high) {
+        return CompatibilityContent(
+          dynamicText: "✨ İnanılmaz bir Karmik Düğüm! Ruhlarınız birbirini bu yaşamdan çok önce, bambaşka bir bedende tanıyordu. Karşılaşmanız tesadüf değil, evrenin eksik bir döngüyü tamamlama planı.",
+          pros: "Nedepsiz bir güven hissi ve birbirinizin açık yara bantı olabilme yeteneği.",
+          cons: "Geçmiş yaşamdan taşınan travmalar yüzünden sebepsiz korkular tetiklenebilir.",
+          advice: "Birbirinize zaman verin; ruhlarınızın tamamen hizalanması için her şeyi kelimelere dökmeye çalışmayın.",
+        );
+      } else if (mid) {
+        return CompatibilityContent(
+          dynamicText: "🌀 Hafif bir geçmiş yaşam kalıntısı! İkinizin enerjisi bir önceki döngüde çok kısa kesişmiş gibi hissediliyor. Burada yarım kalan bir dersi tamamlamak için tekrar bir araya geldiniz.",
+          pros: "Bazen birbirinizi okurken hissettiğiniz o dejavu hissi.",
+          cons: "Aralıklarla gelen anlamsız mesafelilik ve birbirini yanlış anlama potansiyeli.",
+          advice: "İçinizdeki o ses 'bu kişiyi tanıyorum' diyorsa, ona güvenin ve yüzeye odaklanmayın.",
+        );
+      } else {
+        return CompatibilityContent(
+          dynamicText: "🌑 Yeni Başlayanlar İçin Karma! Birbirinizin hayatında tamamen yepyenisiniz. Geçmiş bağlarınız yok, temiz bir sayfa açıp tamamen sıfırdan bir etki alanı oluşturuyorsunuz.",
+          pros: "Geçmiş yüklerden veya karmik cezalardan tamamen arınmış özgür bir ilişki.",
+          cons: "Bağ kurmak için doğal bir çekim yerine daha fazla efor ve yaşanmışlık gerekmesi.",
+          advice: "Dünü boş verin, bu yaşamda birbirinize yepyeni ve temiz anılar hediye edin.",
+        );
+      }
+    } else if (category == 'crisis') {
+      if (high) {
+        return CompatibilityContent(
+          dynamicText: "🌪️ Fırtınanın İçi! Bir kriz anında, dünyadaki her şey çökse bile sırt sırta verip o kaostan sağ çıkacak harika bir savaşçı dinamiğine sahipsiniz.",
+          pros: "Panik anında bir kişinin liderliği ele alıp diğerini mükemmel dengelemesi.",
+          cons: "Kriz olmadığı zamanlarda savaşçı ruhun birbirinize yönelmesi riski.",
+          advice: "Dışarıdaki savaşları aranızdaki bir meydan okumaya dönüştürmeyin.",
+        );
+      } else if (mid) {
+        return CompatibilityContent(
+          dynamicText: "⚖️ Dengeleyici ama Tedirgin! Kriz anlarında ikinizden biri fazlasıyla soğukkanlı olurken, diğeri paniğe kapılabilir. Zıtlıklar birbirini dengeliyor ama zorlukla.",
+          pros: "Bir tarafın rasyonelliği ile diğerinin duygusal deşarjını yaşayabilmesi.",
+          cons: "Panik anlarında aynı frekansta tepki verememenin getirdiği kısa süreli yabancılaşma.",
+          advice: "Kriz anında sadece göz göze gelin, sözlerden çok frekanslarınıza güvenin.",
+        );
+      } else {
+        return CompatibilityContent(
+          dynamicText: "🚨 Alarm Durumu! Bir kriz olduğunda adeta yanıcı bir gaza dönüşüyorsunuz ve birbirinizi sakinleştirmek yerine felaket senaryolarını büyütüyorsunuz.",
+          pros: "Çok güçlü hisler yaşadığınız için hayatı uçlarda çok canlı hissetmeniz.",
+          cons: "Birbirinizi paniğe sürükleyip en ufak sorunu büyük bir yangına çevirme eğilimi.",
+          advice: "Kriz anlarında, çözüm aramadan önce birbirinizden kısa bir süre uzaklaşıp nefes alın.",
+        );
+      }
+    } else if (category == 'telepathy') {
+      if (high) {
+        return CompatibilityContent(
+          dynamicText: "🧿 Telepatik Ağ Aktif! Aynı anda aynı kelimeyi söylemek, tam mesaj atacakken mesaj almak... Sizin için iletişim kelimelere ihtiyaç duymuyor.",
+          pros: "Susarken bile tamamen anlaşılmanın o mucizevi huzuru.",
+          cons: "Nasıl olsa 'anlaşılıyorum' zannedip önemli şeyleri dile getirmeyi unutmak.",
+          advice: "Telepatiye çok güvenmeyin; evrende hala 'Seni seviyorum' sözünü duymak iyidir.",
+        );
+      } else if (mid) {
+        return CompatibilityContent(
+          dynamicText: "📡 Kısmi Frekans! Bazen şaşırtıcı şekilde aynı şarkıyı aynı anda mırıldanabilirsiniz, ama çoğu zaman gerçek dünyadaki iletişim kanallarına bağımlısınız.",
+          pros: "Günlük hayatta denk gelen eğlenceli tesadüflerle şaşırma fırastı.",
+          cons: "Bazen birbirinizin zihnini okuduğunuzu sanarak yanlış genellemeler yapmak.",
+          advice: "Sihre inanın ama yine de kelimelerle hislerinizi doğrulamayı ihmal etmeyin.",
+        );
+      } else {
+        return CompatibilityContent(
+          dynamicText: "📻 Cızırtılı Hat! Birbirinizin ne düşündüğünü asla tahmin edemiyorsunuz! Her mimik, her bakış bir gizem. Açık konuşmadıkça birbirinize uzaysı geleceksiniz.",
+          pros: "Her gün yepyeni birini tanıyormuşsunuz hissinin getirdiği inanılmaz merak duygusu.",
+          cons: "Gizemi yanlış yorumlamak ve 'artniyet' aramak.",
+          advice: "Gizemleri çözmek için falcılara değil, açık uçlu sorulara odaklanın.",
+        );
+      }
+    } else if (category == 'toxic') {
+      // Toxic de yüksek yüzde = AZ toksik, düşük yüzde = ÇOK toksik olsun veya tam tersi.
+      // Ekranda yüksek "Uyum" puanı görünce Toksikliğin AZ olduğunu varsayalım.
+      if (high) {
+        return CompatibilityContent(
+          dynamicText: "🌱 Şifa Bağlantısı! Aranızda hiçbir zehir yok. İkinizin birleşimi, ruhsal olarak detoks etkisi yaratıyor. Kıskançlık, manipülasyon veya kontrol sınırlarınızdan geçemiyor.",
+          pros: "Saf hisler, şeffaflık ve sağlıklı bir 'hayır' diyebilme özgürlüğü.",
+          cons: "Gereğinden fazla politik olmaya çalışıp bazen tutkuyu azaltmak.",
+          advice: "İlişkinizdeki bu doğal şifayı ve güven perdesini hiçbir şeyin delmesine izin vermeyin.",
+        );
+      } else if (mid) {
+        return CompatibilityContent(
+          dynamicText: "⚡ Tatlı Sert! Biraz inatlaşma, biraz tatlı pasif agresyon... Birbirinizi zaman zaman çok iyi manipüle edebiliyorsunuz ama günün sonunda ipin ucunu bırakıyorsunuz.",
+          pros: "Küçük çatışmaların getirdiği tatlı heyecan ve akılda kalıcılık.",
+          cons: "Bu ufak iğnelemelerin zamanla birikip zehire dönme ihtimali.",
+          advice: "Oyunlarınızı sadece eğlenmek için oynayın, sınırları zorlamak güç savaşına dönüşmesin.",
+        );
+      } else {
+        return CompatibilityContent(
+          dynamicText: "☢️ Nükleer Uyarı! İkinizin haritası yan yana geldiğinde, aşırı uç noktalara basıyor ve birbirinizin en sert sınırlarını ihlal ediyorsunuz. Bu etkileşim patlamaya meyilli.",
+          pros: "Değişimi inanılmaz hızlandırması ve ruhsal olarak size en büyük derslerinizi vermesi.",
+          cons: "Aşırı kıskançlık, ego savaşları veya tamamen birbirinin enerjisini emme hali.",
+          advice: "Bu toksinleri birbirinizi yıpratmak için değil, kendinizdeki karanlık noktaları fark edip iyileştirmek için ayna niyetine kullanın.",
+        );
+      }
+    }
+
+    return get(category, pct);
+  }
 }

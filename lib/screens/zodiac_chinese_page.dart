@@ -116,7 +116,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   Widget _staggeredColumn({required int tabIndex, required List<Widget> children, ScrollController? controller}) {
     // Scroll edilince animasyonun tembel (lazy) tetiklenmesi için ListView kullanıyoruz
     final topPadding = MediaQuery.of(context).padding.top + 90; // Top tab padding + safe area
-    final insets = EdgeInsets.fromLTRB(20, topPadding, 20, 120);
+    final insets = EdgeInsets.fromLTRB(20, topPadding, 20, MediaQuery.of(context).padding.bottom + 16);
     
     final alignedChildren = children.map((c) => Align(alignment: Alignment.centerLeft, child: c)).toList();
     if (!_isFirstOpenDay || _staggeredTabsSession.contains(tabIndex)) {
@@ -2127,14 +2127,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                               ),
-                              child: Text(
-                                '✦',
-                                style: TextStyle(
-                                  color: const Color(
-                                    0xFFD4A017,
-                                  ).withOpacity(0.35),
-                                  fontSize: 8,
-                                ),
+                              child: Icon(
+                                Icons.auto_awesome,
+                                size: 10,
+                                color: const Color(0xFFD4A017).withOpacity(0.35),
                               ),
                             ),
                             Expanded(
@@ -2339,17 +2335,6 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               ],
                             ),
                           ),
-                          const SizedBox(height: 18),
-                          // ── Dekoratif yıldız ornament ──
-                          Text(
-                            '✦   ✦   ✦',
-                            style: TextStyle(
-                              color: const Color(0xFFD4A017).withOpacity(0.25),
-                              fontSize: 10,
-                              letterSpacing: 4,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
                         ],
                       ),
                     )
@@ -2657,13 +2642,22 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    'Merak ettiğin burca dokun ✨',
-                    style: TextStyle(
-                      color: _gold.withOpacity(0.4),
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Merak ettiğin burca dokun ',
+                        style: TextStyle(
+                          color: _gold.withOpacity(0.4),
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 9,
+                        color: _gold.withOpacity(0.4),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   // Hayvan seçim gridi — 2 satır 6 sütun
@@ -7274,7 +7268,6 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 6.0,
-                  fontFamily: 'SF Pro Display',
                 ),
               ),
               const SizedBox(height: 38),
@@ -7402,7 +7395,6 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                                       ? FontWeight.w600
                                       : FontWeight.w400,
                                   letterSpacing: 0.5,
-                                  fontFamily: 'SF Pro Display',
                                   shadows: isSelected
                                       ? [
                                           Shadow(
@@ -8224,9 +8216,6 @@ class _EnergyBridgePainter extends CustomPainter {
     canvas.drawCircle(Offset(w * 0.25, h * 0.5), 1.0, dotPaint);
     canvas.drawCircle(Offset(w * 0.75, h * 0.5), 1.0, dotPaint);
   }
-
-  @override
-  bool payment(_EnergyBridgePainter old) => false;
 
   @override
   bool shouldRepaint(_EnergyBridgePainter old) =>
@@ -11425,9 +11414,10 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      selData[0],
-                      style: const TextStyle(fontSize: 22), // Kuçültüldü
+                    Icon(
+                      _getSeasonalIcon(selData[1]),
+                      color: widget.goldL,
+                      size: 24,
                     ),
                     const SizedBox(width: 10),
                     Text(
@@ -11459,6 +11449,14 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
       ],
     );
   }
+}
+
+IconData _getSeasonalIcon(String label) {
+  if (label == 'İlkbahar') return Icons.local_florist_rounded;
+  if (label == 'Yaz') return Icons.wb_sunny_rounded;
+  if (label == 'Sonbahar') return Icons.park_rounded; // Veya energy_savings_leaf
+  if (label == 'Kış') return Icons.ac_unit_rounded;
+  return Icons.star_rounded;
 }
 
 class _CompassPiePainter extends CustomPainter {
@@ -11534,9 +11532,13 @@ class _CompassPiePainter extends CustomPainter {
 
       final tp = TextPainter(textDirection: TextDirection.ltr);
       // İkon
+      final iconData = _getSeasonalIcon(labels[i]);
       tp.text = TextSpan(
-        text: icons[i],
+        text: String.fromCharCode(iconData.codePoint),
         style: TextStyle(
+          fontFamily: iconData.fontFamily,
+          package: iconData.fontPackage,
+          color: isSelected ? goldL : Colors.white.withOpacity(0.5),
           fontSize: isSelected ? 22 : 16, // Küçültüldü
           shadows: isSelected ? [Shadow(color: goldL, blurRadius: 15)] : null,
         ),

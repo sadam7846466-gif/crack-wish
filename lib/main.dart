@@ -27,31 +27,6 @@ Future<void> main() async {
   // Günlük giriş kaydı — takvimde ateş ikonu için
   StorageService.recordAppOpenToday();
   
-  // ── TEST: Eski günlere henüz toplanmamış yeni ateşler koyalım ──
-  final now = DateTime.now();
-  for (int i = 5; i <= 9; i++) { // 5 ile 9 gün öncesi
-    final d = now.subtract(Duration(days: i));
-    final key = "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-    final prefs = await SharedPreferences.getInstance();
-    final days = prefs.getStringList('app_open_days') ?? [];
-    if (!days.contains(key)) {
-      days.add(key);
-      await prefs.setStringList('app_open_days', days);
-    }
-  }
-  // ── TEST SONU ──
-  
-  // ── TEST: ZODIAC KİLİTLERİNİ VE ANİMASYONLARI SIFIRLA (R için) ──
-  final prefsMain = await SharedPreferences.getInstance();
-  for (String k in prefsMain.getKeys().toList()) {
-    if (k.startsWith('zodiac_unlocked_') || 
-        k.startsWith('chinese_auto_stagger_') ||
-        k.startsWith('chinese_intro_played_')) {
-      await prefsMain.remove(k);
-    }
-  }
-  // ── TEST SONU ──
-  
   runApp(MyApp(localeController: localeController));
 }
 

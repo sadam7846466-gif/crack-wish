@@ -17,7 +17,9 @@ class StorageService {
   static const String _keyBirthDate = 'birth_date';
   static const String _keyCurrentMood = 'current_mood';
   static const String _keyStreakDays = 'streak_days';
-  static const String _keySoulStones = 'soul_stones'; // Ruh Taşı (Premium Kredi)
+  static const String _keySoulStones = 'soul_stones'; // Kazanılmış Ruh Taşı (kalıcı — Aura, ödüller, milestone)
+  static const String _keyDailyEliteSoulStones = 'daily_elite_soul_stones'; // Günlük Elite Ruh Taşı (her gece 00:00'da 5'e sıfırlanır)
+  static const String _keyDailyEliteSoulDate = 'daily_elite_soul_date'; // Son günlük Elite taş verilme tarihi
   static const String _keyLastCookieDate = 'last_cookie_date';
   static const String _keyMood = 'mood';
   static const String _keyDreams = 'dreams';
@@ -57,41 +59,99 @@ class StorageService {
   static const String _keySleepPattern = 'sleep_pattern';
   static const String _keyMatchPreference = 'match_preference';
 
-  // ── PREMIUM EKONOMİ (Ruh Taşı / Soul Stones) ──
+  // ══════════════════════════════════════════════════════════════
+  // PREMIUM EKONOMİ — İKİ HAVUZLU RUH TAŞI SİSTEMİ
+  // ══════════════════════════════════════════════════════════════
+  //
+  // HAVUZ 1: Günlük Elite Ruh Taşları (daily_elite_soul_stones)
+  //   - Elite kullanıcılara her gece 00:00'da TAM 5 adet verilir
+  //   - Kullanılsa da kullanılmasa da her gece 5'e sıfırlanır
+  //   - Ücretsiz kullanıcılar için = 0
+  //
+  // HAVUZ 2: Kazanılmış Ruh Taşları (soul_stones)
+  //   - Aura dönüşümünden, milestone ödüllerinden, hoşgeldin hediyesinden gelen
+  //   - ASLA sıfırlanmaz, kalıcıdır
+  //
+  // Kullanırken: Önce günlük havuzdan düşer, günlük biterse kazanılmıştan düşer
+  // UI'da: Toplam (günlük + kazanılmış) gösterilir
+  // ══════════════════════════════════════════════════════════════
+
   static final ValueNotifier<int> soulStonesNotifier = ValueNotifier<int>(0);
 
+  /// Elite kullanıcının günlük 5 taşını yenile (gün değiştiyse)
+  static Future<void> refreshDailyEliteSoulStones() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    if (!isPremium) {
+      // Ücretsiz kullanıcı: günlük taş = 0
+      await prefs.setInt(_keyDailyEliteSoulStones, 0);
+      return;
+    }
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final lastDate = prefs.getString(_keyDailyEliteSoulDate) ?? '';
+    if (lastDate != today) {
+      // Yeni gün: Günlük taşları TAM 5'e sıfırla (ne olursa olsun)
+      await prefs.setInt(_keyDailyEliteSoulStones, 5);
+      await prefs.setString(_keyDailyEliteSoulDate, today);
+    }
+  }
+
+  /// Toplam Ruh Taşı = günlük Elite + kazanılmış (UI göstergesi için)
   static Future<int> getSoulStones() async {
     final prefs = await SharedPreferences.getInstance();
+    // İlk kez ise hoşgeldin hediyesi
     if (!prefs.containsKey(_keySoulStones)) {
-      // Yeni kullanıcılara hoşgeldin hediyesi olarak 3 Ruh Taşı ver
       await prefs.setInt(_keySoulStones, 3);
-      soulStonesNotifier.value = 3;
-      return 3;
     }
-    final val = prefs.getInt(_keySoulStones) ?? 0;
-    soulStonesNotifier.value = val;
-    return val;
+    // Günlük Elite taşlarını yenile (gün değiştiyse)
+    await refreshDailyEliteSoulStones();
+    final earned = prefs.getInt(_keySoulStones) ?? 0;
+    final daily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
+    final total = earned + daily;
+    soulStonesNotifier.value = total;
+    return total;
   }
 
+  /// Kazanılmış (kalıcı) taşlara ekleme yap (Aura dönüşümü, ödüller vs.)
   static Future<void> updateSoulStones(int amount) async {
     final prefs = await SharedPreferences.getInstance();
-    final current = await getSoulStones();
+    final current = prefs.getInt(_keySoulStones) ?? 0;
     final newValue = (current + amount).clamp(0, 9999);
     await prefs.setInt(_keySoulStones, newValue);
-    soulStonesNotifier.value = newValue;
+    // Toplam = yeni kazanılmış + mevcut günlük
+    final daily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
+    soulStonesNotifier.value = newValue + daily;
   }
 
+  /// Ruh Taşı harca: Önce günlükten, sonra kazanılmıştan düşer
   static Future<bool> deductSoulStones(int amount) async {
     if (amount <= 0) return false;
     final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_keySoulStones) ?? 0;
-    if (current >= amount) {
-      final newValue = current - amount;
-      await prefs.setInt(_keySoulStones, newValue);
-      soulStonesNotifier.value = newValue;
-      return true;
+    // Günlük Elite taşlarını yenile (gün değiştiyse)
+    await refreshDailyEliteSoulStones();
+    final daily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
+    final earned = prefs.getInt(_keySoulStones) ?? 0;
+    final total = daily + earned;
+    if (total < amount) return false; // Yetersiz bakiye
+
+    int remaining = amount;
+
+    // 1) Önce günlük havuzdan düş
+    if (daily > 0) {
+      final deductFromDaily = remaining.clamp(0, daily);
+      await prefs.setInt(_keyDailyEliteSoulStones, daily - deductFromDaily);
+      remaining -= deductFromDaily;
     }
-    return false;
+
+    // 2) Kalan varsa kazanılmış havuzdan düş
+    if (remaining > 0) {
+      await prefs.setInt(_keySoulStones, earned - remaining);
+    }
+
+    // Notifier güncelle
+    final newTotal = (total - amount);
+    soulStonesNotifier.value = newTotal;
+    return true;
   }
 
   // ── AURA HARCAMA (Ruh Taşı Çevirimi) ──
@@ -190,6 +250,10 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = await getTotalDreams();
     await prefs.setInt(_keyTotalDreams, current + 1);
+    
+    // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
+    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    await addPendingAura('ruya', 3 * (isPremium ? 3 : 1));
   }
 
   static Future<int> getTotalTarots() async {
@@ -396,6 +460,10 @@ class StorageService {
     final current = prefs.getInt(_keyCookieCount) ?? 0;
     await prefs.setInt(_keyCookieCount, current + 1);
     await _updateStreak();
+    
+    // YENİ SİSTEM: Bekleyen Aura havuzuna (+1) ekliyoruz
+    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    await addPendingAura('kurabiye', 1 * (isPremium ? 3 : 1));
   }
 
   // ── GÜNLÜK KURABİYE HAKKI SİSTEMİ ──
@@ -578,6 +646,24 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = prefs.getInt('daily_bonus_aura') ?? 0;
     await prefs.setInt('daily_bonus_aura', current + amount);
+  }
+
+  // ── PENDING AURA (Bekleyen/Toplanmayı Bekleyen Aura) ──
+  static Future<void> addPendingAura(String sourceKey, int amount) async {
+    if (amount <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt('pending_aura_$sourceKey') ?? 0;
+    await prefs.setInt('pending_aura_$sourceKey', current + amount);
+  }
+
+  static Future<int> getPendingAura(String sourceKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('pending_aura_$sourceKey') ?? 0;
+  }
+
+  static Future<void> clearPendingAura(String sourceKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('pending_aura_$sourceKey');
   }
 
   // ── AURA KAYNAK TOPLAMA (Source Claim) ──

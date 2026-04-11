@@ -3,7 +3,6 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import 'home_page.dart';
-import 'collection_page.dart';
 import 'profile_page.dart';
 
 /// Ortak tab shell: alt menü sabit, sayfalar IndexedStack ile korunur.
@@ -18,16 +17,25 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   late int _currentIndex = widget.initialIndex.clamp(0, 1); // Artık 2 değil 1 (sadece Home ve Profil)
+  final GlobalKey<ProfilePageState> _profileKey = GlobalKey<ProfilePageState>();
 
   late final List<Widget> _tabs = [
     HomePage(showBottomNav: false, onNavTapOverride: _handleNavTap),
     // CollectionPage(showBottomNav: false, onNavTapOverride: _handleNavTap), // Koleksiyon askıya alındı
-    ProfilePage(showBottomNav: false, onNavTapOverride: _handleNavTap),
+    ProfilePage(key: _profileKey, showBottomNav: false, onNavTapOverride: _handleNavTap),
   ];
 
   void _handleNavTap(int index) {
-    if (index == _currentIndex) return;
+    if (index == _currentIndex) {
+      if (index == 1) {
+        _profileKey.currentState?.loadUserData();
+      }
+      return;
+    }
     setState(() => _currentIndex = index);
+    if (index == 1) {
+      _profileKey.currentState?.loadUserData();
+    }
   }
 
   @override

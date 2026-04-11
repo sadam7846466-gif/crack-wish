@@ -479,6 +479,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               isAppUser: true,
               owlButtonRect: br,
               friend: f,
+              onShowLetter: () => setState(() => _showingLetter = true),
+              onHideLetter: () { if (mounted) setState(() => _showingLetter = false); },
             )),
       ],
     );
@@ -1573,6 +1575,8 @@ class _ContactItem extends StatelessWidget {
   final bool isAppUser;
   final Rect owlButtonRect;
   final Friend? friend;
+  final VoidCallback? onShowLetter;
+  final VoidCallback? onHideLetter;
 
   const _ContactItem({
     required this.name,
@@ -1580,12 +1584,13 @@ class _ContactItem extends StatelessWidget {
     required this.isAppUser,
     required this.owlButtonRect,
     this.friend,
+    this.onShowLetter,
+    this.onHideLetter,
   });
 
   void _showLetterPaper(BuildContext context) {
     // Paneli gizle
-    final pageState = context.findAncestorStateOfType<_OwlLetterPageState>();
-    pageState?.setState(() => pageState._showingLetter = true);  
+    onShowLetter?.call();
     HapticFeedback.mediumImpact();
     showGeneralDialog(
       context: context,
@@ -1606,7 +1611,7 @@ class _ContactItem extends StatelessWidget {
       },
     ).then((_) {
       // Mektup kapandı — paneli geri getir
-      pageState?.setState(() => pageState._showingLetter = false);
+      onHideLetter?.call();
     });
   }
 

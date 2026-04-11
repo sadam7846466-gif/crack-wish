@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,10 +35,10 @@ class ProfilePage extends StatefulWidget {
   });
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfilePage> createState() => ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class ProfilePageState extends State<ProfilePage> {
   static final _mottledPainter = _MottledPainter();
   int _currentNavIndex = 2;
 
@@ -58,34 +57,15 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    loadUserData();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> loadUserData() async {
     final snapshot = await StorageService.getUserSnapshot();
-    // final streak = await StorageService.getStreakDays(); // ⚠️ DEBUG: geçici kapalı
+    final streak = await StorageService.getStreakDays();
     final avatar = await StorageService.getAvatar() ?? 'assets/images/owl.webp';
     final bonusAura = await StorageService.getDailyBonusAura();
     final prefs = await SharedPreferences.getInstance();
-
-    // ⚠️ DEBUG: Test için 8 günlük seri + toplanmamış günler
-    await prefs.setInt('streak_days', 8);
-    final streak = 8;
-    // Son 8 günü "giriş yapıldı" olarak kaydet
-    final now = DateTime.now();
-    final openDays = <String>[];
-    for (int i = 0; i < 8; i++) {
-      openDays.add(now.subtract(Duration(days: i)).toIso8601String().split('T')[0]);
-    }
-    await prefs.setStringList('app_open_days', openDays);
-    // Sadece ilk 3 günü "toplanmış" yap, kalan 5 gün toplanmamış kalacak
-    final claimedDays = openDays.sublist(5); // eski 3 gün toplanmış
-    await prefs.setStringList('claimed_aura_days', claimedDays);
-    // Milestone'ları sıfırla (7 günlük ödül toplanmamış olsun)
-    await prefs.setStringList('claimed_milestones', []);
-    // ⚠️ DEBUG: Görülmüş kurabiyeleri sıfırla (hepsi yeni olsun)
-    await prefs.setStringList('seen_cookie_ids', []);
-    debugPrint('🔄 DEBUG: 8 gün seri + 5 toplanmamış gün + yeni kurabiyeler ayarlandı!');
     
     final spentAura = await StorageService.getSpentAura();
     final tarotCount = await UserStatsService.getTotalTarotReadings();
@@ -103,25 +83,15 @@ class _ProfilePageState extends State<ProfilePage> {
       _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
     });
 
-    // Elite kullanıcıya günlük 5 Ruh Taşı yenile
-    if (_isPremiumUser) {
-      final today = DateTime.now().toIso8601String().split('T')[0];
-      final eliteSoulDate = prefs.getString('elite_soul_stone_date');
-      if (eliteSoulDate != today) {
-        final currentStones = prefs.getInt('soul_stones') ?? 0;
-        if (currentStones < 5) {
-          await prefs.setInt('soul_stones', 5);
-          StorageService.soulStonesNotifier.value = 5;
-        }
-        await prefs.setString('elite_soul_stone_date', today);
-      }
-    }
+    // Günlük Elite Ruh Taşlarını yenile (merkezi sistem)
+    await StorageService.getSoulStones();
   }
 
   // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
   // Emoji yerine Material Icon kullanıyoruz — her cihazda çalışır.
   ({IconData icon, Color color, String title}) _getUserLevel(String lang) {
-    final int aura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5) + _bonusAura;
+    // YENİ SİSTEM: Aura doğrudan eklentiler yerine, sadece toplanan (_bonusAura) havuzundan okunur.
+    final int aura = _bonusAura;
     
     if (lang == 'tr') {
       if (aura < 100) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Yeni Başlayan');
@@ -1206,11 +1176,10 @@ info@crackandwish.com''',
                                     return success;
                                   },
                                   onAuraClaimed: () {
-                                    setState(() {
-                                      _bonusAura += 1;
-                                    });
+                                    // Bize lazım olan yeni Aura bilgisini yeniden yüklemek
+                                    loadUserData();
                                   },
-                                  onRefresh: () => setState(() {}),
+                                  onRefresh: () => loadUserData(),
                                 );
                               },
                             );
@@ -1244,7 +1213,7 @@ info@crackandwish.com''',
                         GestureDetector(
                           onTap: () async {
                             final prefs = await SharedPreferences.getInstance();
-                            await prefs.remove('user_name'); // Clear name to trigger onboarding!
+                            await prefs.clear(); // TAMAMEN SIFIRLA (Borçlar, isim vs her şey)!
                             if (mounted) {
                               Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
                             }
@@ -1517,9 +1486,8 @@ class _BentoHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final displayName = userName.isNotEmpty ? userName : profileTitle;
     
-    final int multiplier = isPremium ? 3 : 1;
-    final int baseAura = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5);
-    final int auraPoints = (baseAura * multiplier) + bonusAura;
+    // YENİ SİSTEM: Tüm kazanılan ve toplanan Aura sadece bonusAura havuzunda saklanır.
+    final int auraPoints = bonusAura;
     final int rawAvail = auraPoints - spentAura; 
     final int availableAura = rawAvail < 0 ? 0 : rawAvail;
     
@@ -1679,11 +1647,20 @@ class _BentoHeroCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _GlassBadge(
-                      imagePath: 'assets/images/aura_core.png',
-                      label: "$formattedAura Aura",
-                      color: const Color(0xFFC084FC),
-                      onTap: () => _showStatModal(context, "Aura Puanı", availableAura, Icons.auto_awesome, const Color(0xFFC084FC)),
+                    FutureBuilder<Set<String>>(
+                      future: StorageService.getClaimedAuraSources(),
+                      builder: (context, snapshot) {
+                        final claimed = snapshot.data ?? {};
+                        final allSources = {'ruya', 'fal', 'kurabiye', 'baykus'};
+                        final hasUnclaimed = !allSources.every((s) => claimed.contains(s));
+                        return _GlassBadge(
+                          imagePath: 'assets/images/aura_core.png',
+                          label: "$formattedAura Aura",
+                          color: const Color(0xFFC084FC),
+                          hasNotification: hasUnclaimed,
+                          onTap: () => _showStatModal(context, "Aura Puanı", availableAura, Icons.auto_awesome, const Color(0xFFC084FC)),
+                        );
+                      },
                     ),
                     const SizedBox(width: 10),
                     _GlassBadge(
@@ -1793,25 +1770,35 @@ class _BentoHeroCard extends StatelessWidget {
     for (final t in thresholds) {
       if (streakDays >= t && !claimed.contains(t)) return true;
     }
-    // Bugünün günlük aura'sı toplanmamışsa
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    final claimedDays = await StorageService.getClaimedAuraDays();
-    final openDays = await StorageService.getAppOpenDays();
-    if (openDays.contains(today) && !claimedDays.contains(today)) return true;
+    
+    // YENİ SİSTEM: Herhangi bir toplanmamış bekleyen (pending) Aura var mı?
+    final fal = await StorageService.getPendingAura('fal');
+    final cookie = await StorageService.getPendingAura('kurabiye');
+    final dream = await StorageService.getPendingAura('ruya');
+    final owl = await StorageService.getPendingAura('baykus');
+    
+    if (fal > 0 || cookie > 0 || dream > 0 || owl > 0) return true;
+    
     return false;
   }
 
   void _showStatModal(BuildContext context, String title, int value, IconData icon, Color color) async {
-    final int modalMultiplier = isPremium ? 3 : 1;
-    final int modalBaseAura = (totalCookies * 1) + (totalTarots * 2) + (totalDreams * 3) + (streakDays * 5);
-    int modalAuraTotal = (modalBaseAura * modalMultiplier) + bonusAura;
+    // YENİ SİSTEM: Tüm kazanımlar sadece "bonusAura" (toplanan aura havuzu) üzerinden okunur.
+    // Doğrudan geçmiş verilerden Aura Puanı çarpanı kaldırıldı.
+    int modalAuraTotal = bonusAura;
     int modalSpentAura = spentAura;
     int modalSoulStones = soulStones;
     const int conversionCost = 200;
     bool showSuccess = false;
 
     int selectedStoreIndex = -1;
-    Set<String> claimedSources = {};
+    
+    // Anlık olarak StorageService'dan çekilecek bekleyen aura değerleri
+    int pendingFal = 0;
+    int pendingKurabiye = 0;
+    int pendingRuya = 0;
+    int pendingBaykus = 0;
+    
     int collectedBonus = 0;
     bool sourcesLoaded = false;
     
@@ -1836,15 +1823,21 @@ class _BentoHeroCard extends StatelessWidget {
         backgroundColor: Colors.transparent,
         child: StatefulBuilder(
           builder: (context, setModalState) {
-            // İlk açılışta diskten bugün toplanan kaynakları yükle
+            // İlk açılışta diskten bekleyen auraları yükle
             if (!sourcesLoaded) {
               sourcesLoaded = true;
-              StorageService.getClaimedAuraSources().then((saved) {
-                if (saved.isNotEmpty) {
-                  setModalState(() {
-                    claimedSources = saved;
-                  });
-                }
+              Future.wait([
+                StorageService.getPendingAura('fal'),
+                StorageService.getPendingAura('kurabiye'),
+                StorageService.getPendingAura('ruya'),
+                StorageService.getPendingAura('baykus'),
+              ]).then((results) {
+                setModalState(() {
+                  pendingFal = results[0];
+                  pendingKurabiye = results[1];
+                  pendingRuya = results[2];
+                  pendingBaykus = results[3];
+                });
               });
             }
             final int baseAvailable = (modalAuraTotal - modalSpentAura).clamp(0, 999999);
@@ -2045,45 +2038,57 @@ class _BentoHeroCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Row(
                             children: [
-                              _buildAuraSource(Icons.nights_stay_rounded, "Rüya", claimedSources.contains('ruya') ? 0 : 3 * modalMultiplier, () {
-                                if (claimedSources.contains('ruya')) return;
+                              _buildAuraSource(Icons.nights_stay_rounded, "Rüya", pendingRuya, () {
+                                if (pendingRuya == 0) return;
                                 HapticFeedback.heavyImpact();
-                                final pts = 3 * modalMultiplier;
+                                final pts = pendingRuya;
                                 setModalState(() {
-                                  claimedSources.add('ruya');
+                                  pendingRuya = 0;
                                   collectedBonus += pts;
+                                  modalAuraTotal += pts;
                                 });
-                                StorageService.claimAuraSource('ruya', pts);
+                                StorageService.clearPendingAura('ruya');
+                                StorageService.addBonusAura(pts);
+                                onAuraClaimed?.call();
                               }),
-                              _buildAuraSource(Icons.auto_awesome, "Fal", claimedSources.contains('fal') ? 0 : 2 * modalMultiplier, () {
-                                if (claimedSources.contains('fal')) return;
+                              _buildAuraSource(Icons.auto_awesome, "Fal", pendingFal, () {
+                                if (pendingFal == 0) return;
                                 HapticFeedback.heavyImpact();
-                                final pts = 2 * modalMultiplier;
+                                final pts = pendingFal;
                                 setModalState(() {
-                                  claimedSources.add('fal');
+                                  pendingFal = 0;
                                   collectedBonus += pts;
+                                  modalAuraTotal += pts;
                                 });
-                                StorageService.claimAuraSource('fal', pts);
+                                StorageService.clearPendingAura('fal');
+                                StorageService.addBonusAura(pts);
+                                onAuraClaimed?.call();
                               }),
-                              _buildAuraSource(Icons.cookie, "Kurabiye", claimedSources.contains('kurabiye') ? 0 : 1 * modalMultiplier, () {
-                                if (claimedSources.contains('kurabiye')) return;
+                              _buildAuraSource(Icons.cookie, "Kurabiye", pendingKurabiye, () {
+                                if (pendingKurabiye == 0) return;
                                 HapticFeedback.heavyImpact();
-                                final pts = 1 * modalMultiplier;
+                                final pts = pendingKurabiye;
                                 setModalState(() {
-                                  claimedSources.add('kurabiye');
+                                  pendingKurabiye = 0;
                                   collectedBonus += pts;
+                                  modalAuraTotal += pts;
                                 });
-                                StorageService.claimAuraSource('kurabiye', pts);
+                                StorageService.clearPendingAura('kurabiye');
+                                StorageService.addBonusAura(pts);
+                                onAuraClaimed?.call();
                               }),
-                              _buildAuraSource(Icons.mail_rounded, "Baykuş", claimedSources.contains('baykus') ? 0 : 2 * modalMultiplier, () {
-                                if (claimedSources.contains('baykus')) return;
+                              _buildAuraSource(Icons.mail_rounded, "Baykuş", pendingBaykus, () {
+                                if (pendingBaykus == 0) return;
                                 HapticFeedback.heavyImpact();
-                                final pts = 2 * modalMultiplier;
+                                final pts = pendingBaykus;
                                 setModalState(() {
-                                  claimedSources.add('baykus');
+                                  pendingBaykus = 0;
                                   collectedBonus += pts;
+                                  modalAuraTotal += pts;
                                 });
-                                StorageService.claimAuraSource('baykus', pts);
+                                StorageService.clearPendingAura('baykus');
+                                StorageService.addBonusAura(pts);
+                                onAuraClaimed?.call();
                               }),
                               _buildAuraSource(Icons.diamond_rounded, "Ruh Taşı", 0, () {
                                 HapticFeedback.selectionClick();
@@ -2783,6 +2788,7 @@ class _GlassBadge extends StatelessWidget {
   final String? imagePath;
   final String label;
   final Color color;
+  final bool hasNotification;
   final VoidCallback onTap;
 
   const _GlassBadge({
@@ -2790,6 +2796,7 @@ class _GlassBadge extends StatelessWidget {
     this.imagePath,
     required this.label,
     required this.color,
+    this.hasNotification = false,
     required this.onTap,
   });
 
@@ -2797,45 +2804,72 @@ class _GlassBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return _BentoTouch(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: OverflowBox(
-                    maxWidth: 38,
-                    maxHeight: 38,
-                    child: imagePath != null
-                        ? Image.asset(imagePath!, width: 36, height: 36, fit: BoxFit.contain)
-                        : (icon != null ? Icon(icon, color: color, size: 18) : const SizedBox()),
-                  ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: OverflowBox(
+                        maxWidth: 38,
+                        maxHeight: 38,
+                        child: imagePath != null
+                            ? Image.asset(imagePath!, width: 36, height: 36, fit: BoxFit.contain)
+                            : (icon != null ? Icon(icon, color: color, size: 18) : const SizedBox()),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+          // Bildirim noktası (toplanacak kaynak varsa)
+          if (hasNotification)
+            Positioned(
+              top: -3,
+              right: -3,
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFF0D0C11), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF10B981).withOpacity(0.5),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

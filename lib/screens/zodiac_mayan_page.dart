@@ -158,7 +158,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(20, topPadding, 20, 40),
+      padding: EdgeInsets.fromLTRB(20, topPadding, 20, MediaQuery.of(context).padding.bottom + 16),
       child: Column(
         children: [
           _buildRuhYoluSection(),

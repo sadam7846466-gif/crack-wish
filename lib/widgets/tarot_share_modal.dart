@@ -127,7 +127,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
               children: [
                 Icon(success ? Icons.check_circle : Icons.error, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
-                Text(success ? 'Galeriye kaydedildi! ✨' : 'Kaydetme başarısız'),
+                Text(success ? 'Galeriye kaydedildi!' : 'Kaydetme başarısız'),
               ],
             ),
             backgroundColor: success ? const Color(0xFF2D7A50) : Colors.red.shade700,
