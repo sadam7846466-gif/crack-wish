@@ -22,7 +22,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
 
-  int _currentStep = 0; // 0 to 4
+  int _currentStep = 0; // 0 to 7
+  int? _selectedAvatarIndex;
 
   // --- Step 0 Data ---
   final TextEditingController _nameCtrl = TextEditingController();
@@ -56,7 +57,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _stepCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
+    _stepCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _stepCtrl, curve: Curves.easeOut));
     _slideAnim = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
@@ -64,7 +65,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
     _stepCtrl.forward();
 
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted && _currentStep == 0) _nameFocus.requestFocus();
     });
   }
@@ -81,7 +82,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     HapticFeedback.lightImpact();
     if (_currentStep == 1 && _nameCtrl.text.trim().isEmpty) return;
 
-    if (_currentStep < 5) {
+    if (_currentStep < 7) {
       if (_currentStep == 1) _nameFocus.unfocus();
       _stepCtrl.reverse().then((_) {
         setState(() => _currentStep++);
@@ -149,7 +150,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => const RootShell(),
         transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 1500),
+        transitionDuration: const Duration(milliseconds: 800),
       ),
     );
   }
@@ -166,7 +167,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               Container(decoration: const BoxDecoration(color: Color(0xFF060913))),
               Positioned.fill(
                 child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 1000),
+                  duration: const Duration(milliseconds: 500),
                   opacity: _currentStep == 0 ? 1.0 : 0.6, // Keep it slightly visible on other pages or completely change
                   child: CinematicAuroraWind(
                     child: Image.asset(
@@ -217,15 +218,17 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxHeight),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                if (_currentStep > 0) const SizedBox(height: kToolbarHeight), // Formlar için güvenli üst alan
+                                if (_currentStep > 0) const SizedBox(height: 12), // Tepe boşluğunu daha da kısalttık, yazılar çok yukarda olacak
                                 if (_currentStep == 0) _buildWelcomeStep(),
                                 if (_currentStep == 1) _buildStep0(),
-                                if (_currentStep == 2) _buildStep1(),
-                                if (_currentStep == 3) _buildStep2(),
-                                if (_currentStep == 4) _buildStep3(),
-                                if (_currentStep == 5) _buildStep4(),
+                                if (_currentStep == 2) _buildStepDateWithWheels(),
+                                if (_currentStep == 3) _buildStepTimeWithHourglass(),
+                                if (_currentStep == 4) _buildStep1(),
+                                if (_currentStep == 5) _buildStep2(),
+                                if (_currentStep == 6) _buildStep3(),
+                                if (_currentStep == 7) _buildStep4(),
                                 const SizedBox(height: 100), // Reserve empty space for FAB
                               ],
                             ),
@@ -250,14 +253,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       // Roma Rakamlı Bölüm Belirteci - Aşağıya Taşındı
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(6, (index) {
+                        children: List.generate(8, (index) {
                           final isActive = _currentStep == index;
-                          const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+                          const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
                           
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: AnimatedDefaultTextStyle(
-                              duration: const Duration(milliseconds: 400),
+                              duration: const Duration(milliseconds: 200),
                               style: TextStyle(
                                 color: isActive ? const Color(0xFFD3A29B) : Colors.white.withOpacity(0.2),
                                 fontSize: isActive ? 15 : 13,
@@ -274,8 +277,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       ),
                       const SizedBox(height: 16),
                       _buildNextButton(
-                        title: _currentStep == 5 ? "Yolculuğa Başla" : "Devam Et",
-                        icon: _currentStep == 5 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
+                        title: _currentStep == 7 ? "Yolculuğa Başla" : "Devam Et",
+                        icon: _currentStep == 7 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
                         onTap: _nextStep,
                         glowColor: const Color(0xFFC36E6E), // Splash Screen paletinden yumuşak kırmızımsı/gül kurusu
                       ),
@@ -359,7 +362,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final isSelected = label == currentVal;
     final color = Color(_auraColor);
     return StaggeredFade(
-      delay: Duration(milliseconds: 500 + (index * 150)), // Kademeli animasyon gecikmesi
+      delay: Duration(milliseconds: 150 + (index * 50)), // Kademeli animasyon gecikmesi
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
@@ -415,7 +418,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // --- Helper for inputs ---
   Widget _buildCosmicInput({required Widget child, VoidCallback? onTap, Duration? delay}) {
     return StaggeredFade(
-      delay: delay ?? const Duration(milliseconds: 500),
+      delay: delay ?? const Duration(milliseconds: 200),
       child: GestureDetector(
         onTap: onTap,
         child: ClipRRect(
@@ -465,7 +468,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(color: const Color(0xFFC36E6E).withOpacity(0.12), shape: BoxShape.circle),
-              child: Icon(icon, color: const Color(0xFFD18471), size: 20),
+              child: LoopingPulse(child: Icon(icon, color: const Color(0xFFD18471), size: 20)),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -473,7 +476,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(title.toUpperCase(), style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+                  Text(title, style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
                   const SizedBox(height: 4),
                   child,
                 ],
@@ -499,7 +502,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildWelcomeStep() {
     return Column(
       children: [
-        const SizedBox(height: 16), // Boşluğu minimuma indirdim, çok daha yukarıda başlayacak
         _buildTitle("Kozmik Serüvene\nHoş Geldin"),
         const SizedBox(height: 12),
         _buildSubtitle("Sakinleş, derin bir nefes al ve yıldızların fısıltısına kulak ver... Sen özelsin."),
@@ -564,93 +566,59 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
+
   Widget _buildStep0() {
     return Column(
       children: [
-        _buildTitle("Kozmik Bağ"),
-        _buildSubtitle("Yıldızların senin için ne fısıldadığını duymak adına gökyüzüyle aranda minik bir bağ kuralım..."),
+        _buildTitle("Seni Tanıyalım"),
+        _buildSubtitle("Ruhun için bir isim ve kozmik bir avatar seç."),
         
+        const SizedBox(height: 32),
+        
+        // Avatar seçici
         StaggeredFade(
-          delay: const Duration(milliseconds: 600),
-          child: LoopingFloat(
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04), // Camsı zemin
-                borderRadius: BorderRadius.circular(36),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
-                boxShadow: [
-                  BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.08), blurRadius: 50, spreadRadius: -10),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(36),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: Column(
-                    children: [
-                      _buildUnifiedInputRow(
-                         icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
-                         title: "Ruhun İçin Bir İsim",
-                         child: TextField(
-                             controller: _nameCtrl,
-                             focusNode: _nameFocus,
-                             style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
-                             cursorColor: const Color(0xFFD18471),
-                             textCapitalization: TextCapitalization.words,
-                             decoration: InputDecoration(
-                               border: InputBorder.none,
-                               isDense: true,
-                               contentPadding: EdgeInsets.zero,
-                               hintText: "Örn: Yıldız Tozu",
-                               hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 16),
-                             ),
-                         ),
-                      ),
-                      _buildDivider(),
-                      
-                      _buildUnifiedInputRow(
-                         icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
-                         title: "Dünyaya Gidiş Tarihin",
-                         child: Text(DateFormat('dd MMMM yyyy').format(_selectedDate), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
-                         onTap: () {
-                           _nameFocus.unfocus();
-                           _showDatePicker(context, mode: CupertinoDatePickerMode.date);
-                         },
-                         suffix: Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: const Color(0xFFD18471).withOpacity(0.8), size: 16),
-                      ),
-                      _buildDivider(),
-
-                      _buildUnifiedInputRow(
-                         icon: PhosphorIcons.hourglass(PhosphorIconsStyle.fill),
-                         title: "Doğum Saatin",
-                         child: Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati seçmek için dokun", style: TextStyle(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: 16, fontWeight: FontWeight.w400)),
-                         onTap: () {
-                           _nameFocus.unfocus();
-                           _showDatePicker(context, mode: CupertinoDatePickerMode.time);
-                         },
-                         suffix: _selectedTime != null 
-                            ? GestureDetector(
-                                onTap: () => setState(() => _selectedTime = null),
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
-                                  child: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.8), size: 12),
-                                ),
-                              )
-                            : Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          delay: const Duration(milliseconds: 250),
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildAvatarPicker(0, PhosphorIcons.planet(PhosphorIconsStyle.fill)),
+              _buildAvatarPicker(1, PhosphorIcons.star(PhosphorIconsStyle.fill)),
+              _buildAvatarPicker(2, PhosphorIcons.sparkle(PhosphorIconsStyle.fill)),
+              _buildAvatarPicker(3, PhosphorIcons.moon(PhosphorIconsStyle.fill)),
+              _buildAvatarPicker(4, PhosphorIcons.sun(PhosphorIconsStyle.fill)),
+            ],
           ),
         ),
-        
-        const SizedBox(height: 24),
+
+        const SizedBox(height: 32),
+
+        _buildGlassCard(
+          delay: 400,
+          child: _buildUnifiedInputRow(
+             icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+             title: "RUHUN İÇİN BİR İSİM",
+             child: TextField(
+                 controller: _nameCtrl,
+                 focusNode: _nameFocus,
+                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
+                 cursorColor: const Color(0xFFD18471),
+                 textCapitalization: TextCapitalization.words,
+                 decoration: InputDecoration(
+                   border: InputBorder.none,
+                   isDense: true,
+                   contentPadding: EdgeInsets.zero,
+                   hintText: "Örn: Yıldız Tozu",
+                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                 ),
+             ),
+          ),
+        ),
+
+        const SizedBox(height: 56),
         StaggeredFade(
-          delay: const Duration(milliseconds: 1000),
+          delay: const Duration(milliseconds: 550),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -665,6 +633,172 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         ),
         const SizedBox(height: 24),
       ],
+    );
+  }
+
+  Widget _buildAvatarPicker(int index, IconData icon) {
+    final isSelected = _selectedAvatarIndex == index;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() => _selectedAvatarIndex = index);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isSelected ? const Color(0xFFC36E6E).withOpacity(0.2) : Colors.white.withOpacity(0.04),
+          border: Border.all(color: isSelected ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.1), width: isSelected ? 2 : 1),
+          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.3), blurRadius: 16)] : [],
+        ),
+        child: Center(
+          child: isSelected ? LoopingPulse(child: Icon(icon, color: const Color(0xFFD18471), size: 28)) 
+                            : Icon(icon, color: Colors.white.withOpacity(0.5), size: 24),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepDateWithWheels() {
+    final double targetAngle = (_selectedDate.month - 1) * 30.0 * (math.pi / 180.0);
+    return Column(
+      children: [
+        _buildTitle("Kozmik Koordinat"),
+        _buildSubtitle("Dünyaya geliş tarihin astrolojik haritalarının temelini oluşturur."),
+        const SizedBox(height: 32),
+        StaggeredFade(
+          delay: const Duration(milliseconds: 300),
+          child: Container(
+            height: 200,
+            alignment: Alignment.center,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: targetAngle),
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.elasticOut,
+              builder: (context, angle, child) {
+                return Transform.rotate(
+                  angle: angle,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1, style: BorderStyle.none),
+                          boxShadow: [BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.1), blurRadius: 40)],
+                        ),
+                        child: CustomPaint(painter: _DashedCirclePainter()),
+                      ),
+                      ...List.generate(12, (index) {
+                        final theta = index * 30.0 * (math.pi / 180.0);
+                        return Transform.translate(
+                          offset: Offset(math.cos(theta) * 75, math.sin(theta) * 75),
+                          child: Container(
+                            width: 6, height: 6,
+                            decoration: BoxDecoration(color: index % 3 == 0 ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.4), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white, blurRadius: 4)]),
+                          ),
+                        );
+                      }),
+                      Container(
+                        width: 60, height: 60,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFC36E6E).withOpacity(0.2)),
+                        child: Center(child: Icon(PhosphorIcons.infinity(PhosphorIconsStyle.bold), color: Colors.white, size: 28)),
+                      )
+                    ],
+                  ),
+                );
+              }
+            )
+          )
+        ),
+        const SizedBox(height: 32),
+        _buildGlassCard(
+          delay: 400,
+          child: _buildUnifiedInputRow(
+             icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
+             title: "DÜNYAYA GELİŞ TARİHİN",
+             child: Text(DateFormat('dd MMMM yyyy').format(_selectedDate), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
+             onTap: () {
+               _nameFocus.unfocus();
+               _showDatePicker(context, mode: CupertinoDatePickerMode.date);
+             },
+             suffix: Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: const Color(0xFFD18471).withOpacity(0.8), size: 16),
+          ),
+        ),
+      ]
+    );
+  }
+
+  Widget _buildStepTimeWithHourglass() {
+    return Column(
+      children: [
+        _buildTitle("Zamanın Kumları"),
+        _buildSubtitle("Doğduğun anda zamanın kumları tam olarak hangi frekansta akıyordu?"),
+        const SizedBox(height: 32),
+        StaggeredFade(
+          delay: const Duration(milliseconds: 300),
+          child: Container(
+            height: 160,
+            alignment: Alignment.center,
+            child: const LoopingHourglass(),
+          )
+        ),
+        const SizedBox(height: 32),
+        _buildGlassCard(
+          delay: 400,
+          child: _buildUnifiedInputRow(
+             icon: PhosphorIcons.hourglass(PhosphorIconsStyle.fill),
+             title: "DOĞUM SAATİN",
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: TextStyle(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: 14, fontWeight: FontWeight.w400)),
+               ],
+             ),
+             onTap: () {
+               _nameFocus.unfocus();
+               _showDatePicker(context, mode: CupertinoDatePickerMode.time);
+             },
+             suffix: _selectedTime != null 
+                ? GestureDetector(
+                    onTap: () => setState(() => _selectedTime = null),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
+                      child: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.8), size: 12),
+                    ),
+                  )
+                : Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+          ),
+        ),
+      ]
+    );
+  }
+  Widget _buildGlassCard({required Widget child, required int delay}) {
+    return StaggeredFade(
+      delay: Duration(milliseconds: delay),
+      child: Container(
+        margin: const EdgeInsets.only(top: 24),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08), // Camsı zemin daha belirgin
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.18)), // Dış hatlar daha belirgin
+          boxShadow: [
+            BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.15), blurRadius: 40, spreadRadius: -5),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 
@@ -916,40 +1050,54 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildNextButton({required String title, required IconData icon, required VoidCallback onTap, required Color glowColor}) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 64,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [glowColor, glowColor.withOpacity(0.8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: [
-            BoxShadow(
-              color: glowColor.withOpacity(0.35),
-              blurRadius: 20,
-              spreadRadius: 2,
-              offset: const Offset(0, 6),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.15),
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
+        height: 68,
+        decoration: const BoxDecoration(
+          color: Colors.transparent, // Kutudan kurtulduk, tamamen şeffaf zemin
         ),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                 Text(
+                  title.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 4.5, // Cesur ve açık aralıklı font
+                    shadows: [
+                      Shadow(color: glowColor.withOpacity(0.8), blurRadius: 15),
+                    ]
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Container(
+                   decoration: BoxDecoration(
+                     shape: BoxShape.circle,
+                     boxShadow: [ BoxShadow(color: glowColor.withOpacity(0.6), blurRadius: 20, spreadRadius: 3) ]
+                   ),
+                   child: LoopingPulse(child: Icon(icon, color: Colors.white, size: 24))
+                )
+              ]
             ),
-            const SizedBox(width: 10),
-            Icon(icon, color: Colors.white, size: 24),
-          ],
-        ),
+            const SizedBox(height: 12),
+            // Çizgisel Neon Alt Çizgi
+            Container(
+               width: 160,
+               height: 1,
+               decoration: BoxDecoration(
+                 gradient: LinearGradient(
+                   colors: [Colors.transparent, glowColor, Colors.white, glowColor, Colors.transparent],
+                 ),
+                 boxShadow: [ BoxShadow(color: glowColor, blurRadius: 10, spreadRadius: 1) ]
+               )
+            )
+          ]
+        )
       ),
     );
   }
@@ -1122,3 +1270,80 @@ class _CinematicAuroraWindState extends State<CinematicAuroraWind> with SingleTi
     );
   }
 }
+
+class LoopingPulse extends StatefulWidget {
+  final Widget child;
+  const LoopingPulse({super.key, required this.child});
+  @override
+  State<LoopingPulse> createState() => _LoopingPulseState();
+}
+
+class _LoopingPulseState extends State<LoopingPulse> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
+  late final Animation<double> _scale = Tween<double>(begin: 0.92, end: 1.15).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+  
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(scale: _scale, child: widget.child);
+  }
+}
+
+
+class _DashedCirclePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.2)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+    final double radius = size.width / 2;
+    final center = Offset(radius, radius);
+    for (int i = 0; i < 360; i += 4) {
+      if (i % 8 != 0) {
+        final x1 = center.dx + radius * math.cos(i * math.pi / 180);
+        final y1 = center.dy + radius * math.sin(i * math.pi / 180);
+        final x2 = center.dx + (radius - 4) * math.cos(i * math.pi / 180);
+        final y2 = center.dy + (radius - 4) * math.sin(i * math.pi / 180);
+        canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paint);
+      }
+    }
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class LoopingHourglass extends StatefulWidget {
+  const LoopingHourglass({super.key});
+  @override
+  State<LoopingHourglass> createState() => _LoopingHourglassState();
+}
+class _LoopingHourglassState extends State<LoopingHourglass> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, child) {
+        final v = _ctrl.value;
+        double rotation = 0.0;
+        if (v > 0.8) rotation = math.pi * ((v - 0.8) / 0.2);
+        IconData icon = PhosphorIcons.hourglass(PhosphorIconsStyle.fill);
+        if (v < 0.2) icon = PhosphorIcons.hourglassHigh(PhosphorIconsStyle.fill);
+        else if (v < 0.5) icon = PhosphorIcons.hourglassMedium(PhosphorIconsStyle.fill);
+        else if (v < 0.8) icon = PhosphorIcons.hourglassLow(PhosphorIconsStyle.fill);
+        return Transform.rotate(
+           angle: rotation,
+           child: Container(
+             decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [ BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.2), blurRadius: 40) ]),
+             child: Icon(icon, color: const Color(0xFFD18471), size: 100),
+           )
+        );
+      }
+    );
+  }
+}
+
