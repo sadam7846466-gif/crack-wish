@@ -7,11 +7,13 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
+import '../services/mock_owl_service.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
 import '../widgets/daily_tip_card.dart';
 import '../widgets/bento_grid.dart';
+import '../widgets/cosmic_badge.dart';
 import '../widgets/quote_banner.dart';
 import '../widgets/daily_horoscope_card.dart';
 import '../widgets/bottom_nav.dart';
@@ -68,6 +70,7 @@ class _HomePageState extends State<HomePage> {
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
     _loadUserName();
+    MockOwlService().addListener(_onMockOwlUpdate);
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -80,6 +83,16 @@ class _HomePageState extends State<HomePage> {
     if (mounted) {
       setState(() => _userName = name);
     }
+  }
+
+  void _onMockOwlUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    MockOwlService().removeListener(_onMockOwlUpdate);
+    super.dispose();
   }
 
   Future<void> _checkMilestones() async {
@@ -446,6 +459,8 @@ class _HomePageState extends State<HomePage> {
     final isTr = l10n.localeName == 'tr';
     final hour = DateTime.now().hour;
     
+    final int totalUnread = _unreadOwlCount + MockOwlService().pendingRequestCount + MockOwlService().unreadLetterCount;
+    
     String greeting;
     String timeSubtitle;
     IconData timeIcon;
@@ -609,38 +624,17 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          Center(child: Image.asset('assets/images/owl.webp', width: 52, height: 52)),
+                          Center(child: Image.asset('assets/images/owl.png', width: 52, height: 52)),
                         ],
                       ),
                     ),
                   ),
                   // Okunmamış mektup badge'i
-                  if (_unreadOwlCount > 0)
-                    Positioned(
-                      right: -4,
-                      top: -4,
-                      child: Container(
-                        width: 18,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFFCC3333),
-                          border: Border.all(
-                            color: const Color(0xFFF5F0EB),
-                            width: 2,
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            _unreadOwlCount > 9 ? '9+' : '$_unreadOwlCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
+                  if (totalUnread > 0)
+                    const Positioned(
+                      right: 0,
+                      top: 0,
+                      child: CosmicBadge(),
                     ),
                 ],
               ),

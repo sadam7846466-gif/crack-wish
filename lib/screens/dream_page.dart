@@ -1703,6 +1703,7 @@ class _DreamPageState extends State<DreamPage>
     // Standart Rüyalar artık analiz geçmişine kaydedilmiyor (Sadece Premium kaydedilecek)
     await _consumeDreamAllowance();
     await StorageService.setDreamDoneToday();
+    await StorageService.addPendingAura('ruya', 1); // Rüya analizini başardığı için Aura ver
 
     if (mounted) {
       setState(() {

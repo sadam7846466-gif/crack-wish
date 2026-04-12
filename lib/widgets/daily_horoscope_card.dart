@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
-import '../screens/zodiac_page.dart';
-import '../screens/zodiac_chinese_page.dart';
-import '../screens/zodiac_mayan_page.dart';
+import '../screens/zodiac_hub_page.dart';
 import '../widgets/fade_page_route.dart';
 
 class DailyHoroscopeCard extends StatefulWidget {
@@ -48,18 +46,11 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
   }
 
   void _navigateToDetailPage() {
-    Widget page;
-    if (_activeIndex == 0) {
-      page = const ZodiacPage();
-    } else if (_activeIndex == 1) {
-      page = const ZodiacChinesePage();
-    } else {
-      page = const ZodiacMayanPage();
-    }
-    
     Navigator.push(
       context,
-      SwipeFadePageRoute(page: page),
+      SwipeFadePageRoute(
+        page: ZodiacHubPage(autoOpenIndex: _activeIndex),
+      ),
     );
   }
 
@@ -198,14 +189,18 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: AppColors.primaryOrange.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.primaryOrange.withOpacity(0.35),
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             children: [
-                              Text(isTr ? 'Keşfet' : 'Explore', style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+                              Text(isTr ? 'Keşfet' : 'Explore', style: const TextStyle(color: AppColors.primaryOrange, fontSize: 11, fontWeight: FontWeight.w700)),
                               const SizedBox(width: 4),
-                              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 10),
+                              const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primaryOrange, size: 10),
                             ],
                           ),
                         ),

@@ -235,7 +235,7 @@ class _CookieSectionState extends State<CookieSection>
 
   // Ses efektlerini çal
   Future<void> _playSound(String soundFile) async {
-    // Şimdilik tüm sesler kapalı
+    // Kurabiye kırma sesi istendiğinde kaldırıldı, tamamen sessiz + haptic çalışır
     return;
   }
 
@@ -402,6 +402,10 @@ class _CookieSectionState extends State<CookieSection>
     // ── Günlük limit kontrolü (Herkes için 3/gün) ──
     final cracksUsed = await StorageService.getCookieCracksToday();
 
+    // Premium test modunu gerçek zamanlı oku (Profilde kapatılmış olabilir)
+    final prefs = await SharedPreferences.getInstance();
+    _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+
     // Limit doldu (hem ücretsiz hem premium için)
     if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
       HapticFeedback.heavyImpact();
@@ -459,10 +463,8 @@ class _CookieSectionState extends State<CookieSection>
 
     setState(() => _isCracking = true);
     _crackController.forward(from: 0);
+    _playSound('cookie_crack.mp3'); // Animasyon tetiklendiği an sıfır gecikmeyle çalıyor
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _playSound('cookie_crack.mp3');
-    });
     Future.delayed(const Duration(milliseconds: 400), () {
       _playSound('cookie_sparkle.mp3');
     });

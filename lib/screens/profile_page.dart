@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
@@ -21,6 +22,8 @@ import 'onboarding_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
+import '../widgets/cosmic_badge.dart';
+import '../services/mock_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
 
@@ -45,6 +48,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Gerçek kullanıcı verileri ──
   String _userName = '';
   String _userAvatar = 'assets/images/owl.webp';
+  int _unreadOwlCount = 0;
   int _totalCookies = 0;
   int _totalTarots = 0;
   int _totalDreams = 0;
@@ -58,6 +62,17 @@ class ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     loadUserData();
+    MockOwlService().addListener(_onMockOwlUpdate);
+  }
+
+  void _onMockOwlUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    MockOwlService().removeListener(_onMockOwlUpdate);
+    super.dispose();
   }
 
   Future<void> loadUserData() async {
@@ -69,6 +84,7 @@ class ProfilePageState extends State<ProfilePage> {
     
     final spentAura = await StorageService.getSpentAura();
     final tarotCount = await UserStatsService.getTotalTarotReadings();
+    final unreadOwl = await StorageService.getUnreadOwlLetterCount();
     if (!mounted) return;
     setState(() {
       _userName = (snapshot['userName'] as String?) ?? '';
@@ -79,6 +95,7 @@ class ProfilePageState extends State<ProfilePage> {
       _bonusAura = bonusAura;
       _streakDays = streak;
       _userAvatar = avatar;
+      _unreadOwlCount = unreadOwl;
       _isLoading = false;
       _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
     });
@@ -117,7 +134,7 @@ class ProfilePageState extends State<ProfilePage> {
     String selectedAvatar = _userAvatar;
 
     final avatars = [
-      'assets/images/owl.webp',
+      'assets/images/owl.png',
     ];
 
     showModalBottomSheet(
@@ -137,16 +154,9 @@ class ProfilePageState extends State<ProfilePage> {
                   filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFF16151A).withOpacity(0.85),
-                          const Color(0xFF0D0C11).withOpacity(0.95),
-                        ],
-                      ),
+                      color: Colors.white.withOpacity(0.12),
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
-                      border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
                     ),
                     padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
                     child: Column(
@@ -240,15 +250,20 @@ class ProfilePageState extends State<ProfilePage> {
                                   child: ClipOval(
                                     child: Padding(
                                       padding: EdgeInsets.all(
-                                        (avatar.contains('cookies') || avatar.contains('owl'))
-                                            ? (isSelected ? 16.0 : 20.0)
-                                            : 0.0,
+                                        avatar.contains('owl')
+                                            ? (isSelected ? 2.0 : 6.0)
+                                            : avatar.contains('cookies')
+                                                ? (isSelected ? 16.0 : 20.0)
+                                                : 0.0,
                                       ),
-                                      child: Image.asset(
-                                        avatar,
-                                        fit: (avatar.contains('cookies') || avatar.contains('owl'))
-                                            ? BoxFit.contain
-                                            : BoxFit.cover,
+                                      child: Transform.scale(
+                                        scale: avatar.contains('owl') ? 1.35 : 1.0,
+                                        child: Image.asset(
+                                          avatar,
+                                          fit: (avatar.contains('cookies') || avatar.contains('owl'))
+                                              ? BoxFit.contain
+                                              : BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -257,18 +272,48 @@ class ProfilePageState extends State<ProfilePage> {
                             },
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 24),
+                        
+                        // İsim Düzenleme Alanı
+                        Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.04),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          ),
+                          child: TextField(
+                            controller: controller,
+                            style: const TextStyle(color: Colors.white, fontSize: 16),
+                            cursorColor: AppColors.primaryOrange,
+                            decoration: InputDecoration(
+                              hintText: lang == 'tr' ? 'Kozmik Adın' : 'Cosmic Name',
+                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                              prefixIcon: Icon(Icons.person_outline_rounded, color: Colors.white.withOpacity(0.4)),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                         
                         // Kaydet Butonu
                         GestureDetector(
                           onTap: () async {
                             HapticFeedback.mediumImpact();
                             
+                            final newName = controller.text.trim();
+                            if (newName.isNotEmpty) {
+                              await StorageService.setUserName(newName);
+                            }
                             await StorageService.setAvatar(selectedAvatar);
 
                             if (mounted) {
                               setState(() {
                                 _userAvatar = selectedAvatar;
+                                if (newName.isNotEmpty) {
+                                  _userName = newName;
+                                }
                               });
                             }
                             if (ctx.mounted) Navigator.pop(ctx);
@@ -307,6 +352,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -1190,6 +1236,7 @@ info@crackandwish.com''',
                         // ── 3. PREMİUM BANNER ──
                         _BentoPremiumBanner(
                           lang: lang,
+                          isPremium: _isPremiumUser,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -1245,6 +1292,7 @@ info@crackandwish.com''',
                                 icon: Icons.local_post_office_rounded,
                                 iconColor: const Color(0xFFD4AF37), // Altın rengi Baykuş Postası
                                 label: lang == 'tr' ? 'Baykuş Postası' : 'Owl Mail',
+                                hasBadge: _unreadOwlCount > 0 || MockOwlService().pendingRequestCount > 0 || MockOwlService().unreadLetterCount > 0,
                                 onTap: () {
                                   // TODO: Arkadaş Ekle / Kurabiye Gönder modalı eklenecek
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1385,6 +1433,40 @@ info@crackandwish.com''',
                                 label: 'Onboarding Test',
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OnboardingPage()));
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _BentoActionTile(
+                                icon: Icons.local_fire_department_rounded,
+                                iconColor: const Color(0xFFFF6B6B),
+                                label: 'Seri (Ateş) Ekle',
+                                onTap: () async {
+                                  final prefs = await SharedPreferences.getInstance();
+                                  final now = DateTime.now();
+                                  final days = prefs.getStringList('app_open_days') ?? [];
+                                  final claimed = prefs.getStringList('claimed_aura_days') ?? [];
+                                  
+                                  // Geçmiş 5 gün ekle ve claim durumlarını sıfırla:
+                                  for (int i = 1; i <= 5; i++) {
+                                    final d = now.subtract(Duration(days: i));
+                                    final key = "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+                                    if (!days.contains(key)) {
+                                      days.add(key);
+                                    }
+                                    claimed.remove(key); // Test için toplanmamış hale getir
+                                  }
+                                  
+                                  await prefs.setStringList('app_open_days', days);
+                                  await prefs.setStringList('claimed_aura_days', claimed);
+                                  await prefs.setInt('app_streak_days', 7); // Seri sayısını da 7 yapalım ki profilde görünsün
+                                  
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Geçmiş 5 gün test için eklendi! Yenilemek için Profil sayfasına tekrar tıklayın.")),
+                                    );
+                                  }
                                 },
                               ),
                             ),
@@ -1589,13 +1671,20 @@ class _BentoHeroCard extends StatelessWidget {
                           child: ClipOval(
                             child: Padding(
                               padding: EdgeInsets.all(
-                                (userAvatar.contains('cookies') || userAvatar.contains('owl')) ? 22.0 : 0.0,
+                                userAvatar.contains('owl')
+                                    ? 4.0 // Baykuş avatarı pofuduk olduğu için paddingi sıfıra yaklaştırdım
+                                    : userAvatar.contains('cookies')
+                                        ? 22.0
+                                        : 0.0,
                               ),
-                              child: Image.asset(
-                                userAvatar,
-                                fit: (userAvatar.contains('cookies') || userAvatar.contains('owl'))
-                                    ? BoxFit.contain
-                                    : BoxFit.cover,
+                              child: Transform.scale(
+                                scale: userAvatar.contains('owl') ? 1.35 : 1.0,
+                                child: Image.asset(
+                                  userAvatar,
+                                  fit: (userAvatar.contains('cookies') || userAvatar.contains('owl'))
+                                      ? BoxFit.contain
+                                      : BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
@@ -1647,12 +1736,28 @@ class _BentoHeroCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FutureBuilder<Set<String>>(
-                      future: StorageService.getClaimedAuraSources(),
+                    FutureBuilder<List<dynamic>>(
+                      future: Future.wait([
+                        StorageService.getClaimedAuraSources(),
+                        StorageService.getPendingAura('fal'),
+                        StorageService.getPendingAura('kurabiye'),
+                        StorageService.getPendingAura('ruya'),
+                        StorageService.getPendingAura('baykus'),
+                      ]),
                       builder: (context, snapshot) {
-                        final claimed = snapshot.data ?? {};
-                        final allSources = {'ruya', 'fal', 'kurabiye', 'baykus'};
-                        final hasUnclaimed = !allSources.every((s) => claimed.contains(s));
+                        bool hasUnclaimed = false;
+                        if (snapshot.hasData) {
+                          final claimed = snapshot.data![0] as Set<String>;
+                          final pendingFal = snapshot.data![1] as int;
+                          final pendingCookie = snapshot.data![2] as int;
+                          final pendingDream = snapshot.data![3] as int;
+                          final pendingOwl = snapshot.data![4] as int;
+                          // Nokta sadece gerçekten toplanacak Aura varsa yansın
+                          hasUnclaimed = (!claimed.contains('fal') && pendingFal > 0) ||
+                              (!claimed.contains('kurabiye') && pendingCookie > 0) ||
+                              (!claimed.contains('ruya') && pendingDream > 0) ||
+                              (!claimed.contains('baykus') && pendingOwl > 0);
+                        }
                         return _GlassBadge(
                           imagePath: 'assets/images/aura_core.png',
                           label: "$formattedAura Aura",
@@ -1798,6 +1903,7 @@ class _BentoHeroCard extends StatelessWidget {
     int pendingKurabiye = 0;
     int pendingRuya = 0;
     int pendingBaykus = 0;
+    int pendingZodiac = 0;
     
     int collectedBonus = 0;
     bool sourcesLoaded = false;
@@ -1831,12 +1937,14 @@ class _BentoHeroCard extends StatelessWidget {
                 StorageService.getPendingAura('kurabiye'),
                 StorageService.getPendingAura('ruya'),
                 StorageService.getPendingAura('baykus'),
+                StorageService.getPendingAura('zodiac'),
               ]).then((results) {
                 setModalState(() {
                   pendingFal = results[0];
                   pendingKurabiye = results[1];
                   pendingRuya = results[2];
                   pendingBaykus = results[3];
+                  pendingZodiac = results[4];
                 });
               });
             }
@@ -2050,8 +2158,8 @@ class _BentoHeroCard extends StatelessWidget {
                                 StorageService.clearPendingAura('ruya');
                                 StorageService.addBonusAura(pts);
                                 onAuraClaimed?.call();
-                              }),
-                              _buildAuraSource(Icons.auto_awesome, "Fal", pendingFal, () {
+                              }, color: const Color(0xFF5A8BFF)),
+                              _buildAuraSource(Icons.amp_stories_rounded, "Tarot", pendingFal, () {
                                 if (pendingFal == 0) return;
                                 HapticFeedback.heavyImpact();
                                 final pts = pendingFal;
@@ -2063,7 +2171,20 @@ class _BentoHeroCard extends StatelessWidget {
                                 StorageService.clearPendingAura('fal');
                                 StorageService.addBonusAura(pts);
                                 onAuraClaimed?.call();
-                              }),
+                              }, color: const Color(0xFFC084FC)),
+                              _buildAuraSource(Icons.data_usage_rounded, "Burç", pendingZodiac, () {
+                                if (pendingZodiac == 0) return;
+                                HapticFeedback.heavyImpact();
+                                final pts = pendingZodiac;
+                                setModalState(() {
+                                  pendingZodiac = 0;
+                                  collectedBonus += pts;
+                                  modalAuraTotal += pts;
+                                });
+                                StorageService.clearPendingAura('zodiac');
+                                StorageService.addBonusAura(pts);
+                                onAuraClaimed?.call();
+                              }, color: const Color(0xFFFFD700)),
                               _buildAuraSource(Icons.cookie, "Kurabiye", pendingKurabiye, () {
                                 if (pendingKurabiye == 0) return;
                                 HapticFeedback.heavyImpact();
@@ -2076,7 +2197,7 @@ class _BentoHeroCard extends StatelessWidget {
                                 StorageService.clearPendingAura('kurabiye');
                                 StorageService.addBonusAura(pts);
                                 onAuraClaimed?.call();
-                              }),
+                              }, color: const Color(0xFFFFD166), imagePath: 'assets/icons/splash_cookie.png'),
                               _buildAuraSource(Icons.mail_rounded, "Baykuş", pendingBaykus, () {
                                 if (pendingBaykus == 0) return;
                                 HapticFeedback.heavyImpact();
@@ -2089,10 +2210,10 @@ class _BentoHeroCard extends StatelessWidget {
                                 StorageService.clearPendingAura('baykus');
                                 StorageService.addBonusAura(pts);
                                 onAuraClaimed?.call();
-                              }),
+                              }, color: const Color(0xFF4EE6C5)),
                               _buildAuraSource(Icons.diamond_rounded, "Ruh Taşı", 0, () {
                                 HapticFeedback.selectionClick();
-                              }, color: const Color(0xFFFFD700)),
+                              }, color: const Color(0xFF22D3EE)),
                             ],
                           ),
                         ),
@@ -2714,7 +2835,7 @@ class _BentoHeroCard extends StatelessWidget {
     if (onRefresh != null) onRefresh!();
   }
 
-  Widget _buildAuraSource(IconData icon, String title, int unclaimedAura, VoidCallback onTap, {Color color = const Color(0xFF4EE6C5)}) {
+  Widget _buildAuraSource(IconData icon, String title, int unclaimedAura, VoidCallback onTap, {Color color = const Color(0xFF4EE6C5), String? imagePath, String? emoji}) {
     bool hasAura = unclaimedAura > 0;
     return GestureDetector(
       onTap: onTap,
@@ -2733,7 +2854,24 @@ class _BentoHeroCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: hasAura ? color : Colors.white.withOpacity(0.2), size: 16),
+                if (emoji != null)
+                  Text(emoji, style: const TextStyle(fontSize: 18))
+                else if (imagePath != null)
+                  Transform.translate(
+                    offset: const Offset(0, 1.5), // Görselin içindeki boşluktan kaynaklı yukarı kaymayı düzeltmek için
+                    child: Transform.scale(
+                      scale: 1.4, // PNG'nin iç boşluğundan dolayı küçük görünmesini telafi etmek için büyütme
+                      child: Image.asset(
+                        imagePath, 
+                        width: 16, 
+                        height: 16,
+                        color: hasAura ? color : Colors.white.withOpacity(0.2),
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                    ),
+                  )
+                else
+                  Icon(icon, color: hasAura ? color : Colors.white.withOpacity(0.2), size: 16),
                 const SizedBox(height: 4),
                 Text(title, style: TextStyle(color: hasAura ? color.withOpacity(0.8) : Colors.white.withOpacity(0.3), fontSize: 9)),
                 const SizedBox(height: 2),
@@ -2849,25 +2987,10 @@ class _GlassBadge extends StatelessWidget {
           ),
           // Bildirim noktası (toplanacak kaynak varsa)
           if (hasNotification)
-            Positioned(
-              top: -3,
-              right: -3,
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF0D0C11), width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF10B981).withOpacity(0.5),
-                      blurRadius: 6,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-              ),
+            const Positioned(
+              top: -2,
+              right: 0,
+              child: CosmicBadge(), // Ortak Zümrüt Yeşili rozet!
             ),
         ],
       ),
@@ -3052,6 +3175,7 @@ class _BentoActionTile extends StatefulWidget {
   final String? subtitle;
   final VoidCallback onTap;
   final bool compact;
+  final bool hasBadge;
 
   const _BentoActionTile({
     required this.icon,
@@ -3060,6 +3184,7 @@ class _BentoActionTile extends StatefulWidget {
     required this.onTap,
     this.subtitle,
     this.compact = false,
+    this.hasBadge = false,
   });
 
   @override
@@ -3118,8 +3243,18 @@ class _BentoActionTileState extends State<_BentoActionTile> {
                             color: widget.iconColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Center(
-                            child: Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 16),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            clipBehavior: Clip.none,
+                            children: [
+                              Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 16),
+                              if (widget.hasBadge)
+                                const Positioned(
+                                  top: -2,
+                                  right: 0,
+                                  child: CosmicBadge(), // Nokta formatında cosmic badge
+                                ),
+                            ],
                           ),
                         ),
                         const Spacer(),
@@ -3152,8 +3287,18 @@ class _BentoActionTileState extends State<_BentoActionTile> {
                               width: 0.5,
                             ),
                           ),
-                          child: Center(
-                            child: Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 18),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            clipBehavior: Clip.none,
+                            children: [
+                              Icon(widget.icon, color: widget.iconColor.withValues(alpha: 0.85), size: 18),
+                              if (widget.hasBadge)
+                                const Positioned(
+                                  top: -2,
+                                  right: 0,
+                                  child: CosmicBadge(), // Orijinal noktalardan şaşmıyoruz ama standart
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -3201,10 +3346,12 @@ class _BentoActionTileState extends State<_BentoActionTile> {
 
 class _BentoPremiumBanner extends StatefulWidget {
   final String lang;
+  final bool isPremium;
   final VoidCallback onTap;
 
   const _BentoPremiumBanner({
     required this.lang,
+    required this.isPremium,
     required this.onTap,
   });
 
@@ -3235,15 +3382,23 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFFD4A574).withOpacity(0.25),
-                    const Color(0xFFFFD166).withOpacity(0.10),
-                    const Color(0xFFFF9A5C).withOpacity(0.08),
-                  ],
+                  colors: widget.isPremium
+                      ? [
+                          const Color(0xFF22D3EE).withOpacity(0.25),
+                          const Color(0xFF14B8A6).withOpacity(0.10),
+                          const Color(0xFF0EA5E9).withOpacity(0.08),
+                        ]
+                      : [
+                          const Color(0xFFD4A574).withOpacity(0.25),
+                          const Color(0xFFFFD166).withOpacity(0.10),
+                          const Color(0xFFFF9A5C).withOpacity(0.08),
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFFD4A574).withOpacity(0.2),
+                  color: widget.isPremium
+                      ? const Color(0xFF22D3EE).withOpacity(0.2)
+                      : const Color(0xFFD4A574).withOpacity(0.2),
                   width: 0.5,
                 ),
               ),
@@ -3253,21 +3408,25 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFD4A574), Color(0xFFB8956A)],
+                      gradient: LinearGradient(
+                        colors: widget.isPremium
+                            ? [const Color(0xFF22D3EE), const Color(0xFF0EA5E9)]
+                            : [const Color(0xFFD4A574), const Color(0xFFB8956A)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFD4A574).withOpacity(0.3),
+                          color: widget.isPremium
+                              ? const Color(0xFF22D3EE).withOpacity(0.3)
+                              : const Color(0xFFD4A574).withOpacity(0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Icon(
-                        Icons.workspace_premium_rounded,
+                        widget.isPremium ? Icons.diamond_rounded : Icons.workspace_premium_rounded,
                         color: Colors.white,
                         size: 22,
                       ),
@@ -3279,9 +3438,11 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium',
-                          style: const TextStyle(
-                            color: Color(0xFFD4A574),
+                          widget.isPremium
+                              ? (widget.lang == 'tr' ? 'Elite Büyücüsün' : 'You are Elite')
+                              : (widget.lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium'),
+                          style: TextStyle(
+                            color: widget.isPremium ? const Color(0xFF22D3EE) : const Color(0xFFD4A574),
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.3,
@@ -3289,9 +3450,9 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          widget.lang == 'tr'
-                              ? 'Sınırsız kurabiye ve özel özellikler'
-                              : 'Unlimited cookies and exclusive features',
+                          widget.isPremium
+                              ? (widget.lang == 'tr' ? 'Mistk kapılar emrinde' : 'Mystical gates await')
+                              : (widget.lang == 'tr' ? 'Sınırsız kurabiye ve özel özellikler' : 'Unlimited cookies and exclusive features'),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.45),
                             fontSize: 11,
@@ -3301,11 +3462,21 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: const Color(0xFFD4A574).withOpacity(0.5),
-                    size: 16,
-                  ),
+                  if (!widget.isPremium)
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: const Color(0xFFD4A574).withOpacity(0.5),
+                      size: 16,
+                    ),
+                  if (widget.isPremium)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF22D3EE).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text('Aktif', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
                 ],
               ),
             ),
@@ -3912,57 +4083,74 @@ class _ClaimableFireCell extends StatefulWidget {
 }
 
 class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProviderStateMixin {
-  late AnimationController _bounceController;
+  late AnimationController _explosionController;
   late AnimationController _flyController;
   late Animation<double> _scaleAnim;
+  late Animation<double> _glowAnim;
   late Animation<double> _flyUpAnim;
   late Animation<double> _flyFadeAnim;
+  final AudioPlayer _audioPlayer = AudioPlayer();
   bool _justClaimed = false;
 
   @override
   void initState() {
     super.initState();
-    _bounceController = AnimationController(
+    _explosionController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
     );
+    
+    // Aniden 2.5 katına fırlayıp geri oturma
     _scaleAnim = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.6), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 0.6, end: 1.15), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 30),
-    ]).animate(CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut));
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.8).chain(CurveTween(curve: Curves.easeOutBack)), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.8, end: 1.0).chain(CurveTween(curve: Curves.easeIn)), weight: 50),
+    ]).animate(_explosionController);
+
+    // Altın sarısı glow
+    _glowAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 0.0, end: 1.0), weight: 30),
+      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 40),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.0), weight: 30),
+    ]).animate(_explosionController);
 
     _flyController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 900),
     );
-    _flyUpAnim = Tween<double>(begin: 0, end: -40).animate(
+    
+    // "+1" yazısı için yüksek uçuş
+    _flyUpAnim = Tween<double>(begin: 0, end: -60).animate(
       CurvedAnimation(parent: _flyController, curve: Curves.easeOutCubic),
     );
     _flyFadeAnim = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _flyController, curve: const Interval(0.3, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _flyController, curve: const Interval(0.4, 1.0, curve: Curves.easeOut)),
     );
   }
 
   @override
   void dispose() {
-    _bounceController.dispose();
+    _explosionController.dispose();
     _flyController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
   Future<void> _handleTap() async {
     if (!widget.isAppOpenDay || widget.isClaimed || widget.isFuture || _justClaimed) return;
 
-    // Bounce efekti
-    _bounceController.forward(from: 0);
-    HapticFeedback.mediumImpact();
+    // Tok bir titreşim ve güçlü etki
+    HapticFeedback.heavyImpact();
+
+    // Yeni indirdiğimiz Level Up sesi (Versiyon 01)
+    try {
+      await _audioPlayer.play(AssetSource('sounds/level_up_bonus_01.mp3'), mode: PlayerMode.lowLatency);
+    } catch (_) {}
 
     final success = await StorageService.claimDailyAura(widget.dateKey);
     if (success && mounted) {
       setState(() => _justClaimed = true);
       
-      // Uçuş animasyonu
+      _explosionController.forward(from: 0);
       _flyController.forward(from: 0);
       
       widget.onClaimed?.call();
@@ -3976,15 +4164,16 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
 
     return GestureDetector(
       onTap: canClaim ? _handleTap : null,
+      behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
-        animation: Listenable.merge([_bounceController, _flyController]),
+        animation: Listenable.merge([_explosionController, _flyController]),
         builder: (context, child) {
           return Stack(
             clipBehavior: Clip.none,
             children: [
-              // Ana hücre
+              // Ana hücre (Pop efekti ile)
               Transform.scale(
-                scale: _bounceController.isAnimating ? _scaleAnim.value : 1.0,
+                scale: _explosionController.isAnimating ? _scaleAnim.value : 1.0,
                 child: Container(
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -3993,13 +4182,21 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                       ? const Color(0xFFFF6B6B).withOpacity(0.15) 
                       : (widget.isAppOpenDay && !claimed ? const Color(0xFFFF6B6B).withOpacity(0.08) : Colors.transparent),
                     border: widget.isToday ? Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.5), width: 1) : null,
+                    boxShadow: [
+                      if (_explosionController.isAnimating)
+                        BoxShadow(
+                          color: const Color(0xFFFFC107).withOpacity(_glowAnim.value * 0.6),
+                          blurRadius: 15,
+                          spreadRadius: 5,
+                        ),
+                    ],
                   ),
                   child: Center(
                     child: widget.isAppOpenDay
                       ? Icon(
                           Icons.local_fire_department_rounded, 
                           color: claimed 
-                            ? Colors.white.withOpacity(0.15)
+                            ? (_explosionController.isAnimating ? const Color(0xFFFFC107) : Colors.white.withOpacity(0.15))
                             : const Color(0xFFFF6B6B),
                           size: 18,
                         )
@@ -4013,36 +4210,25 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                   ),
                 ),
               ),
-              // Uçan ateş efekti
+              // Uçan "+1 Aura" yazısı
               if (_justClaimed && _flyController.isAnimating)
                 Positioned(
-                  left: 0,
-                  right: 0,
-                  top: _flyUpAnim.value,
+                  left: -20,
+                  right: -20, // Ortalamak için
+                  top: _flyUpAnim.value - 10,
                   child: Opacity(
                     opacity: _flyFadeAnim.value,
-                    child: const Center(
-                      child: Icon(
-                        Icons.local_fire_department_rounded, 
-                        color: Color(0xFFFF6B6B), 
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-              // Parıltı efekti
-              if (_justClaimed && _flyController.isAnimating)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: _flyUpAnim.value - 4,
-                  child: Opacity(
-                    opacity: _flyFadeAnim.value * 0.6,
-                    child: const Center(
-                      child: Icon(
-                        Icons.auto_awesome, 
-                        color: Color(0xFFFFC107), 
-                        size: 12,
+                    child: Center(
+                      child: Text(
+                        "+1",
+                        style: const TextStyle(
+                          color: Color(0xFFFFC107), 
+                          fontSize: 22, 
+                          fontWeight: FontWeight.w900,
+                          shadows: [
+                            Shadow(color: Color(0x88FF6B6B), blurRadius: 10)
+                          ]
+                        ),
                       ),
                     ),
                   ),

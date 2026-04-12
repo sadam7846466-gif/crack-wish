@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'root_shell.dart';
+import 'onboarding_page.dart';
 import '../services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -43,13 +44,12 @@ class _SplashScreenState extends State<SplashScreen>
     _ctrl.addStatusListener((status) async {
       if (status == AnimationStatus.completed && !_navigating) {
         _navigating = true;
-        await StorageService.hasSeenWelcome();
+        final seenWelcome = await StorageService.hasSeenWelcome();
         if (!mounted) return;
         
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            // DEV MODE: Her seferinde onboarding göster
-            pageBuilder: (_, __, ___) => const OnboardingPage(),
+            pageBuilder: (_, __, ___) => seenWelcome ? const RootShell() : OnboardingPage(),
             transitionsBuilder: (_, a, __, child) => child,
             transitionDuration: Duration.zero,
           ),

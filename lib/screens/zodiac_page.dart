@@ -712,7 +712,7 @@ class _ZodiacPageState extends State<ZodiacPage>
     if (mounted) {
       setState(() {
         _userName = name;
-        _userAvatar = avatar ?? 'assets/images/owl.webp';
+        _userAvatar = avatar ?? 'assets/images/owl.png';
         _traitBoosts = boosts;
         if (savedDate != null) {
           _birthDate = savedDate;

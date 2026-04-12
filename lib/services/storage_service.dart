@@ -89,8 +89,9 @@ class StorageService {
     }
     final today = DateTime.now().toIso8601String().split('T')[0];
     final lastDate = prefs.getString(_keyDailyEliteSoulDate) ?? '';
-    if (lastDate != today) {
-      // Yeni gün: Günlük taşları TAM 5'e sıfırla (ne olursa olsun)
+    final currentDaily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
+    if (lastDate != today || currentDaily == 0) {
+      // Yeni gün VEYA Elite'e yeni geçmiş (aynı gün ama taş 0)
       await prefs.setInt(_keyDailyEliteSoulStones, 5);
       await prefs.setString(_keyDailyEliteSoulDate, today);
     }
@@ -527,9 +528,9 @@ class StorageService {
   }
 
   // ── GÜNLÜK BAYKUŞ MEKTUBU HAKKI SİSTEMİ ──
-  // Free: 3 hak/gün (1 ücretsiz + 2 reklam izleyerek)
-  // Premium: 3 hak/gün (reklamsız)
-  static const int kMaxDailyLetters = 3;
+  // Free: 5 hak/gün (1 ücretsiz + 4 reklam izleyerek)
+  // Premium: 5 hak/gün (reklamsız)
+  static const int kMaxDailyLetters = 5;
   static const String _keyLettersSentToday = 'letters_sent_today';
   static const String _keyLettersSentDate = 'letters_sent_date';
 
