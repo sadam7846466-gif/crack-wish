@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
         
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => seenWelcome ? const RootShell() : OnboardingPage(),
+            pageBuilder: (_, __, ___) => OnboardingPage(), // Geçici olarak zorunlu yönlendirme: seenWelcome ? const RootShell() : OnboardingPage(),
             transitionsBuilder: (_, a, __, child) => child,
             transitionDuration: Duration.zero,
           ),

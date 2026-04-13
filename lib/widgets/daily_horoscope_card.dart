@@ -49,7 +49,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
     Navigator.push(
       context,
       SwipeFadePageRoute(
-        page: ZodiacHubPage(autoOpenIndex: _activeIndex),
+        page: const ZodiacHubPage(),
       ),
     );
   }
