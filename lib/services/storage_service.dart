@@ -1007,7 +1007,10 @@ class StorageService {
       final Map<String, CookieCard> map = {for (final c in base) c.id: c};
       for (final c in stored) {
         if (validIds.contains(c.id)) {
-          map[c.id] = c;
+          // Geliştirme sürecindeki test verilerini (x33 vb.) sıfırlamak için countObtained değerini 1'e çekiyoruz. 
+          // Hediye/ödül sistemi gelene kadar normal yolla kırılan kurabiyeler sadece "unlock" (kilidi açılmış) olarak 1 tane sayılmalı.
+          final safeCount = c.countObtained > 1 ? 1 : c.countObtained;
+          map[c.id] = c.copyWith(countObtained: safeCount);
         }
       }
       return map.values.toList();
@@ -1024,11 +1027,19 @@ class StorageService {
     );
   }
 
-  static Future<void> incrementCookieCard(String id) async {
+  static Future<void> incrementCookieCard(String id, {bool isRewardOrGift = false}) async {
     final cards = await getCookieCollection();
     final updated = cards.map((c) {
       if (c.id != id) return c;
-      final newCount = c.countObtained + 1;
+      
+      int newCount = c.countObtained;
+      if (newCount == 0) {
+        newCount = 1; // İlk kez kırıldığında koleksiyona (envantere) katılır.
+      } else if (isRewardOrGift) {
+        newCount++; // Eğer özel bir ödül veya hediye ise stok birikir (x2, x3...).
+      }
+      // Gündelik aynı hediye kurabiyeyi şansına denediğinde yeni kurabiye kırmadığı için sayısı artmaz.
+
       return c.copyWith(
         countObtained: newCount,
         firstObtainedDate: c.firstObtainedDate ?? DateTime.now(),

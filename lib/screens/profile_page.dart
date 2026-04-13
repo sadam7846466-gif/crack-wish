@@ -671,6 +671,330 @@ info@crackandwish.com''',
     );
   }
 
+  // ── Davet Et & Kazan Sistemi Modalı ──
+  void _showInviteModal() {
+    final lang = Localizations.localeOf(context).languageCode;
+    HapticFeedback.heavyImpact();
+    
+    // Geçici sahte kod üretimi (ileride Supabase'den gerçek kod çekilecek)
+    final inviteCode = _userName.trim().isNotEmpty 
+        ? '${_userName.trim().toUpperCase()}-777' 
+        : 'MYSTIC-777';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF16151A).withOpacity(0.95),
+                  const Color(0xFF0D0C11).withOpacity(0.98),
+                ],
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE879F9).withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.group_add_rounded, color: Color(0xFFE879F9), size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lang == 'tr' ? 'Bağlarını Güçlendir' : 'Strengthen Bonds',
+                            style: const TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            lang == 'tr'
+                                ? 'Kozmik evreni arkadaşlarınla büyüt.'
+                                : 'Expand the cosmic universe with friends.',
+                            style: TextStyle(
+                              color: AppColors.textWhite.withOpacity(0.5),
+                              fontSize: 14,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 36),
+                
+                // Senin Davet Kodun Bölümü
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFE879F9).withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            lang == 'tr' ? 'Ritüel Kodun' : 'Ritual Code',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.diamond_rounded, color: Color(0xFF60A5FA), size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                lang == 'tr' ? '+3 Ruh Taşı Kazan' : 'Earn +3 Soul Stones',
+                                style: const TextStyle(
+                                  color: Color(0xFF60A5FA),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white.withOpacity(0.08)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              inviteCode,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                Clipboard.setData(ClipboardData(text: inviteCode));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      lang == 'tr' ? 'Kod kopyalandı!' : 'Code copied!',
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: const Color(0xFFE879F9),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE879F9).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.copy_rounded, color: Color(0xFFE879F9), size: 18),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Paylaş Butonu
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Share.share(
+                            lang == 'tr'
+                                ? 'Crack&Wish evrenine katıl! ✨\nRitüel Kodum: $inviteCode\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com'
+                                : 'Join the Crack&Wish universe! ✨\nMy Ritual Code: $inviteCode\n\nEnter this code to earn +1 Soul Stone, +50 Aura, and a surprise Premium Cookie!\nhttps://crackandwish.com',
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC084FC), Color(0xFFE879F9)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.share_rounded, color: Colors.white, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  lang == 'tr' ? 'Kodu Paylaş' : 'Share Code',
+                                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // Kod Girme Bölümü
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            lang == 'tr' ? 'Bir Kod mu Aldın?' : 'Received a Code?',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.auto_awesome_rounded, color: Color(0xFFFFD166), size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                lang == 'tr' ? 'Hemen Kullan' : 'Redeem Now',
+                                style: const TextStyle(
+                                  color: Color(0xFFFFD166),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              ),
+                              child: TextField(
+                                style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 2, fontWeight: FontWeight.bold),
+                                textCapitalization: TextCapitalization.characters,
+                                cursorColor: const Color(0xFFE879F9),
+                                decoration: InputDecoration(
+                                  hintText: lang == 'tr' ? 'KODU GİR' : 'ENTER CODE',
+                                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 2, fontWeight: FontWeight.normal),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () {
+                              HapticFeedback.mediumImpact();
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    lang == 'tr' ? 'Premium Arkadaşlık sistemi çok yakında açılacak!' : 'Premium Friendship system opening soon!',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: const Color(0xFF16151A),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 52,
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  lang == 'tr' ? 'Doğrula' : 'Verify',
+                                  style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      useSafeArea: true,
+    );
+  }
+
   // ── Çıkış yap ──
   void _signOut() {
     final lang = Localizations.localeOf(context).languageCode;
@@ -1255,6 +1579,13 @@ info@crackandwish.com''',
                               ),
                             );
                           },
+                        ),
+                        const SizedBox(height: 10),
+                        
+                        // ── 2B. REFERRAL BANNER (Davet Et ve Kazan) ──
+                        _BentoInviteBanner(
+                          lang: lang,
+                          onTap: _showInviteModal,
                         ),
                         const SizedBox(height: 10),
                         GestureDetector(
@@ -3477,6 +3808,138 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       ),
                       child: const Text('Aktif', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BentoInviteBanner extends StatefulWidget {
+  final String lang;
+  final VoidCallback onTap;
+
+  const _BentoInviteBanner({
+    required this.lang,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoInviteBanner> createState() => _BentoInviteBannerState();
+}
+
+class _BentoInviteBannerState extends State<_BentoInviteBanner> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFFC084FC).withOpacity(0.20),
+                    const Color(0xFFE879F9).withOpacity(0.10),
+                    const Color(0xFFFF6B6B).withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFFE879F9).withOpacity(0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE879F9).withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE879F9).withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.group_add_rounded,
+                        color: Color(0xFFE879F9),
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.lang == 'tr' ? 'Arkadaşlarını Davet Et' : 'Invite Friends',
+                          style: const TextStyle(
+                            color: Color(0xFFE879F9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          widget.lang == 'tr' 
+                              ? 'Kozmik bağlar kur, birlikte kazan' 
+                              : 'Build cosmic bonds, earn together',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.45),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE879F9).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFE879F9).withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.diamond_rounded, color: Color(0xFF60A5FA), size: 12),
+                        const SizedBox(width: 4),
+                        const Text(
+                          '+3',
+                          style: TextStyle(
+                            color: Color(0xFF60A5FA), 
+                            fontSize: 12, 
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

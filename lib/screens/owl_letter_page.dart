@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/mock_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
@@ -29,6 +30,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   late PageController _pageCtrl;
   final _searchCtrl = TextEditingController();
   String _searchQuery = '';
+  final Set<String> _sentRequests = {};
   String? _expandedSenderId;
   String? _expandedContactId;
   final _service = MockOwlService();
@@ -289,7 +291,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
               style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
               decoration: InputDecoration(
-                hintText: 'Arkadaş ara...',
+                hintText: _selectedTab == 1 ? 'Kozmik evrende ara...' : 'Arkadaş ara...',
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
                 border: InputBorder.none,
                 isDense: true,
@@ -397,51 +399,343 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
   // YENİ SEKMELER: Uygulama içi olmayan/veya rehberden gelenlerin gösterileceği yer.
   Widget _buildDiscoverTab(Rect br) {
+    if (_searchQuery.isNotEmpty) {
+      return _buildGlobalSearchList();
+    }
+    
     final requests = _service.incomingRequests;
 
     return ListView(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       children: [
-        if (requests.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              'Arkadaşlık İstekleri',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          ...requests.map((req) => _buildRequestItem(req)),
-          const SizedBox(height: 32),
-        ],
         Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.contact_phone_rounded, color: Colors.white.withOpacity(0.15), size: 40),
-              const SizedBox(height: 10),
-              Text(
-                'Rehberine Eriş',
-                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Kişilerin (Rehberin)', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
               ),
-              const SizedBox(height: 6),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  'Uygulamayı kullananları bul ve kullanmayanlara davet gönder.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
-                ),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              _buildMockContactList(),
+              const SizedBox(height: 24),
+              // Eskiden Rehberine Eriş Olan "Arkadaş Ekle" Butonu
               _addFriendButton(),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildGlobalSearchList() {
+    final mockGlobalUsers = [
+      {"name": "Selin Arslan", "username": "@selin01", "emoji": "🔮"},
+      {"name": "Selin Yılmaz", "username": "@seliny", "emoji": "✨"},
+      {"name": "Selinay Kara", "username": "@selinayy", "emoji": "🦅"},
+      {"name": "Burak Yılmaz", "username": "@burak_k", "emoji": "♠️"},
+      {"name": "Elif Yılmaz", "username": "@elifyilmaz", "emoji": "🌙"},
+      {"name": "Ali Veli", "username": "@aliveli", "emoji": "🍀"},
+      {"name": "Ece Nur", "username": "@ecenur", "emoji": "🍄"},
+      {"name": "Tarık Akan", "username": "@tarika", "emoji": "🕯️"},
+      {"name": "Gizem Şahin", "username": "@gizem_ms", "emoji": "👁️"},
+      {"name": "Mert Taşkıran", "username": "@mert_t", "emoji": "🌑"},
+      {"name": "Aylin Selin", "username": "@aylin_s", "emoji": "🌸"},
+    ];
+
+    final results = mockGlobalUsers.where((u) {
+       return (u["name"] as String).toLowerCase().contains(_searchQuery) ||
+              (u["username"] as String).toLowerCase().contains(_searchQuery);
+    }).toList();
+
+    if (results.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.2), size: 32),
+            const SizedBox(height: 8),
+            Text('Kozmik evrende kimse bulunamadı.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
+          ],
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text('Kozmik Evrende Bulunanlar', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+        ),
+        ...results.map((u) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.2),
+                    border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                  ),
+                  child: Center(
+                    child: Text(u["emoji"] as String, style: const TextStyle(fontSize: 18)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHighlightedText(
+                        u["name"] as String,
+                        _searchQuery,
+                        TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      _buildHighlightedText(
+                        u["username"] as String,
+                        _searchQuery,
+                        TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 11,
+                        ),
+                        const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Builder(
+                  builder: (ctx) {
+                    final isSent = _sentRequests.contains(u["username"] as String);
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (isSent) return;
+                        HapticFeedback.mediumImpact();
+                        setState(() {
+                          _sentRequests.add(u["username"] as String);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${u["name"]} kişisine arkadaşlık isteği gönderildi!',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: const Color(0xFF16151A),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSent ? Colors.white.withOpacity(0.05) : const Color(0xFF6DE8B8).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSent ? Colors.white.withOpacity(0.1) : const Color(0xFF6DE8B8).withOpacity(0.3),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                if (isSent) ...[
+                                  Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+                                  const SizedBox(width: 4),
+                                ],
+                                Text(
+                                  isSent ? 'Gönderildi' : 'İstek Gönder',
+                                  style: TextStyle(
+                                    color: isSent ? Colors.white.withOpacity(0.4) : const Color(0xFF6DE8B8),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle highlightStyle) {
+    if (query.isEmpty) return Text(text, style: baseStyle);
+    
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    
+    if (!lowerText.contains(lowerQuery)) {
+      return Text(text, style: baseStyle);
+    }
+
+    final spans = <TextSpan>[];
+    int start = 0;
+    while (true) {
+      final index = lowerText.indexOf(lowerQuery, start);
+      if (index < 0) {
+        if (start < text.length) {
+          spans.add(TextSpan(text: text.substring(start), style: baseStyle));
+        }
+        break;
+      }
+      if (index > start) {
+        spans.add(TextSpan(text: text.substring(start, index), style: baseStyle));
+      }
+      spans.add(TextSpan(text: text.substring(index, index + query.length), style: highlightStyle));
+      start = index + query.length;
+    }
+
+    return RichText(text: TextSpan(children: spans));
+  }
+
+  Widget _buildMockContactList() {
+    final mockContacts = [
+      {"name": "Ahmet Yılmaz", "isAppUser": true, "phone": "+90 555 123 4567"},
+      {"name": "Derya Deniz", "isAppUser": false, "phone": "+90 532 987 6543"},
+      {"name": "Canan Kaya", "isAppUser": true, "phone": "+90 505 111 2233"},
+      {"name": "Emre Can", "isAppUser": false, "phone": "+90 544 444 5566"},
+    ];
+
+    return Column(
+      children: mockContacts.map((c) {
+        final isAppUser = c["isAppUser"] as bool;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.1) : Colors.white.withOpacity(0.05),
+                  border: Border.all(color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.3) : Colors.white.withOpacity(0.08)),
+                ),
+                child: Icon(
+                  Icons.person,
+                  color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.4),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      c["name"] as String,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isAppUser ? '@${(c["name"] as String).split(' ').first.toLowerCase()}01' : c["phone"] as String,
+                      style: TextStyle(
+                        color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.7) : Colors.white.withOpacity(0.4),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Builder(
+                builder: (ctx) {
+                  final isSent = _sentRequests.contains(c["name"] as String);
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (isSent) return;
+                      HapticFeedback.lightImpact();
+                      setState(() {
+                        _sentRequests.add(c["name"] as String);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isAppUser ? '${c["name"]} kişisine İstek Gönderildi!' : '${c["name"]} kişisine Davet Gönderildi!',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: const Color(0xFF16151A),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSent 
+                            ? Colors.white.withOpacity(0.05) 
+                            : isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.15) : const Color(0xFFE879F9).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSent 
+                            ? Colors.white.withOpacity(0.1) 
+                            : isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.3) : const Color(0xFFE879F9).withOpacity(0.3)
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          if (isSent) ...[
+                            Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            isSent ? 'Gönderildi' : (isAppUser ? 'İstek Gönder' : 'Davet Et (+3)'),
+                            style: TextStyle(
+                              color: isSent 
+                                  ? Colors.white.withOpacity(0.4) 
+                                  : isAppUser ? const Color(0xFF6DE8B8) : const Color(0xFFE879F9),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -481,6 +775,32 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       child: ListView(
         padding: const EdgeInsets.only(top: 16, bottom: 16),
         children: [
+          if (requests.isNotEmpty && _searchQuery.isEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                'Arkadaşlık İstekleri',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ...requests.map((req) => _buildRequestItem(req)),
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                'Arkadaşların',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
           // Arkadaş listesi
           ...friends.map((f) {
             final isExpanded = _expandedContactId == f.user.id;
@@ -932,70 +1252,118 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
               // Açıldığında alt tarafta beliren zarf listesi
               AnimatedSize(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutCubic,
                 child: isExpanded
-                    ? ShaderMask(
-                        shaderCallback: (Rect bounds) {
-                          return const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.transparent,
-                              Colors.white,
-                              Colors.white,
-                              Colors.transparent,
-                            ],
-                            stops: [0.0, 0.15, 0.95, 1.0], // Sol ve sağdan yavaşça silikleşme
-                          ).createShader(bounds);
-                        },
-                        blendMode: BlendMode.dstIn,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 16),
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
-                          child: Row(
-                            children: senderLetters.map((l) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 12), // Öğeler arası yatay boşluk
-                                child: _BouncingNode(
-                                  onTap: () {
-                                    HapticFeedback.lightImpact();
-                                    _service.markAsRead(l.id);
-                                    _showReceivedLetter(context, l, br);
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(40),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: l.isRead 
-                                              ? Colors.white.withOpacity(0.04) 
-                                              : const Color(0xFF4A6A8A).withOpacity(0.15),
-                                          border: Border.all(
-                                            color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
-                                            width: 0.8
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                            color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
-                                            size: l.isRead ? 18 : 20,
-                                          ),
-                                        ),
+                    ? Builder(
+                        builder: (ctx) {
+                          Widget buildEnvelopeIcon(OwlLetter l) {
+                            return _BouncingNode(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                _service.markAsRead(l.id);
+                                _showReceivedLetter(context, l, br);
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: l.isRead 
+                                          ? Colors.white.withOpacity(0.04) 
+                                          : const Color(0xFF4A6A8A).withOpacity(0.15),
+                                      border: Border.all(
+                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
+                                        width: 0.8
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
+                                        size: l.isRead ? 18 : 20,
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                              ),
+                            );
+                          }
+
+                          return ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.white,
+                                  Colors.white,
+                                  Colors.transparent,
+                                ],
+                                stops: [0.0, 0.15, 0.95, 1.0], // Sol ve sağdan yavaşça silikleşme
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.dstIn,
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 16),
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
+                              child: Row(
+                                children: [
+                                  ...senderLetters.take(12).map((l) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: buildEnvelopeIcon(l),
+                                    );
+                                  }),
+                                  if (senderLetters.length > 12)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: _BouncingNode(
+                                        onTap: () {
+                                          HapticFeedback.mediumImpact();
+                                          _showAllLettersPanel(context, sender, senderLetters, br);
+                                        },
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(40),
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.white.withOpacity(0.08),
+                                                border: Border.all(
+                                                  color: Colors.white.withOpacity(0.2), 
+                                                  width: 0.8
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  '+${senderLetters.length - 12}',
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.9),
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       )
                     : const SizedBox.shrink(),
               ),
@@ -1004,6 +1372,92 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           );
         }),
       ],
+    );
+  }
+
+  void _showAllLettersPanel(BuildContext context, OwlUser sender, List<OwlLetter> letters, Rect br) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, a1, a2, child) {
+        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
+        return Transform.scale(
+          scale: 0.9 + 0.1 * curve.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: Align(
+              alignment: Alignment.center,
+              child: Material(
+                color: Colors.transparent,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.88,
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.center,
+                          children: letters.map((l) {
+                            return _BouncingNode(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                Navigator.pop(ctx);
+                                _service.markAsRead(l.id);
+                                _showReceivedLetter(context, l, br);
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40),
+                                child: Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: l.isRead 
+                                        ? Colors.white.withOpacity(0.04) 
+                                        : const Color(0xFF4A6A8A).withOpacity(0.2),
+                                    border: Border.all(
+                                      color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.4), 
+                                      width: 1.0
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                      color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
+                                      size: l.isRead ? 20 : 22,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1079,6 +1533,24 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     ).then((_) {
       if (mounted) setState(() => _showingLetter = false);
     });
+  }
+
+  void _showFeatureDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2A3D),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        content: Text(message, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -1187,10 +1659,69 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
     super.dispose();
   }
 
-  void _claimCookie() {
+  void _claimCookie() async {
+    if (_claimed) return;
     HapticFeedback.heavyImpact();
     setState(() => _claimed = true);
+    
+    final imgPath = _cookieImageMap[widget.cookieId];
+    if (widget.cookieId != null) {
+      // isRewardOrGift = true çünkü sana başkası yollamış, bu bir hediye! 
+      // Dolayısıyla varsa x2, x3 olarak yığılabilir.
+      await StorageService.incrementCookieCard(widget.cookieId!, isRewardOrGift: true);
+    }
     widget.onClaimCookie?.call();
+
+    if (!mounted || imgPath == null) return;
+
+    // Ödül animasyonu popup
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4), // Çok daha şeffaf ve yumuşak bir arka plan
+      barrierDismissible: true,
+      barrierLabel: 'CookieReward',
+      transitionDuration: const Duration(milliseconds: 250), // Hızlıca ekrana gelsin
+      pageBuilder: (context, anim, secondaryAnim) {
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(), // Erken kapatmak isterse
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 350), // Elastik değil, yumuşak scale
+                curve: Curves.easeOutCubic,
+                builder: (context, scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFFD700).withOpacity(0.5),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(imgPath, width: 140, height: 140, fit: BoxFit.contain),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    // Daha hızlı kaybolur (toplam 1.2 saniye gibi)
+    Future.delayed(const Duration(milliseconds: 1100), () {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   @override
@@ -1310,11 +1841,11 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                                     child: Text(
                                       widget.message,
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Color(0xFF4A3928),
-                                        fontSize: 13,
+                                      style: GoogleFonts.kalam(
+                                        color: const Color(0xFF4A3928),
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        height: 1.6,
+                                        height: 1.4,
                                         letterSpacing: 0.1,
                                       ),
                                     ),
@@ -1322,17 +1853,16 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              // Gönderenin imzası sağ alt köşede olur
+                              // Gönderenin imzası sol alt köşede olur (sağda kurabiye var)
                               Align(
-                                alignment: Alignment.centerRight,
+                                alignment: Alignment.centerLeft,
                                 child: Text(
                                   '~ ${widget.senderName}',
-                                  style: const TextStyle(
-                                    color: Color(0xFF4A3928),
+                                  style: GoogleFonts.kalam(
+                                    color: const Color(0xFF4A3928),
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.italic,
-                                    letterSpacing: 0.5,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2,
                                   ),
                                 ),
                               ),
@@ -1347,30 +1877,22 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                     Positioned(
                       right: 14,
                       bottom: 12,
-                      child: ScaleTransition(
-                        scale: _cookieScale,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFE8D4B8),
-                            border: Border.all(
-                              color: const Color(0xFFD4A574),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.brown.withOpacity(0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                      child: GestureDetector(
+                        onTap: !_claimed ? _claimCookie : null, // Mühre tıkla ve topla
+                        child: AnimatedOpacity(
+                          opacity: _claimed ? 0.3 : 1.0, // Alındıysa soluklaşır
+                          duration: const Duration(milliseconds: 600),
+                          child: ScaleTransition(
+                            scale: _cookieScale,
+                            child: SizedBox(
+                              width: 36,
+                              height: 36,
+                              child: Center(
+                                child: imgPath != null
+                                    ? Image.asset(imgPath, width: 36, height: 36, fit: BoxFit.contain)
+                                    : const Text('🥠', style: TextStyle(fontSize: 24)),
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: imgPath != null
-                                ? Image.asset(imgPath, width: 24, height: 24, fit: BoxFit.contain)
-                                : const Text('🥠', style: TextStyle(fontSize: 14)),
+                            ),
                           ),
                         ),
                       ),
@@ -1378,67 +1900,9 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                 ],
               ),
             ),
-            // Kurabiye Al butonu
-            if (hasCookie && !_claimed) ...[
-              const SizedBox(height: 16),
-              _BouncingNode(
-                onTap: _claimCookie,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFF8A3D), Color(0xFFFF6B2C)],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFF8A3D).withOpacity(0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (imgPath != null)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Image.asset(imgPath, width: 20, height: 20, fit: BoxFit.contain),
-                        ),
-                      const Text(
-                        'Kurabiyeyi Al',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const Text(' 🥠', style: TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            // Zaten alınmış
-            if (hasCookie && _claimed) ...[
-              const SizedBox(height: 12),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.check_circle_rounded, color: Colors.green[300], size: 14),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Kurabiye koleksiyona eklendi!',
-                    style: TextStyle(
-                      color: Colors.green[300],
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            // Zaten alınmış - yazı yok sadece mektuptaki ikon soluklaşır
+            if (hasCookie && _claimed) 
+              const SizedBox.shrink(),
             // Yanıtla Butonu (Herkeste çıkmalı)
             const SizedBox(height: 16),
             Row(
@@ -1705,6 +2169,17 @@ class _ContactItem extends StatelessWidget {
                       letterSpacing: 0.3,
                     ),
                   ),
+                  if (isAppUser) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      '@${name.toLowerCase().replaceAll(' ', '')}01',
+                      style: TextStyle(
+                        color: const Color(0xFF6DE8B8).withOpacity(0.7),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1813,16 +2288,6 @@ class _ContactItem extends StatelessWidget {
                                   () {
                                     HapticFeedback.mediumImpact();
                                     _showFeatureDialog(context, 'Kurabiye Hediye Et', 'Çok yakında arkadaşlarına sahip olduğun kurabiyeleri veya ruh taşlarını hediye edebileceksin! 🎁');
-                                  }
-                                ),
-                                _buildIconButton(
-                                  context,
-                                  Icons.history_rounded, 
-                                  'Geçmiş', 
-                                  Colors.white70,
-                                  () {
-                                    HapticFeedback.mediumImpact();
-                                    _showFeatureDialog(context, 'Mektup Geçmişi', 'Eskiden birbirinize yolladığınız gizemli baykuş mektuplarını burada okuyabileceksin. 📜');
                                   }
                                 ),
                                 _buildIconButton(
@@ -2038,12 +2503,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     final collection = await StorageService.getCookieCollection();
     final owned = collection.where((c) => c.firstObtainedDate != null && c.countObtained > 0).toList();
     owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
-    // Test: sayıları x1, x2, x3 olarak sınırla
-    final capped = owned.asMap().entries.map((e) {
-      final cap = (e.key % 3) + 1; // 1, 2, 3, 1, 2, 3...
-      return e.value.copyWith(countObtained: cap);
-    }).toList();
-    if (mounted) setState(() => _ownedCookies = capped);
+    if (mounted) setState(() => _ownedCookies = owned);
   }
 
   @override
@@ -2095,6 +2555,10 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         });
       }
       if (!adWatched) return; // Kullanıcı Vazgeç dedi, gönderme
+      
+      // Reklam popup menüsünün (overlay) kapanma animasyonu 
+      // sırasınca bekle, ki asıl animasyon arkada yarılanmasın!
+      await Future.delayed(const Duration(milliseconds: 400));
     }
 
     // Mektup gönderimini kaydet
@@ -2192,12 +2656,11 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         child: Text(
                           _textCtrl.text,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF4A3928),
-                            fontSize: 13,
+                          style: GoogleFonts.kalam(
+                            color: const Color(0xFF4A3928),
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            fontFamily: 'Roboto',
-                            height: 1.6,
+                            height: 1.4,
                             letterSpacing: 0.1,
                           ),
                         ),
@@ -2219,17 +2682,12 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
             right: 10, bottom: 8,
             child: Transform.scale(
               scale: 1.0,
-              child: Container(
+              child: SizedBox(
                 width: 44, height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.15),
-                  border: Border.all(color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.7), width: 1.5),
-                ),
                 child: Center(
                   child: _cookieImageMap[_selectedCookieId] != null
-                      ? Image.asset(_cookieImageMap[_selectedCookieId]!, width: 32, height: 32, fit: BoxFit.contain)
-                      : const Text('🥠', style: TextStyle(fontSize: 18)),
+                      ? Image.asset(_cookieImageMap[_selectedCookieId]!, width: 44, height: 44, fit: BoxFit.contain)
+                      : const Text('🥠', style: TextStyle(fontSize: 28)),
                 ),
               ),
             ),
@@ -2945,18 +3403,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                               maxLines: 5,
                                               minLines: 1,
                                               textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Color(0xFF4A3928),
-                                                fontSize: 13,
+                                              style: GoogleFonts.kalam(
+                                                color: const Color(0xFF4A3928),
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w500,
-                                                height: 1.6,
+                                                height: 1.4,
                                                 letterSpacing: 0.1,
                                               ),
-                                              decoration: const InputDecoration(
+                                              decoration: InputDecoration(
                                                 hintText: 'Mektubunu yaz...',
-                                                hintStyle: TextStyle(
-                                                  color: Color(0xFFB0A484),
-                                                  fontSize: 13,
+                                                hintStyle: GoogleFonts.kalam(
+                                                  color: const Color(0xFFB0A484),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                                 border: InputBorder.none,
                                                 isDense: true,
@@ -3004,33 +3463,18 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   },
                   child: _BouncingNode(
                     onTap: () => setState(() => _selectedCookieId = null),
-                    child: Container(
+                    child: SizedBox(
                       width: 44,
                       height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: stampColor.withOpacity(0.15),
-                        border: Border.all(
-                          color: stampColor.withOpacity(0.7),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: stampColor.withOpacity(0.25),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
                       child: Center(
                         child: _cookieImageMap[_selectedCookieId] != null
                             ? Image.asset(
                                 _cookieImageMap[_selectedCookieId]!,
-                                width: 32,
-                                height: 32,
+                                width: 44,
+                                height: 44,
                                 fit: BoxFit.contain,
                               )
-                            : const Text('🥠', style: TextStyle(fontSize: 18)),
+                            : const Text('🥠', style: TextStyle(fontSize: 28)),
                       ),
                     ),
                   ),
@@ -3326,15 +3770,17 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                           imgPath != null
                                               ? Image.asset(imgPath, width: 28, height: 28, fit: BoxFit.contain)
                                               : const Icon(Icons.stars_rounded, color: Colors.white54, size: 24),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            'x${cookie.countObtained}',
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.4),
-                                              fontSize: 7,
-                                              fontWeight: FontWeight.w500,
+                                          if (cookie.countObtained > 1) ...[
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              'x${cookie.countObtained}',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.4),
+                                                fontSize: 7,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ],
                                       ),
                                     ),

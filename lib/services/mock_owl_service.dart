@@ -248,12 +248,15 @@ class MockOwlService {
         sentAt: DateTime.now().subtract(const Duration(hours: 1)),
         deliveredAt: DateTime.now().subtract(const Duration(minutes: 55)),
       ),
-      for (var i = 1; i <= 11; i++)
+      for (var i = 1; i <= 14; i++)
         OwlLetter(
           id: 'letter_mock_ahmet_$i',
           from: _friends[1].user, // Ahmet Kaya
           to: currentUser,
-          message: "Ahmet'ten gelen test mektubu #$i",
+          message: "Ahmet'ten gelen test mektubu #$i\nUmarım günün harika geçiyordur!",
+          // Her 3 mektuptan birine şans yoncası ekleyelim ki test edebilsin:
+          attachedCookieId: i % 3 == 0 ? 'lucky_clover' : null,
+          attachedCookieName: i % 3 == 0 ? 'Şanslı Yonca' : null,
           sentAt: DateTime.now().subtract(Duration(minutes: 10 + i * 2)),
           deliveredAt: DateTime.now().subtract(Duration(minutes: 5 + i)),
         ),
