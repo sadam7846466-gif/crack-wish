@@ -28,6 +28,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // --- Step 0 Data ---
   final TextEditingController _nameCtrl = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
+  final TextEditingController _handleCtrl = TextEditingController();
+  final FocusNode _handleFocus = FocusNode();
   DateTime _selectedDate = DateTime(2000, 1, 1);
   DateTime? _selectedTime;
   bool _knowsTime = false;
@@ -73,17 +75,23 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void dispose() {
     _stepCtrl.dispose();
+    _stepCtrl.dispose();
     _nameCtrl.dispose();
     _nameFocus.dispose();
+    _handleCtrl.dispose();
+    _handleFocus.dispose();
     super.dispose();
   }
 
   void _nextStep() {
     HapticFeedback.lightImpact();
-    if (_currentStep == 1 && _nameCtrl.text.trim().isEmpty) return;
+    if (_currentStep == 1 && (_nameCtrl.text.trim().isEmpty || _handleCtrl.text.trim().isEmpty)) return;
 
     if (_currentStep < 7) {
-      if (_currentStep == 1) _nameFocus.unfocus();
+      if (_currentStep == 1) {
+        _nameFocus.unfocus();
+        _handleFocus.unfocus();
+      }
       _stepCtrl.reverse().then((_) {
         setState(() => _currentStep++);
         _stepCtrl.forward();
@@ -122,8 +130,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Future<void> _finishOnboarding() async {
     HapticFeedback.heavyImpact();
     
-    // 0. Name & Zodiac & DoB
+    // 0. Name & Zodiac & DoB & Handle
     await StorageService.setUserName(_nameCtrl.text.trim());
+    await StorageService.setUserHandle(_handleCtrl.text.trim());
     await StorageService.setZodiacSign(_calculateZodiac(_selectedDate));
     await StorageService.setBirthDate(_selectedDate);
     if (_knowsTime && _selectedTime != null) {
@@ -616,7 +625,33 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ),
         ),
 
-        const SizedBox(height: 56),
+        const SizedBox(height: 16),
+
+        _buildGlassCard(
+          delay: 500,
+          child: _buildUnifiedInputRow(
+             icon: PhosphorIcons.at(PhosphorIconsStyle.fill),
+             title: "BENZERSİZ KULLANICI ADIN",
+             child: TextField(
+                 controller: _handleCtrl,
+                 focusNode: _handleFocus,
+                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
+                 cursorColor: const Color(0xFFD18471),
+                 inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]')), // Sadece harf, rakam ve alt çizgi
+                 ],
+                 decoration: InputDecoration(
+                   border: InputBorder.none,
+                   isDense: true,
+                   contentPadding: EdgeInsets.zero,
+                   hintText: "Örn: kahin_123",
+                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                 ),
+             ),
+          ),
+        ),
+
+        const SizedBox(height: 48),
         StaggeredFade(
           delay: const Duration(milliseconds: 550),
           child: Row(

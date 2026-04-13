@@ -13,6 +13,7 @@ class StorageService {
   static const String _keyTotalTarots = 'total_tarots';
   static const String _keyLongestStreak = 'longest_streak';
   static const String _keyUserName = 'user_name';
+  static const String _keyUserHandle = 'user_handle';
   static const String _keyZodiacSign = 'zodiac_sign';
   static const String _keyBirthDate = 'birth_date';
   static const String _keyCurrentMood = 'current_mood';
@@ -288,6 +289,20 @@ class StorageService {
     await prefs.setString(_keyUserName, name);
   }
 
+  static Future<String?> getUserHandle() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyUserHandle);
+  }
+
+  static Future<void> setUserHandle(String handle) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Başında @ yoksa ekle
+    if (!handle.startsWith('@') && handle.isNotEmpty) {
+      handle = '@$handle';
+    }
+    await prefs.setString(_keyUserHandle, handle.toLowerCase());
+  }
+
   static Future<String?> getAvatar() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_avatar');
@@ -445,6 +460,7 @@ class StorageService {
       'longestStreak': prefs.getInt(_keyLongestStreak) ?? 0,
       'soulStones': prefs.getInt(_keySoulStones) ?? 3, // Eğer boşsa default hediye miktarını alıyoruz gibi düşün ama getSoulStones handle ediyor, buraya direkt yansıtalım.
       'userName': prefs.getString(_keyUserName),
+      'userHandle': prefs.getString(_keyUserHandle),
       'zodiacSign': prefs.getString(_keyZodiacSign),
       'currentMood':
           prefs.getString(_keyCurrentMood) ?? prefs.getString(_keyMood),

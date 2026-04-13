@@ -47,6 +47,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   // ── Gerçek kullanıcı verileri ──
   String _userName = '';
+  String _userHandle = '';
   String _userAvatar = 'assets/images/owl.webp';
   int _unreadOwlCount = 0;
   int _totalCookies = 0;
@@ -88,6 +89,7 @@ class ProfilePageState extends State<ProfilePage> {
     if (!mounted) return;
     setState(() {
       _userName = (snapshot['userName'] as String?) ?? '';
+      _userHandle = (snapshot['userHandle'] as String?) ?? '';
       _totalCookies = (snapshot['totalCookies'] as int?) ?? 0;
       _totalTarots = tarotCount;
       _totalDreams = (snapshot['totalDreams'] as int?) ?? 0;
@@ -129,7 +131,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   // ── İsim & Profil Düzenleme ──
   void _editProfile() {
-    final controller = TextEditingController(text: _userName);
+    final nameController = TextEditingController(text: _userName);
     final lang = Localizations.localeOf(context).languageCode;
     String selectedAvatar = _userAvatar;
 
@@ -283,7 +285,7 @@ class ProfilePageState extends State<ProfilePage> {
                             border: Border.all(color: Colors.white.withOpacity(0.1)),
                           ),
                           child: TextField(
-                            controller: controller,
+                            controller: nameController,
                             style: const TextStyle(color: Colors.white, fontSize: 16),
                             cursorColor: AppColors.primaryOrange,
                             decoration: InputDecoration(
@@ -295,6 +297,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 24),
                         
                         // Kaydet Butonu
@@ -302,7 +305,7 @@ class ProfilePageState extends State<ProfilePage> {
                           onTap: () async {
                             HapticFeedback.mediumImpact();
                             
-                            final newName = controller.text.trim();
+                            final newName = nameController.text.trim();
                             if (newName.isNotEmpty) {
                               await StorageService.setUserName(newName);
                             }
@@ -1506,8 +1509,12 @@ info@crackandwish.com''',
                             return ValueListenableBuilder<int>(
                               valueListenable: StorageService.soulStonesNotifier,
                               builder: (context, currentSoulStones, child) {
+                                final displayHandle = _userHandle.isNotEmpty 
+                                    ? _userHandle 
+                                    : '@${_userName.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}';
                                 return _BentoHeroCard(
                                   userName: _userName,
+                                  userHandle: displayHandle,
                                   userAvatar: _userAvatar,
                                   levelTitle: level.title,
                                   levelIcon: level.icon,
@@ -1852,6 +1859,7 @@ info@crackandwish.com''',
 
 class _BentoHeroCard extends StatelessWidget {
   final String userName;
+  final String userHandle;
   final String userAvatar;
   final String levelTitle;
   final IconData levelIcon;
@@ -1874,6 +1882,7 @@ class _BentoHeroCard extends StatelessWidget {
 
   const _BentoHeroCard({
     required this.userName,
+    required this.userHandle,
     required this.userAvatar,
     required this.levelTitle,
     required this.levelIcon,
@@ -2043,6 +2052,18 @@ class _BentoHeroCard extends StatelessWidget {
                             letterSpacing: 0.3,
                           ),
                         ),
+                        if (userHandle.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            userHandle,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.45),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 4),
                         Row(
                           mainAxisSize: MainAxisSize.min,

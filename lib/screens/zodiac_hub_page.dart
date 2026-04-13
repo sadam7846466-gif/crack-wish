@@ -15,7 +15,8 @@ import '../services/ad_service.dart';
 import 'premium_paywall_page.dart';
 
 class ZodiacHubPage extends StatefulWidget {
-  const ZodiacHubPage({super.key});
+  final int? autoOpenIndex;
+  const ZodiacHubPage({super.key, this.autoOpenIndex});
   @override
   State<ZodiacHubPage> createState() => _ZodiacHubPageState();
 }
