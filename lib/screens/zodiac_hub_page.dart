@@ -638,27 +638,27 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                 // ── ÜÇ ÇARK (Tek ekrana sığması için kompakt tasarlandı) ──
                 _animWrap(_t1, _wheelSection(
                   wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
-                  painter: (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  painter: (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   onTap: () async {
-                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => _WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
+                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
                   },
                 )),
                 const SizedBox(height: 28),
                 _animWrap(_t2, _wheelSection(
                   wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
-                  painter: (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  painter: (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   onTap: () => _handlePremiumAccess(context, 'asian', () async {
-                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', (p) => _ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
+                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
                   }),
                 )),
                 const SizedBox(height: 28),
                 _animWrap(_t3, _wheelSection(
                   wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
-                  painter: (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  painter: (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   onTap: () => _handlePremiumAccess(context, 'mayan', () async {
-                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', (p) => _MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
+                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
                   }),
                 )),
                 const SizedBox(height: 40),
@@ -823,10 +823,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
 }
 
 // BATI ZODIAC ÇARKI — Referans görselden ilham
-class _WesternWheelPainter extends CustomPainter {
+class WesternWheelPainter extends CustomPainter {
   final double rotation;
   final Color gold, goldD;
-  _WesternWheelPainter({required this.rotation, required this.gold, required this.goldD});
+  WesternWheelPainter({required this.rotation, required this.gold, required this.goldD});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -844,7 +844,7 @@ class _WesternWheelPainter extends CustomPainter {
 
     // 12 segment bölmesi
     for (int i = 0; i < 12; i++) {
-      final a = (i * 30 - 90 + rotation * 4) * math.pi / 180;
+      final a = (i * 30 - 90 + rotation * 360) * math.pi / 180;
       p..color = gold.withOpacity(0.1)..strokeWidth = 0.6;
       canvas.drawLine(c + Offset(math.cos(a) * r * 0.36, math.sin(a) * r * 0.36),
         c + Offset(math.cos(a) * (r - 8), math.sin(a) * (r - 8)), p);
@@ -854,7 +854,7 @@ class _WesternWheelPainter extends CustomPainter {
     final sp = Paint()..color = gold.withOpacity(0.9)..style = PaintingStyle.stroke
       ..strokeWidth = 2.4..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
     for (int i = 0; i < 12; i++) {
-      final a = (i * 30 - 75 + rotation * 4) * math.pi / 180;
+      final a = (i * 30 - 75 + rotation * 360) * math.pi / 180;
       _drawSym(canvas, i, c + Offset(math.cos(a) * r * 0.68, math.sin(a) * r * 0.68), r * 0.15, sp);
     }
 
@@ -869,7 +869,7 @@ class _WesternWheelPainter extends CustomPainter {
 
     // 36 uzun ışın — segmentlere kadar uzanıyor
     for (int i = 0; i < 36; i++) {
-      final a = (i * 10 + rotation * 6) * math.pi / 180;
+      final a = (i * 10 + rotation * 360) * math.pi / 180;
       final type = i % 3;
       // Uzun ışınlar sembol halkasına yaklaşıyor
       final outerEnd = type == 0 ? r * 0.52 : (type == 2 ? r * 0.42 : r * 0.34);
@@ -885,7 +885,7 @@ class _WesternWheelPainter extends CustomPainter {
 
     // İkinci katman — 12 ana ışın (daha kalın, daha uzun)
     for (int i = 0; i < 12; i++) {
-      final a = (i * 30 + 15 + rotation * 6) * math.pi / 180;
+      final a = (i * 30 + 15 + rotation * 360) * math.pi / 180;
       p..color = gold.withOpacity(0.12)..strokeWidth = 2.0;
       canvas.drawLine(
         c + Offset(math.cos(a) * discR * 1.5, math.sin(a) * discR * 1.5),
@@ -917,16 +917,10 @@ class _WesternWheelPainter extends CustomPainter {
 
     // Dış noktalar
     for (int i = 0; i < 36; i++) {
-      final a = (i * 10) * math.pi / 180;
+      final a = (i * 10 + rotation * 360) * math.pi / 180;
       canvas.drawCircle(c + Offset(math.cos(a) * (r - 5), math.sin(a) * (r - 5)),
         i % 3 == 0 ? 1.5 : 0.7, Paint()..color = gold.withOpacity(i % 3 == 0 ? 0.25 : 0.08)..style = PaintingStyle.fill);
     }
-
-    // Dönen ışık
-    final ga = rotation * 2 * math.pi;
-    final gp = c + Offset(math.cos(ga) * r * 0.91, math.sin(ga) * r * 0.91);
-    canvas.drawCircle(gp, 10, Paint()..shader = RadialGradient(
-      colors: [gold.withOpacity(0.5), gold.withOpacity(0)]).createShader(Rect.fromCircle(center: gp, radius: 10)));
   }
 
   void _drawSym(Canvas canvas, int i, Offset o, double s, Paint p) {
@@ -1012,14 +1006,14 @@ class _WesternWheelPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WesternWheelPainter old) => old.rotation != rotation;
+  bool shouldRepaint(covariant WesternWheelPainter old) => old.rotation != rotation;
 }
 
 // ÇİN ZODIAC ÇARKI — Net Altın Silüetler (Görseldeki gibi net ve tanınabilir)
-class _ChineseWheelPainter extends CustomPainter {
+class ChineseWheelPainter extends CustomPainter {
   final double rotation;
   final Color gold, goldD;
-  _ChineseWheelPainter({required this.rotation, required this.gold, required this.goldD});
+  ChineseWheelPainter({required this.rotation, required this.gold, required this.goldD});
 
   static const List<String> _names = ['FARE', 'ÖKÜZ', 'KAPLAN', 'TAVŞAN', 'EJDERHA', 'YILAN', 'AT', 'KEÇİ', 'MAYMUN', 'HOROZ', 'KÖPEK', 'DOMUZ'];
 
@@ -1040,7 +1034,7 @@ class _ChineseWheelPainter extends CustomPainter {
     canvas.save();
     canvas.translate(c.dx, c.dy);
     
-    final frameColor = const Color(0xFFC62828);
+    final frameColor = gold == Colors.white ? Colors.white.withOpacity(0.3) : const Color(0xFFC62828);
     final cR = r * 0.32; // Büyük merkez çerçevenin boyutu
 
     // Kalın kızıl dış çerçeve (Köşeleri yuvarlatılmış)
@@ -1091,7 +1085,7 @@ class _ChineseWheelPainter extends CustomPainter {
       // Çark dönerken hayvanlar dik dursun (Ferris wheel effect)
       
       // Çok zarif ve hafif kızıl-altın karışımı Asya Mühür Çerçevesi (Rounded Rect)
-      final frameColor = const Color(0xFFC62828); // Hafif crimson/kırmızı
+      final frameColor = gold == Colors.white ? Colors.white.withOpacity(0.3) : const Color(0xFFC62828);
       final rectRadius = animalR * 1.02; // Karelerin birbirine girmemesi için boyut küçültüldü
       final rr = RRect.fromRectAndRadius(
         Rect.fromCenter(center: Offset.zero, width: rectRadius * 2, height: rectRadius * 2),
@@ -1110,7 +1104,7 @@ class _ChineseWheelPainter extends CustomPainter {
       canvas.drawRRect(innerRr, Paint()..color = gold.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 0.8);
 
       // Hayvanı çiz (Artık hiçbir metin yok, tamamen saf tasarımlar)
-      _drawIcon(canvas, i, animalR * 0.85); // Çerçeveye tam oturması için ikonu hafif orantıladık
+      _drawIcon(canvas, i, animalR * 0.85, gold); // Çerçeveye tam oturması için ikonu hafif orantıladık
 
       canvas.restore();
     }
@@ -1218,17 +1212,21 @@ class _ChineseWheelPainter extends CustomPainter {
     canvas.drawCircle(Offset.zero, r * 0.28, pStroke);
   }
 
-  void _drawIcon(Canvas canvas, int idx, double s) {
-    // Görseldeki gibi şahane 3D hissi veren altın/bronz gradyanı
+  void _drawIcon(Canvas canvas, int idx, double s, Color baseColor) {
     final Rect bounds = Rect.fromCircle(center: Offset.zero, radius: s * 0.8);
-    final Paint f = Paint()
-      ..shader = const LinearGradient(
+    final Paint f = Paint();
+    if (baseColor == Colors.white) {
+      f.color = Colors.white.withOpacity(0.9);
+      f.style = PaintingStyle.fill;
+    } else {
+      f.shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [Color(0xFFFFF6D9), Color(0xFFFFD060), Color(0xFFD48A18)],
         stops: [0.0, 0.4, 1.0],
-      ).createShader(bounds)
-      ..style = PaintingStyle.fill;
+      ).createShader(bounds);
+      f.style = PaintingStyle.fill;
+    }
     
     // Primitive Çizim Araçları (Çok daha net ve tanınan geometrik şekiller için)
     void circle(double x, double y, double r) => canvas.drawCircle(Offset(s * x, s * y), s * r, f);
@@ -1383,37 +1381,41 @@ class _ChineseWheelPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ChineseWheelPainter old) => old.rotation != rotation;
+  bool shouldRepaint(covariant ChineseWheelPainter old) => old.rotation != rotation;
 }
 
-class _MayanWheelPainter extends CustomPainter {
+class MayanWheelPainter extends CustomPainter {
   final double rotation;
   final Color gold, goldD;
-  _MayanWheelPainter({required this.rotation, required this.gold, required this.goldD});
+  final bool isMini;
+  MayanWheelPainter({required this.rotation, required this.gold, required this.goldD, this.isMini = false});
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
     final r = size.width / 2;
     
-    // Uygulamanın ana temasıyla tam uyumlu zarif altın (Parlaklık azaltıldı, sadelik arttı)
+    // Uygulamanın ana temasıyla tam uyumlu zarif altın 
     final g = gold; 
+    final double sm = isMini ? 0.35 : 1.0; // Stroke Multiplier (Mini modda çizgiler ipince olur)
 
-    // Hafif zemin izi (Diğer çarklarla uyumlu şeffaflık)
-    canvas.drawCircle(c, r, Paint()..shader = RadialGradient(
-      colors: [g.withOpacity(0.05), Colors.transparent],
-    ).createShader(Rect.fromCircle(center: c, radius: r)));
+    // Hafif zemin izi (Eğer mini değilse, blur ve gradient korunsun)
+    if (!isMini) {
+      canvas.drawCircle(c, r, Paint()..shader = RadialGradient(
+        colors: [g.withOpacity(0.05), Colors.transparent],
+      ).createShader(Rect.fromCircle(center: c, radius: r)));
+    }
 
     // Daha ince ve narin çizgiler
-    final pLine = Paint()..color = g.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0..strokeCap = StrokeCap.round;
+    final pLine = Paint()..color = g.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0 * sm..strokeCap = StrokeCap.round;
 
     canvas.save();
     canvas.translate(c.dx, c.dy);
     canvas.rotate(rotation * math.pi * 0.5); // Ağır dönüş
     
-    // 1. Dış Sınırlar (Daha sade titreşim)
-    canvas.drawCircle(Offset.zero, r - 2, pLine..strokeWidth = 1.2);
-    canvas.drawCircle(Offset.zero, r - 6, pLine..strokeWidth = 0.5);
+    // 1. Dış Sınırlar 
+    canvas.drawCircle(Offset.zero, r - 2, pLine..strokeWidth = 1.2 * sm);
+    canvas.drawCircle(Offset.zero, r - 6, pLine..strokeWidth = 0.5 * sm);
 
     // 2. Dış 20 Nawal (Tzolkin Glifleri)
     final glyphR = r * 0.82;
@@ -1425,65 +1427,60 @@ class _MayanWheelPainter extends CustomPainter {
         
         // Klasik Maya Hiyeroglif Çerçevesi (Sadeleştirildi)
         final crRect = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset.zero, width: glyphRadius * 1.8, height: glyphRadius * 1.6), const Radius.circular(8));
-        canvas.drawRRect(crRect, Paint()..color = g.withOpacity(0.03)..style = PaintingStyle.fill);
-        canvas.drawRRect(crRect, pLine..strokeWidth = 0.8);
+        if (!isMini) canvas.drawRRect(crRect, Paint()..color = g.withOpacity(0.03)..style = PaintingStyle.fill);
+        canvas.drawRRect(crRect, pLine..strokeWidth = 0.8 * sm);
         
         // İçine GERÇEK Maya Burç piktogramlarını (Nawal) çiziyoruz
-        _drawAuthenticNawal(canvas, i, glyphRadius * 0.9, g.withOpacity(0.8));
+        _drawAuthenticNawal(canvas, i, glyphRadius * 0.9, g.withOpacity(0.8), sm);
 
         canvas.restore();
     }
 
     // 3. Bölücü Sınır 
     final innerBoundR = r * 0.68;
-    canvas.drawCircle(Offset.zero, innerBoundR, pLine..strokeWidth = 2.0);
-    canvas.drawCircle(Offset.zero, innerBoundR - 4, pLine..strokeWidth = 0.8);
+    canvas.drawCircle(Offset.zero, innerBoundR, pLine..strokeWidth = 2.0 * sm);
+    canvas.drawCircle(Offset.zero, innerBoundR - 4, pLine..strokeWidth = 0.8 * sm);
 
-    // 4. GALAKTİK TONLAR HALKASI (Tam 13 Adet - İç içe girme sorunu çözüldü)
-    // Tzolkin'deki 13 sayı rakamı, bu sayede sistem 20x13 orantısına kavuşuyor
+    // 4. GALAKTİK TONLAR HALKASI 
     final toneR = r * 0.55;
     for (int i = 0; i < 13; i++) {
         canvas.save();
         canvas.rotate(i * (math.pi * 2 / 13));
         
-        // 13 Dilim ayırıcı çizgiler
-        canvas.drawLine(Offset(0, -innerBoundR + 4), Offset(0, -toneR), Paint()..color=g.withOpacity(0.3)..style=PaintingStyle.stroke..strokeWidth=1.5);
+        canvas.drawLine(Offset(0, -innerBoundR + 4), Offset(0, -toneR), Paint()..color=g.withOpacity(0.3)..style=PaintingStyle.stroke..strokeWidth=1.5 * sm);
 
-        // 1 ile 13 arası sırayla sayılar (Daha narin ve ince çizgilerle)
         int num = i + 1;
         int bars = num ~/ 5;
         int dots = num % 5;
         
         double currentR = innerBoundR - 12;
-        final pBar = Paint()..color = g.withOpacity(0.7)..style = PaintingStyle.stroke..strokeWidth = 2.5..strokeCap = StrokeCap.round;
+        final pBar = Paint()..color = g.withOpacity(0.7)..style = PaintingStyle.stroke..strokeWidth = 2.5 * sm..strokeCap = StrokeCap.round;
         final pDot = Paint()..color = g.withOpacity(0.7)..style = PaintingStyle.fill;
         
-        // Çubuklar
         for (int b = 0; b < bars; b++) {
             final sweep = math.pi * 2 / 13 * 0.45; 
             canvas.drawArc(Rect.fromCircle(center: Offset.zero, radius: currentR), -math.pi / 2 - sweep / 2, sweep, false, pBar);
-            currentR -= 8; // İçeri doğru diz
+            currentR -= 8; 
         }
         
         if (bars > 0 && dots > 0) currentR -= 2;
         
-        // Noktalar
         if (dots > 0) {
             final arcLen = math.pi * 2 / 13 * 0.35;
             final dotStep = dots > 1 ? arcLen / (dots - 1) : 0;
             final startA = -math.pi / 2 - (dots > 1 ? arcLen / 2 : 0);
             for (int d = 0; d < dots; d++) {
                 final dAngle = startA + d * dotStep;
-                canvas.drawCircle(Offset(math.cos(dAngle) * currentR, math.sin(dAngle) * currentR), 2.0, pDot);
+                canvas.drawCircle(Offset(math.cos(dAngle) * currentR, math.sin(dAngle) * currentR), 2.0 * sm, pDot);
             }
         }
         canvas.restore();
     }
 
-    // 5. İç İnce Sınır (Tonların tabanı)
-    canvas.drawCircle(Offset.zero, toneR, pLine..strokeWidth = 1.5);
+    // 5. İç İnce Sınır 
+    canvas.drawCircle(Offset.zero, toneR, pLine..strokeWidth = 1.5 * sm);
     
-    // 6. Orta Katman - Maya Güneş Dalgaları (Petals/Işınlar)
+    // 6. Orta Katman - Maya Güneş Dalgaları 
     final centerFaceR = r * 0.38;
     for (int i = 0; i < 20; i++) {
         canvas.save();
@@ -1493,78 +1490,70 @@ class _MayanWheelPainter extends CustomPainter {
            ..lineTo(-r*0.06, -toneR)
            ..lineTo(r*0.06, -toneR)
            ..close();
-        canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.15)..style = PaintingStyle.fill);
-        canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.4)..style = PaintingStyle.stroke..strokeWidth=1.0);
+        if(!isMini) canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.15)..style = PaintingStyle.fill);
+        canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.4)..style = PaintingStyle.stroke..strokeWidth=1.0 * sm);
         canvas.restore();
     }
 
-    // 7. MERKEZ: Rustik Maya Güneş Tanrısı (Tonatiuh)
-    // Yuvarlak ve taş oyması hissi (Tamamen uyumlu, temiz ve sadeleştirilmiş yapı)
-    canvas.drawCircle(Offset.zero, centerFaceR, Paint()..color = g.withOpacity(0.04)..style = PaintingStyle.fill);
-    canvas.drawCircle(Offset.zero, centerFaceR, pLine..strokeWidth = 1.2);
-    canvas.drawCircle(Offset.zero, centerFaceR - 4, pLine..strokeWidth = 0.5);
+    // 7. MERKEZ: Hunab Ku
+    if (!isMini) canvas.drawCircle(Offset.zero, centerFaceR, Paint()..color = g.withOpacity(0.04)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset.zero, centerFaceR, pLine..strokeWidth = 1.2 * sm);
+    canvas.drawCircle(Offset.zero, centerFaceR - 4, pLine..strokeWidth = 0.5 * sm);
     
-    _drawTrueMayanHunabKu(canvas, centerFaceR * 0.85, g.withOpacity(0.85));
+    _drawTrueMayanHunabKu(canvas, centerFaceR * 0.85, g.withOpacity(0.85), sm, isMini);
 
     canvas.restore();
   }
 
-  void _drawTrueMayanHunabKu(Canvas c, double r, Color g) {
-    // KUSURSUZ MAYA GEOMETRİSİ: HUNAB KU (Galaktik Kelebek / Zamanın En Saf Hali)
-    // Organik, kutsal bir insan/tanrı yüzünü basit kod çizgileriyle çizmek karikatürleşip, 
-    // saygısız bir görüntü (uncanny valley) yarattığı için mutlak ve saygın geometriye dönüldü.
-    final pLine = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 2.0..strokeCap = StrokeCap.round;
+  void _drawTrueMayanHunabKu(Canvas c, double r, Color g, double sm, bool isMini) {
+    final pLine = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 2.0 * sm..strokeCap = StrokeCap.round;
     final pFill = Paint()..color = g.withValues(alpha: 0.15)..style = PaintingStyle.fill;
     final pGlow = Paint()..color = g.withValues(alpha: 0.1)..style = PaintingStyle.fill..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
 
-    // Kutsal Parlama Güzelliği
-    c.drawCircle(Offset.zero, r * 0.45, pGlow);
-    c.drawCircle(Offset.zero, r * 0.45, pFill);
+    if (!isMini) {
+      c.drawCircle(Offset.zero, r * 0.45, pGlow);
+      c.drawCircle(Offset.zero, r * 0.45, pFill);
+    }
 
-    // İç Çember (Sonsuzluk ve Bütünlük)
     c.drawCircle(Offset.zero, r * 0.45, pLine);
 
-    // "S" formundaki bölünme (Maya Yin-Yang yapısı - İlahi Denge)
     final dualPath = Path()
       ..moveTo(0, -r * 0.45)
       ..cubicTo(-r * 0.4, -r * 0.15, r * 0.4, r * 0.15, 0, r * 0.45);
-    c.drawPath(dualPath, pLine..strokeWidth = 2.5);
+    c.drawPath(dualPath, pLine..strokeWidth = 2.5 * sm);
 
-    // Kozmik Denge Noktaları (Gözler/Tohumlar)
-    c.drawCircle(Offset(-r * 0.2, -r * 0.15), r * 0.07, Paint()..color = g..style = PaintingStyle.fill);
-    c.drawCircle(Offset(r * 0.2, r * 0.15), r * 0.07, Paint()..color = g..style = PaintingStyle.fill);
+    if (!isMini) {
+      c.drawCircle(Offset(-r * 0.2, -r * 0.15), r * 0.07 * sm, Paint()..color = g..style = PaintingStyle.fill);
+      c.drawCircle(Offset(r * 0.2, r * 0.15), r * 0.07 * sm, Paint()..color = g..style = PaintingStyle.fill);
+    }
 
-    // Zamanın 4 Kozmik Yönü (Kelebeğin / Evrenin açılan yaprakları)
     for (int i = 0; i < 4; i++) {
         c.save();
         c.rotate(i * math.pi / 2);
         
-        // Zarafeti artırılmış yaprak / ışın hatları
         final petalPath = Path()
           ..moveTo(-r * 0.12, -r * 0.5)
-          ..quadraticBezierTo(-r * 0.2, -r * 0.8, 0, -r * 0.95) // Tepeye tırmanan sivri yapı
+          ..quadraticBezierTo(-r * 0.2, -r * 0.8, 0, -r * 0.95) 
           ..quadraticBezierTo(r * 0.2, -r * 0.8, r * 0.12, -r * 0.5);
           
-        c.drawPath(petalPath, pLine..strokeWidth = 1.6);
-        c.drawPath(petalPath, pFill);
+        c.drawPath(petalPath, pLine..strokeWidth = 1.6 * sm);
+        if (!isMini) c.drawPath(petalPath, pFill);
         
-        // Taç yaprak merkezindeki zarif iç çizgi
-        c.drawLine(Offset(0, -r * 0.52), Offset(0, -r * 0.88), pLine..strokeWidth = 1.0);
+        c.drawLine(Offset(0, -r * 0.52), Offset(0, -r * 0.88), pLine..strokeWidth = 1.0 * sm);
         
-        // Ara yönler (4 Köşegen)
         c.restore();
         c.save();
         c.rotate(i * math.pi / 2 + math.pi / 4);
-        c.drawLine(Offset(0, r * 0.5), Offset(0, r * 0.75), pLine..strokeWidth = 1.8);
-        c.drawCircle(Offset(0, r * 0.8), r * 0.04, Paint()..color = g..style = PaintingStyle.fill);
+        c.drawLine(Offset(0, r * 0.5), Offset(0, r * 0.75), pLine..strokeWidth = 1.8 * sm);
+        if (!isMini) c.drawCircle(Offset(0, r * 0.8), r * 0.04 * sm, Paint()..color = g..style = PaintingStyle.fill);
         c.restore();
     }
   }
 
-  void _drawAuthenticNawal(Canvas c, int i, double h, Color g) {
-     // GERÇEK 20 Nawal (Tzolkin Burçları) Soyutlamaları. Batıdan tamamen bağımsız, aslına uygun geometrik formlar.
-     final p = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 1.6..strokeCap = StrokeCap.round;
+  void _drawAuthenticNawal(Canvas c, int i, double h, Color g, double sm) {
+     final p = Paint()..color = g..style = PaintingStyle.stroke..strokeWidth = 1.6 * sm..strokeCap = StrokeCap.round;
      final f = Paint()..color = g..style = PaintingStyle.fill;
+
      
      // Her sembol, resimdeki gerçek 20 Maya hiyeroglifine doğrudan atıf yapar.
      switch (i) {
@@ -1692,5 +1681,5 @@ class _MayanWheelPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _MayanWheelPainter old) => old.rotation != rotation;
+  bool shouldRepaint(covariant MayanWheelPainter old) => old.rotation != rotation;
 }

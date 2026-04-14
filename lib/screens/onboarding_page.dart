@@ -10,7 +10,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import 'root_shell.dart';
-
+import 'zodiac_hub_page.dart';
+import '../data/mayan_zodiac_data.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
 
@@ -23,7 +27,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
 
-  int _currentStep = 0; // 0 to 7
+  int _currentStep = 0; // 0 to 6
   int _selectedAvatarIndex = 2; // Ortadan (3. avatar) başlasın, kapak akışına uygun
 
   // --- Step 0 Data ---
@@ -32,8 +36,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   final TextEditingController _usernameCtrl = TextEditingController();
   final FocusNode _usernameFocus = FocusNode();
   DateTime _selectedDate = DateTime(2000, 1, 1);
+  bool _hasSelectedDate = false;
   DateTime? _selectedTime;
   bool _knowsTime = false;
+  String? _selectedLocation;
 
   // --- Step 1 Data ---
   String _lifeFocus = "Ruhsal Aydınlanma";
@@ -87,7 +93,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     HapticFeedback.lightImpact();
     if (_currentStep == 1 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
 
-    if (_currentStep < 7) {
+    if (_currentStep < 6) {
       if (_currentStep == 1) {
         _nameFocus.unfocus();
         _usernameFocus.unfocus();
@@ -233,11 +239,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 if (_currentStep == 0) _buildWelcomeStep(),
                                 if (_currentStep == 1) _buildStep0(),
                                 if (_currentStep == 2) _buildStepDateWithWheels(),
-                                if (_currentStep == 3) _buildStepTimeWithHourglass(),
-                                if (_currentStep == 4) _buildStep1(),
-                                if (_currentStep == 5) _buildStep2(),
-                                if (_currentStep == 6) _buildStep3(),
-                                if (_currentStep == 7) _buildStep4(),
+                                if (_currentStep == 3) _buildStep1(),
+                                if (_currentStep == 4) _buildStep2(),
+                                if (_currentStep == 5) _buildStep3(),
+                                if (_currentStep == 6) _buildStep4(),
                                 const SizedBox(height: 24), // Sadece rahat bir nefes payı bırakıldı, bottomNavigationBar artık kendi gerçek alanını kaplayacak
                               ],
                             ),
@@ -261,25 +266,28 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     children: [
                       // Kilit yazısı sayfa göstergeleri ve Butonun "ÜSTÜNE" taşındı
                       if (_currentStep > 0) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(PhosphorIcons.lockKey(PhosphorIconsStyle.fill), color: Colors.white.withOpacity(0.15), size: 14),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Yalnızca sana özel haritanı çizmek içindir.",
-                              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
-                            ),
-                          ],
+                        Transform.translate(
+                          offset: const Offset(0, -16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(PhosphorIcons.lockKey(PhosphorIconsStyle.fill), color: Colors.white.withOpacity(0.15), size: 14),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Yalnızca sana özel haritanı çizmek içindir.",
+                                style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 16),
                       ],
                       // Roma Rakamlı Bölüm Belirteci - İçeriğin Ortasında
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(8, (index) {
+                        children: List.generate(7, (index) {
                           final isActive = _currentStep == index;
-                          const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+                          const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
                           
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -301,8 +309,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       ),
                       const SizedBox(height: 4), // Roma rakamları butonlara doğru aşağıya yaklaştıırıldı
                       _buildNextButton(
-                        title: _currentStep == 7 ? "Yolculuğa Başla" : "Devam Et",
-                        icon: _currentStep == 7 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
+                        title: _currentStep == 6 ? "Yolculuğa Başla" : "Devam Et",
+                        icon: _currentStep == 6 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
                         onTap: _nextStep,
                         glowColor: const Color(0xFFC36E6E), // Splash Screen paletinden yumuşak kırmızımsı/gül kurusu
                       ),
@@ -323,19 +331,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // ==========================================
   Widget _buildTitle(String text) {
     return Text(
-      text, // Baş harfleri büyük, kaligrafi için en güzel form
+      text,
       textAlign: TextAlign.center,
-      // Great Vibes / Parisienne kalitesi: O görseldeki ("Rome" hissi veren) bağlantılı, çok zarif eğik el yazısı, lüks imza / kaligrafi fontudur.
-      style: GoogleFonts.greatVibes(
+      style: GoogleFonts.cormorant(
         color: Colors.white,
-        fontSize: 52, // El yazısı (cursive) fontlar ekranda göze daha küçük gelir, bu yüzden şiirsel görünmesi için belirgin şekilde büyütüldü
-        fontWeight: FontWeight.w400, // Cursive fontların kendi zarif kalınlığı
-        fontStyle: FontStyle.normal,
-        height: 1.15,
-        letterSpacing: 0.0, // KRİTİK: Harflerin aralarındaki el yazısı dikiş/bağlantı noktalarının kopmaması için sıfırda bırakıldı
+        fontSize: 36, // Cormorant fontu daha zarif olduğu için font boyutu biraz artırıldı
+        fontWeight: FontWeight.w300, // Lüks serif hissiyatı için çok daha ince ve asil (Light)
+        height: 1.2,
+        letterSpacing: 1.0, 
         shadows: [
-          Shadow(color: Colors.black.withOpacity(0.9), blurRadius: 20, offset: const Offset(0, 4)),
-          Shadow(color: const Color(0xFFD3A29B).withOpacity(0.5), blurRadius: 15),
+          Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
     );
@@ -482,18 +487,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   // ==========================================
   // HELPER FOR UNIFIED COSMIC CARDS
-  // ==========================================
-  Widget _buildUnifiedInputRow({required IconData icon, required String title, required Widget child, VoidCallback? onTap, Widget? suffix}) {
+  Widget _buildUnifiedInputRow({IconData? icon, Widget? customIcon, required String title, required Widget child, VoidCallback? onTap, Widget? suffix}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 74), // Esnek yükseklik
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Text taşmasını önlemek için dinamik iç boşluk
+        constraints: const BoxConstraints(minHeight: 52), // Ultra ince ve zarif görünüm için yükseklik daha da kısıldı
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6), 
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: const Color(0xFFFCE4EC).withOpacity(0.25), // Çok hafif, tatlı bir toz pembe dokunuşu
                 shape: BoxShape.circle,
@@ -503,7 +509,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6),
                 ],
               ),
-              child: LoopingPulse(child: Icon(icon, color: Colors.white, size: 20)), // İlk sayfadaki gibi bembeyaz parlak bırakıldı
+              child: customIcon ?? Icon(icon, color: Colors.white, size: 23),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -526,7 +532,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildDivider() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 68), // Divider starts after the icon
+      padding: const EdgeInsets.only(left: 76, right: 20), // Ayraç tam olarak yazının başlangıç hizasına oturtuldu (20 padding + 40 icon + 16 gap)
       child: Divider(color: Colors.white.withOpacity(0.06), height: 1),
     );
   }
@@ -539,7 +545,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       children: [
         _buildTitle("Kozmik Serüvene\nHoş Geldin"),
         const SizedBox(height: 8), // Alt Başlık ile başlık arası kısaldı, blok yukarı taşındı
-        _buildSubtitle("Sakinleş, derin bir nefes al ve yıldızların fısıltısına kulak ver... Sen özelsin."),
+        _buildSubtitle("Derin bir nefes al ve yıldızların rehberliğine hazır ol."),
         
         const SizedBox(height: 16), // Yukarı çekilmesi için 32'den 16'ya düşürüldü
         
@@ -604,12 +610,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
 
   Widget _buildStep0() {
-    return Column(
-      children: [
-        _buildTitle("Seni Tanıyalım"),
-        _buildSubtitle("Profil adını ve kozmik avatarını belirle.\nRuh eşlerinin seni kolayca bulabilmesi için özel bir kullanıcı adı yarat."),
-        
-        const SizedBox(height: 32),
+    return Transform.translate(
+      offset: const Offset(0, -15), // İçeriği biraz daha aşağı oturtmak için -35'ten -15'e çekildi
+      child: Column(
+        children: [
+          _buildTitle("Seni Tanıyalım"),
+          _buildSubtitle("Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle."),
+          
+          const SizedBox(height: 16),
         
         // CoverFlow Tarzı Dinamik Avatar Seçici
         StaggeredFade(
@@ -626,15 +634,17 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ),
         ),
 
-        const SizedBox(height: 16), // Paneli daha sıkı bir gruplandırma için yukarı taşıdık
+        const SizedBox(height: 36), // Paneli avatarlardan ayırmak için biraz aşağı kaydırdık
 
         _buildGlassCard(
           delay: 400,
           child: Column(
             children: [
-              // 1. Görünen İsim (Serbest, Estetik Profil İsmi)
               _buildUnifiedInputRow(
-                 icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
+                 customIcon: Transform.scale(
+                   scale: 1.4,
+                   child: Image.asset('assets/images/owl.png', width: 38, height: 38),
+                 ),
                  title: "PROFİL ADIN",
                  child: TextField(
                      controller: _nameCtrl,
@@ -675,128 +685,206 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ),
         ),
       ],
+    ),
     );
   }
 
 
+
+  String _getWesternZodiac(DateTime d) {
+    final month = d.month;
+    final day = d.day;
+    final signs = ['Oğlak', 'Kova', 'Balık', 'Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak'];
+    const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
+    return day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+  }
+
+  int _getWesternZodiacIndex(DateTime d) {
+    final month = d.month;
+    final day = d.day;
+    final signsIdx = [9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
+    return day < cutoffs[month - 1] ? signsIdx[month - 1] : signsIdx[month];
+  }
+
+  String _getChineseZodiac(DateTime d) {
+    final animals = ['Fare', 'Öküz', 'Kaplan', 'Tavşan', 'Ejderha', 'Yılan', 'At', 'Keçi', 'Maymun', 'Horoz', 'Köpek', 'Domuz'];
+    return animals[(d.year - 4) % 12];
+  }
+
+  int _getChineseZodiacIndex(DateTime d) {
+    return (d.year - 4) % 12;
+  }
+
+  String _getMayanZodiac(DateTime d) {
+    // Gerçek Maya İsimleri ve Türkçe Anlamı bir arada gösterimi (örn. OC \n (KÖPEK))
+    final idx = MayanZodiacData.nahualIndex(d);
+    final nahual = MayanZodiacData.nahuales[idx];
+    return "${nahual['name']}\n(${nahual['meaning']})".toUpperCase();
+  }
+
+  int _getMayanZodiacIndex(DateTime d) {
+    // Profil sayfası ile %100 uyumlu tam isabet indeksi
+    final nahualIdx = MayanZodiacData.nahualIndex(d);
+    // Çark çizimi Maymun'dan (10. indeks) başladığı için +10 kaydırıyoruz
+    return (nahualIdx + 10) % 20;
+  }
 
   Widget _buildStepDateWithWheels() {
-    final double targetAngle = (_selectedDate.month - 1) * 30.0 * (math.pi / 180.0);
-    return Column(
-      children: [
-        _buildTitle("Kozmik Koordinat"),
-        _buildSubtitle("Dünyaya geliş tarihin astrolojik haritalarının temelini oluşturur."),
-        const SizedBox(height: 32),
-        StaggeredFade(
-          delay: const Duration(milliseconds: 300),
-          child: Container(
-            height: 200,
-            alignment: Alignment.center,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0, end: targetAngle),
-              duration: const Duration(milliseconds: 1200),
-              curve: Curves.elasticOut,
-              builder: (context, angle, child) {
-                return Transform.rotate(
-                  angle: angle,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 180,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1, style: BorderStyle.none),
-                          boxShadow: [BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.1), blurRadius: 40)],
-                        ),
-                        child: CustomPaint(painter: _DashedCirclePainter()),
-                      ),
-                      ...List.generate(12, (index) {
-                        final theta = index * 30.0 * (math.pi / 180.0);
-                        return Transform.translate(
-                          offset: Offset(math.cos(theta) * 75, math.sin(theta) * 75),
-                          child: Container(
-                            width: 6, height: 6,
-                            decoration: BoxDecoration(color: index % 3 == 0 ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.4), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white, blurRadius: 4)]),
-                          ),
-                        );
-                      }),
-                      Container(
-                        width: 60, height: 60,
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFC36E6E).withOpacity(0.2)),
-                        child: Center(child: Icon(PhosphorIcons.infinity(PhosphorIconsStyle.bold), color: Colors.white, size: 28)),
-                      )
-                    ],
-                  ),
-                );
-              }
-            )
-          )
-        ),
-        const SizedBox(height: 32),
-        _buildGlassCard(
-          delay: 400,
-          child: _buildUnifiedInputRow(
-             icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
-             title: "DÜNYAYA GELİŞ TARİHİN",
-             child: Text(DateFormat('dd MMMM yyyy').format(_selectedDate), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
-             onTap: () {
-               _nameFocus.unfocus();
-               _showDatePicker(context, mode: CupertinoDatePickerMode.date);
-             },
-             suffix: Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: const Color(0xFFD18471).withOpacity(0.8), size: 16),
-          ),
-        ),
-      ]
-    );
-  }
+    final int wIndex = _getWesternZodiacIndex(_selectedDate);
+    final int cIndex = _getChineseZodiacIndex(_selectedDate);
+    final int mIndex = _getMayanZodiacIndex(_selectedDate);
 
-  Widget _buildStepTimeWithHourglass() {
-    return Column(
-      children: [
-        _buildTitle("Zamanın Kumları"),
-        _buildSubtitle("Doğduğun anda zamanın kumları tam olarak hangi frekansta akıyordu?"),
-        const SizedBox(height: 32),
+    // Alt merkeze seçili burcu getirecek matematiksel formüller
+    final double wTargetRotation = (165 - wIndex * 30) / 360.0;
+    final double cTargetRotation = (180 - cIndex * 30) / 360.0;
+    final double mTargetRotation = 2.0 - mIndex * 0.2;
+    
+    final String wSign = _hasSelectedDate ? _getWesternZodiac(_selectedDate).toUpperCase() : "BATI";
+    final String cSign = _hasSelectedDate ? _getChineseZodiac(_selectedDate).toUpperCase() : "ASYA";
+    final String mSign = _hasSelectedDate ? _getMayanZodiac(_selectedDate).toUpperCase() : "MAYA";
+
+    return Transform.translate(
+      offset: const Offset(0, -25), // Başlığı ve içeriği bir tık yukarı taşımak için
+      child: Column(
+        children: [
+        _buildTitle("Kozmik Koordinat"),
+        _buildSubtitle("Astrolojik haritanın temeli için doğduğun anı seç."),
+        const SizedBox(height: 20), // Kozmik çarkları biraz aşağıya doğru kaydırarak nefes aldırır
         StaggeredFade(
           delay: const Duration(milliseconds: 300),
           child: Container(
             height: 160,
+            width: double.infinity,
             alignment: Alignment.center,
-            child: const LoopingHourglass(),
+            color: Colors.transparent,
+            child: SizedBox(
+              width: 280,
+              height: 160,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: _SimpleConnectionPainter(),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: cTargetRotation),
+                      duration: const Duration(milliseconds: 1500),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, angle, child) => _buildMiniWheel(cSign, ChineseWheelPainter(rotation: angle, gold: Colors.white, goldD: Colors.white.withOpacity(0.5)), 105),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    bottom: 0,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: wTargetRotation),
+                      duration: const Duration(milliseconds: 1500),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, angle, child) => _buildMiniWheel(wSign, WesternWheelPainter(rotation: angle, gold: Colors.white, goldD: Colors.white.withOpacity(0.5)), 90),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: mTargetRotation),
+                      duration: const Duration(milliseconds: 1500),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, angle, child) => _buildMiniWheel(mSign, MayanWheelPainter(rotation: angle, gold: Colors.white, goldD: Colors.white.withOpacity(0.5), isMini: true), 90),
+                    ),
+                  ),
+                ],
+              ),
+            )
           )
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 56), // Paneli kullanıcının isteği üzerine biraz daha aşağı taşıdık
         _buildGlassCard(
           delay: 400,
-          child: _buildUnifiedInputRow(
-             icon: PhosphorIcons.hourglass(PhosphorIconsStyle.fill),
-             title: "DOĞUM SAATİN",
-             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-               children: [
-                 Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: TextStyle(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: 14, fontWeight: FontWeight.w400)),
-               ],
-             ),
-             onTap: () {
-               _nameFocus.unfocus();
-               _showDatePicker(context, mode: CupertinoDatePickerMode.time);
-             },
-             suffix: _selectedTime != null 
-                ? GestureDetector(
-                    onTap: () => setState(() => _selectedTime = null),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
-                      child: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.8), size: 12),
-                    ),
-                  )
-                : Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+          child: Column(
+            children: [
+              _buildUnifiedInputRow(
+                 icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
+                 title: "DÜNYAYA GELİŞ TARİHİN",
+                 child: Text(
+                   _hasSelectedDate 
+                      ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
+                      : "Doğum tarihini seç",
+                   style: TextStyle(
+                     color: _hasSelectedDate ? Colors.white : Colors.white.withOpacity(0.25), 
+                     fontSize: _hasSelectedDate ? 15 : 12, 
+                     fontWeight: FontWeight.w400
+                   )
+                 ),
+                 onTap: () {
+                   _nameFocus.unfocus();
+                   _showDatePicker(context, mode: CupertinoDatePickerMode.date);
+                 },
+                 suffix: Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+              ),
+              _buildDivider(),
+              _buildUnifiedInputRow(
+                 icon: PhosphorIcons.hourglass(PhosphorIconsStyle.fill),
+                 title: "DOĞUM SAATİN (Opsiyonel)",
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: TextStyle(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedTime != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                   ],
+                 ),
+                 onTap: () {
+                   _nameFocus.unfocus();
+                   _showDatePicker(context, mode: CupertinoDatePickerMode.time);
+                 },
+                 suffix: _selectedTime != null 
+                    ? GestureDetector(
+                        onTap: () => setState(() => _selectedTime = null),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
+                          child: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.8), size: 12),
+                        ),
+                      )
+                    : Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+              ),
+              _buildDivider(),
+              _buildUnifiedInputRow(
+                 icon: PhosphorIcons.mapPin(PhosphorIconsStyle.fill),
+                 title: "DOĞUM YERİN (Opsiyonel)",
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text(_selectedLocation ?? "Şehir seçerek hesaplamayı netleştir", style: TextStyle(color: _selectedLocation != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedLocation != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                   ],
+                 ),
+                 onTap: () {
+                   _nameFocus.unfocus();
+                   _showLocationPicker(context);
+                 },
+                 suffix: _selectedLocation != null 
+                    ? GestureDetector(
+                        onTap: () => setState(() => _selectedLocation = null),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
+                          child: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.8), size: 12),
+                        ),
+                      )
+                    : Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+              ),
+            ],
           ),
         ),
       ]
-    );
+    ));
   }
+
+
   Widget _buildGlassCard({required Widget child, required int delay}) {
     return StaggeredFade(
       delay: Duration(milliseconds: delay),
@@ -821,11 +909,41 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
+  Widget _buildMiniWheel(String label, CustomPainter painter, double size) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: size,
+          height: size,
+          child: CustomPaint(painter: painter),
+        ),
+        const SizedBox(height: 2),
+        Icon(PhosphorIcons.caretUp(PhosphorIconsStyle.fill), size: 12, color: Colors.white),
+        // panelsiz tasarim
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+          color: Colors.transparent,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStep1() {
     return Column(
       children: [
         _buildTitle("Kalbinin Pusulası"),
-        _buildSubtitle("Şu an en çok neye ihtiyaç duyuyorsun?\nTarot ve Kahve falların bu frekansa göre okunacak."),
+        _buildSubtitle("Fallarının frekansı için niyetini belirle."),
         
         _buildSectionLabel("HAYAT ODAĞI"),
         _buildOption("Ruhsal Aydınlanma & Keşif", _lifeFocus, (v) => setState(() => _lifeFocus = v)),
@@ -846,7 +964,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return Column(
       children: [
         _buildTitle("Bilinçaltı & Auran"),
-        _buildSubtitle("Rüyaların nasıl şekilleniyor ve ruhun hangi renkte parlıyor?"),
+        _buildSubtitle("Bilinçaltının derinliklerini ve auranı keşfet."),
 
         _buildSectionLabel("RÜYA YAKLAŞIMI"),
         _buildOption("Haberci & Net Rüyalar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v)),
@@ -891,7 +1009,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return Column(
       children: [
         _buildTitle("Kozmik Senkronizasyon"),
-        _buildSubtitle("Evrenin sana hediye edeceği mesajları, günün hangi saatinde almak ruhuna daha iyi gelir?"),
+        _buildSubtitle("Kozmik mesajlarını hangi aralıkta almak istersin?"),
 
         _buildSectionLabel("UYKU & UYANIŞ DÖNGÜSÜ"),
         _buildOption("Sabah Kuşu (Erken Uyanan)", _sleepPattern, (v) => setState(() => _sleepPattern = v)),
@@ -927,7 +1045,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return Column(
       children: [
         _buildTitle("Kozmik Ağdaki Yerin"),
-        _buildSubtitle("Evren tesadüfleri sever. Seninle aynı auroya sahip ve benzer yıldız dizilimini paylaşanlarla eşleşmeye açık mısın?"),
+        _buildSubtitle("Aynı aurayı paylaştığın ruh eşinle karşılaşmaya hazır mısın?"),
 
         _buildSectionLabel("EŞLEŞME TERCİHİ"),
         GestureDetector(
@@ -1011,56 +1129,250 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // ==========================================
   // UTILS
   // ==========================================
+  void _showLocationPicker(BuildContext context) {
+    String tempLocation = "";
+    bool isSearching = false;
+    Timer? _debounce;
+    
+    // Uygulama açılışında görünen prestijli dünya başkentleri
+    final List<String> defaultLocations = [
+      "İstanbul, Türkiye", "New York, ABD", "Londra, Birleşik Krallık", "Paris, Fransa", "Tokyo, Japonya",
+      "Ankara, Türkiye", "İzmir, Türkiye", "Zürih, İsviçre", "Berlin, Almanya", "Roma, İtalya", 
+      "Dubai, BAE", "Los Angeles, ABD", "Sidney, Avustralya", "Antalya, Türkiye", "Barselona, İspanya"
+    ];
+    
+    List<String> searchResults = List.from(defaultLocations);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true, 
+      builder: (ctx) {
+        return StatefulBuilder( 
+          builder: (BuildContext context, StateSetter setModalState) {
+
+            Future<void> performSearch(String query) async {
+               if (query.trim().length < 2) {
+                  setModalState(() {
+                     searchResults = List.from(defaultLocations);
+                     isSearching = false;
+                  });
+                  return;
+               }
+               
+               setModalState(() => isSearching = true);
+               
+               try {
+                  final uri = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=8&accept-language=tr');
+                  final res = await http.get(uri, headers: {'User-Agent': 'vlucky_cosmic_app_1.0'});
+                  
+                  if (res.statusCode == 200) {
+                     final List data = json.decode(res.body);
+                     final List<String> results = [];
+                     for (var e in data) {
+                        final addr = e['address'] ?? {};
+                        final city = addr['city'] ?? addr['town'] ?? addr['village'] ?? addr['county'] ?? addr['state'] ?? e['name'] ?? "";
+                        final country = addr['country'] ?? "";
+                        if (city.isNotEmpty) {
+                           final fullName = country.isNotEmpty ? "$city, $country" : city;
+                           if (!results.contains(fullName)) results.add(fullName);
+                        }
+                     }
+                     if (results.isEmpty) results.add("$query (Özel Konum)");
+                     
+                     setModalState(() {
+                        searchResults = results;
+                        isSearching = false;
+                     });
+                  } else {
+                     setModalState(() => isSearching = false);
+                  }
+               } catch (e) {
+                  setModalState(() => isSearching = false);
+               }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+              child: Container(
+                height: 440, // Klavye açıkken harita arama konforu için yükseklik artırıldı
+                margin: const EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border(top: BorderSide(color: Colors.white.withOpacity(0.25), width: 1.5)),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 18.0, sigmaY: 18.0),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.15))),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 24),
+                                  child: Text("Dünyadaki Doğum Konumun", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16)),
+                                ),
+                                CupertinoButton(
+                                  child: const Text('Bitti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                                  onPressed: () {
+                                    if (tempLocation.trim().isNotEmpty && searchResults.isNotEmpty) {
+                                      setState(() => _selectedLocation = searchResults.first);
+                                    }
+                                    Navigator.of(context).pop();
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 0),
+                            child: TextField(
+                              autofocus: false, 
+                              style: const TextStyle(color: Colors.white, fontSize: 17, fontFamily: 'Montserrat'),
+                              cursorColor: const Color(0xFFD18471),
+                              decoration: InputDecoration(
+                                hintText: "Şehir, ilçe veya ülke araştırın...",
+                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 16, fontFamily: 'Montserrat'),
+                                prefixIcon: Icon(Icons.public, color: Colors.white.withOpacity(0.5), size: 22),
+                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.2))),
+                                focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1.5)),
+                                suffixIcon: isSearching ? const CupertinoActivityIndicator() : null,
+                              ),
+                              onChanged: (val) {
+                                tempLocation = val;
+                                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                                _debounce = Timer(const Duration(milliseconds: 600), () {
+                                   performSearch(val);
+                                });
+                              },
+                              onSubmitted: (val) {
+                                 if (val.trim().isNotEmpty && searchResults.isNotEmpty) {
+                                   setState(() => _selectedLocation = searchResults.first);
+                                 }
+                                 Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                          
+                          Expanded( 
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                              itemCount: searchResults.length,
+                              itemBuilder: (context, index) {
+                                final parts = searchResults[index].split(',');
+                                final city = parts[0].trim();
+                                final country = parts.length > 1 ? parts[1].trim() : "";
+                                
+                                return ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+                                  title: Row(
+                                    children: [
+                                      Text(city, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                                      if (country.isNotEmpty) ...[
+                                        const SizedBox(width: 8),
+                                        Expanded(child: Text(country, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14, fontFamily: 'Montserrat'), overflow: TextOverflow.ellipsis)),
+                                      ]
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setState(() => _selectedLocation = searchResults[index]);
+                                    Navigator.of(context).pop();
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
+
+
+
   void _showDatePicker(BuildContext context, {required CupertinoDatePickerMode mode}) {
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
-        height: 300,
-        color: const Color(0xFF1B2330),
-        child: Column(
-          children: [
-            Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CupertinoButton(
-                    child: const Text('Bitti', style: TextStyle(color: Color(0xFFD18471), fontWeight: FontWeight.bold)),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: CupertinoTheme(
-                data: const CupertinoThemeData(
-                  textTheme: CupertinoTextThemeData(
-                    dateTimePickerTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+        height: 320,
+        margin: const EdgeInsets.only(top: 10), // Yuvarlatılmış köşeler için üst boşluk
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08), // Açık renk, lüks cam efekti
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.25), width: 1.5)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 18.0, sigmaY: 18.0), // Cam bulanıklığı arka plandaki yıldızları gösterir
+            child: Column(
+              children: [
+                Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.15))),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CupertinoButton(
+                        child: const Text('Bitti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        onPressed: () => Navigator.of(context).pop(),
+                      )
+                    ],
                   ),
                 ),
-                child: CupertinoDatePicker(
-                  backgroundColor: Colors.transparent,
-                  mode: mode,
-                  initialDateTime: mode == CupertinoDatePickerMode.date ? _selectedDate : (_selectedTime ?? DateTime.now()),
-                  maximumYear: DateTime.now().year,
-                  onDateTimeChanged: (val) {
-                    setState(() {
-                      if (mode == CupertinoDatePickerMode.date) {
-                        _selectedDate = val;
-                      } else {
-                        _selectedTime = val;
-                        _knowsTime = true;
-                      }
-                    });
-                  },
+                Expanded(
+                  child: CupertinoTheme(
+                    data: const CupertinoThemeData(
+                      textTheme: CupertinoTextThemeData(
+                        dateTimePickerTextStyle: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400, fontFamily: 'Cormorant'),
+                      ),
+                    ),
+                    child: CupertinoDatePicker(
+                      backgroundColor: Colors.transparent,
+                      mode: mode,
+                      initialDateTime: mode == CupertinoDatePickerMode.date ? _selectedDate : (_selectedTime ?? DateTime.now()),
+                      maximumYear: DateTime.now().year,
+                      onDateTimeChanged: (val) {
+                        setState(() {
+                          if (mode == CupertinoDatePickerMode.date) {
+                            _selectedDate = val;
+                            _hasSelectedDate = true;
+                          } else {
+                            _selectedTime = val;
+                            _knowsTime = true;
+                          }
+                        });
+                      },
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1587,26 +1899,36 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
                         width: 145,  // Yükseklikle birebir aynı ebat!
                         decoration: BoxDecoration(
                           shape: BoxShape.circle, // "burayı yuvarlak yap" emrine göre tam daire kesimi
+                          color: Colors.white.withOpacity(0.04), // Cam efektati tabanı
                           border: Border.all(
-                            color: isFullyFocused ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.05),
-                            width: isFullyFocused ? 3.0 : 1.0,
+                            color: isFullyFocused ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.1),
+                            width: isFullyFocused ? 2.5 : 1.0,
                           ),
-                          boxShadow: isFullyFocused ? [BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.4), blurRadius: 40)] : [],
+                          boxShadow: isFullyFocused ? [BoxShadow(color: Colors.white.withOpacity(0.15), blurRadius: 40)] : [],
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(1000), // Tam sarmalayan yuvarlak maske
-                          child: ImageFiltered(
-                            imageFilter: ui.ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(_avatars[index]),
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.black.withOpacity(isFullyFocused ? 0.0 : 0.5), 
-                                    BlendMode.darken,
-                                  )
-                                )
+                          child: BackdropFilter(
+                            filter: ui.ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0), // Cam panel bulanıklığı
+                            child: Padding(
+                              padding: EdgeInsets.zero, // Cam panele tam oturmasını sağlamak için boşluk sıfırlandı
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(1000), // İç resmin mükemmel yuvarlak kalması için
+                                child: ImageFiltered(
+                                  imageFilter: ui.ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(_avatars[index]),
+                                        fit: BoxFit.cover,
+                                        colorFilter: ColorFilter.mode(
+                                          Colors.black.withOpacity(isFullyFocused ? 0.0 : 0.5), 
+                                          BlendMode.darken,
+                                        )
+                                      )
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -1638,4 +1960,35 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
       ),
     );
   }
+}
+
+class _SimpleConnectionPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final pLine = Paint()
+      ..color = Colors.white.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+      
+    final pDot = Paint()
+      ..color = Colors.white.withOpacity(0.4)
+      ..style = PaintingStyle.fill;
+
+    final Offset c1 = Offset(size.width / 2, 52.5);
+    final Offset c2 = Offset(45, size.height - 69);
+    final Offset c3 = Offset(size.width - 45, size.height - 69);
+
+    canvas.drawLine(c2, c1, pLine);
+    canvas.drawLine(c1, c3, pLine);
+    
+    canvas.drawCircle(c1, 3.5, pDot);
+    canvas.drawCircle(c2, 3.5, pDot);
+    canvas.drawCircle(c3, 3.5, pDot);
+    canvas.drawCircle(c1, 1.5, Paint()..color = Colors.white);
+    canvas.drawCircle(c2, 1.5, Paint()..color = Colors.white);
+    canvas.drawCircle(c3, 1.5, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
