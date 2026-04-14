@@ -59,6 +59,8 @@ class StorageService {
   static const String _keyAuraColor = 'aura_color';
   static const String _keySleepPattern = 'sleep_pattern';
   static const String _keyMatchPreference = 'match_preference';
+  static const String _keyBirthPlace = 'birth_place';
+  static const String _keyPhoneNumber = 'phone_number';
 
   // ══════════════════════════════════════════════════════════════
   // PREMIUM EKONOMİ — İKİ HAVUZLU RUH TAŞI SİSTEMİ
@@ -398,6 +400,24 @@ class StorageService {
   static Future<void> setMatchPreference(bool isOpen) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyMatchPreference, isOpen);
+  }
+
+  static Future<String?> getBirthPlace() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyBirthPlace);
+  }
+  static Future<void> setBirthPlace(String place) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBirthPlace, place);
+  }
+
+  static Future<String?> getPhoneNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyPhoneNumber);
+  }
+  static Future<void> setPhoneNumber(String phone) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyPhoneNumber, phone);
   }
 
   static String _todayKey() =>

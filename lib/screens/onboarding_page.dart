@@ -76,22 +76,21 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void dispose() {
     _stepCtrl.dispose();
-    _stepCtrl.dispose();
     _nameCtrl.dispose();
     _nameFocus.dispose();
-    _handleCtrl.dispose();
-    _handleFocus.dispose();
+    _usernameCtrl.dispose();
+    _usernameFocus.dispose();
     super.dispose();
   }
 
   void _nextStep() {
     HapticFeedback.lightImpact();
-    if (_currentStep == 1 && (_nameCtrl.text.trim().isEmpty || _handleCtrl.text.trim().isEmpty)) return;
+    if (_currentStep == 1 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
 
     if (_currentStep < 7) {
       if (_currentStep == 1) {
         _nameFocus.unfocus();
-        _handleFocus.unfocus();
+        _usernameFocus.unfocus();
       }
       _stepCtrl.reverse().then((_) {
         setState(() => _currentStep++);
@@ -133,7 +132,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     
     // 0. Name & Zodiac & DoB & Handle
     await StorageService.setUserName(_nameCtrl.text.trim());
-    await StorageService.setUserHandle(_handleCtrl.text.trim());
+    await StorageService.setUserHandle(_usernameCtrl.text.trim());
     await StorageService.setZodiacSign(_calculateZodiac(_selectedDate));
     await StorageService.setBirthDate(_selectedDate);
     if (_knowsTime && _selectedTime != null) {
