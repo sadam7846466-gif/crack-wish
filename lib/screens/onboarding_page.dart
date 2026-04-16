@@ -91,10 +91,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   void _nextStep() {
     HapticFeedback.lightImpact();
-    if (_currentStep == 1 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
+    if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
 
-    if (_currentStep < 6) {
-      if (_currentStep == 1) {
+    if (_currentStep < 7) {
+      if (_currentStep == 2) {
         _nameFocus.unfocus();
         _usernameFocus.unfocus();
       }
@@ -236,14 +236,18 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 if (_currentStep > 0) const SizedBox(height: 12), // Tepe boşluğunu daha da kısalttık, yazılar çok yukarda olacak
-                                if (_currentStep == 0) _buildWelcomeStep(),
-                                if (_currentStep == 1) _buildStep0(),
-                                if (_currentStep == 2) _buildStepDateWithWheels(),
-                                if (_currentStep == 3) _buildStep1(),
-                                if (_currentStep == 4) _buildStep2(),
-                                if (_currentStep == 5) _buildStep3(),
-                                if (_currentStep == 6) _buildStep4(),
-                                const SizedBox(height: 24), // Sadece rahat bir nefes payı bırakıldı, bottomNavigationBar artık kendi gerçek alanını kaplayacak
+                                if (_currentStep == 0) SizedBox(height: constraints.maxHeight, child: _buildWelcomeStep()),
+                                if (_currentStep == 1) _buildFeaturesStep(),
+                                if (_currentStep == 2) _buildStep0(),
+                                if (_currentStep == 3) _buildStepDateWithWheels(),
+                                if (_currentStep == 4) _buildStep1(),
+                                if (_currentStep == 5) _buildStep2(),
+                                if (_currentStep == 6) _buildStep3(),
+                                if (_currentStep == 7) _buildStep4(),
+                                if (_currentStep > 0)
+                                   const SizedBox(height: 60), // Kilit ikonunun ve alt modüllerin üzerine binmemesi için oluşturulan dev tampon/scroll bölgesi
+                                if (_currentStep == 0)
+                                   const SizedBox(height: 24),
                               ],
                             ),
                           ),
@@ -260,56 +264,53 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                 child: SlideTransition(
                   position: _slideAnim,
                   child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                    padding: const EdgeInsets.only(left: 28, right: 28, top: 10, bottom: 12), // Aşırı yukarı itme iptal edildi, orjinal alt çizgi sınırına geri yaklaştırıldı
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Kilit yazısı sayfa göstergeleri ve Butonun "ÜSTÜNE" taşındı
                       if (_currentStep > 0) ...[
-                        Transform.translate(
-                          offset: const Offset(0, -16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(PhosphorIcons.lockKey(PhosphorIconsStyle.fill), color: Colors.white.withOpacity(0.15), size: 14),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Yalnızca sana özel haritanı çizmek içindir.",
-                                style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      // Roma Rakamlı Bölüm Belirteci - İçeriğin Ortasında
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(7, (index) {
-                          final isActive = _currentStep == index;
-                          const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
-                          
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: AnimatedDefaultTextStyle(
-                              duration: const Duration(milliseconds: 200),
-                              style: TextStyle(
-                                color: isActive ? const Color(0xFFD3A29B) : Colors.white.withOpacity(0.2),
-                                fontSize: isActive ? 15 : 13,
-                                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                                letterSpacing: 1.0,
-                                shadows: isActive ? [
-                                  Shadow(color: const Color(0xFFD3A29B).withOpacity(0.6), blurRadius: 10)
-                                ] : [],
-                              ),
-                              child: Text(numerals[index]),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(PhosphorIcons.lockKey(PhosphorIconsStyle.fill), color: Colors.white.withOpacity(0.15), size: 14),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Yalnızca sana özel haritanı çizmek içindir.",
+                              style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3), fontSize: 12),
                             ),
-                          );
-                        }),
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                      // Açık liste: Tüm Roma Rakamları (pasifler soluk, aktif olan parlak)
+                      if (_currentStep > 0)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(7, (index) {
+                            final romanNums = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+                            final isActive = (_currentStep - 1) == index;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 300),
+                                style: GoogleFonts.cinzel(
+                                  color: isActive ? const Color(0xFFD3A29B) : Colors.white.withOpacity(0.25),
+                                  fontSize: 14, // Cinzel biraz küçük kaldığı için bir tık (+1) büyütüldü
+                                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                                  letterSpacing: 1.0,
+                                  shadows: isActive 
+                                    ? [Shadow(color: const Color(0xFFD3A29B).withOpacity(0.6), blurRadius: 10)] 
+                                    : [],
+                                ),
+                                child: Text(romanNums[index]),
+                              ),
+                            );
+                          }),
+                        ),
                       const SizedBox(height: 4), // Roma rakamları butonlara doğru aşağıya yaklaştıırıldı
                       _buildNextButton(
-                        title: _currentStep == 6 ? "Yolculuğa Başla" : "Devam Et",
+                        title: _currentStep == 0 ? "Hadi Başlayalım" : (_currentStep == 6 ? "Yolculuğa Başla" : "Devam Et"),
                         icon: _currentStep == 6 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
                         onTap: _nextStep,
                         glowColor: const Color(0xFFC36E6E), // Splash Screen paletinden yumuşak kırmızımsı/gül kurusu
@@ -332,13 +333,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildTitle(String text) {
     return Text(
       text,
-      textAlign: TextAlign.center,
-      style: GoogleFonts.cormorant(
+      textAlign: TextAlign.center, // Konum değişimi istenmedi
+      style: GoogleFonts.nunito(
         color: Colors.white,
-        fontSize: 36, // Cormorant fontu daha zarif olduğu için font boyutu biraz artırıldı
-        fontWeight: FontWeight.w300, // Lüks serif hissiyatı için çok daha ince ve asil (Light)
+        fontSize: 34, // Nunito daha enli olduğu için hafif dengelendi
+        fontWeight: FontWeight.w900, // Moonie tarzı tok, dolgun ve kalın başlık (Black weight)
         height: 1.2,
-        letterSpacing: 1.0, 
+        letterSpacing: -0.5, // Daha modern, sıkı görünüm
         shadows: [
           Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 16, offset: const Offset(0, 4)),
         ],
@@ -351,13 +352,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       padding: const EdgeInsets.only(top: 12, bottom: 32),
       child: Text(
         text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
+        textAlign: TextAlign.center, // Konum korunuyor
+        style: GoogleFonts.nunito(
           color: Colors.white.withOpacity(0.85),
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
-          letterSpacing: 0.2,
+          fontSize: 16,
+          fontWeight: FontWeight.w700, // Alt başlık da Moonie'deki gibi dikkat çekici ve tok
+          height: 1.4,
+          letterSpacing: 0.0,
           shadows: [
             Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 12, offset: const Offset(0, 2)),
           ],
@@ -378,7 +379,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ],
           Text(
             text.toUpperCase(),
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               color: Colors.white.withOpacity(0.45),
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -390,59 +391,172 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
-  Widget _buildOption(String label, String currentVal, Function(String) onSelect, {int index = 0}) {
+  Widget _buildOption(String emoji, String label, String currentVal, Function(String) onSelect, {int index = 0}) {
     final isSelected = label == currentVal;
-    final color = Color(_auraColor);
+    
+    // Moonie/Apple Style Premium Glass Panel (Geniş, kutu hissi, cam efekti)
     return StaggeredFade(
-      delay: Duration(milliseconds: 150 + (index * 50)), // Kademeli animasyon gecikmesi
+      delay: Duration(milliseconds: 150 + (index * 50)),
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
           onSelect(label);
         },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              decoration: BoxDecoration(
-                color: isSelected ? color.withOpacity(0.12) : Colors.white.withOpacity(0.02),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? color.withOpacity(0.6) : Colors.white.withOpacity(0.08),
-                  width: 1,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20), // Apple cam hissiyatı
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.05), // Çok hafif cam arka planı
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.15), // Apple tarzı soft beyaz seçim karesi
+                    width: isSelected ? 1.5 : 1.0,
+                  ),
+                  boxShadow: isSelected ? [
+                    BoxShadow(color: Colors.white.withOpacity(0.15), blurRadius: 30, spreadRadius: 5) // Seçiliyken dışa yayılan beyaz glow
+                  ] : [],
                 ),
-                boxShadow: isSelected ? [
-                  BoxShadow(color: color.withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 4))
-                ] : [],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: TextStyle(
-                        color: isSelected ? color : Colors.white.withOpacity(0.85),
-                        fontSize: 15,
-                        letterSpacing: 0.2,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                child: Row(
+                  children: [
+                    // Sol tarafa Emoji Kutucuğu (Moonie'deki dolgun ikon)
+                    Container(
+                      padding: const EdgeInsets.all(10), // Emojiyi kapsayan yuvarlak alan
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        emoji,
+                        style: GoogleFonts.nunito(fontSize: 22),
                       ),
                     ),
-                  ),
-                  if (isSelected)
-                    Icon(PhosphorIcons.checkCircle(PhosphorIconsStyle.fill), color: color, size: 22)
-                  else
-                    Icon(PhosphorIcons.circle(PhosphorIconsStyle.regular), color: Colors.white.withOpacity(0.15), size: 22),
-                ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: GoogleFonts.nunito(
+                          color: isSelected ? Colors.white : Colors.white.withOpacity(0.85),
+                          fontSize: 16,
+                          letterSpacing: 0.1,
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, // Apple/Moonie tarzı kalın, tok ve modern oval font
+                        ),
+                      ),
+                    ),
+                    if (isSelected)
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2), // Moonie tik işareti stili
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(PhosphorIcons.check(PhosphorIconsStyle.bold), color: Colors.white, size: 14),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildGridOption(IconData icon, String label, String currentVal, Function(String) onSelect, {int index = 0}) {
+    final isSelected = label == currentVal;
+    
+    return StaggeredFade(
+      delay: Duration(milliseconds: 150 + (index * 50)),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onSelect(label);
+        },
+        child: SizedBox(
+          width: 150,
+          height: 150,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04), // Seçiliyken cam efektini güçlendirecek fon
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isSelected ? const Color(0xFFE5A69E) : Colors.white.withOpacity(0.10),
+                    width: isSelected ? 2.0 : 1.0,
+                  ),
+                  boxShadow: isSelected ? [
+                    BoxShadow(color: const Color(0xFFE5A69E).withOpacity(0.3), blurRadius: 24, spreadRadius: 2)
+                  ] : [],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.white : Colors.white.withOpacity(0.08),
+                            shape: BoxShape.circle,
+                            boxShadow: isSelected ? [
+                              BoxShadow(color: Colors.white.withOpacity(0.4), blurRadius: 16)
+                            ] : [],
+                          ),
+                          child: Icon(icon, color: isSelected ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.7), size: 36),
+                        ),
+                        const SizedBox(height: 14),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            label,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(
+                              color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+                              fontSize: 14,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Positioned(
+                  top: -12,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFC36E6E),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.5), blurRadius: 8, offset: const Offset(0, 4)),
+                        ],
+                      ),
+                      child: Icon(PhosphorIcons.check(PhosphorIconsStyle.bold), color: Colors.white, size: 14),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -517,7 +631,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(title, style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+                  Text(title, style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.35), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
                   const SizedBox(height: 4),
                   child,
                 ],
@@ -538,35 +652,74 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   // ==========================================
-  // STEPS
-  // ==========================================
   Widget _buildWelcomeStep() {
-    return Column(
-      children: [
-        _buildTitle("Kozmik Serüvene\nHoş Geldin"),
-        const SizedBox(height: 8), // Alt Başlık ile başlık arası kısaldı, blok yukarı taşındı
-        _buildSubtitle("Derin bir nefes al ve yıldızların rehberliğine hazır ol."),
-        
-        const SizedBox(height: 16), // Yukarı çekilmesi için 32'den 16'ya düşürüldü
-        
-        _buildFeatureItem(icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill), text: "Sana Özel Astroloji Haritası"),
-        _buildFeatureItem(
-          icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), 
-          text: "Yol Gösterici Tarot Serüveni",
-          angle: math.pi / 2, // Yatay kartları gerçek dikey (vertical) tarot destesi formuna çevirir
-        ),
-        _buildFeatureItem(icon: PhosphorIcons.coffee(PhosphorIconsStyle.fill), text: "Telvelerde Gizlenen Kadim Kahve Falı Sırları"),
-        _buildFeatureItem(icon: PhosphorIcons.moonStars(PhosphorIconsStyle.fill), text: "Bilinçaltı Rüya Analizleri"),
-        _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: "Mistik Çin & Maya Uyumları"),
-        
-        const SizedBox(height: 48),
-      ],
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40), // Kurabiyenin tavanla arasındaki sabit pay, onu hep en yukarıda tutar
+          
+          // Asset Şans Kurabiyesi Görseli
+          Image.asset(
+            'assets/icons/splash_cookie.png',
+            width: 120, // Kibar ve doygun
+            height: 120,
+            fit: BoxFit.contain,
+            color: Colors.white, // Cihaz temasına göre bozulmayı önler
+          ),
+          const Spacer(flex: 2), // Esnek boşluk daraltılarak logo ve motto bloğu hafifçe yukarı (kurabiyeye doğru) çekildi
+          
+          // Düz yazılış, gölgelerden tamamen arındırılmış crack&wish
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: GoogleFonts.nunito(
+                fontSize: 46, // İdeal logonun görsel ağırlığı için hafif yumuşatıldı
+                fontWeight: FontWeight.w600, // Yarı kalın (SemiBold) - tam görseldeki o yumuşak ama belirgin dolgunluk
+                letterSpacing: 0.0, // Harfler arası nefes payı açıldı
+                color: Colors.white,
+                // Kullanıcı isteği: Shadows tamamen silindi
+              ),
+              children: [
+                const TextSpan(text: 'crack'),
+                TextSpan(
+                  text: '&', 
+                  style: GoogleFonts.nunito(
+                    color: const Color(0xFFD3A29B),
+                    fontWeight: FontWeight.w400, // & işareti logoda bir tık ince kalarak tipografik estetiği artırıyor
+                    // Kullanıcı isteği: Shadows tamamen silindi
+                  ),
+                ),
+                const TextSpan(text: 'wish'),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 12), // Logo ile Motto arasındaki mesafe eski haline (12) döndürüldü
+          
+          // Kullanıcının Özel Beklenti Mottosu
+          Text(
+            "Bugün umutlarım hayallerimden daha büyük.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              color: Colors.white.withOpacity(0.85), // Premium puslu hissiyat
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 0.5,
+            ),
+          ),
+
+          const Spacer(flex: 4), 
+        ],
+      ),
     );
   }
 
   Widget _buildFeatureItem({required IconData icon, required String text, double angle = 0.0}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24, left: 40, right: 24), // Maddeler arasındaki nefes alma boşluğu artırıldı
+      padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24), // Yazılar ikonlarla beraber daha sola kaydırıldı (40'tan 24'e düşürüldü)
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -586,22 +739,64 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               child: Icon(icon, color: Colors.white, size: 22),
             ),
           ),
-          const SizedBox(width: 20),
-          Expanded( // Flex kullanıyoruz ki metin ikonların düzenini asla bozmasın
-            child: Text(
-              text,
-              textAlign: TextAlign.left, // Tüm yazılar ip gibi soldan başlar
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.5,
-                shadows: [
-                  Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 16, offset: const Offset(0, 4)),
-                  Shadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
-                ],
+          const SizedBox(width: 12), // İkon ile metin arası mesafe daraltılarak yazılar daha da sola çekildi
+          Expanded( 
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4.0), // Yazılar hizalanma amaçlı hafifçe aşağı kaydırıldı
+              child: Text(
+                text,
+                textAlign: TextAlign.left,
+                style: GoogleFonts.nunito(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.5,
+                  shadows: [
+                    Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 16, offset: const Offset(0, 4)),
+                    Shadow(color: Colors.black.withOpacity(0.4), blurRadius: 8),
+                  ],
+                ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturesStep() {
+    return Transform.translate(
+      offset: const Offset(0, -15),
+      child: Column(
+        children: [
+          _buildTitle("Seni Neler Bekliyor?"),
+          const SizedBox(height: 12),
+          _buildSubtitle("Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?"),
+          const SizedBox(height: 32), // Yazı ve ikonlar arası temiz boşluk
+          
+          StaggeredFade(
+            delay: const Duration(milliseconds: 300),
+            child: _buildFeatureItem(icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill), text: "Sana Özel Astroloji Haritası"),
+          ),
+          StaggeredFade(
+            delay: const Duration(milliseconds: 450),
+            child: _buildFeatureItem(
+              icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), 
+              text: "Yol Gösterici Tarot Serüveni",
+              angle: math.pi / 2, // Yatay kartları gerçek dikey (vertical) tarot destesi formuna çevirir
+            ),
+          ),
+          StaggeredFade(
+            delay: const Duration(milliseconds: 600),
+            child: _buildFeatureItem(icon: PhosphorIcons.coffee(PhosphorIconsStyle.fill), text: "Telvelerde Gizlenen Kadim Kahve Falı Sırları"),
+          ),
+          StaggeredFade(
+            delay: const Duration(milliseconds: 750),
+            child: _buildFeatureItem(icon: PhosphorIcons.moonStars(PhosphorIconsStyle.fill), text: "Bilinçaltı Rüya Analizleri"),
+          ),
+          StaggeredFade(
+            delay: const Duration(milliseconds: 900),
+            child: _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: "Mistik Çin & Maya Uyumları"),
           ),
         ],
       ),
@@ -649,7 +844,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: TextField(
                      controller: _nameCtrl,
                      focusNode: _nameFocus,
-                     style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
+                     style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
                      cursorColor: const Color(0xFFD18471), // Lüks altın/somon
                      textCapitalization: TextCapitalization.words,
                      decoration: InputDecoration(
@@ -657,7 +852,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                        isDense: true,
                        contentPadding: EdgeInsets.zero,
                        hintText: "Örn: Yıldız Tozu \uD83C\uDF19",
-                       hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                       hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
                      ),
                  ),
               ),
@@ -669,7 +864,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: TextField(
                      controller: _usernameCtrl,
                      focusNode: _usernameFocus,
-                     style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+                     style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
                      cursorColor: const Color(0xFFD18471),
                      keyboardType: TextInputType.emailAddress, // Boşluksuz ve küçük harf klavye yapısı için ideal
                      decoration: InputDecoration(
@@ -677,7 +872,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                        isDense: true,
                        contentPadding: EdgeInsets.zero,
                        hintText: "@kozmikyolcu",
-                       hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                       hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
                      ),
                  ),
               ),
@@ -745,22 +940,22 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final String mSign = _hasSelectedDate ? _getMayanZodiac(_selectedDate).toUpperCase() : "MAYA";
 
     return Transform.translate(
-      offset: const Offset(0, -25), // Başlığı ve içeriği bir tık yukarı taşımak için
+      offset: const Offset(0, 0), // Başlık kaybolmasın diye sıfırlandı
       child: Column(
         children: [
         _buildTitle("Kozmik Koordinat"),
         _buildSubtitle("Astrolojik haritanın temeli için doğduğun anı seç."),
-        const SizedBox(height: 20), // Kozmik çarkları biraz aşağıya doğru kaydırarak nefes aldırır
+        // SizedBox boşluğu silinerek içerik bir tık yukarı çekildi
         StaggeredFade(
           delay: const Duration(milliseconds: 300),
           child: Container(
-            height: 160,
+            height: 190, // Çark alanına nefes aldırıldı
             width: double.infinity,
             alignment: Alignment.center,
             color: Colors.transparent,
             child: SizedBox(
-              width: 280,
-              height: 160,
+              width: 320, 
+              height: 190,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -770,7 +965,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    top: 0,
+                    top: 0, 
+                    left: 90, // Merkez X = 160
+                    width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: cTargetRotation),
                       duration: const Duration(milliseconds: 1500),
@@ -779,8 +976,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    left: 0,
-                    bottom: 0,
+                    left: -20, 
+                    bottom: 15, // Tekerleğin altı kesilmemesi için yukarı alındı
+                    width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: wTargetRotation),
                       duration: const Duration(milliseconds: 1500),
@@ -789,13 +987,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    right: 0,
-                    bottom: 0,
+                    left: 200, 
+                    bottom: 35, // Batı ile simetri kırığı esnetildi
+                    width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: mTargetRotation),
                       duration: const Duration(milliseconds: 1500),
                       curve: Curves.easeOutCubic,
-                      builder: (context, angle, child) => _buildMiniWheel(mSign, MayanWheelPainter(rotation: angle, gold: Colors.white, goldD: Colors.white.withOpacity(0.5), isMini: true), 90),
+                      builder: (context, angle, child) => _buildMiniWheel(mSign, MayanWheelPainter(rotation: angle, gold: Colors.white, goldD: Colors.white.withOpacity(0.5), isMini: true), 96), 
                     ),
                   ),
                 ],
@@ -803,10 +1002,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             )
           )
         ),
-        const SizedBox(height: 56), // Paneli kullanıcının isteği üzerine biraz daha aşağı taşıdık
-        _buildGlassCard(
-          delay: 400,
-          child: Column(
+        Transform.translate(
+          offset: const Offset(0, 5), // İsteğe istinaden çarklar ile panel arası mesafe biraz daha genişletildi (aşağı kaydırıldı)
+          child: _buildGlassCard(
+            delay: 200, // Sayfa açılır açılmaz hızlıca belirmesi için gecikme azaltıldı
+            child: Column(
             children: [
               _buildUnifiedInputRow(
                  icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
@@ -815,7 +1015,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                    _hasSelectedDate 
                       ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
                       : "Doğum tarihini seç",
-                   style: TextStyle(
+                   style: GoogleFonts.nunito(
                      color: _hasSelectedDate ? Colors.white : Colors.white.withOpacity(0.25), 
                      fontSize: _hasSelectedDate ? 15 : 12, 
                      fontWeight: FontWeight.w400
@@ -834,7 +1034,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: TextStyle(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedTime != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                     Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: GoogleFonts.nunito(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedTime != null ? 15 : 12, fontWeight: FontWeight.w400)),
                    ],
                  ),
                  onTap: () {
@@ -859,7 +1059,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     Text(_selectedLocation ?? "Şehir seçerek hesaplamayı netleştir", style: TextStyle(color: _selectedLocation != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedLocation != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                     Text(_selectedLocation ?? "Şehir seçerek hesaplamayı netleştir", style: GoogleFonts.nunito(color: _selectedLocation != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedLocation != null ? 15 : 12, fontWeight: FontWeight.w400)),
                    ],
                  ),
                  onTap: () {
@@ -879,7 +1079,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               ),
             ],
           ),
-        ),
+        )),
       ]
     ));
   }
@@ -927,7 +1127,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: GoogleFonts.nunito(
               color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.w600,
@@ -943,19 +1143,24 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return Column(
       children: [
         _buildTitle("Kalbinin Pusulası"),
-        _buildSubtitle("Fallarının frekansı için niyetini belirle."),
+        _buildSubtitle("Niyetini belirle, yolunu çizelim."),
         
-        _buildSectionLabel("HAYAT ODAĞI"),
-        _buildOption("Ruhsal Aydınlanma & Keşif", _lifeFocus, (v) => setState(() => _lifeFocus = v)),
-        _buildOption("Kariyer & Kişisel Güç", _lifeFocus, (v) => setState(() => _lifeFocus = v)),
-        _buildOption("Aşk & Kozmik Uyum", _lifeFocus, (v) => setState(() => _lifeFocus = v)),
-        _buildOption("Şifa & İçsel Huzur", _lifeFocus, (v) => setState(() => _lifeFocus = v)),
-
-        const SizedBox(height: 12),
-        _buildSectionLabel("İLİŞKİ DURUMU"),
-        _buildOption("Yalnız Gökyüzü (Bekar)", _relationship, (v) => setState(() => _relationship = v)),
-        _buildOption("Karmaşık Bir Yörünge", _relationship, (v) => setState(() => _relationship = v)),
-        _buildOption("Eşleşmiş Ruh (İlişkisi Var)", _relationship, (v) => setState(() => _relationship = v)),
+        const SizedBox(height: 32),
+        Container(
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 24, // Checkmark rozetinin üst kareye taşma estetiği için dikey boşluk fazla bırakıldı
+            alignment: WrapAlignment.center,
+          children: [
+            _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 0),
+            _buildGridOption(PhosphorIcons.rocketLaunch(PhosphorIconsStyle.fill), "Kariyer &\nKişisel Güç", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 1),
+            _buildGridOption(PhosphorIcons.heart(PhosphorIconsStyle.fill), "Aşk &\nKozmik Uyum", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 2),
+            _buildGridOption(PhosphorIcons.leaf(PhosphorIconsStyle.fill), "Şifa &\nİçsel Huzur", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 3),
+          ],
+        ),
+        ), // Container closed
       ],
     );
   }
@@ -967,9 +1172,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         _buildSubtitle("Bilinçaltının derinliklerini ve auranı keşfet."),
 
         _buildSectionLabel("RÜYA YAKLAŞIMI"),
-        _buildOption("Haberci & Net Rüyalar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v)),
-        _buildOption("Sürprizli & Kaotik Olaylar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v)),
-        _buildOption("Bulutlar Kadar Sakin", _dreamFrequency, (v) => setState(() => _dreamFrequency = v)),
+        _buildOption("🕊️", "Haberci & Net Rüyalar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 0),
+        _buildOption("🌪️", "Sürprizli & Kaotik Olaylar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 1),
+        _buildOption("☁️", "Bulutlar Kadar Sakin", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 2),
 
         const SizedBox(height: 24),
         _buildSectionLabel("AURA RENGİNİ SEÇ"),
@@ -1012,9 +1217,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         _buildSubtitle("Kozmik mesajlarını hangi aralıkta almak istersin?"),
 
         _buildSectionLabel("UYKU & UYANIŞ DÖNGÜSÜ"),
-        _buildOption("Sabah Kuşu (Erken Uyanan)", _sleepPattern, (v) => setState(() => _sleepPattern = v)),
-        _buildOption("Gece İnsanı (Geç Uyuyan)", _sleepPattern, (v) => setState(() => _sleepPattern = v)),
-        _buildOption("Düzensiz Bir Döngüm Var", _sleepPattern, (v) => setState(() => _sleepPattern = v)),
+        _buildOption("🌅", "Sabah Kuşu (Erken Uyanan)", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 0),
+        _buildOption("🦉", "Gece İnsanı (Geç Uyuyan)", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 1),
+        _buildOption("🌒", "Düzensiz Bir Döngüm Var", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 2),
 
         const SizedBox(height: 32),
         Container(
@@ -1031,7 +1236,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               Expanded(
                 child: Text(
                   "Sana bildirim atarken bu döngüyü dikkate alacağız.",
-                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.4),
+                  style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.4),
                 ),
               )
             ],
@@ -1070,12 +1275,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     children: [
                       Text(
                         "Kozmik Ağ'a Açığım",
-                        style: TextStyle(color: _matchPreference ? Color(_auraColor) : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.nunito(color: _matchPreference ? Color(_auraColor) : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         "Benzer falları seçen ruhlarla etkileşime girmeme izin ver.",
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
+                        style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
                       ),
                     ],
                   ),
@@ -1107,12 +1312,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     children: [
                       Text(
                         "Sadece Kendi Yolculuğum",
-                        style: TextStyle(color: !_matchPreference ? Colors.white : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.nunito(color: !_matchPreference ? Colors.white : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         "Görünmez olmak ve eşleşmemek istiyorum.",
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
+                        style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
                       ),
                     ],
                   ),
@@ -1194,38 +1399,36 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
             return Padding(
               padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-              child: Container(
-                height: 440, // Klavye açıkken harita arama konforu için yükseklik artırıldı
-                margin: const EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border(top: BorderSide(color: Colors.white.withOpacity(0.25), width: 1.5)),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 18.0, sigmaY: 18.0),
-                    child: Material(
-                      color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 40.0, sigmaY: 40.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.45, // Boyut %55'ten %45'e küçültüldü
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12), // Ortak renk değeri (0.10 ve eski 0.15'in ortası)
+                        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2))),
+                      ),
                       child: Column(
                         children: [
-                          Container(
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.15))),
-                            ),
+                          const SizedBox(height: 12),
+                          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
+                          const SizedBox(height: 16),
+                          
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 24),
-                                  child: Text("Dünyadaki Doğum Konumun", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16)),
+                                const SizedBox(width: 50),
+                                Expanded(
+                                  child: Text('Tam Konumu Ara', textAlign: TextAlign.center, style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
                                 CupertinoButton(
-                                  child: const Text('Bitti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                                  padding: EdgeInsets.zero,
+                                  child: Text('Bitti', style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
                                   onPressed: () {
                                     if (tempLocation.trim().isNotEmpty && searchResults.isNotEmpty) {
                                       setState(() => _selectedLocation = searchResults.first);
@@ -1236,19 +1439,24 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               ],
                             ),
                           ),
+                          const SizedBox(height: 4),
+                          Container(height: 1, color: Colors.white.withOpacity(0.05)),
+                          
+                          const SizedBox(height: 16),
                           Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: TextField(
-                              autofocus: false, 
-                              style: const TextStyle(color: Colors.white, fontSize: 17, fontFamily: 'Montserrat'),
-                              cursorColor: const Color(0xFFD18471),
+                              autofocus: true, 
+                              style: GoogleFonts.nunito(color: Colors.white, fontSize: 14),
+                              textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
-                                hintText: "Şehir, ilçe veya ülke araştırın...",
-                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 16, fontFamily: 'Montserrat'),
-                                prefixIcon: Icon(Icons.public, color: Colors.white.withOpacity(0.5), size: 22),
-                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.2))),
-                                focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1.5)),
-                                suffixIcon: isSearching ? const CupertinoActivityIndicator() : null,
+                                hintText: "Köy, ilçe veya şehir yaz...",
+                                hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3)),
+                                prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                                suffixIcon: isSearching ? const Padding(padding: EdgeInsets.all(12), child: CupertinoActivityIndicator(radius: 10)) : null,
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.05),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                               ),
                               onChanged: (val) {
                                 tempLocation = val;
@@ -1265,29 +1473,37 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               },
                             ),
                           ),
+                          const SizedBox(height: 16),
                           
+                          if (tempLocation.trim().isNotEmpty && !isSearching)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: ListTile(
+                                leading: Container(
+                                  width: 32, height: 32,
+                                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
+                                ),
+                                title: Text('"${tempLocation.trim()}"', style: GoogleFonts.nunito(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                                subtitle: Text('Serbest metin olarak ekle', style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _selectedLocation = tempLocation.trim());
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+
                           Expanded( 
                             child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                               itemCount: searchResults.length,
                               itemBuilder: (context, index) {
-                                final parts = searchResults[index].split(',');
-                                final city = parts[0].trim();
-                                final country = parts.length > 1 ? parts[1].trim() : "";
-                                
                                 return ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
-                                  title: Row(
-                                    children: [
-                                      Text(city, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                                      if (country.isNotEmpty) ...[
-                                        const SizedBox(width: 8),
-                                        Expanded(child: Text(country, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14, fontFamily: 'Montserrat'), overflow: TextOverflow.ellipsis)),
-                                      ]
-                                    ],
-                                  ),
+                                  leading: const Icon(Icons.location_on_outlined, color: Colors.white54, size: 20),
+                                  title: Text(searchResults[index], style: GoogleFonts.nunito(color: Colors.white, fontSize: 13)),
                                   onTap: () {
+                                    HapticFeedback.selectionClick();
                                     setState(() => _selectedLocation = searchResults[index]);
                                     Navigator.of(context).pop();
                                   },
@@ -1313,64 +1529,88 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   void _showDatePicker(BuildContext context, {required CupertinoDatePickerMode mode}) {
     showCupertinoModalPopup(
       context: context,
-      builder: (_) => Container(
-        height: 320,
-        margin: const EdgeInsets.only(top: 10), // Yuvarlatılmış köşeler için üst boşluk
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08), // Açık renk, lüks cam efekti
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.25), width: 1.5)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 18.0, sigmaY: 18.0), // Cam bulanıklığı arka plandaki yıldızları gösterir
-            child: Column(
-              children: [
-                Container(
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.15))),
+      builder: (_) => ClipRRect( // ClipRRect ana sarıcı yapıldı, yapı eşitlendi
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 40.0, sigmaY: 40.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.45, // Konum paneliyle BİREBİR aynı daha küçük yükseklik
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12), // Ortak renk değeri (0.10 ve eski 0.15'in ortası)
+                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.2))),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))), // Sürükleme çubuğu
+                  const SizedBox(height: 16),
+                  
+                  // Başlık ve Buton uyumu
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(width: 50), // Başlığı merkeze hizalamak için dummmy boşluk
+                        Expanded(
+                          child: Text(
+                            mode == CupertinoDatePickerMode.date ? 'Doğum Tarihini Seç' : 'Doğum Saatini Seç',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Text('Bitti', style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                          onPressed: () {
+                            setState(() {
+                              if (mode == CupertinoDatePickerMode.date) {
+                                _hasSelectedDate = true;
+                              } else {
+                                _selectedTime ??= DateTime.now(); // Eğer çark hiç döndürülmediyse UI'da görünen şimdiki zamanı kabul et
+                                _knowsTime = true;
+                              }
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CupertinoButton(
-                        child: const Text('Bitti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        onPressed: () => Navigator.of(context).pop(),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: CupertinoTheme(
-                    data: const CupertinoThemeData(
-                      textTheme: CupertinoTextThemeData(
-                        dateTimePickerTextStyle: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400, fontFamily: 'Cormorant'),
+                  
+                  const SizedBox(height: 4),
+                  Container(height: 1, color: Colors.white.withOpacity(0.05)), // Alt çizgi
+                  
+                  Expanded(
+                    child: CupertinoTheme(
+                      data: CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: GoogleFonts.nunito(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        backgroundColor: Colors.transparent,
+                        mode: mode,
+                        initialDateTime: mode == CupertinoDatePickerMode.date ? _selectedDate : (_selectedTime ?? DateTime.now()),
+                        maximumYear: DateTime.now().year,
+                        onDateTimeChanged: (val) {
+                          setState(() {
+                            if (mode == CupertinoDatePickerMode.date) {
+                              _selectedDate = val;
+                              _hasSelectedDate = true;
+                            } else {
+                              _selectedTime = val;
+                              _knowsTime = true;
+                            }
+                          });
+                        },
                       ),
                     ),
-                    child: CupertinoDatePicker(
-                      backgroundColor: Colors.transparent,
-                      mode: mode,
-                      initialDateTime: mode == CupertinoDatePickerMode.date ? _selectedDate : (_selectedTime ?? DateTime.now()),
-                      maximumYear: DateTime.now().year,
-                      onDateTimeChanged: (val) {
-                        setState(() {
-                          if (mode == CupertinoDatePickerMode.date) {
-                            _selectedDate = val;
-                            _hasSelectedDate = true;
-                          } else {
-                            _selectedTime = val;
-                            _knowsTime = true;
-                          }
-                        });
-                      },
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1380,7 +1620,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildNextButton({required String title, required IconData icon, required VoidCallback onTap, required Color glowColor}) {
     return Transform.translate(
-      offset: const Offset(-36, 16), // Bloğun görsel ağırlığını merkeze oturtmak için X ekseninde biraz sola kaydırıldı
+      offset: _currentStep == 0 
+          ? const Offset(-30, 12) // "Hadi Başlayalım" ince ayar ile tam ortaya çekildi
+          : const Offset(-56, 12), // "Devam Et" kelimesi kısa olduğu için daha çok sola itilir
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -1406,13 +1648,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       mainAxisAlignment: MainAxisAlignment.end,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                         // Görsel merkezleme için altın kural: Ok uzunluğunu yutan görünmez bir sol ağırlık (tüm adımlarda aktif)
+                         const SizedBox(width: 26), 
                          Text(
                           title.toUpperCase(),
-                          style: TextStyle(
+                          style: GoogleFonts.nunito(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 4.5, 
+                            letterSpacing: _currentStep == 0 ? 3.0 : 4.5, 
                             shadows: [
                               Shadow(color: glowColor.withOpacity(0.8), blurRadius: 15),
                             ]
@@ -1711,7 +1955,7 @@ class _AnimatedCurvedLineState extends State<_AnimatedCurvedLine> with SingleTic
       animation: _ctrl,
       builder: (context, _) {
         return CustomPaint(
-          size: const Size(220, 24),
+          size: const Size(280, 24), // Kuyruklu yıldızın dalgalı kuyrukları görsel olarak çok daha uzatıldı (220 -> 280)
           painter: _CurvedLinePainter(progress: _ctrl.value, glowColor: widget.glowColor),
         );
       },
@@ -1974,9 +2218,9 @@ class _SimpleConnectionPainter extends CustomPainter {
       ..color = Colors.white.withOpacity(0.4)
       ..style = PaintingStyle.fill;
 
-    final Offset c1 = Offset(size.width / 2, 52.5);
-    final Offset c2 = Offset(45, size.height - 69);
-    final Offset c3 = Offset(size.width - 45, size.height - 69);
+    final Offset c1 = Offset(160, 52.5); // Asya (90 + 70 = 160)
+    final Offset c2 = Offset(50, size.height - 99); // Batı (-20 + 70 = 50)
+    final Offset c3 = Offset(270, size.height - 129); // Maya (200 + 70 = 270)
 
     canvas.drawLine(c2, c1, pLine);
     canvas.drawLine(c1, c3, pLine);
