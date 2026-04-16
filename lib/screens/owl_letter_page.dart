@@ -2563,7 +2563,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
 
     // Mektup gönderimini kaydet
     await StorageService.recordLetterSent();
-    await StorageService.addPendingAura('owl', 1);
+    await StorageService.addPendingAura('baykus', 1);
 
     setState(() {
       _isSending = true;
@@ -3025,31 +3025,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                 child: Center(
                                   child: GestureDetector(
                                     onTap: () async {
-                                      // Play butonuna tıklandı
-                                      if (mounted) {
-                                        showGeneralDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          pageBuilder: (c, _, __) => Center(
-                                            child: Material(
-                                              color: Colors.transparent,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const CircularProgressIndicator(color: Color(0xFFFF8A3D)),
-                                                  const SizedBox(height: 16),
-                                                  Text('Reklam İzleniyor...', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                        await Future.delayed(const Duration(milliseconds: 2500));
-                                        if (mounted) Navigator.of(context).pop(); // Spinner'ı kapat
-                                      }
-                                      if (_adCompleter != null && !_adCompleter!.isCompleted) {
-                                        _adCompleter!.complete(true);
-                                      }
+                                      // Play butonuna tıklandı — gerçek reklam göster
+                                      HapticFeedback.mediumImpact();
+                                      AdService().showRewardedAd(
+                                        () {
+                                          // Reklam izlendi, ödül kazanıldı
+                                          if (_adCompleter != null && !_adCompleter!.isCompleted) {
+                                            _adCompleter!.complete(true);
+                                          }
+                                        },
+                                        () {
+                                          // Reklam kapatıldı (dismiss)
+                                        },
+                                      );
                                     },
                                     child: TweenAnimationBuilder<double>(
                                       tween: Tween(begin: 0.0, end: 1.0),
@@ -3501,30 +3489,19 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         child: Center(
                           child: GestureDetector(
                             onTap: () async {
-                              if (mounted) {
-                                showGeneralDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  pageBuilder: (c, _, __) => Center(
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const CircularProgressIndicator(color: Color(0xFFFF8A3D)),
-                                          const SizedBox(height: 16),
-                                          Text('Reklam İzleniyor...', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                                await Future.delayed(const Duration(milliseconds: 2500));
-                                if (mounted) Navigator.of(context).pop();
-                              }
-                              if (_adCompleter != null && !_adCompleter!.isCompleted) {
-                                _adCompleter!.complete(true);
-                              }
+                              // Play butonuna tıklandı — gerçek reklam göster
+                              HapticFeedback.mediumImpact();
+                              AdService().showRewardedAd(
+                                () {
+                                  // Reklam izlendi, ödül kazanıldı
+                                  if (_adCompleter != null && !_adCompleter!.isCompleted) {
+                                    _adCompleter!.complete(true);
+                                  }
+                                },
+                                () {
+                                  // Reklam kapatıldı (dismiss)
+                                },
+                              );
                             },
                             child: TweenAnimationBuilder<double>(
                               tween: Tween(begin: 0.0, end: 1.0),

@@ -246,10 +246,13 @@ class ProfilePageState extends State<ProfilePage> {
                                             IOSUiSettings(
                                               title: 'Kozmik Kesim',
                                               cancelButtonTitle: 'İptal',
-                                              doneButtonTitle: 'Bitti',
+                                              doneButtonTitle: 'Tamam',
                                               cropStyle: CropStyle.circle,
                                               aspectRatioLockEnabled: true,
                                               resetAspectRatioEnabled: false,
+                                              rotateButtonsHidden: true,
+                                              rotateClockwiseButtonHidden: true,
+                                              aspectRatioPickerButtonHidden: true,
                                             ),
                                           ],
                                         );

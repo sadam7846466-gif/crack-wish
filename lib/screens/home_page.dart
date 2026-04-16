@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   late String _randomSubtitle;
   String? _userName;
   static final _mottledPainter = _MottledPainter();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   static const _subtitles = [
     'Kır, Oku, Gülümse.',
@@ -92,6 +94,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     MockOwlService().removeListener(_onMockOwlUpdate);
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -233,9 +236,28 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _playOwlNotificationSound() async {
+    try {
+      await _audioPlayer.play(AssetSource('sounds/owl_bell.mp3'));
+      // Titreşim de ekleyelim, telefonda hissiyat artsın
+      HapticFeedback.heavyImpact();
+    } catch (e) {
+      debugPrint('Bildirim sesi oynatılamadı: $e');
+    }
+  }
+
   Future<void> _checkUnreadOwlLetters() async {
     final count = await StorageService.getUnreadOwlLetterCount();
     if (!mounted) return;
+    
+    // Eğer yeni mektup geldiyse (ve ilk açılış değilse veya sadece 0'dan arttıysa)
+    if (_unreadOwlCount > 0 && count > _unreadOwlCount) {
+      _playOwlNotificationSound();
+    } else if (_unreadOwlCount == 0 && count > 0) {
+      // Daha önceden uygulamanın içinde dolaşırken ilk mektup düştüğünde
+      _playOwlNotificationSound();
+    }
+
     setState(() => _unreadOwlCount = count);
   }
 

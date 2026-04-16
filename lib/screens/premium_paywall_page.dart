@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class PremiumPaywallPage extends StatefulWidget {
   const PremiumPaywallPage({super.key});
 
@@ -15,6 +15,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   late Animation<Offset> _slideAnimation;
 
   int _selectedPackageIndex = 2; // Yıllık Varsayılan
+  bool _isRestoring = false;
 
   @override
   void initState() {
@@ -114,24 +115,65 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
+                        onTap: () async {
+                          if (_isRestoring) return;
+                          HapticFeedback.lightImpact();
+                          setState(() => _isRestoring = true);
+                          
+                          // Simüle edilmiş Apple/Google Sunucu Bağlantısı
+                          await Future.delayed(const Duration(seconds: 2));
+                          
+                          final prefs = await SharedPreferences.getInstance();
+                          final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+                          
+                          if (!mounted) return;
+                          setState(() => _isRestoring = false);
+                          
+                          if (isPremium) {
+                            HapticFeedback.heavyImpact();
+                            _showGlassMessage(
+                              "Elite Geri Yüklendi",
+                              "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
+                              Icons.check_circle_rounded,
+                              const Color(0xFF10B981),
+                              onOk: () {
+                                Navigator.pop(context); // Paywall'u kapat
+                              }
+                            );
+                          } else {
+                            HapticFeedback.vibrate();
+                            _showGlassMessage(
+                              "Aktif Abonelik Yok",
+                              "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
+                              Icons.error_outline_rounded,
+                              const Color(0xFFF87171),
+                            );
+                          }
                         },
-                        child: const Text("Satın Alımları Geri Yükle", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                        child: _isRestoring 
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2))
+                          : const Text("Satın Alımları Geri Yükle", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
                       )
                     ],
                   ),
                 ),
 
-                // ── MERKEZİ İÇERİK (Sığarsa kaymaz, taşarsa kayar) ──
+                // ── MERKEZİ İÇERİK ──
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
-                    child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(), // Ekran sığıyorsa sekmeyi engeller, lüks hissi korur.
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                        child: Column(
-                          children: [
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const NeverScrollableScrollPhysics(), // TAMAMEN SABİT, ASLA KAYMAZ
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            child: IntrinsicHeight(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                             // ── ICON & BAŞLIK ──
                             Container(
                               padding: const EdgeInsets.all(16),
@@ -177,12 +219,16 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                             _buildGlassPackageRow(0, "Haftalık Uyanış", "₺49.99", "/ hafta"),
                             _buildGlassPackageRow(1, "Aylık Sezgi", "₺129.99", "/ ay", subText: "%35 Tasarruf Edin"),
                             _buildGlassPackageRow(2, "Yıllık Aydınlanma", "₺699.99", "/ yıl", badge: "Popüler", subText: "Aylık Sadece ₺58.33 (%70 Kazanç)"),
-                          ],
-                        ),
-                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-
+                ),
                 // ── ALT BUTON VE YASAL METİN (SABİT) ──
                 SlideTransition(
                   position: _slideAnimation,
@@ -343,6 +389,83 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
           ),
         ),
       ),
+    );
+  }
+
+  void _showGlassMessage(String title, String subtitle, IconData icon, Color color, {VoidCallback? onOk}) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1E).withOpacity(0.6), // Çok koyu saydam lüks zemin
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: color.withOpacity(0.3), width: 1),
+                        ),
+                        child: Icon(icon, color: color, size: 36),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
+                      const SizedBox(height: 8),
+                      Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4)),
+                      const SizedBox(height: 28),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.pop(context); // Modal kapat
+                          if (onOk != null) onOk(); // Varsa ek action (örn: paywall kapat)
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text("Tamam", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: anim1, curve: Curves.easeOutBack)),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }

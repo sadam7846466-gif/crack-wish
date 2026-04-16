@@ -10,13 +10,22 @@ class AdService {
   RewardedAd? _rewardedAd;
   bool _isRewardedAdLoading = false;
 
-  // Google'ın sunduğu evrensel TEST Reklam ID'leri:
-  // Yayınlanmadan önce buralara gerçek AdMob kimliklerini girmelisin.
+  // Yayınlanmadan önce test IDsini kullanmalıyız ki reklamlar her zaman yüklensin.
   String get _rewardedAdUnitId {
-    if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917'; // Android Test Rewarded ID
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313'; // iOS Test Rewarded ID
+    if (kDebugMode) {
+      // ✅ TEST REKLAM ID'leri (Geliştirme sırasında Google bunları %100 yükler)
+      if (Platform.isAndroid) {
+        return 'ca-app-pub-3940256099942544/5224354917'; 
+      } else if (Platform.isIOS) {
+        return 'ca-app-pub-3940256099942544/1712485313'; 
+      }
+    } else {
+      // 🚀 GERÇEK REKLAM ID'leri (Sadece mağazaya yüklendiğinde çalışacak)
+      if (Platform.isAndroid) {
+        return 'ca-app-pub-5096906411582452/3337507175'; // Android Production Rewarded ID
+      } else if (Platform.isIOS) {
+        return 'ca-app-pub-5096906411582452/3877609409'; // iOS Production Rewarded ID
+      }
     }
     throw UnsupportedError("Unsupported platform");
   }

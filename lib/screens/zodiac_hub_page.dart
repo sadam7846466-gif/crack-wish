@@ -342,6 +342,249 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     );
   }
 
+  // ── BATI ASTROLOJİSİ: 1 ücretsiz + 3 reklamlı = günde 4 giriş ──
+  static const String _kWesternFreeDate = 'zodiac_western_free_date';
+  static const String _kWesternAdUsed = 'zodiac_western_ad_used_date';
+  static const String _kWesternAdCount = 'zodiac_western_ad_count';
+  static const int _kWesternMaxAdEntries = 3;
+
+  Future<void> _handleWesternAccess(BuildContext context, VoidCallback onUnlock) async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+
+    // Elite kullanıcı → direkt giriş
+    if (_isPremiumUser) {
+      onUnlock();
+      return;
+    }
+
+    // 1. Günlük ücretsiz hak
+    final savedDate = prefs.getString(_kWesternFreeDate) ?? '';
+    if (savedDate != today) {
+      await prefs.setString(_kWesternFreeDate, today);
+      // Yeni gün: reklam sayacını sıfırla
+      await prefs.setString(_kWesternAdUsed, today);
+      await prefs.setInt(_kWesternAdCount, 0);
+      await StorageService.addPendingAura('zodiac', 1);
+      onUnlock();
+      return;
+    }
+
+    // Reklam sayacını günlük kontrol
+    final adDate = prefs.getString(_kWesternAdUsed) ?? '';
+    int adCount = (adDate == today) ? (prefs.getInt(_kWesternAdCount) ?? 0) : 0;
+    if (adDate != today) {
+      await prefs.setString(_kWesternAdUsed, today);
+      adCount = 0;
+      await prefs.setInt(_kWesternAdCount, 0);
+    }
+
+    // 2. Günlük reklam limiti doldu (3 reklam izlenmiş)
+    if (adCount >= _kWesternMaxAdEntries) {
+      if (!context.mounted) return;
+      _showWesternLimitReached(context);
+      return;
+    }
+
+    // 3. Reklam izle paneli göster
+    if (!context.mounted) return;
+    _showWesternAdPanel(context, adCount, onUnlock);
+  }
+
+  void _showWesternAdPanel(BuildContext context, int adCount, VoidCallback onUnlock) {
+    final remaining = _kWesternMaxAdEntries - adCount;
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'WesternAd',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogCtx, anim1, anim2) {
+        final panelW = MediaQuery.of(dialogCtx).size.width * 0.85;
+        return Center(
+          child: SizedBox(
+            width: panelW,
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.flare_outlined, color: Color(0xFFFFD060), size: 48),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Günlük Ücretsiz Hakkın Doldu',
+                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.\nKalan hak: $remaining',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white.withOpacity(0.08),
+                                  elevation: 0,
+                                  minimumSize: const Size(double.infinity, 48),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: BorderSide(color: const Color(0xFFFFD060).withOpacity(0.3)),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  AdService().showRewardedAd(() async {
+                                    final prefs = await SharedPreferences.getInstance();
+                                    final today = DateTime.now().toIso8601String().split('T')[0];
+                                    int count = prefs.getInt(_kWesternAdCount) ?? 0;
+                                    await prefs.setInt(_kWesternAdCount, count + 1);
+                                    await prefs.setString(_kWesternAdUsed, today);
+                                    await StorageService.addPendingAura('zodiac', 1);
+                                    if (dialogCtx.mounted) {
+                                      Navigator.pop(dialogCtx);
+                                      onUnlock();
+                                    }
+                                  }, () {});
+                                },
+                                icon: Icon(Icons.play_circle_filled_rounded, color: const Color(0xFFFFD060).withOpacity(0.8), size: 18),
+                                label: Text(
+                                  'Reklam İzle',
+                                  style: TextStyle(color: const Color(0xFFFFD060).withOpacity(0.9), fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                  elevation: 0,
+                                  minimumSize: const Size(double.infinity, 48),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(dialogCtx);
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                },
+                                icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
+                                label: const Text(
+                                  'Elite Al',
+                                  style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(opacity: anim1, child: ScaleTransition(scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack), child: child));
+      },
+    );
+  }
+
+  void _showWesternLimitReached(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      barrierDismissible: true,
+      barrierLabel: 'WesternLimit',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogCtx, anim1, anim2) {
+        final panelW = MediaQuery.of(dialogCtx).size.width * 0.85;
+        return Center(
+          child: SizedBox(
+            width: panelW,
+            child: Material(
+              type: MaterialType.transparency,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.lock_clock_rounded, color: Colors.white.withOpacity(0.4), size: 48),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Günlük Limit Doldu',
+                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Bugünlük Batı Astrolojisi hakkın bitti.\nYarın yeni haklar seni bekliyor!\n\nYa da Elite ile sınırsız giriş yap.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.5),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                            elevation: 0,
+                            minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(dialogCtx);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                          },
+                          icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
+                          label: const Text(
+                            'Elite Al — Sınırsız Giriş',
+                            style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(opacity: anim1, child: ScaleTransition(scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack), child: child));
+      },
+    );
+  }
+
   Future<void> _handlePremiumAccess(BuildContext context, String moduleKey, VoidCallback onUnlock) async {
     // 1. Günlük kilit açık mı kontrolü
     final prefs = await SharedPreferences.getInstance();
@@ -469,78 +712,49 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                           const SizedBox(height: 20),
                                           Row(
                                             children: [
-                                              if (hasEnough)
-                                                Expanded(
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
-                                                      elevation: 0,
-                                                      padding: const EdgeInsets.symmetric(vertical: 0),
-                                                      minimumSize: const Size(double.infinity, 48),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(16),
-                                                        side: BorderSide(
-                                                          color: const Color(0xFF22D3EE).withOpacity(0.4),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onPressed: () async {
-                                                      final success = await StorageService.deductSoulStones(1);
-                                                      if (success) {
-                                                        await prefs.setBool(unlockKey, true); // O gün için açıldı
-                                                        if (context.mounted) {
-                                                          Navigator.pop(dialogCtx);
-                                                          onUnlock();
-                                                        }
-                                                      }
-                                                    },
-                                                    child: const FittedBox(
-                                                      fit: BoxFit.scaleDown,
-                                                      child: Text(
-                                                        "1 Ruh Taşı Kullan",
-                                                        style: TextStyle(
-                                                          color: Color(0xFF22D3EE),
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
+                                              Expanded(
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: hasEnough
+                                                        ? const Color(0xFF22D3EE).withOpacity(0.15)
+                                                        : Colors.white.withOpacity(0.05),
+                                                    elevation: 0,
+                                                    padding: const EdgeInsets.symmetric(vertical: 0),
+                                                    minimumSize: const Size(double.infinity, 48),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      side: BorderSide(
+                                                        color: hasEnough
+                                                            ? const Color(0xFF22D3EE).withOpacity(0.4)
+                                                            : Colors.white.withOpacity(0.1),
                                                       ),
                                                     ),
                                                   ),
-                                                )
-                                              else ...[
-                                                Expanded(
-                                                  child: ElevatedButton.icon(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.white.withOpacity(0.08),
-                                                      elevation: 0,
-                                                      minimumSize: const Size(double.infinity, 48),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(16),
-                                                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
-                                                      ),
-                                                    ),
-                                                    onPressed: () {
-                                                      AdService().showRewardedAd(() async {
-                                                        await StorageService.updateSoulStones(1);
-                                                        final success = await StorageService.deductSoulStones(1);
-                                                        if (success) {
-                                                          await prefs.setBool(unlockKey, true);
-                                                          if (context.mounted) {
-                                                            Navigator.pop(dialogCtx);
-                                                            onUnlock();
-                                                          }
-                                                        }
-                                                      }, () {});
-                                                    },
-                                                    icon: Icon(Icons.play_circle_filled_rounded, color: Colors.white.withOpacity(0.7), size: 18),
-                                                    label: FittedBox(
-                                                      fit: BoxFit.scaleDown,
-                                                      child: Text(
-                                                        "Reklam İzle",
-                                                        style: TextStyle(color: Colors.white.withOpacity(0.9), fontWeight: FontWeight.bold),
+                                                  onPressed: hasEnough ? () async {
+                                                    final success = await StorageService.deductSoulStones(1);
+                                                    if (success) {
+                                                      await prefs.setBool(unlockKey, true);
+                                                      if (context.mounted) {
+                                                        Navigator.pop(dialogCtx);
+                                                        onUnlock();
+                                                      }
+                                                    }
+                                                  } : null,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      "1 Ruh Taşı Kullan",
+                                                      style: TextStyle(
+                                                        color: hasEnough
+                                                            ? const Color(0xFF22D3EE)
+                                                            : Colors.white.withOpacity(0.3),
+                                                        fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
                                                   ),
                                                 ),
+                                              ),
+                                              if (!hasEnough) ...[
                                                 const SizedBox(width: 8),
                                                 Expanded(
                                                   child: ElevatedButton.icon(
@@ -639,9 +853,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                 _animWrap(_t1, _wheelSection(
                   wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
                   painter: (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
-                  onTap: () async {
+                  onTap: () => _handleWesternAccess(context, () async {
                     await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
-                  },
+                  }),
                 )),
                 const SizedBox(height: 28),
                 _animWrap(_t2, _wheelSection(

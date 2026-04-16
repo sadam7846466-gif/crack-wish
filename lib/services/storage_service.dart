@@ -1529,4 +1529,18 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('${_keyNotifPrefix}$key', value);
   }
+
+  // --- DEVELOPER FAST RESET ---
+  static Future<void> forceResetDailyLimits() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('cookie_cracks_today');
+    await prefs.remove('cookie_cracks_date');
+    await prefs.remove('letters_sent_today');
+    await prefs.remove('letters_sent_date');
+    await prefs.remove('tarot_done_date');
+    await prefs.remove('dream_done_date');
+    await prefs.remove('zodiac_done_date');
+    await prefs.remove('motiv_done_date');
+    await prefs.remove('owl_last_delivered');
+  }
 }

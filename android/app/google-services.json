@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79501630124",
+    "project_id": "crackwish-21462",
+    "storage_bucket": "crackwish-21462.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79501630124:android:6b3053f635669cf4d7dd09",
+        "android_client_info": {
+          "package_name": "com.vlucky.vlucky_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKAwdj-hZAom938Ev0SSZkG0ubVXIG8ME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
