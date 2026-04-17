@@ -24,6 +24,7 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStateMixin {
   late final AnimationController _stepCtrl;
+  late final AnimationController _shakeCtrl;
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
 
@@ -66,7 +67,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _stepCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _stepCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _shakeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _stepCtrl, curve: Curves.easeOut));
     _slideAnim = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
@@ -82,6 +85,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void dispose() {
     _stepCtrl.dispose();
+    _shakeCtrl.dispose();
     _nameCtrl.dispose();
     _nameFocus.dispose();
     _usernameCtrl.dispose();
@@ -93,53 +97,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     HapticFeedback.lightImpact();
     if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) {
       HapticFeedback.heavyImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(PhosphorIcons.warningCircle(PhosphorIconsStyle.fill), color: const Color(0xFFECA37F), size: 18),
-              const SizedBox(width: 8),
-              Expanded(child: Text("Lütfen profil adını ve kullanıcı adını belirle.", style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600))),
-            ],
-          ),
-          backgroundColor: const Color(0xFF151726).withOpacity(0.85),
-          behavior: SnackBarBehavior.floating,
-          elevation: 0, 
-          // Uyarı balonunu boşluğa doğru en alta (sıfır noktasına) ittik
-          margin: const EdgeInsets.only(bottom: 0, left: 32, right: 32),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1),
-          ),
-          duration: const Duration(seconds: 2),
-        )
-      );
+      _shakeCtrl.forward(from: 0.0);
       return;
     }
     if (_currentStep == 3 && !_hasSelectedDate) {
       HapticFeedback.heavyImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(PhosphorIcons.warningCircle(PhosphorIconsStyle.fill), color: const Color(0xFFECA37F), size: 18),
-              const SizedBox(width: 8),
-              Expanded(child: Text("Haritanı çizebilmemiz için doğum tarihini seçmelisin.", style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600))),
-            ],
-          ),
-          // Daha koyu tonlu, puslu cam uyarısı
-          backgroundColor: const Color(0xFF151726).withOpacity(0.85),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.only(bottom: 0, left: 32, right: 32),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1),
-          ),
-          duration: const Duration(seconds: 2),
-        )
-      );
+      _shakeCtrl.forward(from: 0.0);
       return;
     }
 
@@ -1095,9 +1058,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
 
   Widget _buildGlassCard({required Widget child, required int delay}) {
-    return StaggeredFade(
-      delay: Duration(milliseconds: delay),
-      child: Container(
+    return AnimatedBuilder(
+      animation: _shakeCtrl,
+      builder: (context, animChild) {
+        // Hata anında sağa sola titreme efekti (Sine wave)
+        final dx = math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value);
+        return Transform.translate(
+          offset: Offset(dx, 0),
+          child: animChild,
+        );
+      },
+      child: StaggeredFade(
+        delay: Duration(milliseconds: delay),
+        child: Container(
         margin: const EdgeInsets.only(top: 18), // Çark alanı yükseklik kazandığı için burası dengelendi
         decoration: BoxDecoration(
           color: const Color(0xFFFBE4EB).withOpacity(0.12), // Toz pembe eklendi, camsı zemin
@@ -1114,6 +1087,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             child: child,
           ),
         ),
+      ),
       ),
     );
   }

@@ -2430,38 +2430,38 @@ class _DreamPageState extends State<DreamPage>
                       );
                     }
 
-                    // 💎 Yumuşatılmış Günbatımı (Soft Rose & Peach)
+                    // 💎 Derin Kozmik Okyanus (Midnight Indigo & Ice Cyan)
                     final premiumActiveColors = List.filled(
                       7,
-                      const Color(0xFF25101A).withOpacity(0.40), // Yumuşak koyu bordo taban
+                      const Color(0xFF131B2A).withOpacity(0.40), // Derin mavi/indigo taban
                     );
                     final premiumHalfColors = List.filled(
                       7,
-                      const Color(0xFF25101A).withOpacity(0.20),
+                      const Color(0xFF131B2A).withOpacity(0.20),
                     );
 
-                    // Ahenkli, sıcak ve göz yormayan yansımalar
+                    // Ahenkli, lüks ve buz gibi parlak aydınlanmalar (Elmas temalı)
                     final gemLayers = <Gradient>[
-                      // Üst sol Yumuşak Gül Pembesi (Soft Rose)
+                      // Üst sol Buz Mavi / Ice Cyan 
                       RadialGradient(
                         center: const Alignment(-0.8, -0.6),
                         radius: 2.0,
                         colors: [
-                          const Color(0xFFE91E63).withOpacity(0.22), // Soft Rose Pink
-                          const Color(0xFFE91E63).withOpacity(0.08),
-                          const Color(0xFFE91E63).withOpacity(0.01),
+                          const Color(0xFF22D3EE).withOpacity(0.22), // Diamond Blue (Turkuaz Elmas)
+                          const Color(0xFF22D3EE).withOpacity(0.08),
+                          const Color(0xFF22D3EE).withOpacity(0.01),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.35, 0.65, 1.0],
                       ),
-                      // Alt sağ Tatlı Şeftali (Soft Peach)
+                      // Alt sağ Derin Gök Mavisi (Deep Ocean Blue)
                       RadialGradient(
                         center: const Alignment(0.8, 0.7),
                         radius: 1.5,
                         colors: [
-                          const Color(0xFFFF8A65).withOpacity(0.18), // Soft Peach
-                          const Color(0xFFFF8A65).withOpacity(0.05),
-                          const Color(0xFFFF8A65).withOpacity(0.01),
+                          const Color(0xFF2979FF).withOpacity(0.18), // Electric Royal Blue
+                          const Color(0xFF2979FF).withOpacity(0.05),
+                          const Color(0xFF2979FF).withOpacity(0.01),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.3, 0.6, 1.0],
@@ -2497,7 +2497,7 @@ class _DreamPageState extends State<DreamPage>
                                   : 'Discover secrets',
                               activeGradients: premiumActiveColors,
                               halfGradients: premiumHalfColors,
-                              customGlowColor: const Color(0xFFF48FB1), // Soft Rose Glow
+                              customGlowColor: const Color(0xFF22D3EE), // Vibrant Diamond Cyan Glow
                               isPremium: true,
                               extraGradientLayers: gemLayers,
                               onTap: () async {

@@ -262,20 +262,38 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           ],
         ),
         const SizedBox(height: 12),
-        Text(
-          n['words'].toUpperCase(),
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7), // Biraz daha belirgin yaptık
-            fontSize: 11, 
-            fontWeight: FontWeight.w600, 
-            letterSpacing: 4.0,
-            shadows: [
-              Shadow(color: Colors.black.withValues(alpha: 0.9), blurRadius: 12), // Çizgiler altına girmesin diye sert gölge
-            ]
-          ),
+        RichText(
           textAlign: TextAlign.center,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "${n['meaning'].toUpperCase()}  |  ",
+                style: GoogleFonts.cinzel(
+                  color: Colors.white.withValues(alpha: 0.9), // IK ile aynı renk ailesi (Burç adı ve Çevirisi)
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3.0,
+                  shadows: [
+                    Shadow(color: Colors.black.withValues(alpha: 0.9), blurRadius: 10),
+                  ]
+                ),
+              ),
+              TextSpan(
+                text: n['words'].toUpperCase(),
+                style: TextStyle(
+                  color: _goldBright, // Mottosu/Simgelediği şey altın sarısı
+                  fontSize: 10, 
+                  fontWeight: FontWeight.w600, 
+                  letterSpacing: 3.0,
+                  shadows: [
+                    Shadow(color: Colors.black.withValues(alpha: 0.9), blurRadius: 12),
+                  ]
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 18), // Boşluğu artırdık
+        const SizedBox(height: 20), // Doğum tarihine biraz nefes alanı
         
         // Doğum Tarihi Kabuğu (Tasarım iyileştirildi)
         GestureDetector(
@@ -596,7 +614,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${todayNahual['name'].toUpperCase()} (TON $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                                Text('${todayNahual['name'].toUpperCase()} • ${todayNahual['meaning'].toUpperCase()} (TON $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                 const SizedBox(height: 4),
                                 Text(
                                   '${todayNahual['words'].toUpperCase()} • ${todayToneData['title']!.split('(').first.trim().toUpperCase()}', 
