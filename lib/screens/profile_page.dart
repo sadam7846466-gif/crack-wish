@@ -3110,6 +3110,15 @@ class _BentoHeroCard extends StatelessWidget {
                                   final isAppOpenDay = appOpenDays.contains(dateKey);
                                   final isClaimed = claimedDays.contains(dateKey);
 
+                                  final prevDate = testDate.subtract(const Duration(days: 1));
+                                  final nextDate = testDate.add(const Duration(days: 1));
+                                  final prevKey = "${prevDate.year.toString().padLeft(4, '0')}-${prevDate.month.toString().padLeft(2, '0')}-${prevDate.day.toString().padLeft(2, '0')}";
+                                  final nextKey = "${nextDate.year.toString().padLeft(4, '0')}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}";
+                                  
+                                  final dayIdx = firstWeekday - 1 + i - 1;
+                                  final isConnectedLeft = dayIdx % 7 != 0 && isAppOpenDay && appOpenDays.contains(prevKey);
+                                  final isConnectedRight = dayIdx % 7 != 6 && isAppOpenDay && appOpenDays.contains(nextKey);
+
                                   calendarDays.add(
                                     _ClaimableFireCell(
                                       day: i,
@@ -3117,6 +3126,8 @@ class _BentoHeroCard extends StatelessWidget {
                                       isFuture: isFuture,
                                       isAppOpenDay: isAppOpenDay,
                                       isClaimed: isClaimed,
+                                      isConnectedLeft: isConnectedLeft,
+                                      isConnectedRight: isConnectedRight,
                                       dateKey: dateKey,
                                       onClaimed: () {
                                         setModalState(() {
@@ -3869,7 +3880,7 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                         Text(
                           widget.isPremium
                               ? (widget.lang == 'tr' ? 'Elite Büyücüsün' : 'You are Elite')
-                              : (widget.lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium'),
+                              : (widget.lang == 'tr' ? 'Elite\'e Geç' : 'Go Elite'),
                           style: TextStyle(
                             color: widget.isPremium ? const Color(0xFF22D3EE) : const Color(0xFFD4A574),
                             fontSize: 15,
@@ -3880,8 +3891,8 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                         const SizedBox(height: 3),
                         Text(
                           widget.isPremium
-                              ? (widget.lang == 'tr' ? 'Mistk kapılar emrinde' : 'Mystical gates await')
-                              : (widget.lang == 'tr' ? 'Sınırsız kurabiye ve özel özellikler' : 'Unlimited cookies and exclusive features'),
+                              ? (widget.lang == 'tr' ? 'Mistik kapılar emrinde' : 'Mystical gates await')
+                              : (widget.lang == 'tr' ? 'Kozmik farkındalığa giden kapıyı aç' : 'Unlock the door to cosmic awareness'),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.45),
                             fontSize: 11,
@@ -4626,6 +4637,8 @@ class _ClaimableFireCell extends StatefulWidget {
   final bool isFuture;
   final bool isAppOpenDay;
   final bool isClaimed;
+  final bool isConnectedLeft;
+  final bool isConnectedRight;
   final String dateKey;
   final VoidCallback? onClaimed;
 
@@ -4635,6 +4648,8 @@ class _ClaimableFireCell extends StatefulWidget {
     required this.isFuture,
     required this.isAppOpenDay,
     required this.isClaimed,
+    this.isConnectedLeft = false,
+    this.isConnectedRight = false,
     required this.dateKey,
     this.onClaimed,
   });
@@ -4732,6 +4747,25 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
           return Stack(
             clipBehavior: Clip.none,
             children: [
+              // Bağlantı çubuğu (Seriyi birleştirmek için arkada kalacak çizgi)
+              if (widget.isConnectedLeft || widget.isConnectedRight)
+                Positioned(
+                  top: 0, bottom: 0,
+                  left: widget.isConnectedLeft ? -3 : 19.5, // 19.5 radius merkeze denk getirir yaklaşık olarak, dengelemek için
+                  right: widget.isConnectedRight ? -3 : 19.5,
+                  child: Center(
+                    child: Container(
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                        borderRadius: BorderRadius.horizontal(
+                          left: widget.isConnectedLeft ? Radius.zero : const Radius.circular(5),
+                          right: widget.isConnectedRight ? Radius.zero : const Radius.circular(5),
+                        )
+                      ),
+                    ),
+                  )
+                ),
               // Ana hücre (Pop efekti ile)
               Transform.scale(
                 scale: _explosionController.isAnimating ? _scaleAnim.value : 1.0,

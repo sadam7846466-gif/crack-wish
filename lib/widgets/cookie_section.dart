@@ -16,6 +16,7 @@ import '../services/storage_service.dart';
 import '../services/ad_service.dart';
 import 'share_modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../services/purchase_service.dart';
 
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
@@ -1712,6 +1713,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
   }
 
   bool _closing = false;
+  bool _isPurchasing = false;
 
   void _close() {
     if (_closing) return;
@@ -1721,42 +1723,87 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
     });
   }
 
+  Future<void> _handlePurchase() async {
+    if (_isPurchasing) return;
+    HapticFeedback.mediumImpact();
+    setState(() => _isPurchasing = true);
+
+    try {
+      // Kurabiye ID'sine göre ürün ID'sini belirle
+      final productId = 'cookie_${widget.cookieId}';
+      final success = await PurchaseService().purchase(productId);
+
+      if (!success && mounted) {
+        HapticFeedback.heavyImpact();
+        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isTr ? 'Şu anda satın alma yapılamıyor.' : 'Purchase unavailable right now.',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.redAccent.withOpacity(0.9),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Kurabiye satın alma hatası: $e');
+    } finally {
+      if (mounted) setState(() => _isPurchasing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _close,
-      child: Material(
-        color: Colors.transparent,
-        child: AnimatedBuilder(
-          animation: _ctrl,
-          builder: (context, child) {
-            return Stack(
+    return Material(
+      color: Colors.transparent,
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (context, child) {
+          return SizedBox.expand(
+            child: Stack(
               children: [
                 Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withOpacity(0.45 * _fadeAnim.value),
-                  ),
-                ),
-                Center(
-                  child: FadeTransition(
-                    opacity: _fadeAnim,
-                    child: Transform.translate(
-                      offset: Offset(0, _slideAnim.value),
-                      child: Transform.scale(
-                        scale: _scaleAnim.value,
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: _buildGlassPanel(),
-                        ),
+                  child: Listener(
+                    onPointerMove: (_) => _close(),
+                    behavior: HitTestBehavior.translucent,
+                    child: GestureDetector(
+                      onTap: _close,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.45 * _fadeAnim.value),
                       ),
                     ),
                   ),
                 ),
+                Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FadeTransition(
+                        opacity: _fadeAnim,
+                        child: Transform.translate(
+                          offset: Offset(0, _slideAnim.value - 90),
+                          child: Transform.scale(
+                            scale: _scaleAnim.value,
+                            child: GestureDetector(
+                              onTap: () {},
+                              onVerticalDragStart: (_) => _close(),
+                              onHorizontalDragStart: (_) => _close(),
+                              child: _buildGlassPanel(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -1774,13 +1821,13 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
         : const Color(0xFF7DD4FF); // Açık mavi
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 28),
+      margin: const EdgeInsets.symmetric(horizontal: 42),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), // 40 → 18 (performans)
           child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.12),
               borderRadius: BorderRadius.circular(22),
@@ -1800,14 +1847,16 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
               mainAxisSize: MainAxisSize.min,
               children: [
                 // ── Kurabiye görseli + nadirlik badge ──
-                Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
+                SizedBox(
+                  width: 76,
+                  height: 76,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
                     // Kurabiye görseli — hafif bulanık
                     Container(
-                      width: 90,
-                      height: 90,
+                      width: 76,
+                      height: 76,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
@@ -1829,32 +1878,12 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                                 imageFilter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
                                 child: Image.asset(
                                   widget.imagePath!,
-                                  width: 60,
-                                  height: 60,
+                                  width: 50,
+                                  height: 50,
                                   fit: BoxFit.contain,
                                 ),
                               )
                             : const Text('🥠', style: TextStyle(fontSize: 36, fontFamilyFallback: ['Apple Color Emoji'])),
-                      ),
-                    ),
-                    // Kilit ikonu
-                    Positioned(
-                      bottom: -2,
-                      right: -2,
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black.withOpacity(0.4),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.25),
-                            width: 0.6,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text('🔒', style: TextStyle(fontSize: 13, fontFamilyFallback: const ['Apple Color Emoji'])),
-                        ),
                       ),
                     ),
                     // Nadirlik badge — sağ üstte
@@ -1884,90 +1913,42 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 12),
                 // ── Kurabiye adı ──
                 Text(
                   cookieName,
                   style: const TextStyle(
                     color: Color(0xFFF5EDE4),
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   isTr ? 'Premium Koleksiyon' : 'Premium Collection',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.45),
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.8,
                   ),
                 ),
-                const SizedBox(height: 18),
-                // ── Özellik listesi ──
-                _buildFeatureRow(
-                  PhosphorIcons.sparkle(PhosphorIconsStyle.fill),
-                  isTr ? 'Özel şans mesajları' : 'Exclusive fortune messages',
-                  const Color(0xFFFFD700),
-                ),
                 const SizedBox(height: 10),
-                _buildFeatureRow(
-                  PhosphorIcons.magicWand(PhosphorIconsStyle.fill),
-                  isTr ? 'Benzersiz kırılma animasyonu' : 'Unique cracking animation',
-                  const Color(0xFFE8A0FF),
-                ),
-                const SizedBox(height: 10),
-                _buildFeatureRow(
-                  PhosphorIcons.star(PhosphorIconsStyle.fill),
-                  isTr ? '3x koleksiyon puanı' : '3x collection points',
-                  const Color(0xFFF7941D),
-                ),
-                const SizedBox(height: 22),
                 // ── Fiyat + Satın Al Butonu ──
-                GestureDetector(
-                  onTap: () {
-                    // TODO: Satın alma işlemi (App Store / Google Play)
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.20),
-                          Colors.white.withOpacity(0.10),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.30),
-                        width: 0.6,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        isTr ? 'Yakında Satışa Çıkacak ✨' : 'Coming Soon ✨',
-                        style: const TextStyle(
-                          color: Color(0xFFF5EDE4),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ),
-                  ),
+                _PurchaseButton(
+                  isPurchasing: _isPurchasing,
+                  label: isTr ? 'Satın Al (₺29.99)' : 'Purchase (\$0.99)',
+                  onTap: _handlePurchase,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 // ── Kapat ipucu ──
                 Text(
                   isTr ? 'Kapatmak için dışına dokun' : 'Tap outside to close',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.30),
-                    fontSize: 11,
+                    color: Colors.white.withOpacity(0.25),
+                    fontSize: 10,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -2010,6 +1991,85 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
           ),
         ),
       ],
+    );
+   }
+}
+
+// ── Satın Al Butonu (Tıklama Efekti + Haptic + Loading) ──
+class _PurchaseButton extends StatefulWidget {
+  final bool isPurchasing;
+  final String label;
+  final VoidCallback onTap;
+
+  const _PurchaseButton({
+    required this.isPurchasing,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  State<_PurchaseButton> createState() => _PurchaseButtonState();
+}
+
+class _PurchaseButtonState extends State<_PurchaseButton> with SingleTickerProviderStateMixin {
+  double _scale = 1.0;
+
+  void _onTapDown(TapDownDetails _) {
+    setState(() => _scale = 0.94);
+  }
+
+  void _onTapUp(TapUpDetails _) {
+    setState(() => _scale = 1.0);
+  }
+
+  void _onTapCancel() {
+    setState(() => _scale = 1.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: const Color(0xFF4EE6C5).withOpacity(0.15),
+            border: Border.all(
+              color: const Color(0xFF4EE6C5).withOpacity(0.40),
+              width: 0.6,
+            ),
+          ),
+          child: Center(
+            child: widget.isPurchasing
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF4EE6C5),
+                    ),
+                  )
+                : Text(
+                    widget.label,
+                    style: const TextStyle(
+                      color: Color(0xFF4EE6C5),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+          ),
+        ),
+      ),
     );
   }
 }

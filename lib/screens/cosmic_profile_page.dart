@@ -122,13 +122,8 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
 
     final prefs = await SharedPreferences.getInstance();
     final lastUpdateStr = prefs.getString('last_cosmic_profile_update');
-    if (lastUpdateStr != null) {
-      final lastUpdate = DateTime.parse(lastUpdateStr);
-      final daysPassed = DateTime.now().difference(lastUpdate).inDays;
-      if (daysPassed < 30) {
-        _daysUntilUnlock = 30 - daysPassed;
-      }
-    }
+    // SINIR KALDIRILDI: Artık herkes dilediği zaman profilini güncelleyebilir.
+    _daysUntilUnlock = 0;
 
     if (mounted) {
       setState(() {
@@ -277,116 +272,95 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
     return '${lat.toString().padLeft(2, '0')}°${(hash % 60).toString().padLeft(2, '0')}\'12"$latDir  ${lng.toString().padLeft(2, '0')}°${(hash % 60).toString().padLeft(2, '0')}\'44"$lngDir';
   }
 
-  Widget _buildAvatarHeader(String lang) {
-    final zodiacIconName = getWesternZodiac(currentBirthDate); // Gets 'Akrep', 'Aries', or '-'
-    
-    // Convert translated zodiac text into a simple unified visual string symbol
-    String zodiacSymbol = '✨'; 
-    if (zodiacIconName != '-') {
-      final z = zodiacIconName.toLowerCase();
-      if (z == 'koç' || z == 'aries') zodiacSymbol = '♈';
-      if (z == 'boğa' || z == 'taurus') zodiacSymbol = '♉';
-      if (z == 'ikizler' || z == 'gemini') zodiacSymbol = '♊';
-      if (z == 'yengeç' || z == 'cancer') zodiacSymbol = '♋';
-      if (z == 'aslan' || z == 'leo') zodiacSymbol = '♌';
-      if (z == 'başak' || z == 'virgo') zodiacSymbol = '♍';
-      if (z == 'terazi' || z == 'libra') zodiacSymbol = '♎';
-      if (z == 'akrep' || z == 'scorpio') zodiacSymbol = '♏';
-      if (z == 'yay' || z == 'sagittarius') zodiacSymbol = '♐';
-      if (z == 'oğlak' || z == 'capricorn') zodiacSymbol = '♑';
-      if (z == 'kova' || z == 'aquarius') zodiacSymbol = '♒';
-      if (z == 'balık' || z == 'pisces') zodiacSymbol = '♓';
-    }
-
+  Widget _buildTopLiveSummary(String lang) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 12, bottom: 20, left: 24, right: 24),
+      padding: const EdgeInsets.only(top: 8, bottom: 20, left: 16, right: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.01),
         border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05), width: 1)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar + Zodiac Badge
-          Stack(
-            clipBehavior: Clip.none,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFC084FC).withOpacity(0.4), width: 2),
-                  boxShadow: [
-                    BoxShadow(color: const Color(0xFFC084FC).withOpacity(0.2), blurRadius: 16, spreadRadius: -2)
-                  ],
-                ),
-                child: ClipOval(
-                  child: Padding(
-                    padding: EdgeInsets.all(_userAvatar.contains('owl') ? 2.0 : 0.0),
-                    child: Transform.scale(
-                      scale: _userAvatar.contains('owl') ? 1.3 : 1.0,
-                      child: _userAvatar.startsWith('http')
-                          ? Image.network(_userAvatar, fit: BoxFit.cover, errorBuilder: (_,__,___) => Icon(Icons.person, color: Colors.white.withOpacity(0.3), size: 30))
-                          : _userAvatar.startsWith('assets') 
-                              ? Image.asset(_userAvatar, fit: _userAvatar.contains('owl') ? BoxFit.contain : BoxFit.cover)
-                              : Image.file(File(_userAvatar), fit: BoxFit.cover, errorBuilder: (_,__,___) => Icon(Icons.person, color: Colors.white.withOpacity(0.3), size: 30)),
-                    ),
-                  ),
-                ),
+              _buildSummaryNode(
+                lang == 'tr' ? 'BATI' : 'WESTERN',
+                getWesternZodiac(currentBirthDate),
+                const Color(0xFFC084FC),
+                Icons.flare_outlined,
               ),
-              // Zodiac badge pinned next to frame
-              Positioned(
-                bottom: -4,
-                right: -4,
-                child: Container(
-                  width: 26,
-                  height: 26,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F1F2A),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 6),
-                    ]
-                  ),
-                  child: Center(
-                    child: Text(
-                      zodiacSymbol,
-                      style: const TextStyle(fontSize: 12, color: Color(0xFFC084FC)),
-                    ),
-                  ),
-                ),
+              _buildSummaryNode(
+                lang == 'tr' ? 'ASYA' : 'ASIAN',
+                getChineseZodiac(currentBirthDate),
+                const Color(0xFFFF6B6B),
+                Icons.brightness_medium_outlined,
+              ),
+              _buildSummaryNode(
+                lang == 'tr' ? 'MAYA' : 'MAYAN',
+                getMayanZodiac(currentBirthDate),
+                const Color(0xFF2DD4BF),
+                Icons.filter_vintage_outlined,
+              ),
+              _buildSummaryNode(
+                lang == 'tr' ? 'YÜKSELEN' : 'RISING',
+                getAscendant(currentBirthDate, currentBirthTime),
+                const Color(0xFF60A5FA),
+                Icons.north_east_rounded,
               ),
             ],
           ),
-          const SizedBox(width: 20),
-          // User Name
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _userName.isNotEmpty ? _userName : (lang == 'tr' ? 'Uzaylı' : 'Cosmic Being'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryNode(String title, String value, Color color, IconData icon) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, color: color.withOpacity(0.6), size: 16),
+          const SizedBox(height: 12),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              final inAnimation = Tween<Offset>(begin: const Offset(0.0, 0.5), end: Offset.zero).animate(animation);
+              final outAnimation = Tween<Offset>(begin: const Offset(0.0, -0.5), end: Offset.zero).animate(animation);
+
+              return SlideTransition(
+                position: child.key == ValueKey<String>(value) ? inAnimation : outAnimation,
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  lang == 'tr' ? 'Spiritüel Verilerin' : 'Your Spiritual Data',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
+              );
+            },
+            child: Text(
+              value,
+              key: ValueKey<String>(value),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              color: color.withOpacity(0.8),
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
             ),
           ),
         ],
@@ -552,7 +526,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                   ),
                 ),
             // Always fixed at the very top: The Live Summary!
-            _buildAvatarHeader(lang),
+            _buildTopLiveSummary(lang),
             
             // Scrollable forms
             Expanded(

@@ -12,13 +12,20 @@ import 'screens/splash_screen.dart';
 import 'services/locale_controller.dart';
 import 'services/ad_service.dart';
 import 'services/storage_service.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vlucky_flutter/services/push_notification_service.dart';
 import 'package:vlucky_flutter/services/auth_service.dart';
-import 'package:vlucky_flutter/services/revenuecat_service.dart';
+import 'package:vlucky_flutter/services/purchase_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Güvenlik Kalkanı: Ekranı tüm cihazlarda BİRİNCİL DİKEY moda kilitler.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   
   await Supabase.initialize(
     url: 'https://zzheonrmioxbiinvomsw.supabase.co',
@@ -28,8 +35,8 @@ Future<void> main() async {
   // Kullanıcı Oturum İşlemleri (Bulut Veritabanı için Gizli ID Alımı)
   await AuthService().signInAnonymously();
 
-  // Elite (Premium) Abonelik Kasası Başlatıcısı
-  await RevenueCatService().initialize();
+  // Elite (Premium) Abonelik + Kurabiye Satın Alma Sistemi
+  await PurchaseService().initialize();
 
   // Firebase ve Bildirim Başlatıcısı
   try {

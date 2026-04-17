@@ -382,7 +382,7 @@ void showCreditInfoDialog({
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          isTr ? "Premium'a Geç" : 'Go Premium',
+                                          isTr ? "Elite'e Geç" : 'Go Elite',
                                           style: GoogleFonts.inter(
                                             color: const Color(0xFF2A1810),
                                             fontSize: 13,

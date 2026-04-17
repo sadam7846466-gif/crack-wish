@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/mock_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
@@ -34,10 +35,12 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   String? _expandedSenderId;
   String? _expandedContactId;
   final _service = MockOwlService();
+  bool _isPremiumUser = false;
 
   @override
   void initState() {
     super.initState();
+    _loadPremiumStatus();
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -47,6 +50,15 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     _pageCtrl = PageController(initialPage: _selectedTab);
     _service.loadMockData();
     _service.addListener(_onServiceUpdate);
+  }
+
+  Future<void> _loadPremiumStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+      });
+    }
   }
 
   void _onServiceUpdate() {
@@ -408,20 +420,19 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     return ListView(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       children: [
+        // Sabit olarak en üstte duran Şık Davet Kartı
+        _addFriendButton(),
+        const SizedBox(height: 24),
         Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text('Kişilerin (Rehberin)', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(height: 12),
               _buildMockContactList(),
-              const SizedBox(height: 24),
-              // Eskiden Rehberine Eriş Olan "Arkadaş Ekle" Butonu
-              _addFriendButton(),
             ],
           ),
         ),
@@ -716,16 +727,38 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
                             const SizedBox(width: 4),
                           ],
-                          Text(
-                            isSent ? 'Gönderildi' : (isAppUser ? 'İstek Gönder' : 'Davet Et (+3)'),
-                            style: TextStyle(
-                              color: isSent 
-                                  ? Colors.white.withOpacity(0.4) 
-                                  : isAppUser ? const Color(0xFF6DE8B8) : const Color(0xFFE879F9),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                           Row(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               Text(
+                                 isSent ? 'Gönderildi' : (isAppUser ? 'İstek Gönder' : 'Davet Et'),
+                                 style: TextStyle(
+                                   color: isSent 
+                                       ? Colors.white.withOpacity(0.4) 
+                                       : isAppUser ? const Color(0xFF6DE8B8) : const Color(0xFFE879F9),
+                                   fontSize: 11,
+                                   fontWeight: FontWeight.w700,
+                                 ),
+                               ),
+                               if (!isSent && !isAppUser) ...[
+                                 const SizedBox(width: 4),
+                                 Icon(
+                                   _isPremiumUser ? Icons.cookie_rounded : Icons.diamond_rounded, 
+                                   color: const Color(0xFFE879F9).withOpacity(0.7), 
+                                   size: 11
+                                 ),
+                                 const SizedBox(width: 2),
+                                 Text(
+                                   _isPremiumUser ? '+1' : '+3',
+                                   style: const TextStyle(
+                                     color: Color(0xFFE879F9),
+                                     fontSize: 10,
+                                     fontWeight: FontWeight.bold,
+                                   ),
+                                 ),
+                               ]
+                             ],
+                           ),
                         ],
                       ),
                     ),
@@ -912,174 +945,126 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     );
   }
 
+
   Widget _addFriendButton() {
-    return GestureDetector(
-      onTap: () => _showAddFriendDialog(),
+    final rewardColor = _isPremiumUser ? const Color(0xFFFFD700) : const Color(0xFF6DE8B8);
+    final rewardText = _isPremiumUser ? '+1 Kurabiye' : '+3 Ruh Taşı';
+
+    return _BouncingNode(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        final String username = _service.currentUser.name.replaceAll(' ', '').toLowerCase();
+        // Smart Deep Link ile otomatik takip
+        final String shareText = "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackandwish.com/invite?ref=$username";
+        
+        try {
+          Share.share(shareText);
+        } catch (e) {
+          debugPrint("Share error: $e");
+        }
+      },
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white.withOpacity(0.04), // Tamamen siyah yerine çok şeffaf beyaz buz
-              border: Border.all(color: Colors.white.withOpacity(0.08)),
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF00E5FF).withOpacity(0.18), // Parlak neon cyan
+                  const Color(0xFF2979FF).withOpacity(0.03), // Derin uzay mavisi eriyiş
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.3), width: 0.5),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // İkon Çemberi
                 Container(
-                  padding: const EdgeInsets.all(4),
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFF00E5FF).withOpacity(0.35), const Color(0xFF2979FF).withOpacity(0.05)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.4), width: 0.5),
                   ),
-                  child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.8), size: 12),
+                  child: Center(
+                    child: Icon(Icons.person_add_rounded, color: const Color(0xFF00E5FF), size: 16),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'Arkadaş Ekle',
-                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600),
+                const SizedBox(width: 12),
+                
+                // Metin Alanı
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Arkadaş Davet Et',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Kozmik evreni yansıt',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Sağ taraf Rozet (Badge)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: rewardColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: rewardColor.withOpacity(0.3), width: 0.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _isPremiumUser ? Icons.cookie_rounded : Icons.diamond_rounded, 
+                        color: rewardColor, 
+                        size: 11
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        rewardText,
+                        style: TextStyle(
+                          color: rewardColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  void _showAddFriendDialog() {
-    final codeCtrl = TextEditingController();
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
-      transitionBuilder: (ctx, a1, a2, child) {
-        return Transform.scale(
-          scale: 0.9 + 0.1 * a1.value,
-          child: Opacity(
-            opacity: a1.value,
-            child: Dialog(
-              backgroundColor: const Color(0xFF2E1420),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset('assets/images/owl.png', width: 32, height: 32),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Senin Baykuş Kodun',
-                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
-                    ),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: '#${_service.currentUser.owlCode}'));
-                        HapticFeedback.lightImpact();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.white.withOpacity(0.08),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '#${_service.currentUser.owlCode}',
-                              style: TextStyle(
-                                color: Colors.amber[200],
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(Icons.copy_rounded, color: Colors.white.withOpacity(0.4), size: 14),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Divider(color: Colors.white.withOpacity(0.08)),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Arkadaşının Kodunu Gir',
-                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: codeCtrl,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'OWL-XXXX',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 1.5),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.06),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.amber.withOpacity(0.4)),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    StatefulBuilder(
-                      builder: (ctx2, setDialogState) {
-                        return ElevatedButton(
-                          onPressed: () async {
-                            final code = codeCtrl.text.trim();
-                            if (code.isEmpty) return;
-                            HapticFeedback.mediumImpact();
-                            final success = await _service.sendFriendRequest(code);
-                            if (ctx2.mounted) Navigator.pop(ctx2);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF8A3D),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                            elevation: 0,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('İstek Gönder ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-                              Image.asset('assets/images/owl.png', width: 14, height: 14),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
