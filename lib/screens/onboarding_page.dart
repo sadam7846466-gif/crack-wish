@@ -42,7 +42,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   String? _selectedLocation;
 
   // --- Step 1 Data ---
-  String _lifeFocus = "Ruhsal Aydınlanma";
+  List<String> _lifeFocus = [];
   String _relationship = "Yalnız Gökyüzü";
 
   // --- Step 2 Data ---
@@ -92,8 +92,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   void _nextStep() {
     HapticFeedback.lightImpact();
     if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
+    if (_currentStep == 3 && !_hasSelectedDate) {
+      HapticFeedback.heavyImpact();
+      return;
+    }
 
-    if (_currentStep < 7) {
+    if (_currentStep < 6) {
       if (_currentStep == 2) {
         _nameFocus.unfocus();
         _usernameFocus.unfocus();
@@ -146,7 +150,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     }
 
     // 1. Focus & Relationship
-    await StorageService.setLifeFocus(_lifeFocus);
+    await StorageService.setLifeFocus(_lifeFocus.join(", "));
     await StorageService.setRelationshipStatus(_relationship);
 
     // 2. Dreams & Aura
@@ -155,9 +159,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
     // 3. Sleep Pattern
     await StorageService.setSleepPattern(_sleepPattern);
-
-    // 4. Match Preference
-    await StorageService.setMatchPreference(_matchPreference);
 
     if (!mounted) return;
 
@@ -179,11 +180,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           background: Stack(
             fit: StackFit.expand,
             children: [
-              Container(decoration: const BoxDecoration(color: Color(0xFF060913))),
+              Container(decoration: const BoxDecoration(color: Color(0xFF151726))), // Keskin siyahtan daha yumuşak gece tonuna geçildi
               Positioned.fill(
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 500),
-                  opacity: _currentStep == 0 ? 1.0 : 0.6, // Keep it slightly visible on other pages or completely change
+                  opacity: _currentStep == 0 ? 1.0 : 0.45, // Arka planı biraz daha yumuşattık (0.6 -> 0.45)
                   child: CinematicAuroraWind(
                     child: Image.asset(
                       "assets/images/serene_welcome.png",
@@ -243,7 +244,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 if (_currentStep == 4) _buildStep1(),
                                 if (_currentStep == 5) _buildStep2(),
                                 if (_currentStep == 6) _buildStep3(),
-                                if (_currentStep == 7) _buildStep4(),
                                 if (_currentStep > 0)
                                    const SizedBox(height: 60), // Kilit ikonunun ve alt modüllerin üzerine binmemesi için oluşturulan dev tampon/scroll bölgesi
                                 if (_currentStep == 0)
@@ -287,8 +287,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       if (_currentStep > 0)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(7, (index) {
-                            final romanNums = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+                          children: List.generate(6, (index) {
+                            final romanNums = ['I', 'II', 'III', 'IV', 'V', 'VI'];
                             final isActive = (_currentStep - 1) == index;
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -391,10 +391,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
-  Widget _buildOption(String emoji, String label, String currentVal, Function(String) onSelect, {int index = 0}) {
+  Widget _buildOption(IconData icon, String label, String currentVal, Function(String) onSelect, {int index = 0}) {
     final isSelected = label == currentVal;
     
-    // Moonie/Apple Style Premium Glass Panel (Geniş, kutu hissi, cam efekti)
     return StaggeredFade(
       delay: Duration(milliseconds: 150 + (index * 50)),
       child: GestureDetector(
@@ -408,33 +407,32 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20), // Apple cam hissiyatı
+              filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.05), // Çok hafif cam arka planı
+                  color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04), // Cam arka plan
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.15), // Apple tarzı soft beyaz seçim karesi
-                    width: isSelected ? 1.5 : 1.0,
+                    color: isSelected ? const Color(0xFFEEDBD5) : Colors.white.withOpacity(0.10), // Pastel çerçeve
+                    width: isSelected ? 2.0 : 1.0,
                   ),
                   boxShadow: isSelected ? [
-                    BoxShadow(color: Colors.white.withOpacity(0.15), blurRadius: 30, spreadRadius: 5) // Seçiliyken dışa yayılan beyaz glow
+                    BoxShadow(color: const Color(0xFFD3A29B).withOpacity(0.2), blurRadius: 24, spreadRadius: 2) // Yumuşak parlama
                   ] : [],
                 ),
                 child: Row(
                   children: [
-                    // Sol tarafa Emoji Kutucuğu (Moonie'deki dolgun ikon)
                     Container(
-                      padding: const EdgeInsets.all(10), // Emojiyi kapsayan yuvarlak alan
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.08),
                         shape: BoxShape.circle,
+                        boxShadow: isSelected ? [
+                          BoxShadow(color: Colors.white.withOpacity(0.4), blurRadius: 16)
+                        ] : [],
                       ),
-                      child: Text(
-                        emoji,
-                        style: GoogleFonts.nunito(fontSize: 22),
-                      ),
+                      child: Icon(icon, color: isSelected ? const Color(0xFFD3A29B) : Colors.white.withOpacity(0.7), size: 24),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -444,19 +442,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                           color: isSelected ? Colors.white : Colors.white.withOpacity(0.85),
                           fontSize: 16,
                           letterSpacing: 0.1,
-                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, // Apple/Moonie tarzı kalın, tok ve modern oval font
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                         ),
                       ),
                     ),
-                    if (isSelected)
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2), // Moonie tik işareti stili
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(PhosphorIcons.check(PhosphorIconsStyle.bold), color: Colors.white, size: 14),
-                      ),
                   ],
                 ),
               ),
@@ -467,8 +456,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
-  Widget _buildGridOption(IconData icon, String label, String currentVal, Function(String) onSelect, {int index = 0}) {
-    final isSelected = label == currentVal;
+  Widget _buildGridOption(IconData icon, String label, List<String> currentVals, Function(String) onSelect, {int index = 0}) {
+    final isSelected = currentVals.contains(label);
     
     return StaggeredFade(
       delay: Duration(milliseconds: 150 + (index * 50)),
@@ -478,35 +467,35 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           onSelect(label);
         },
         child: SizedBox(
-          width: 150,
-          height: 150,
+          width: 155,
+          height: 115,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: 150,
-                height: 150,
+                width: 155,
+                height: 115,
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04), // Seçiliyken cam efektini güçlendirecek fon
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFFE5A69E) : Colors.white.withOpacity(0.10),
+                    color: isSelected ? const Color(0xFFEEDBD5) : Colors.white.withOpacity(0.10),
                     width: isSelected ? 2.0 : 1.0,
                   ),
                   boxShadow: isSelected ? [
-                    BoxShadow(color: const Color(0xFFE5A69E).withOpacity(0.3), blurRadius: 24, spreadRadius: 2)
+                    BoxShadow(color: const Color(0xFFD3A29B).withOpacity(0.2), blurRadius: 24, spreadRadius: 2)
                   ] : [],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(22),
                   child: BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: isSelected ? Colors.white : Colors.white.withOpacity(0.08),
                             shape: BoxShape.circle,
@@ -514,19 +503,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               BoxShadow(color: Colors.white.withOpacity(0.4), blurRadius: 16)
                             ] : [],
                           ),
-                          child: Icon(icon, color: isSelected ? const Color(0xFFC36E6E) : Colors.white.withOpacity(0.7), size: 36),
+                          child: Icon(icon, color: isSelected ? const Color(0xFFD3A29B) : Colors.white.withOpacity(0.7), size: 28),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 8),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
                             label,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
                               color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              height: 1.2,
+                              height: 1.1,
                             ),
                           ),
                         ),
@@ -535,25 +524,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   ),
                 ),
               ),
-              if (isSelected)
-                Positioned(
-                  top: -12,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFC36E6E),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(color: const Color(0xFFC36E6E).withOpacity(0.5), blurRadius: 8, offset: const Offset(0, 4)),
-                        ],
-                      ),
-                      child: Icon(PhosphorIcons.check(PhosphorIconsStyle.bold), color: Colors.white, size: 14),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
@@ -775,11 +745,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           const SizedBox(height: 32), // Yazı ve ikonlar arası temiz boşluk
           
           StaggeredFade(
-            delay: const Duration(milliseconds: 300),
+            delay: const Duration(milliseconds: 50),
             child: _buildFeatureItem(icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill), text: "Sana Özel Astroloji Haritası"),
           ),
           StaggeredFade(
-            delay: const Duration(milliseconds: 450),
+            delay: const Duration(milliseconds: 100),
             child: _buildFeatureItem(
               icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), 
               text: "Yol Gösterici Tarot Serüveni",
@@ -787,15 +757,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             ),
           ),
           StaggeredFade(
-            delay: const Duration(milliseconds: 600),
+            delay: const Duration(milliseconds: 150),
             child: _buildFeatureItem(icon: PhosphorIcons.coffee(PhosphorIconsStyle.fill), text: "Telvelerde Gizlenen Kadim Kahve Falı Sırları"),
           ),
           StaggeredFade(
-            delay: const Duration(milliseconds: 750),
+            delay: const Duration(milliseconds: 200),
             child: _buildFeatureItem(icon: PhosphorIcons.moonStars(PhosphorIconsStyle.fill), text: "Bilinçaltı Rüya Analizleri"),
           ),
           StaggeredFade(
-            delay: const Duration(milliseconds: 900),
+            delay: const Duration(milliseconds: 250),
             child: _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: "Mistik Çin & Maya Uyumları"),
           ),
         ],
@@ -1122,6 +1092,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         Icon(PhosphorIcons.caretUp(PhosphorIconsStyle.fill), size: 12, color: Colors.white),
         // panelsiz tasarim
         Container(
+          height: 28, // Sabit yükseklik, yazılar 2 satıra çıksa bile çarkı yukarı itmesini engeller
+          alignment: Alignment.topCenter,
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
           color: Colors.transparent,
           child: Text(
@@ -1150,14 +1122,46 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           width: double.infinity,
           alignment: Alignment.center,
           child: Wrap(
-            spacing: 16,
-            runSpacing: 24, // Checkmark rozetinin üst kareye taşma estetiği için dikey boşluk fazla bırakıldı
+            spacing: 12,
+            runSpacing: 14, // Kesiklik olmaması için daraltıldı
             alignment: WrapAlignment.center,
           children: [
-            _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 0),
-            _buildGridOption(PhosphorIcons.rocketLaunch(PhosphorIconsStyle.fill), "Kariyer &\nKişisel Güç", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 1),
-            _buildGridOption(PhosphorIcons.heart(PhosphorIconsStyle.fill), "Aşk &\nKozmik Uyum", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 2),
-            _buildGridOption(PhosphorIcons.leaf(PhosphorIconsStyle.fill), "Şifa &\nİçsel Huzur", _lifeFocus, (v) => setState(() => _lifeFocus = v), index: 3),
+            _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 0),
+            _buildGridOption(PhosphorIcons.rocketLaunch(PhosphorIconsStyle.fill), "Kariyer &\nKişisel Güç", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 1),
+            _buildGridOption(PhosphorIcons.heart(PhosphorIconsStyle.fill), "Aşk &\nKozmik Uyum", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 2),
+            _buildGridOption(PhosphorIcons.leaf(PhosphorIconsStyle.fill), "Şifa &\nİçsel Huzur", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 3),
+            _buildGridOption(PhosphorIcons.coins(PhosphorIconsStyle.fill), "Maddi Bolluk &\nBereket", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 4),
+            _buildGridOption(PhosphorIcons.planet(PhosphorIconsStyle.fill), "Evrenin\nSürprizleri", _lifeFocus, (v) {
+              setState(() {
+                if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
+                else _lifeFocus.add(v);
+              });
+            }, index: 5),
           ],
         ),
         ), // Container closed
@@ -1165,168 +1169,310 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
+  Widget _buildOverlappingOption(String label, String currentVal, IconData icon, Function(String) onSelect) {
+    final isSelected = label == currentVal;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onSelect(label);
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 24, left: 24, right: 16, top: 12),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            // Base Card
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 24, bottom: 24, left: 60, right: 20),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFFD3A29B).withOpacity(0.12) : Colors.white.withOpacity(0.07),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFD3A29B).withOpacity(0.5) : Colors.white.withOpacity(0.10),
+                  width: isSelected ? 1.5 : 1.0,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: GoogleFonts.nunito(
+                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.75),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700, // Sabit font kalınlığı (kutu büyümesini/şişmesini engeller)
+                      ),
+                    ),
+                  ),
+                  if (isSelected)
+                    Icon(PhosphorIcons.checkCircle(PhosphorIconsStyle.fill), color: const Color(0xFFD3A29B), size: 24)
+                  else
+                    Icon(PhosphorIcons.circle(), color: Colors.white.withOpacity(0.2), size: 24),
+                ],
+              ),
+            ),
+            
+            // Breaking bounds huge icon
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutBack,
+              left: isSelected ? -24 : -16, 
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: isSelected ? [
+                    BoxShadow(color: const Color(0xFFD3A29B).withOpacity(0.6), blurRadius: 20, offset: const Offset(4, 4))
+                  ] : [
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(2, 2))
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? const Color(0xFFD3A29B) : Colors.black.withOpacity(0.15), // Küçücük bir koyuluk
+                        border: Border.all(
+                          color: isSelected ? Colors.white.withOpacity(0.8) : Colors.white.withOpacity(0.2), // Yumuşak saydam kenarlık
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Center(
+                        child: label == "Sürprizli & Kaotik Olaylar" 
+                        ? SizedBox(
+                            width: isSelected ? 36 : 28,
+                            height: isSelected ? 36 : 28,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.center,
+                              children: [
+                                // Ana şimşek
+                                Icon(PhosphorIcons.lightning(PhosphorIconsStyle.fill), color: isSelected ? Colors.white : Colors.white.withOpacity(0.8), size: isSelected ? 24 : 20),
+                                // Sol hafif yatık (Dengeli Kaos)
+                                Positioned(
+                                  left: isSelected ? -4 : -2, 
+                                  top: isSelected ? 0 : 2, 
+                                  child: Transform.rotate(
+                                    angle: -0.25, 
+                                    child: Icon(PhosphorIcons.lightning(PhosphorIconsStyle.fill), color: isSelected ? Colors.white.withOpacity(0.7) : Colors.white.withOpacity(0.5), size: isSelected ? 16 : 14)
+                                  )
+                                ),
+                                // Sağ hafif yatık (Dengeli Kaos)
+                                Positioned(
+                                  right: isSelected ? -4 : -2, 
+                                  bottom: isSelected ? 0 : 2, 
+                                  child: Transform.rotate(
+                                    angle: 0.25, 
+                                    child: Icon(PhosphorIcons.lightning(PhosphorIconsStyle.fill), color: isSelected ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.7), size: isSelected ? 18 : 14)
+                                  )
+                                ),
+                              ],
+                            ),
+                          )
+                        : Icon(
+                          icon, 
+                          color: isSelected ? Colors.white : Colors.white.withOpacity(0.8), 
+                          size: isSelected ? 36 : 28
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStep2() {
     return Column(
       children: [
-        _buildTitle("Bilinçaltı & Auran"),
-        _buildSubtitle("Bilinçaltının derinliklerini ve auranı keşfet."),
+        _buildTitle("Bilinçaltının Sesi"),
+        _buildSubtitle("Rüyaların sana nasıl ulaşıyor?"),
 
-        _buildSectionLabel("RÜYA YAKLAŞIMI"),
-        _buildOption("🕊️", "Haberci & Net Rüyalar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 0),
-        _buildOption("🌪️", "Sürprizli & Kaotik Olaylar", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 1),
-        _buildOption("☁️", "Bulutlar Kadar Sakin", _dreamFrequency, (v) => setState(() => _dreamFrequency = v), index: 2),
+        const SizedBox(height: 52), // Kutuları biraz aşağı kaydırdık
 
-        const SizedBox(height: 24),
-        _buildSectionLabel("AURA RENGİNİ SEÇ"),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          alignment: WrapAlignment.center,
-          children: _auraColors.map((colorVal) {
-            final isSel = _auraColor == colorVal;
-            return GestureDetector(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                setState(() => _auraColor = colorVal);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(colorVal),
-                  border: Border.all(color: Colors.white, width: isSel ? 3 : 0),
-                  boxShadow: [
-                    if (isSel) BoxShadow(color: Color(colorVal).withOpacity(0.6), blurRadius: 20, spreadRadius: 4),
-                  ],
-                ),
-                child: isSel ? Icon(PhosphorIcons.check(PhosphorIconsStyle.bold), color: Colors.white, size: 28) : null,
-              ),
-            );
-          }).toList(),
-        )
+        _buildOverlappingOption(
+          "Haberci & Net Rüyalar", 
+          _dreamFrequency, 
+          PhosphorIcons.bird(PhosphorIconsStyle.fill),
+          (v) => setState(() => _dreamFrequency = v)
+        ),
+        _buildOverlappingOption(
+          "Sürprizli & Kaotik Olaylar", 
+          _dreamFrequency, 
+          PhosphorIcons.lightning(PhosphorIconsStyle.fill), // Özel şimşek kümesi
+          (v) => setState(() => _dreamFrequency = v)
+        ),
+
+        _buildOverlappingOption(
+          "Bulutlar Kadar Sakin", 
+          _dreamFrequency, 
+          PhosphorIcons.cloud(PhosphorIconsStyle.fill),
+          (v) => setState(() => _dreamFrequency = v)
+        ),
       ],
+    );
+  }
+
+  Widget _buildTimeAccordion(String title, String desc, IconData icon, String val, List<Color> gradientColors) {
+    final isSelected = _sleepPattern == val;
+    final isInitial = _sleepPattern.isEmpty;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() => _sleepPattern = val);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
+        margin: const EdgeInsets.only(bottom: 12),
+        height: isSelected ? 120 : (isInitial ? 82 : 64),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            colors: isSelected 
+               ? gradientColors 
+               : [Colors.white.withOpacity(0.04), Colors.white.withOpacity(0.02)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: isSelected ? Colors.white.withOpacity(0.3) : Colors.white.withOpacity(0.05),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(color: gradientColors.last.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 8))
+          ] : [],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              // Arka plandaki dev ikon (Seçilince watermark gibi çıkar)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutQuint,
+                right: isSelected ? -20 : 20,
+                top: isSelected ? -20 : 10,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  opacity: isSelected ? 0.35 : 0.03, // Seçili değilken neredeyse görünmez
+                  child: Icon(icon, size: isSelected ? 180 : 64, color: Colors.white),
+                ),
+              ),
+              
+              // İçerik
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 400),
+                              padding: EdgeInsets.all(isSelected ? 10 : 8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                              ),
+                              child: Icon(icon, color: isSelected ? Colors.white : Colors.white.withOpacity(0.5), size: isSelected ? 24 : 20),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: GoogleFonts.nunito(
+                                  color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
+                                  fontSize: isSelected ? 18 : 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(PhosphorIcons.checkCircle(PhosphorIconsStyle.fill), color: Colors.white, size: 24),
+                          ],
+                        ),
+                        
+                        // Açıklama Metni (Sadece seçiliyken veya hiçbir şey seçilmemişken görünür)
+                        AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: isSelected ? 0.9 : (isInitial ? 0.6 : 0.0),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              desc,
+                              style: GoogleFonts.nunito(
+                                color: Colors.white,
+                                fontSize: 13,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildStep3() {
     return Column(
       children: [
-        _buildTitle("Kozmik Senkronizasyon"),
-        _buildSubtitle("Kozmik mesajlarını hangi aralıkta almak istersin?"),
+        _buildTitle("İçsel Pusulan"),
+        _buildSubtitle("Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?"),
 
-        _buildSectionLabel("UYKU & UYANIŞ DÖNGÜSÜ"),
-        _buildOption("🌅", "Sabah Kuşu (Erken Uyanan)", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 0),
-        _buildOption("🦉", "Gece İnsanı (Geç Uyuyan)", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 1),
-        _buildOption("🌒", "Düzensiz Bir Döngüm Var", _sleepPattern, (v) => setState(() => _sleepPattern = v), index: 2),
+        const SizedBox(height: 16),
 
-        const SizedBox(height: 32),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Color(_auraColor).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Color(_auraColor).withOpacity(0.3), width: 1),
-          ),
-          child: Row(
-            children: [
-              Icon(PhosphorIcons.bellRinging(PhosphorIconsStyle.fill), color: Color(_auraColor), size: 28),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  "Sana bildirim atarken bu döngüyü dikkate alacağız.",
-                  style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.4),
-                ),
-              )
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _buildStep4() {
-    return Column(
-      children: [
-        _buildTitle("Kozmik Ağdaki Yerin"),
-        _buildSubtitle("Aynı aurayı paylaştığın ruh eşinle karşılaşmaya hazır mısın?"),
-
-        _buildSectionLabel("EŞLEŞME TERCİHİ"),
-        GestureDetector(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            setState(() => _matchPreference = true);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: _matchPreference ? Color(_auraColor).withOpacity(0.15) : Colors.white.withOpacity(0.02),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _matchPreference ? Color(_auraColor).withOpacity(0.5) : Colors.white.withOpacity(0.05)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Kozmik Ağ'a Açığım",
-                        style: GoogleFonts.nunito(color: _matchPreference ? Color(_auraColor) : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Benzer falları seçen ruhlarla etkileşime girmeme izin ver.",
-                        style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_matchPreference) Icon(Icons.check_circle_rounded, color: Color(_auraColor))
-              ],
-            ),
-          ),
+        _buildTimeAccordion(
+          "Aklın Işığı", 
+          "Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.", 
+          PhosphorIcons.sun(PhosphorIconsStyle.fill), 
+          "Aklın Işığı (Mantık)", 
+          [const Color(0xFFECA37F), const Color(0xFFD3A29B)]
+        ),
+        _buildTimeAccordion(
+          "Kalbin Fısıltısı", 
+          "İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.", 
+          PhosphorIcons.moon(PhosphorIconsStyle.fill), 
+          "Kalbin Fısıltısı (Sezgi)", 
+          [const Color(0xFF384358), const Color(0xFF161821)]
+        ),
+        _buildTimeAccordion(
+          "Evrenin Akışı", 
+          "Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.", 
+          PhosphorIcons.spiral(PhosphorIconsStyle.fill), 
+          "Evrenin Akışı (Kader)", 
+          [const Color(0xFF6B4B7C), const Color(0xFF392D46)]
         ),
 
-        GestureDetector(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            setState(() => _matchPreference = false);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: !_matchPreference ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.02),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: !_matchPreference ? Colors.white.withOpacity(0.3) : Colors.white.withOpacity(0.05)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Sadece Kendi Yolculuğum",
-                        style: GoogleFonts.nunito(color: !_matchPreference ? Colors.white : Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Görünmez olmak ve eşleşmemek istiyorum.",
-                        style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.5), fontSize: 12, height: 1.4),
-                      ),
-                    ],
-                  ),
-                ),
-                if (!_matchPreference) const Icon(Icons.check_circle_rounded, color: Colors.white)
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -1621,8 +1767,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildNextButton({required String title, required IconData icon, required VoidCallback onTap, required Color glowColor}) {
     return Transform.translate(
       offset: _currentStep == 0 
-          ? const Offset(-30, 12) // "Hadi Başlayalım" ince ayar ile tam ortaya çekildi
-          : const Offset(-56, 12), // "Devam Et" kelimesi kısa olduğu için daha çok sola itilir
+          ? const Offset(-30, 12) // "Hadi Başlayalım" ince ayar
+          : _currentStep == 6 
+              ? const Offset(-4, 12) // "Yolculuğa Başla" çok uzun olduğu için optik merkezi sağlamak adına daha sağa (0'a yakın) çekildi
+              : const Offset(-56, 12), // "Devam Et" kısa olduğu için daha çok sola itilir
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
