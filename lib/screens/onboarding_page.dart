@@ -91,9 +91,55 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   void _nextStep() {
     HapticFeedback.lightImpact();
-    if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) return;
+    if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) {
+      HapticFeedback.heavyImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(PhosphorIcons.warningCircle(PhosphorIconsStyle.fill), color: const Color(0xFFECA37F), size: 18),
+              const SizedBox(width: 8),
+              Expanded(child: Text("Lütfen profil adını ve kullanıcı adını belirle.", style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600))),
+            ],
+          ),
+          backgroundColor: const Color(0xFF151726).withOpacity(0.85),
+          behavior: SnackBarBehavior.floating,
+          elevation: 0, 
+          // Uyarı balonunu boşluğa doğru en alta (sıfır noktasına) ittik
+          margin: const EdgeInsets.only(bottom: 0, left: 32, right: 32),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1),
+          ),
+          duration: const Duration(seconds: 2),
+        )
+      );
+      return;
+    }
     if (_currentStep == 3 && !_hasSelectedDate) {
       HapticFeedback.heavyImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(PhosphorIcons.warningCircle(PhosphorIconsStyle.fill), color: const Color(0xFFECA37F), size: 18),
+              const SizedBox(width: 8),
+              Expanded(child: Text("Haritanı çizebilmemiz için doğum tarihini seçmelisin.", style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600))),
+            ],
+          ),
+          // Daha koyu tonlu, puslu cam uyarısı
+          backgroundColor: const Color(0xFF151726).withOpacity(0.85),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 0, left: 32, right: 32),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1),
+          ),
+          duration: const Duration(seconds: 2),
+        )
+      );
       return;
     }
 
@@ -245,7 +291,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 if (_currentStep == 5) _buildStep2(),
                                 if (_currentStep == 6) _buildStep3(),
                                 if (_currentStep > 0)
-                                   const SizedBox(height: 60), // Kilit ikonunun ve alt modüllerin üzerine binmemesi için oluşturulan dev tampon/scroll bölgesi
+                                   const SizedBox(height: 16), // Kaydırma engelini (Scroll) kaldırmak için ektra itiş miktarı silindi
                                 if (_currentStep == 0)
                                    const SizedBox(height: 24),
                               ],
@@ -269,7 +315,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Kilit yazısı sayfa göstergeleri ve Butonun "ÜSTÜNE" taşındı
-                      if (_currentStep > 0) ...[
+                      if (_currentStep == 3) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -333,13 +379,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildTitle(String text) {
     return Text(
       text,
-      textAlign: TextAlign.center, // Konum değişimi istenmedi
+      textAlign: TextAlign.center,
       style: GoogleFonts.nunito(
         color: Colors.white,
-        fontSize: 34, // Nunito daha enli olduğu için hafif dengelendi
-        fontWeight: FontWeight.w900, // Moonie tarzı tok, dolgun ve kalın başlık (Black weight)
+        fontSize: 32, // Zarif punto
+        fontWeight: FontWeight.w600, // crack&wish logosuyla birebir aynı kalınlık (w600)
         height: 1.2,
-        letterSpacing: -0.5, // Daha modern, sıkı görünüm
+        letterSpacing: -0.5,
         shadows: [
           Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 16, offset: const Offset(0, 4)),
         ],
@@ -352,11 +398,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       padding: const EdgeInsets.only(top: 12, bottom: 32),
       child: Text(
         text,
-        textAlign: TextAlign.center, // Konum korunuyor
+        textAlign: TextAlign.center,
         style: GoogleFonts.nunito(
           color: Colors.white.withOpacity(0.85),
           fontSize: 16,
-          fontWeight: FontWeight.w700, // Alt başlık da Moonie'deki gibi dikkat çekici ve tok
+          fontWeight: FontWeight.w500, // Daha okunaklı ve ince alt başlık (w700 -> w500)
           height: 1.4,
           letterSpacing: 0.0,
           shadows: [
@@ -735,9 +781,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildFeaturesStep() {
-    return Transform.translate(
-      offset: const Offset(0, -15),
-      child: Column(
+    return Column(
         children: [
           _buildTitle("Seni Neler Bekliyor?"),
           const SizedBox(height: 12),
@@ -769,15 +813,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             child: _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: "Mistik Çin & Maya Uyumları"),
           ),
         ],
-      ),
-    );
+      );
   }
 
 
   Widget _buildStep0() {
-    return Transform.translate(
-      offset: const Offset(0, -15), // İçeriği biraz daha aşağı oturtmak için -35'ten -15'e çekildi
-      child: Column(
+    return Column(
         children: [
           _buildTitle("Seni Tanıyalım"),
           _buildSubtitle("Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle."),
@@ -850,7 +891,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ),
         ),
       ],
-    ),
     );
   }
 
@@ -909,9 +949,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final String cSign = _hasSelectedDate ? _getChineseZodiac(_selectedDate).toUpperCase() : "ASYA";
     final String mSign = _hasSelectedDate ? _getMayanZodiac(_selectedDate).toUpperCase() : "MAYA";
 
-    return Transform.translate(
-      offset: const Offset(0, 0), // Başlık kaybolmasın diye sıfırlandı
-      child: Column(
+    return Column(
         children: [
         _buildTitle("Kozmik Koordinat"),
         _buildSubtitle("Astrolojik haritanın temeli için doğduğun anı seç."),
@@ -919,14 +957,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         StaggeredFade(
           delay: const Duration(milliseconds: 300),
           child: Container(
-            height: 190, // Çark alanına nefes aldırıldı
+            height: 230, // Kırpılmayı önlemek için dikey görüş alanı uzatıldı 
             width: double.infinity,
             alignment: Alignment.center,
             color: Colors.transparent,
             child: SizedBox(
-              width: 320, 
-              height: 190,
+              width: 330, 
+              height: 230,
               child: Stack(
+                clipBehavior: Clip.none,
                 alignment: Alignment.center,
                 children: [
                   Positioned.fill(
@@ -935,8 +974,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    top: 0, 
-                    left: 90, // Merkez X = 160
+                    top: 85, 
+                    left: 85, // Sola doğru kaydırıldı (Merkez X = 155)
                     width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: cTargetRotation),
@@ -946,8 +985,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    left: -20, 
-                    bottom: 15, // Tekerleğin altı kesilmemesi için yukarı alındı
+                    left: -10, // En yüksekte
+                    top: 0, // Merkez Y = 45
                     width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: wTargetRotation),
@@ -957,8 +996,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    left: 200, 
-                    bottom: 35, // Batı ile simetri kırığı esnetildi
+                    left: 215, 
+                    top: 40, // Asya ile orantılı olarak biraz aşağı çekildi
                     width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: mTargetRotation),
@@ -1051,7 +1090,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ),
         )),
       ]
-    ));
+    );
   }
 
 
@@ -1059,7 +1098,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return StaggeredFade(
       delay: Duration(milliseconds: delay),
       child: Container(
-        margin: const EdgeInsets.only(top: 24),
+        margin: const EdgeInsets.only(top: 18), // Çark alanı yükseklik kazandığı için burası dengelendi
         decoration: BoxDecoration(
           color: const Color(0xFFFBE4EB).withOpacity(0.12), // Toz pembe eklendi, camsı zemin
           borderRadius: BorderRadius.circular(24),
@@ -1340,8 +1379,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeOutQuart,
-        margin: const EdgeInsets.only(bottom: 12),
-        height: isSelected ? 120 : (isInitial ? 82 : 64),
+        margin: const EdgeInsets.only(bottom: 24), // Panellerin arası genişletilip sayfayı doldurması sağlandı
+        height: isSelected ? 130 : (isInitial ? 90 : 72), // Paneller biraz daha dolgunlaşıp lüks bir görünüme kavuştu
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
@@ -1449,7 +1488,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         _buildTitle("İçsel Pusulan"),
         _buildSubtitle("Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?"),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 64), // Tepede sıkışan seçenekleri, ekranı dengeli kullanmak için aşağı ittik
 
         _buildTimeAccordion(
           "Aklın Işığı", 
@@ -2366,9 +2405,13 @@ class _SimpleConnectionPainter extends CustomPainter {
       ..color = Colors.white.withOpacity(0.4)
       ..style = PaintingStyle.fill;
 
-    final Offset c1 = Offset(160, 52.5); // Asya (90 + 70 = 160)
-    final Offset c2 = Offset(50, size.height - 99); // Batı (-20 + 70 = 50)
-    final Offset c3 = Offset(270, size.height - 129); // Maya (200 + 70 = 270)
+    // Tek sayfa (scrollsuz) görünüm için dikey eksende kısıtlanan yeni merkezler
+    // ASYA: top=85, size=105 -> Y Merkezi: 85 + 52.5 = 137.5. X Merkezi: 85 + 70 = 155.
+    final Offset c1 = Offset(155, 137.5); 
+    // BATI: top=0, size=90 -> Y Merkezi: 0 + 45 = 45. X Merkezi: 60.
+    final Offset c2 = Offset(60, 45); 
+    // MAYA: top=40, size=96 -> Y Merkezi: 40 + 48 = 88. X Merkezi: 285.
+    final Offset c3 = Offset(285, 88);  
 
     canvas.drawLine(c2, c1, pLine);
     canvas.drawLine(c1, c3, pLine);
