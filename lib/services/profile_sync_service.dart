@@ -10,6 +10,40 @@ class ProfileSyncService {
 
   final _supabase = Supabase.instance.client;
 
+  /// Kullanıcı adı (handle) benzersiz mi kontrol et
+  /// true = kullanılabilir, false = başkası almış
+  Future<bool> isHandleAvailable(String handle) async {
+    try {
+      final cleaned = handle.toLowerCase().trim();
+      if (cleaned.isEmpty) return false;
+      
+      // @ işaretini ekle/düzelt
+      final normalized = cleaned.startsWith('@') ? cleaned : '@$cleaned';
+      
+      final user = _supabase.auth.currentUser;
+      
+      // Supabase'den bu handle'ı kullanan birini ara
+      final result = await _supabase
+          .from('profiles')
+          .select('id')
+          .eq('handle', normalized)
+          .maybeSingle();
+      
+      // Sonuç yoksa → handle müsait
+      if (result == null) return true;
+      
+      // Sonuç kendi kullanıcımızsa → handle müsait (kendi handle'ını değiştirmiyor)
+      if (user != null && result['id'] == user.id) return true;
+      
+      // Başka biri almış
+      return false;
+    } catch (e) {
+      debugPrint('Handle kontrol hatası: $e');
+      // Hata durumunda geçişe izin ver (offline durumlar için)
+      return true;
+    }
+  }
+
   /// Profil fotoğrafını Supabase 'avatars' storage klasörüne güvenle yükler
   /// Başarılı olursa herkese açık URL'sini (publicUrl) döndürür.
   Future<String?> uploadAvatar(File imageFile) async {

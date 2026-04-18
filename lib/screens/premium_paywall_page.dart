@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/purchase_service.dart';
+import '../services/analytics_service.dart';
 class PremiumPaywallPage extends StatefulWidget {
   const PremiumPaywallPage({super.key});
 
@@ -25,6 +27,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   void initState() {
     super.initState();
     _checkEliteStatus();
+    AnalyticsService().logPaywallViewed();
     _animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _fadeAnimation = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic));
@@ -36,7 +39,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _isAlreadyElite = prefs.getBool('is_premium_test_mode') ?? false;
+      _isAlreadyElite = prefs.getBool('is_elite') ?? false;
       final type = prefs.getString('elite_plan_type');
       if (type == 'weekly') _activePackageIndex = 0;
       else if (type == 'monthly') _activePackageIndex = 1;
@@ -144,34 +147,39 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                           HapticFeedback.lightImpact();
                           setState(() => _isRestoring = true);
                           
-                          // Simüle edilmiş Apple/Google Sunucu Bağlantısı
-                          await Future.delayed(const Duration(seconds: 2));
-                          
-                          final prefs = await SharedPreferences.getInstance();
-                          final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
-                          
-                          if (!mounted) return;
-                          setState(() => _isRestoring = false);
-                          
-                          if (isPremium) {
-                            HapticFeedback.heavyImpact();
-                            _showGlassMessage(
-                              "Elite Geri Yüklendi",
-                              "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
-                              Icons.check_circle_rounded,
-                              const Color(0xFF10B981),
-                              onOk: () {
-                                Navigator.pop(context); // Paywall'u kapat
-                              }
-                            );
-                          } else {
-                            HapticFeedback.vibrate();
-                            _showGlassMessage(
-                              "Aktif Abonelik Yok",
-                              "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
-                              Icons.error_outline_rounded,
-                              const Color(0xFFF87171),
-                            );
+                          try {
+                            await PurchaseService().restorePurchases();
+                            await Future.delayed(const Duration(seconds: 2));
+                            
+                            final isElite = await PurchaseService().isUserElite();
+                            
+                            if (!mounted) return;
+                            setState(() => _isRestoring = false);
+                            
+                            if (isElite) {
+                              HapticFeedback.heavyImpact();
+                              setState(() => _isAlreadyElite = true);
+                              _showGlassMessage(
+                                "Elite Geri Yüklendi",
+                                "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
+                                Icons.check_circle_rounded,
+                                const Color(0xFF10B981),
+                                onOk: () {
+                                  Navigator.pop(context);
+                                }
+                              );
+                            } else {
+                              HapticFeedback.vibrate();
+                              _showGlassMessage(
+                                "Aktif Abonelik Yok",
+                                "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
+                                Icons.error_outline_rounded,
+                                const Color(0xFFF87171),
+                              );
+                            }
+                          } catch (e) {
+                            debugPrint('Geri yükleme hatası: $e');
+                            if (mounted) setState(() => _isRestoring = false);
                           }
                         },
                         child: _isRestoring 
@@ -260,9 +268,9 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                             const SizedBox(height: 28),
 
                             // ── CAM TASARIMLI 3'LÜ PAKET DİZİLİMİ ──
-                            _buildGlassPackageRow(0, "Haftalık Uyanış", "₺49.99", "/ hafta"),
-                            _buildGlassPackageRow(1, "Aylık Sezgi", "₺129.99", "/ ay", subText: "%35 Tasarruf Edin"),
-                            _buildGlassPackageRow(2, "Yıllık Aydınlanma", "₺699.99", "/ yıl", badge: "Popüler", subText: "Aylık Sadece ₺58.33 (%70 Kazanç)"),
+                            _buildGlassPackageRow(0, "Haftalık Uyanış", "\$2.99", "/ week"),
+                            _buildGlassPackageRow(1, "Aylık Sezgi", "\$7.99", "/ month", subText: "Save 33%"),
+                            _buildGlassPackageRow(2, "Yıllık Aydınlanma", "\$39.99", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
                                   ],
                                 ),
                               ),
@@ -300,32 +308,46 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                                 HapticFeedback.heavyImpact();
                                 setState(() => _isPurchasing = true);
                                 
-                                // TODO: İleride RevenueCat satınalma işlemi fonksiyona bağlanacak.
-                                // Şimdilik Test/Geçiş Süreci simülasyonu çalışıyor.
-                                await Future.delayed(const Duration(seconds: 2));
-                                final prefs = await SharedPreferences.getInstance();
-                                await prefs.setBool('is_premium_test_mode', true);
-                                await prefs.setInt('daily_elite_soul_stones', 5);
-                                
-                                final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
-                                await prefs.setString('elite_plan_type', plan);
-                                
-                                if (!mounted) return;
-                                setState(() {
-                                  _isPurchasing = false;
-                                  _isAlreadyElite = true;
-                                  _activePackageIndex = _selectedPackageIndex;
-                                });
-                                
-                                _showGlassMessage(
-                                  "Aydınlanmaya Hoşgeldiniz",
-                                  "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
-                                  Icons.auto_awesome,
-                                  const Color(0xFFFFD700),
-                                  onOk: () {
-                                    Navigator.pop(context, true); // Sayfadan çık
+                                try {
+                                  // Seçilen pakete göre ürün ID'sini belirle
+                                  final productId = _selectedPackageIndex == 0 
+                                    ? PurchaseService.eliteWeeklyId 
+                                    : (_selectedPackageIndex == 1 
+                                      ? PurchaseService.eliteMonthlyId 
+                                      : PurchaseService.eliteYearlyId);
+                                  
+                                  final success = await PurchaseService().purchase(productId);
+                                  
+                                  if (success && mounted) {
+                                    // Satın alma başarılı — yerel kayıt
+                                    final prefs = await SharedPreferences.getInstance();
+                                    final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
+                                    await prefs.setString('elite_plan_type', plan);
+                                    await prefs.setInt('daily_elite_soul_stones', 5);
+                                    
+                                    if (!mounted) return;
+                                    setState(() {
+                                      _isPurchasing = false;
+                                      _isAlreadyElite = true;
+                                      _activePackageIndex = _selectedPackageIndex;
+                                    });
+                                    
+                                    _showGlassMessage(
+                                      "Aydınlanmaya Hoşgeldiniz",
+                                      "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
+                                      Icons.auto_awesome,
+                                      const Color(0xFFFFD700),
+                                      onOk: () {
+                                        Navigator.pop(context, true);
+                                      }
+                                    );
+                                  } else if (mounted) {
+                                    setState(() => _isPurchasing = false);
                                   }
-                                );
+                                } catch (e) {
+                                  debugPrint('Elite satın alma hatası: \$e');
+                                  if (mounted) setState(() => _isPurchasing = false);
+                                }
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 14),

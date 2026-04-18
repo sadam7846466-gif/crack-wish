@@ -17,6 +17,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:vlucky_flutter/services/push_notification_service.dart';
 import 'package:vlucky_flutter/services/auth_service.dart';
 import 'package:vlucky_flutter/services/purchase_service.dart';
+import 'package:vlucky_flutter/services/analytics_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +59,8 @@ Future<void> main() async {
   await localeController.load();
   // Günlük giriş kaydı — takvimde ateş ikonu için
   StorageService.recordAppOpenToday();
+  // Uygulama açıldı event'i
+  AnalyticsService().logAppOpened();
   
   runApp(MyApp(localeController: localeController));
 }
@@ -89,6 +92,7 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
+            navigatorObservers: [AnalyticsService().observer],
           );
         },
       ),

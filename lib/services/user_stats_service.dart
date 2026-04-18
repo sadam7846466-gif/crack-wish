@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'storage_service.dart';
+import 'analytics_service.dart';
 
 /// Türkçe/İngilizce kart ismi → asset yolu eşleme tablosu (78 kart)
 const Map<String, String> _cardNameToAsset = {
@@ -192,6 +193,8 @@ class UserStatsService {
     final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
     final int pts = 2 * (isPremium ? 3 : 1);
     await StorageService.addPendingAura('fal', pts);
+    // 📊 Analytics
+    AnalyticsService().logTarotOpened(cardCount: 1);
   }
 
   /// Tüm Tarot geçmişini zaman sırasına göre (en yeni en üstte) döner

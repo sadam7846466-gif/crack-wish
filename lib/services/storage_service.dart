@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'analytics_service.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
@@ -258,6 +259,8 @@ class StorageService {
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
     final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
     await addPendingAura('ruya', 3 * (isPremium ? 3 : 1));
+    // 📊 Analytics
+    AnalyticsService().logDreamAnalyzed();
   }
 
   static Future<int> getTotalTarots() async {
@@ -561,6 +564,8 @@ class StorageService {
       current = prefs.getInt(_keyCookieCracksToday) ?? 0;
     }
     await prefs.setInt(_keyCookieCracksToday, current + 1);
+    // 📊 Analytics
+    AnalyticsService().logCookieCracked(cookieId: 'daily', rarity: 'unknown');
   }
 
   // ── GÜNLÜK BAYKUŞ MEKTUBU HAKKI SİSTEMİ ──

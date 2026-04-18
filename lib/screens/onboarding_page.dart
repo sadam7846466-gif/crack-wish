@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
+import '../services/profile_sync_service.dart';
+import '../services/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'root_shell.dart';
 import 'zodiac_hub_page.dart';
 import '../data/mayan_zodiac_data.dart';
@@ -30,12 +34,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   int _currentStep = 0; // 0 to 6
   int _selectedAvatarIndex = 2; // Ortadan (3. avatar) başlasın, kapak akışına uygun
+  bool _showLoginButtons = false;
+  bool _isAuthLoading = false;
 
   // --- Step 0 Data ---
   final TextEditingController _nameCtrl = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final TextEditingController _usernameCtrl = TextEditingController();
   final FocusNode _usernameFocus = FocusNode();
+  bool _isCheckingHandle = false;
+  String? _handleError;
   DateTime _selectedDate = DateTime(2000, 1, 1);
   bool _hasSelectedDate = false;
   DateTime? _selectedTime;
@@ -93,13 +101,35 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     super.dispose();
   }
 
-  void _nextStep() {
+  void _nextStep() async {
     HapticFeedback.lightImpact();
     if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) {
       HapticFeedback.heavyImpact();
       _shakeCtrl.forward(from: 0.0);
       return;
     }
+    
+    // Handle benzersizlik kontrolü (Step 2'den çıkarken)
+    if (_currentStep == 2) {
+      setState(() {
+        _isCheckingHandle = true;
+        _handleError = null;
+      });
+      
+      final handle = _usernameCtrl.text.trim();
+      final isAvailable = await ProfileSyncService().isHandleAvailable(handle);
+      
+      if (!mounted) return;
+      setState(() => _isCheckingHandle = false);
+      
+      if (!isAvailable) {
+        HapticFeedback.heavyImpact();
+        setState(() => _handleError = 'Bu kullanıcı adı zaten alınmış');
+        _shakeCtrl.forward(from: 0.0);
+        return;
+      }
+    }
+    
     if (_currentStep == 3 && !_hasSelectedDate) {
       HapticFeedback.heavyImpact();
       _shakeCtrl.forward(from: 0.0);
@@ -115,8 +145,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         setState(() => _currentStep++);
         _stepCtrl.forward();
       });
-    } else {
-      _finishOnboarding();
+    } else if (_currentStep == 6) {
+      final supabase = Supabase.instance.client;
+      if (supabase.auth.currentUser == null) {
+        _stepCtrl.reverse().then((_) {
+          setState(() => _currentStep = 7);
+          _stepCtrl.forward();
+        });
+      } else {
+        await _completeFinalOnboardingProfileSave();
+      }
     }
   }
 
@@ -146,10 +184,108 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return 'pisces';
   }
 
-  Future<void> _finishOnboarding() async {
+  Future<void> _checkAndRouteUser() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+    if (user != null) {
+      try {
+        final profile = await supabase.from('profiles').select('full_name, handle').eq('id', user.id).maybeSingle();
+        if (profile != null && profile['full_name'] != null) {
+           await StorageService.setUserName(profile['full_name'].toString());
+           if(profile['handle'] != null) {
+             await StorageService.setUserHandle(profile['handle'].toString());
+           }
+           if (!mounted) return;
+           Navigator.of(context).pushReplacement(
+             MaterialPageRoute(builder: (_) => const RootShell()),
+           );
+           return;
+        }
+      } catch (e) {
+        debugPrint('Profil kurtarma hatası: $e');
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      _showLoginButtons = false;
+      _nextStep(); // Goes to step 1
+    });
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final response = await AuthService().signInWithGoogle();
+      if (response != null && mounted) {
+        await _checkAndRouteUser();
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final response = await AuthService().signInWithApple();
+      if (response != null && mounted) {
+        await _checkAndRouteUser();
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
+
+  Future<void> _handleFinalGoogleSignIn() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final response = await AuthService().signInWithGoogle();
+      if (response != null && mounted) {
+        await _completeFinalOnboardingProfileSave();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
+        await AuthService().signInAnonymously();
+        await _completeFinalOnboardingProfileSave();
+        return;
+      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white))));
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
+
+  Future<void> _handleFinalAppleSignIn() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final response = await AuthService().signInWithApple();
+      if (response != null && mounted) {
+        await _completeFinalOnboardingProfileSave();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
+        await AuthService().signInAnonymously();
+        await _completeFinalOnboardingProfileSave();
+        return;
+      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white))));
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
+
+
+
+  Future<void> _completeFinalOnboardingProfileSave() async {
     HapticFeedback.heavyImpact();
     
-    // 0. Name & Zodiac & DoB & Handle
+    // Lokal veriler kaydediliyor
     await StorageService.setUserName(_nameCtrl.text.trim());
     await StorageService.setUserHandle(_usernameCtrl.text.trim());
     await StorageService.setZodiacSign(_calculateZodiac(_selectedDate));
@@ -157,17 +293,21 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     if (_knowsTime && _selectedTime != null) {
       await StorageService.setBirthTime(DateFormat('HH:mm').format(_selectedTime!));
     }
-
-    // 1. Focus & Relationship
     await StorageService.setLifeFocus(_lifeFocus.join(", "));
     await StorageService.setRelationshipStatus(_relationship);
-
-    // 2. Dreams & Aura
     await StorageService.setDreamFrequency(_dreamFrequency);
     await StorageService.setAuraColor(_auraColor);
-
-    // 3. Sleep Pattern
     await StorageService.setSleepPattern(_sleepPattern);
+
+    // Buluta (Supabase) Senkronize Ediliyor
+    if (Supabase.instance.client.auth.currentUser != null) {
+      await ProfileSyncService().syncProfileData(
+        userName: _nameCtrl.text.trim(),
+        userHandle: _usernameCtrl.text.trim(),
+        avatarUrl: "", 
+        zodiacSign: _calculateZodiac(_selectedDate),
+      );
+    }
 
     if (!mounted) return;
 
@@ -239,21 +379,22 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
+                          physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(), // 0. Adımda devasa logoyu kilitle!
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxHeight),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 if (_currentStep > 0) const SizedBox(height: 12), // Tepe boşluğunu daha da kısalttık, yazılar çok yukarda olacak
-                                if (_currentStep == 0) SizedBox(height: constraints.maxHeight, child: _buildWelcomeStep()),
+                                if (_currentStep == 0) SizedBox(height: MediaQuery.of(context).size.height * 0.62, child: _buildWelcomeStep()),
                                 if (_currentStep == 1) _buildFeaturesStep(),
                                 if (_currentStep == 2) _buildStep0(),
                                 if (_currentStep == 3) _buildStepDateWithWheels(),
                                 if (_currentStep == 4) _buildStep1(),
                                 if (_currentStep == 5) _buildStep2(),
                                 if (_currentStep == 6) _buildStep3(),
-                                if (_currentStep > 0)
+                                if (_currentStep == 7) SizedBox(height: MediaQuery.of(context).size.height * 0.62, child: _buildWelcomeStep(isFinal: true)),
+                                if (_currentStep > 0 && _currentStep < 7)
                                    const SizedBox(height: 16), // Kaydırma engelini (Scroll) kaldırmak için ektra itiş miktarı silindi
                                 if (_currentStep == 0)
                                    const SizedBox(height: 24),
@@ -293,7 +434,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         const SizedBox(height: 20),
                       ],
                       // Açık liste: Tüm Roma Rakamları (pasifler soluk, aktif olan parlak)
-                      if (_currentStep > 0)
+                      if (_currentStep > 0 && _currentStep < 7)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(6, (index) {
@@ -318,13 +459,168 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                           }),
                         ),
                       const SizedBox(height: 4), // Roma rakamları butonlara doğru aşağıya yaklaştıırıldı
-                      _buildNextButton(
-                        title: _currentStep == 0 ? "Hadi Başlayalım" : (_currentStep == 6 ? "Yolculuğa Başla" : "Devam Et"),
-                        icon: _currentStep == 6 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
-                        onTap: _nextStep,
-                        glowColor: const Color(0xFFC36E6E), // Splash Screen paletinden yumuşak kırmızımsı/gül kurusu
-                      ),
-                    ],
+                      if (_currentStep != 0 && _currentStep < 7) ...[
+                        _buildNextButton(
+                          title: _currentStep == 6 ? "Yolculuğa Başla" : "Devam Et",
+                          icon: _currentStep == 6 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
+                          onTap: _nextStep,
+                          glowColor: const Color(0xFFC36E6E),
+                        ),
+                      ] else if (_currentStep == 0) ...[
+                        Stack(
+                          alignment: Alignment.bottomCenter, // "Hadi Başlayalım" butonunu orijinal en alt noktasına çiviler!
+                          clipBehavior: Clip.none,
+                          children: [
+                            // 1. Durum: Kayıt Ol Modu (Hadi Başlayalım Butonu)
+                            IgnorePointer(
+                              ignoring: _showLoginButtons,
+                              child: AnimatedSlide(
+                                offset: _showLoginButtons ? const Offset(0.0, 0.1) : Offset.zero, // Çıkarken usulca aşağı süzülme
+                                duration: const Duration(milliseconds: 600),
+                                curve: Curves.easeOutQuint,
+                                child: AnimatedOpacity(
+                                  opacity: _showLoginButtons ? 0.0 : 1.0,
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeOut,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 24.0), // "Hadi Başlayalım" butonunu alt yazıdan hafifçe koparıp havaya kaldırır
+                                    child: _buildNextButton(
+                                      title: "Hadi Başlayalım",
+                                      icon: PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
+                                      onTap: _nextStep,
+                                      glowColor: const Color(0xFFC36E6E),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // 2. Durum: Giriş Yap Modu (Apple ve Google Butonları)
+                            IgnorePointer(
+                              ignoring: !_showLoginButtons,
+                              child: AnimatedSlide(
+                                offset: _showLoginButtons ? Offset.zero : const Offset(0.0, 0.08), // Girerken dipten yukarı yumuşak bir yükseliş
+                                duration: const Duration(milliseconds: 700),
+                                curve: Curves.easeOutExpo,
+                                child: AnimatedScale(
+                                  scale: _showLoginButtons ? 1.0 : 0.95, // Derinlik hissiyatı için ufak bir büyüme (Scale)
+                                  duration: const Duration(milliseconds: 700),
+                                  curve: Curves.easeOutExpo,
+                                  child: AnimatedOpacity(
+                                    opacity: _showLoginButtons ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 450),
+                                    curve: Curves.easeOut,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 70.0), // 100 pixel çok geldiği için "bir tık" (30px) düşürülerek tam odak merkeze alındı
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                      if (_isAuthLoading)
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 24.0),
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      )
+                                    else ...[
+                                      _buildAuthButton(
+                                        icon: Icons.apple,
+                                        label: "Apple ile Giriş Yap",
+                                        color: Colors.white,
+                                        textColor: Colors.black,
+                                        onTap: _handleAppleSignIn,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildAuthButton(
+                                        icon: Icons.g_mobiledata_rounded,
+                                        label: "Google ile Giriş Yap",
+                                        color: Colors.white.withOpacity(0.1),
+                                        textColor: Colors.white,
+                                        onTap: _handleGoogleSignIn,
+                                      ),
+                                    ]
+                                  ],
+                                ),
+                              ), // Padding closing
+                            ), // AnimatedOpacity closing
+                                ), // AnimatedScale closing
+                              ), // AnimatedSlide closing
+                            ), // IgnorePointer closing
+                          ],
+                        ),
+                      const SizedBox(height: 16),
+                      Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              setState(() {
+                                _showLoginButtons = !_showLoginButtons;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            highlightColor: Colors.white.withOpacity(0.05),
+                            splashColor: Colors.white.withOpacity(0.1),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: Text.rich(
+                                  key: ValueKey(_showLoginButtons),
+                                  TextSpan(
+                                    text: _showLoginButtons ? "Henüz evrene katılmadın mı?  " : "Zaten evrene katıldın mı?  ",
+                                    style: GoogleFonts.nunito(
+                                      color: Colors.white.withOpacity(0.5),
+                                      fontSize: 13,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: _showLoginButtons ? "Kayıt Ol" : "Giriş Yap",
+                                        style: GoogleFonts.nunito(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ] else if (_currentStep == 7) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 70.0), // İlk sayfadaki butonlarla birebir aynı seviyede tutuldu
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (_isAuthLoading)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 24.0),
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              else ...[
+                                _buildAuthButton(
+                                  icon: Icons.apple,
+                                  label: "Apple ile Hesabını Oluştur",
+                                  color: Colors.white,
+                                  textColor: Colors.black,
+                                  onTap: _handleFinalAppleSignIn,
+                                ),
+                                const SizedBox(height: 12),
+                                _buildAuthButton(
+                                  icon: Icons.g_mobiledata_rounded,
+                                  label: "Google ile Hesabını Oluştur",
+                                  color: Colors.white.withOpacity(0.1),
+                                  textColor: Colors.white,
+                                  onTap: _handleFinalGoogleSignIn,
+                                ),
+                              ]
+                            ],
+                          ),
+                        ),
+                        // 7. adımda butonlar arasına mesafe konarak tam splash düzenini yakalıyoruz
+                        const SizedBox(height: 48), // BottomBar'ı aşağıdan esnetir
+                      ]
+                    ], // Column children
                   ),
                 ),
               ),
@@ -339,6 +635,44 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // ==========================================
   // SHARED UI COMPONENTS
   // ==========================================
+  Widget _buildAuthButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required Color textColor,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color == Colors.white ? Colors.transparent : Colors.white.withOpacity(0.1),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: textColor, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTitle(String text) {
     return Text(
       text,
@@ -631,14 +965,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   // ==========================================
-  Widget _buildWelcomeStep() {
+  Widget _buildWelcomeStep({bool isFinal = false}) {
     return SizedBox(
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 40), // Kurabiyenin tavanla arasındaki sabit pay, onu hep en yukarıda tutar
+          const SizedBox(height: 60), // Kurabiyenin tavanla arasındaki boşluk artırılarak icon hafifçe aşağı indirildi
           
           // Asset Şans Kurabiyesi Görseli
           Image.asset(
@@ -680,7 +1014,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           
           // Kullanıcının Özel Beklenti Mottosu
           Text(
-            "Bugün umutlarım hayallerimden daha büyük.",
+            isFinal ? "Kozmik haritanı güvenceye almak için tıkla." : "Bugün umutlarım hayallerimden daha büyük.",
             textAlign: TextAlign.center,
             style: GoogleFonts.nunito(
               color: Colors.white.withOpacity(0.85), // Premium puslu hissiyat
@@ -838,18 +1172,34 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: TextField(
                      controller: _usernameCtrl,
                      focusNode: _usernameFocus,
+                     onChanged: (_) {
+                       if (_handleError != null) setState(() => _handleError = null);
+                     },
                      style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
                      cursorColor: const Color(0xFFD18471),
-                     keyboardType: TextInputType.emailAddress, // Boşluksuz ve küçük harf klavye yapısı için ideal
+                     keyboardType: TextInputType.emailAddress,
                      decoration: InputDecoration(
                        border: InputBorder.none,
                        isDense: true,
                        contentPadding: EdgeInsets.zero,
                        hintText: "@kozmikyolcu",
                        hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                       suffixIcon: _isCheckingHandle
+                           ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white38))
+                           : null,
+                       suffixIconConstraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
                      ),
                  ),
               ),
+              // Handle hata mesajı
+              if (_handleError != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 52, top: 4),
+                  child: Text(
+                    _handleError!,
+                    style: GoogleFonts.nunito(color: const Color(0xFFF87171), fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
             ],
           ),
         ),
@@ -978,26 +1328,41 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           offset: const Offset(0, 5), // İsteğe istinaden çarklar ile panel arası mesafe biraz daha genişletildi (aşağı kaydırıldı)
           child: _buildGlassCard(
             delay: 200, // Sayfa açılır açılmaz hızlıca belirmesi için gecikme azaltıldı
+            shake: false, // TÜM KARTIN TİTREMESİ İPTAL EDİLDİ (Sadece doldurulmamış zorunlu alan titreyecek)
             child: Column(
             children: [
-              _buildUnifiedInputRow(
-                 icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
-                 title: "DÜNYAYA GELİŞ TARİHİN",
-                 child: Text(
-                   _hasSelectedDate 
-                      ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
-                      : "Doğum tarihini seç",
-                   style: GoogleFonts.nunito(
-                     color: _hasSelectedDate ? Colors.white : Colors.white.withOpacity(0.25), 
-                     fontSize: _hasSelectedDate ? 15 : 12, 
-                     fontWeight: FontWeight.w400
-                   )
-                 ),
-                 onTap: () {
-                   _nameFocus.unfocus();
-                   _showDatePicker(context, mode: CupertinoDatePickerMode.date);
-                 },
-                 suffix: Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
+              AnimatedBuilder(
+                animation: _shakeCtrl,
+                builder: (context, animChild) {
+                  // Eğer tarih seçilmediyse ve titreme başladıysa sarsıntı ve kırmızılık hissi
+                  final isError = !_hasSelectedDate && _shakeCtrl.isAnimating;
+                  final dx = isError ? math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value) : 0.0;
+                  
+                  return Transform.translate(
+                    offset: Offset(dx, 0),
+                    child: _buildUnifiedInputRow(
+                       icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
+                       title: isError ? "DÜNYAYA GELİŞ TARİHİN (Burası Zorunlu)" : "DÜNYAYA GELİŞ TARİHİN",
+                       child: Text(
+                         _hasSelectedDate 
+                            ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
+                            : "Doğum tarihini seç",
+                         style: GoogleFonts.nunito(
+                           color: isError 
+                              ? const Color(0xFFE58888) // Hata anında kırmızı parlar
+                              : (_hasSelectedDate ? Colors.white : Colors.white.withOpacity(0.25)), 
+                           fontSize: _hasSelectedDate ? 15 : 12, 
+                           fontWeight: FontWeight.w400
+                         )
+                       ),
+                       onTap: () {
+                         _nameFocus.unfocus();
+                         _showDatePicker(context, mode: CupertinoDatePickerMode.date);
+                       },
+                       suffix: Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: isError ? const Color(0xFFE58888) : Colors.white.withOpacity(0.3), size: 16),
+                    ),
+                  );
+                }
               ),
               _buildDivider(),
               _buildUnifiedInputRow(
@@ -1057,12 +1422,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
 
-  Widget _buildGlassCard({required Widget child, required int delay}) {
+  Widget _buildGlassCard({required Widget child, required int delay, bool shake = true}) {
     return AnimatedBuilder(
       animation: _shakeCtrl,
       builder: (context, animChild) {
         // Hata anında sağa sola titreme efekti (Sine wave)
-        final dx = math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value);
+        final dx = shake ? math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value) : 0.0;
         return Transform.translate(
           offset: Offset(dx, 0),
           child: animChild,

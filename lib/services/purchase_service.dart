@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'analytics_service.dart';
 
 /// Apple/Google'ın kendi satın alma sistemi — üçüncü parti yok.
 class PurchaseService {
@@ -124,6 +125,7 @@ class PurchaseService {
       // Elite abonelik — premium durumunu aç
       await prefs.setBool('is_elite', true);
       debugPrint('✅ Elite aktif edildi!');
+      AnalyticsService().logElitePurchased(plan: productId);
     } else if (_isCookieProduct(productId)) {
       // Kurabiye — satın alınan kurabiyeyi kaydet
       final ownedCookies = prefs.getStringList('owned_cookies') ?? [];
@@ -132,6 +134,7 @@ class PurchaseService {
         await prefs.setStringList('owned_cookies', ownedCookies);
       }
       debugPrint('✅ Kurabiye satın alındı: $productId');
+      AnalyticsService().logCookiePurchased(cookieId: productId, price: 'store');
     }
 
     onPurchaseSuccess?.call(productId);

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../screens/root_shell.dart';
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _isLoading = false;
+  bool _isLoginMode = false;
 
   @override
   void initState() {
@@ -35,16 +37,49 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Future<void> _routeUser() async {
-    final userName = await StorageService.getUserName();
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+    
+    // Varsayılan olarak lokal hafızaya (önbelleğe) bak
+    String? userName = await StorageService.getUserName();
+
+    if (user != null) {
+      // 1. Apple/Google ile girmiş biri var. Supabase (Bulut) veri tabanına soruyoruz:
+      // "Bu kişinin profili önceden var mı?"
+      try {
+        final profile = await supabase
+            .from('profiles')
+            .select('full_name, handle')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (profile != null && profile['full_name'] != null) {
+           // ESKİ KULLANICI! Hemen bulut verilerini cihaza geri indiriyoruz:
+           await StorageService.setUserName(profile['full_name'].toString());
+           
+           if(profile['handle'] != null) {
+             await StorageService.setUserHandle(profile['handle'].toString());
+           }
+           
+           // Ve artık yerel adımız dolu olduğu için onu Onboarding'e Yollamayacağız.
+           userName = profile['full_name'].toString();
+           debugPrint("Kullanıcı profili buluttan geri yüklendi: $userName");
+        }
+      } catch (e) {
+        debugPrint('Profil kurtarma hatası: $e');
+      }
+    }
+
     if (!mounted) return;
     
-    // Eğer isim yoksa (veya test için boşsa) yeni profil oluşturma sihirbazına (Onboarding) gönder
+    // Eğer isim hala yoksa (Bulutta da yokmuş), o zaman o YENİ bir kullanıcıdır.
+    // Onu profil oluşturma sihirbazına (Onboarding) gönder
     if (userName == null || userName.isEmpty) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const OnboardingPage()),
       );
     } else {
-      // Zaten profili varsa ana menüye dön
+      // Zaten profili olduğu anlaşıldığına göre, hiç soru sormadan direkt Yıldız Odasına Gönder!
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const RootShell()),
       );
@@ -77,10 +112,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _continueAsGuest() async {
-    await _routeUser();
   }
 
   void _showError(String message) {
@@ -199,7 +230,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               else ...[
                                 _buildAuthButton(
                                   icon: Icons.apple,
-                                  label: "Apple ile Devam Et",
+                                  label: _isLoginMode ? "Apple ile Giriş Yap" : "Apple ile Devam Et",
                                   color: Colors.white,
                                   textColor: Colors.black,
                                   onTap: _handleAppleSignIn,
@@ -208,7 +239,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 _buildAuthButton(
                                   // Google icon yerine şimdilik basit bir text veya Mdi icon
                                   icon: Icons.g_mobiledata_rounded,
-                                  label: "Google ile Devam Et",
+                                  label: _isLoginMode ? "Google ile Giriş Yap" : "Google ile Devam Et",
                                   color: Colors.white.withOpacity(0.1),
                                   textColor: Colors.white,
                                   onTap: _handleGoogleSignIn,
@@ -222,23 +253,36 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
                     const SizedBox(height: 24),
 
-                    // Misafir Girişi Butonu
-                    TextButton(
-                      onPressed: _continueAsGuest,
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white.withOpacity(0.5),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Text("Misafir Olarak Başla"),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_rounded, size: 16),
-                        ],
+                    // Mod Değiştirici (Zarif Metin)
+                    GestureDetector(
+                      onTap: () => setState(() => _isLoginMode = !_isLoginMode),
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text.rich(
+                          TextSpan(
+                            text: _isLoginMode ? "Henüz evrene katılmadın mı?  " : "Zaten hesabın var mı?  ",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.5), 
+                              fontSize: 13,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: _isLoginMode ? "Kayıt Ol" : "Giriş Yap",
+                                style: const TextStyle(
+                                  color: Colors.white, 
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                     
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

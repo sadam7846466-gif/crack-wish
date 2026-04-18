@@ -1,5 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._();
@@ -25,5 +29,86 @@ class AuthService {
 
   String? getCurrentUserId() {
     return _supabase.auth.currentUser?.id;
+  }
+
+  /// ----------------------------------------
+  /// GOOGLE GİRİŞİ (NATIVE)
+  /// ----------------------------------------
+  Future<AuthResponse?> signInWithGoogle() async {
+    try {
+      // 1. Google ile native giriş başlat
+      // iOS ve Web Client ID'lerini ortam değişkenlerinden veya sabitlerden almalısın
+      const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: 'TODO_ADD_WEB_CLIENT_ID');
+      const iosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID', defaultValue: 'TODO_ADD_IOS_CLIENT_ID');
+
+      if (webClientId.contains('TODO') || (defaultTargetPlatform == TargetPlatform.iOS && iosClientId.contains('TODO'))) {
+        throw 'Geliştirici Hatası: Google Client ID ayarlamaları eksik! Uygulamanın çökmesini (crash) iptal ettik. Lütfen Supabase/Firebase Client ID\'lerinizi girin ve Info.plist ayarlarını yapın.';
+      }
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: webClientId,
+        clientId: defaultTargetPlatform == TargetPlatform.iOS ? iosClientId : null,
+      );
+
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // Kullanıcı girişi iptal etti
+        return null;
+      }
+
+      // 2. Google'dan Authentication bilgilerini (Token) al
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw 'Google ID Token alınamadı.';
+      }
+
+      // 3. Supabase'e ID Token ile giriş yap
+      final response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+      
+      debugPrint("Google Girişi Başarılı: ${response.user?.id}");
+      return response;
+    } catch (e) {
+      debugPrint("Google Giriş Hatası: $e");
+      rethrow;
+    }
+  }
+
+  /// ----------------------------------------
+  /// APPLE GİRİŞİ (NATIVE)
+  /// ----------------------------------------
+  Future<AuthResponse?> signInWithApple() async {
+    try {
+      // Sadece iOS/macOS'te mi çalıştığını kontrol edebilmek için kütüphane kendi içinde handle eder
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw 'Apple ID Token alınamadı.';
+      }
+
+      // Supabase'e Apple kimliği ile giriş yap
+      final response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+      );
+
+      debugPrint("Apple Girişi Başarılı: ${response.user?.id}");
+      return response;
+    } catch (e) {
+      debugPrint("Apple Giriş Hatası: $e");
+      rethrow;
+    }
   }
 }

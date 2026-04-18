@@ -45,12 +45,16 @@ class _SplashScreenState extends State<SplashScreen>
     _ctrl.addStatusListener((status) async {
       if (status == AnimationStatus.completed && !_navigating) {
         _navigating = true;
-        final seenWelcome = await StorageService.hasSeenWelcome();
+        
+        // Kullanıcı önbellekte var mı bakıyoruz
+        final userName = await StorageService.getUserName();
+        final isNewUser = (userName == null || userName.isEmpty);
+
         if (!mounted) return;
         
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => OnboardingPage(), // Geçici olarak zorunlu yönlendirme: seenWelcome ? const RootShell() : OnboardingPage(),
+            pageBuilder: (_, __, ___) => isNewUser ? const OnboardingPage() : const RootShell(),
             transitionsBuilder: (_, a, __, child) => child,
             transitionDuration: Duration.zero,
           ),
