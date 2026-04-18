@@ -189,11 +189,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final user = supabase.auth.currentUser;
     if (user != null) {
       try {
-        final profile = await supabase.from('profiles').select('full_name, handle').eq('id', user.id).maybeSingle();
+        final profile = await supabase.from('profiles').select('full_name, handle, zodiac_sign').eq('id', user.id).maybeSingle();
         if (profile != null && profile['full_name'] != null) {
            await StorageService.setUserName(profile['full_name'].toString());
            if(profile['handle'] != null) {
              await StorageService.setUserHandle(profile['handle'].toString());
+           }
+           if(profile['zodiac_sign'] != null) {
+             await StorageService.setZodiacSign(profile['zodiac_sign'].toString());
            }
            if (!mounted) return;
            Navigator.of(context).pushReplacement(
@@ -220,6 +223,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         await _checkAndRouteUser();
       }
     } catch (e) {
+      if (kDebugMode) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim giriş yapılıyor...', style: TextStyle(color: Colors.white))));
+        await AuthService().signInAnonymously();
+        await _checkAndRouteUser();
+        return;
+      }
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);
@@ -234,6 +243,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         await _checkAndRouteUser();
       }
     } catch (e) {
+      if (kDebugMode) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim giriş yapılıyor...', style: TextStyle(color: Colors.white))));
+        await AuthService().signInAnonymously();
+        await _checkAndRouteUser();
+        return;
+      }
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);

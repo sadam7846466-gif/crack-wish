@@ -17,6 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'premium_paywall_page.dart';
+import 'onboarding_page.dart';
 import 'welcome_screen.dart';
 import 'notification_settings_page.dart';
 import 'home_page.dart';
@@ -1022,7 +1023,7 @@ info@crackandwish.com''',
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.clear();
                             if (mounted) {
-                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const WelcomeScreen(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
+                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const OnboardingPage(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
                             }
                           },
                           child: Container(
@@ -1136,9 +1137,10 @@ info@crackandwish.com''',
                           onTap: () async {
                             Navigator.pop(ctx);
                             try { await Supabase.instance.client.auth.signOut(); } catch(e) { debugPrint("SignOut Error: $e"); }
-                            await StorageService.setHasSeenWelcome(false);
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.clear();
                             if (mounted) {
-                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const WelcomeScreen(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
+                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const OnboardingPage(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
                             }
                           },
                           child: Container(
