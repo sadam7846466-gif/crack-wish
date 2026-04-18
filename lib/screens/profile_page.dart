@@ -26,6 +26,8 @@ import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
 import '../services/profile_sync_service.dart';
 import '../services/content_moderation_service.dart';
+import 'dart:async';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../widgets/cosmic_badge.dart';
 import 'cosmic_profile_page.dart';
@@ -4392,98 +4394,163 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
     final firstDate = cookie.firstObtainedDate;
     final dateStr = firstDate != null ? "${firstDate.day.toString().padLeft(2, '0')}.${firstDate.month.toString().padLeft(2, '0')}.${firstDate.year}" : "—";
 
-    showModalBottomSheet(
+    showGeneralDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1E).withOpacity(0.65),
-              border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
-              boxShadow: [
-                BoxShadow(color: rarityColor.withOpacity(0.1), blurRadius: 40, spreadRadius: -5),
+      barrierDismissible: true,
+      barrierLabel: 'CookiePopup',
+      barrierColor: Colors.black.withOpacity(0.65), // Yumuşak karanlık arkaplan
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                // Arkaplan Pırıltısı (Arkada devasa bir aydınlanma)
+                Positioned(
+                  top: 20,
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: rarityColor.withOpacity(0.35), blurRadius: 100, spreadRadius: 30),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Ana Cam Kart
+                Container(
+                  margin: const EdgeInsets.only(top: 80, left: 32, right: 32),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30.0, sigmaY: 30.0),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(28, 70, 28, 36), // Üst padding kurabiyeye yer açar
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12), // Çok hafif açık tonlu cam (Frosty effect)
+                          borderRadius: BorderRadius.circular(40),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.4),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 40),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              meta['name']!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Date & Adet Pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.calendar_today_rounded, color: rarityColor, size: 14),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "Keşif: $dateStr", 
+                                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
+                                  if (cookie.countObtained > 1) ...[
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                                      width: 1, height: 12, color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Icon(Icons.auto_awesome_motion_rounded, color: rarityColor, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      "x${cookie.countObtained}", 
+                                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                  ]
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+                            // Açıklama
+                            Text(
+                              meta['desc']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.85), 
+                                fontSize: 15, 
+                                height: 1.6, 
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Panele Taşan (Overflow) Animasyonlu Merkez Kurabiye
+                Positioned(
+                  top: 0, 
+                  child: _SensorParallaxWidget(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.2, end: 1.0),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.elasticOut,
+                      builder: (context, scale, child) {
+                        return Transform.scale(
+                          scale: scale,
+                          child: Transform.translate(
+                            offset: Offset(0, 15 * (1 - scale)), // Pop up as it grows
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 140,
+                        height: 140,
+                        child: Image.asset(
+                          'assets/images/cookies/${cookie.id}.webp',
+                          errorBuilder: (_, __, ___) => Icon(Icons.bakery_dining_rounded, color: rarityColor, size: 80),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Kurabiye görseli + glow
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: rarityColor.withOpacity(0.2), blurRadius: 30, spreadRadius: 2),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/cookies/${cookie.id}.webp',
-                  errorBuilder: (_, __, ___) => Icon(Icons.bakery_dining_rounded, color: rarityColor, size: 48),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // İsim
-              Text(
-                meta['name']!,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.3),
-              ),
-              const SizedBox(height: 6),
-              // Nadirlik rozeti
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: rarityColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: rarityColor.withOpacity(0.3), width: 0.5),
-                ),
-                child: Text(
-                  meta['rarity']!,
-                  style: TextStyle(color: rarityColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                ),
-              ),
-              const SizedBox(height: 14),
-              // Açıklama
-              Text(
-                meta['desc']!,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 13, height: 1.5, fontStyle: FontStyle.italic),
-              ),
-              const SizedBox(height: 18),
-              // Alt bilgi satırı
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.calendar_today_rounded, color: Colors.white.withOpacity(0.3), size: 13),
-                    const SizedBox(width: 6),
-                    Text("İlk bulunma: $dateStr", style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Mini bilgelik mesajı
-              Text(
-                meta['quote'] ?? '',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: rarityColor.withOpacity(0.7), fontSize: 11.5, height: 1.4, letterSpacing: 0.2),
-              ),
-            ],
           ),
-        ),
-       ),
-      ),
-     ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curve = CurvedAnimation(parent: animation, curve: Curves.easeOutBack);
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10 * animation.value, sigmaY: 10 * animation.value),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.8, end: 1.0).animate(curve),
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+        );
+      },
     );
   }
 
@@ -4935,6 +5002,54 @@ class _SettingsListTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SensorParallaxWidget extends StatefulWidget {
+  final Widget child;
+  const _SensorParallaxWidget({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<_SensorParallaxWidget> createState() => _SensorParallaxWidgetState();
+}
+
+class _SensorParallaxWidgetState extends State<_SensorParallaxWidget> {
+  double _pitch = 0.0;
+  double _roll = 0.0;
+  StreamSubscription<AccelerometerEvent>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _subscription = accelerometerEventStream().listen((AccelerometerEvent event) {
+        if (mounted) {
+          setState(() {
+            _pitch = (event.y * 0.05).clamp(-0.25, 0.25);
+            _roll = (event.x * -0.05).clamp(-0.25, 0.25);
+          });
+        }
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100), // Hızlı ama pürüzsüz tepki
+      transformAlignment: FractionalOffset.center,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // perspective
+        ..rotateX(_pitch)
+        ..rotateY(_roll),
+      child: widget.child,
     );
   }
 }
