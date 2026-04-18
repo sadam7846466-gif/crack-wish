@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 enum ModerationResult {
   approved,
@@ -24,31 +26,44 @@ class ContentModerationService {
         return ModerationResult.rejectedTooLarge; // 5MB sınırı
       }
 
-      // 2. Zırh: Yapay Zeka Görüntü Analizi (API Entegrasyonu Noktası)
-      // TODO: Canlıya çıkarken buraya AWS Rekognition veya Google Cloud Vision API eklenecek.
-      // Şimdilik simülasyon olarak dosyayı geçiriyoruz, ancak API eklendiğinde %60 üstü
-      // çıplaklık veya şiddet algılandığında doğrudan rejected dönecek:
-      /*
-        final response = await http.post(
-          Uri.parse('https://api.sightengine.com/1.0/check.json'),
-          body: {
-            'models': 'nudity-2.0,gore',
-            'api_user': 'YOUR_API_USER',
-            'api_secret': 'YOUR_API_SECRET',
-            'media': imageFile, // Base64 veya form-data olarak iletilir
+      // 2. Zırh: Yapay Zeka Görüntü Analizi (SightEngine)
+      try {
+        final request = http.MultipartRequest('POST', Uri.parse('https://api.sightengine.com/1.0/check.json'));
+        request.fields['models'] = 'nudity-2.0,gore,weapon';
+        request.fields['api_user'] = '1943156292';
+        request.fields['api_secret'] = 'vK6gWacrF8stpPkx5J4m3ojvpHZvJJ48';
+        request.files.add(await http.MultipartFile.fromPath('media', imageFile.path));
+
+        final response = await request.send();
+        final responseData = await response.stream.bytesToString();
+        final aiDecision = jsonDecode(responseData);
+
+        if (aiDecision['status'] == 'success') {
+          // Çıplaklık ve +18 kontrolü (safe skoru düşükse tehlikelidir)
+          if (aiDecision['nudity'] != null && (aiDecision['nudity']['safe'] ?? 1.0) < 0.45) {
+             return ModerationResult.rejectedAdultContent;
           }
-        );
-        final aiDecision = jsonDecode(response.body);
-        if (aiDecision['nudity']['safe'] < 0.4 || aiDecision['gore']['prob'] > 0.5) {
-           return ModerationResult.rejectedAdultContent;
+          // Kan ve Şiddet kontrolü
+          if (aiDecision['gore'] != null && (aiDecision['gore']['prob'] ?? 0.0) > 0.5) {
+             return ModerationResult.rejectedViolence;
+          }
+          // Silah kontrolü
+          if (aiDecision['weapon'] != null && (aiDecision['weapon'] ?? 0.0) > 0.5) {
+             return ModerationResult.rejectedViolence;
+          }
+        } else {
+          // LİMİT BİTİNCE VEYA SİSTEM ÇÖKÜNCE ÇALIŞAN GİZLİ KALKAN (Fail-Safe):
+          // Hata varsa kullanıcıyı kapıda bekletme, sessizce onay ver ve içeri al! (Para ödemekten kurtaran yapı)
+          debugPrint('SightEngine Fail-Safe Devrede (Limit/Hata): \${aiDecision["error"]["message"]}');
+          return ModerationResult.approved;
         }
-      */
+      } catch (aiError) {
+        // İnternet kopuksa veya yapay zeka sunucusu kapalıysa geçişe izin ver
+        debugPrint('Yapay Zeka Ağ Hatası (Fail-Safe Devrede): \$aiError');
+        return ModerationResult.approved;
+      }
 
-      // 3. Zırh: Şikayet Sabıka Kontrolü
-      // (Bunu ileride veritabanından kullanıcının 'flag_score' verisini okuyarak yapacağız)
-
-      // Tüm güvenlik duvarlarından geçti!
-      await Future.delayed(const Duration(milliseconds: 1500)); // Yapay Zeka analizi hissi
+      // Tüm güvenlik duvarlarından başarıyla geçti!
       return ModerationResult.approved;
 
     } catch (e) {
