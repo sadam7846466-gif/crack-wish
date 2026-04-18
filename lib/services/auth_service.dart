@@ -37,9 +37,8 @@ class AuthService {
   Future<AuthResponse?> signInWithGoogle() async {
     try {
       // 1. Google ile native giriş başlat
-      // iOS ve Web Client ID'lerini ortam değişkenlerinden veya sabitlerden almalısın
-      const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: 'TODO_ADD_WEB_CLIENT_ID');
-      const iosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID', defaultValue: 'TODO_ADD_IOS_CLIENT_ID');
+      const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: '79501630124-fts9hq66lm9cpbdps3hf9an9vnoje65i.apps.googleusercontent.com');
+      const iosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID', defaultValue: '79501630124-peeupkr8v24kkgla408kg741dcd1n2fp.apps.googleusercontent.com');
 
       if (webClientId.contains('TODO') || (defaultTargetPlatform == TargetPlatform.iOS && iosClientId.contains('TODO'))) {
         throw 'Geliştirici Hatası: Google Client ID ayarlamaları eksik! Uygulamanın çökmesini (crash) iptal ettik. Lütfen Supabase/Firebase Client ID\'lerinizi girin ve Info.plist ayarlarını yapın.';

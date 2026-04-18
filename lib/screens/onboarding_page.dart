@@ -224,9 +224,17 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       }
     } catch (e) {
       if (kDebugMode) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim giriş yapılıyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Eski hesaba giriş simüle ediliyor...', style: TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
-        await _checkAndRouteUser();
+        // Gerçek bir eski kullanıcı girişini simüle etmek için sahte önbellek:
+        await StorageService.setUserName("Alpha Tester");
+        await StorageService.setUserHandle("alpha_tester");
+        await StorageService.setZodiacSign("scorpio");
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const RootShell()),
+          );
+        }
         return;
       }
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
@@ -244,9 +252,17 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       }
     } catch (e) {
       if (kDebugMode) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim giriş yapılıyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Eski hesaba giriş simüle ediliyor...', style: TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
-        await _checkAndRouteUser();
+        // Gerçek bir eski kullanıcı girişini simüle etmek için sahte önbellek:
+        await StorageService.setUserName("Alpha Tester");
+        await StorageService.setUserHandle("alpha_tester");
+        await StorageService.setZodiacSign("scorpio");
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const RootShell()),
+          );
+        }
         return;
       }
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));

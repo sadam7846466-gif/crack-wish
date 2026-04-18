@@ -76,5 +76,16 @@
 	<string>ca-app-pub-5096906411582452~7933238634</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.79501630124-peeupkr8v24kkgla408kg741dcd1n2fp</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
