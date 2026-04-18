@@ -22,18 +22,18 @@ class BottomNav extends StatelessWidget {
     ];
 
     return Padding(
-      padding: EdgeInsets.only(bottom: bottomPadding + 8, left: 16, right: 16),
+      padding: EdgeInsets.only(bottom: bottomPadding + 8, left: 24, right: 24),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // Daha fazla blur
           child: Container(
-            height: 64,
+            height: 56, // Daha ince 
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withOpacity(0.05), // Daha transparan
               borderRadius: BorderRadius.circular(32),
               border: Border.all(
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withOpacity(0.12), // Çok ince ve saydam border
                 width: 0.5,
               ),
             ),
@@ -52,27 +52,36 @@ class BottomNav extends StatelessWidget {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 4), // Padding azaltıldı
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center, // Ortalaması için eklendi
                         children: [
                           Icon(
                             tabs[i].icon,
-                            size: 22,
+                            size: 20, // İkon biraz küçüldü
                             color: selected
                                 ? activeColor
                                 : AppColors.textWhite50,
+                            // Parlama efekti eklendi
+                            shadows: selected
+                                ? [Shadow(color: activeColor.withOpacity(0.6), blurRadius: 10)]
+                                : null,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 3), // Aradaki boşluk kısaldı
                           Text(
                             tabs[i].label,
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 9, // Font 10'dan 9'a ufaldı
                               fontWeight:
                                   selected ? FontWeight.w700 : FontWeight.w500,
                               color: selected
                                   ? activeColor
                                   : AppColors.textWhite50,
+                              // Metine de parlama eklendi
+                              shadows: selected
+                                  ? [Shadow(color: activeColor.withOpacity(0.6), blurRadius: 8)]
+                                  : null,
                             ),
                           ),
                         ],

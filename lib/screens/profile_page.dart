@@ -1587,7 +1587,7 @@ info@crackandwish.com''',
                         ),
                         const SizedBox(height: 24),
 
-                        // ── 3. PREMİUM BANNER ──
+                        // ── 3. PREMİUM BANNER (TICKET) ──
                         _BentoPremiumBanner(
                           lang: lang,
                           isPremium: _isPremiumUser,
@@ -1610,14 +1610,15 @@ info@crackandwish.com''',
                             );
                           },
                         ),
-                        const SizedBox(height: 10),
-                        
-                        // ── 2B. REFERRAL BANNER (Davet Et ve Kazan) ──
-                        _BentoInviteBanner(
+                        const SizedBox(height: 8),
+
+                        // ── 3B. KOZMİK PROFIL BANNERI (HERO) ──
+                        _BentoCosmicBanner(
                           lang: lang,
-                          onTap: _showInviteModal,
+                          onTap: _openCosmicChart,
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
+
                         GestureDetector(
                           onTap: () async {
                             final prefs = await SharedPreferences.getInstance();
@@ -1643,106 +1644,14 @@ info@crackandwish.com''',
                         ),
                         const SizedBox(height: 20),
 
-                        // ── 4. QUICK ACTIONS (2x2 Bento Grid) ──
-                        _SectionLabel(lang == 'tr' ? 'Genel' : 'General'),
-                        const SizedBox(height: 10),
-                        // Removed Owl Mail placeholder since it's available via BottomNav
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.language_rounded,
-                                iconColor: const Color(0xFF5A8BFF),
-                                label: l10n.language,
-                                subtitle: languageValue,
-                                onTap: _openLanguagePicker,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.notifications_none_rounded,
-                                iconColor: const Color(0xFFFF6B6B),
-                                label: lang == 'tr' ? 'Bildirimler' : 'Notifications',
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    SwipeFadePageRoute(
-                                      page: const NotificationSettingsPage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // ── 5. KOZMİK BİLGİLER ──
-                        _SectionLabel(lang == 'tr' ? 'Kozmik Bilgiler' : 'Cosmic Info'),
-                        const SizedBox(height: 10),
-                        _SettingsListGroup(
-                          children: [
-                            _SettingsListTile(
-                              icon: Icons.insights_rounded,
-                              iconColor: const Color(0xFFC084FC),
-                              label: lang == 'tr' ? 'Kozmik Profilim' : 'My Cosmic Profile',
-                              subtitle: lang == 'tr' ? 'Harita, Saat ve Konum' : 'Chart, Time, and Place',
-                              onTap: _openCosmicChart,
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-                        // ── 6. PAYLAŞ & DESTEK ──
-                        _SectionLabel(lang == 'tr' ? 'Paylaş & Destek' : 'Share & Support'),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.share_rounded,
-                                iconColor: const Color(0xFF2DD4BF),
-                                label: lang == 'tr' ? 'Paylaş' : 'Share',
-                                onTap: _shareApp,
-                                compact: true,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.star_border_rounded,
-                                iconColor: const Color(0xFFFFD166),
-                                label: lang == 'tr' ? 'Değerlendir' : 'Rate',
-                                onTap: _rateApp,
-                                compact: true,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.help_outline_rounded,
-                                iconColor: const Color(0xFFC084FC),
-                                label: lang == 'tr' ? 'Yardım' : 'Help',
-                                onTap: _openHelpCenter,
-                                compact: true,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // ── 7. HESAP ──
+                        // ── BÖLÜM 1: HESAP ──
                         _SectionLabel(lang == 'tr' ? 'Hesap' : 'Account'),
                         const SizedBox(height: 10),
                         _SettingsListGroup(
                           children: [
                             _SettingsListTile(
                               icon: Icons.email_outlined,
-                              iconColor: const Color(0xFF5A8BFF),
+                              iconColor: Colors.white54,
                               label: lang == 'tr' ? 'E-posta' : 'Email',
                               subtitle: _getConnectedEmail(),
                               onTap: () {
@@ -1762,17 +1671,81 @@ info@crackandwish.com''',
                                 );
                               },
                             ),
+                            _SettingsListTile(
+                              icon: Icons.language_rounded,
+                              iconColor: Colors.white54,
+                              label: l10n.language,
+                              subtitle: languageValue,
+                              onTap: _openLanguagePicker,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.notifications_none_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Bildirimler' : 'Notifications',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  SwipeFadePageRoute(
+                                    page: const NotificationSettingsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
 
+                        const SizedBox(height: 24),
+
+                        // ── BÖLÜM 2: DESTEK & DENEYİM ──
+                        _SectionLabel(lang == 'tr' ? 'Destek & Deneyim' : 'Support & Experience'),
+                        const SizedBox(height: 10),
+                        _SettingsListGroup(
+                          children: [
+                            _SettingsListTile(
+                              icon: Icons.group_add_rounded,
+                              iconColor: const Color(0xFFC084FC).withOpacity(0.8),
+                              label: lang == 'tr' ? 'Arkadaşlarını Davet Et' : 'Invite Friends',
+                              subtitle: lang == 'tr' ? '+3 Ruh Taşı' : '+3 Soul Stones',
+                              onTap: _showInviteModal,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.help_outline_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Yardım' : 'Help',
+                              onTap: _openHelpCenter,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.share_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Paylaş' : 'Share',
+                              onTap: _shareApp,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.star_border_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Değerlendir' : 'Rate',
+                              onTap: _rateApp,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // ── BÖLÜM 3: TEHLİKELİ ALAN ──
+                        _SectionLabel(lang == 'tr' ? 'Tehlikeli Alan' : 'Danger Zone'),
+                        const SizedBox(height: 10),
+                        _SettingsListGroup(
+                          children: [
                             _SettingsListTile(
                               icon: Icons.logout_rounded,
-                              iconColor: const Color(0xFFFF4D4D),
+                              iconColor: const Color(0xFFFCA5A5), // Soft red
                               label: lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
                               isDestructive: true,
                               onTap: _signOut,
                             ),
                             _SettingsListTile(
                               icon: Icons.delete_forever_rounded,
-                              iconColor: const Color(0xFFFF2D55),
+                              iconColor: const Color(0xFFF87171), // Little darker soft red
                               label: lang == 'tr' ? 'Hesabı Sil' : 'Delete Account',
                               isDestructive: true,
                               onTap: _deleteAccount,
@@ -3817,54 +3790,52 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
         duration: const Duration(milliseconds: 120),
         scale: _pressed ? 0.97 : 1.0,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+            bottomLeft: Radius.circular(8), // Asymmetric connection
+            bottomRight: Radius.circular(20),
+          ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: widget.isPremium
-                      ? [
-                          const Color(0xFF22D3EE).withOpacity(0.25),
-                          const Color(0xFF14B8A6).withOpacity(0.10),
-                          const Color(0xFF0EA5E9).withOpacity(0.08),
-                        ]
-                      : [
-                          const Color(0xFFD4A574).withOpacity(0.25),
-                          const Color(0xFFFFD166).withOpacity(0.10),
-                          const Color(0xFFFF9A5C).withOpacity(0.08),
-                        ],
+                color: widget.isPremium
+                    ? Colors.white.withOpacity(0.08)
+                    : const Color(0xFFD4A574).withOpacity(0.15),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(8),
+                  bottomRight: Radius.circular(20),
                 ),
-                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: widget.isPremium
-                      ? const Color(0xFF22D3EE).withOpacity(0.2)
-                      : const Color(0xFFD4A574).withOpacity(0.2),
-                  width: 0.5,
+                      ? Colors.white.withOpacity(0.15)
+                      : const Color(0xFFD4A574).withOpacity(0.3),
+                  width: 1.0,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: widget.isPremium
-                            ? [const Color(0xFF22D3EE), const Color(0xFF0EA5E9)]
+                            ? [const Color(0xFF38BDF8), const Color(0xFF0284C7)]
                             : [const Color(0xFFD4A574), const Color(0xFFB8956A)],
                       ),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
                           color: widget.isPremium
-                              ? const Color(0xFF22D3EE).withOpacity(0.3)
+                              ? const Color(0xFF0284C7).withOpacity(0.3)
                               : const Color(0xFFD4A574).withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -3872,11 +3843,11 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       child: Icon(
                         widget.isPremium ? Icons.diamond_rounded : Icons.workspace_premium_rounded,
                         color: Colors.white,
-                        size: 22,
+                        size: 16,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3886,41 +3857,51 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                               ? (widget.lang == 'tr' ? 'Elite Büyücüsün' : 'You are Elite')
                               : (widget.lang == 'tr' ? 'Elite\'e Geç' : 'Go Elite'),
                           style: TextStyle(
-                            color: widget.isPremium ? const Color(0xFF22D3EE) : const Color(0xFFD4A574),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.3,
+                            color: widget.isPremium ? const Color(0xFFE0F2FE) : const Color(0xFFD4A574),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 3),
                         Text(
                           widget.isPremium
-                              ? (widget.lang == 'tr' ? 'Mistik kapılar emrinde' : 'Mystical gates await')
-                              : (widget.lang == 'tr' ? 'Kozmik farkındalığa giden kapıyı aç' : 'Unlock the door to cosmic awareness'),
+                              ? (widget.lang == 'tr' ? 'Mistik kapıları incele' : 'View mystical gates')
+                              : (widget.lang == 'tr' ? 'Farkındalığa giden kapı' : 'Door to awareness'),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.45),
-                            fontSize: 11,
+                            color: Colors.white.withOpacity(0.55),
+                            fontSize: 10,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  if (!widget.isPremium)
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: const Color(0xFFD4A574).withOpacity(0.5),
-                      size: 16,
-                    ),
-                  if (widget.isPremium)
+                  if (widget.isPremium) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF22D3EE).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withOpacity(0.12),
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text('Aktif', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        'Aktif', 
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9), 
+                          fontSize: 9, 
+                          fontWeight: FontWeight.bold, 
+                          letterSpacing: 0.5
+                        )
+                      ),
                     ),
+                    const SizedBox(width: 8),
+                  ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: widget.isPremium 
+                        ? Colors.white.withOpacity(0.2) 
+                        : const Color(0xFFD4A574).withOpacity(0.5),
+                    size: 12,
+                  ),
                 ],
               ),
             ),
@@ -3930,6 +3911,129 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
     );
   }
 }
+
+class _BentoCosmicBanner extends StatefulWidget {
+  final String lang;
+  final VoidCallback onTap;
+
+  const _BentoCosmicBanner({
+    required this.lang,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoCosmicBanner> createState() => _BentoCosmicBannerState();
+}
+
+class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(8), // Asymmetric connection to Elite above
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08), // Bright pure translucent glass
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(24),
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFC084FC),
+                          Color(0xFF9333EA),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF9333EA).withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.insights_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.lang == 'tr' ? 'Kozmik Profilim' : 'My Cosmic Profile',
+                          style: const TextStyle(
+                            color: Color(0xFFF3E8FF),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          widget.lang == 'tr' 
+                              ? 'Harita, Saat ve Konum Bilgileri' 
+                              : 'Chart, Time, and Place Details',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.white.withOpacity(0.25),
+                    size: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 class _BentoInviteBanner extends StatefulWidget {
   final String lang;

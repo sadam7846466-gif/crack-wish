@@ -454,7 +454,6 @@ class _HomePageState extends State<HomePage> {
                                   const DailyTipCard(),
                                   const BentoGrid(),
                                   const SizedBox(height: 16),
-                                  const QuoteBanner(),
                                   const DailyHoroscopeCard(),
                                 ],
                               ),
