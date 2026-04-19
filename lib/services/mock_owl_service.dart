@@ -33,6 +33,11 @@ class MockOwlService {
       user: const OwlUser(id: 'u3', name: 'Selin Arslan', emoji: '👧', owlCode: 'OWL-9012'),
       friendsSince: DateTime.now().subtract(const Duration(days: 7)),
     ),
+    Friend(
+      id: 'f4',
+      user: const OwlUser(id: 'u4', name: 'Gamze Çelik', emoji: '👩', owlCode: 'OWL-5555'),
+      friendsSince: DateTime.now().subtract(const Duration(days: 2)),
+    ),
   ];
 
   // --- Arkadaşlık istekleri ---

@@ -7,7 +7,7 @@ import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
 import '../services/storage_service.dart';
 import '../models/owl_models.dart';
-import '../services/mock_owl_service.dart';
+import '../services/supabase_owl_service.dart';
 import 'compatibility_content.dart';
 
 /// Batı Zodyak Sayfası — "Ben nasıl biriyim?"
@@ -1143,7 +1143,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   }
 
   void _showFriendListForCompatibility(Map<String, dynamic> mySign) {
-    final mockService = MockOwlService();
+    final mockService = SupabaseOwlService();
     final friends = mockService.friends;
 
     showModalBottomSheet(

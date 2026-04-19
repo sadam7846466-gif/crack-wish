@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:vlucky_flutter/services/cloud_sync_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._();
@@ -72,6 +73,10 @@ class AuthService {
       );
       
       debugPrint("Google Girişi Başarılı: ${response.user?.id}");
+      
+      // ✅ Buluttaki verileri (Kazançlar, Rüyalar) bu yeni telefona şak diye indir!
+      await CloudSyncService().pullFromCloud();
+      
       return response;
     } catch (e) {
       debugPrint("Google Giriş Hatası: $e");
@@ -104,6 +109,10 @@ class AuthService {
       );
 
       debugPrint("Apple Girişi Başarılı: ${response.user?.id}");
+
+      // ✅ Buluttaki verileri (Kazançlar, Rüyalar) bu yeni telefona şak diye indir!
+      await CloudSyncService().pullFromCloud();
+
       return response;
     } catch (e) {
       debugPrint("Apple Giriş Hatası: $e");

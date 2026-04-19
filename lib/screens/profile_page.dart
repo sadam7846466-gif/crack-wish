@@ -32,7 +32,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../widgets/cosmic_badge.dart';
 import 'cosmic_profile_page.dart';
-import '../services/mock_owl_service.dart';
+import '../services/supabase_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
 
@@ -72,7 +72,7 @@ class ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     loadUserData();
-    MockOwlService().addListener(_onMockOwlUpdate);
+    SupabaseOwlService().addListener(_onMockOwlUpdate);
   }
 
   void _onMockOwlUpdate() {
@@ -81,7 +81,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    MockOwlService().removeListener(_onMockOwlUpdate);
+    SupabaseOwlService().removeListener(_onMockOwlUpdate);
     super.dispose();
   }
 
@@ -178,10 +178,12 @@ class ProfilePageState extends State<ProfilePage> {
                       border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
                     ),
                     padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         Center(
                           child: Container(
                             width: 48,
@@ -555,10 +557,11 @@ class ProfilePageState extends State<ProfilePage> {
 
                       ],
                     ),
-                  ),
-                ),
-              ),
-            );
+                  ), // end SingleChildScrollView
+                ), // end Container
+              ), // end BackdropFilter
+            ), // end ClipRRect
+            ); // end Padding
           },
         );
       },
@@ -1019,7 +1022,14 @@ info@crackandwish.com''',
                         child: GestureDetector(
                           onTap: () async {
                             Navigator.pop(ctx);
-                            try { await Supabase.instance.client.auth.signOut(); } catch (e) { debugPrint("Delete Account Error: $e");}
+                            try { 
+                              // 1. Önce buluttan kullanıcının kendi data'sını kalıcı sil (Postgres RPC)
+                              await Supabase.instance.client.rpc('delete_user');
+                              // 2. Auth statüsünü temizle
+                              await Supabase.instance.client.auth.signOut(); 
+                            } catch (e) { 
+                              debugPrint("Delete Account Error: $e");
+                            }
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.clear();
                             if (mounted) {
@@ -2153,16 +2163,14 @@ class _BentoHeroCard extends StatelessWidget {
                       builder: (context, snapshot) {
                         bool hasUnclaimed = false;
                         if (snapshot.hasData) {
-                          final claimed = snapshot.data![0] as Set<String>;
+                          // Gün içinde birden fazla toplanabileceği için 'claimed' kilidi kapatıldı. (Sadece bekleyen fona bakılır)
                           final pendingFal = snapshot.data![1] as int;
                           final pendingCookie = snapshot.data![2] as int;
                           final pendingDream = snapshot.data![3] as int;
                           final pendingOwl = snapshot.data![4] as int;
+                          
                           // Nokta sadece gerçekten toplanacak Aura varsa yansın
-                          hasUnclaimed = (!claimed.contains('fal') && pendingFal > 0) ||
-                              (!claimed.contains('kurabiye') && pendingCookie > 0) ||
-                              (!claimed.contains('ruya') && pendingDream > 0) ||
-                              (!claimed.contains('baykus') && pendingOwl > 0);
+                          hasUnclaimed = pendingFal > 0 || pendingCookie > 0 || pendingDream > 0 || pendingOwl > 0;
                         }
                         return _GlassBadge(
                           imagePath: 'assets/images/aura_core.png',

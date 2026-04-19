@@ -57,19 +57,19 @@ class _DailyTipCardState extends State<DailyTipCard> {
         Navigator.push(
           context,
           SwipeFadePageRoute(page: const DreamPage()),
-        );
+        ).then((_) => _loadSuggestion());
         break;
       case _SuggestionType.tarot:
         Navigator.push(
           context,
           SwipeFadePageRoute(page: const TarotPage()),
-        );
+        ).then((_) => _loadSuggestion());
         break;
       case _SuggestionType.zodiac:
         Navigator.push(
           context,
           SwipeFadePageRoute(page: const ZodiacHubPage()),
-        );
+        ).then((_) => _loadSuggestion());
         break;
       case _SuggestionType.allDone:
       case null:

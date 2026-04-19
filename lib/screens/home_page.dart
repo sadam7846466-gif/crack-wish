@@ -8,7 +8,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
-import '../services/mock_owl_service.dart';
+import '../services/supabase_owl_service.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
     _loadUserName();
-    MockOwlService().addListener(_onMockOwlUpdate);
+    SupabaseOwlService().addListener(_onMockOwlUpdate);
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    MockOwlService().removeListener(_onMockOwlUpdate);
+    SupabaseOwlService().removeListener(_onMockOwlUpdate);
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -480,7 +480,7 @@ class _HomePageState extends State<HomePage> {
     final isTr = l10n.localeName == 'tr';
     final hour = DateTime.now().hour;
     
-    final int totalUnread = _unreadOwlCount + MockOwlService().pendingRequestCount + MockOwlService().unreadLetterCount;
+    final int totalUnread = _unreadOwlCount + SupabaseOwlService().pendingRequestCount + SupabaseOwlService().unreadLetterCount;
     
     String greeting;
     String timeSubtitle;

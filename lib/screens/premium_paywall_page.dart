@@ -123,7 +123,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
               children: [
                 // ── ÜST BAR (SABİT) ──
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 24, bottom: 10), // Tepe barlarına yapışmayı engellemek için top paddding 24 eklendi
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -197,7 +197,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(), // TAMAMEN SABİT, ASLA KAYMAZ
+                          physics: const BouncingScrollPhysics(), // Ekran küçükse veya taşma varsa kullanıcı kaydırabilsin (Taşıp butonları ezmesin)
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxHeight),
                             child: IntrinsicHeight(
@@ -208,20 +208,20 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                                   children: [
                             // ── ICON & BAŞLIK ──
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10), // reduced
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.white.withOpacity(0.03),
                                 border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
                               ),
-                              child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFE5C07B), size: 28),
+                              child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFE5C07B), size: 24), // reduced
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8), // reduced
                             const Text(
                               "Crack Wish Elite",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 24,
+                                fontSize: 22, // reduced
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1.0,
                               ),
@@ -234,22 +234,22 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.6),
-                                fontSize: 13,
+                                fontSize: 12, // reduced
                                 height: 1.3,
                               ),
                             ),
-                            const SizedBox(height: 26),
+                            const SizedBox(height: 16), // from 26
 
                             // ── MENÜ BAR STİLİ CAM PANEL İÇİNDE ÖZELLİKLER ──
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(22),
+                              borderRadius: BorderRadius.circular(18), // reduced slightly
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // reduced
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.03),
-                                    borderRadius: BorderRadius.circular(22),
+                                    borderRadius: BorderRadius.circular(18),
                                     border: Border.all(color: Colors.white.withOpacity(0.06), width: 0.5),
                                   ),
                                   child: Column(
@@ -265,12 +265,13 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                               ),
                             ),
                             
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 16), // from 28
 
                             // ── CAM TASARIMLI 3'LÜ PAKET DİZİLİMİ ──
                             _buildGlassPackageRow(0, "Haftalık Uyanış", "\$2.99", "/ week"),
                             _buildGlassPackageRow(1, "Aylık Sezgi", "\$7.99", "/ month", subText: "Save 33%"),
                             _buildGlassPackageRow(2, "Yıllık Aydınlanma", "\$39.99", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
+                            const SizedBox(height: 16), // from 24
                                   ],
                                 ),
                               ),
@@ -285,11 +286,11 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                 SlideTransition(
                   position: _slideAnimation,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 16), // from 24, 8, 24, 24
                     child: Column(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(26), // from 30
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                             child: AnimatedContainer(
@@ -297,7 +298,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(26),
                                 border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
                               ),
                               child: Material(
@@ -426,19 +427,19 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
 
   Widget _buildCompactFeature(IconData icon, Color color, String title, {bool isLast = false}) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 8),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 6), // from 8
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(4), // from 5
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 14),
+            child: Icon(icon, color: color, size: 12), // from 14
           ),
-          const SizedBox(width: 14),
-          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500)),
+          const SizedBox(width: 10), // from 14
+          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12, fontWeight: FontWeight.w500)), // from 13
         ],
       ),
     );
@@ -455,12 +456,12 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
       child: Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16), // from 20
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // from 14, 10
               decoration: BoxDecoration(
                 color: isSelected 
                   ? highlightColor.withOpacity(0.08)

@@ -57,7 +57,7 @@ class ProfileSyncService {
       final userId = user.id;
       final fileExtension = p.extension(imageFile.path).toLowerCase();
       // Örn: avatars/df4a-1.../profile.jpg
-      final fileName = '\$userId/profile_\${DateTime.now().millisecondsSinceEpoch}\$fileExtension';
+      final fileName = '$userId/profile_${DateTime.now().millisecondsSinceEpoch}$fileExtension';
 
       // Eski resmi (eğer varsa) üstüne yazmamak veya sildiğimizden emin olmak için yol:
       // (Supabase Storage upsert: true kullanılarak üzerine yazdırılır)
@@ -69,18 +69,18 @@ class ProfileSyncService {
 
       // Başarılı yükleme sonrası public URL'i alırız
       final publicUrl = _supabase.storage.from('avatars').getPublicUrl(fileName);
-      debugPrint('Avatar Yüklendi! Public URL: \$publicUrl');
+      debugPrint('Avatar Yüklendi! Public URL: $publicUrl');
       
       return publicUrl;
     } catch (e) {
-      debugPrint('Supabase Upload Avatar Hatası: \$e');
+      debugPrint('Supabase Upload Avatar Hatası: $e');
       return null;
     }
   }
 
   /// Profil Verilerini Supabase 'profiles' tablosuna eşitler (Sync)
   /// Bu sayede, Baykuş Postası gönderdiğimizde diğerleri bizi bu güncel isim/foto ile görür.
-  Future<bool> syncProfileData({
+  Future<dynamic> syncProfileData({
     required String userName,
     required String userHandle,
     required String avatarUrl,
@@ -92,9 +92,8 @@ class ProfileSyncService {
 
       final updateData = {
         'id': user.id, // Primary Key olarak eşleşecek
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
         'full_name': userName,
-        'handle': userHandle,
+        'username': userHandle,
         'avatar_url': avatarUrl,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
       };
@@ -105,8 +104,8 @@ class ProfileSyncService {
       debugPrint('Profil Senkronizasyonu Başarılı!');
       return true;
     } catch (e) {
-      debugPrint('Supabase Profile Sync Hatası: \$e');
-      return false;
+      debugPrint('Supabase Profile Sync Hatası: $e');
+      return e.toString();
     }
   }
 }

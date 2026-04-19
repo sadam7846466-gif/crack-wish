@@ -18,6 +18,8 @@ import 'package:vlucky_flutter/services/push_notification_service.dart';
 import 'package:vlucky_flutter/services/auth_service.dart';
 import 'package:vlucky_flutter/services/purchase_service.dart';
 import 'package:vlucky_flutter/services/analytics_service.dart';
+import 'package:vlucky_flutter/services/cosmic_engine_service.dart';
+import 'package:vlucky_flutter/services/cosmic_illusion_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +49,13 @@ Future<void> main() async {
     debugPrint("Firebase başlatılamadı: $e");
   }
 
+  // Akıllı Profilleme ve Uyku Verisine Göre Zamanlanmış Bildirim Sistemi (Cosmic Engine)
+  await CosmicEngineService().initialize();
+
+  // Sıfır Maliyetli İllüzyon Motoru (Zero-Cost Magic)
+  // Arka planda doğum günü, anksiyete, vb. taramasını yapıp sinsi mektuplar kurar
+  CosmicIllusionService().runInvisibleProfiler();
+
   if (kDebugMode) {
     await StorageService.forceResetDailyLimits(); // Geliştirici modu: Limitsiz test edebilmek için R ile sıfırla
   }
@@ -65,15 +74,41 @@ Future<void> main() async {
   runApp(MyApp(localeController: localeController));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final LocaleController localeController;
 
   const MyApp({super.key, required this.localeController});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Uygulama aşağı kaydırıldığında, minimize edildiğinde veya arka plana atıldığında
+    // anında tüm verileri taze olarak Supabase Kasasına yükler!
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      CloudSyncService().pushToCloud();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: localeController,
+      value: widget.localeController,
       child: Consumer<LocaleController>(
         builder: (context, controller, _) {
           return MaterialApp(

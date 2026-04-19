@@ -5876,16 +5876,19 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       child: Scaffold(
         extendBody: true,
         backgroundColor: const Color(0xFF0E0E2A),
-        body: AnimatedBuilder(
-          animation: Listenable.merge([_bgPulseCtrl, _fogCtrl]),
-          builder: (context, _) {
-            final bv = _bgPulseCtrl.value; // 0‥1 ping‑pong
-            final rv = _fogCtrl.value; // 0‥1 continuous rotation
-            final screenW = MediaQuery.of(context).size.width;
-            final screenH = MediaQuery.of(context).size.height;
-            return Stack(
-              children: [
-                // ── Temel mor gradient (diagonal) ──
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: Listenable.merge([_bgPulseCtrl, _fogCtrl]),
+                builder: (context, _) {
+                  final bv = _bgPulseCtrl.value; // 0‥1 ping‑pong
+                  final rv = _fogCtrl.value; // 0‥1 continuous rotation
+                  final screenW = MediaQuery.of(context).size.width;
+                  final screenH = MediaQuery.of(context).size.height;
+                  return Stack(
+                    children: [
+                      // ── Temel mor gradient (diagonal) ──
                 Positioned.fill(
                   child: Container(
                     decoration: const BoxDecoration(
@@ -6431,7 +6434,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     ),
                   ),
 
-                SafeArea(
+            SafeArea(
                   child: AnimatedBuilder(
                     animation: _readingScrollCtrl,
                     builder: (context, child) {
@@ -8520,9 +8523,12 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                     child: GlassBackButton(onTap: _resetToIdle),
                   ),
               ],
-            ); // Stack
-          }, // builder
-        ), // AnimatedBuilder
+            ); // inner bg Stack
+                  },
+                ),
+              ), // AnimatedBuilder + Positioned.fill
+            ],
+          ), // body: Stack
       ), // Scaffold
     ); // PopScope
   }

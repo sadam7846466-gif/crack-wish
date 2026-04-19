@@ -146,15 +146,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         _stepCtrl.forward();
       });
     } else if (_currentStep == 6) {
-      final supabase = Supabase.instance.client;
-      if (supabase.auth.currentUser == null) {
-        _stepCtrl.reverse().then((_) {
-          setState(() => _currentStep = 7);
-          _stepCtrl.forward();
-        });
-      } else {
-        await _completeFinalOnboardingProfileSave();
-      }
+      // Artık asla atlama yok. Hadi Başlayalım diyen HERKES 7. adımı (Hesap Oluştur panelini) görecek.
+      _stepCtrl.reverse().then((_) {
+        setState(() => _currentStep = 7);
+        _stepCtrl.forward();
+      });
     }
   }
 
@@ -184,34 +180,100 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return 'pisces';
   }
 
+  void _showGlassError(String message) {
+    HapticFeedback.heavyImpact();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+      padding: EdgeInsets.zero,
+      content: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF2D55).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFFF2D55).withOpacity(0.35), width: 1),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF2D55).withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.error_outline_rounded, color: Color(0xFFFF2D55), size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.1,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      duration: const Duration(seconds: 4),
+    ));
+  }
+
+  void _transitionToHome() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const RootShell(),
+        transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 800),
+      ),
+    );
+  }
+
   Future<void> _checkAndRouteUser() async {
     final supabase = Supabase.instance.client;
     final user = supabase.auth.currentUser;
     if (user != null) {
       try {
-        final profile = await supabase.from('profiles').select('full_name, handle, zodiac_sign').eq('id', user.id).maybeSingle();
+        final profile = await supabase.from('profiles').select('full_name, username, zodiac_sign').eq('id', user.id).maybeSingle();
         if (profile != null && profile['full_name'] != null) {
            await StorageService.setUserName(profile['full_name'].toString());
-           if(profile['handle'] != null) {
-             await StorageService.setUserHandle(profile['handle'].toString());
+           if(profile['username'] != null) {
+             await StorageService.setUserHandle(profile['username'].toString());
            }
            if(profile['zodiac_sign'] != null) {
              await StorageService.setZodiacSign(profile['zodiac_sign'].toString());
            }
            if (!mounted) return;
-           Navigator.of(context).pushReplacement(
-             MaterialPageRoute(builder: (_) => const RootShell()),
-           );
+           _transitionToHome();
            return;
         }
       } catch (e) {
         debugPrint('Profil kurtarma hatası: $e');
       }
     }
+    
+    // Eğer buraya gelindiyse: Kullanıcı ya veritabanında yoktur, ya da profili kırıktır.
     if (!mounted) return;
+    
+    // Giriş yapmaya çalışmış ama hesabı/profili yok
+    await supabase.auth.signOut(); // Güvenlik için varsa auth oturumunu kapat
+    
+    _showGlassError('Evrende böyle bir kayıt bulamadık veya profiliniz eksik. Lütfen "Kayıt Ol" işlemiyle yıldız haritanızı oluşturun.');
+    
     setState(() {
-      _showLoginButtons = false;
-      _nextStep(); // Goes to step 1
+      _showLoginButtons = false; // Kullanıcıyı giriş yap ekranından çıkart
     });
   }
 
@@ -231,13 +293,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         await StorageService.setUserHandle("alpha_tester");
         await StorageService.setZodiacSign("scorpio");
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const RootShell()),
-          );
+          _transitionToHome();
         }
         return;
       }
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade900,
+        behavior: SnackBarBehavior.floating,
+        content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 8),
+      ));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);
     }
@@ -259,16 +324,46 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         await StorageService.setUserHandle("alpha_tester");
         await StorageService.setZodiacSign("scorpio");
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const RootShell()),
-          );
+          _transitionToHome();
         }
         return;
       }
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade900,
+        behavior: SnackBarBehavior.floating,
+        content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 8),
+      ));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);
     }
+  }
+
+  /// Zaten kayıtlı bir profili olan kullanıcıyı tespit edip engelleyen ortak kontrol.
+  /// true dönerse: profil zaten var, işlem iptal edilmeli.
+  /// false dönerse: yeni kullanıcı, kayıt devam edebilir.
+  Future<bool> _isAlreadyRegistered(String provider) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) return false;
+      
+      debugPrint('🔍 [$provider] Profil kontrolü yapılıyor... User ID: ${user.id}');
+      final profile = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+      debugPrint('🔍 [$provider] Profil sonucu: $profile');
+      
+      if (profile != null && profile['full_name'] != null) {
+        debugPrint('🚫 [$provider] ZATEN KAYITLI! Oturum kapatılıyor...');
+        await supabase.auth.signOut();
+        if (mounted) {
+          _showGlassError('Bu $provider hesabı ile zaten bir kozmik profilin var! Lütfen ilk sayfadaki "Giriş Yap" seçeneğini kullan.');
+        }
+        return true;
+      }
+    } catch (e) {
+      debugPrint('⚠️ [$provider] Profil kontrol hatası: $e');
+    }
+    return false;
   }
 
   Future<void> _handleFinalGoogleSignIn() async {
@@ -276,16 +371,25 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     try {
       final response = await AuthService().signInWithGoogle();
       if (response != null && mounted) {
+        if (await _isAlreadyRegistered('Google')) return;
         await _completeFinalOnboardingProfileSave();
       }
     } catch (e) {
       if (kDebugMode) {
+        debugPrint('⚠️ [Google] Gerçek giriş başarısız, test modunda anonim deneniyor: $e');
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
+        // Anonim modda bile zaten kayıtlı kontrolü yap
+        if (await _isAlreadyRegistered('Google-Test')) return;
         await _completeFinalOnboardingProfileSave();
         return;
       }
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade900,
+        behavior: SnackBarBehavior.floating,
+        content: Text('Google Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 8),
+      ));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);
     }
@@ -296,16 +400,25 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     try {
       final response = await AuthService().signInWithApple();
       if (response != null && mounted) {
+        if (await _isAlreadyRegistered('Apple')) return;
         await _completeFinalOnboardingProfileSave();
       }
     } catch (e) {
       if (kDebugMode) {
+        debugPrint('⚠️ [Apple] Gerçek giriş başarısız, test modunda anonim deneniyor: $e');
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
+        // Anonim modda bile zaten kayıtlı kontrolü yap
+        if (await _isAlreadyRegistered('Apple-Test')) return;
         await _completeFinalOnboardingProfileSave();
         return;
       }
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Apple Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade900,
+        behavior: SnackBarBehavior.floating,
+        content: Text('Apple Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 8),
+      ));
     } finally {
       if (mounted) setState(() => _isAuthLoading = false);
     }
@@ -316,39 +429,65 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Future<void> _completeFinalOnboardingProfileSave() async {
     HapticFeedback.heavyImpact();
     
+    // Sabit avatar havuzundan index'e göre URL çekimi
+    final List<String> avatarPool = [
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300", 
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300", 
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300", 
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300", 
+      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300", 
+    ];
+    final String selectedAvatarUrl = avatarPool[_selectedAvatarIndex];
+    
+    debugPrint('💾 Profil kaydı başlıyor...');
+    debugPrint('💾 İsim: ${_nameCtrl.text.trim()}, Handle: ${_usernameCtrl.text.trim()}, Burç: ${_calculateZodiac(_selectedDate)}');
+    
     // Lokal veriler kaydediliyor
     await StorageService.setUserName(_nameCtrl.text.trim());
     await StorageService.setUserHandle(_usernameCtrl.text.trim());
+    await StorageService.setAvatar(selectedAvatarUrl);
     await StorageService.setZodiacSign(_calculateZodiac(_selectedDate));
     await StorageService.setBirthDate(_selectedDate);
     if (_knowsTime && _selectedTime != null) {
       await StorageService.setBirthTime(DateFormat('HH:mm').format(_selectedTime!));
+    }
+    if (_selectedLocation != null) {
+      await StorageService.setBirthPlace(_selectedLocation!);
     }
     await StorageService.setLifeFocus(_lifeFocus.join(", "));
     await StorageService.setRelationshipStatus(_relationship);
     await StorageService.setDreamFrequency(_dreamFrequency);
     await StorageService.setAuraColor(_auraColor);
     await StorageService.setSleepPattern(_sleepPattern);
+    
+    debugPrint('✅ Lokal kayıt tamamlandı!');
 
     // Buluta (Supabase) Senkronize Ediliyor
+    dynamic syncResult = false;
     if (Supabase.instance.client.auth.currentUser != null) {
-      await ProfileSyncService().syncProfileData(
+      debugPrint('☁️ Supabase senkronizasyonu başlıyor...');
+      syncResult = await ProfileSyncService().syncProfileData(
         userName: _nameCtrl.text.trim(),
         userHandle: _usernameCtrl.text.trim(),
-        avatarUrl: "", 
+        avatarUrl: selectedAvatarUrl,
         zodiacSign: _calculateZodiac(_selectedDate),
       );
+      debugPrint('☁️ Supabase senkronizasyon sonucu: ${syncResult == true ? "BAŞARILI ✅" : "BAŞARISIZ ❌ $syncResult"}');
+    } else {
+      debugPrint('⚠️ Supabase auth kullanıcısı null - bulut senkronizasyonu atlandı');
     }
 
     if (!mounted) return;
+    
+    // EĞER BULUT KAYDI BAŞARISIZ OLDUYSA İŞLEMİ DURDUR
+    if (syncResult != true && Supabase.instance.client.auth.currentUser != null) {
+       _showGlassError('Kayıt işlemi veritabanında reddedildi:\n$syncResult\nLütfen destek ile iletişime geçin.');
+       // Sisteme çöp oturum kalmasın diye iptal edelim
+       await Supabase.instance.client.auth.signOut();
+       return;
+    }
 
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const RootShell(),
-        transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 800),
-      ),
-    );
+    _transitionToHome();
   }
 
   @override
@@ -384,9 +523,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             ],
           ),
           content: Scaffold(
-            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: false, // KLAVYE ÇAKIŞMA ÇÖZÜMÜ: Sayfanın kendi kendine itilmesini kapatıp %100 kontrolü TweenAnimation'a veriyoruz!
             backgroundColor: Colors.transparent,
             extendBodyBehindAppBar: true,
+            extendBody: true, // Alt kısımdaki kesikleri engeller, cam efekti pürüzsüz çalışır
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               surfaceTintColor: Colors.transparent, // Fixes iOS scroll dark overlay issue
@@ -399,24 +539,25 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   : const SizedBox.shrink(),
               actions: const [], // Sağ üst köşe tamamen temizlendi, adım göstergesi en alta taşındı
             ),
-            body: SafeArea(
-              bottom: false,
-              child: FadeTransition(
-                opacity: _fadeAnim,
-                child: SlideTransition(
+            body: FadeTransition(
+              opacity: _fadeAnim,
+              child: SlideTransition(
                   position: _slideAnim,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return SingleChildScrollView(
-                          physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(), // 0. Adımda devasa logoyu kilitle!
+                          clipBehavior: Clip.none, // Avatarların sağa sola taşmasına izin verir (akıcı geçiş)
+                          physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.only(top: 100, bottom: 200), // En tepede ve aşağıda kesilmeleri tamamen ortadan kaldırır
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight - 200),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                if (_currentStep > 0) const SizedBox(height: 12), // Tepe boşluğunu daha da kısalttık, yazılar çok yukarda olacak
+                                if (_currentStep > 0 && _currentStep < 7) 
+                                   _buildDynamicHeader(), // Sabitlenmiş Başlık
                                 if (_currentStep == 0) SizedBox(height: MediaQuery.of(context).size.height * 0.62, child: _buildWelcomeStep()),
                                 if (_currentStep == 1) _buildFeaturesStep(),
                                 if (_currentStep == 2) _buildStep0(),
@@ -425,10 +566,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 if (_currentStep == 5) _buildStep2(),
                                 if (_currentStep == 6) _buildStep3(),
                                 if (_currentStep == 7) SizedBox(height: MediaQuery.of(context).size.height * 0.62, child: _buildWelcomeStep(isFinal: true)),
-                                if (_currentStep > 0 && _currentStep < 7)
-                                   const SizedBox(height: 16), // Kaydırma engelini (Scroll) kaldırmak için ektra itiş miktarı silindi
-                                if (_currentStep == 0)
-                                   const SizedBox(height: 24),
                               ],
                             ),
                           ),
@@ -438,19 +575,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   ),
                 ),
               ),
-            ),
             bottomNavigationBar: SafeArea(
               child: FadeTransition(
                 opacity: _fadeAnim,
                 child: SlideTransition(
                   position: _slideAnim,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 28, right: 28, top: 10, bottom: 12), // Aşırı yukarı itme iptal edildi, orjinal alt çizgi sınırına geri yaklaştırıldı
+                    padding: const EdgeInsets.only(left: 28, right: 28, top: 8, bottom: 0), // Küçük telefon optimizasyonu
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Kilit yazısı sayfa göstergeleri ve Butonun "ÜSTÜNE" taşındı
                       if (_currentStep == 3) ...[
+                        const SizedBox(height: 16), // Form kutusundan ayrılması için nefes boşluğu eklendi
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -462,7 +599,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8), // Kilit simgesi ile roman rakamları arası daraltıldı
                       ],
                       // Açık liste: Tüm Roma Rakamları (pasifler soluk, aktif olan parlak)
                       if (_currentStep > 0 && _currentStep < 7)
@@ -546,10 +683,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                       if (_isAuthLoading)
-                                      const Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 24.0),
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                      )
+                                        const SizedBox(
+                                          height: 124,
+                                          child: Center(
+                                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                          ),
+                                        )
                                     else ...[
                                       _buildAuthButton(
                                         icon: Icons.apple,
@@ -624,9 +763,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (_isAuthLoading)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 24.0),
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                const SizedBox(
+                                  height: 124,
+                                  child: Center(
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  ),
                                 )
                               else ...[
                                 _buildAuthButton(
@@ -704,6 +845,57 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
+  Widget _buildDynamicHeader() {
+    String title = "";
+    String subtitle = "";
+    
+    switch (_currentStep) {
+      case 1:
+        title = "Seni Neler Bekliyor?";
+        subtitle = "Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?";
+        break;
+      case 2:
+        title = "Seni Tanıyalım";
+        subtitle = "Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle.";
+        break;
+      case 3:
+        title = "Kozmik Koordinat";
+        subtitle = "Astrolojik haritanın temeli için doğduğun anı seç.";
+        break;
+      case 4:
+        title = "Kalbinin Pusulası";
+        subtitle = "Niyetini belirle, yolunu çizelim.";
+        break;
+      case 5:
+        title = "Bilinçaltının Sesi";
+        subtitle = "Rüyaların sana nasıl ulaşıyor?";
+        break;
+      case 6:
+        title = "İçsel Pusulan";
+        subtitle = "Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?";
+        break;
+      default:
+        return const SizedBox.shrink();
+    }
+
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    // Sadece 2. adımda (İsim girme bölümü) klavye açılınca başlığı da loşlaştır
+    final bool shouldDim = isKeyboardOpen && _currentStep == 2;
+
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      opacity: shouldDim ? 0.1 : 1.0,
+      child: Column(
+        key: ValueKey('header_$_currentStep'), // Her adım değişiminde taze bir yapı
+        children: [
+          _buildTitle(title),
+          _buildSubtitle(subtitle),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTitle(String text) {
     return Text(
       text,
@@ -723,7 +915,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildSubtitle(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 32),
+      padding: const EdgeInsets.only(top: 8, bottom: 12), // Boşluk israfı engellenerek panellerin sığması sağlandı
       child: Text(
         text,
         textAlign: TextAlign.center,
@@ -1111,10 +1303,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildFeaturesStep() {
     return Column(
         children: [
-          _buildTitle("Seni Neler Bekliyor?"),
-          const SizedBox(height: 12),
-          _buildSubtitle("Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?"),
-          const SizedBox(height: 32), // Yazı ve ikonlar arası temiz boşluk
+          const SizedBox(height: 64), // Yazı ve ikonlar arası boşluk biraz artırılarak aşağı alındı
           
           StaggeredFade(
             delay: const Duration(milliseconds: 50),
@@ -1145,96 +1334,149 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
 
-  Widget _buildStep0() {
+  // ==========================================
+  // PROFİL INPUTLARI (İSİM VE KULLANICI ADI)
+  Widget _buildNameInputs({bool isDummy = false}) {
     return Column(
-        children: [
-          _buildTitle("Seni Tanıyalım"),
-          _buildSubtitle("Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle."),
-          
-          const SizedBox(height: 16),
-        
-        // CoverFlow Tarzı Dinamik Avatar Seçici
-        StaggeredFade(
-          delay: const Duration(milliseconds: 250),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0),
-            child: _AvatarCoverFlow(
-              selectedIndex: _selectedAvatarIndex,
-              onSelected: (idx) {
-                HapticFeedback.selectionClick();
-                setState(() => _selectedAvatarIndex = idx);
-              },
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildUnifiedInputRow(
+           customIcon: Transform.scale(
+             scale: 1.4,
+             child: Image.asset('assets/images/owl.png', width: 38, height: 38),
+           ),
+           title: "PROFİL ADIN",
+           child: TextField(
+               controller: isDummy ? null : _nameCtrl,
+               focusNode: isDummy ? null : _nameFocus,
+               style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
+               cursorColor: const Color(0xFFD18471), // Lüks altın/somon
+               textCapitalization: TextCapitalization.words,
+               decoration: InputDecoration(
+                 border: InputBorder.none,
+                 isDense: true,
+                 contentPadding: EdgeInsets.zero,
+                 hintText: "Örn: Yıldız Tozu \uD83C\uDF19",
+                 hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
+               ),
+           ),
+        ),
+        _buildDivider(),
+        // 2. Kullanıcı Adı (Benzersiz, Aramalarda Bulunmak İçin)
+        _buildUnifiedInputRow(
+           icon: PhosphorIcons.at(PhosphorIconsStyle.fill),
+           title: "KULLANICI ADI",
+           child: TextField(
+               controller: isDummy ? null : _usernameCtrl,
+               focusNode: isDummy ? null : _usernameFocus,
+               onChanged: isDummy ? null : (_) {
+                 if (_handleError != null) setState(() => _handleError = null);
+               },
+               style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+               cursorColor: const Color(0xFFD18471),
+               keyboardType: TextInputType.emailAddress,
+               decoration: InputDecoration(
+                 border: InputBorder.none,
+                 isDense: true,
+                 contentPadding: EdgeInsets.zero,
+                 hintText: "@kozmikyolcu",
+                 hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
+                 suffixIcon: _isCheckingHandle
+                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white38))
+                     : null,
+                 suffixIconConstraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
+               ),
+           ),
+        ),
+        // Handle hata mesajı
+        if (_handleError != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 52, top: 4),
+            child: Text(
+              _handleError!,
+              style: GoogleFonts.nunito(color: const Color(0xFFF87171), fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ),
-        ),
-
-        const SizedBox(height: 36), // Paneli avatarlardan ayırmak için biraz aşağı kaydırdık
-
-        _buildGlassCard(
-          delay: 400,
-          child: Column(
-            children: [
-              _buildUnifiedInputRow(
-                 customIcon: Transform.scale(
-                   scale: 1.4,
-                   child: Image.asset('assets/images/owl.png', width: 38, height: 38),
-                 ),
-                 title: "PROFİL ADIN",
-                 child: TextField(
-                     controller: _nameCtrl,
-                     focusNode: _nameFocus,
-                     style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
-                     cursorColor: const Color(0xFFD18471), // Lüks altın/somon
-                     textCapitalization: TextCapitalization.words,
-                     decoration: InputDecoration(
-                       border: InputBorder.none,
-                       isDense: true,
-                       contentPadding: EdgeInsets.zero,
-                       hintText: "Örn: Yıldız Tozu \uD83C\uDF19",
-                       hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
-                     ),
-                 ),
-              ),
-              _buildDivider(),
-              // 2. Kullanıcı Adı (Benzersiz, Aramalarda Bulunmak İçin)
-              _buildUnifiedInputRow(
-                 icon: PhosphorIcons.at(PhosphorIconsStyle.fill),
-                 title: "KULLANICI ADI",
-                 child: TextField(
-                     controller: _usernameCtrl,
-                     focusNode: _usernameFocus,
-                     onChanged: (_) {
-                       if (_handleError != null) setState(() => _handleError = null);
-                     },
-                     style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.5),
-                     cursorColor: const Color(0xFFD18471),
-                     keyboardType: TextInputType.emailAddress,
-                     decoration: InputDecoration(
-                       border: InputBorder.none,
-                       isDense: true,
-                       contentPadding: EdgeInsets.zero,
-                       hintText: "@kozmikyolcu",
-                       hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
-                       suffixIcon: _isCheckingHandle
-                           ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white38))
-                           : null,
-                       suffixIconConstraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
-                     ),
-                 ),
-              ),
-              // Handle hata mesajı
-              if (_handleError != null)
-                Padding(
-                  padding: const EdgeInsets.only(left: 52, top: 4),
-                  child: Text(
-                    _handleError!,
-                    style: GoogleFonts.nunito(color: const Color(0xFFF87171), fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
-                ),
-            ],
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildStep0() {
+    // Klavye kapanma tepkisini "ANINDA" almak için Focus statülerini de ekledik (Gecikme tamamen silinir)
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 40 || _nameFocus.hasFocus || _usernameFocus.hasFocus;
+
+    return SizedBox(
+      height: 390, // Altın oran
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // 1. ZEMİN KATMani (Title, Subtitle, Avatar her zaman burada)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              opacity: isKeyboardOpen ? 0.1 : 1.0, 
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  StaggeredFade(
+                    delay: const Duration(milliseconds: 100),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: _AvatarCoverFlow(
+                        selectedIndex: _selectedAvatarIndex,
+                        onSelected: (idx) {
+                          HapticFeedback.selectionClick();
+                          setState(() => _selectedAvatarIndex = idx);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 36),
+                  // Dummy placeholder for exact alignment
+                  Opacity(
+                    opacity: 0.0,
+                    child: IgnorePointer(
+                      child: _buildGlassCard(
+                        delay: 0,
+                        shake: false,
+                        child: _buildNameInputs(isDummy: true),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 2. AKTİF İNPUT PANELİ (Hardware Accelerated - %100 CPU'suz Grafik Motorunda Kayar)
+          Align(
+            alignment: Alignment.bottomCenter, // Fiziksel olarak daima altta durur
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                begin: 0.0, 
+                end: isKeyboardOpen ? -170.0 : 0.0 // Klavye açıldığında -170 piksel yukarı süzülür
+              ),
+              duration: const Duration(milliseconds: 300), // Süre biraz yumuşatıldı
+              curve: Curves.easeOutQuart, // Quart kavis kaymak gibi süzülür
+              builder: (context, translateY, child) {
+                return Transform.translate(
+                  offset: Offset(0, translateY),
+                  child: child,
+                );
+              },
+              child: _buildGlassCard(
+                delay: 0,
+                shake: true,
+                child: _buildNameInputs(isDummy: false), // Gerçek text field'lar
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1280,6 +1522,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildStepDateWithWheels() {
+    final bool isSmallScreen = MediaQuery.of(context).size.height < 800; // Telefon ekranı ufaksa (örn iPhone SE, standart Android)
     final int wIndex = _getWesternZodiacIndex(_selectedDate);
     final int cIndex = _getChineseZodiacIndex(_selectedDate);
     final int mIndex = _getMayanZodiacIndex(_selectedDate);
@@ -1295,20 +1538,22 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
     return Column(
         children: [
-        _buildTitle("Kozmik Koordinat"),
-        _buildSubtitle("Astrolojik haritanın temeli için doğduğun anı seç."),
+        const SizedBox(height: 16), // Başlık menüden ayrıldıktan sonra çarkların arasına girmesini (çakışmayı) engeller
         // SizedBox boşluğu silinerek içerik bir tık yukarı çekildi
         StaggeredFade(
           delay: const Duration(milliseconds: 300),
           child: Container(
-            height: 230, // Kırpılmayı önlemek için dikey görüş alanı uzatıldı 
+            height: isSmallScreen ? 180 : 230, // Küçük ekranda alt cam panele yer açmak için daraltıldı
             width: double.infinity,
-            alignment: Alignment.center,
+            alignment: Alignment.topCenter,
             color: Colors.transparent,
-            child: SizedBox(
-              width: 330, 
-              height: 230,
-              child: Stack(
+            child: Transform.scale(
+              scale: isSmallScreen ? 0.78 : 1.0, // Küçük ekranda çarklar ölçeklendi
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: 330, 
+                height: 230,
+                child: Stack(
                 clipBehavior: Clip.none,
                 alignment: Alignment.center,
                 children: [
@@ -1318,8 +1563,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    top: 85, 
-                    left: 85, // Sola doğru kaydırıldı (Merkez X = 155)
+                    top: 80, 
+                    left: 95, // Ortaya hizalandı
                     width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: cTargetRotation),
@@ -1340,8 +1585,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     ),
                   ),
                   Positioned(
-                    left: 215, 
-                    top: 40, // Asya ile orantılı olarak biraz aşağı çekildi
+                    left: 210, 
+                    top: 40, // Asya ile orantılı
                     width: 140,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: mTargetRotation),
@@ -1352,15 +1597,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   ),
                 ],
               ),
-            )
-          )
+            ),
+          ),
         ),
-        Transform.translate(
-          offset: const Offset(0, 5), // İsteğe istinaden çarklar ile panel arası mesafe biraz daha genişletildi (aşağı kaydırıldı)
-          child: _buildGlassCard(
-            delay: 200, // Sayfa açılır açılmaz hızlıca belirmesi için gecikme azaltıldı
-            shake: false, // TÜM KARTIN TİTREMESİ İPTAL EDİLDİ (Sadece doldurulmamış zorunlu alan titreyecek)
-            child: Column(
+      ),
+      _buildGlassCard(
+        delay: 200, // Sayfa açılır açılmaz hızlıca belirmesi için gecikme azaltıldı
+        shake: false, // TÜM KARTIN TİTREMESİ İPTAL EDİLDİ (Sadece doldurulmamış zorunlu alan titreyecek)
+        child: Column(
             children: [
               AnimatedBuilder(
                 animation: _shakeCtrl,
@@ -1373,7 +1617,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     offset: Offset(dx, 0),
                     child: _buildUnifiedInputRow(
                        icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
-                       title: isError ? "DÜNYAYA GELİŞ TARİHİN (Burası Zorunlu)" : "DÜNYAYA GELİŞ TARİHİN",
+                       title: "DÜNYAYA GELİŞ TARİHİN", // (Burası Zorunlu) yazısı kaldırıldı, boyut değişmeyecek
                        child: Text(
                          _hasSelectedDate 
                             ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
@@ -1445,9 +1689,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       )
                     : Icon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold), color: Colors.white.withOpacity(0.3), size: 16),
               ),
+              const SizedBox(height: 2), // Alt sıranın cama yapışmasını engellemek için ufak boşluk
             ],
           ),
-        )),
+        ),
       ]
     );
   }
@@ -1523,9 +1768,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep1() {
     return Column(
       children: [
-        _buildTitle("Kalbinin Pusulası"),
-        _buildSubtitle("Niyetini belirle, yolunu çizelim."),
-        
         const SizedBox(height: 32),
         Container(
           width: double.infinity,
@@ -1709,9 +1951,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep2() {
     return Column(
       children: [
-        _buildTitle("Bilinçaltının Sesi"),
-        _buildSubtitle("Rüyaların sana nasıl ulaşıyor?"),
-
         const SizedBox(height: 52), // Kutuları biraz aşağı kaydırdık
 
         _buildOverlappingOption(
@@ -1855,9 +2094,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep3() {
     return Column(
       children: [
-        _buildTitle("İçsel Pusulan"),
-        _buildSubtitle("Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?"),
-
         const SizedBox(height: 64), // Tepede sıkışan seçenekleri, ekranı dengeli kullanmak için aşağı ittik
 
         _buildTimeAccordion(
@@ -2658,6 +2894,7 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
     return SizedBox(
       height: 160, // Kusursuz yuvarlaklar için genel yükseklik daraltıldı
       child: Stack(
+        clipBehavior: Clip.none, // Kenarlardaki avatarların Padding dışına taşmasına izin ver
         alignment: Alignment.center,
         children: [
           // 1. Z-Index Katmanı: Ortadaki eleman DAİMA en üstte olacak şekilde Stack
@@ -2676,6 +2913,7 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
               });
 
               return Stack(
+                clipBehavior: Clip.none, // Pürüzsüz taşma için kritik ayar
                 alignment: Alignment.center,
                 children: renderOrder.map((index) {
                   final double diff = (page - index);

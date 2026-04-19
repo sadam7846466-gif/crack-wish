@@ -15,17 +15,42 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>vlucky_flutter</string>
+	<string>Crack&amp;Wish</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.79501630124-peeupkr8v24kkgla408kg741dcd1n2fp</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-5096906411582452~7933238634</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>Rehberinizdeki arkadaşlarınızı bulup Crack&amp;Wish evrenine ekleyebilmeniz için izin gerekiyor. Rehberiniz sunucularımızda saklanmaz.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Rüya yorumlarınızı biyolojik sirkadiyen ritminizle eşleştirmek ve uyku kalitenizi analiz etmek için Health verinize ihtiyaç duyuyoruz.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Crack&amp;Wish sağlık uygulamanızı destekleyerek daha sağlıklı rüya kalitesi ölçümü sunar.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -49,6 +74,8 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -68,24 +95,5 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-5096906411582452~7933238634</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.79501630124-peeupkr8v24kkgla408kg741dcd1n2fp</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>

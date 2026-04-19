@@ -13,6 +13,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../services/storage_service.dart';
+import '../services/cosmic_engine_service.dart';
 import '../services/ad_service.dart';
 import '../services/dream_analysis_service.dart';
 import '../services/supabase_dream_service.dart';
@@ -991,9 +992,26 @@ class _DreamPageState extends State<DreamPage>
       _premiumAnswers = finalAnswers;
       _isPremiumResult = true;
       _isFromHistory = false;
-      _isDreamSaved = false;
-      _currentDreamId = null;
+      _isDreamSaved = true;
+      _currentDreamId ??= DateTime.now().millisecondsSinceEpoch.toString();
       _selectedReflectionAction = null;
+
+      // Otomatik Premium Kayıt
+      final now = DateTime.now().toIso8601String();
+      StorageService.saveDream({
+        'id': _currentDreamId,
+        'isPremium': true,
+        'title': deepResult.title,
+        'text': trimmed, // local trimmed from _analyzeDream
+        'emotion': _selectedEmotion?.name,
+        'date': now,
+        'premiumAnswers': jsonEncode(finalAnswers),
+        'premiumData': jsonEncode(deepResult.rawJson),
+        'reflectionAction': _selectedReflectionAction,
+      }).catchError((e) {
+        print('Oto-kayıt hatası: $e');
+      });
+      StorageService.setDreamDoneToday().catchError((e) => null);
 
       // Durumu hemen results'a geçecek şekilde güncelle ki kayıt işlemi asılı kalırsa UI'yi kilitlemesin
       print(
@@ -1003,8 +1021,6 @@ class _DreamPageState extends State<DreamPage>
         _overlayContent = 'gap';
         _isWriting = true;
       });
-
-      // Otomatik Premium Kayıt İptal Edildi - Kullanıcı butona basarak kaydedecek.
 
       Future.delayed(const Duration(milliseconds: 520), () {
         if (mounted) {
@@ -3440,109 +3456,16 @@ class _DreamPageState extends State<DreamPage>
                   ),
                 ),
               ),
-
-            // ── 6.5) Rüyayı Kaydet Butonu ──
-            if (!_isFromHistory && _deepAnalysisResult != null)
-              SliverToBoxAdapter(
-                child: _PremiumReveal(
-                  index: 7,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(40, 24, 40, 0),
-                    child: _AnimatedBounceButton(
-                      onTap: _isDreamSaved
-                          ? null
-                          : () async {
-                              setState(() {
-                                _isDreamSaved = true;
-                                _historyKeyTracker++;
-                              });
-                              try {
-                                final now = DateTime.now().toIso8601String();
-                                _currentDreamId ??= DateTime.now()
-                                    .millisecondsSinceEpoch
-                                    .toString();
-                                await StorageService.saveDream({
-                                  'id': _currentDreamId,
-                                  'isPremium': true,
-                                  'title': _deepAnalysisResult!.title,
-                                  'text': _dreamController.text,
-                                  'emotion': _selectedEmotion?.name,
-                                  'date': now,
-                                  'premiumAnswers': jsonEncode(_premiumAnswers),
-                                  'premiumData': jsonEncode(
-                                    _deepAnalysisResult!.rawJson,
-                                  ),
-                                  'reflectionAction': _selectedReflectionAction,
-                                });
-                                await StorageService.setDreamDoneToday();
-                              } catch (e) {
-                                debugPrint('Error saving dream: $e');
-                                if (mounted)
-                                  setState(() => _isDreamSaved = false);
-                              }
-                            },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: _isDreamSaved
-                                ? Colors.green.withOpacity(0.3)
-                                : Colors.white.withOpacity(
-                                    0.2,
-                                  ), // Mor yerine beyaz
-                            width: 1,
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              _isDreamSaved
-                                  ? Colors.green.withOpacity(0.15)
-                                  : Colors.white.withOpacity(
-                                      0.08,
-                                    ), // Mor yerine beyaz gradyan
-                              _isDreamSaved
-                                  ? Colors.green.withOpacity(0.02)
-                                  : Colors.white.withOpacity(0.01),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _isDreamSaved
-                                  ? Icons.check_circle
-                                  : Icons.bookmark_add_rounded,
-                              color: _isDreamSaved
-                                  ? Colors.greenAccent
-                                  : Colors.white.withOpacity(0.9), // Açık beyaz
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _isDreamSaved
-                                  ? (isTr ? 'KAYDEDİLDİ' : 'SAVED')
-                                  : (isTr ? 'RÜYAYI KAYDET' : 'SAVE DREAM'),
-                              style: TextStyle(
-                                color: _isDreamSaved
-                                    ? Colors.greenAccent
-                                    : Colors.white.withOpacity(
-                                        0.9,
-                                      ), // Açık beyaz
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+            // ── 6.5) Kozmik Uyku Bağlantısı (HealthKit) ──
+            SliverToBoxAdapter(
+              child: _PremiumReveal(
+                index: 6,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                  child: _CosmicSyncButton(isTr: isTr),
                 ),
               ),
+            ),
 
             // ── 7) Yeni Rüya Yaz Butonu (Kapatma) ──
             SliverToBoxAdapter(
@@ -7676,42 +7599,7 @@ class _ClinicalMainThemeCard extends StatelessWidget {
                       letterSpacing: 1.5,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _confidenceColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: _confidenceColor.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          uncertainty < 30
-                              ? Icons.check_circle_outline
-                              : (uncertainty < 70
-                                    ? Icons.info_outline
-                                    : Icons.warning_amber_outlined),
-                          color: _confidenceColor,
-                          size: 13,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          _confidenceText,
-                          style: TextStyle(
-                            color: _confidenceColor,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+
                 ],
               ),
               const SizedBox(height: 16),
@@ -7868,21 +7756,41 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.donut_large,
-                    color: Colors.white.withOpacity(0.5),
-                    size: 16,
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.donut_large,
+                        color: Colors.white.withOpacity(0.5),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        widget.isTr ? 'BİLİŞSEL DAĞILIM' : 'COGNITIVE DISTRIBUTION',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.isTr ? 'BİLİŞSEL DAĞILIM' : 'COGNITIVE DISTRIBUTION',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.5,
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.touch_app_rounded, color: Colors.white.withOpacity(0.4), size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.isTr ? 'GENİŞLETMEK İÇİN DOKUN' : 'TAP TO EXPAND',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -7969,6 +7877,17 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.5,
                                       ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  AnimatedRotation(
+                                    turns: isSelected ? 0.5 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    child: Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.white.withOpacity(isSelected ? 0.8 : 0.3),
+                                      size: 14,
                                     ),
                                   ),
                                 ],
@@ -9092,3 +9011,168 @@ class _AnimatedBounceButtonState extends State<_AnimatedBounceButton> {
     );
   }
 }
+
+class _CosmicSyncButton extends StatefulWidget {
+  final bool isTr;
+  const _CosmicSyncButton({required this.isTr});
+
+  @override
+  State<_CosmicSyncButton> createState() => _CosmicSyncButtonState();
+}
+
+class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
+  bool _isSyncing = false;
+  bool _isSynced = false;
+
+  void _handleSync() async {
+    setState(() => _isSyncing = true);
+    
+    // Arkada HealthKit & Predictive Push Notification işlemlerini tetikliyor.
+    await CosmicEngineService().syncSleepAndSchedulePrediction();
+    
+    // Küçük bir bekletme, animasyon tamamlansın diye
+    await Future.delayed(const Duration(seconds: 1));
+    
+    if (mounted) {
+      setState(() {
+        _isSyncing = false;
+        _isSynced = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isSynced) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.green.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.green.withOpacity(0.2), width: 1),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.isTr ? "Kozmik Ritmin Bağlandı" : "Cosmic Rhythm Synced",
+                    style: const TextStyle(
+                      color: Colors.greenAccent,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.isTr 
+                      ? "Uyku döngünüze göre özel rüya bildirimleri alacaksınız." 
+                      : "You will receive custom dream prompts based on your sleep cycle.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: _isSyncing ? null : _handleSync,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.deepPurpleAccent.withOpacity(0.15),
+              Colors.indigo.withOpacity(0.1),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.deepPurpleAccent.withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.deepPurpleAccent.withOpacity(0.05),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: _isSyncing
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
+                    ),
+                  )
+                : const Icon(
+                    Icons.health_and_safety_outlined,
+                    color: Colors.deepPurpleAccent,
+                    size: 26,
+                  ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.isTr ? "Uyku Verini Senkronize Et" : "Sync Sleep Data",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.isTr 
+                      ? "Tam uyandığın anı tespit edip en derin rüyanı sormasına izin ver." 
+                      : "Allow it to detect when you wake up to ask about your deepest dream.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white.withOpacity(0.3),
+              size: 16,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+

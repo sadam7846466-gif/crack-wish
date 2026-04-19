@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
-import '../services/mock_owl_service.dart';
+import '../services/supabase_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
 import '../models/cookie_card.dart';
@@ -34,8 +34,11 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   final Set<String> _sentRequests = {};
   String? _expandedSenderId;
   String? _expandedContactId;
-  final _service = MockOwlService();
+  final _service = SupabaseOwlService();
   bool _isPremiumUser = false;
+  bool _isContactsSynced = false;
+  bool _isSyncingContacts = false;
+  List<Map<String, dynamic>> _syncedContacts = [];
 
   @override
   void initState() {
@@ -429,10 +432,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Kişilerin (Rehberin)', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+                child: Text('Telefon Rehberin', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(height: 12),
-              _buildMockContactList(),
+              if (!_isContactsSynced)
+                _buildSyncContactsButton()
+              else
+                _buildSyncedContactList(),
             ],
           ),
         ),
@@ -631,33 +637,111 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     return RichText(text: TextSpan(children: spans));
   }
 
-  Widget _buildMockContactList() {
-    final mockContacts = [
-      {"name": "Ahmet Yılmaz", "isAppUser": true, "phone": "+90 555 123 4567"},
-      {"name": "Derya Deniz", "isAppUser": false, "phone": "+90 532 987 6543"},
-      {"name": "Canan Kaya", "isAppUser": true, "phone": "+90 505 111 2233"},
-      {"name": "Emre Can", "isAppUser": false, "phone": "+90 544 444 5566"},
-    ];
+  Widget _buildSyncContactsButton() {
+    return GestureDetector(
+      onTap: () async {
+        setState(() => _isSyncingContacts = true);
+        HapticFeedback.mediumImpact();
+        
+        // Servisimizi çağırıyoruz, izin yoksa isteyecek.
+        final results = await _service.syncContactsWithSupabase();
+        
+        if (mounted) {
+          setState(() {
+            _isSyncingContacts = false;
+            _isContactsSynced = true;
+            _syncedContacts = results;
+          });
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.03),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
+        ),
+        child: Column(
+          children: [
+            if (_isSyncingContacts)
+              const CircularProgressIndicator(color: Color(0xFF6DE8B8))
+            else ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF6DE8B8).withOpacity(0.15),
+                ),
+                child: const Icon(Icons.sync_rounded, color: Color(0xFF6DE8B8), size: 32),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Rehberini Bağla',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSyncedContactList() {
+    if (_syncedContacts.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.03),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.3), size: 32),
+            const SizedBox(height: 12),
+            Text(
+              'Crack&Wish Evreninde\nKimseyi Bulamadık',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Onları davet ederek kozmik enerjiyi başlatabilirsin!',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Column(
-      children: mockContacts.map((c) {
-        final isAppUser = c["isAppUser"] as bool;
+      children: _syncedContacts.map((contact) {
+        final String name = contact["name"] ?? "Bilinmeyen";
+        final bool isAppUser = contact["isAppUser"] == true;
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.1) : Colors.white.withOpacity(0.05),
-                  border: Border.all(color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.3) : Colors.white.withOpacity(0.08)),
+                  color: Colors.black.withOpacity(0.2),
+                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
-                child: Icon(
-                  Icons.person,
-                  color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.4),
-                  size: 20,
+                child: Center(
+                  child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
               ),
               const SizedBox(width: 12),
@@ -666,19 +750,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      c["name"] as String,
+                      name,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withOpacity(0.95),
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isAppUser ? '@${(c["name"] as String).split(' ').first.toLowerCase()}01' : c["phone"] as String,
+                      isAppUser ? 'Crack&Wish Kullanıcısı' : 'Rehberinde ekli',
                       style: TextStyle(
-                        color: isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.7) : Colors.white.withOpacity(0.4),
+                        color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.4),
                         fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -686,80 +771,37 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
               Builder(
                 builder: (ctx) {
-                  final isSent = _sentRequests.contains(c["name"] as String);
-
                   return GestureDetector(
                     onTap: () {
-                      if (isSent) return;
                       HapticFeedback.lightImpact();
-                      setState(() {
-                        _sentRequests.add(c["name"] as String);
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            isAppUser ? '${c["name"]} kişisine İstek Gönderildi!' : '${c["name"]} kişisine Davet Gönderildi!',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: const Color(0xFF16151A),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      );
                     },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSent 
-                            ? Colors.white.withOpacity(0.05) 
-                            : isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.15) : const Color(0xFFE879F9).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSent 
-                            ? Colors.white.withOpacity(0.1) 
-                            : isAppUser ? const Color(0xFF6DE8B8).withOpacity(0.3) : const Color(0xFFE879F9).withOpacity(0.3)
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isAppUser
+                                ? const Color(0xFF6DE8B8).withOpacity(0.15)
+                                : Colors.white.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isAppUser
+                                  ? const Color(0xFF6DE8B8).withOpacity(0.3)
+                                  : Colors.white.withOpacity(0.1),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            isAppUser ? 'Bağlan' : 'Davet Et',
+                            style: TextStyle(
+                              color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.5),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          if (isSent) ...[
-                            Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
-                            const SizedBox(width: 4),
-                          ],
-                           Row(
-                             mainAxisSize: MainAxisSize.min,
-                             children: [
-                               Text(
-                                 isSent ? 'Gönderildi' : (isAppUser ? 'İstek Gönder' : 'Davet Et'),
-                                 style: TextStyle(
-                                   color: isSent 
-                                       ? Colors.white.withOpacity(0.4) 
-                                       : isAppUser ? const Color(0xFF6DE8B8) : const Color(0xFFE879F9),
-                                   fontSize: 11,
-                                   fontWeight: FontWeight.w700,
-                                 ),
-                               ),
-                               if (!isSent && !isAppUser) ...[
-                                 const SizedBox(width: 4),
-                                 Icon(
-                                   _isPremiumUser ? Icons.cookie_rounded : Icons.diamond_rounded, 
-                                   color: const Color(0xFFE879F9).withOpacity(0.7), 
-                                   size: 11
-                                 ),
-                                 const SizedBox(width: 2),
-                                 Text(
-                                   _isPremiumUser ? '+1' : '+3',
-                                   style: const TextStyle(
-                                     color: Color(0xFFE879F9),
-                                     fontSize: 10,
-                                     fontWeight: FontWeight.bold,
-                                   ),
-                                 ),
-                               ]
-                             ],
-                           ),
-                        ],
                       ),
                     ),
                   );
@@ -789,10 +831,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _searchQuery.isEmpty ? 'Henüz arkadaşın yok' : 'Sonuç bulunamadı',
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
-            if (_searchQuery.isEmpty) ...[
-              const SizedBox(height: 8),
-              _addFriendButton(),
-            ],
           ],
         ),
       );
@@ -2556,7 +2594,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     });
 
     if (widget.friend != null) {
-      final service = MockOwlService();
+      final service = SupabaseOwlService();
       final cookieName = _selectedCookieId != null
           ? _ownedCookies.firstWhere((c) => c.id == _selectedCookieId, orElse: () => _ownedCookies.first).name
           : null;
