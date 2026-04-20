@@ -35,7 +35,7 @@ class NotificationService {
     );
 
     await _notificationsPlugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         debugPrint('BİLDİRİME TIKLANDI: ${response.payload}');
         // TODO: Deep linking ve payload yapısı eklenebilir.
@@ -66,11 +66,11 @@ class NotificationService {
   /// Sabah Rutini Paketi: Rüya, Günlük Kurabiye ve Astroloji (Her sabah atılır)
   Future<void> scheduleMorningRoutine({required int targetHour, required int targetMinute}) async {
     await _notificationsPlugin.zonedSchedule(
-      1, // Sabah id'si
-      'Güneş doğdu! 🌞', // Titreşimli tazeleyici bir başlık
-      'Dün geceki rüyanı analiz et, taze kurabiyeni kır ve gökyüzünün bugünkü mesajını öğren.',
-      _nextInstanceOfTime(targetHour, targetMinute),
-      const NotificationDetails(
+      id: 1, // Sabah id'si
+      title: 'Güneş doğdu! 🌞',
+      body: 'Dün geceki rüyanı analiz et, taze kurabiyeni kır ve gökyüzünün bugünkü mesajını öğren.',
+      scheduledDate: _nextInstanceOfTime(targetHour, targetMinute),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'morning_routine',
           'Sabah Kahini',
@@ -81,8 +81,6 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time, // Her gün aynı saatte tekrar et
     );
   }
@@ -90,11 +88,11 @@ class NotificationService {
   /// Akşam Rutini Paketi: Tarot Serisi (Her akşam atılır)
   Future<void> scheduleEveningRoutine({required int targetHour, required int targetMinute}) async {
     await _notificationsPlugin.zonedSchedule(
-      2, // Akşam id'si
-      'Ruhsal Dinlenme Vakti ✨',
-      'Günün yorgunluğunu atmak için Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
-      _nextInstanceOfTime(targetHour, targetMinute),
-      const NotificationDetails(
+      id: 2, // Akşam id'si
+      title: 'Ruhsal Dinlenme Vakti ✨',
+      body: 'Günün yorgunluğunu atmak için Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
+      scheduledDate: _nextInstanceOfTime(targetHour, targetMinute),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'evening_routine',
           'Akşam Tarotu',
@@ -105,8 +103,6 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time, // Her gün aynı saatte tekrar et
     );
   }
@@ -127,3 +123,4 @@ class NotificationService {
     return scheduledDate;
   }
 }
+

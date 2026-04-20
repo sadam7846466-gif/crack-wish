@@ -16,6 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
+  late final Animation<double> _scale;
   bool _navigating = false;
 
   @override
@@ -31,15 +32,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1400),
     );
 
-    // 0→30% belir, 30→70% dur, 70→100% kaybol
+    // Fade: Çabuk belir, ortada kal, hafif erken çık
     _fade = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 30),
-      TweenSequenceItem(tween: ConstantTween(1.0), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 20),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
     ]).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    
+    // Scale: Yavaşça büyüyen (zoom) sinematik efekt
+    _scale = Tween<double>(begin: 0.85, end: 1.05)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
 
     _ctrl.forward();
     _ctrl.addStatusListener((status) async {
@@ -55,8 +60,8 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (_, __, ___) => isNewUser ? const OnboardingPage() : const RootShell(),
-            transitionsBuilder: (_, a, __, child) => child,
-            transitionDuration: Duration.zero,
+            transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 800),
           ),
         );
       }
@@ -93,11 +98,14 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               child: Center(
-                child: Image.asset(
-                  'assets/icons/splash_cookie.png',
-                  width: 70,
-                  height: 70,
-                  fit: BoxFit.contain,
+                child: ScaleTransition(
+                  scale: _scale,
+                  child: Image.asset(
+                    'assets/icons/splash_cookie.png',
+                    width: 75,
+                    height: 75,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),

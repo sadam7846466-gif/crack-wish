@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       try {
         final profile = await supabase
             .from('profiles')
-            .select('full_name, handle')
+            .select('full_name, handle, avatar_url')
             .eq('id', user.id)
             .maybeSingle();
 
@@ -59,6 +59,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
            
            if(profile['handle'] != null) {
              await StorageService.setUserHandle(profile['handle'].toString());
+           }
+           
+           if(profile['avatar_url'] != null) {
+             await StorageService.setAvatar(profile['avatar_url'].toString());
            }
            
            // Ve artık yerel adımız dolu olduğu için onu Onboarding'e Yollamayacağız.

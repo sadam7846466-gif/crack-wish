@@ -8,11 +8,24 @@ class AnalyticsService {
   factory AnalyticsService() => _instance;
   AnalyticsService._();
 
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  FirebaseAnalytics? _analytics;
+
+  FirebaseAnalytics? get _safeAnalytics {
+    try {
+      _analytics ??= FirebaseAnalytics.instance;
+      return _analytics;
+    } catch (e) {
+      debugPrint('⚠️ Firebase Analytics henüz hazır değil: $e');
+      return null;
+    }
+  }
 
   /// Navigator observer — otomatik ekran takibi (hangi sayfayı açtı?)
-  FirebaseAnalyticsObserver get observer =>
-      FirebaseAnalyticsObserver(analytics: _analytics);
+  FirebaseAnalyticsObserver? get observer {
+    final a = _safeAnalytics;
+    if (a == null) return null;
+    return FirebaseAnalyticsObserver(analytics: a);
+  }
 
   // ══════════════════════════════════════════════
   // 🍪 KURABİYE
@@ -162,7 +175,7 @@ class AnalyticsService {
   /// Kullanıcı özelliği ayarla (segmentasyon için)
   Future<void> setUserProperty({required String name, required String value}) async {
     try {
-      await _analytics.setUserProperty(name: name, value: value);
+      await _safeAnalytics?.setUserProperty(name: name, value: value);
     } catch (e) {
       debugPrint('Analytics user property hatası: $e');
     }
@@ -171,7 +184,7 @@ class AnalyticsService {
   // ── İç yardımcı metod ──
   Future<void> _log(String name, Map<String, Object> params) async {
     try {
-      await _analytics.logEvent(name: name, parameters: params);
+      await _safeAnalytics?.logEvent(name: name, parameters: params);
       debugPrint('📊 Analytics: $name $params');
     } catch (e) {
       debugPrint('Analytics log hatası: $e');

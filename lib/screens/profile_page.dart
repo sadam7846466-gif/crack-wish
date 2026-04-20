@@ -488,6 +488,18 @@ class ProfilePageState extends State<ProfilePage> {
                                final publicUrl = await ProfileSyncService().uploadAvatar(imageFile);
                                if (publicUrl != null) {
                                    finalAvatarToSave = publicUrl;
+                               } else {
+                                  // YÜKLEME BAŞARISIZ OLDU! Geçici dosyayı kaydetmeyi engelle.
+                                  if (mounted) {
+                                    setModalState(() => _isSaving = false);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.'),
+                                        backgroundColor: Colors.redAccent,
+                                      )
+                                    );
+                                  }
+                                  return;
                                }
                             }
                             
@@ -2066,6 +2078,7 @@ class _BentoHeroCard extends StatelessWidget {
                                 child: userAvatar.startsWith('http')
                                     ? Image.network(
                                         userAvatar,
+                                        key: ValueKey(userAvatar),
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => Icon(
                                           Icons.person_rounded,
@@ -2076,12 +2089,14 @@ class _BentoHeroCard extends StatelessWidget {
                                     : userAvatar.startsWith('assets')
                                         ? Image.asset(
                                             userAvatar,
+                                            key: ValueKey(userAvatar),
                                             fit: userAvatar.contains('owl')
                                                 ? BoxFit.contain
                                                 : BoxFit.cover,
                                           )
                                         : Image.file(
                                             File(userAvatar),
+                                            key: ValueKey(userAvatar),
                                             fit: BoxFit.cover,
                                             errorBuilder: (_, __, ___) => Icon(
                                               Icons.person_rounded,

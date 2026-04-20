@@ -44,6 +44,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   void initState() {
     super.initState();
     _loadPremiumStatus();
+    _loadContactsSyncState();
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -53,6 +54,23 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     _pageCtrl = PageController(initialPage: _selectedTab);
     _service.loadMockData();
     _service.addListener(_onServiceUpdate);
+  }
+
+  Future<void> _loadContactsSyncState() async {
+    final syncedOnce = await StorageService.hasContactsSynced();
+    if (syncedOnce && mounted) {
+      setState(() {
+        _isContactsSynced = true;
+        _isSyncingContacts = true;
+      });
+      final results = await _service.syncContactsWithSupabase();
+      if (mounted) {
+        setState(() {
+          _isSyncingContacts = false;
+          _syncedContacts = results;
+        });
+      }
+    }
   }
 
   Future<void> _loadPremiumStatus() async {
@@ -353,61 +371,75 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         ),
         border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
       ),
-      child: Row(
-        // crossAxisAlignment kaldırıldı, çünkü merkeze hizalanacak tıpkı ContactItem gibi
-        children: [
-          Container(
-            width: 44, // 48'den 44'e düşürüldü (ContactItem boyutu)
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.black.withOpacity(0.2),
-              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-            ),
-            child: Center(
-              child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22), // 24'ten 22'ye düşürüldü
-            ),
-          ),
-          const SizedBox(width: 12), // 14 yerine 12 (ContactItem ile aynı)
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center, // start yerine center
-              children: [
-                FutureBuilder<String?>(
-                  future: StorageService.getUserName(),
-                  initialData: user.name,
-                  builder: (context, snapshot) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          snapshot.data ?? user.name,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.95),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          '${(snapshot.data ?? user.name).toLowerCase().replaceAll(' ', '')}01',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+      child: FutureBuilder<List<String?>>(
+        future: Future.wait([
+          StorageService.getUserName(),
+          StorageService.getUserHandle(),
+          StorageService.getAvatar(),
+        ]),
+        builder: (context, snapshot) {
+          final userName = snapshot.data?[0] ?? user.name;
+          final userHandle = snapshot.data?[1];
+          final avatarUrl = snapshot.data?[2];
+          
+          final handleDisplay = (userHandle != null && userHandle.isNotEmpty)
+              ? userHandle
+              : '@${userName.toLowerCase().replaceAll(' ', '')}';
+
+          return Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black.withOpacity(0.2),
+                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
-              ],
-            ),
-          ),
-        ],
+                child: ClipOval(
+                  child: avatarUrl != null && avatarUrl.startsWith('http')
+                      ? Image.network(
+                          avatarUrl,
+                          key: ValueKey(avatarUrl),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                        )
+                      : avatarUrl != null && avatarUrl.startsWith('assets')
+                          ? Image.asset(avatarUrl, fit: avatarUrl.contains('owl') ? BoxFit.contain : BoxFit.cover)
+                          : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      handleDisplay,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.85),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -645,6 +677,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         
         // Servisimizi çağırıyoruz, izin yoksa isteyecek.
         final results = await _service.syncContactsWithSupabase();
+        
+        await StorageService.setContactsSynced(true);
         
         if (mounted) {
           setState(() {

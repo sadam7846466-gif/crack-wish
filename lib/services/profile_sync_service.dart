@@ -94,7 +94,9 @@ class ProfileSyncService {
         'id': user.id, // Primary Key olarak eşleşecek
         'full_name': userName,
         'username': userHandle,
+        'handle': userHandle,
         'avatar_url': avatarUrl,
+        if (user.email != null) 'email': user.email,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
       };
 

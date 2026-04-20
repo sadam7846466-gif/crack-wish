@@ -20,6 +20,7 @@ import 'package:vlucky_flutter/services/purchase_service.dart';
 import 'package:vlucky_flutter/services/analytics_service.dart';
 import 'package:vlucky_flutter/services/cosmic_engine_service.dart';
 import 'package:vlucky_flutter/services/cosmic_illusion_service.dart';
+import 'package:vlucky_flutter/services/cloud_sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -127,7 +128,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            navigatorObservers: [AnalyticsService().observer],
+            navigatorObservers: [
+              if (AnalyticsService().observer != null)
+                AnalyticsService().observer!,
+            ],
           );
         },
       ),

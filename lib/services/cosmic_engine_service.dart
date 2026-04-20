@@ -12,7 +12,7 @@ class CosmicEngineService {
 
   // Bildirim ve Sağlık Motorları
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
-  final HealthFactory _health = HealthFactory(useHealthConnectIfAvailable: true);
+  final Health _health = Health();
 
   bool _isInitialized = false;
 
@@ -37,7 +37,7 @@ class CosmicEngineService {
       iOS: iosRules,
     );
 
-    await _notificationsPlugin.initialize(initSettings);
+    await _notificationsPlugin.initialize(settings: initSettings);
     _isInitialized = true;
     debugPrint("🔮 Cosmic Engine & Notifications Initialized");
   }
@@ -62,7 +62,7 @@ class CosmicEngineService {
       final now = DateTime.now();
       final yesterday = now.subtract(const Duration(days: 3));
       
-      List<HealthDataPoint> healthData = await _health.getHealthDataFromTypes(yesterday, now, types);
+      List<HealthDataPoint> healthData = await _health.getHealthDataFromTypes(startTime: yesterday, endTime: now, types: types);
       
       if (healthData.isEmpty) {
         // Veri yoksa standart saatte (Örn 09:00) at
@@ -126,12 +126,11 @@ class CosmicEngineService {
     );
 
     await _notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      targetTime,
-      platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: targetTime,
+      notificationDetails: platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
 

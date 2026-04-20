@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vlucky_flutter/services/storage_service.dart';
@@ -119,13 +120,30 @@ class CosmicIllusionService {
 
   /// Kendi kendine mesaj yollama illüzyonu (Kullanıcının veritabanına)
   Future<void> _deliverCosmicLetter(String senderName, String content, {int giftAmount = 0}) async {
-    // Burada aslında "Kullanıcının" kendisinden kendine giden ama arayüzde "Evren" diye görünen bir kayıt atılır:
-    // Mevcut 'owl_letters' tablosuna (veya yerel StorageService) mesajı kaydetme fonksiyonu 
-    // Daha önce yazdığımız Owl Letter mimarisini kullanarak bu mesajı InBox'a ekler
-    
-    // Bu fonksiyona bildirimin doğrudan düşmesi için Local Notification da bağlayabiliriz.
+    // 1. Mektubu kullanıcının Posta Kutusunda kalıcı görünmesi için Local Storage'a json olarak kaydet
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lettersVec = prefs.getStringList('cosmic_inbox_letters') ?? [];
+      
+      final Map<String, dynamic> newLetter = {
+        'id': 'cosmic_\${DateTime.now().millisecondsSinceEpoch}',
+        'senderName': senderName,
+        'content': content,
+        'giftAmount': giftAmount,
+        'date': DateTime.now().toIso8601String(),
+      };
+      
+      lettersVec.add(jsonEncode(newLetter));
+      await prefs.setStringList('cosmic_inbox_letters', lettersVec);
+      
+      debugPrint("💌 [İlizyon Motoru] \$senderName posta kutusuna zarfı bıraktı!");
+    } catch(e) {
+      debugPrint("Mektup bırakılamadı: \$e");
+    }
+
+    // 2. Bildirimin doğrudan düşmesi için Local Notification taklit et
     CosmicEngineService().scheduleInstantLocalNotification(
-      title: "🔮 \$senderName'den Yeni Bir Mesaj Görüldü",
+      title: "🔮 \$senderName'den Yeni Bir Mesaj",
       body: "Evrenin sana iletmek istediği bir mesaj var...",
     );
   }

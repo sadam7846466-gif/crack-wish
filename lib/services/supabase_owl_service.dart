@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/owl_models.dart';
+import 'storage_service.dart';
 
 class SupabaseOwlService {
   static final SupabaseOwlService _instance = SupabaseOwlService._();
@@ -41,6 +44,7 @@ class SupabaseOwlService {
     
     await _loadCurrentUser();
     await _loadInitialData();
+    await _loadCosmicLetters(); // Kozmik İllüzyon Mektuplarını yükle!
     _setupRealtime();
   }
 
@@ -136,22 +140,108 @@ class SupabaseOwlService {
   int get unreadLetterCount => inbox.where((l) => !l.isRead).length;
   List<OwlLetter> get sentLetters => List.unmodifiable(_sent);
 
-  void sendLetter({
+  Future<void> sendLetter({
     required Friend toFriend,
     required String message,
     List<List<Map<String, double>>>? drawingStrokes,
     String? attachedCookieId,
     String? attachedCookieName,
   }) async {
-    // Impl
+    // 1. Ekrandaki Giden Kutusuna (UI) hemen ekle (hız hissi vermek için)
+    final instantLetter = OwlLetter(
+      id: 'local_\${DateTime.now().millisecondsSinceEpoch}',
+      from: currentUser,
+      to: toFriend.user,
+      message: message,
+      attachedCookieId: attachedCookieId,
+      attachedCookieName: attachedCookieName,
+      sentAt: DateTime.now(),
+      deliveredAt: DateTime.now().add(const Duration(minutes: 5)), // Baykuş yola çıktı!
+    );
+    _sent.insert(0, instantLetter);
+    _notify(); // UI anında güncellensin
+
+    // 1.5 Eğer mektupla birlikte bir "Kurabiye Gönderildiyse", gönderenin envanterinden 1 tane eksilt.
+    // (Böylece oyun ekonomisi kurulmuş olur, başkasına attığın şey senden gider).
+    if (attachedCookieId != null && attachedCookieId.isNotEmpty) {
+      await StorageService.decrementCookieCard(attachedCookieId);
+    }
+
+    // 2. Arka planda gerçek SQL sunucusuna (Supabase) gönder
+    if (_db.auth.currentUser != null) {
+      try {
+        final letterData = {
+          'from_user': currentUser.id,
+          'to_user': toFriend.user.id,
+          'content': message,
+          'attached_cookie_id': attachedCookieId,
+          'attached_cookie_name': attachedCookieName,
+        };
+        await _db.from('owl_letters').insert(letterData);
+        debugPrint("🦉 Mektup Supabase'e fırlatıldı!");
+      } catch (e) {
+         debugPrint("🦉 Bağlantı yok ama mektup kasada tutuluyor (CloudSync eşleyene kadar): \$e");
+      }
+    }
   }
 
   void markAsRead(String letterId) async {
-    // Impl
+    try {
+      // 1. Lokalde oku olarak işaretle ki ekrandaki kırmızı okubadı (Unread) rozeti kaybolsun
+      final index = _inbox.indexWhere((l) => l.id == letterId);
+      if (index != -1) {
+        _inbox[index].isRead = true; // Modelde zaten 'bool isRead;' şeklinde mutable tanımlanmış
+        _notify();
+      }
+
+      // 2. Gerçek veritabanında okundu yap
+      if (!letterId.startsWith('local_') && !letterId.startsWith('cosmic_')) {
+        await _db.from('owl_letters').update({'is_read': true}).eq('id', letterId);
+      }
+    } catch(e) {
+      debugPrint("Mark As Read Error: \$e");
+    }
   }
 
   void loadMockData() {
     // Empty
+  }
+
+  /// İlizyon Motorunun sessizce bıraktığı sistem mektuplarını Posta Kutusuna (Inbox) çeker
+  Future<void> _loadCosmicLetters() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var lettersVec = prefs.getStringList('cosmic_inbox_letters') ?? [];
+      
+      for (var stringJson in lettersVec) {
+         final data = jsonDecode(stringJson);
+         
+         // Zarfı mevcut gelen kutumuza (inbox) modelleyip ekliyoruz.
+         // Evreni (CosmicOwl) sahte bir arkadaş gibi simüle ediyoruz.
+         OwlLetter letter = OwlLetter(
+           id: data['id'],
+           from: OwlUser(
+             id: 'cosmic_owl',
+             name: data['senderName'], // "Kozmik Baykuş" veya "Evren"
+             emoji: '🌌',
+             owlCode: 'COSMIC',
+           ),
+           to: currentUser,
+           message: data['content'],
+           sentAt: DateTime.parse(data['date'] ?? DateTime.now().toIso8601String()),
+           deliveredAt: DateTime.parse(data['date'] ?? DateTime.now().toIso8601String()),
+         );
+         
+         // Önceden listeye eklenmemişse ekle
+         if (!_inbox.any((element) => element.id == letter.id)) {
+            _inbox.add(letter);
+         }
+      }
+      _inbox.sort((a,b) => b.sentAt.compareTo(a.sentAt)); // Yeniden eskiye
+      _notify(); // Ekranın Posta kutusu kırmızı yansın diye listeyi yenile
+    } catch(e) {
+      debugPrint("Sistem mektupları çekilemedi: \$e");
+    }
   }
 
   // ========================

@@ -63,6 +63,26 @@ class StorageService {
   static const String _keyBirthPlace = 'birth_place';
   static const String _keyPhoneNumber = 'phone_number';
 
+  /// DEV METHOD: Sıfırla (BETA) - Günlük yenilemeyi tetiklemek için tüm tarih bazlı sınırları 'dün' olarak ayarlar
+  static Future<void> resetDailies() async {
+    final prefs = await SharedPreferences.getInstance();
+    final yesterday = DateTime.now().subtract(const Duration(days: 1)).toIso8601String();
+    
+    await prefs.setString(_keyDailyEliteSoulDate, yesterday);
+    await prefs.setString(_keyLastCookieDate, yesterday);
+    await prefs.setString(_keyTarotDoneDate, yesterday);
+    await prefs.setString(_keyDreamDoneDate, yesterday);
+    await prefs.setString(_keyZodiacDoneDate, yesterday);
+    
+    // Cookie, Tarot, Zodiac vs. true kalmışsa false yapalım ki UI anında yenilensin
+    await prefs.setBool(_keyTarotDone, false);
+    await prefs.setBool(_keyDreamDone, false);
+    await prefs.setBool(_keyZodiacDone, false);
+    
+    // Reset completed tasks for the day
+    await prefs.remove(_keyCompletedCosmicTasks);
+  }
+
   // ══════════════════════════════════════════════════════════════
   // PREMIUM EKONOMİ — İKİ HAVUZLU RUH TAŞI SİSTEMİ
   // ══════════════════════════════════════════════════════════════
@@ -1043,17 +1063,16 @@ class StorageService {
       final stored = decoded
           .map((e) => CookieCard.fromJson(e as Map<String, dynamic>))
           .toList();
-      // Bilinen kurabiye ID'leri — eski emoji ID'leri filtrele
-      final validIds = base.map((c) => c.id).toSet();
-      final Map<String, CookieCard> map = {for (final c in base) c.id: c};
-      for (final c in stored) {
-        if (validIds.contains(c.id)) {
-          // Geliştirme sürecindeki test verilerini (x33 vb.) sıfırlamak için countObtained değerini 1'e çekiyoruz. 
-          // Hediye/ödül sistemi gelene kadar normal yolla kırılan kurabiyeler sadece "unlock" (kilidi açılmış) olarak 1 tane sayılmalı.
-          final safeCount = c.countObtained > 1 ? 1 : c.countObtained;
-          map[c.id] = c.copyWith(countObtained: safeCount);
+      // Kullanıcının kayıtlı tüm kurabiyelerini haritaya al (Eskiler ve oyundan tamamen kaldırılanlar dahil ASLA silinmesin)
+      final Map<String, CookieCard> map = {for (final c in stored) c.id: c};
+      
+      // Oyuna sonradan kodla (güncellemeyle) eklenmiş, yeni kurabiyeleri de sıfır (kilitsiz) olarak dahil et
+      for (final c in base) {
+        if (!map.containsKey(c.id)) {
+          map[c.id] = c;
         }
       }
+      
       return map.values.toList();
     } catch (_) {
       return base;
@@ -1085,6 +1104,19 @@ class StorageService {
         countObtained: newCount,
         firstObtainedDate: c.firstObtainedDate ?? DateTime.now(),
       );
+    }).toList();
+    await _saveCookieCollection(updated);
+  }
+
+  static Future<void> decrementCookieCard(String id) async {
+    final cards = await getCookieCollection();
+    final updated = cards.map((c) {
+      if (c.id != id) return c;
+      
+      int newCount = c.countObtained - 1;
+      if (newCount < 0) newCount = 0; // Negatif olmasını önle
+      
+      return c.copyWith(countObtained: newCount);
     }).toList();
     await _saveCookieCollection(updated);
   }
@@ -1547,5 +1579,16 @@ class StorageService {
     await prefs.remove('zodiac_done_date');
     await prefs.remove('motiv_done_date');
     await prefs.remove('owl_last_delivered');
+  }
+
+  // --- CONTACTS SYNC STATE ---
+  static Future<bool> hasContactsSynced() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('contacts_synced_once') ?? false;
+  }
+
+  static Future<void> setContactsSynced(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('contacts_synced_once', value);
   }
 }
