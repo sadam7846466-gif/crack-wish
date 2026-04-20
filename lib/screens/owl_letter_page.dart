@@ -487,7 +487,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           .from('profiles')
           .select('id, full_name, handle, avatar_url')
           .or('full_name.ilike.%${_searchQuery}%,handle.ilike.%${_searchQuery}%')
-          .neq('id', Supabase.instance.client.auth.currentUser?.id ?? '')
+          .neq('id', Supabase.instance.client.auth.currentUser?.id ?? '00000000-0000-0000-0000-000000000000')
           .limit(20)
           .then((res) => List<Map<String, dynamic>>.from(res)),
       builder: (context, snapshot) {

@@ -247,11 +247,18 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final user = supabase.auth.currentUser;
     if (user != null) {
       try {
-        final profile = await supabase.from('profiles').select('full_name, username, zodiac_sign').eq('id', user.id).maybeSingle();
+        final profile = await supabase.from('profiles').select('full_name, username, zodiac_sign, handle, avatar_url').eq('id', user.id).maybeSingle();
         if (profile != null && profile['full_name'] != null) {
+           // HESAP VAR: Verileri indir ve direkt ana ekrana yönlendir
            await StorageService.setUserName(profile['full_name'].toString());
            if(profile['username'] != null) {
              await StorageService.setUserHandle(profile['username'].toString());
+           }
+           if(profile['handle'] != null) {
+             await StorageService.setUserHandle(profile['handle'].toString());
+           }
+           if(profile['avatar_url'] != null) {
+             await StorageService.setAvatar(profile['avatar_url'].toString());
            }
            if(profile['zodiac_sign'] != null) {
              await StorageService.setZodiacSign(profile['zodiac_sign'].toString());
@@ -263,18 +270,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       } catch (e) {
         debugPrint('Profil kurtarma hatası: $e');
       }
+      
+      // Profil yok → oturumu kapat, kayıt ol mesajı göster
+      await supabase.auth.signOut();
     }
     
-    // Eğer buraya gelindiyse: Kullanıcı ya veritabanında yoktur, ya da profili kırıktır.
     if (!mounted) return;
-    
-    // Giriş yapmaya çalışmış ama hesabı/profili yok
-    await supabase.auth.signOut(); // Güvenlik için varsa auth oturumunu kapat
-    
-    _showGlassError('Evrende böyle bir kayıt bulamadık veya profiliniz eksik. Lütfen "Kayıt Ol" işlemiyle yıldız haritanızı oluşturun.');
-    
+    _showGlassError('Hesabın bulunamadı. Lütfen önce "Kayıt Ol" ile hesap oluştur.');
     setState(() {
-      _showLoginButtons = false; // Kullanıcıyı giriş yap ekranından çıkart
+      _showLoginButtons = false;
     });
   }
 

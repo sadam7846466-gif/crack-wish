@@ -93,6 +93,7 @@ class ProfileSyncService {
       final updateData = {
         'id': user.id, // Primary Key olarak eşleşecek
         'full_name': userName,
+        'username': userHandle, // Supabase 'not-null' zorunluluğu
         'handle': userHandle,
         'avatar_url': avatarUrl,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
