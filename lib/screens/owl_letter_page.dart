@@ -49,6 +49,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     super.initState();
     _loadPremiumStatus();
     _loadContactsSyncState();
+    _loadSentRequestsLocal(); // Daha önce gönderilenleri hatırla
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -56,8 +57,33 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuart);
     _ctrl.forward();
     _pageCtrl = PageController(initialPage: _selectedTab);
-    _service.loadMockData();
+    _service.initialize();
     _service.addListener(_onServiceUpdate);
+  }
+
+  Future<void> _loadSentRequestsLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Tablo yeni oluşturuldu — eski sahte cache'i temizle (bir kerelik)
+    final isCleanedOnce = prefs.getBool('friend_cache_cleaned_v1') ?? false;
+    if (!isCleanedOnce) {
+      await prefs.remove('sent_friend_requests_cache');
+      await prefs.setBool('friend_cache_cleaned_v1', true);
+      return;
+    }
+    final sent = prefs.getStringList('sent_friend_requests_cache') ?? [];
+    if (mounted) {
+      setState(() {
+        _sentRequests.addAll(sent);
+      });
+    }
+  }
+
+  void _markRequestAsSentLocally(String username) async {
+    setState(() {
+      _sentRequests.add(username);
+    });
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('sent_friend_requests_cache', _sentRequests.toList());
   }
 
   Future<void> _loadContactsSyncState() async {
@@ -591,15 +617,23 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     ),
                     Builder(
                       builder: (ctx) {
-                        final isSent = _sentRequests.contains(userId);
+                        final isSent = _sentRequests.contains(userId) || _sentRequests.contains(username);
 
-                        return GestureDetector(
-                          onTap: () {
+                        return _BouncingNode(
+                          onTap: () async {
                             if (isSent) return;
                             HapticFeedback.mediumImpact();
-                            setState(() {
-                              _sentRequests.add(userId);
+                            _markRequestAsSentLocally(userId);
+                            _markRequestAsSentLocally(username); // Her ikisi için de cache'le
+                            
+                            // 🪄 GERÇEK BACKEND İSTEĞİ (userId ile doğrudan):
+                            SupabaseOwlService().sendFriendRequestById(userId).then((success) {
+                              debugPrint("🎯 [UI] sendFriendRequestById result: $success for userId=$userId");
+                              if (!success) {
+                               debugPrint("İstek gönderilemedi: $userId");
+                              }
                             });
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -611,7 +645,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                             );
-                            // Burada arkadaşlık isteğini Supabase'e ekleme kodu eklenebilir.
                           },
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
@@ -827,20 +860,35 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               Builder(
                 builder: (ctx) {
                   final String username = contact["username"] ?? name;
+                  final String? contactUserId = contact["userId"]?.toString();
                   final String? rawPhone = contact["phone"];
-                  final isSent = _sentRequests.contains(username);
+                  final isSent = _sentRequests.contains(username) || (contactUserId != null && _sentRequests.contains(contactUserId));
 
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
+                  return _BouncingNode(
                     onTap: () async {
                       debugPrint("--- Davet Et / Bağlan Butonuna Tıklandı ---");
                       try {
                         if (isAppUser) {
                           if (isSent) return;
                           HapticFeedback.mediumImpact();
-                          setState(() {
-                            _sentRequests.add(username);
-                          });
+                          _markRequestAsSentLocally(username);
+                          if (contactUserId != null) _markRequestAsSentLocally(contactUserId);
+                          
+                          // 🪄 GERÇEK BACKEND İSTEĞİ (userId ile doğrudan):
+                          if (contactUserId != null && contactUserId.isNotEmpty) {
+                            SupabaseOwlService().sendFriendRequestById(contactUserId).then((success) {
+                              debugPrint("🎯 [CONTACTS] sendFriendRequestById result: $success for userId=$contactUserId");
+                              if (!success) {
+                                 debugPrint("İstek gönderilemedi: $contactUserId");
+                              }
+                            });
+                          } else {
+                            // Fallback: handle ile dene
+                            SupabaseOwlService().sendFriendRequest(username).then((success) {
+                              debugPrint("🎯 [CONTACTS] sendFriendRequest fallback result: $success for handle=$username");
+                            });
+                          }
+                          
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -960,6 +1008,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       child: ListView(
         padding: const EdgeInsets.only(top: 16, bottom: 16),
         children: [
+          // Gelen İstekler (Arkadaşlarım sekmesinde göster)
           if (requests.isNotEmpty && _searchQuery.isEmpty) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -973,20 +1022,21 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
             ),
             ...requests.map((req) => _buildRequestItem(req)),
-            const SizedBox(height: 32),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                'Arkadaşların',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
+            if (friends.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  'Arkadaşların',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
-          // Arkadaş listesi
           ...friends.map((f) {
             final isExpanded = _expandedContactId == f.user.id;
             return _ContactItem(
@@ -1025,8 +1075,16 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   color: Colors.white.withOpacity(0.05),
                   border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
-                child: Center(
-                  child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                child: ClipOval(
+                  child: req.from.avatarUrl != null && req.from.avatarUrl!.startsWith('http')
+                      ? Image.network(
+                          req.from.avatarUrl!,
+                          fit: BoxFit.cover,
+                          width: 44,
+                          height: 44,
+                          errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                        )
+                      : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
               ),
               const SizedBox(width: 12),

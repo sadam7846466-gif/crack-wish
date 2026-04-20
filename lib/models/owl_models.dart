@@ -5,12 +5,14 @@ class OwlUser {
   final String name;
   final String emoji;
   final String owlCode; // #OWL-XXXX
+  final String? avatarUrl;
 
   const OwlUser({
     required this.id,
     required this.name,
     required this.emoji,
     required this.owlCode,
+    this.avatarUrl,
   });
 }
 

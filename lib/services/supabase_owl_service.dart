@@ -68,21 +68,116 @@ class SupabaseOwlService {
 
   Future<void> _loadInitialData() async {
     try {
-      final userId = _db.auth.currentUser!.id;
+      final user = _db.auth.currentUser;
+      if (user == null) {
+        debugPrint("🔴 [LOAD] user is null, returning");
+        return;
+      }
+      final userId = user.id;
+      debugPrint("🟢 [LOAD] Loading data for user: $userId");
       
-      // Load friends
-      // This requires fetching users that are friends with me
-      // Because Supabase joins can be tricky, we just fetch all my rows and then load user data
-      // (This is basic implementation, could be optimized)
+      // 1. Gelen Bekleyen İstekleri Yükle
+      final List<dynamic> requests = await _db.from('friend_requests')
+          .select()
+          .eq('to_user', userId)
+          .eq('status', 'pending');
       
-    } catch(e) {
-      debugPrint("Load Data Error: $e");
+      debugPrint("🟢 [LOAD] friend_requests query returned ${requests.length} results");
+      debugPrint("🟢 [LOAD] Raw data: $requests");
+          
+      _incomingRequests.clear();
+      
+      if (requests.isNotEmpty) {
+         final senderIds = requests.map((r) => r['from_user']).toSet().toList();
+         debugPrint("🟢 [LOAD] Sender IDs: $senderIds");
+         
+         final profiles = await _db.from('profiles')
+             .select('id, full_name, handle, avatar_url')
+             .filter('id', 'in', '(${senderIds.join(',')})');
+         
+         debugPrint("🟢 [LOAD] Profiles found: ${profiles.length} -> $profiles");
+             
+         final Map<String, dynamic> profileMap = { for (var p in profiles) p['id'].toString(): p };
+         
+         for (var req in requests) {
+            final senderId = req['from_user'].toString();
+            final p = profileMap[senderId];
+            debugPrint("🟢 [LOAD] Processing request from $senderId, profile found: ${p != null}");
+            if (p != null) {
+               _incomingRequests.add(FriendRequest(
+                  id: req['id'].toString(),
+                  from: OwlUser(
+                    id: p['id'].toString(),
+                    name: p['full_name'] ?? 'Ruhsal Rehber',
+                    emoji: '🧑',
+                    owlCode: p['handle']?.toString().replaceFirst('@', '') ?? 'MYS',
+                    avatarUrl: p['avatar_url']?.toString(),
+                  ),
+                  to: currentUser,
+                  createdAt: DateTime.tryParse(req['created_at'].toString()) ?? DateTime.now(),
+               ));
+            }
+         }
+      }
+      
+      // 2. Kabul Edilen Arkadaşlıkları Yükle
+      _friends.clear();
+      final List<dynamic> acceptedFrom = await _db.from('friend_requests')
+          .select()
+          .eq('to_user', userId)
+          .eq('status', 'accepted');
+      final List<dynamic> acceptedTo = await _db.from('friend_requests')
+          .select()
+          .eq('from_user', userId)
+          .eq('status', 'accepted');
+      
+      // Tüm arkadaş ID'lerini topla
+      final Set<String> friendIds = {};
+      for (var r in acceptedFrom) { friendIds.add(r['from_user'].toString()); }
+      for (var r in acceptedTo) { friendIds.add(r['to_user'].toString()); }
+      
+      if (friendIds.isNotEmpty) {
+        final friendProfiles = await _db.from('profiles')
+            .select('id, full_name, handle, avatar_url')
+            .filter('id', 'in', '(${friendIds.join(',')})');
+        
+        for (var p in friendProfiles) {
+          final uid = p['id'].toString();
+          // Duplicate kontrolü
+          if (_friends.any((f) => f.user.id == uid)) continue;
+          _friends.add(Friend(
+            id: 'friend_$uid',
+            user: OwlUser(
+              id: uid,
+              name: p['full_name'] ?? 'Arkadaş',
+              emoji: '🧑',
+              owlCode: p['handle']?.toString().replaceFirst('@', '') ?? '',
+              avatarUrl: p['avatar_url']?.toString(),
+            ),
+            friendsSince: DateTime.now(),
+          ));
+        }
+      }
+      
+      debugPrint("🟢 [LOAD] Final: ${_incomingRequests.length} requests, ${_friends.length} friends");
+      _notify();
+      
+    } catch(e, stack) {
+      debugPrint("🔴 [LOAD] Error: $e");
+      debugPrint("🔴 [LOAD] Stack: $stack");
     }
   }
 
   void _setupRealtime() {
     if (_db.auth.currentUser == null) return;
-    // Realtime listeners to keep everything perfectly synced
+    
+    // Gelen İstekler Bağlantısı
+    _requestSub = _db.from('friend_requests')
+      .stream(primaryKey: ['id'])
+      .eq('to_user', _db.auth.currentUser!.id)
+      .listen((data) {
+         _loadInitialData(); // Şimdilik basite kaçıp stream tetiklenince datayı tekrar çekelim
+      });
   }
 
   // ========================
@@ -103,33 +198,154 @@ class SupabaseOwlService {
   int get pendingRequestCount => incomingRequests.length;
 
   Future<bool> sendFriendRequest(String owlCode) async {
-    final code = owlCode.toUpperCase().replaceAll('#', '').trim();
-    if (code == currentUser.owlCode) return false;
+    debugPrint("🟡 [SEND] sendFriendRequest called with: '$owlCode'");
+    debugPrint("🟡 [SEND] currentUser.id: '${currentUser.id}', owlCode: '${currentUser.owlCode}'");
+    
+    final code = owlCode.replaceAll('#', '').replaceAll('@', '').trim();
+    debugPrint("🟡 [SEND] cleaned code: '$code'");
+    
+    if (code == currentUser.owlCode.replaceAll('@', '')) {
+      debugPrint("🔴 [SEND] Same user, returning false");
+      return false;
+    }
     
     try {
-      final targetProfile = await _db.from('profiles').select('id').eq('handle', '@\$code').maybeSingle() ??
-                            await _db.from('profiles').select('id').eq('handle', code).maybeSingle();
+      // Önce handle ile ara
+      debugPrint("🟡 [SEND] Searching profiles for handle='$code'");
+      var targetProfile = await _db.from('profiles').select('id, handle, full_name').eq('handle', code).maybeSingle();
+      debugPrint("🟡 [SEND] handle='$code' result: $targetProfile");
       
-      if (targetProfile == null) return false; // Code not found
+      targetProfile ??= await _db.from('profiles').select('id, handle, full_name').eq('handle', code.toLowerCase()).maybeSingle();
+      debugPrint("🟡 [SEND] handle='${code.toLowerCase()}' result: $targetProfile");
       
+      // handle @ ile kayıtlı olabilir
+      targetProfile ??= await _db.from('profiles').select('id, handle, full_name').eq('handle', '@$code').maybeSingle();
+      debugPrint("🟡 [SEND] handle='@$code' result: $targetProfile");
+      
+      targetProfile ??= await _db.from('profiles').select('id, handle, full_name').eq('handle', '@${code.toLowerCase()}').maybeSingle();
+      debugPrint("🟡 [SEND] handle='@${code.toLowerCase()}' result: $targetProfile");
+      
+      if (targetProfile == null) {
+        debugPrint("🔴 [SEND] No profile found for '$code' in any variant!");
+        
+        // Son çare: tüm profilleri listele debug için
+        final allProfiles = await _db.from('profiles').select('id, handle, full_name').limit(20);
+        debugPrint("🟡 [SEND] ALL PROFILES (first 20): $allProfiles");
+        return false;
+      }
+      
+      debugPrint("🟢 [SEND] Found target: ${targetProfile['id']} (${targetProfile['full_name']})");
+      
+      final targetId = targetProfile['id'].toString();
       await _db.from('friend_requests').insert({
         'from_user': currentUser.id,
-        'to_user': targetProfile['id'],
+        'to_user': targetId,
         'status': 'pending'
       });
+      debugPrint("🟢 [SEND] ✅ INSERT SUCCESSFUL! from=${currentUser.id} to=$targetId");
       return true;
-    } catch (e) {
-      debugPrint("Add Friend Error: \$e");
+    } catch (e, stack) {
+      debugPrint("🔴 [SEND] Error: $e");
+      debugPrint("🔴 [SEND] Stack: $stack");
       return false;
     }
   }
 
-  void acceptRequest(String requestId) async {
-    // Impl
+  /// userId ile doğrudan istek gönder (handle araması yapmadan)
+  Future<bool> sendFriendRequestById(String targetUserId) async {
+    debugPrint("🟡 [SEND_BY_ID] targetUserId='$targetUserId', currentUser='${currentUser.id}'");
+    if (targetUserId == currentUser.id) {
+      debugPrint("🔴 [SEND_BY_ID] Same user!");
+      return false;
+    }
+    try {
+      // Aynı istek daha önce gönderilmiş mi kontrol et
+      final existing = await _db.from('friend_requests')
+          .select('id')
+          .eq('from_user', currentUser.id)
+          .eq('to_user', targetUserId)
+          .maybeSingle();
+      if (existing != null) {
+        debugPrint("🟡 [SEND_BY_ID] Already sent, skipping");
+        return true; // Zaten gönderilmiş, başarılı sayalım
+      }
+      
+      await _db.from('friend_requests').insert({
+        'from_user': currentUser.id,
+        'to_user': targetUserId,
+        'status': 'pending',
+      });
+      debugPrint("🟢 [SEND_BY_ID] ✅ INSERT SUCCESSFUL!");
+      return true;
+    } catch (e, stack) {
+      debugPrint("🔴 [SEND_BY_ID] Error: $e");
+      debugPrint("🔴 [SEND_BY_ID] Stack: $stack");
+      return false;
+    }
   }
 
-  void rejectRequest(String requestId) async {
-    // Impl
+  final Set<String> _processingRequestIds = {};
+
+  Future<void> acceptRequest(String requestId) async {
+    // Çift tıklama koruması
+    if (_processingRequestIds.contains(requestId)) return;
+    _processingRequestIds.add(requestId);
+    
+    try {
+      debugPrint("🟢 [ACCEPT] Accepting request: $requestId");
+      
+      // 1. İsteği bul
+      final reqIndex = _incomingRequests.indexWhere((r) => r.id == requestId);
+      FriendRequest? acceptedReq;
+      if (reqIndex != -1) {
+        acceptedReq = _incomingRequests[reqIndex];
+        _incomingRequests.removeAt(reqIndex);
+      }
+      
+      // 2. Supabase'de status'u 'accepted' yap
+      await _db.from('friend_requests')
+          .update({'status': 'accepted'})
+          .eq('id', requestId);
+      
+      // 3. Duplicate kontrolü — zaten arkadaşsa ekleme
+      if (acceptedReq != null && !_friends.any((f) => f.user.id == acceptedReq!.from.id)) {
+        _friends.add(Friend(
+          id: 'friend_${acceptedReq.from.id}',
+          user: acceptedReq.from,
+          friendsSince: DateTime.now(),
+        ));
+      }
+      
+      debugPrint("🟢 [ACCEPT] ✅ Request accepted! Friends count: ${_friends.length}");
+      _notify();
+    } catch (e) {
+      debugPrint("🔴 [ACCEPT] Error: $e");
+    } finally {
+      _processingRequestIds.remove(requestId);
+    }
+  }
+
+  Future<void> rejectRequest(String requestId) async {
+    // Çift tıklama koruması
+    if (_processingRequestIds.contains(requestId)) return;
+    _processingRequestIds.add(requestId);
+    
+    try {
+      debugPrint("🟡 [REJECT] Rejecting request: $requestId");
+      
+      _incomingRequests.removeWhere((r) => r.id == requestId);
+      
+      await _db.from('friend_requests')
+          .delete()
+          .eq('id', requestId);
+      
+      debugPrint("🟢 [REJECT] ✅ Request rejected and deleted");
+      _notify();
+    } catch (e) {
+      debugPrint("🔴 [REJECT] Error: $e");
+    } finally {
+      _processingRequestIds.remove(requestId);
+    }
   }
 
   // ========================
@@ -279,6 +495,8 @@ class SupabaseOwlService {
           results.add({
             "name": profile['full_name'] ?? 'Bilinmeyen Büyücü',
             "username": profile['handle'] ?? '',
+            "userId": profile['id'] ?? '',
+            "avatar_url": profile['avatar_url'],
             "isAppUser": true,
           });
         }
