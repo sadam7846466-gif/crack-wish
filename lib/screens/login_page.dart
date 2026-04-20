@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -232,16 +233,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   ),
                                 )
                               else ...[
+                                if (Platform.isIOS || Platform.isMacOS) ...[
+                                  _buildAuthButton(
+                                    icon: Icons.apple,
+                                    label: _isLoginMode ? "Apple ile Giriş Yap" : "Apple ile Devam Et",
+                                    color: Colors.white,
+                                    textColor: Colors.black,
+                                    onTap: _handleAppleSignIn,
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
                                 _buildAuthButton(
-                                  icon: Icons.apple,
-                                  label: _isLoginMode ? "Apple ile Giriş Yap" : "Apple ile Devam Et",
-                                  color: Colors.white,
-                                  textColor: Colors.black,
-                                  onTap: _handleAppleSignIn,
-                                ),
-                                const SizedBox(height: 16),
-                                _buildAuthButton(
-                                  // Google icon yerine şimdilik basit bir text veya Mdi icon
                                   icon: Icons.g_mobiledata_rounded,
                                   label: _isLoginMode ? "Google ile Giriş Yap" : "Google ile Devam Et",
                                   color: Colors.white.withOpacity(0.1),

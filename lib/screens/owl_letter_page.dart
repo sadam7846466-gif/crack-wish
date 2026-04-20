@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -481,123 +482,138 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildGlobalSearchList() {
-    final mockGlobalUsers = [
-      {"name": "Selin Arslan", "username": "@selin01", "emoji": "🔮"},
-      {"name": "Selin Yılmaz", "username": "@seliny", "emoji": "✨"},
-      {"name": "Selinay Kara", "username": "@selinayy", "emoji": "🦅"},
-      {"name": "Burak Yılmaz", "username": "@burak_k", "emoji": "♠️"},
-      {"name": "Elif Yılmaz", "username": "@elifyilmaz", "emoji": "🌙"},
-      {"name": "Ali Veli", "username": "@aliveli", "emoji": "🍀"},
-      {"name": "Ece Nur", "username": "@ecenur", "emoji": "🍄"},
-      {"name": "Tarık Akan", "username": "@tarika", "emoji": "🕯️"},
-      {"name": "Gizem Şahin", "username": "@gizem_ms", "emoji": "👁️"},
-      {"name": "Mert Taşkıran", "username": "@mert_t", "emoji": "🌑"},
-      {"name": "Aylin Selin", "username": "@aylin_s", "emoji": "🌸"},
-    ];
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: Supabase.instance.client
+          .from('profiles')
+          .select('id, full_name, handle, avatar_url')
+          .or('full_name.ilike.%${_searchQuery}%,handle.ilike.%${_searchQuery}%')
+          .neq('id', Supabase.instance.client.auth.currentUser?.id ?? '')
+          .limit(20)
+          .then((res) => List<Map<String, dynamic>>.from(res)),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(color: Colors.white24, strokeWidth: 2),
+            ),
+          );
+        }
 
-    final results = mockGlobalUsers.where((u) {
-       return (u["name"] as String).toLowerCase().contains(_searchQuery) ||
-              (u["username"] as String).toLowerCase().contains(_searchQuery);
-    }).toList();
+        final results = snapshot.data ?? [];
 
-    if (results.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.2), size: 32),
-            const SizedBox(height: 8),
-            Text('Kozmik evrende kimse bulunamadı.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.only(top: 16, bottom: 16),
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text('Kozmik Evrende Bulunanlar', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
-        ),
-        ...results.map((u) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
+        if (results.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.black.withOpacity(0.2),
-                    border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                  ),
-                  child: Center(
-                    child: Text(u["emoji"] as String, style: const TextStyle(fontSize: 18)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHighlightedText(
-                        u["name"] as String,
-                        _searchQuery,
-                        TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      _buildHighlightedText(
-                        u["username"] as String,
-                        _searchQuery,
-                        TextStyle(
-                          color: Colors.white.withOpacity(0.3),
-                          fontSize: 11,
-                        ),
-                        const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Builder(
-                  builder: (ctx) {
-                    final isSent = _sentRequests.contains(u["username"] as String);
+                Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.2), size: 32),
+                const SizedBox(height: 8),
+                Text('Kozmik evrende kimse bulunamadı.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
+              ],
+            ),
+          );
+        }
 
-                    return GestureDetector(
-                      onTap: () {
-                        if (isSent) return;
-                        HapticFeedback.mediumImpact();
-                        setState(() {
-                          _sentRequests.add(u["username"] as String);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${u["name"]} kişisine arkadaşlık isteği gönderildi!',
-                              style: const TextStyle(color: Colors.white),
+        return ListView(
+          padding: const EdgeInsets.only(top: 16, bottom: 16),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text('Kozmik Evrende Bulunanlar', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+            ),
+            ...results.map((u) {
+              final String name = u['full_name']?.toString() ?? 'Bilinmeyen Profil';
+              final String username = u['handle']?.toString() ?? '';
+              final String userId = u['id']?.toString() ?? '';
+              final String? avatarUrl = u['avatar_url']?.toString();
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.2),
+                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                      ),
+                      child: ClipOval(
+                        child: avatarUrl != null && avatarUrl.startsWith('http')
+                            ? Image.network(
+                                avatarUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                              )
+                            : avatarUrl != null && avatarUrl.startsWith('assets')
+                                ? Image.asset(avatarUrl, fit: avatarUrl.contains('owl') ? BoxFit.contain : BoxFit.cover)
+                                : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHighlightedText(
+                            name,
+                            _searchQuery,
+                            TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
                             ),
-                            backgroundColor: const Color(0xFF16151A),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 2),
+                          _buildHighlightedText(
+                            username,
+                            _searchQuery,
+                            TextStyle(
+                              color: Colors.white.withOpacity(0.3),
+                              fontSize: 11,
+                            ),
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Builder(
+                      builder: (ctx) {
+                        final isSent = _sentRequests.contains(userId);
+
+                        return GestureDetector(
+                          onTap: () {
+                            if (isSent) return;
+                            HapticFeedback.mediumImpact();
+                            setState(() {
+                              _sentRequests.add(userId);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '$name kişisine arkadaşlık isteği gönderildi!',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: const Color(0xFF16151A),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                            // Burada arkadaşlık isteğini Supabase'e ekleme kodu eklenebilir.
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                           child: AnimatedContainer(
@@ -639,7 +655,9 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         }).toList(),
       ],
     );
-  }
+  },
+);
+}
 
   Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle highlightStyle) {
     if (query.isEmpty) return Text(text, style: baseStyle);
