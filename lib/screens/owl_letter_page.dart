@@ -1076,14 +1076,22 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
                 child: ClipOval(
-                  child: req.from.avatarUrl != null && req.from.avatarUrl!.startsWith('http')
-                      ? Image.network(
-                          req.from.avatarUrl!,
-                          fit: BoxFit.cover,
-                          width: 44,
-                          height: 44,
-                          errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                        )
+                  child: req.from.avatarUrl != null 
+                      ? (req.from.avatarUrl!.startsWith('http') 
+                          ? Image.network(
+                              req.from.avatarUrl!,
+                              fit: BoxFit.cover,
+                              width: 44,
+                              height: 44,
+                              errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                            )
+                          : Image.asset(
+                              req.from.avatarUrl!,
+                              fit: BoxFit.cover,
+                              width: 44,
+                              height: 44,
+                              errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                            ))
                       : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
               ),
@@ -1392,8 +1400,24 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                           color: Colors.white.withOpacity(0.05),
                           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                         ),
-                        child: Center(
-                          child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                        child: ClipOval(
+                          child: sender.avatarUrl != null 
+                              ? (sender.avatarUrl!.startsWith('http') 
+                                  ? Image.network(
+                                      sender.avatarUrl!,
+                                      fit: BoxFit.cover,
+                                      width: 44,
+                                      height: 44,
+                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                    )
+                                  : Image.asset(
+                                      sender.avatarUrl!,
+                                      fit: BoxFit.cover,
+                                      width: 44,
+                                      height: 44,
+                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                    ))
+                              : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -2519,8 +2543,30 @@ class _ContactItem extends StatelessWidget {
                   BoxShadow(color: const Color(0xFF6B429C).withOpacity(0.3), blurRadius: 8, spreadRadius: 1)
                 ] : [],
               ),
-              child: Center(
-                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+              child: ClipOval(
+                child: friend?.user.avatarUrl != null 
+                    ? (friend!.user.avatarUrl!.startsWith('http') 
+                        ? Image.network(
+                            friend!.user.avatarUrl!,
+                            fit: BoxFit.cover,
+                            width: 44,
+                            height: 44,
+                            errorBuilder: (_, __, ___) => Center(
+                              child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                            ),
+                          )
+                        : Image.asset(
+                            friend!.user.avatarUrl!,
+                            fit: BoxFit.cover,
+                            width: 44,
+                            height: 44,
+                            errorBuilder: (_, __, ___) => Center(
+                              child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                            ),
+                          ))
+                    : Center(
+                        child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                      ),
               ),
             ),
             const SizedBox(width: 12),

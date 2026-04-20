@@ -44,6 +44,7 @@ class SupabaseOwlService {
     
     await _loadCurrentUser();
     await _loadInitialData();
+    await _loadInboxFromSupabase();
     await _loadCosmicLetters(); // Kozmik İllüzyon Mektuplarını yükle!
     _setupRealtime();
   }
@@ -122,24 +123,37 @@ class SupabaseOwlService {
       
       // 2. Kabul Edilen Arkadaşlıkları Yükle
       _friends.clear();
+      
+      // DEBUG: Tüm friend_requests tablosunu çek (status fark etmez)
+      final allRequests = await _db.from('friend_requests')
+          .select()
+          .or('from_user.eq.$userId,to_user.eq.$userId');
+      debugPrint("🔍 [DEBUG] ALL friend_requests for $userId: ${allRequests.length} -> $allRequests");
+      
       final List<dynamic> acceptedFrom = await _db.from('friend_requests')
           .select()
           .eq('to_user', userId)
           .eq('status', 'accepted');
+      debugPrint("🟢 [FRIENDS] acceptedFrom (I received & accepted): ${acceptedFrom.length} -> $acceptedFrom");
+      
       final List<dynamic> acceptedTo = await _db.from('friend_requests')
           .select()
           .eq('from_user', userId)
           .eq('status', 'accepted');
+      debugPrint("🟢 [FRIENDS] acceptedTo (I sent & they accepted): ${acceptedTo.length} -> $acceptedTo");
       
       // Tüm arkadaş ID'lerini topla
       final Set<String> friendIds = {};
       for (var r in acceptedFrom) { friendIds.add(r['from_user'].toString()); }
       for (var r in acceptedTo) { friendIds.add(r['to_user'].toString()); }
+      debugPrint("🟢 [FRIENDS] Friend IDs: $friendIds");
       
       if (friendIds.isNotEmpty) {
         final friendProfiles = await _db.from('profiles')
             .select('id, full_name, handle, avatar_url')
             .filter('id', 'in', '(${friendIds.join(',')})');
+        
+        debugPrint("🟢 [FRIENDS] Profiles: $friendProfiles");
         
         for (var p in friendProfiles) {
           final uid = p['id'].toString();
@@ -176,7 +190,15 @@ class SupabaseOwlService {
       .stream(primaryKey: ['id'])
       .eq('to_user', _db.auth.currentUser!.id)
       .listen((data) {
-         _loadInitialData(); // Şimdilik basite kaçıp stream tetiklenince datayı tekrar çekelim
+         _loadInitialData();
+      });
+    
+    // Gelen Mektuplar Bağlantısı
+    _letterSub = _db.from('owl_letters')
+      .stream(primaryKey: ['id'])
+      .eq('to_user', _db.auth.currentUser!.id)
+      .listen((data) {
+         _loadInboxFromSupabase();
       });
   }
 
@@ -355,6 +377,102 @@ class SupabaseOwlService {
   List<OwlLetter> get pendingLetters => List.unmodifiable(_inbox.where((l) => !l.isDelivered));
   int get unreadLetterCount => inbox.where((l) => !l.isRead).length;
   List<OwlLetter> get sentLetters => List.unmodifiable(_sent);
+
+  /// Supabase'den gelen mektupları çek
+  Future<void> _loadInboxFromSupabase() async {
+    try {
+      final user = _db.auth.currentUser;
+      if (user == null) return;
+      
+      // Bana gelen mektuplar
+      final List<dynamic> received = await _db.from('owl_letters')
+          .select()
+          .eq('to_user', user.id)
+          .order('created_at', ascending: false);
+      
+      debugPrint("📨 [INBOX] Received letters: ${received.length}");
+      
+      // Benim gönderdiğim mektuplar
+      final List<dynamic> sentFromDb = await _db.from('owl_letters')
+          .select()
+          .eq('from_user', user.id)
+          .order('created_at', ascending: false);
+      
+      debugPrint("📨 [INBOX] Sent letters: ${sentFromDb.length}");
+      
+      // Tüm kullanıcı ID'lerini topla profil bilgisi için
+      final Set<String> userIds = {};
+      for (var l in received) { userIds.add(l['from_user'].toString()); }
+      for (var l in sentFromDb) { userIds.add(l['to_user'].toString()); }
+      
+      Map<String, dynamic> profileMap = {};
+      if (userIds.isNotEmpty) {
+        final profiles = await _db.from('profiles')
+            .select('id, full_name, handle, avatar_url')
+            .filter('id', 'in', '(${userIds.join(',')})');
+        profileMap = { for (var p in profiles) p['id'].toString(): p };
+      }
+      
+      // Gelen mektupları inbox'a ekle
+      for (var l in received) {
+        final letterId = l['id'].toString();
+        if (_inbox.any((e) => e.id == letterId)) continue; // Duplicate kontrolü
+        
+        final senderId = l['from_user'].toString();
+        final senderProfile = profileMap[senderId];
+        
+        _inbox.add(OwlLetter(
+          id: letterId,
+          from: OwlUser(
+            id: senderId,
+            name: senderProfile?['full_name'] ?? 'Bilinmeyen',
+            emoji: '🧑',
+            owlCode: senderProfile?['handle']?.toString().replaceFirst('@', '') ?? '',
+            avatarUrl: senderProfile?['avatar_url']?.toString(),
+          ),
+          to: currentUser,
+          message: l['content'] ?? '',
+          attachedCookieId: l['attached_cookie_id']?.toString(),
+          attachedCookieName: l['attached_cookie_name']?.toString(),
+          sentAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
+          deliveredAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
+        ));
+      }
+      
+      // Gönderilen mektupları sent'e ekle
+      for (var l in sentFromDb) {
+        final letterId = l['id'].toString();
+        if (_sent.any((e) => e.id == letterId)) continue;
+        
+        final receiverId = l['to_user'].toString();
+        final receiverProfile = profileMap[receiverId];
+        
+        _sent.add(OwlLetter(
+          id: letterId,
+          from: currentUser,
+          to: OwlUser(
+            id: receiverId,
+            name: receiverProfile?['full_name'] ?? 'Bilinmeyen',
+            emoji: '🧑',
+            owlCode: receiverProfile?['handle']?.toString().replaceFirst('@', '') ?? '',
+            avatarUrl: receiverProfile?['avatar_url']?.toString(),
+          ),
+          message: l['content'] ?? '',
+          attachedCookieId: l['attached_cookie_id']?.toString(),
+          attachedCookieName: l['attached_cookie_name']?.toString(),
+          sentAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
+          deliveredAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
+        ));
+      }
+      
+      _inbox.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+      _sent.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+      _notify();
+      
+    } catch (e) {
+      debugPrint("🔴 [INBOX] Error loading letters: $e");
+    }
+  }
 
   Future<void> sendLetter({
     required Friend toFriend,
