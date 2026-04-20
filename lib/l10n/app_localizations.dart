@@ -1414,6 +1414,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Mini eylem'**
   String get feedTagMiniAction;
+
+  /// No description provided for @inviteShareMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mistik bir yolculuğa hazır mısın? Crack&Wish evreninde seni bekliyorum! ✨\n\nDavet kodum: {handle}\nHemen İndir: {link}'**
+  String inviteShareMessage(String handle, String link);
+
+  /// No description provided for @inviteShareSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'Crack&Wish Daveti'**
+  String get inviteShareSubject;
+
+  /// No description provided for @inviteSendButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Davet Et'**
+  String get inviteSendButton;
+
+  /// No description provided for @inviteConnectButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlan'**
+  String get inviteConnectButton;
+
+  /// No description provided for @inviteSentText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderildi'**
+  String get inviteSentText;
+
+  /// No description provided for @inviteRequestSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} kişisine istek gönderildi!'**
+  String inviteRequestSent(String name);
 }
 
 class _AppLocalizationsDelegate

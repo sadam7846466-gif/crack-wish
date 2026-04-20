@@ -21,6 +21,7 @@ import 'package:vlucky_flutter/services/analytics_service.dart';
 import 'package:vlucky_flutter/services/cosmic_engine_service.dart';
 import 'package:vlucky_flutter/services/cosmic_illusion_service.dart';
 import 'package:vlucky_flutter/services/cloud_sync_service.dart';
+import 'package:vlucky_flutter/services/referral_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,8 +37,14 @@ Future<void> main() async {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aGVvbnJtaW94YmlpbnZvbXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI3MTAsImV4cCI6MjA4OTgwODcxMH0.ur8u0vCa9x-nRKdKhS_xL6c56jpmXjU9FXa2CCHnaWU',
   );
 
+  // Uygulama başlar başlamaz Davet Linklerini dinlemeye başla
+  ReferralService().initialize();
+
   // Kullanıcı Oturum İşlemleri (Bulut Veritabanı için Gizli ID Alımı)
   await AuthService().signInAnonymously();
+
+  // Her girişte kendimize gelen davet ödüllerini (Çevrimdışı Ruh Taşları) kontrol edelim
+  ReferralService.checkInviterRewards();
 
   // Elite (Premium) Abonelik + Kurabiye Satın Alma Sistemi
   await PurchaseService().initialize();

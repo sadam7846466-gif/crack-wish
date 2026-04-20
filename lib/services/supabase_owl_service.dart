@@ -283,19 +283,33 @@ class SupabaseOwlService {
           });
         }
 
-        // 2. Uygulamayı kullanmayan E-postalar:
+        // 2. Uygulamayı kullanmayan E-postalar (Davet Listesi):
         for (var c in rawContacts) {
           final contactEmails = (c['emails'] as List<dynamic>?)?.cast<String>() ?? [];
-          if (contactEmails.isEmpty) continue;
+          final contactPhones = (c['phones'] as List<dynamic>?)?.cast<String>() ?? [];
+          final name = c['name'] as String? ?? 'Bilinmeyen Arkadaş';
+
+          if (contactEmails.isEmpty) {
+            // E-postası olmayanları da sadece "Davet Et" diyebilmek için listeye ekle
+            if (!results.any((r) => r["name"] == name)) {
+              results.add({
+                "name": name,
+                "isAppUser": false,
+                "phone": contactPhones.isNotEmpty ? contactPhones.first : null,
+              });
+            }
+            continue;
+          }
+
           final contactEmail = contactEmails.first.toLowerCase().trim();
           
           if (!matchedEmails.contains(contactEmail)) {
-            final name = c['name'] as String? ?? 'Bilinmeyen Arkadaş';
             if (!results.any((r) => r["name"] == name)) {
               results.add({
                 "name": name,
                 "isAppUser": false,
                 "email": contactEmail,
+                "phone": contactPhones.isNotEmpty ? contactPhones.first : null,
               });
             }
           }
@@ -303,9 +317,11 @@ class SupabaseOwlService {
       } catch (e) {
         debugPrint("Supabase Bağlantı Hatası: $e");
         for (var c in rawContacts) {
+          final contactPhones = (c['phones'] as List<dynamic>?)?.cast<String>() ?? [];
           results.add({
             "name": c['name'] ?? 'Bilinmeyen Arkadaş',
             "isAppUser": false,
+            "phone": contactPhones.isNotEmpty ? contactPhones.first : null,
           });
         }
       }

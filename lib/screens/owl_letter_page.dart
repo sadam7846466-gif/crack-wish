@@ -6,12 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
 import '../models/cookie_card.dart';
 import '../widgets/cosmic_badge.dart';
 import '../services/storage_service.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 
 /// Baykuş butonundan açılan buzlu cam panel (glassmorphism)
 class OwlLetterPage extends StatefulWidget {
@@ -805,35 +807,94 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
               Builder(
                 builder: (ctx) {
+                  final String username = contact["username"] ?? name;
+                  final String? rawPhone = contact["phone"];
+                  final isSent = _sentRequests.contains(username);
+
                   return GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () async {
+                      debugPrint("--- Davet Et / Bağlan Butonuna Tıklandı ---");
+                      try {
+                        if (isAppUser) {
+                          if (isSent) return;
+                          HapticFeedback.mediumImpact();
+                          setState(() {
+                            _sentRequests.add(username);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.inviteRequestSent(name),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: const Color(0xFF16151A),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        } else {
+                          debugPrint("Davet gönderme açılıyor...");
+                          HapticFeedback.lightImpact(); 
+                          final String handle = await StorageService.getUserHandle() ?? '';
+                          final inviteLink = 'https://crackwish.com/invite/$handle';
+                          final message = AppLocalizations.of(context)!.inviteShareMessage(handle, inviteLink);
+                          final subject = AppLocalizations.of(context)!.inviteShareSubject;
+                          
+                          // Özel davet tepsisini aç (WhatsApp, SMS, veya Diğer Seçenekler)
+                          if (!context.mounted) return;
+                          final RenderBox? box = ctx.findRenderObject() as RenderBox?;
+                          _showInviteOptions(context, rawPhone, message, subject, box);
+                        }
+                      } catch (e, stack) {
+                        debugPrint("DAVET BUTONU HATASI: $e \n $stack");
+                      }
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: isAppUser
-                                ? const Color(0xFF6DE8B8).withOpacity(0.15)
-                                : Colors.white.withOpacity(0.05),
+                            color: isSent 
+                                ? Colors.white.withOpacity(0.05)
+                                : isAppUser
+                                    ? const Color(0xFF6DE8B8).withOpacity(0.15)
+                                    : Colors.white.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isAppUser
-                                  ? const Color(0xFF6DE8B8).withOpacity(0.3)
-                                  : Colors.white.withOpacity(0.1),
+                              color: isSent 
+                                  ? Colors.white.withOpacity(0.1)
+                                  : isAppUser
+                                      ? const Color(0xFF6DE8B8).withOpacity(0.3)
+                                      : Colors.white.withOpacity(0.1),
                               width: 1.0,
                             ),
                           ),
-                          child: Text(
-                            isAppUser ? 'Bağlan' : 'Davet Et',
-                            style: TextStyle(
-                              color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.5),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (isSent) ...[
+                                Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                isSent 
+                                    ? AppLocalizations.of(context)!.inviteSentText 
+                                    : (isAppUser ? AppLocalizations.of(context)!.inviteConnectButton : AppLocalizations.of(context)!.inviteSendButton),
+                                style: TextStyle(
+                                  color: isSent
+                                      ? Colors.white.withOpacity(0.4)
+                                      : isAppUser
+                                          ? const Color(0xFF6DE8B8)
+                                          : Colors.white.withOpacity(0.7),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -1606,6 +1667,162 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showInviteOptions(BuildContext context, String? rawPhone, String message, String subject, RenderBox? renderBox) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF16151A),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Nasıl Davet Etmek İstersin?",
+                style: GoogleFonts.manrope(
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.manrope(
+                  textStyle: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              if (rawPhone != null && rawPhone.isNotEmpty) ...[
+                // WhatsApp Seçeneği
+                _buildInviteOptionTile(
+                  icon: Icons.chat_bubble_rounded,
+                  title: "WhatsApp ile Gönder",
+                  subtitle: "Sadece bu kişiye WhatsApp'tan yaz",
+                  color: const Color(0xFF25D366),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
+                    final Uri whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
+                    if (await canLaunchUrl(whatsappUri)) {
+                      await launchUrl(whatsappUri);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                
+                // SMS Seçeneği
+                _buildInviteOptionTile(
+                  icon: Icons.message_rounded,
+                  title: "SMS ile Gönder",
+                  subtitle: "Normal mesaj olarak yolla",
+                  color: const Color(0xFF0A84FF),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
+                    final Uri smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
+                    if (await canLaunchUrl(smsUri)) {
+                      await launchUrl(smsUri);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+              
+              // Paylaşım Seçeneği (Instagram, TikTok vb)
+              _buildInviteOptionTile(
+                icon: Icons.share_rounded,
+                title: "Diğer İletişim Uygulamaları",
+                subtitle: "Instagram, TikTok, Twitter vb.",
+                color: Colors.white,
+                onTap: () async {
+                  Navigator.pop(context);
+                  await Share.share(
+                    message,
+                    subject: subject,
+                    sharePositionOrigin: renderBox != null ? renderBox.localToGlobal(Offset.zero) & renderBox.size : null,
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 32),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInviteOptionTile({required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.2), size: 20),
+          ],
+        ),
       ),
     );
   }

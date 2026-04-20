@@ -701,4 +701,26 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get feedTagMiniAction => 'Mini eylem';
+
+  @override
+  String inviteShareMessage(String handle, String link) {
+    return 'Mistik bir yolculuğa hazır mısın? Crack&Wish evreninde seni bekliyorum! ✨\n\nDavet kodum: $handle\nHemen İndir: $link';
+  }
+
+  @override
+  String get inviteShareSubject => 'Crack&Wish Daveti';
+
+  @override
+  String get inviteSendButton => 'Davet Et';
+
+  @override
+  String get inviteConnectButton => 'Bağlan';
+
+  @override
+  String get inviteSentText => 'Gönderildi';
+
+  @override
+  String inviteRequestSent(String name) {
+    return '$name kişisine istek gönderildi!';
+  }
 }

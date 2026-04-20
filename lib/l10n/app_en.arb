@@ -282,5 +282,22 @@
   "feedTypeZodiac": "Zodiac",
   "feedTagDailyEnergy": "Daily energy",
   "feedTypeMotivation": "Motivation",
-  "feedTagMiniAction": "Mini action"
+  "feedTagMiniAction": "Mini action",
+  "inviteShareMessage": "Are you ready for a mystical journey? I am waiting for you in the Crack&Wish universe! ✨\n\nMy invite code: {handle}\nDownload Now: {link}",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "handle": { "type": "String" },
+      "link": { "type": "String" }
+    }
+  },
+  "inviteShareSubject": "Crack&Wish Invite",
+  "inviteSendButton": "Invite",
+  "inviteConnectButton": "Connect",
+  "inviteSentText": "Sent",
+  "inviteRequestSent": "Request sent to {name}!",
+  "@inviteRequestSent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  }
 }

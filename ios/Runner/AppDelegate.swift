@@ -37,7 +37,7 @@ import Contacts
         return
       }
       
-      let keys = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactEmailAddressesKey] as [CNKeyDescriptor]
+      let keys = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactEmailAddressesKey, CNContactPhoneNumbersKey] as [CNKeyDescriptor]
       let request = CNContactFetchRequest(keysToFetch: keys)
       
       var contacts: [[String: Any]] = []
@@ -45,12 +45,12 @@ import Contacts
       do {
         try store.enumerateContacts(with: request) { contact, _ in
           let emails = contact.emailAddresses.map { $0.value as String }
-          if !emails.isEmpty {
-            contacts.append([
-              "name": "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespaces),
-              "emails": emails
-            ])
-          }
+          let phones = contact.phoneNumbers.map { $0.value.stringValue }
+          contacts.append([
+            "name": "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespaces),
+            "emails": emails,
+            "phones": phones
+          ])
         }
         DispatchQueue.main.async {
           result(contacts)

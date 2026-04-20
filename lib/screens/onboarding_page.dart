@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import '../services/profile_sync_service.dart';
+import '../services/referral_service.dart';
 import '../services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'root_shell.dart';
@@ -464,7 +465,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
     // Buluta (Supabase) Senkronize Ediliyor
     dynamic syncResult = false;
-    if (Supabase.instance.client.auth.currentUser != null) {
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    if (currentUser != null) {
       debugPrint('☁️ Supabase senkronizasyonu başlıyor...');
       syncResult = await ProfileSyncService().syncProfileData(
         userName: _nameCtrl.text.trim(),
@@ -473,6 +475,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         zodiacSign: _calculateZodiac(_selectedDate),
       );
       debugPrint('☁️ Supabase senkronizasyon sonucu: ${syncResult == true ? "BAŞARILI ✅" : "BAŞARISIZ ❌ $syncResult"}');
+      
+      // ✅ BAŞARILI İSE: Varsa davet kodunu (referral) tetikle!
+      if (syncResult == true) {
+        await ReferralService.processPendingReferrals(currentUser.id);
+      }
     } else {
       debugPrint('⚠️ Supabase auth kullanıcısı null - bulut senkronizasyonu atlandı');
     }

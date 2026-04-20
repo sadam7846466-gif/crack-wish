@@ -711,4 +711,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedTagMiniAction => 'Mini action';
+
+  @override
+  String inviteShareMessage(String handle, String link) {
+    return 'Are you ready for a mystical journey? I am waiting for you in the Crack&Wish universe! ✨\n\nMy invite code: $handle\nDownload Now: $link';
+  }
+
+  @override
+  String get inviteShareSubject => 'Crack&Wish Invite';
+
+  @override
+  String get inviteSendButton => 'Invite';
+
+  @override
+  String get inviteConnectButton => 'Connect';
+
+  @override
+  String get inviteSentText => 'Sent';
+
+  @override
+  String inviteRequestSent(String name) {
+    return 'Request sent to $name!';
+  }
 }
