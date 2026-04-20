@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
@@ -1695,98 +1696,114 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF16151A),
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Nasıl Davet Etmek İstersin?",
-                style: GoogleFonts.manrope(
-                  textStyle: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+        return ClipRRect(
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
+                border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.5),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Üst tutma çubuğu
+                  Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.manrope(
-                  textStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                  Text(
+                    "Nasıl Davet Etmek İstersin?",
+                    style: GoogleFonts.manrope(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(
+                      textStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  if (rawPhone != null && rawPhone.isNotEmpty) ...[
+                    // WhatsApp Seçeneği
+                    _buildInviteOptionTile(
+                      icon: PhosphorIcons.whatsappLogo(PhosphorIconsStyle.regular),
+                      title: "WhatsApp",
+                      subtitle: "Mesaj olarak gönder",
+                      color: const Color(0xFF25D366),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
+                        final Uri whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
+                        if (await canLaunchUrl(whatsappUri)) {
+                          await launchUrl(whatsappUri);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    
+                    // SMS Seçeneği
+                    _buildInviteOptionTile(
+                      icon: PhosphorIcons.chatCircleText(PhosphorIconsStyle.regular), // Görseldeki gibi oval sohbet balonu
+                      title: "SMS",
+                      subtitle: "Klasik mesaj ile yolla",
+                      color: const Color(0xFF0A84FF),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
+                        final Uri smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
+                        if (await canLaunchUrl(smsUri)) {
+                          await launchUrl(smsUri);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  
+                  // Paylaşım Seçeneği (Instagram, TikTok vb)
+                  _buildInviteOptionTile(
+                    icon: PhosphorIcons.shareNetwork(PhosphorIconsStyle.regular),
+                    title: "Diğer Uygulamalar",
+                    subtitle: "Instagram, TikTok, X vb.",
+                    color: const Color(0xFFAB68FF),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await Share.share(
+                        message,
+                        subject: subject,
+                        sharePositionOrigin: renderBox != null ? renderBox.localToGlobal(Offset.zero) & renderBox.size : null,
+                      );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 32),
+                ],
               ),
-              const SizedBox(height: 32),
-              
-              if (rawPhone != null && rawPhone.isNotEmpty) ...[
-                // WhatsApp Seçeneği
-                _buildInviteOptionTile(
-                  icon: Icons.chat_bubble_rounded,
-                  title: "WhatsApp ile Gönder",
-                  subtitle: "Sadece bu kişiye WhatsApp'tan yaz",
-                  color: const Color(0xFF25D366),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                    final Uri whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
-                    if (await canLaunchUrl(whatsappUri)) {
-                      await launchUrl(whatsappUri);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
-                    }
-                  },
-                ),
-                const SizedBox(height: 12),
-                
-                // SMS Seçeneği
-                _buildInviteOptionTile(
-                  icon: Icons.message_rounded,
-                  title: "SMS ile Gönder",
-                  subtitle: "Normal mesaj olarak yolla",
-                  color: const Color(0xFF0A84FF),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                    final Uri smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
-                    if (await canLaunchUrl(smsUri)) {
-                      await launchUrl(smsUri);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
-                    }
-                  },
-                ),
-                const SizedBox(height: 12),
-              ],
-              
-              // Paylaşım Seçeneği (Instagram, TikTok vb)
-              _buildInviteOptionTile(
-                icon: Icons.share_rounded,
-                title: "Diğer İletişim Uygulamaları",
-                subtitle: "Instagram, TikTok, Twitter vb.",
-                color: Colors.white,
-                onTap: () async {
-                  Navigator.pop(context);
-                  await Share.share(
-                    message,
-                    subject: subject,
-                    sharePositionOrigin: renderBox != null ? renderBox.localToGlobal(Offset.zero) & renderBox.size : null,
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
         );
       },
@@ -1795,50 +1812,52 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
   Widget _buildInviteOptionTile({required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          color: Colors.white.withOpacity(0.03), // Çok daha mat ve belirsiz arka plan
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.06), width: 1), // Çok ince zarif sınır
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 4), // İkonun soluna hafif boşluk
+            Icon(icon, color: Colors.white, size: 34), // Görseldeki orantıya uygun boyut
+            const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    style: GoogleFonts.manrope(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600, // Görseldeki kalınlık
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                    style: GoogleFonts.manrope(
+                      textStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.45),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.2), size: 20),
+            Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.35), size: 22),
+            const SizedBox(width: 4),
           ],
         ),
       ),
