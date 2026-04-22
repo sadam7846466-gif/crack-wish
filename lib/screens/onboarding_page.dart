@@ -561,9 +561,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         return SingleChildScrollView(
                           clipBehavior: Clip.none, // Avatarların sağa sola taşmasına izin verir (akıcı geçiş)
                           physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(top: 100, bottom: 200), // En tepede ve aşağıda kesilmeleri tamamen ortadan kaldırır
+                          padding: const EdgeInsets.only(top: 140, bottom: 120), // Başlık aşağı çekildi, alt boşluk dengelendi
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight - 200),
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight - 120),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -1044,15 +1044,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           onSelect(label);
         },
         child: SizedBox(
-          width: 155,
-          height: 115,
+          width: 160,
+          height: 135,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: 155,
-                height: 115,
+                width: 160,
+                height: 135,
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04), // Seçiliyken cam efektini güçlendirecek fon
                   borderRadius: BorderRadius.circular(22),
@@ -1784,8 +1784,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           width: double.infinity,
           alignment: Alignment.center,
           child: Wrap(
-            spacing: 12,
-            runSpacing: 14, // Kesiklik olmaması için daraltıldı
+            spacing: 16,
+            runSpacing: 20, // Alt boşluğu doldurması için genişletildi
+
             alignment: WrapAlignment.center,
           children: [
             _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) {
@@ -2395,6 +2396,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       child: CupertinoDatePicker(
                         backgroundColor: Colors.transparent,
                         mode: mode,
+                        use24hFormat: true,
                         initialDateTime: mode == CupertinoDatePickerMode.date ? _selectedDate : (_selectedTime ?? DateTime.now()),
                         maximumYear: DateTime.now().year,
                         onDateTimeChanged: (val) {

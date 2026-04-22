@@ -300,8 +300,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
                                 shape: BoxShape.circle,
                                 color: Colors.white10,
                               ),
-                              child: const Icon(
-                                Icons.auto_awesome_rounded,
+                              child: Icon(
+                                insights[_activeIndex]['icon'] as IconData,
                                 color: AppColors.primaryOrange,
                                 size: 14,
                               ),
