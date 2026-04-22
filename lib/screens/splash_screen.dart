@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'root_shell.dart';
-import 'onboarding_page.dart';
-import '../services/storage_service.dart';
 import 'onboarding_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -51,15 +50,15 @@ class _SplashScreenState extends State<SplashScreen>
       if (status == AnimationStatus.completed && !_navigating) {
         _navigating = true;
         
-        // Kullanıcı önbellekte var mı bakıyoruz
-        final userName = await StorageService.getUserName();
-        final isNewUser = (userName == null || userName.isEmpty);
+        // Kullanıcının aktif Supabase oturumu (Google/Apple ile giriş) var mı?
+        final session = Supabase.instance.client.auth.currentSession;
+        final isLoggedIn = session != null;
 
         if (!mounted) return;
         
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => isNewUser ? const OnboardingPage() : const RootShell(),
+            pageBuilder: (_, __, ___) => isLoggedIn ? const RootShell() : const OnboardingPage(),
             transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
             transitionDuration: const Duration(milliseconds: 800),
           ),

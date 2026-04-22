@@ -1641,30 +1641,7 @@ info@crackandwish.com''',
                         ),
                         const SizedBox(height: 16),
 
-                        GestureDetector(
-                          onTap: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.clear(); // TAMAMEN SIFIRLA (Borçlar, isim vs her şey)!
-                            if (mounted) {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
-                            }
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.redAccent),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              '🛠️ TEST (Profili Sıfırla): Login Ekranına Git',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+
 
                         // ── BÖLÜM 1: HESAP ──
                         _SectionLabel(lang == 'tr' ? 'Hesap' : 'Account'),
@@ -1779,58 +1756,7 @@ info@crackandwish.com''',
 
 
 
-                        // ── DEV ──
-                        _SectionLabel('Dahili Test (Sonra Silinecek)'),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.rocket_launch_rounded,
-                                iconColor: const Color(0xFFF7941D),
-                                label: 'Onboarding Test',
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OnboardingPage()));
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.local_fire_department_rounded,
-                                iconColor: const Color(0xFFFF6B6B),
-                                label: 'Seri (Ateş) Ekle',
-                                onTap: () async {
-                                  final prefs = await SharedPreferences.getInstance();
-                                  final now = DateTime.now();
-                                  final days = prefs.getStringList('app_open_days') ?? [];
-                                  final claimed = prefs.getStringList('claimed_aura_days') ?? [];
-                                  
-                                  // Geçmiş 5 gün ekle ve claim durumlarını sıfırla:
-                                  for (int i = 1; i <= 5; i++) {
-                                    final d = now.subtract(Duration(days: i));
-                                    final key = "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-                                    if (!days.contains(key)) {
-                                      days.add(key);
-                                    }
-                                    claimed.remove(key); // Test için toplanmamış hale getir
-                                  }
-                                  
-                                  await prefs.setStringList('app_open_days', days);
-                                  await prefs.setStringList('claimed_aura_days', claimed);
-                                  await prefs.setInt('app_streak_days', 7); // Seri sayısını da 7 yapalım ki profilde görünsün
-                                  
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Geçmiş 5 gün test için eklendi! Yenilemek için Profil sayfasına tekrar tıklayın.")),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
+
 
                         // ── FOOTER & YASAL ──
                         Column(

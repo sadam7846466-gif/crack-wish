@@ -38,15 +38,27 @@ class SupabaseOwlService {
 
   OwlUser get currentUser => _currentUser ?? const OwlUser(id: 'me', name: 'Ziyaretçi', emoji: '🧑', owlCode: 'MYS');
 
+  bool _initialized = false;
+  bool _realtimeSetup = false;
+
   Future<void> initialize() async {
+    if (_initialized) return;
     final user = _db.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      debugPrint("🔴 [INIT] user is null, will retry on next call");
+      return; // Guard'ı kilitleme — user null ise tekrar denenebilsin
+    }
+    _initialized = true;
+    debugPrint("🟢 [INIT] Initializing SupabaseOwlService for user: ${user.id}");
     
     await _loadCurrentUser();
     await _loadInitialData();
     await _loadInboxFromSupabase();
     await _loadCosmicLetters(); // Kozmik İllüzyon Mektuplarını yükle!
-    _setupRealtime();
+    if (!_realtimeSetup) {
+      _realtimeSetup = true;
+      _setupRealtime();
+    }
   }
 
   Future<void> _loadCurrentUser() async {
@@ -94,7 +106,7 @@ class SupabaseOwlService {
          
          final profiles = await _db.from('profiles')
              .select('id, full_name, handle, avatar_url')
-             .filter('id', 'in', '(${senderIds.join(',')})');
+             .inFilter('id', senderIds.map((e) => e.toString()).toList());
          
          debugPrint("🟢 [LOAD] Profiles found: ${profiles.length} -> $profiles");
              
@@ -151,12 +163,13 @@ class SupabaseOwlService {
       if (friendIds.isNotEmpty) {
         final friendProfiles = await _db.from('profiles')
             .select('id, full_name, handle, avatar_url')
-            .filter('id', 'in', '(${friendIds.join(',')})');
+            .inFilter('id', friendIds.map((e) => e.toString()).toList());
         
         debugPrint("🟢 [FRIENDS] Profiles: $friendProfiles");
         
         for (var p in friendProfiles) {
           final uid = p['id'].toString();
+          if (uid == userId) continue; // Kendisini arkadaş listesine eklemesin
           // Duplicate kontrolü
           if (_friends.any((f) => f.user.id == uid)) continue;
           _friends.add(Friend(
@@ -185,12 +198,19 @@ class SupabaseOwlService {
   void _setupRealtime() {
     if (_db.auth.currentUser == null) return;
     
-    // Gelen İstekler Bağlantısı
+    // Gelen İstekler ve Kabul Edilen Arkadaşlıklar Bağlantısı
     _requestSub = _db.from('friend_requests')
       .stream(primaryKey: ['id'])
-      .eq('to_user', _db.auth.currentUser!.id)
       .listen((data) {
-         _loadInitialData();
+        final userId = _db.auth.currentUser?.id;
+        if (userId == null) return;
+        
+        bool hasRelevantChange = data.any((row) => 
+            row['to_user'] == userId || row['from_user'] == userId);
+            
+         if (hasRelevantChange) {
+           _loadInitialData();
+        }
       });
     
     // Gelen Mektuplar Bağlantısı
@@ -200,6 +220,16 @@ class SupabaseOwlService {
       .listen((data) {
          _loadInboxFromSupabase();
       });
+
+    // 🔴 HAYAT KURTARAN DÜZELTME: Supabase Realtime ayarı eksikse bile her 5 saniyede bir manuel eşitle
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_currentUser == null) {
+        timer.cancel(); // Kullanıcı yoksa durdur
+        return;
+      }
+      _loadInitialData();
+      _loadInboxFromSupabase();
+    });
   }
 
   // ========================
@@ -220,8 +250,14 @@ class SupabaseOwlService {
   int get pendingRequestCount => incomingRequests.length;
 
   Future<bool> sendFriendRequest(String owlCode) async {
+    final authUser = _db.auth.currentUser;
+    if (authUser == null) {
+      debugPrint("🔴 [SEND] Auth user is null, cannot send");
+      return false;
+    }
+    final myId = authUser.id;
     debugPrint("🟡 [SEND] sendFriendRequest called with: '$owlCode'");
-    debugPrint("🟡 [SEND] currentUser.id: '${currentUser.id}', owlCode: '${currentUser.owlCode}'");
+    debugPrint("🟡 [SEND] myId: '$myId', owlCode: '${currentUser.owlCode}'");
     
     final code = owlCode.replaceAll('#', '').replaceAll('@', '').trim();
     debugPrint("🟡 [SEND] cleaned code: '$code'");
@@ -260,11 +296,11 @@ class SupabaseOwlService {
       
       final targetId = targetProfile['id'].toString();
       await _db.from('friend_requests').insert({
-        'from_user': currentUser.id,
+        'from_user': myId,
         'to_user': targetId,
         'status': 'pending'
       });
-      debugPrint("🟢 [SEND] ✅ INSERT SUCCESSFUL! from=${currentUser.id} to=$targetId");
+      debugPrint("🟢 [SEND] ✅ INSERT SUCCESSFUL! from=$myId to=$targetId");
       return true;
     } catch (e, stack) {
       debugPrint("🔴 [SEND] Error: $e");
@@ -275,8 +311,14 @@ class SupabaseOwlService {
 
   /// userId ile doğrudan istek gönder (handle araması yapmadan)
   Future<bool> sendFriendRequestById(String targetUserId) async {
-    debugPrint("🟡 [SEND_BY_ID] targetUserId='$targetUserId', currentUser='${currentUser.id}'");
-    if (targetUserId == currentUser.id) {
+    final authUser = _db.auth.currentUser;
+    if (authUser == null) {
+      debugPrint("🔴 [SEND_BY_ID] Auth user is null, cannot send");
+      return false;
+    }
+    final myId = authUser.id;
+    debugPrint("🟡 [SEND_BY_ID] targetUserId='$targetUserId', myId='$myId'");
+    if (targetUserId == myId) {
       debugPrint("🔴 [SEND_BY_ID] Same user!");
       return false;
     }
@@ -284,7 +326,7 @@ class SupabaseOwlService {
       // Aynı istek daha önce gönderilmiş mi kontrol et
       final existing = await _db.from('friend_requests')
           .select('id')
-          .eq('from_user', currentUser.id)
+          .eq('from_user', myId)
           .eq('to_user', targetUserId)
           .maybeSingle();
       if (existing != null) {
@@ -293,7 +335,7 @@ class SupabaseOwlService {
       }
       
       await _db.from('friend_requests').insert({
-        'from_user': currentUser.id,
+        'from_user': myId,
         'to_user': targetUserId,
         'status': 'pending',
       });
@@ -370,6 +412,29 @@ class SupabaseOwlService {
     }
   }
 
+  Future<void> unfriend(String friendId) async {
+    final user = _db.auth.currentUser;
+    if (user == null) return;
+    
+    try {
+      debugPrint("🟡 [UNFRIEND] Unfriending: $friendId");
+      
+      // Remove from local list
+      _friends.removeWhere((f) => f.user.id == friendId);
+      
+      // Delete from database
+      await _db.from('friend_requests')
+          .delete()
+          .eq('status', 'accepted')
+          .or('and(from_user.eq.${user.id},to_user.eq.$friendId),and(from_user.eq.$friendId,to_user.eq.${user.id})');
+          
+      debugPrint("🟢 [UNFRIEND] ✅ Unfriended successfully");
+      _notify(); // UI güncellensin
+    } catch (e) {
+      debugPrint("🔴 [UNFRIEND] Error: $e");
+    }
+  }
+
   // ========================
   // MEKTUPLAR
   // ========================
@@ -409,16 +474,20 @@ class SupabaseOwlService {
       if (userIds.isNotEmpty) {
         final profiles = await _db.from('profiles')
             .select('id, full_name, handle, avatar_url')
-            .filter('id', 'in', '(${userIds.join(',')})');
+            .inFilter('id', userIds.map((e) => e.toString()).toList());
         profileMap = { for (var p in profiles) p['id'].toString(): p };
       }
-      
+      final prefs = await SharedPreferences.getInstance();
+      final claimedList = prefs.getStringList('claimed_letter_cookies') ?? [];
+
       // Gelen mektupları inbox'a ekle
       for (var l in received) {
         final letterId = l['id'].toString();
         if (_inbox.any((e) => e.id == letterId)) continue; // Duplicate kontrolü
         
         final senderId = l['from_user'].toString();
+        if (senderId == user.id) continue; // Kendisinden kendisine gelen mektupları iptal et (önceki test bug'larını temizle)
+
         final senderProfile = profileMap[senderId];
         
         _inbox.add(OwlLetter(
@@ -436,6 +505,8 @@ class SupabaseOwlService {
           attachedCookieName: l['attached_cookie_name']?.toString(),
           sentAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
           deliveredAt: DateTime.tryParse(l['created_at'].toString()) ?? DateTime.now(),
+          cookieClaimed: claimedList.contains(letterId),
+          isRead: l['is_read'] == true,
         ));
       }
       
@@ -505,7 +576,7 @@ class SupabaseOwlService {
     if (_db.auth.currentUser != null) {
       try {
         final letterData = {
-          'from_user': currentUser.id,
+          'from_user': _db.auth.currentUser!.id,
           'to_user': toFriend.user.id,
           'content': message,
           'attached_cookie_id': attachedCookieId,
@@ -533,7 +604,26 @@ class SupabaseOwlService {
         await _db.from('owl_letters').update({'is_read': true}).eq('id', letterId);
       }
     } catch(e) {
-      debugPrint("Mark As Read Error: \$e");
+      debugPrint("Mark As Read Error: $e");
+    }
+  }
+
+  void markCookieClaimed(String letterId) async {
+    try {
+      final index = _inbox.indexWhere((l) => l.id == letterId);
+      if (index != -1) {
+        _inbox[index].cookieClaimed = true;
+        _notify();
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final claimedList = prefs.getStringList('claimed_letter_cookies') ?? [];
+      if (!claimedList.contains(letterId)) {
+        claimedList.add(letterId);
+        await prefs.setStringList('claimed_letter_cookies', claimedList);
+      }
+    } catch(e) {
+      debugPrint("Mark Cookie Claimed Error: $e");
     }
   }
 
@@ -610,6 +700,8 @@ class SupabaseOwlService {
 
         // 1. Crack&Wish kullanan gerçek arkadaşlar:
         for (var profile in matchedProfiles) {
+          if (profile['id'].toString() == _db.auth.currentUser?.id) continue; // Kendini göstermesin
+          
           results.add({
             "name": profile['full_name'] ?? 'Bilinmeyen Büyücü',
             "username": profile['handle'] ?? '',

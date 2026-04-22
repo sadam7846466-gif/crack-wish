@@ -85,10 +85,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         .animate(CurvedAnimation(parent: _stepCtrl, curve: Curves.easeOutCubic));
 
     _stepCtrl.forward();
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted && _currentStep == 0) _nameFocus.requestFocus();
-    });
   }
 
   @override
@@ -147,11 +143,18 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         _stepCtrl.forward();
       });
     } else if (_currentStep == 6) {
-      // Artık asla atlama yok. Hadi Başlayalım diyen HERKES 7. adımı (Hesap Oluştur panelini) görecek.
-      _stepCtrl.reverse().then((_) {
-        setState(() => _currentStep = 7);
-        _stepCtrl.forward();
-      });
+      // Kullanıcı zaten giriş yapmışsa (Giriş Yap → onboarding yönlendirmesi) direkt kaydet
+      final existingUser = Supabase.instance.client.auth.currentUser;
+      if (existingUser != null) {
+        // Zaten oturum açık → step 7'yi atla, direkt profil kaydet
+        await _completeFinalOnboardingProfileSave();
+      } else {
+        // Oturum yok → step 7 (Hesap Oluştur) göster
+        _stepCtrl.reverse().then((_) {
+          setState(() => _currentStep = 7);
+          _stepCtrl.forward();
+        });
+      }
     }
   }
 
@@ -271,12 +274,20 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         debugPrint('Profil kurtarma hatası: $e');
       }
       
-      // Profil yok → oturumu kapat, kayıt ol mesajı göster
-      await supabase.auth.signOut();
+      // Profil yok ama hesap var → Onboarding'e yönlendir (profil tamamlasın)
+      // Oturumu KAPATMA! Auth hesabı zaten oluştu, sadece profil eksik.
+      if (!mounted) return;
+      _showGlassError('Hoş geldin! Profilini tamamlamak için birkaç adım kaldı.');
+      setState(() {
+        _showLoginButtons = false;
+        _currentStep = 1; // Onboarding adımlarına yönlendir
+      });
+      _stepCtrl.forward(from: 0.0);
+      return;
     }
     
     if (!mounted) return;
-    _showGlassError('Hesabın bulunamadı. Lütfen önce "Kayıt Ol" ile hesap oluştur.');
+    _showGlassError('Giriş başarısız oldu. Lütfen tekrar deneyin.');
     setState(() {
       _showLoginButtons = false;
     });

@@ -6805,7 +6805,9 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                       fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                     )))
                   : assetImageAvatar != null
-                      ? ClipOval(child: Image.asset(assetImageAvatar, fit: BoxFit.cover))
+                      ? ClipOval(child: assetImageAvatar.startsWith('http')
+                          ? Image.network(assetImageAvatar, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset(s['image'] as String, fit: BoxFit.cover))
+                          : Image.asset(assetImageAvatar, fit: BoxFit.cover))
                       : ClipOval(child: Image.asset(s['image'] as String, fit: BoxFit.cover)),
             ),
             if (hasAvatarOverride)
@@ -7747,10 +7749,19 @@ class _CosmicHarmonyAnimationState extends State<_CosmicHarmonyAnimation> with S
               ),
               child: widget.userAvatar != null
                   ? ClipOval(
-                      child: Image.asset(
-                        widget.userAvatar!,
-                        fit: BoxFit.cover,
-                      ),
+                      child: widget.userAvatar!.startsWith('http')
+                          ? Image.network(
+                              widget.userAvatar!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(
+                                widget.currentSignData['image'] as String,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Image.asset(
+                              widget.userAvatar!,
+                              fit: BoxFit.cover,
+                            ),
                     )
                   : ClipOval(
                       child: Image.asset(

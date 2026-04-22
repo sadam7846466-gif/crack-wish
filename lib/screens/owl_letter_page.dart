@@ -1053,6 +1053,14 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               },
               onShowLetter: () => setState(() => _showingLetter = true),
               onHideLetter: () { if (mounted) setState(() => _showingLetter = false); },
+              onUnfriend: () {
+                _service.unfriend(f.user.id);
+                setState(() {
+                  if (_expandedContactId == f.user.id) {
+                    _expandedContactId = null;
+                  }
+                });
+              },
             );
           }),
         ],
@@ -1703,10 +1711,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               cookieName: letter.attachedCookieName,
               cookieClaimed: letter.cookieClaimed,
               onClaimCookie: () async {
-                letter.cookieClaimed = true;
-                if (letter.attachedCookieId != null) {
-                  await StorageService.addCookieToCollection(letter.attachedCookieId!);
-                }
+                SupabaseOwlService().markCookieClaimed(letter.id);
                 if (mounted) setState(() {});
               },
               onReply: () {
@@ -2468,6 +2473,7 @@ class _ContactItem extends StatelessWidget {
   final Friend? friend;
   final VoidCallback? onShowLetter;
   final VoidCallback? onHideLetter;
+  final VoidCallback? onUnfriend;
 
   const _ContactItem({
     required this.name,
@@ -2479,9 +2485,10 @@ class _ContactItem extends StatelessWidget {
     this.friend,
     this.onShowLetter,
     this.onHideLetter,
+    this.onUnfriend,
   });
 
-  void _showLetterPaper(BuildContext context) {
+  void _showLetterPaper(BuildContext context, {bool autoOpenCookie = false}) {
     onShowLetter?.call();
     HapticFeedback.mediumImpact();
     showGeneralDialog(
@@ -2497,7 +2504,13 @@ class _ContactItem extends StatelessWidget {
           scale: 0.9 + 0.1 * curve.value,
           child: Opacity(
             opacity: a1.value,
-            child: _LetterPaper(recipientName: name, recipientEmoji: emoji, owlButtonRect: owlButtonRect, friend: friend),
+            child: _LetterPaper(
+              recipientName: name, 
+              recipientEmoji: emoji, 
+              owlButtonRect: owlButtonRect, 
+              friend: friend,
+              autoOpenCookie: autoOpenCookie,
+            ),
           ),
         );
       },
@@ -2702,7 +2715,7 @@ class _ContactItem extends StatelessWidget {
                                   Colors.orangeAccent,
                                   () {
                                     HapticFeedback.mediumImpact();
-                                    _showFeatureDialog(context, 'Kurabiye Hediye Et', 'Çok yakında arkadaşlarına sahip olduğun kurabiyeleri veya ruh taşlarını hediye edebileceksin! 🎁');
+                                    _showLetterPaper(context, autoOpenCookie: true); // Mektup menüsünü aç ve direkt kurabiye menüsünü göster
                                   }
                                 ),
                                 _buildIconButton(
@@ -2710,9 +2723,31 @@ class _ContactItem extends StatelessWidget {
                                   Icons.person_remove_rounded, 
                                   'Bağı Kes', 
                                   Colors.redAccent.withOpacity(0.8),
-                                  () {
+                                  () async {
                                     HapticFeedback.heavyImpact();
-                                    _showFeatureDialog(context, 'Bağı Kes', 'Gerçekten sihirli bağı koparmak istediğine emin misin? Bu işlem yakında kalıcı olarak eklenecek. 🛑');
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        backgroundColor: const Color(0xFF2A2A3D),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        title: const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                                        content: Text('${friend?.user.name} ile arandaki sihirli bağı koparmak istediğine emin misin?', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(false),
+                                            child: Text('İptal', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(true),
+                                            child: const Text('Evet, Kopar', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    
+                                    if (confirm == true && friend != null) {
+                                      onUnfriend?.call();
+                                    }
                                   }
                                 ),
                               ],
@@ -2793,12 +2828,14 @@ class _LetterPaper extends StatefulWidget {
   final String recipientEmoji;
   final Rect owlButtonRect;
   final Friend? friend;
+  final bool autoOpenCookie;
 
   const _LetterPaper({
     required this.recipientName,
     required this.recipientEmoji,
     required this.owlButtonRect,
     this.friend,
+    this.autoOpenCookie = false,
   });
 
   @override
@@ -2918,7 +2955,15 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     final collection = await StorageService.getCookieCollection();
     final owned = collection.where((c) => c.firstObtainedDate != null && c.countObtained > 0).toList();
     owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
-    if (mounted) setState(() => _ownedCookies = owned);
+    if (mounted) {
+      setState(() {
+        _ownedCookies = owned;
+        if (widget.autoOpenCookie) {
+          _showCookiePicker = true;
+          _textFocusNode.unfocus();
+        }
+      });
+    }
   }
 
   @override
@@ -2980,53 +3025,67 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     await StorageService.recordLetterSent();
     await StorageService.addPendingAura('baykus', 1);
 
-    setState(() {
-      _isSending = true;
-      _isFolding = true;
-    });
+    try {
+      setState(() {
+        _isSending = true;
+        _isFolding = true;
+      });
 
-    if (widget.friend != null) {
-      final service = SupabaseOwlService();
-      final cookieName = _selectedCookieId != null
-          ? _ownedCookies.firstWhere((c) => c.id == _selectedCookieId, orElse: () => _ownedCookies.first).name
-          : null;
-      service.sendLetter(
-        toFriend: widget.friend!,
-        message: _textCtrl.text.trim(),
-        drawingStrokes: _strokes.isNotEmpty
-            ? _strokes.map((s) => s.map((o) => {'x': o.dx, 'y': o.dy}).toList()).toList()
-            : null,
-        attachedCookieId: _selectedCookieId,
-        attachedCookieName: cookieName,
-      );
-      if (_selectedCookieId != null) {
-        await _deductCookie(_selectedCookieId!);
+      if (widget.friend != null) {
+        final service = SupabaseOwlService();
+        String? cookieName;
+        if (_selectedCookieId != null && _ownedCookies.isNotEmpty) {
+          final cookie = _ownedCookies.firstWhere(
+            (c) => c.id == _selectedCookieId,
+            orElse: () => CookieCard(id: _selectedCookieId!, name: 'Kurabiye', rarity: 'common', emoji: ''),
+          );
+          cookieName = cookie.name;
+        }
+
+        service.sendLetter(
+          toFriend: widget.friend!,
+          message: _textCtrl.text.trim(),
+          drawingStrokes: _strokes.isNotEmpty
+              ? _strokes.map((s) => s.map((o) => {'x': o.dx, 'y': o.dy}).toList()).toList()
+              : null,
+          attachedCookieId: _selectedCookieId,
+          attachedCookieName: cookieName,
+        );
+        
+        if (_selectedCookieId != null) {
+          await _deductCookie(_selectedCookieId!);
+        }
       }
-    }
 
-    // Adım 1: Muhteşem origami katlama başlar
-    await _foldCtrl.forward().orCancel;
-    if (!mounted) return;
+      // Adım 1: Muhteşem origami katlama başlar
+      await _foldCtrl.forward().orCancel;
+      if (!mounted) return;
 
-    // Kısa bekleme — daha akıcı ve hızlı geçiş
-    await Future.delayed(const Duration(milliseconds: 50));
-    if (!mounted) return;
+      // Kısa bekleme — daha akıcı ve hızlı geçiş
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (!mounted) return;
 
-    // Adım 2: Mektup zarfa girer, kapak kapanır
-    setState(() => _isEnveloping = true);
-    await _envelopeCtrl.forward().orCancel;
-    if (!mounted) return;
+      // Adım 2: Mektup zarfa girer, kapak kapanır
+      setState(() => _isEnveloping = true);
+      await _envelopeCtrl.forward().orCancel;
+      if (!mounted) return;
 
-    // Adım 3: Zarf havada çok kısa asılı kalır ve sonra baykuşa uçar
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (!mounted) return;
-    
-    HapticFeedback.mediumImpact(); // Uçuşa geçerken hafif titreşim
-    await _sendCtrl.forward().orCancel;
+      // Adım 3: Zarf havada çok kısa asılı kalır ve sonra baykuşa uçar
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!mounted) return;
+      
+      HapticFeedback.mediumImpact(); // Uçuşa geçerken hafif titreşim
+      await _sendCtrl.forward().orCancel;
 
-    // Animasyon tamamlandığında paneli kapatıp mektup göndermeyi bitir
-    if (mounted) {
-      Navigator.of(context).pop();
+    } on TickerCanceled {
+      // Animasyon iptal edildiyse, sessizce çık.
+    } catch (e) {
+      debugPrint("Mektup animasyonu veya gönderim hatası: $e");
+    } finally {
+      // Animasyon tamamlandığında veya hata olduğunda paneli kapatıp mektup göndermeyi bitir
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 

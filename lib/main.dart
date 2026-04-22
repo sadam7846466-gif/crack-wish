@@ -22,6 +22,7 @@ import 'package:vlucky_flutter/services/cosmic_engine_service.dart';
 import 'package:vlucky_flutter/services/cosmic_illusion_service.dart';
 import 'package:vlucky_flutter/services/cloud_sync_service.dart';
 import 'package:vlucky_flutter/services/referral_service.dart';
+import 'package:vlucky_flutter/services/supabase_owl_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,8 +41,11 @@ Future<void> main() async {
   // Uygulama başlar başlamaz Davet Linklerini dinlemeye başla
   ReferralService().initialize();
 
-  // Kullanıcı Oturum İşlemleri (Bulut Veritabanı için Gizli ID Alımı)
-  await AuthService().signInAnonymously();
+  // Kullanıcı zaten giriş yapmışsa (Google/Apple), sosyal servisleri başlat
+  final existingSession = Supabase.instance.client.auth.currentSession;
+  if (existingSession != null) {
+    await SupabaseOwlService().initialize();
+  }
 
   // Her girişte kendimize gelen davet ödüllerini (Çevrimdışı Ruh Taşları) kontrol edelim
   ReferralService.checkInviterRewards();
