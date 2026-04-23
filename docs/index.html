@@ -60,15 +60,9 @@
             animation: fadeIn 1.2s ease-out forwards;
         }
 
-        /* MUHTEŞEM BLUR CAM PANEL (GLASSMORPHISM) */
+        /* İÇERİK KUTUSU (Çerçeve Kaldırıldı) */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 40px;
             padding: 50px 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -208,7 +202,7 @@
 
         /* MOBİL UYUM (BUTONLAR YAN YANA KALMAYA ZORLANIYOR) */
         @media (max-width: 500px) {
-            .glass-panel { padding: 40px 20px; border-radius: 30px; }
+            .glass-panel { padding: 40px 20px; }
             h1 { font-size: 2.3rem; }
             p.subtitle { font-size: 1rem; margin-bottom: 2.5rem; }
             
