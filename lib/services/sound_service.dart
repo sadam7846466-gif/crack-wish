@@ -28,12 +28,11 @@ class SoundService {
     }
 
     if (_isSoundEnabled) {
-      // Sadece ufak tıklama/ısırık sesi
-      await _player.play(AssetSource('sounds/cookie_bite.mp3'), volume: 0.5);
+      // Tıklamada ses yok, sadece tok titreşim (Sessiz Lüks)
     }
   }
 
-  /// Kurabiye tamamen kırıldığında (Senin indirdiğin KIRIK sesi + Güçlü Titreşim)
+  /// Kurabiye tamamen kırıldığında (Sadece Güçlü Titreşim)
   Future<void> playCookieBreak() async {
     // Güçlü ve uzun titreşim (Başarı hissi)
     if (await Vibration.hasCustomVibrationsSupport() ?? false) {
@@ -43,8 +42,7 @@ class SoundService {
     }
 
     if (_isSoundEnabled) {
-      // Senin özel indirdiğin kurabiye kırma sesi
-      await _player.play(AssetSource('sounds/cookieKIRIK.mp3'), volume: 1.0);
+      // Ses tamamen kaldırıldı, sadece titreşim.
     }
   }
 
