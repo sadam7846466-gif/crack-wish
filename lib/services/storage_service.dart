@@ -1591,4 +1591,15 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('contacts_synced_once', value);
   }
+
+  // --- SOUND SETTINGS ---
+  static Future<bool?> getSoundEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('sound_enabled');
+  }
+
+  static Future<void> setSoundEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_enabled', value);
+  }
 }

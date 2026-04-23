@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../screens/root_shell.dart';
 import '../screens/onboarding_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -116,6 +117,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       _showError('Apple Girişi Başarısız: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -257,7 +265,70 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
+
+                    // Yasal Bilgilendirme (App Store / Play Store Şartı)
+                    Text.rich(
+                      TextSpan(
+                        text: 'By continuing, you agree to our ',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.35),
+                          fontSize: 11,
+                          height: 1.5,
+                        ),
+                        children: [
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: () => _openUrl('https://crackwish.com/terms.html'),
+                              child: Text(
+                                'Terms of Use',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.55),
+                                  fontSize: 11,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white.withOpacity(0.3),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' and ',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.35),
+                              fontSize: 11,
+                            ),
+                          ),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: () => _openUrl('https://crackwish.com/privacy.html'),
+                              child: Text(
+                                'Privacy Policy',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.55),
+                                  fontSize: 11,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.white.withOpacity(0.3),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            text: '.',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.35),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 16),
 
                     // Mod Değiştirici (Zarif Metin)
                     GestureDetector(

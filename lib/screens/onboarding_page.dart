@@ -18,6 +18,7 @@ import 'root_shell.dart';
 import 'zodiac_hub_page.dart';
 import '../data/mayan_zodiac_data.dart';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 class OnboardingPage extends StatefulWidget {
@@ -727,7 +728,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                         textColor: Colors.white,
                                         onTap: _handleGoogleSignIn,
                                       ),
-                                    ]
+                                    ],
                                   ],
                                 ),
                               ), // Padding closing
@@ -807,13 +808,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                   textColor: Colors.white,
                                   onTap: _handleFinalGoogleSignIn,
                                 ),
-                              ]
+                              ],
                             ],
                           ),
                         ),
                         // 7. adımda butonlar arasına mesafe konarak tam splash düzenini yakalıyoruz
                         const SizedBox(height: 48), // BottomBar'ı aşağıdan esnetir
-                      ]
+                      ],
+                      // Yasal Bilgilendirme — Ekranın En Altı (Sadece auth butonları görünürken)
+                      if (_currentStep == 0 || _currentStep == 7)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8, top: 4),
+                          child: _buildLegalDisclaimer(),
+                        ),
                     ], // Column children
                   ),
                 ),
@@ -829,6 +836,75 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // ==========================================
   // SHARED UI COMPONENTS
   // ==========================================
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Widget _buildLegalDisclaimer() {
+    return Text.rich(
+      TextSpan(
+        text: 'By continuing, you agree to our ',
+        style: GoogleFonts.nunito(
+          color: Colors.white.withOpacity(0.3),
+          fontSize: 11,
+          height: 1.5,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: GestureDetector(
+              onTap: () => _openUrl('https://crackwish.com/terms.html'),
+              child: Text(
+                'Terms of Use',
+                style: GoogleFonts.nunito(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 11,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.white.withOpacity(0.25),
+                ),
+              ),
+            ),
+          ),
+          TextSpan(
+            text: ' and ',
+            style: GoogleFonts.nunito(
+              color: Colors.white.withOpacity(0.3),
+              fontSize: 11,
+            ),
+          ),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: GestureDetector(
+              onTap: () => _openUrl('https://crackwish.com/privacy.html'),
+              child: Text(
+                'Privacy Policy',
+                style: GoogleFonts.nunito(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 11,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.white.withOpacity(0.25),
+                ),
+              ),
+            ),
+          ),
+          TextSpan(
+            text: '.',
+            style: GoogleFonts.nunito(
+              color: Colors.white.withOpacity(0.3),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
   Widget _buildAuthButton({
     required IconData icon,
     required String label,

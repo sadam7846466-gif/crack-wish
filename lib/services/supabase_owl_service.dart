@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/owl_models.dart';
 import 'storage_service.dart';
+import 'sound_service.dart';
 
 class SupabaseOwlService {
   static final SupabaseOwlService _instance = SupabaseOwlService._();
@@ -39,26 +40,37 @@ class SupabaseOwlService {
   OwlUser get currentUser => _currentUser ?? const OwlUser(id: 'me', name: 'Ziyaretçi', emoji: '🧑', owlCode: 'MYS');
 
   bool _initialized = false;
-  bool _realtimeSetup = false;
+  String? _initializedUserId;
 
   Future<void> initialize() async {
-    if (_initialized) return;
     final user = _db.auth.currentUser;
     if (user == null) {
       debugPrint("🔴 [INIT] user is null, will retry on next call");
-      return; // Guard'ı kilitleme — user null ise tekrar denenebilsin
+      return;
     }
+    
+    // Zaten tamamen yüklüyse ve veriler mevcutsa atla
+    if (_initialized && _initializedUserId == user.id && _friends.isNotEmpty) return;
+    
+    // Eski realtime aboneliklerini iptal et (hot restart'ta ölü kalmaması için)
+    await _friendSub?.cancel();
+    await _requestSub?.cancel();
+    await _letterSub?.cancel();
+    _friendSub = null;
+    _requestSub = null;
+    _letterSub = null;
+    
     _initialized = true;
+    _initializedUserId = user.id;
     debugPrint("🟢 [INIT] Initializing SupabaseOwlService for user: ${user.id}");
     
     await _loadCurrentUser();
     await _loadInitialData();
     await _loadInboxFromSupabase();
-    await _loadCosmicLetters(); // Kozmik İllüzyon Mektuplarını yükle!
-    if (!_realtimeSetup) {
-      _realtimeSetup = true;
-      _setupRealtime();
-    }
+    await _loadCosmicLetters();
+    
+    // Her zaman taze realtime abonelikleri kur
+    _setupRealtime();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -89,35 +101,31 @@ class SupabaseOwlService {
       final userId = user.id;
       debugPrint("🟢 [LOAD] Loading data for user: $userId");
       
+      // ── YENİ VERİLERİ GEÇİCİ LİSTELERDE TOPLA (eski veriyi SİLME!) ──
+      
       // 1. Gelen Bekleyen İstekleri Yükle
+      final List<FriendRequest> newRequests = [];
       final List<dynamic> requests = await _db.from('friend_requests')
           .select()
           .eq('to_user', userId)
           .eq('status', 'pending');
       
       debugPrint("🟢 [LOAD] friend_requests query returned ${requests.length} results");
-      debugPrint("🟢 [LOAD] Raw data: $requests");
           
-      _incomingRequests.clear();
-      
       if (requests.isNotEmpty) {
          final senderIds = requests.map((r) => r['from_user']).toSet().toList();
-         debugPrint("🟢 [LOAD] Sender IDs: $senderIds");
          
          final profiles = await _db.from('profiles')
              .select('id, full_name, handle, avatar_url')
              .inFilter('id', senderIds.map((e) => e.toString()).toList());
-         
-         debugPrint("🟢 [LOAD] Profiles found: ${profiles.length} -> $profiles");
              
          final Map<String, dynamic> profileMap = { for (var p in profiles) p['id'].toString(): p };
          
          for (var req in requests) {
             final senderId = req['from_user'].toString();
             final p = profileMap[senderId];
-            debugPrint("🟢 [LOAD] Processing request from $senderId, profile found: ${p != null}");
             if (p != null) {
-               _incomingRequests.add(FriendRequest(
+               newRequests.add(FriendRequest(
                   id: req['id'].toString(),
                   from: OwlUser(
                     id: p['id'].toString(),
@@ -133,26 +141,18 @@ class SupabaseOwlService {
          }
       }
       
-      // 2. Kabul Edilen Arkadaşlıkları Yükle
-      _friends.clear();
-      
-      // DEBUG: Tüm friend_requests tablosunu çek (status fark etmez)
-      final allRequests = await _db.from('friend_requests')
-          .select()
-          .or('from_user.eq.$userId,to_user.eq.$userId');
-      debugPrint("🔍 [DEBUG] ALL friend_requests for $userId: ${allRequests.length} -> $allRequests");
+      // 2. Kabul Edilen Arkadaşlıkları Yükle (GEÇİCİ LİSTEYE!)
+      final List<Friend> newFriends = [];
       
       final List<dynamic> acceptedFrom = await _db.from('friend_requests')
           .select()
           .eq('to_user', userId)
           .eq('status', 'accepted');
-      debugPrint("🟢 [FRIENDS] acceptedFrom (I received & accepted): ${acceptedFrom.length} -> $acceptedFrom");
       
       final List<dynamic> acceptedTo = await _db.from('friend_requests')
           .select()
           .eq('from_user', userId)
           .eq('status', 'accepted');
-      debugPrint("🟢 [FRIENDS] acceptedTo (I sent & they accepted): ${acceptedTo.length} -> $acceptedTo");
       
       // Tüm arkadaş ID'lerini topla
       final Set<String> friendIds = {};
@@ -165,14 +165,11 @@ class SupabaseOwlService {
             .select('id, full_name, handle, avatar_url')
             .inFilter('id', friendIds.map((e) => e.toString()).toList());
         
-        debugPrint("🟢 [FRIENDS] Profiles: $friendProfiles");
-        
         for (var p in friendProfiles) {
           final uid = p['id'].toString();
           if (uid == userId) continue; // Kendisini arkadaş listesine eklemesin
-          // Duplicate kontrolü
-          if (_friends.any((f) => f.user.id == uid)) continue;
-          _friends.add(Friend(
+          if (newFriends.any((f) => f.user.id == uid)) continue;
+          newFriends.add(Friend(
             id: 'friend_$uid',
             user: OwlUser(
               id: uid,
@@ -186,11 +183,18 @@ class SupabaseOwlService {
         }
       }
       
+      // ── BAŞARILI! Şimdi ATOMİK OLARAK eski listeyi yenisiyle değiştir ──
+      _incomingRequests.clear();
+      _incomingRequests.addAll(newRequests);
+      _friends.clear();
+      _friends.addAll(newFriends);
+      
       debugPrint("🟢 [LOAD] Final: ${_incomingRequests.length} requests, ${_friends.length} friends");
       _notify();
       
     } catch(e, stack) {
-      debugPrint("🔴 [LOAD] Error: $e");
+      // ⚠️ HATA OLURSA ESKİ VERİYE DOKUNMA! Kullanıcı mevcut arkadaşlarını görmeye devam etsin.
+      debugPrint("🔴 [LOAD] Error (keeping existing data): $e");
       debugPrint("🔴 [LOAD] Stack: $stack");
     }
   }
@@ -218,7 +222,7 @@ class SupabaseOwlService {
       .stream(primaryKey: ['id'])
       .eq('to_user', _db.auth.currentUser!.id)
       .listen((data) {
-         _loadInboxFromSupabase();
+         _loadInboxFromSupabase(playSound: true);
       });
 
     // 🔴 HAYAT KURTARAN DÜZELTME: Supabase Realtime ayarı eksikse bile her 5 saniyede bir manuel eşitle
@@ -444,8 +448,9 @@ class SupabaseOwlService {
   List<OwlLetter> get sentLetters => List.unmodifiable(_sent);
 
   /// Supabase'den gelen mektupları çek
-  Future<void> _loadInboxFromSupabase() async {
+  Future<void> _loadInboxFromSupabase({bool playSound = false}) async {
     try {
+      final prevCount = _inbox.length; // Ses kontrolü için önceki sayı
       final user = _db.auth.currentUser;
       if (user == null) return;
       
@@ -538,6 +543,12 @@ class SupabaseOwlService {
       
       _inbox.sort((a, b) => b.sentAt.compareTo(a.sentAt));
       _sent.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+      
+      // 🔔 Yeni mektup geldiyse baykuş zili çal
+      if (playSound && _inbox.length > prevCount) {
+        SoundService().playOwlLetter();
+      }
+      
       _notify();
       
     } catch (e) {

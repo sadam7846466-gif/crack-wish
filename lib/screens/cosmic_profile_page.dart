@@ -932,6 +932,17 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                         if (currentBirthDate != null) {
                           await StorageService.setBirthDate(currentBirthDate!);
                           await StorageService.setZodiacSign(getWesternZodiac(currentBirthDate));
+                          
+                          // Buluta Kaydet (AI Bildirimleri için)
+                          final user = Supabase.instance.client.auth.currentUser;
+                          if (user != null) {
+                            try {
+                              await Supabase.instance.client.from('profiles').update({
+                                'birth_date': currentBirthDate!.toIso8601String().split('T')[0],
+                                'zodiac_sign': getWesternZodiac(currentBirthDate)
+                              }).eq('id', user.id);
+                            } catch (_) {}
+                          }
                         }
                         await StorageService.setBirthTime(currentBirthTime ?? '');
                         await StorageService.setBirthPlace(currentBirthPlace ?? '');

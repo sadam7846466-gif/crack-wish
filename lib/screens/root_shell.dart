@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
+import '../services/supabase_owl_service.dart';
+import '../services/push_notification_service.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
 
@@ -24,6 +26,16 @@ class _RootShellState extends State<RootShell> {
     // CollectionPage(showBottomNav: false, onNavTapOverride: _handleNavTap), // Koleksiyon askıya alındı
     ProfilePage(key: _profileKey, showBottomNav: false, onNavTapOverride: _handleNavTap),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Hot restart sonrası arkadaş/mektup verilerini yeniden yükle
+    SupabaseOwlService().initialize();
+    
+    // Bildirim izinlerini iste ve token'i kaydet
+    PushNotificationService().requestPermissionAndGetToken();
+  }
 
   void _handleNavTap(int index) {
     if (index == _currentIndex) {

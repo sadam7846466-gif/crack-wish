@@ -24,6 +24,8 @@ import 'package:vlucky_flutter/services/cloud_sync_service.dart';
 import 'package:vlucky_flutter/services/referral_service.dart';
 import 'package:vlucky_flutter/services/supabase_owl_service.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -115,6 +117,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       CloudSyncService().pushToCloud();
     }
+    
+    // Uygulama ekrana geri döndüğünde (Resumed) "last_active_at" süresini güncelle.
+    // Bu sayede AI kullanıcının hangi saatlerde aktif olduğunu öğrenir.
+    if (state == AppLifecycleState.resumed) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        Supabase.instance.client.from('profiles').update({
+          'last_active_at': DateTime.now().toUtc().toIso8601String()
+        }).eq('id', user.id).catchError((_) {}); // Sessizce çalışsın, hatada uygulamayı bozmasın
+      }
+    }
   }
 
   @override
@@ -127,6 +140,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             onGenerateTitle: (context) =>
                 AppLocalizations.of(context)!.appTitle,
             debugShowCheckedModeBanner: false,
+            scaffoldMessengerKey: scaffoldMessengerKey,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,

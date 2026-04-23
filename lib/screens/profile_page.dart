@@ -36,6 +36,7 @@ import 'cosmic_profile_page.dart';
 import '../services/supabase_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
+import '../services/sound_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -1938,6 +1939,22 @@ For questions: info@crackandwish.com''',
                                     page: const NotificationSettingsPage(),
                                   ),
                                 );
+                              },
+                            ),
+                            _SettingsListTile(
+                              icon: SoundService().isSoundEnabled 
+                                  ? Icons.volume_up_rounded 
+                                  : Icons.volume_off_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Ses Efektleri' : 'Sound Effects',
+                              subtitle: SoundService().isSoundEnabled
+                                  ? (lang == 'tr' ? 'Açık' : 'On')
+                                  : (lang == 'tr' ? 'Kapalı' : 'Off'),
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                final newVal = !SoundService().isSoundEnabled;
+                                await SoundService().toggleSound(newVal);
+                                setState(() {});
                               },
                             ),
                           ],

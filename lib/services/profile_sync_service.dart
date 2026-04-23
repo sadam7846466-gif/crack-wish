@@ -85,6 +85,7 @@ class ProfileSyncService {
     required String userHandle,
     required String avatarUrl,
     String? zodiacSign,
+    String? birthDate,
   }) async {
     try {
       final user = _supabase.auth.currentUser;
@@ -97,6 +98,7 @@ class ProfileSyncService {
         'handle': userHandle,
         'avatar_url': avatarUrl,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
+        if (birthDate != null) 'birth_date': birthDate,
       };
 
       // 'profiles' tablosuna upsert işlemi (varsa günceller, yoksa yaratır)

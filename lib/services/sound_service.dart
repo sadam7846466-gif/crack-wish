@@ -1,19 +1,29 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
+import 'storage_service.dart';
 
 class SoundService {
   static final SoundService _instance = SoundService._internal();
   factory SoundService() => _instance;
-  SoundService._internal();
+  SoundService._internal() {
+    _loadSoundPreference();
+  }
 
   final AudioPlayer _player = AudioPlayer();
   final AudioPlayer _bgPlayer = AudioPlayer(); // İleride arka plan müziği gerekirse
 
   bool _isSoundEnabled = true;
+  bool get isSoundEnabled => _isSoundEnabled;
 
-  // Ses ayarlarını aç/kapat
-  void toggleSound(bool enabled) {
+  // Ses ayarını kalıcı olarak yükle
+  Future<void> _loadSoundPreference() async {
+    _isSoundEnabled = await StorageService.getSoundEnabled() ?? true;
+  }
+
+  // Ses ayarlarını aç/kapat (kalıcı olarak kaydeder)
+  Future<void> toggleSound(bool enabled) async {
     _isSoundEnabled = enabled;
+    await StorageService.setSoundEnabled(enabled);
   }
 
   // ── KURABİYE KIRMA (COOKIE) ──
@@ -28,11 +38,11 @@ class SoundService {
     }
 
     if (_isSoundEnabled) {
-      // Tıklamada ses yok, sadece tok titreşim (Sessiz Lüks)
+      // Sadece titreşim, ses yok (Sessiz Lüks)
     }
   }
 
-  /// Kurabiye tamamen kırıldığında (Sadece Güçlü Titreşim)
+  /// Kurabiye tamamen kırıldığında (Güçlü Titreşim + Kırılma Sesi)
   Future<void> playCookieBreak() async {
     // Güçlü ve uzun titreşim (Başarı hissi)
     if (await Vibration.hasCustomVibrationsSupport() ?? false) {
@@ -42,7 +52,7 @@ class SoundService {
     }
 
     if (_isSoundEnabled) {
-      // Ses tamamen kaldırıldı, sadece titreşim.
+      await _player.play(AssetSource('sounds/fortune_cookie_snap.mp3'), volume: 0.8);
     }
   }
 
@@ -62,6 +72,21 @@ class SoundService {
     }
   }
 
+  // ── TAROT KART ÇEVİRME ──
+
+  /// Tarot kartı çevrildiğinde
+  Future<void> playCardFlip() async {
+    if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+      Vibration.vibrate(duration: 30, amplitude: 100);
+    } else {
+      Vibration.vibrate(duration: 30);
+    }
+
+    if (_isSoundEnabled) {
+      await _player.play(AssetSource('sounds/kartsesi1.wav'), volume: 0.6);
+    }
+  }
+
   // ── ÖDÜL VE AURA TOPLAMA (REWARDS) ──
 
   /// Aura / Günlük ödül / Rozet toplandığında
@@ -74,7 +99,6 @@ class SoundService {
     }
 
     if (_isSoundEnabled) {
-      // Kaliteli tını (level_up_bonus.mp3)
       await _player.play(AssetSource('sounds/level_up_bonus.mp3'), volume: 1.0);
     }
   }
