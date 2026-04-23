@@ -64,65 +64,7 @@ b {color: rgba(255,255,255,0.9); font-weight: 400;}
 <body>
 <div class="container">
 <h1>🍪 Crack&Wish</h1>
-<div class="lang-switch"><a href="#en" onclick="document.getElementById('tr').style.display='none';document.getElementById('en').style.display='block'">English</a></div>
 
-<div id="tr">
-<h2>Gizlilik Politikası</h2>
-<p class="date">Son güncelleme: 23 Nisan 2026</p>
-<p>Bu gizlilik politikası, Crack&Wish mobil uygulamasının ("Uygulama") kişisel verilerinizi nasıl topladığını, kullandığını, sakladığını ve koruduğunu açıklar.</p>
-
-<h3>1. Toplanan Veriler</h3>
-<p><b>Hesap Verileri:</b> Google veya Apple hesabınızla giriş yaptığınızda; adınız, e-posta adresiniz ve benzersiz kullanıcı kimliğiniz Supabase altyapısında güvenle saklanır.</p>
-<p><b>Profil Verileri:</b> Kullanıcı adınız (@handle), doğum tarihiniz, burç bilginiz, doğum yeriniz ve profil fotoğrafınız bulut sunucularımızda depolanır.</p>
-<p><b>Uygulama İçi Veriler:</b> Kurabiye falları, rüya kayıtları, tarot okumaları, ruh taşı bakiyesi ve ayarlarınız cihazınızda yerel olarak saklanır. Giriş yaptığınızda Supabase'e şifreli olarak yedeklenir.</p>
-<p><b>Sosyal Veriler:</b> Arkadaş istekleri, bağlantılar ve Baykuş Postası mektupları Supabase veritabanında saklanır.</p>
-<p><b>Profil Fotoğrafı:</b> Yüklenen fotoğraflar AI tabanlı içerik moderasyonundan geçirilir.</p>
-<p><b>Rüya Analizi:</b> Rüya metinleriniz anonim olarak Google Gemini AI'a gönderilir ve kalıcı olarak saklanmaz.</p>
-
-<h3>2. Veri Kullanımı</h3>
-<ul>
-<li>Hesap yönetimi ve kimlik doğrulama</li>
-<li>Bulut senkronizasyonu</li>
-<li>Sosyal özellikler (arkadaşlık, mektup)</li>
-<li>Rüya analizi ve kişiselleştirilmiş yorumlar</li>
-<li>Uygulama içi satın alma (RevenueCat)</li>
-<li>Reklam gösterimi (Google AdMob)</li>
-</ul>
-
-<h3>3. Üçüncü Taraf Hizmetler</h3>
-<ul>
-<li>Supabase: Veritabanı, kimlik doğrulama, dosya depolama</li>
-<li>Google Gemini AI: Rüya analizi</li>
-<li>Google AdMob: Reklam gösterimi</li>
-<li>RevenueCat: Abonelik yönetimi</li>
-<li>Google/Apple Sign-In: Kimlik doğrulama</li>
-</ul>
-
-<h3>4. Veri Güvenliği</h3>
-<ul>
-<li>Tüm iletişim HTTPS/TLS ile şifrelenir</li>
-<li>Supabase Row Level Security (RLS) ile korunur</li>
-<li>Her kullanıcı yalnızca kendi verilerine erişebilir</li>
-</ul>
-
-<h3>5. Veri Saklama</h3>
-<p>Verileriniz hesabınız aktif olduğu sürece saklanır. Hesap sildiğinizde tüm verileriniz kalıcı olarak silinir.</p>
-
-<h3>6. Kullanıcı Hakları</h3>
-<ul>
-<li>Verilerinize erişim talep etme</li>
-<li>Verilerinizin düzeltilmesini isteme</li>
-<li>Hesabınızı ve tüm verilerinizi silme</li>
-</ul>
-
-<h3>7. Çocukların Gizliliği</h3>
-<p>Crack&Wish 13 yaş altı kullanıcılara yönelik değildir.</p>
-
-<h3>8. İletişim</h3>
-<p>crackwish.studio@gmail.com</p>
-</div>
-
-<div id="en" style="display:none">
 <h2>Privacy Policy</h2>
 <p class="date">Last updated: April 23, 2026</p>
 <p>This privacy policy explains how the Crack&Wish mobile application ("App") collects, uses, stores, and protects your personal data.</p>
@@ -176,21 +118,11 @@ b {color: rgba(255,255,255,0.9); font-weight: 400;}
 
 <h3>8. Contact</h3>
 <p>crackwish.studio@gmail.com</p>
-</div>
 
-<div class="footer">© 2026 Crack&Wish. All rights reserved.</div>
+<div class="footer">
+  <a href="/" style="color: rgba(255,255,255,0.5); text-decoration: none; margin-bottom: 10px; display: inline-block;">&larr; Back to Home</a><br>
+  © 2026 Crack&Wish. All rights reserved.
 </div>
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const hash = window.location.hash;
-    if (hash === '#en') {
-      document.getElementById('tr').style.display = 'none';
-      document.getElementById('en').style.display = 'block';
-    } else if (hash === '#tr') {
-      document.getElementById('en').style.display = 'none';
-      document.getElementById('tr').style.display = 'block';
-    }
-  });
-</script>
+</div>
 </body>
 </html>
