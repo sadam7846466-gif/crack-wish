@@ -386,12 +386,18 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
-                              onTap: () => _launchURL("https://crackwish.com/privacy"),
+                              onTap: () {
+                                final lang = Localizations.localeOf(context).languageCode;
+                                _launchURL("https://crackwish.com/privacy.html#$lang");
+                              },
                               child: Text("Gizlilik Sözleşmesi", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
                             ),
                             Text("   •   ", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9)),
                             GestureDetector(
-                              onTap: () => _launchURL("https://crackwish.com/terms"),
+                              onTap: () {
+                                final lang = Localizations.localeOf(context).languageCode;
+                                _launchURL("https://crackwish.com/terms.html#$lang");
+                              },
                               child: Text("Kullanım Şartları", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
                             ),
                           ],
@@ -420,8 +426,12 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
 
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri)) {
-      debugPrint('Could not launch $url');
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        debugPrint('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Launch URL error: $e');
     }
   }
 

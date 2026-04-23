@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
@@ -1192,8 +1193,21 @@ info@crackandwish.com''',
   }
 
   // ── Gizlilik Politikası ──
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        debugPrint('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Launch URL error: $e');
+    }
+  }
+
   void _openPrivacyPolicy() {
     final lang = Localizations.localeOf(context).languageCode;
+    _launchURL("https://crackwish.com/privacy.html#$lang");
+    return;
     _showLegalSheet(
       title: lang == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
       content: lang == 'tr'
@@ -1361,6 +1375,8 @@ For questions: info@crackandwish.com''',
   // ── Kullanım Koşulları ──
   void _openTermsOfService() {
     final lang = Localizations.localeOf(context).languageCode;
+    _launchURL("https://crackwish.com/terms.html#$lang");
+    return;
     _showLegalSheet(
       title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use',
       content: lang == 'tr'
