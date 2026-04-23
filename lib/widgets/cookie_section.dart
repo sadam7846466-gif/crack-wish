@@ -17,6 +17,7 @@ import '../services/ad_service.dart';
 import 'share_modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../services/purchase_service.dart';
+import '../services/sound_service.dart';
 
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
@@ -234,11 +235,7 @@ class _CookieSectionState extends State<CookieSection>
     super.dispose();
   }
 
-  // Ses efektlerini çal
-  Future<void> _playSound(String soundFile) async {
-    // Kurabiye kırma sesi istendiğinde kaldırıldı, tamamen sessiz + haptic çalışır
-    return;
-  }
+
 
   // Cookie görseli veya emoji göster
   Widget _buildCookieDisplay(String emoji) {
@@ -460,15 +457,10 @@ class _CookieSectionState extends State<CookieSection>
       languageCode: Localizations.localeOf(context).languageCode,
     );
 
-    _playSound('cookie_tap.mp3');
+    SoundService().playCookieBreak();
 
     setState(() => _isCracking = true);
     _crackController.forward(from: 0);
-    _playSound('cookie_crack.mp3'); // Animasyon tetiklendiği an sıfır gecikmeyle çalıyor
-
-    Future.delayed(const Duration(milliseconds: 400), () {
-      _playSound('cookie_sparkle.mp3');
-    });
 
     await StorageService.recordCookieCrack();
     StorageService.incrementCookieCount();
@@ -672,6 +664,7 @@ class _CookieSectionState extends State<CookieSection>
                                 onTapDown: (_) {
                                   if (!_showFortune) {
                                     setState(() => _isPressed = true);
+                                    SoundService().playCookieTap();
                                   }
                                 },
                                 onTapUp: (_) {
