@@ -222,7 +222,7 @@ class SupabaseOwlService {
       });
 
     // 🔴 HAYAT KURTARAN DÜZELTME: Supabase Realtime ayarı eksikse bile her 5 saniyede bir manuel eşitle
-    Timer.periodic(const Duration(seconds: 5), (timer) {
+    Timer.periodic(const Duration(seconds: 30), (timer) {
       if (_currentUser == null) {
         timer.cancel(); // Kullanıcı yoksa durdur
         return;

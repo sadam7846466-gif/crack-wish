@@ -1198,38 +1198,162 @@ info@crackandwish.com''',
       title: lang == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
       content: lang == 'tr'
           ? '''Crack&Wish Gizlilik Politikası
-Son güncelleme: Nisan 2026
+Son güncelleme: 23 Nisan 2026
 
-1. Toplanan Veriler
-Crack&Wish, kullanıcı verilerini cihazınızda yerel olarak saklar. Kurabiye geçmişi, rüya kayıtları, tarot okumaları ve kullanıcı tercihleri yalnızca cihazınızda tutulur.
+Bu gizlilik politikası, Crack&Wish mobil uygulamasının ("Uygulama") kişisel verilerinizi nasıl topladığını, kullandığını, sakladığını ve koruduğunu açıklar.
 
-2. Veri Paylaşımı
-Kişisel verileriniz üçüncü taraflarla paylaşılmaz. Rüya analizi için anonim olarak AI servislerine metin gönderilir; bu metinler saklanmaz.
+1. TOPLANAN VERİLER
 
-3. Çerezler ve İzleme
-Uygulama çerez kullanmaz ve kullanıcı davranışlarını izlemez.
+1.1 Hesap Verileri
+Google veya Apple hesabınızla giriş yaptığınızda; adınız, e-posta adresiniz ve benzersiz kullanıcı kimliğiniz (User ID) Supabase altyapısında güvenle saklanır.
 
-4. Veri Güvenliği
-Verileriniz cihazınızın yerel depolama alanında şifreli olarak saklanır.
+1.2 Profil Verileri
+Kullanıcı adınız (@handle), doğum tarihiniz, burç bilginiz, doğum yeriniz ve seçtiğiniz profil fotoğrafı bulut sunucularımızda depolanır.
 
-5. İletişim
+1.3 Uygulama İçi Veriler
+Kurabiye falları, rüya kayıtları, tarot okumaları, ruh taşı bakiyesi ve ayarlarınız öncelikle cihazınızda yerel olarak saklanır. Giriş yaptığınızda bu veriler Supabase bulut sunucusuna şifreli olarak yedeklenir.
+
+1.4 Sosyal Veriler
+Arkadaş istekleri, kabul edilen bağlantılar ve Baykuş Postası (Owl Letter) mektupları Supabase veritabanında saklanır. Mektup içerikleri yalnızca gönderen ve alıcı tarafından görüntülenebilir.
+
+1.5 Profil Fotoğrafı
+Yüklediğiniz profil fotoğrafları, uygunsuz içerik tespiti için yapay zeka tabanlı içerik moderasyon sisteminden geçirilir. Uygun bulunan fotoğraflar Supabase Storage'da saklanır.
+
+1.6 Rüya Analizi
+Rüya metinleriniz analiz için Google Gemini AI servisine anonim olarak gönderilir. Gönderilen metinler kullanıcı kimliğinizle ilişkilendirilmez ve AI servisi tarafından kalıcı olarak saklanmaz.
+
+1.7 Rehber Erişimi
+Arkadaş bulma özelliği için cihaz rehberinize erişim izni istenebilir. Rehber verileri yalnızca eşleşme amacıyla kullanılır ve sunucularımızda saklanmaz.
+
+2. VERİ KULLANIMI
+
+Verileriniz yalnızca şu amaçlarla kullanılır:
+• Hesap yönetimi ve kimlik doğrulama
+• Bulut senkronizasyonu (cihaz değişikliğinde verilerinizi koruma)
+• Sosyal özellikler (arkadaşlık, mektup gönderme)
+• Rüya analizi ve kişiselleştirilmiş yorumlar
+• Uygulama içi satın alma işlemleri (RevenueCat)
+• Reklam gösterimi (Google AdMob)
+
+3. ÜÇÜNCÜ TARAF HİZMETLER
+
+Uygulama şu üçüncü taraf hizmetleri kullanır:
+• Supabase: Veritabanı, kimlik doğrulama ve dosya depolama
+• Google Gemini AI: Rüya analizi
+• Google AdMob: Reklam gösterimi
+• RevenueCat: Abonelik yönetimi
+• Google/Apple Sign-In: Kimlik doğrulama
+
+Her hizmet sağlayıcı kendi gizlilik politikasına tabidir.
+
+4. VERİ GÜVENLİĞİ
+
+• Tüm veri iletişimi HTTPS/TLS şifreleme ile korunur.
+• Supabase veritabanı Row Level Security (RLS) ile korunmaktadır.
+• Her kullanıcı yalnızca kendi verilerine erişebilir.
+• Profil fotoğrafları içerik moderasyonundan geçirilir.
+
+5. VERİ SAKLAMA SÜRESİ
+
+Verileriniz hesabınız aktif olduğu sürece saklanır. Hesabınızı sildiğinizde tüm verileriniz (profil, mektuplar, arkadaşlıklar, bulut yedekleri) kalıcı olarak silinir.
+
+6. KULLANICI HAKLARI
+
+Aşağıdaki haklara sahipsiniz:
+• Verilerinize erişim talep etme
+• Verilerinizin düzeltilmesini isteme
+• Hesabınızı ve tüm verilerinizi silme (Profil → Hesabı Sil)
+• Bildirim tercihlerini değiştirme
+
+7. ÇOCUKLARIN GİZLİLİĞİ
+
+Crack&Wish 13 yaş altı kullanıcılara yönelik değildir. Bilerek 13 yaş altı kullanıcılardan veri toplamayız.
+
+8. DEĞİŞİKLİKLER
+
+Bu politika gerektiğinde güncellenebilir. Önemli değişikliklerde uygulama içi bildirim yapılır.
+
+9. İLETİŞİM
+
 Sorularınız için: info@crackandwish.com'''
           : '''Crack&Wish Privacy Policy
-Last updated: April 2026
+Last updated: April 23, 2026
 
-1. Data Collection
-Crack&Wish stores user data locally on your device. Cookie history, dream entries, tarot readings, and preferences are kept only on your device.
+This privacy policy explains how the Crack&Wish mobile application ("App") collects, uses, stores, and protects your personal data.
 
-2. Data Sharing
-Your personal data is not shared with third parties. For dream analysis, anonymous text is sent to AI services; these texts are not stored.
+1. DATA COLLECTED
 
-3. Cookies and Tracking
-The app does not use cookies and does not track user behavior.
+1.1 Account Data
+When you sign in with Google or Apple, your name, email address, and unique user ID are securely stored on Supabase infrastructure.
 
-4. Data Security
-Your data is stored encrypted in your device's local storage.
+1.2 Profile Data
+Your username (@handle), date of birth, zodiac sign, birth location, and profile photo are stored on our cloud servers.
 
-5. Contact
+1.3 In-App Data
+Fortune cookies, dream entries, tarot readings, soul stone balance, and preferences are primarily stored locally on your device. When signed in, this data is encrypted and backed up to Supabase cloud.
+
+1.4 Social Data
+Friend requests, accepted connections, and Owl Letter messages are stored in the Supabase database. Letter contents are viewable only by the sender and recipient.
+
+1.5 Profile Photo
+Uploaded profile photos pass through an AI-based content moderation system. Approved photos are stored in Supabase Storage.
+
+1.6 Dream Analysis
+Dream texts are sent anonymously to Google Gemini AI for analysis. Submitted texts are not associated with your identity and are not permanently stored by the AI service.
+
+1.7 Contact Access
+Permission to access your device contacts may be requested for friend discovery. Contact data is used only for matching and is not stored on our servers.
+
+2. DATA USAGE
+
+Your data is used solely for:
+• Account management and authentication
+• Cloud synchronization (protecting your data across devices)
+• Social features (friendships, letter sending)
+• Dream analysis and personalized interpretations
+• In-app purchases (RevenueCat)
+• Advertisement display (Google AdMob)
+
+3. THIRD-PARTY SERVICES
+
+The App uses the following third-party services:
+• Supabase: Database, authentication, and file storage
+• Google Gemini AI: Dream analysis
+• Google AdMob: Advertisement display
+• RevenueCat: Subscription management
+• Google/Apple Sign-In: Authentication
+
+Each service provider is subject to its own privacy policy.
+
+4. DATA SECURITY
+
+• All data transmission is protected with HTTPS/TLS encryption.
+• Supabase database is protected with Row Level Security (RLS).
+• Each user can only access their own data.
+• Profile photos undergo content moderation.
+
+5. DATA RETENTION
+
+Your data is retained as long as your account is active. When you delete your account, all your data (profile, letters, friendships, cloud backups) is permanently deleted.
+
+6. USER RIGHTS
+
+You have the following rights:
+• Request access to your data
+• Request correction of your data
+• Delete your account and all data (Profile → Delete Account)
+• Change notification preferences
+
+7. CHILDREN'S PRIVACY
+
+Crack&Wish is not intended for users under 13. We do not knowingly collect data from children under 13.
+
+8. CHANGES
+
+This policy may be updated as needed. Important changes will be communicated via in-app notification.
+
+9. CONTACT
+
 For questions: info@crackandwish.com''',
     );
   }
@@ -1238,54 +1362,164 @@ For questions: info@crackandwish.com''',
   void _openTermsOfService() {
     final lang = Localizations.localeOf(context).languageCode;
     _showLegalSheet(
-      title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Service',
+      title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use',
       content: lang == 'tr'
           ? '''Crack&Wish Kullanım Koşulları
-Son güncelleme: Nisan 2026
+Son güncelleme: 23 Nisan 2026
 
-1. Kabul
-Uygulamayı kullanarak bu koşulları kabul etmiş olursunuz.
+Crack&Wish uygulamasını ("Uygulama") kullanarak aşağıdaki koşulları kabul etmiş olursunuz.
 
-2. Hizmet Tanımı
-Crack&Wish bir eğlence uygulamasıdır. Kurabiye falı, tarot okumaları ve rüya yorumları tamamen eğlence amaçlıdır ve profesyonel tavsiye niteliği taşımaz.
+1. HİZMET TANIMI
 
-3. Kullanıcı Sorumlulukları
-Uygulamayı yasal amaçlarla kullanmayı kabul edersiniz. İçerikleri ticari amaçla kopyalayamazsınız.
+Crack&Wish bir eğlence ve kişisel keşif uygulamasıdır. Kurabiye falları, tarot okumaları, rüya yorumları ve burç analizleri tamamen eğlence amaçlıdır ve profesyonel psikolojik, tıbbi veya finansal tavsiye niteliği taşımaz.
 
-4. Fikri Mülkiyet
-Uygulama içeriği, tasarımı ve kodu Crack&Wish'e aittir.
+2. HESAP VE GÜVENLİK
 
-5. Sorumluluk Sınırı
-Uygulama "olduğu gibi" sunulur. Fallar ve yorumlar eğlence amaçlıdır.
+• Uygulamayı kullanmak için Google veya Apple hesabıyla giriş yapmanız gerekir.
+• Hesap bilgilerinizin güvenliği sizin sorumluluğunuzdadır.
+• Her kullanıcı yalnızca bir hesap oluşturabilir.
+• Kullanıcı adınız (@handle) kayıt sonrası değiştirilemez.
 
-6. Değişiklikler
-Bu koşullar önceden bildirimde bulunmaksızın güncellenebilir.
+3. KULLANICI DAVRANIŞLARI
 
-7. İletişim
-info@crackandwish.com'''
-          : '''Crack&Wish Terms of Service
-Last updated: April 2026
+Aşağıdaki davranışlar kesinlikle yasaktır:
+• Spam, hakaret, taciz veya uygunsuz içerik gönderme
+• Başka kullanıcıları taklit etme
+• Uygunsuz profil fotoğrafı yükleme
+• Uygulamanın güvenlik sistemlerini atlatmaya çalışma
+• Bot veya otomatik araçlar kullanma
+• Uygulama içeriklerini izinsiz kopyalama veya dağıtma
 
-1. Acceptance
-By using the app, you accept these terms.
+İhlal durumunda hesabınız önceden uyarı yapılmaksızın askıya alınabilir veya kalıcı olarak silinebilir.
 
-2. Service Description
-Crack&Wish is an entertainment app. Fortune cookies, tarot readings, and dream interpretations are for entertainment only and do not constitute professional advice.
+4. SOSYAL ÖZELLİKLER
 
-3. User Responsibilities
-You agree to use the app for lawful purposes only. You may not copy content for commercial use.
+• Baykuş Postası (Owl Letter) ile gönderdiğiniz mektuplar yalnızca alıcı tarafından okunabilir.
+• Arkadaşlık bağlantıları karşılıklı onay gerektirir.
+• Gönderilen kurabiyeler envanterden düşer ve geri alınamaz.
+• Uygunsuz içerikli mektuplar sistem tarafından filtrelenebilir.
 
-4. Intellectual Property
-App content, design, and code belong to Crack&Wish.
+5. SATIN ALMALAR VE ABONELİKLER
 
-5. Limitation of Liability
-The app is provided "as is." Fortunes and readings are for entertainment purposes.
+• Crack&Wish Elite aboneliği aylık yenilenen bir abonelik hizmetidir.
+• Abonelikler Apple App Store veya Google Play Store üzerinden yönetilir.
+• İptal işlemi ilgili mağaza üzerinden yapılmalıdır.
+• Ruh taşları ve premium kurabiyeler sanal ürünlerdir ve gerçek para karşılığı iade edilemez.
+• Satın alımlar Apple/Google hesabınız üzerinden faturalandırılır.
 
-6. Changes
-These terms may be updated without prior notice.
+6. FİKRİ MÜLKİYET
 
-7. Contact
-info@crackandwish.com''',
+Uygulama içindeki tüm tasarımlar, görseller, metinler, animasyonlar ve kaynak kodu Crack&Wish'e aittir ve telif hakkı ile korunmaktadır. İzinsiz kullanım yasaktır.
+
+7. YAPAY ZEKA KULLANIMI
+
+• Rüya yorumları Google Gemini AI tarafından üretilir.
+• AI tarafından üretilen içerikler profesyonel tavsiye değildir.
+• AI yorumları her seferinde farklılık gösterebilir.
+• Crack&Wish, AI tarafından üretilen içeriklerin doğruluğunu garanti etmez.
+
+8. SORUMLULUK SINIRLAMALARI
+
+• Uygulama "olduğu gibi" sunulur, herhangi bir garanti verilmez.
+• Kurabiye falları, tarot okumaları ve rüya yorumları eğlence amaçlıdır.
+• Bu içeriklere dayanarak alınan kararlardan Crack&Wish sorumlu tutulamaz.
+• Uygulama kesintisiz veya hatasız çalışmayı garanti etmez.
+
+9. HESAP SONLANDIRMA
+
+• Hesabınızı istediğiniz zaman Profil → Hesabı Sil seçeneğiyle silebilirsiniz.
+• Hesap silme işlemi geri alınamaz ve tüm verileriniz kalıcı olarak kaldırılır.
+• Koşulları ihlal eden hesaplar önceden bildirim yapılmaksızın sonlandırılabilir.
+
+10. UYGULANACAK HUKUK
+
+Bu koşullar Türkiye Cumhuriyeti yasalarına tabidir. Uyuşmazlıklar İstanbul mahkemelerinde çözümlenir.
+
+11. DEĞİŞİKLİKLER
+
+Bu koşullar gerektiğinde güncellenebilir. Önemli değişikliklerde uygulama içi bildirim yapılır. Değişiklik sonrası uygulamayı kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.
+
+12. İLETİŞİM
+
+Sorularınız için: info@crackandwish.com'''
+          : '''Crack&Wish Terms of Use
+Last updated: April 23, 2026
+
+By using the Crack&Wish application ("App"), you agree to the following terms.
+
+1. SERVICE DESCRIPTION
+
+Crack&Wish is an entertainment and personal discovery application. Fortune cookies, tarot readings, dream interpretations, and zodiac analyses are purely for entertainment and do not constitute professional psychological, medical, or financial advice.
+
+2. ACCOUNT AND SECURITY
+
+• You must sign in with a Google or Apple account to use the App.
+• You are responsible for the security of your account credentials.
+• Each user may create only one account.
+• Your username (@handle) cannot be changed after registration.
+
+3. USER CONDUCT
+
+The following behaviors are strictly prohibited:
+• Sending spam, insults, harassment, or inappropriate content
+• Impersonating other users
+• Uploading inappropriate profile photos
+• Attempting to bypass the App's security systems
+• Using bots or automated tools
+• Copying or distributing App content without permission
+
+In case of violations, your account may be suspended or permanently deleted without prior notice.
+
+4. SOCIAL FEATURES
+
+• Letters sent via Owl Letter can only be read by the recipient.
+• Friend connections require mutual approval.
+• Sent cookies are deducted from inventory and cannot be retrieved.
+• Letters with inappropriate content may be filtered by the system.
+
+5. PURCHASES AND SUBSCRIPTIONS
+
+• Crack&Wish Elite subscription is a monthly auto-renewing subscription.
+• Subscriptions are managed through Apple App Store or Google Play Store.
+• Cancellation must be done through the respective store.
+• Soul stones and premium cookies are virtual products and are non-refundable.
+• Purchases are billed through your Apple/Google account.
+
+6. INTELLECTUAL PROPERTY
+
+All designs, images, texts, animations, and source code within the App are owned by Crack&Wish and protected by copyright. Unauthorized use is prohibited.
+
+7. ARTIFICIAL INTELLIGENCE USAGE
+
+• Dream interpretations are generated by Google Gemini AI.
+• AI-generated content is not professional advice.
+• AI interpretations may vary each time.
+• Crack&Wish does not guarantee the accuracy of AI-generated content.
+
+8. LIMITATION OF LIABILITY
+
+• The App is provided "as is" without any warranties.
+• Fortune cookies, tarot readings, and dream interpretations are for entertainment.
+• Crack&Wish cannot be held liable for decisions made based on this content.
+• The App does not guarantee uninterrupted or error-free operation.
+
+9. ACCOUNT TERMINATION
+
+• You may delete your account at any time via Profile → Delete Account.
+• Account deletion is irreversible and all your data is permanently removed.
+• Accounts violating these terms may be terminated without prior notice.
+
+10. GOVERNING LAW
+
+These terms are governed by the laws of the Republic of Turkey. Disputes shall be resolved in Istanbul courts.
+
+11. CHANGES
+
+These terms may be updated as needed. Important changes will be communicated via in-app notification. Continued use of the App after changes constitutes acceptance of the new terms.
+
+12. CONTACT
+
+For questions: info@crackandwish.com''',
     );
   }
 

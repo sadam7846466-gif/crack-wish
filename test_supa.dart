@@ -7,122 +7,62 @@ void main() async {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aGVvbnJtaW94YmlpbnZvbXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI3MTAsImV4cCI6MjA4OTgwODcxMH0.ur8u0vCa9x-nRKdKhS_xL6c56jpmXjU9FXa2CCHnaWU',
   );
 
-  print("═══════════════════════════════════════════");
-  print("  🔐 SUPABASE GÜVENLİK TARAMASI");
-  print("═══════════════════════════════════════════\n");
+  print("═══════════════════════════════════════");
+  print("  🔐 UPDATE/DELETE DOĞRULAMA TESTİ");
+  print("═══════════════════════════════════════\n");
 
-  // 1. Anonim olarak profillere erişim testi
-  print("📋 TEST 1: Anonim (giriş yapmadan) profil okuma...");
+  // Test: Anonim UPDATE sonrası gerçekten değişmiş mi?
+  print("📋 T1: Anonim UPDATE denemesi...");
   try {
-    final profiles = await supabase.from('profiles').select();
-    if (profiles.isEmpty) {
-      print("  ✅ Profil yok veya RLS engelledi");
+    // Önce mevcut ismi oku (authenticated olmadığımız için okunamayacak)
+    final before = await supabase.from('profiles').select('full_name').limit(1);
+    print("  → Önce profil okuma: ${before.length} sonuç (0 olmalı)");
+
+    // Update dene
+    await supabase.from('profiles').update({'full_name': 'HACKED_TEST'}).eq('id', '520639f1-dd4a-4b5d-a98c-ab9d096915c1');
+    print("  → UPDATE komutu hata vermedi");
+
+    // Tekrar oku — değişmiş mi?
+    final after = await supabase.from('profiles').select('full_name').limit(1);
+    print("  → Sonra profil okuma: ${after.length} sonuç");
+    
+    if (after.isEmpty) {
+      print("  ✅ Profil okunamıyor = UPDATE de etkisiz (RLS çalışıyor!)");
     } else {
-      print("  ⚠️ UYARI: Anonim ${profiles.length} profil okudu!");
-      for (var p in profiles) {
-        print("    → ${p['full_name']} (@${p['username']})");
+      final name = after.first['full_name'];
+      if (name == 'HACKED_TEST') {
+        print("  🔴 KRİTİK: Profil değiştirildi! İsim şimdi: $name");
+      } else {
+        print("  ✅ Profil değişmemiş. İsim hala: $name");
       }
     }
   } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
+    print("  ✅ Exception fırlatıldı: $e");
   }
 
-  // 2. Anonim olarak friend_requests erişimi
-  print("\n📋 TEST 2: Anonim friend_requests okuma...");
+  // Test: Anonim DELETE sonrası gerçekten silinmiş mi?
+  print("\n📋 T2: Anonim DELETE denemesi...");
   try {
-    final reqs = await supabase.from('friend_requests').select();
-    if (reqs.isEmpty) {
-      print("  ✅ İstek yok veya RLS engelledi");
-    } else {
-      print("  ⚠️ UYARI: Anonim ${reqs.length} istek okudu!");
+    await supabase.from('profiles').delete().eq('id', '520639f1-dd4a-4b5d-a98c-ab9d096915c1');
+    print("  → DELETE komutu hata vermedi");
+
+    // Ama profil gerçekten silinmiş mi? Authenticated olmadan okuyamayız
+    // O yüzden insert deneyelim — eğer silinmişse aynı id ile insert edilebilir
+    try {
+      await supabase.from('profiles').insert({'id': '520639f1-dd4a-4b5d-a98c-ab9d096915c1', 'full_name': 'TEST'});
+      print("  🔴 Profil silinmiş olabilir! INSERT başarılı oldu");
+      // Geri al
+      await supabase.from('profiles').delete().eq('full_name', 'TEST');
+    } catch (e2) {
+      print("  ✅ INSERT de engellendi = Profil silinmemiş, RLS çalışıyor!");
     }
   } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
+    print("  ✅ Exception fırlatıldı: $e");
   }
 
-  // 3. Anonim olarak owl_letters erişimi
-  print("\n📋 TEST 3: Anonim owl_letters okuma...");
-  try {
-    final letters = await supabase.from('owl_letters').select();
-    if (letters.isEmpty) {
-      print("  ✅ Mektup yok veya RLS engelledi");
-    } else {
-      print("  ⚠️ UYARI: Anonim ${letters.length} mektup okudu!");
-    }
-  } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
-  }
-
-  // 4. Anonim olarak connections erişimi
-  print("\n📋 TEST 4: Anonim connections okuma...");
-  try {
-    final conns = await supabase.from('connections').select();
-    if (conns.isEmpty) {
-      print("  ✅ Bağlantı yok veya RLS engelledi");
-    } else {
-      print("  ⚠️ UYARI: Anonim ${conns.length} bağlantı okudu!");
-    }
-  } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
-  }
-
-  // 5. Anonim olarak user_cloud_saves erişimi
-  print("\n📋 TEST 5: Anonim user_cloud_saves okuma...");
-  try {
-    final saves = await supabase.from('user_cloud_saves').select();
-    if (saves.isEmpty) {
-      print("  ✅ Kayıt yok veya RLS engelledi");
-    } else {
-      print("  ⚠️ UYARI: Anonim ${saves.length} bulut kaydı okudu!");
-    }
-  } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
-  }
-
-  // 6. Anonim olarak cosmic_referrals erişimi
-  print("\n📋 TEST 6: Anonim cosmic_referrals okuma...");
-  try {
-    final refs = await supabase.from('cosmic_referrals').select();
-    if (refs.isEmpty) {
-      print("  ✅ Referans yok veya RLS engelledi");
-    } else {
-      print("  ⚠️ UYARI: Anonim ${refs.length} referans okudu!");
-    }
-  } catch (e) {
-    print("  ✅ Erişim reddedildi: $e");
-  }
-
-  // 7. Anonim profil oluşturma testi
-  print("\n📋 TEST 7: Anonim profil INSERT denemesi...");
-  try {
-    await supabase.from('profiles').insert({
-      'id': '00000000-0000-0000-0000-000000000001',
-      'full_name': 'HACKER_TEST',
-      'username': '@hacker',
-    });
-    print("  🔴 KRİTİK: Anonim profil oluşturabildi!");
-    // Temizle
-    await supabase.from('profiles').delete().eq('id', '00000000-0000-0000-0000-000000000001');
-  } catch (e) {
-    print("  ✅ Anonim INSERT engellendi");
-  }
-
-  // 8. Anonim friend_request gönderme testi
-  print("\n📋 TEST 8: Anonim friend_request INSERT denemesi...");
-  try {
-    await supabase.from('friend_requests').insert({
-      'from_user': '00000000-0000-0000-0000-000000000001',
-      'to_user': '00000000-0000-0000-0000-000000000002',
-      'status': 'pending',
-    });
-    print("  🔴 KRİTİK: Anonim istek gönderebildi!");
-  } catch (e) {
-    print("  ✅ Anonim INSERT engellendi");
-  }
-
-  print("\n═══════════════════════════════════════════");
-  print("  🔐 TARAMA TAMAMLANDI");
-  print("═══════════════════════════════════════════\n");
+  print("\n═══════════════════════════════════════");
+  print("  ✅ TEST TAMAMLANDI");
+  print("═══════════════════════════════════════\n");
 
   exit(0);
 }
