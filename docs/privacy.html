@@ -180,5 +180,17 @@ b {color: rgba(255,255,255,0.9); font-weight: 400;}
 
 <div class="footer">© 2026 Crack&Wish. All rights reserved.</div>
 </div>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash === '#en') {
+      document.getElementById('tr').style.display = 'none';
+      document.getElementById('en').style.display = 'block';
+    } else if (hash === '#tr') {
+      document.getElementById('en').style.display = 'none';
+      document.getElementById('tr').style.display = 'block';
+    }
+  });
+</script>
 </body>
 </html>
