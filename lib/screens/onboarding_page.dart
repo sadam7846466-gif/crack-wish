@@ -268,6 +268,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
            if(profile['zodiac_sign'] != null) {
              await StorageService.setZodiacSign(profile['zodiac_sign'].toString());
            }
+           
+           // Giriş yapıldığında Buluttaki bakiyeyi cihaz hafızasına indir!
+           await StorageService.fetchEconomyFromCloud();
+           
            if (!mounted) return;
            _transitionToHome();
            return;
@@ -504,13 +508,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (syncResult == true) {
         await ReferralService.processPendingReferrals(currentUser.id);
         
-        // Hoş Geldin Bonusu (İlk kez kayıt olanlara 10 Ruh Taşı)
+        // Hoş Geldin Bonusu (İlk kez kayıt olanlara 3 Ruh Taşı)
         final prefs = await SharedPreferences.getInstance();
         if (!(prefs.getBool('welcome_bonus_claimed') ?? false)) {
           final currentStones = await StorageService.getSoulStones();
-          await StorageService.updateSoulStones(currentStones + 10);
+          await StorageService.updateSoulStones(currentStones + 3);
           await prefs.setBool('welcome_bonus_claimed', true);
-          debugPrint('🎁 Hoş Geldin Bonusu verildi: +10 Ruh Taşı');
+          await prefs.setBool('needs_welcome_dialog', true); // Ana sayfada kutlama göstermek için bayrak
+          debugPrint('🎁 Hoş Geldin Bonusu verildi: +3 Ruh Taşı');
         }
       }
     } else {

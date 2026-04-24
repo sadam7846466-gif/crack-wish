@@ -37,6 +37,8 @@ import '../services/supabase_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
 import '../services/sound_service.dart';
+import '../widgets/cosmic_reward_dialog.dart';
+import '../widgets/cosmic_toast.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -69,6 +71,7 @@ class ProfilePageState extends State<ProfilePage> {
   int _bonusAura = 0; // Günlük takvimden ve hedeflerden gelen ekstra Aura
   bool _isLoading = true;
   bool _isPremiumUser = false;
+  int _testAchievementIndex = 0; // Test için başarım sayacı
 
   @override
   void initState() {
@@ -1970,6 +1973,89 @@ For questions: info@crackandwish.com''',
 
                         const SizedBox(height: 24),
 
+                        // ── TEST ÖDÜLLER (GEÇİCİ) ──
+                        _SectionLabel('Test Ödüller (Geçici)'),
+                        const SizedBox(height: 10),
+                        _SettingsListGroup(
+                          children: [
+                            _SettingsListTile(
+                              icon: Icons.card_giftcard,
+                              iconColor: Colors.purpleAccent,
+                              label: 'Test: Hoş Geldin Ödülü',
+                              onTap: () async {
+                                await CosmicRewardDialog.show(
+                                  context: context,
+                                  title: "Evrene Hoş Geldin",
+                                  description: "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.\n\n+3 Ruh Taşı",
+                                  icon: "🎁",
+                                );
+                              },
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.person_add_alt_1,
+                              iconColor: Colors.blueAccent,
+                              label: 'Test: Arkadaş Daveti (Sen davet ettin)',
+                              onTap: () async {
+                                await CosmicRewardDialog.show(
+                                  context: context,
+                                  title: "Çağrın Duyuldu!",
+                                  description: "1 arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.\n\n+25 Aura\n+2 Ruh Taşı",
+                                  icon: "🦉",
+                                  glowColor: const Color(0xFF38BDF8),
+                                );
+                              },
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.mail,
+                              iconColor: Colors.pinkAccent,
+                              label: 'Test: Arkadaş Daveti (Sen davet edildin)',
+                              onTap: () async {
+                                await CosmicRewardDialog.show(
+                                  context: context,
+                                  title: "Beklenmedik Bir Hediye",
+                                  description: "Sadam seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.\n\n+50 Aura\n+2 Ruh Taşı",
+                                  icon: "💌",
+                                  glowColor: const Color(0xFFC36E6E),
+                                );
+                              },
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.emoji_events,
+                              iconColor: Colors.greenAccent,
+                              label: 'Test: Başarım Tasarımı',
+                              onTap: () async {
+                                final achievement = StorageService.achievementDefinitions[_testAchievementIndex];
+                                final title = achievement['title'] as String;
+                                final desc = achievement['desc'] as String;
+                                final aura = achievement['aura'] as int;
+                                final stones = achievement['stones'] as int;
+                                final rewardText = stones > 0 ? '+$stones Ruh Taşı' : '+$aura Aura';
+                                final iconData = achievement['iconData'] as IconData;
+                                final color = achievement['color'] as Color;
+                                final imagePath = achievement['imagePath'] as String?;
+
+                                CosmicToast.show(
+                                  context: context,
+                                  title: title,
+                                  message: desc,
+                                  reward: rewardText,
+                                  icon: iconData,
+                                  imagePath: imagePath,
+                                  iconColor: color,
+                                  rewardColor: color,
+                                );
+
+                                // Bir sonraki başarıma geç, liste sonuna gelince başa dön
+                                setState(() {
+                                  _testAchievementIndex = (_testAchievementIndex + 1) % StorageService.achievementDefinitions.length;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
                         // ── BÖLÜM 2: DESTEK & DENEYİM ──
                         _SectionLabel(lang == 'tr' ? 'Destek & Deneyim' : 'Support & Experience'),
                         const SizedBox(height: 10),
@@ -2576,7 +2662,7 @@ class _BentoHeroCard extends StatelessWidget {
               });
             }
             final int baseAvailable = (modalAuraTotal - modalSpentAura).clamp(0, 999999);
-            final int availableAura = baseAvailable + collectedBonus;
+            final int availableAura = baseAvailable; // collectedBonus zaten modalAuraTotal içine eklendiği için tekrar eklenmemeli
             final bool canConvert = availableAura >= conversionCost;
 
             return GestureDetector(

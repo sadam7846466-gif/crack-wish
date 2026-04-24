@@ -64,11 +64,15 @@ class ReferralService {
         'invitee_id': newUserId,
       });
 
-      // 3. Davet ile geldiği için Gamze'ye anında ödül ver! (+50 Aura, +2 Ruh Taşı)
+      // 3. Davet ile geldiği için anında ödül ver! (+50 Aura, +2 Ruh Taşı)
       await StorageService.updateSoulStones(2);
       await StorageService.addBonusAura(50);
       
-      debugPrint("Davet ödülleri (Gamze) hesabına yüklendi!");
+      // Ana sayfada "Arkadaşından sana bir hediye!" kutlamasını göstermek için bayrak
+      await prefs.setBool('needs_referral_receiver_dialog', true);
+      await prefs.setString('referral_inviter_name', referralCode);
+      
+      debugPrint("Davet ödülleri hesaba yüklendi!");
 
       // 4. Eklendiği için artık Pending kodunu sil
       await prefs.remove('pending_referral_code');
@@ -109,6 +113,12 @@ class ReferralService {
         await StorageService.updateSoulStones(rewardedStones);
         await StorageService.addBonusAura(25 * referralCount); // Her davet için +25 Aura
         await StorageService.incrementStat('total_referrals_count', referralCount); // Achievement için
+        
+        // Ana sayfada "Arkadaşın davetini kabul etti" kutlamasını göstermek için
+        final prefs = await SharedPreferences.getInstance();
+        final currentCount = prefs.getInt('needs_inviter_reward_dialog_count') ?? 0;
+        await prefs.setInt('needs_inviter_reward_dialog_count', currentCount + referralCount);
+        
         debugPrint("Davet ettiğin $referralCount kişi: +$rewardedStones Ruh Taşı, +${25 * referralCount} Aura!");
       }
     } catch (e) {

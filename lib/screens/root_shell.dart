@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/push_notification_service.dart';
 import '../services/storage_service.dart';
+import '../widgets/cosmic_reward_dialog.dart';
+import '../widgets/cosmic_toast.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
 
@@ -36,6 +39,67 @@ class _RootShellState extends State<RootShell> {
     
     // Başarım kontrolü — yeni kazanılan varsa bildir
     _checkAchievements();
+    
+    // Büyük ödül modal'larını (Hoşgeldin, Referans vb.) kontrol et
+    _checkPendingRewardDialogs();
+    
+    // Cihazdaki güncel Aura ve Ruh Taşını anında veritabanına yansıt (Senkronize et)
+    StorageService.syncEconomyToCloud();
+  }
+
+  Future<void> _checkPendingRewardDialogs() async {
+    await Future.delayed(const Duration(seconds: 1)); // Sayfa yüklenmesi için bekle
+    if (!mounted) return;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    // 1. Hoş Geldin Bonusu Dialogu
+    if (prefs.getBool('needs_welcome_dialog') == true) {
+      if (!mounted) return;
+      await prefs.remove('needs_welcome_dialog');
+      await CosmicRewardDialog.show(
+        context: context,
+        title: "Evrene Hoş Geldin",
+        description: "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.\n\n+3 Ruh Taşı",
+        icon: "🎁",
+      );
+      await Future.delayed(const Duration(milliseconds: 500)); // Dialog kapanmasını bekle
+    }
+
+    // 2. Davet ile Gelen Kişiye Verilen Ödül Dialogu
+    if (prefs.getBool('needs_referral_receiver_dialog') == true) {
+      if (!mounted) return;
+      final inviter = prefs.getString('referral_inviter_name') ?? 'Bir arkadaşın';
+      await prefs.remove('needs_referral_receiver_dialog');
+      await prefs.remove('referral_inviter_name');
+      
+      await CosmicRewardDialog.show(
+        context: context,
+        title: "Beklenmedik Bir Hediye",
+        description: "$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.\n\n+50 Aura\n+2 Ruh Taşı",
+        icon: "💌",
+        glowColor: const Color(0xFFC36E6E), // Kırmızımsı/pembe
+      );
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    // 3. Davet Eden Kişiye (Arkadaşı Geldiği İçin) Verilen Ödül Dialogu
+    final inviterRewardCount = prefs.getInt('needs_inviter_reward_dialog_count') ?? 0;
+    if (inviterRewardCount > 0) {
+      if (!mounted) return;
+      await prefs.remove('needs_inviter_reward_dialog_count');
+      
+      final totalAura = inviterRewardCount * 25;
+      final totalStones = inviterRewardCount * 2;
+      
+      await CosmicRewardDialog.show(
+        context: context,
+        title: "Çağrın Duyuldu!",
+        description: "$inviterRewardCount arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.\n\n+$totalAura Aura\n+$totalStones Ruh Taşı",
+        icon: "🦉",
+        glowColor: const Color(0xFF38BDF8), // Mavi
+      );
+    }
   }
 
   Future<void> _checkAchievements() async {
@@ -49,39 +113,38 @@ class _RootShellState extends State<RootShell> {
       final stones = achievement['stones'] as int;
       final aura = achievement['aura'] as int;
       final rewardText = stones > 0 ? '+$stones Ruh Taşı' : '+$aura Aura';
+      final iconData = achievement['iconData'] as IconData;
+      final color = achievement['color'] as Color;
+      final imagePath = achievement['imagePath'] as String?;
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Text(achievement['icon'] as String, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '🏆 ${achievement['title']}',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    Text(
-                      '${achievement['desc']} — $rewardText',
-                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: const Color(0xFF1A1A2E),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          duration: const Duration(seconds: 4),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        ),
+      CosmicToast.show(
+        context: context,
+        title: achievement['title'] as String,
+        message: achievement['desc'] as String,
+        reward: rewardText,
+        icon: iconData,
+        imagePath: imagePath,
+        iconColor: color,
+        rewardColor: color,
       );
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 4));
+    }
+
+    // Unvan (Rank) yükselmesi kontrolü
+    if (!mounted) return;
+    final newRank = await StorageService.checkAndClaimRankUp();
+    if (newRank != null && mounted) {
+      HapticFeedback.heavyImpact();
+      CosmicToast.show(
+        context: context,
+        title: 'Kozmik Terfi!',
+        message: 'Aura gücün arttı. Yeni unvanın: $newRank',
+        reward: 'Yeni Rütbe',
+        icon: Icons.workspace_premium_rounded,
+        iconColor: const Color(0xFFFFD700), // Altın sarısı
+        rewardColor: const Color(0xFFFFD700),
+      );
+      await Future.delayed(const Duration(seconds: 4));
     }
   }
 

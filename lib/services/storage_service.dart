@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'analytics_service.dart';
+import 'profile_sync_service.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
@@ -146,6 +148,51 @@ class StorageService {
     // Toplam = yeni kazanılmış + mevcut günlük
     final daily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
     soulStonesNotifier.value = newValue + daily;
+    
+    // Değişikliği Buluta Yedekle
+    await syncEconomyToCloud();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CLOUD ECONOMY SYNC
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Mevcut Aura ve Ruh Taşı değerlerini alıp Supabase'e yedekler
+  static Future<void> syncEconomyToCloud() async {
+    final prefs = await SharedPreferences.getInstance();
+    final aura = prefs.getInt('daily_bonus_aura') ?? 0;
+    final stones = prefs.getInt(_keySoulStones) ?? 0;
+    await ProfileSyncService().syncEconomyData(aura, stones);
+  }
+
+  /// Buluttan (Supabase) mevcut değerleri indirip cihaz hafızasına yazar
+  static Future<void> fetchEconomyFromCloud() async {
+    final data = await ProfileSyncService().fetchEconomyData();
+    if (data != null) {
+      final prefs = await SharedPreferences.getInstance();
+      
+      final cloudAura = data['aura']!;
+      final cloudStones = data['stones']!;
+      final localAura = prefs.getInt('daily_bonus_aura') ?? 0;
+      final localStones = prefs.getInt(_keySoulStones) ?? 0;
+      
+      // Eğer bulut 0 ise ve cihazda puan varsa, SIFIRLAMAK YERİNE bulutu GÜNCELLE (Eski kullanıcılar için)
+      if (cloudAura == 0 && cloudStones == 0 && (localAura > 0 || localStones > 0)) {
+        debugPrint('☁️ Bulut boş ama cihaz dolu. Bulut güncelleniyor...');
+        await syncEconomyToCloud();
+        return;
+      }
+      
+      // Cihazı bulutla eşitle
+      await prefs.setInt('daily_bonus_aura', cloudAura);
+      await prefs.setInt(_keySoulStones, cloudStones);
+      
+      // UI için notifier'ı güncelle
+      final daily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
+      soulStonesNotifier.value = cloudStones + daily;
+      
+      debugPrint('📥 Ekonomi başarıyla buluttan indirildi: $cloudAura Aura, $cloudStones Taş');
+    }
   }
 
   /// Ruh Taşı harca: Önce günlükten, sonra kazanılmıştan düşer
@@ -176,6 +223,8 @@ class StorageService {
     // Notifier güncelle
     final newTotal = (total - amount);
     soulStonesNotifier.value = newTotal;
+    
+    await syncEconomyToCloud();
     return true;
   }
 
@@ -704,6 +753,8 @@ class StorageService {
     // Günü claimed olarak işaretle
     claimed.add(dateKey);
     await prefs.setStringList(_keyClaimedAuraDays, claimed);
+    
+    await syncEconomyToCloud();
     return true;
   }
 
@@ -719,6 +770,7 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = prefs.getInt('daily_bonus_aura') ?? 0;
     await prefs.setInt('daily_bonus_aura', current + amount);
+    await syncEconomyToCloud();
   }
 
   // ── PENDING AURA (Bekleyen/Toplanmayı Bekleyen Aura) ──
@@ -840,16 +892,16 @@ class StorageService {
 
   /// Tüm başarım tanımları
   static const List<Map<String, dynamic>> achievementDefinitions = [
-    {'id': 'first_cookie', 'title': 'İlk Adım', 'desc': 'İlk kurabiyeni kır', 'icon': '🥚', 'aura': 5, 'stones': 0, 'checkKey': 'total_cookies', 'threshold': 1},
-    {'id': 'first_tarot', 'title': 'Falcı Çırağı', 'desc': 'İlk tarot falını bak', 'icon': '🔮', 'aura': 5, 'stones': 0, 'checkKey': 'total_tarots', 'threshold': 1},
-    {'id': 'first_dream', 'title': 'Rüya Avcısı', 'desc': 'İlk rüya analizini yap', 'icon': '💭', 'aura': 5, 'stones': 0, 'checkKey': 'total_dreams', 'threshold': 1},
-    {'id': 'first_friend', 'title': 'Sosyal Kelebek', 'desc': 'İlk arkadaşını ekle', 'icon': '💌', 'aura': 10, 'stones': 0, 'checkKey': 'total_friends', 'threshold': 1},
-    {'id': 'cookie_master', 'title': 'Kurabiye Ustası', 'desc': '50 kurabiye kır', 'icon': '🍪', 'aura': 0, 'stones': 1, 'checkKey': 'total_cookies', 'threshold': 50},
-    {'id': 'wise_fortune', 'title': 'Bilge Kahin', 'desc': '30 tarot falı bak', 'icon': '🔮', 'aura': 0, 'stones': 1, 'checkKey': 'total_tarots', 'threshold': 30},
-    {'id': 'dream_collector', 'title': 'Rüya Koleksiyoncusu', 'desc': '20 rüya analizi yap', 'icon': '💭', 'aura': 0, 'stones': 1, 'checkKey': 'total_dreams', 'threshold': 20},
-    {'id': 'letter_addict', 'title': 'Mektup Bağımlısı', 'desc': '10 mektup gönder', 'icon': '🦉', 'aura': 0, 'stones': 1, 'checkKey': 'total_letters_sent', 'threshold': 10},
-    {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet et', 'icon': '👥', 'aura': 0, 'stones': 3, 'checkKey': 'total_referrals', 'threshold': 5},
-    {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topla', 'icon': '⭐', 'aura': 0, 'stones': 2, 'checkKey': 'unique_cookies', 'threshold': 10},
+    {'id': 'first_cookie', 'title': 'İlk Adım', 'desc': 'İlk kurabiyeni kırdın', 'icon': '🥚', 'iconData': Icons.cookie_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFDE047), 'aura': 5, 'stones': 0, 'checkKey': 'total_cookies', 'threshold': 1},
+    {'id': 'first_tarot', 'title': 'Falcı Çırağı', 'desc': 'İlk tarot falına baktın', 'icon': '🔮', 'iconData': Icons.auto_awesome_rounded, 'color': Color(0xFFC084FC), 'aura': 5, 'stones': 0, 'checkKey': 'total_tarots', 'threshold': 1},
+    {'id': 'first_dream', 'title': 'Rüya Avcısı', 'desc': 'İlk rüya analizini yaptın', 'icon': '💭', 'iconData': Icons.nights_stay_rounded, 'color': Color(0xFF60A5FA), 'aura': 5, 'stones': 0, 'checkKey': 'total_dreams', 'threshold': 1},
+    {'id': 'first_friend', 'title': 'Sosyal Kelebek', 'desc': 'İlk arkadaşını ekledin', 'icon': '💌', 'iconData': Icons.people_alt_rounded, 'color': Color(0xFFF472B6), 'aura': 10, 'stones': 0, 'checkKey': 'total_friends', 'threshold': 1},
+    {'id': 'cookie_master', 'title': 'Kurabiye Ustası', 'desc': '50 kurabiye kırdın', 'icon': '🍪', 'iconData': Icons.cookie_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFBBF24), 'aura': 0, 'stones': 1, 'checkKey': 'total_cookies', 'threshold': 50},
+    {'id': 'wise_fortune', 'title': 'Bilge Kahin', 'desc': '30 tarot falı baktın', 'icon': '🔮', 'iconData': Icons.remove_red_eye_rounded, 'color': Color(0xFFA855F7), 'aura': 0, 'stones': 1, 'checkKey': 'total_tarots', 'threshold': 30},
+    {'id': 'dream_collector', 'title': 'Rüya Koleksiyoncusu', 'desc': '20 rüya analizi yaptın', 'icon': '💭', 'iconData': Icons.bedtime_rounded, 'color': Color(0xFF3B82F6), 'aura': 0, 'stones': 1, 'checkKey': 'total_dreams', 'threshold': 20},
+    {'id': 'letter_addict', 'title': 'Mektup Bağımlısı', 'desc': '10 mektup gönderdin', 'icon': '🦉', 'iconData': Icons.mail_rounded, 'color': Color(0xFF34D399), 'aura': 0, 'stones': 1, 'checkKey': 'total_letters_sent', 'threshold': 10},
+    {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet ettin', 'icon': '👥', 'iconData': Icons.groups_rounded, 'color': Color(0xFFFB923C), 'aura': 0, 'stones': 3, 'checkKey': 'total_referrals', 'threshold': 5},
+    {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': '⭐', 'iconData': Icons.stars_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFFD700), 'aura': 0, 'stones': 2, 'checkKey': 'unique_cookies', 'threshold': 10},
   ];
 
   /// Kazanılmış başarımları döndür
@@ -924,6 +976,25 @@ class StorageService {
     if (totalAura >= 151) return 'Kahin';
     if (totalAura >= 51) return 'Çırak Kahin';
     return 'Acemi Kahin';
+  }
+
+  /// Yeni bir unvan kazanılıp kazanılmadığını kontrol eder ve varsa döndürür
+  static Future<String?> checkAndClaimRankUp() async {
+    final prefs = await SharedPreferences.getInstance();
+    final totalAura = await getDailyBonusAura();
+    final currentRank = getUserTitle(totalAura);
+    final lastSeenRank = prefs.getString('last_seen_rank') ?? 'Acemi Kahin';
+
+    // Eğer son görülen rank ile şu anki rank farklıysa ve Aura puanı artıyorsa (rank düşmesi durumu olmaması için)
+    // Aslında unvanlar sadece artar, düşmez.
+    if (currentRank != lastSeenRank) {
+      // Sadece terfi durumunda kutlama yap (başlangıçta Acemi Kahin'den Acemi Kahin'e geçişi sayma)
+      await prefs.setString('last_seen_rank', currentRank);
+      if (lastSeenRank != 'Acemi Kahin' || currentRank != 'Acemi Kahin') {
+        return currentRank;
+      }
+    }
+    return null;
   }
 
   /// Bir sonraki unvana kaç aura kaldığını döndür

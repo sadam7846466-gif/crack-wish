@@ -111,4 +111,45 @@ class ProfileSyncService {
       return e.toString();
     }
   }
+
+  /// Kullanıcının hesap bakiyesini (Aura ve Ruh Taşı) Supabase'e canlı yedekler
+  Future<void> syncEconomyData(int aura, int soulStones) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+
+      await _supabase.from('profiles').update({
+        'aura_points': aura,
+        'soul_stones': soulStones,
+      }).eq('id', user.id);
+      
+      debugPrint('☁️ Ekonomi Buluta Yedeklendi: $aura Aura, $soulStones Ruh Taşı');
+    } catch (e) {
+      debugPrint('☁️ Ekonomi Buluta Yedeklenirken Hata: $e');
+    }
+  }
+
+  /// Başka cihaza geçildiğinde veya silinip yüklendiğinde eski bakiyeyi buluttan çeker
+  Future<Map<String, int>?> fetchEconomyData() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return null;
+
+      final data = await _supabase
+          .from('profiles')
+          .select('aura_points, soul_stones')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data != null) {
+        return {
+          'aura': (data['aura_points'] ?? 0) as int,
+          'stones': (data['soul_stones'] ?? 0) as int,
+        };
+      }
+    } catch (e) {
+      debugPrint('☁️ Ekonomi Buluttan Çekilirken Hata: $e');
+    }
+    return null;
+  }
 }
