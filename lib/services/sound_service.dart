@@ -103,6 +103,32 @@ class SoundService {
     }
   }
 
+  /// Alttan çıkan CosmicToast (Başarımlar vb.) süzüldüğünde
+  Future<void> playCosmicToast() async {
+    if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+      Vibration.vibrate(duration: 40, amplitude: 80); // Hafif ve nazik bir titreşim
+    } else {
+      Vibration.vibrate(duration: 40);
+    }
+
+    if (_isSoundEnabled) {
+      await _player.play(AssetSource('sounds/auraodulleri.mp3'), volume: 0.8);
+    }
+  }
+
+  /// Ekranın ortasında açılan büyük ödül panelleri (CosmicRewardDialog) için
+  Future<void> playPanelReward() async {
+    if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+      Vibration.vibrate(pattern: [0, 50, 100, 50], intensities: [0, 128, 0, 255]);
+    } else {
+      Vibration.vibrate(duration: 100);
+    }
+
+    if (_isSoundEnabled) {
+      await _player.play(AssetSource('sounds/panelhediyelr.mp3'), volume: 0.9);
+    }
+  }
+
   // ── STANDART UI TIKLAMALARI (SADECE TİTREŞİM) ──
 
   /// Standart buton geçişleri (Ses yok, sadece lüks dokunma hissi)

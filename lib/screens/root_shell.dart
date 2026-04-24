@@ -60,8 +60,9 @@ class _RootShellState extends State<RootShell> {
       await CosmicRewardDialog.show(
         context: context,
         title: "Evrene Hoş Geldin",
-        description: "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.\n\n+3 Ruh Taşı",
-        icon: "🎁",
+        description: "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.",
+        icon: Icons.card_giftcard,
+        stoneReward: 3,
       );
       await Future.delayed(const Duration(milliseconds: 500)); // Dialog kapanmasını bekle
     }
@@ -76,9 +77,11 @@ class _RootShellState extends State<RootShell> {
       await CosmicRewardDialog.show(
         context: context,
         title: "Beklenmedik Bir Hediye",
-        description: "$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.\n\n+50 Aura\n+2 Ruh Taşı",
-        icon: "💌",
+        description: "$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.",
+        icon: Icons.mail_outline,
         glowColor: const Color(0xFFC36E6E), // Kırmızımsı/pembe
+        auraReward: 50,
+        stoneReward: 2,
       );
       await Future.delayed(const Duration(milliseconds: 500));
     }
@@ -87,17 +90,33 @@ class _RootShellState extends State<RootShell> {
     final inviterRewardCount = prefs.getInt('needs_inviter_reward_dialog_count') ?? 0;
     if (inviterRewardCount > 0) {
       if (!mounted) return;
+      final newNames = prefs.getStringList('needs_inviter_reward_dialog_names') ?? [];
+      
       await prefs.remove('needs_inviter_reward_dialog_count');
+      await prefs.remove('needs_inviter_reward_dialog_names');
       
       final totalAura = inviterRewardCount * 25;
       final totalStones = inviterRewardCount * 2;
       
+      String descText;
+      if (newNames.isNotEmpty) {
+        if (inviterRewardCount == 1) {
+          descText = "${newNames.first} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+        } else {
+          descText = "${newNames.first} ve ${inviterRewardCount - 1} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+        }
+      } else {
+        descText = "$inviterRewardCount arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+      }
+      
       await CosmicRewardDialog.show(
         context: context,
         title: "Çağrın Duyuldu!",
-        description: "$inviterRewardCount arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.\n\n+$totalAura Aura\n+$totalStones Ruh Taşı",
-        icon: "🦉",
+        description: descText,
+        icon: Icons.person_add_alt_1,
         glowColor: const Color(0xFF38BDF8), // Mavi
+        auraReward: totalAura,
+        stoneReward: totalStones,
       );
     }
   }

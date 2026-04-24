@@ -98,10 +98,28 @@ class ReferralService {
 
       int rewardedStones = 0;
       int referralCount = 0;
+      List<String> newNames = [];
 
       for (var row in response) {
         rewardedStones += 2;
         referralCount++;
+
+        // Davet edilen kişinin adını profilinden çek
+        final inviteeId = row['invitee_id'];
+        if (inviteeId != null) {
+          final profileRes = await Supabase.instance.client
+              .from('profiles')
+              .select('full_name')
+              .eq('id', inviteeId)
+              .maybeSingle();
+          if (profileRes != null && profileRes['full_name'] != null) {
+            final name = profileRes['full_name'].toString().split(' ').first; // Sadece ilk adını al
+            if (name.isNotEmpty) {
+              newNames.add(name);
+            }
+          }
+        }
+
         // Satırı alındı olarak işaretle
         await Supabase.instance.client
             .from('cosmic_referrals')
@@ -118,6 +136,13 @@ class ReferralService {
         final prefs = await SharedPreferences.getInstance();
         final currentCount = prefs.getInt('needs_inviter_reward_dialog_count') ?? 0;
         await prefs.setInt('needs_inviter_reward_dialog_count', currentCount + referralCount);
+        
+        // Yeni katılanların isimlerini de listeye ekle
+        if (newNames.isNotEmpty) {
+          final currentNames = prefs.getStringList('needs_inviter_reward_dialog_names') ?? [];
+          currentNames.addAll(newNames);
+          await prefs.setStringList('needs_inviter_reward_dialog_names', currentNames);
+        }
         
         debugPrint("Davet ettiğin $referralCount kişi: +$rewardedStones Ruh Taşı, +${25 * referralCount} Aura!");
       }

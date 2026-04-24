@@ -901,7 +901,7 @@ class StorageService {
     {'id': 'dream_collector', 'title': 'Rüya Koleksiyoncusu', 'desc': '20 rüya analizi yaptın', 'icon': '💭', 'iconData': Icons.bedtime_rounded, 'color': Color(0xFF3B82F6), 'aura': 0, 'stones': 1, 'checkKey': 'total_dreams', 'threshold': 20},
     {'id': 'letter_addict', 'title': 'Mektup Bağımlısı', 'desc': '10 mektup gönderdin', 'icon': '🦉', 'iconData': Icons.mail_rounded, 'color': Color(0xFF34D399), 'aura': 0, 'stones': 1, 'checkKey': 'total_letters_sent', 'threshold': 10},
     {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet ettin', 'icon': '👥', 'iconData': Icons.groups_rounded, 'color': Color(0xFFFB923C), 'aura': 0, 'stones': 3, 'checkKey': 'total_referrals', 'threshold': 5},
-    {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': '⭐', 'iconData': Icons.stars_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFFD700), 'aura': 0, 'stones': 2, 'checkKey': 'unique_cookies', 'threshold': 10},
+    {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': '⭐', 'iconData': Icons.stars_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFFD700), 'aura': 0, 'stones': 1, 'checkKey': 'unique_cookies', 'threshold': 10},
   ];
 
   /// Kazanılmış başarımları döndür

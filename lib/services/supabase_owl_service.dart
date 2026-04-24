@@ -12,7 +12,23 @@ import 'sound_service.dart';
 class SupabaseOwlService {
   static final SupabaseOwlService _instance = SupabaseOwlService._();
   factory SupabaseOwlService() => _instance;
-  SupabaseOwlService._();
+  SupabaseOwlService._() {
+    _db.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.initialSession) {
+        initialize();
+      } else if (event == AuthChangeEvent.signedOut) {
+        _friends.clear();
+        _inbox.clear();
+        _sent.clear();
+        _incomingRequests.clear();
+        _outgoingRequests.clear();
+        _currentUser = null;
+        _initialized = false;
+        _notify();
+      }
+    });
+  }
 
   final _db = Supabase.instance.client;
 

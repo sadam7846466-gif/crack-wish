@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../services/sound_service.dart';
 
 class CosmicToast {
   static void show({
@@ -13,6 +14,9 @@ class CosmicToast {
     Color rewardColor = const Color(0xFFD8B4FE),
     Duration duration = const Duration(seconds: 4),
   }) {
+    // Ses ve titreşim efektini tetikle
+    SoundService().playCosmicToast();
+
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
     
@@ -41,8 +45,8 @@ class CosmicToast {
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         bottom: bottomPadding + 8, // Menü barın hemen üstü
-        left: 16,
-        right: 16,
+        left: 24,
+        right: 24,
         child: Material(
           color: Colors.transparent,
           child: FadeTransition(
@@ -50,14 +54,14 @@ class CosmicToast {
             child: SlideTransition(
               position: slideAnimation,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(32),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.05), // Daha transparan cam
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(32),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.15), // İnce cam sınırı
                         width: 0.5,
