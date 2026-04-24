@@ -93,9 +93,11 @@ class ReferralService {
       if (response == null || (response as List).isEmpty) return;
 
       int rewardedStones = 0;
+      int referralCount = 0;
 
       for (var row in response) {
         rewardedStones += 2;
+        referralCount++;
         // Satırı alındı olarak işaretle
         await Supabase.instance.client
             .from('cosmic_referrals')
@@ -105,7 +107,9 @@ class ReferralService {
 
       if (rewardedStones > 0) {
         await StorageService.updateSoulStones(rewardedStones);
-        debugPrint("Davet ettiğin $rewardedStones / 2 Kişi sayesinde Ruh Taşı kazandın!");
+        await StorageService.addBonusAura(25 * referralCount); // Her davet için +25 Aura
+        await StorageService.incrementStat('total_referrals_count', referralCount); // Achievement için
+        debugPrint("Davet ettiğin $referralCount kişi: +$rewardedStones Ruh Taşı, +${25 * referralCount} Aura!");
       }
     } catch (e) {
       debugPrint("Davet ödülleri kontrol hatası: $e");

@@ -21,6 +21,7 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
 
@@ -453,6 +454,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300", 
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300", 
       "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300", 
+      "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300",
     ];
     final String selectedAvatarUrl = avatarPool[_selectedAvatarIndex];
     
@@ -495,6 +503,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       // ✅ BAŞARILI İSE: Varsa davet kodunu (referral) tetikle!
       if (syncResult == true) {
         await ReferralService.processPendingReferrals(currentUser.id);
+        
+        // Hoş Geldin Bonusu (İlk kez kayıt olanlara 10 Ruh Taşı)
+        final prefs = await SharedPreferences.getInstance();
+        if (!(prefs.getBool('welcome_bonus_claimed') ?? false)) {
+          final currentStones = await StorageService.getSoulStones();
+          await StorageService.updateSoulStones(currentStones + 10);
+          await prefs.setBool('welcome_bonus_claimed', true);
+          debugPrint('🎁 Hoş Geldin Bonusu verildi: +10 Ruh Taşı');
+        }
       }
     } else {
       debugPrint('⚠️ Supabase auth kullanıcısı null - bulut senkronizasyonu atlandı');
@@ -2974,6 +2991,13 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300", 
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300", 
     "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300", 
+    "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
+    "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300",
   ];
 
   @override

@@ -678,17 +678,28 @@ class StorageService {
     return days.toSet();
   }
 
-  /// Belirli bir gün için +1 Aura topla (takvimden tıklama)
+  /// Belirli bir gün için Aura topla (takvimden tıklama)
+  /// Hafta sonu +2, hafta içi +1
   /// Başarılıysa true döner, zaten toplanmışsa false
   static Future<bool> claimDailyAura(String dateKey) async {
     final prefs = await SharedPreferences.getInstance();
     final claimed = prefs.getStringList(_keyClaimedAuraDays) ?? [];
     if (claimed.contains(dateKey)) return false; // Zaten toplandı
 
-    // Aura'yı ekle — negatif spent aura ile simüle ediyoruz
-    // Aslında doğrudan "bonus aura" olarak ekliyoruz
+    // Hafta sonu bonusu: Cumartesi ve Pazar +2, diğer günler +1
+    final parts = dateKey.split('-');
+    int auraAmount = 1;
+    if (parts.length == 3) {
+      try {
+        final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+        if (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday) {
+          auraAmount = 2; // Hafta sonu bonusu!
+        }
+      } catch (_) {}
+    }
+
     final bonusAura = prefs.getInt('daily_bonus_aura') ?? 0;
-    await prefs.setInt('daily_bonus_aura', bonusAura + 1);
+    await prefs.setInt('daily_bonus_aura', bonusAura + auraAmount);
 
     // Günü claimed olarak işaretle
     claimed.add(dateKey);
@@ -821,6 +832,121 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final claimed = prefs.getStringList(_keyClaimedAuraDays) ?? [];
     return claimed.toSet();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BAŞARIM (ACHIEVEMENT) SİSTEMİ
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Tüm başarım tanımları
+  static const List<Map<String, dynamic>> achievementDefinitions = [
+    {'id': 'first_cookie', 'title': 'İlk Adım', 'desc': 'İlk kurabiyeni kır', 'icon': '🥚', 'aura': 5, 'stones': 0, 'checkKey': 'total_cookies', 'threshold': 1},
+    {'id': 'first_tarot', 'title': 'Falcı Çırağı', 'desc': 'İlk tarot falını bak', 'icon': '🔮', 'aura': 5, 'stones': 0, 'checkKey': 'total_tarots', 'threshold': 1},
+    {'id': 'first_dream', 'title': 'Rüya Avcısı', 'desc': 'İlk rüya analizini yap', 'icon': '💭', 'aura': 5, 'stones': 0, 'checkKey': 'total_dreams', 'threshold': 1},
+    {'id': 'first_friend', 'title': 'Sosyal Kelebek', 'desc': 'İlk arkadaşını ekle', 'icon': '💌', 'aura': 10, 'stones': 0, 'checkKey': 'total_friends', 'threshold': 1},
+    {'id': 'cookie_master', 'title': 'Kurabiye Ustası', 'desc': '50 kurabiye kır', 'icon': '🍪', 'aura': 0, 'stones': 1, 'checkKey': 'total_cookies', 'threshold': 50},
+    {'id': 'wise_fortune', 'title': 'Bilge Kahin', 'desc': '30 tarot falı bak', 'icon': '🔮', 'aura': 0, 'stones': 1, 'checkKey': 'total_tarots', 'threshold': 30},
+    {'id': 'dream_collector', 'title': 'Rüya Koleksiyoncusu', 'desc': '20 rüya analizi yap', 'icon': '💭', 'aura': 0, 'stones': 1, 'checkKey': 'total_dreams', 'threshold': 20},
+    {'id': 'letter_addict', 'title': 'Mektup Bağımlısı', 'desc': '10 mektup gönder', 'icon': '🦉', 'aura': 0, 'stones': 1, 'checkKey': 'total_letters_sent', 'threshold': 10},
+    {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet et', 'icon': '👥', 'aura': 0, 'stones': 3, 'checkKey': 'total_referrals', 'threshold': 5},
+    {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topla', 'icon': '⭐', 'aura': 0, 'stones': 2, 'checkKey': 'unique_cookies', 'threshold': 10},
+  ];
+
+  /// Kazanılmış başarımları döndür
+  static Future<Set<String>> getClaimedAchievements() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList('claimed_achievements') ?? []).toSet();
+  }
+
+  /// Başarım kontrolü yap ve yeni kazanılan varsa döndür
+  static Future<List<Map<String, dynamic>>> checkAndClaimAchievements() async {
+    final prefs = await SharedPreferences.getInstance();
+    final claimed = (prefs.getStringList('claimed_achievements') ?? []).toSet();
+    final newlyUnlocked = <Map<String, dynamic>>[];
+
+    // Kullanıcı verilerini topla
+    final stats = <String, int>{
+      'total_cookies': prefs.getInt('total_cookies') ?? 0,
+      'total_tarots': prefs.getInt('total_tarot_count') ?? 0,
+      'total_dreams': (prefs.getStringList('dream_list') ?? []).length,
+      'total_friends': prefs.getInt('total_friends_count') ?? 0,
+      'total_letters_sent': prefs.getInt('total_letters_sent') ?? 0,
+      'total_referrals': prefs.getInt('total_referrals_count') ?? 0,
+      'unique_cookies': (prefs.getStringList(_keyCookieCollection) ?? []).length,
+    };
+
+    for (final achievement in achievementDefinitions) {
+      final id = achievement['id'] as String;
+      if (claimed.contains(id)) continue; // Zaten kazanılmış
+
+      final checkKey = achievement['checkKey'] as String;
+      final threshold = achievement['threshold'] as int;
+      final currentValue = stats[checkKey] ?? 0;
+
+      if (currentValue >= threshold) {
+        // Ödülü ver
+        final aura = achievement['aura'] as int;
+        final stones = achievement['stones'] as int;
+        if (aura > 0) {
+          await addBonusAura(aura);
+        }
+        if (stones > 0) {
+          final currentStones = await getSoulStones();
+          await prefs.setInt(_keySoulStones, currentStones + stones);
+        }
+
+        // Kazanıldı olarak işaretle
+        claimed.add(id);
+        newlyUnlocked.add(achievement);
+      }
+    }
+
+    await prefs.setStringList('claimed_achievements', claimed.toList());
+    return newlyUnlocked;
+  }
+
+  /// Belirli bir istatistiğin sayacını artır (achievement tetiklemesi için)
+  static Future<void> incrementStat(String key, [int amount = 1]) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(key) ?? 0;
+    await prefs.setInt(key, current + amount);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // UNVAN SİSTEMİ (Aura'ya Göre Otomatik)
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Aura puanına göre kullanıcının unvanını döndür
+  static String getUserTitle(int totalAura) {
+    if (totalAura >= 1001) return 'Kozmik Kahin';
+    if (totalAura >= 601) return 'Usta Kahin';
+    if (totalAura >= 301) return 'Bilge Kahin';
+    if (totalAura >= 151) return 'Kahin';
+    if (totalAura >= 51) return 'Çırak Kahin';
+    return 'Acemi Kahin';
+  }
+
+  /// Bir sonraki unvana kaç aura kaldığını döndür
+  static Map<String, dynamic> getNextTitleInfo(int totalAura) {
+    const levels = [
+      {'title': 'Çırak Kahin', 'min': 51},
+      {'title': 'Kahin', 'min': 151},
+      {'title': 'Bilge Kahin', 'min': 301},
+      {'title': 'Usta Kahin', 'min': 601},
+      {'title': 'Kozmik Kahin', 'min': 1001},
+    ];
+    for (final level in levels) {
+      final min = level['min'] as int;
+      if (totalAura < min) {
+        return {
+          'nextTitle': level['title'],
+          'remaining': min - totalAura,
+          'target': min,
+          'progress': totalAura / min,
+        };
+      }
+    }
+    return {'nextTitle': null, 'remaining': 0, 'target': 1001, 'progress': 1.0}; // Max seviye
   }
 
   static Future<String?> getMood() async {

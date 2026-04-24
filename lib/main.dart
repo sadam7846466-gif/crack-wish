@@ -81,7 +81,7 @@ Future<void> main() async {
   final localeController = LocaleController();
   await localeController.load();
   // Günlük giriş kaydı — takvimde ateş ikonu için
-  StorageService.recordAppOpenToday();
+  await StorageService.recordAppOpenToday();
   // Uygulama açıldı event'i
   AnalyticsService().logAppOpened();
   

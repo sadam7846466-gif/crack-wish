@@ -124,19 +124,19 @@ class ProfilePageState extends State<ProfilePage> {
     final int aura = _bonusAura;
     
     if (lang == 'tr') {
-      if (aura < 100) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Yeni Başlayan');
-      if (aura < 500) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Acemi Kahin');
-      if (aura < 1500) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Çırak Kahin');
-      if (aura < 5000) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Bilge Kahin');
-      if (aura < 10000) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Usta Kahin');
-      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Yüce Başbüyücü');
+      if (aura < 51) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Acemi Kahin');
+      if (aura < 151) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Çırak Kahin');
+      if (aura < 301) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Kahin');
+      if (aura < 601) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Bilge Kahin');
+      if (aura < 1001) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Usta Kahin');
+      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Kozmik Kahin');
     } else {
-      if (aura < 100) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Newcomer');
-      if (aura < 500) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Novice Seer');
-      if (aura < 1500) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Apprentice Seer');
-      if (aura < 5000) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Wise Seer');
-      if (aura < 10000) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Master Seer');
-      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Grandmaster');
+      if (aura < 51) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Novice Seer');
+      if (aura < 151) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Apprentice Seer');
+      if (aura < 301) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Seer');
+      if (aura < 601) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Wise Seer');
+      if (aura < 1001) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Master Seer');
+      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Cosmic Seer');
     }
   }
 
@@ -150,11 +150,19 @@ class ProfilePageState extends State<ProfilePage> {
       (!_userAvatar.startsWith('http') && !_userAvatar.startsWith('assets')) ? _userAvatar : 'gallery',
       'assets/images/owl.png',
       'assets/images/owl_sleepy.png',
+      // 12 adet Kozmik Hazır Avatar
       'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
       'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
       'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
+      'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300',
     ];
 
     showModalBottomSheet(
@@ -2491,20 +2499,17 @@ class _BentoHeroCard extends StatelessWidget {
   }
 
   static Future<bool> _hasUnclaimedReward(int streakDays) async {
+    // Takvimde bugün toplanmamış ateş var mı?
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final claimedDays = await StorageService.getClaimedAuraDays();
+    if (!claimedDays.contains(today)) return true;
+    
     // Milestone eşikleri
     const thresholds = [7, 14, 30, 50, 100, 365];
     final claimed = await StorageService.getClaimedMilestones();
     for (final t in thresholds) {
       if (streakDays >= t && !claimed.contains(t)) return true;
     }
-    
-    // YENİ SİSTEM: Herhangi bir toplanmamış bekleyen (pending) Aura var mı?
-    final fal = await StorageService.getPendingAura('fal');
-    final cookie = await StorageService.getPendingAura('kurabiye');
-    final dream = await StorageService.getPendingAura('ruya');
-    final owl = await StorageService.getPendingAura('baykus');
-    
-    if (fal > 0 || cookie > 0 || dream > 0 || owl > 0) return true;
     
     return false;
   }
@@ -3300,7 +3305,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   final isToday = testDate.year == nowNorm.year && testDate.month == nowNorm.month && testDate.day == nowNorm.day;
                                   final isFuture = testDate.isAfter(nowNorm);
                                   final dateKey = "${targetYear.toString().padLeft(4, '0')}-${targetMonth.toString().padLeft(2, '0')}-${i.toString().padLeft(2, '0')}";
-                                  final isAppOpenDay = appOpenDays.contains(dateKey);
+                                  final isAppOpenDay = isToday || appOpenDays.contains(dateKey); // Bugün her zaman açık — kullanıcı şu an uygulamada
                                   final isClaimed = claimedDays.contains(dateKey);
 
                                   final prevDate = testDate.subtract(const Duration(days: 1));
@@ -3309,8 +3314,10 @@ class _BentoHeroCard extends StatelessWidget {
                                   final nextKey = "${nextDate.year.toString().padLeft(4, '0')}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}";
                                   
                                   final dayIdx = firstWeekday - 1 + i - 1;
-                                  final isConnectedLeft = dayIdx % 7 != 0 && isAppOpenDay && appOpenDays.contains(prevKey);
-                                  final isConnectedRight = dayIdx % 7 != 6 && isAppOpenDay && appOpenDays.contains(nextKey);
+                                  final isPrevOpen = appOpenDays.contains(prevKey) || (prevDate.year == nowNorm.year && prevDate.month == nowNorm.month && prevDate.day == nowNorm.day);
+                                  final isNextOpen = appOpenDays.contains(nextKey) || (nextDate.year == nowNorm.year && nextDate.month == nowNorm.month && nextDate.day == nowNorm.day);
+                                  final isConnectedLeft = dayIdx % 7 != 0 && isAppOpenDay && isPrevOpen;
+                                  final isConnectedRight = dayIdx % 7 != 6 && isAppOpenDay && isNextOpen;
 
                                   calendarDays.add(
                                     _ClaimableFireCell(
@@ -3321,11 +3328,13 @@ class _BentoHeroCard extends StatelessWidget {
                                       isClaimed: isClaimed,
                                       isConnectedLeft: isConnectedLeft,
                                       isConnectedRight: isConnectedRight,
+                                      isWeekend: testDate.weekday == DateTime.saturday || testDate.weekday == DateTime.sunday,
                                       dateKey: dateKey,
                                       onClaimed: () {
+                                        final weekendBonus = (testDate.weekday == DateTime.saturday || testDate.weekday == DateTime.sunday) ? 2 : 1;
                                         setModalState(() {
                                           claimedDays.add(dateKey);
-                                          modalAuraTotal += 1;
+                                          modalAuraTotal += weekendBonus;
                                         });
                                         if (onAuraClaimed != null) {
                                           onAuraClaimed!();
@@ -5028,6 +5037,7 @@ class _ClaimableFireCell extends StatefulWidget {
   final bool isClaimed;
   final bool isConnectedLeft;
   final bool isConnectedRight;
+  final bool isWeekend;
   final String dateKey;
   final VoidCallback? onClaimed;
 
@@ -5039,6 +5049,7 @@ class _ClaimableFireCell extends StatefulWidget {
     required this.isClaimed,
     this.isConnectedLeft = false,
     this.isConnectedRight = false,
+    this.isWeekend = false,
     required this.dateKey,
     this.onClaimed,
   });
@@ -5054,6 +5065,8 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
   late Animation<double> _glowAnim;
   late Animation<double> _flyUpAnim;
   late Animation<double> _flyFadeAnim;
+  late AnimationController _breatheController;
+  late Animation<double> _breatheAnim;
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _justClaimed = false;
 
@@ -5064,6 +5077,21 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
+    
+    _breatheController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    
+    _breatheAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 1.2).chain(CurveTween(curve: Curves.easeInOutSine)), weight: 50),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.2, end: 1.0).chain(CurveTween(curve: Curves.easeInOutSine)), weight: 50),
+    ]).animate(_breatheController);
+
+    final bool canClaimInit = widget.isAppOpenDay && !widget.isClaimed && !widget.isFuture && !_justClaimed;
+    if (canClaimInit) {
+      _breatheController.repeat();
+    }
     
     // Aniden 2.5 katına fırlayıp geri oturma
     _scaleAnim = TweenSequence<double>([
@@ -5096,8 +5124,23 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
   void dispose() {
     _explosionController.dispose();
     _flyController.dispose();
+    _breatheController.dispose();
     _audioPlayer.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ClaimableFireCell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final bool canClaim = widget.isAppOpenDay && !widget.isClaimed && !widget.isFuture && !_justClaimed;
+    if (canClaim) {
+      if (!_breatheController.isAnimating) _breatheController.repeat();
+    } else {
+      if (_breatheController.isAnimating) {
+        _breatheController.stop();
+        _breatheController.reset();
+      }
+    }
   }
 
   Future<void> _handleTap() async {
@@ -5113,7 +5156,11 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
 
     final success = await StorageService.claimDailyAura(widget.dateKey);
     if (success && mounted) {
-      setState(() => _justClaimed = true);
+      setState(() {
+        _justClaimed = true;
+        _breatheController.stop();
+        _breatheController.reset();
+      });
       
       _explosionController.forward(from: 0);
       _flyController.forward(from: 0);
@@ -5131,7 +5178,7 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
       onTap: canClaim ? _handleTap : null,
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
-        animation: Listenable.merge([_explosionController, _flyController]),
+        animation: Listenable.merge([_explosionController, _flyController, _breatheController]),
         builder: (context, child) {
           return Stack(
             clipBehavior: Clip.none,
@@ -5144,12 +5191,12 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                   right: widget.isConnectedRight ? -3 : 19.5,
                   child: Center(
                     child: Container(
-                      height: 10,
+                      height: 1.5,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                        color: Colors.white.withOpacity(0.35),
                         borderRadius: BorderRadius.horizontal(
-                          left: widget.isConnectedLeft ? Radius.zero : const Radius.circular(5),
-                          right: widget.isConnectedRight ? Radius.zero : const Radius.circular(5),
+                          left: widget.isConnectedLeft ? Radius.zero : const Radius.circular(1),
+                          right: widget.isConnectedRight ? Radius.zero : const Radius.circular(1),
                         )
                       ),
                     ),
@@ -5157,7 +5204,9 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                 ),
               // Ana hücre (Pop efekti ile)
               Transform.scale(
-                scale: _explosionController.isAnimating ? _scaleAnim.value : 1.0,
+                scale: _explosionController.isAnimating 
+                    ? _scaleAnim.value 
+                    : (canClaim ? _breatheAnim.value : 1.0),
                 child: Container(
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -5204,7 +5253,7 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                     opacity: _flyFadeAnim.value,
                     child: Center(
                       child: Text(
-                        "+1",
+                        widget.isWeekend ? "+2" : "+1",
                         style: const TextStyle(
                           color: Color(0xFFFFC107), 
                           fontSize: 22, 
