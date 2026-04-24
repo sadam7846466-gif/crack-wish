@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/purchase_service.dart';
 import '../services/analytics_service.dart';
+import '../services/profile_sync_service.dart';
 class PremiumPaywallPage extends StatefulWidget {
   const PremiumPaywallPage({super.key});
 
@@ -36,10 +37,20 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   }
 
   Future<void> _checkEliteStatus() async {
+    if (!mounted) return;
+    
+    // 1. Önce Supabase'den güncel statüyü çek
+    final isEliteInCloud = await ProfileSyncService().fetchEliteStatus();
+    
+    // 2. Lokal veriyi güncelle
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_elite', isEliteInCloud);
+    await prefs.setBool('is_premium_test_mode', isEliteInCloud); // Eski uyumluluk için
+    
     if (!mounted) return;
     setState(() {
-      _isAlreadyElite = prefs.getBool('is_elite') ?? false;
+      _isAlreadyElite = isEliteInCloud;
+      
       final type = prefs.getString('elite_plan_type');
       if (type == 'weekly') _activePackageIndex = 0;
       else if (type == 'monthly') _activePackageIndex = 1;
@@ -159,6 +170,10 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                             if (isElite) {
                               HapticFeedback.heavyImpact();
                               setState(() => _isAlreadyElite = true);
+                              
+                              // Supabase'e bildir
+                              await ProfileSyncService().syncEliteStatus(true);
+                              
                               _showGlassMessage(
                                 "Elite Geri Yüklendi",
                                 "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
@@ -319,14 +334,17 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                                   
                                   final success = await PurchaseService().purchase(productId);
                                   
-                                  if (success && mounted) {
-                                    // Satın alma başarılı — yerel kayıt
-                                    final prefs = await SharedPreferences.getInstance();
-                                    final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
-                                    await prefs.setString('elite_plan_type', plan);
-                                    await prefs.setInt('daily_elite_soul_stones', 5);
-                                    
-                                    if (!mounted) return;
+                                    if (success && mounted) {
+                                      // Satın alma başarılı — yerel kayıt
+                                      final prefs = await SharedPreferences.getInstance();
+                                      final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
+                                      await prefs.setString('elite_plan_type', plan);
+                                      await prefs.setInt('daily_elite_soul_stones', 5);
+                                      
+                                      // Supabase'e bildir
+                                      await ProfileSyncService().syncEliteStatus(true);
+                                      
+                                      if (!mounted) return;
                                     setState(() {
                                       _isPurchasing = false;
                                       _isAlreadyElite = true;

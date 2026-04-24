@@ -1831,6 +1831,17 @@ For questions: info@crackandwish.com''',
                                     final prefs = await SharedPreferences.getInstance();
                                     setState(() => _isPremiumUser = !_isPremiumUser);
                                     await prefs.setBool('is_premium_test_mode', _isPremiumUser);
+                                    
+                                    // Test butonuna basıldığında Elite olduysa anında 5 günlük RT ver
+                                    if (_isPremiumUser) {
+                                      await prefs.setInt('daily_elite_soul_stones', 5);
+                                    } else {
+                                      await prefs.setInt('daily_elite_soul_stones', 0);
+                                    }
+                                    
+                                    // Supabase'e Premium durumunu kaydet
+                                    await ProfileSyncService().syncEliteStatus(_isPremiumUser);
+                                    
                                     HapticFeedback.heavyImpact();
                                     if (mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('TEST MODU: Elite Üyelik ${_isPremiumUser ? "AKTİF 💎" : "KAPALI 🛑"}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: Colors.black87));
@@ -1970,8 +1981,213 @@ For questions: info@crackandwish.com''',
                           ],
                         ),
 
+
                         const SizedBox(height: 24),
 
+                        // ── ⚠️ BİLDİRİM TEST PANELİ (Yayından önce silinecek) ──
+                        _SectionLabel('Test Paneli'),
+                        const SizedBox(height: 10),
+                        _SettingsListGroup(
+                          children: [
+                            // 1. BÜYÜK PANEL TESTİ (CosmicRewardDialog)
+                            _SettingsListTile(
+                              icon: Icons.auto_awesome_rounded,
+                              iconColor: const Color(0xFFC084FC),
+                              label: 'Buyuk Panel (5)',
+                              subtitle: 'CosmicRewardDialog',
+                              onTap: () async {
+                                HapticFeedback.heavyImpact();
+                                final name = await StorageService.getUserName();
+                                final displayName = (name != null && name.isNotEmpty) ? name : 'Gezgin';
+                                if (!context.mounted) return;
+                                final panels = [
+                                  {'title': 'Evrene Hos Geldin', 'desc': 'Yolculuguna baslaman icin sana kucuk bir hediye biraktik.', 'icon': Icons.card_giftcard, 'color': const Color(0xFFC084FC), 'aura': null, 'stones': 3},
+                                  {'title': 'Beklenmedik Bir Hediye', 'desc': 'Bir arkadaşın seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.', 'icon': Icons.mail_outline, 'color': const Color(0xFFC36E6E), 'aura': 50, 'stones': 2},
+                                  {'title': 'Cagrın Duyuldu!', 'desc': '2 arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.', 'icon': Icons.person_add_alt_1, 'color': const Color(0xFF38BDF8), 'aura': 50, 'stones': 4},
+                                  {'title': '$displayName, Dogum Gunun Kutlu Olsun!', 'desc': 'Bugün ruhunun bu dünyaya indiği kutsal gün.', 'icon': Icons.cake_rounded, 'color': const Color(0xFFFF6B9D), 'aura': 30, 'stones': 2},
+                                  {'title': 'Ramazan Bayramınız Kutlu Olsun', 'desc': 'Evren sana huzur diliyor.', 'icon': Icons.mosque_rounded, 'color': const Color(0xFF10B981), 'aura': null, 'stones': null},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_panel_idx') ?? 0) % panels.length;
+                                await prefs.setInt('_test_panel_idx', idx + 1);
+                                final p = panels[idx];
+                                if (!context.mounted) return;
+                                CosmicRewardDialog.show(
+                                  context: context,
+                                  title: p['title'] as String,
+                                  description: p['desc'] as String,
+                                  icon: p['icon'] as IconData,
+                                  glowColor: p['color'] as Color,
+                                  auraReward: p['aura'] as int?,
+                                  stoneReward: p['stones'] as int?,
+                                );
+                              },
+                            ),
+                            // 2. TOAST TESTİ (CosmicToast)
+                            _SettingsListTile(
+                              icon: Icons.notifications_active_rounded,
+                              iconColor: const Color(0xFFFBBF24),
+                              label: 'Toast Bildirim (4)',
+                              subtitle: 'CosmicToast',
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                final toasts = [
+                                  {'title': 'Bugun Kurabiye Kırmadın', 'msg': 'Gunluk sans mesajın seni bekliyor!', 'reward': '3 Hak', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFBBF24)},
+                                  {'title': 'Inanılmaz Odak!', 'msg': 'Gunluk serin tam 30 gune ulastı.', 'reward': '+1 Ruh Tası', 'icon': Icons.diamond_rounded, 'color': const Color(0xFF60A5FA)},
+                                  {'title': 'Basarım Tamamlandı', 'msg': 'Ilk 100 kurabiyeni kırdın!', 'reward': '+5 Aura', 'icon': Icons.emoji_events_rounded, 'color': const Color(0xFFF97316)},
+                                  {'title': 'Kozmik Terfi!', 'msg': 'Aura gucun arttı. Yeni unvanın: Kozmik Kahin', 'reward': 'Yeni Rutbe', 'icon': Icons.workspace_premium_rounded, 'color': const Color(0xFFFFD700)},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_toast_idx') ?? 0) % toasts.length;
+                                await prefs.setInt('_test_toast_idx', idx + 1);
+                                final t = toasts[idx];
+                                if (!context.mounted) return;
+                                CosmicToast.show(
+                                  context: context,
+                                  title: t['title'] as String,
+                                  message: t['msg'] as String,
+                                  reward: t['reward'] as String,
+                                  icon: t['icon'] as IconData,
+                                  iconColor: t['color'] as Color,
+                                  rewardColor: t['color'] as Color,
+                                );
+                              },
+                            ),
+                            // 3. PUSH BİLDİRİM ÖNİZLEME
+                            _SettingsListTile(
+                              icon: Icons.send_rounded,
+                              iconColor: const Color(0xFF38BDF8),
+                              label: 'Push Bildirim (29)',
+                              subtitle: 'FCM onizleme',
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                final pushMessages = [
+                                  {'title': 'Kurabiyenin Icinde Ne Var?', 'body': 'Bugunku sans mesajın hazır. Kır ve kesfet!'},
+                                  {'title': 'Tarot Kartların Hazır', 'body': 'Niyetini tut ve bugunun rehber kartlarını cek.'},
+                                  {'title': 'Ruyalarının Fısıltısı', 'body': 'Dun gece zihnin sana ne anlatmaya calıstı?'},
+                                  {'title': 'Gokyuzu Hareketli', 'body': 'Yıldızlar bugun senin icin parlıyor.'},
+                                  {'title': 'Baykus Agın Seni Ozledi', 'body': 'Arkadaslarına bir mektup yollayalı uzun zaman oldu.'},
+                                  {'title': 'Dogum Gunun Kutlu Olsun!', 'body': 'Bugun senin gunun. Evrenin sana ozel bir mesajı var!'},
+                                  {'title': 'Serin Kırılmasın!', 'body': 'Gunluk giris serini devam ettir.'},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_push_idx') ?? 0) % pushMessages.length;
+                                await prefs.setInt('_test_push_idx', idx + 1);
+                                final pm = pushMessages[idx];
+                                if (!context.mounted) return;
+                                CosmicToast.show(
+                                  context: context,
+                                  title: pm['title']!,
+                                  message: pm['body']!,
+                                  reward: 'Push #${idx + 1}/${pushMessages.length}',
+                                  icon: Icons.notifications_rounded,
+                                  iconColor: const Color(0xFF38BDF8),
+                                  rewardColor: const Color(0xFF38BDF8),
+                                );
+                              },
+                            ),
+                            // 4. ÖZEL GÜN TESTİ
+                            _SettingsListTile(
+                              icon: Icons.flag_rounded,
+                              iconColor: const Color(0xFF10B981),
+                              label: 'Ozel Gun (11 ulke)',
+                              subtitle: 'Ulke bazlı kutlama',
+                              onTap: () async {
+                                HapticFeedback.heavyImpact();
+                                final specialDays = [
+                                  {'title': 'Yeni Yılın Kutlu Olsun!', 'desc': 'Yeni bir yıl, yeni bir baslangıc.', 'icon': Icons.celebration_rounded, 'color': const Color(0xFFFFD700)},
+                                  {'title': '23 Nisan Kutlu Olsun!', 'desc': 'Ulusal Egemenlik ve Cocuk Bayramı.', 'icon': Icons.flag_rounded, 'color': const Color(0xFFEF4444)},
+                                  {'title': 'Happy Independence Day', 'desc': 'Celebrate freedom and the cosmic spark of liberty.', 'icon': Icons.flag_rounded, 'color': const Color(0xFF3B82F6)},
+                                  {'title': 'Joyeux 14 Juillet', 'desc': 'Bastille Day — celebrating freedom.', 'icon': Icons.flag_rounded, 'color': const Color(0xFF3B82F6)},
+                                  {'title': 'Happy German Unity Day', 'desc': 'Celebrating unity and togetherness.', 'icon': Icons.handshake_rounded, 'color': const Color(0xFFFBBF24)},
+                                  {'title': 'Dia de los Muertos', 'desc': 'Honor those who passed. The veil is thinnest today.', 'icon': Icons.local_florist_rounded, 'color': const Color(0xFFF97316)},
+                                  {'title': 'Guy Fawkes Night', 'desc': 'The cosmic fire burns bright tonight.', 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFF97316)},
+                                  {'title': 'Happy Eid al-Fitr', 'desc': 'The universe wishes you peace on this blessed Eid.', 'icon': Icons.mosque_rounded, 'color': const Color(0xFF10B981)},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_special_idx') ?? 0) % specialDays.length;
+                                await prefs.setInt('_test_special_idx', idx + 1);
+                                final sd = specialDays[idx];
+                                if (!context.mounted) return;
+                                CosmicRewardDialog.show(
+                                  context: context,
+                                  title: sd['title'] as String,
+                                  description: sd['desc'] as String,
+                                  icon: sd['icon'] as IconData,
+                                  glowColor: sd['color'] as Color,
+                                );
+                              },
+                            ),
+                            // 5. BAŞARIM TESTİ (10 Achievement)
+                            _SettingsListTile(
+                              icon: Icons.emoji_events_rounded,
+                              iconColor: const Color(0xFFFDE047),
+                              label: 'Basarım (10)',
+                              subtitle: 'Achievement toast',
+                              onTap: () async {
+                                HapticFeedback.heavyImpact();
+                                final achievements = [
+                                  {'title': 'Ilk Adım', 'desc': 'Ilk kurabiyeni kırdın', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFDE047), 'reward': '+5 Aura', 'image': 'assets/icons/splash_cookie.png'},
+                                  {'title': 'Falcı Cıragı', 'desc': 'Ilk tarot falına baktın', 'icon': Icons.auto_awesome_rounded, 'color': const Color(0xFFC084FC), 'reward': '+5 Aura', 'image': null},
+                                  {'title': 'Ruya Avcısı', 'desc': 'Ilk ruya analizini yaptın', 'icon': Icons.nights_stay_rounded, 'color': const Color(0xFF60A5FA), 'reward': '+5 Aura', 'image': null},
+                                  {'title': 'Sosyal Kelebek', 'desc': 'Ilk arkadasını ekledin', 'icon': Icons.people_alt_rounded, 'color': const Color(0xFFF472B6), 'reward': '+10 Aura', 'image': null},
+                                  {'title': 'Kurabiye Ustası', 'desc': '50 kurabiye kırdın', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFBBF24), 'reward': '+1 Ruh Tası', 'image': 'assets/icons/splash_cookie.png'},
+                                  {'title': 'Bilge Kahin', 'desc': '30 tarot falı baktın', 'icon': Icons.remove_red_eye_rounded, 'color': const Color(0xFFA855F7), 'reward': '+1 Ruh Tası', 'image': null},
+                                  {'title': 'Ruya Koleksiyoncusu', 'desc': '20 ruya analizi yaptın', 'icon': Icons.bedtime_rounded, 'color': const Color(0xFF3B82F6), 'reward': '+1 Ruh Tası', 'image': null},
+                                  {'title': 'Mektup Bagımlısı', 'desc': '10 mektup gonderdin', 'icon': Icons.mail_rounded, 'color': const Color(0xFF34D399), 'reward': '+1 Ruh Tası', 'image': null},
+                                  {'title': 'Topluluk Lideri', 'desc': '5 arkadas davet ettin', 'icon': Icons.groups_rounded, 'color': const Color(0xFFFB923C), 'reward': '+3 Ruh Tası', 'image': null},
+                                  {'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': Icons.stars_rounded, 'color': const Color(0xFFFFD700), 'reward': '+1 Ruh Tası', 'image': 'assets/icons/splash_cookie.png'},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_ach_idx') ?? 0) % achievements.length;
+                                await prefs.setInt('_test_ach_idx', idx + 1);
+                                final a = achievements[idx];
+                                if (!context.mounted) return;
+                                CosmicToast.show(
+                                  context: context,
+                                  title: a['title'] as String,
+                                  message: a['desc'] as String,
+                                  reward: a['reward'] as String,
+                                  icon: a['icon'] as IconData,
+                                  imagePath: a['image'] as String?,
+                                  iconColor: a['color'] as Color,
+                                  rewardColor: a['color'] as Color,
+                                );
+                              },
+                            ),
+                            // 6. UNVAN TESTİ (6 Rütbe)
+                            _SettingsListTile(
+                              icon: Icons.workspace_premium_rounded,
+                              iconColor: const Color(0xFFFFD700),
+                              label: 'Unvan Terfi (6)',
+                              subtitle: 'Rank up toast',
+                              onTap: () async {
+                                HapticFeedback.heavyImpact();
+                                final ranks = [
+                                  {'title': 'Çırak Kahin', 'reward': 10, 'icon': Icons.star_rounded, 'color': const Color(0xFF64B5F6)},
+                                  {'title': 'Kahin', 'reward': 20, 'icon': Icons.visibility_rounded, 'color': const Color(0xFFBA68C8)},
+                                  {'title': 'Bilge Kahin', 'reward': 30, 'icon': Icons.auto_stories_rounded, 'color': const Color(0xFFFFB74D)},
+                                  {'title': 'Usta Kahin', 'reward': 50, 'icon': Icons.shield_rounded, 'color': const Color(0xFFE57373)},
+                                  {'title': 'Kozmik Kahin', 'reward': 100, 'icon': Icons.diamond_rounded, 'color': const Color(0xFFFFD700)},
+                                ];
+                                final prefs = await SharedPreferences.getInstance();
+                                final idx = (prefs.getInt('_test_rank_idx') ?? 0) % ranks.length;
+                                await prefs.setInt('_test_rank_idx', idx + 1);
+                                final r = ranks[idx];
+                                if (!context.mounted) return;
+                                CosmicToast.show(
+                                  context: context,
+                                  title: 'Kozmik Terfi!',
+                                  message: 'Aura gücün arttı. Yeni unvanın: ${r['title']}',
+                                  reward: '+${r['reward']} Aura',
+                                  icon: r['icon'] as IconData,
+                                  iconColor: r['color'] as Color,
+                                  rewardColor: r['color'] as Color,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
 
 
                         // ── BÖLÜM 2: DESTEK & DENEYİM ──

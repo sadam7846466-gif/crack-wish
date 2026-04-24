@@ -112,21 +112,91 @@ class ProfileSyncService {
     }
   }
 
-  /// Kullanıcının hesap bakiyesini (Aura ve Ruh Taşı) Supabase'e canlı yedekler
-  Future<void> syncEconomyData(int aura, int soulStones) async {
+  /// Kullanıcının hesap bakiyesini ve TÜM istatistiklerini Supabase'e canlı yedekler
+  Future<void> syncEconomyData({
+    required int aura, 
+    required int soulStones,
+    int? totalCookies,
+    int? totalTarots,
+    int? totalDreams,
+    int? streakDays,
+    int? totalFriends,
+    int? totalLetters,
+    int? totalReferrals,
+    int? uniqueCookies,
+    List<String>? unlockedAchievements,
+  }) async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) return;
 
-      await _supabase.from('profiles').update({
+      final Map<String, dynamic> updateData = {
         'aura_points': aura,
         'soul_stones': soulStones,
-      }).eq('id', user.id);
+      };
+
+      if (totalCookies != null) updateData['total_cookies'] = totalCookies;
+      if (totalTarots != null) updateData['total_tarots'] = totalTarots;
+      if (totalDreams != null) updateData['total_dreams'] = totalDreams;
+      if (streakDays != null) updateData['streak_days'] = streakDays;
       
-      debugPrint('☁️ Ekonomi Buluta Yedeklendi: $aura Aura, $soulStones Ruh Taşı');
+      if (totalFriends != null) updateData['total_friends'] = totalFriends;
+      if (totalLetters != null) updateData['total_letters_sent'] = totalLetters;
+      if (totalReferrals != null) updateData['total_referrals'] = totalReferrals;
+      if (uniqueCookies != null) updateData['unique_cookies'] = uniqueCookies;
+      if (unlockedAchievements != null) updateData['unlocked_achievements'] = unlockedAchievements;
+
+      await _supabase.from('profiles').update(updateData).eq('id', user.id);
+      
+      debugPrint('☁️ Tüm Veriler Yedeklendi: $aura Aura, $soulStones RT');
     } catch (e) {
-      debugPrint('☁️ Ekonomi Buluta Yedeklenirken Hata: $e');
+      debugPrint('☁️ Veri Yedeklenirken Hata: $e');
     }
+  }
+
+  /// Elite (Premium) durumunu Supabase'e senkronize eder
+  /// Böylece Supabase panelinden Premium kullanıcıları görebilirsin
+  Future<void> syncEliteStatus(bool isElite) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+
+      final Map<String, dynamic> updateData = {
+        'is_elite': isElite,
+      };
+
+      // İlk kez Elite oluyorsa tarihi kaydet
+      if (isElite) {
+        updateData['elite_since'] = DateTime.now().toIso8601String();
+      }
+
+      await _supabase.from('profiles').update(updateData).eq('id', user.id);
+      
+      debugPrint('👑 Elite durum güncellendi: $isElite');
+    } catch (e) {
+      debugPrint('👑 Elite senkronizasyon hatası: $e');
+    }
+  }
+
+  /// Elite durumunu Supabase'den çeker
+  Future<bool> fetchEliteStatus() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return false;
+
+      final data = await _supabase
+          .from('profiles')
+          .select('is_elite')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data != null) {
+        return (data['is_elite'] ?? false) as bool;
+      }
+    } catch (e) {
+      debugPrint('👑 Elite durumu çekilirken hata: $e');
+    }
+    return false;
   }
 
   /// Başka cihaza geçildiğinde veya silinip yüklendiğinde eski bakiyeyi buluttan çeker

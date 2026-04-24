@@ -113,6 +113,7 @@ flutter:
     - assets/images/letter_icon.png
     - assets/images/
     - assets/images/cookies/
+    - assets/images/ranks/
     - assets/images/avatars/
     - assets/images/tarot/
     - assets/images/tarot/tarot/

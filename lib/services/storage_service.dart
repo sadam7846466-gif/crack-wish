@@ -162,7 +162,31 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final aura = prefs.getInt('daily_bonus_aura') ?? 0;
     final stones = prefs.getInt(_keySoulStones) ?? 0;
-    await ProfileSyncService().syncEconomyData(aura, stones);
+    
+    final totalCookies = prefs.getInt('total_cookies') ?? 0;
+    final totalTarots = prefs.getInt('total_tarot_count') ?? 0; // Doğru key
+    final totalDreams = (prefs.getStringList('dream_list') ?? []).length; // Liste boyutu
+    final streakDays = prefs.getInt('streak_days') ?? 0;
+    
+    final totalFriends = prefs.getInt('total_friends_count') ?? 0;
+    final totalLetters = prefs.getInt('total_letters_sent') ?? 0;
+    final totalReferrals = prefs.getInt('total_referrals_count') ?? 0;
+    final uniqueCookies = (prefs.getStringList(_keyCookieCollection) ?? []).length;
+    final unlockedAchievements = prefs.getStringList('achievements_claimed') ?? [];
+
+    await ProfileSyncService().syncEconomyData(
+      aura: aura, 
+      soulStones: stones,
+      totalCookies: totalCookies,
+      totalTarots: totalTarots,
+      totalDreams: totalDreams,
+      streakDays: streakDays,
+      totalFriends: totalFriends,
+      totalLetters: totalLetters,
+      totalReferrals: totalReferrals,
+      uniqueCookies: uniqueCookies,
+      unlockedAchievements: unlockedAchievements,
+    );
   }
 
   /// Buluttan (Supabase) mevcut değerleri indirip cihaz hafızasına yazar
@@ -900,7 +924,7 @@ class StorageService {
     {'id': 'wise_fortune', 'title': 'Bilge Kahin', 'desc': '30 tarot falı baktın', 'icon': '🔮', 'iconData': Icons.remove_red_eye_rounded, 'color': Color(0xFFA855F7), 'aura': 0, 'stones': 1, 'checkKey': 'total_tarots', 'threshold': 30},
     {'id': 'dream_collector', 'title': 'Rüya Koleksiyoncusu', 'desc': '20 rüya analizi yaptın', 'icon': '💭', 'iconData': Icons.bedtime_rounded, 'color': Color(0xFF3B82F6), 'aura': 0, 'stones': 1, 'checkKey': 'total_dreams', 'threshold': 20},
     {'id': 'letter_addict', 'title': 'Mektup Bağımlısı', 'desc': '10 mektup gönderdin', 'icon': '🦉', 'iconData': Icons.mail_rounded, 'color': Color(0xFF34D399), 'aura': 0, 'stones': 1, 'checkKey': 'total_letters_sent', 'threshold': 10},
-    {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet ettin', 'icon': '👥', 'iconData': Icons.groups_rounded, 'color': Color(0xFFFB923C), 'aura': 0, 'stones': 3, 'checkKey': 'total_referrals', 'threshold': 5},
+    {'id': 'community_leader', 'title': 'Topluluk Lideri', 'desc': '5 arkadaş davet ettin', 'icon': '👥', 'iconData': Icons.groups_rounded, 'color': Color(0xFFFB923C), 'aura': 0, 'stones': 2, 'checkKey': 'total_referrals', 'threshold': 5},
     {'id': 'cosmic_collector', 'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': '⭐', 'iconData': Icons.stars_rounded, 'imagePath': 'assets/icons/splash_cookie.png', 'color': Color(0xFFFFD700), 'aura': 0, 'stones': 1, 'checkKey': 'unique_cookies', 'threshold': 10},
   ];
 
@@ -979,19 +1003,29 @@ class StorageService {
   }
 
   /// Yeni bir unvan kazanılıp kazanılmadığını kontrol eder ve varsa döndürür
-  static Future<String?> checkAndClaimRankUp() async {
+  static Future<Map<String, dynamic>?> checkAndClaimRankUp() async {
     final prefs = await SharedPreferences.getInstance();
     final totalAura = await getDailyBonusAura();
     final currentRank = getUserTitle(totalAura);
     final lastSeenRank = prefs.getString('last_seen_rank') ?? 'Acemi Kahin';
 
-    // Eğer son görülen rank ile şu anki rank farklıysa ve Aura puanı artıyorsa (rank düşmesi durumu olmaması için)
-    // Aslında unvanlar sadece artar, düşmez.
+    // Her rütbenin Aura ödülü
+    const rankRewards = {
+      'Çırak Kahin': 10,
+      'Kahin': 20,
+      'Bilge Kahin': 30,
+      'Usta Kahin': 50,
+      'Kozmik Kahin': 100,
+    };
+
     if (currentRank != lastSeenRank) {
-      // Sadece terfi durumunda kutlama yap (başlangıçta Acemi Kahin'den Acemi Kahin'e geçişi sayma)
       await prefs.setString('last_seen_rank', currentRank);
       if (lastSeenRank != 'Acemi Kahin' || currentRank != 'Acemi Kahin') {
-        return currentRank;
+        final reward = rankRewards[currentRank] ?? 0;
+        if (reward > 0) {
+          await addPendingAura('rank_up', reward);
+        }
+        return {'title': currentRank, 'auraReward': reward};
       }
     }
     return null;

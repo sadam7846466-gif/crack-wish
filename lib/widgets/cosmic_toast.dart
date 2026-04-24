@@ -91,8 +91,8 @@ class CosmicToast {
                             border: Border.all(color: const Color(0xFFC084FC).withOpacity(0.3), width: 1),
                           ),
                           child: imagePath != null
-                              ? Image.asset(imagePath, width: 24, height: 24)
-                              : Icon(icon ?? Icons.star_rounded, color: iconColor, size: 24),
+                              ? Image.asset(imagePath, width: 28, height: 28)
+                              : Icon(icon ?? Icons.star_rounded, color: iconColor, size: 28),
                         ),
                         const SizedBox(width: 14),
                         // Metinler
