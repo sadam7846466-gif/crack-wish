@@ -159,34 +159,38 @@ class StorageService {
 
   /// Mevcut Aura ve Ruh Taşı değerlerini alıp Supabase'e yedekler
   static Future<void> syncEconomyToCloud() async {
-    final prefs = await SharedPreferences.getInstance();
-    final aura = prefs.getInt('daily_bonus_aura') ?? 0;
-    final stones = prefs.getInt(_keySoulStones) ?? 0;
-    
-    final totalCookies = prefs.getInt('total_cookies') ?? 0;
-    final totalTarots = prefs.getInt('total_tarot_count') ?? 0; // Doğru key
-    final totalDreams = (prefs.getStringList('dream_list') ?? []).length; // Liste boyutu
-    final streakDays = prefs.getInt('streak_days') ?? 0;
-    
-    final totalFriends = prefs.getInt('total_friends_count') ?? 0;
-    final totalLetters = prefs.getInt('total_letters_sent') ?? 0;
-    final totalReferrals = prefs.getInt('total_referrals_count') ?? 0;
-    final uniqueCookies = (prefs.getStringList(_keyCookieCollection) ?? []).length;
-    final unlockedAchievements = prefs.getStringList('achievements_claimed') ?? [];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final aura = prefs.getInt('daily_bonus_aura') ?? 0;
+      final stones = prefs.getInt(_keySoulStones) ?? 0;
+      
+      final totalCookies = prefs.getInt('total_cookies') ?? 0;
+      final totalTarots = prefs.getInt('total_tarots') ?? 0; // Düzeltildi
+      final totalDreams = prefs.getInt('total_dreams') ?? 0; // Düzeltildi
+      final streakDays = prefs.getInt('streak_days') ?? 0;
+      
+      final totalFriends = prefs.getInt('total_friends_count') ?? 0;
+      final totalLetters = prefs.getInt('total_letters_sent') ?? 0;
+      final totalReferrals = prefs.getInt('total_referrals_count') ?? 0;
+      final uniqueCookies = (prefs.getStringList(_keyCookieCollection) ?? []).length;
+      final unlockedAchievements = prefs.getStringList('achievements_claimed') ?? [];
 
-    await ProfileSyncService().syncEconomyData(
-      aura: aura, 
-      soulStones: stones,
-      totalCookies: totalCookies,
-      totalTarots: totalTarots,
-      totalDreams: totalDreams,
-      streakDays: streakDays,
-      totalFriends: totalFriends,
-      totalLetters: totalLetters,
-      totalReferrals: totalReferrals,
-      uniqueCookies: uniqueCookies,
-      unlockedAchievements: unlockedAchievements,
-    );
+      await ProfileSyncService().syncEconomyData(
+        aura: aura, 
+        soulStones: stones,
+        totalCookies: totalCookies,
+        totalTarots: totalTarots,
+        totalDreams: totalDreams,
+        streakDays: streakDays,
+        totalFriends: totalFriends,
+        totalLetters: totalLetters,
+        totalReferrals: totalReferrals,
+        uniqueCookies: uniqueCookies,
+        unlockedAchievements: unlockedAchievements,
+      );
+    } catch (e) {
+      debugPrint('🚨 syncEconomyToCloud Hatası: $e');
+    }
   }
 
   /// Buluttan (Supabase) mevcut değerleri indirip cihaz hafızasına yazar
@@ -943,8 +947,8 @@ class StorageService {
     // Kullanıcı verilerini topla
     final stats = <String, int>{
       'total_cookies': prefs.getInt('total_cookies') ?? 0,
-      'total_tarots': prefs.getInt('total_tarot_count') ?? 0,
-      'total_dreams': (prefs.getStringList('dream_list') ?? []).length,
+      'total_tarots': prefs.getInt('total_tarots') ?? 0,
+      'total_dreams': prefs.getInt('total_dreams') ?? 0,
       'total_friends': prefs.getInt('total_friends_count') ?? 0,
       'total_letters_sent': prefs.getInt('total_letters_sent') ?? 0,
       'total_referrals': prefs.getInt('total_referrals_count') ?? 0,
