@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Instagram / X tarzı — ekranın HER YERİNDEN sağa kaydırarak geri dönme.
+/// iOS tarzı — doğal sola kaydırarak geri dönme.
 /// 
-/// Güvenlik:
-/// - Minimum 20px yatay hareket gerekir (tıklamayı yanlışlıkla tetiklemez)
-/// - Yatay hareket, dikeyden baskın olmalı (scroll ile çakışmaz)  
-/// - Sadece SAĞA kaydırma çalışır
+/// Davranış:
+/// - Sayfa parmağı birebir takip eder (düz kayma, opacity/scale yok)
+/// - Sol kenarda hafif gölge
+/// - Bırakıldığında iOS spring fiziği ile yerine oturur veya çıkar
+/// - Minimum 20px yatay hareket gerekir (tıklamayı tetiklemez)
+/// - Yatay hareket dikeyden baskın olmalı (scroll ile çakışmaz)
 class SwipeBackWrapper extends StatefulWidget {
   final Widget child;
   
@@ -42,8 +44,11 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
   bool _swipeDecided = false;   // Yön kararı verildi mi?
   bool _swipeAccepted = false;  // Yatay sağa swipe kabul edildi mi?
 
+  // Velocity tracking
+  Offset? _lastPosition;
+  DateTime? _lastTime;
+  double _velocity = 0.0;
 
-  
   // Minimum hareket eşiği — bu kadar px hareket etmeden karar verilmez
   static const double _directionThreshold = 20.0;
 
@@ -52,7 +57,7 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 350),
     );
   }
 
@@ -74,6 +79,9 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     }
 
     _initialPosition = event.position;
+    _lastPosition = event.position;
+    _lastTime = DateTime.now();
+    _velocity = 0.0;
     _swipeDecided = false;
     _swipeAccepted = false;
   }
@@ -94,6 +102,17 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     
     // Kabul edilmediyse hiçbir şey yapma
     if (!_swipeAccepted) return;
+
+    // Velocity hesapla
+    final now = DateTime.now();
+    if (_lastPosition != null && _lastTime != null) {
+      final dt = now.difference(_lastTime!).inMicroseconds / 1000000.0;
+      if (dt > 0) {
+        _velocity = (event.position.dx - _lastPosition!.dx) / dt;
+      }
+    }
+    _lastPosition = event.position;
+    _lastTime = now;
     
     final screenWidth = MediaQuery.of(context).size.width;
     final newOffset = (event.position.dx - _initialPosition!.dx).clamp(0.0, screenWidth);
@@ -114,9 +133,8 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     final screenWidth = MediaQuery.of(context).size.width;
     final dragRatio = _dragOffset / screenWidth;
     
-    // Hızlı hesaplama: son pozisyondan basit velocity tahmini
-    // (Gerçek velocity için daha gelişmiş tracking gerekir ama bu yeterli)
-    if (dragRatio > widget.dismissThreshold) {
+    // iOS davranışı: %30'dan fazla kaydırıldıysa VEYA hızlı fırlatıldıysa → çık
+    if (dragRatio > widget.dismissThreshold || _velocity > widget.velocityThreshold) {
       _dismiss();
     } else {
       _snapBack();
@@ -140,13 +158,17 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     final startOffset = _dragOffset;
     final endOffset = screenWidth;
     
+    // iOS tarzı hızlı çıkış — kalan mesafeye göre süre ayarla
+    final remaining = (endOffset - startOffset) / screenWidth;
+    final duration = (remaining * 250).toInt().clamp(100, 250);
+    
     _animController.reset();
-    _animController.duration = const Duration(milliseconds: 200);
+    _animController.duration = Duration(milliseconds: duration);
     
     late final VoidCallback listener;
     listener = () {
       setState(() {
-        _dragOffset = startOffset + (endOffset - startOffset) * Curves.easeOut.transform(_animController.value);
+        _dragOffset = startOffset + (endOffset - startOffset) * Curves.easeOutCubic.transform(_animController.value);
       });
       
       if (_animController.isCompleted) {
@@ -174,15 +196,16 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
       return;
     }
     
+    // iOS spring fiziği — doğal yay etkisi
     _animController.reset();
-    _animController.duration = Duration(
-      milliseconds: (startOffset / MediaQuery.of(context).size.width * 250).toInt().clamp(100, 250),
-    );
+    _animController.duration = const Duration(milliseconds: 350);
     
     late final VoidCallback listener;
     listener = () {
       setState(() {
-        _dragOffset = startOffset * (1.0 - Curves.easeOutCubic.transform(_animController.value));
+        // Spring benzeri overshoot efekti
+        _dragOffset = startOffset * (1.0 - Curves.easeOutBack.transform(_animController.value));
+        if (_dragOffset < 0) _dragOffset = 0; // Overshoot'u sıfırda kes
       });
       
       if (_animController.isCompleted) {
@@ -200,6 +223,9 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
     _swipeDecided = false;
     _swipeAccepted = false;
     _initialPosition = null;
+    _lastPosition = null;
+    _lastTime = null;
+    _velocity = 0.0;
     if (_dragOffset != 0.0) {
       setState(() {
         _dragOffset = 0.0;
@@ -219,12 +245,10 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final dragRatio = (screenWidth > 0) ? (_dragOffset / screenWidth).clamp(0.0, 1.0) : 0.0;
-    
-    // Görsel efektler
-    final opacity = (1.0 - dragRatio * 0.5).clamp(0.0, 1.0);
-    final scale = 1.0 - dragRatio * 0.05;
-    final borderRadius = dragRatio * 16.0;
+    // Gölge opaklığı — kaydırma ilerledikçe azalır
+    final shadowAlpha = _dragOffset > 0 
+        ? (0.2 * (1.0 - (_dragOffset / screenWidth).clamp(0.0, 1.0)))
+        : 0.0;
 
     return Listener(
       onPointerDown: _onPointerDown,
@@ -232,16 +256,25 @@ class _SwipeBackWrapperState extends State<SwipeBackWrapper>
       onPointerUp: _onPointerUp,
       onPointerCancel: _onPointerCancel,
       behavior: HitTestBehavior.translucent,
-      child: Transform(
-        transform: Matrix4.translationValues(_dragOffset, 0.0, 0.0)
-          ..multiply(Matrix4.diagonal3Values(scale, scale, 1.0)),
-        alignment: Alignment.centerLeft,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: AbsorbPointer(
-            absorbing: _swipeAccepted || _isPopping,
-            child: Opacity(
-              opacity: opacity,
+      child: Transform.translate(
+        offset: Offset(_dragOffset, 0),
+        child: ClipRect(
+          child: DecoratedBox(
+            // iOS tarzı sol kenar gölgesi — sadece kaydırma aktifken
+            decoration: BoxDecoration(
+              boxShadow: shadowAlpha > 0
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: shadowAlpha),
+                      blurRadius: 25,
+                      spreadRadius: -5,
+                      offset: const Offset(-8, 0),
+                    ),
+                  ]
+                : null,
+            ),
+            child: AbsorbPointer(
+              absorbing: _swipeAccepted || _isPopping,
               child: widget.child,
             ),
           ),

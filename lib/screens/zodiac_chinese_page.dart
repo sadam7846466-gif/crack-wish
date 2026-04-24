@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:math' as math;
 import 'package:flutter_animate/flutter_animate.dart';
 import '../widgets/glass_back_button.dart';
+import '../widgets/swipe_back_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import 'chinese_zodiac_data.dart';
@@ -24,13 +25,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   bool _careerAnimated = false;
   int _animalIdx = 6;
   int _activeSection = 0;
-  bool _canPop = false;
   
   void _handleBack() {
-    setState(() => _canPop = true);
-    Future.microtask(() {
-      if (mounted) Navigator.of(context).pop();
-    });
+    if (mounted) Navigator.of(context).pop();
   }
 
   DateTime _birthDate = DateTime(1999, 12, 20);
@@ -208,13 +205,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: _canPop,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          _handleBack();
-        }
-      },
+    return SwipeBackWrapper(
       child: Scaffold(
         backgroundColor: _bg,
         body: Stack(
@@ -7024,81 +7015,161 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
       DateTime.now().millisecondsSinceEpoch ~/ (1000 * 60 * 60 * 24 * 7);
 
   String _getPersonalizedActivate(String goal, String element) {
-    if (goal == 'Para') {
-      if (element == 'Ağaç')
-        return 'Sarmaşık veya para çiçeği, yeşil bambu, tavanı gören yatay ahşap raflar.';
-      if (element == 'Ateş')
-        return 'Parlak veya kırmızımsı bir kristal, bol günışığı alan çekici bir bitki.';
-      if (element == 'Toprak')
-        return 'Seramik kalın saksıda canlı bitkiler, doğal kahve tonlu dekorlar.';
-      if (element == 'Metal')
-        return 'Madeni paralarla dolu şık metal bir kâse, beyaz çiçekli zarif bitkiler.';
-      if (element == 'Su')
-        return 'Akan su sembolü (ör. mini şelale), yansıtıcı aynalar, siyah-lacivert saksılar.';
-    }
-    if (goal == 'Aşk') {
-      if (element == 'Ağaç')
-        return 'İnce uzun çift ahşap obje, taze yapraklı dekoratif canlı çiçek.';
-      if (element == 'Ateş')
-        return 'İkili sıcak-kırmızı mumlar, aşkı simgeleyen ve ortamı ısıtan loş aydınlatma.';
-      if (element == 'Toprak')
-        return 'Kare veya doğal kesim ikili taş objeler, sarsılmazı simgeleyen ağırlıklar.';
-      if (element == 'Metal')
-        return 'Gümüş veya dairesel parlak çerçeveli romantik bir çift fotoğrafı.';
-      if (element == 'Su')
-        return 'Yan yana uyumla duran kıvrımlı cam biblolar, şeffaf asimetrik objeler.';
-    }
-    if (goal == 'Kariyer') {
-      if (element == 'Ağaç')
-        return 'Kariyer büyümesini tetikleyecek dik formlu asil bir bitki, maskülen çalışma eşyası.';
-      if (element == 'Ateş')
-        return 'İlham verecek iddialı bir lamba, tutkunuzu hatırlatan çerçeveli bir başarı sözü.';
-      if (element == 'Toprak')
-        return 'Kalıcılık hissi için masa üstünde sağlam, doğal kristaller ya da ağır küpler.';
-      if (element == 'Metal')
-        return 'Keskin ve net hatlara sahip gümüş-gri organizer, dairesel metal saat.';
-      if (element == 'Su')
-        return 'Zihni açan lacivert vurgular, derinlik hissi katan yansıtıcı yüzeyler ve camlıklar.';
-    }
-    if (goal == 'Huzur') {
-      if (element == 'Ağaç')
-        return 'Orta noktada sıcak doğal ahşap dokunuş, enerjinin yayılmasına açık bir boşluk.';
-      if (element == 'Ateş')
-        return 'Huzur alanınızı ısıtacak sarı veya sıcak bir ambiyans aydınlatması.';
-      if (element == 'Toprak')
-        return 'Merkezi tam simetrik tutmak, açık kiremit veya toprak halı kullanmak.';
-      if (element == 'Metal')
-        return 'Gürültüyü emen, ferahlık veren minimal ve dairesel objeler, yumuşak yüzeyler.';
-      if (element == 'Su')
-        return 'İçsel sükunet için alanı tamamen engelsiz bırakıp sadece dalgalı bir form eklemek.';
-    }
-    if (goal == 'Sağlık') {
-      if (element == 'Ağaç')
-        return 'Orman yenilenmesini anımsatan geniş yapraklı bitkiler, ahşap rüzgar çanı.';
-      if (element == 'Ateş')
-        return 'Sabah güneşi anımsatan turuncu tonlu bir dekor veya canlı kırmızı çiçekler.';
-      if (element == 'Toprak')
-        return 'Köklenme hissi yaratacak toprak vazolar, doğal şifayı simgeleyen motifler.';
-      if (element == 'Metal')
-        return 'Nefes aldıran pürüzsüz yüzeyler, beyaz çiçekler ve sade metalik çatkılar.';
-      if (element == 'Su')
-        return 'Havayı ferahlatan küçük bir su tası veya mavi-lacivert derin tonlu vazolar.';
-    }
-    return widget.goals[goal]!['activate']!;
+    final eActivators = {
+      'Ağaç': [
+        'Yeşil yapraklı canlı bitkiler ekle', 'Ahşap dokulu dekoratif objeler kullan', 'Uzun ve dikey formlu aksesuarlar yerleştir',
+        'Doğal bambu çubukları bulundur', 'Açık yeşil veya mint tonlarında detaylar seç', 'Ahşap çerçeveli doğa manzaraları as',
+        'Hasır veya doğal örgü sepetler kullan', 'Mekana taze ve canlı çiçekler getir', 'Sarmaşık türü büyüyen bitkiler yerleştir',
+        'Ağaç dalı formunda sanatsal objeler ekle', 'Pamuklu ve keten doğal kumaşlar tercih et', 'Doğal ahşap rüzgar çanları veya mobilyalar ekle'
+      ],
+      'Ateş': [
+        'Kırmızı, turuncu veya bordo tonlu objeler ekle', 'Sıcak sarı ışık veren abajurlar kullan', 'Üçgen veya piramit formlu aksesuarlar yerleştir',
+        'Canlı yanan mumlar veya şamdanlar bulundur', 'Güneş ışığını içeri çeken parlak kristalleri as', 'Sıcak tonlu tütsüler veya aromaterapi yağları kullan',
+        'Parlak dokulu ve göz alıcı kumaşlar seç', 'Ateş elementini yansıtan yıldız şekilli dekorlar ekle', 'Güneş veya ateş temalı sanat eserleri as',
+        'Evcil hayvanların veya canlılığın enerjisini yansıt', 'Kırmızı detaylı yumuşak kırlentler yerleştir', 'Sıcak bir ambiyans yaratan tuz lambası kullan'
+      ],
+      'Toprak': [
+        'Toprak, bej veya kiremit tonlarında eşyalar ekle', 'Kare veya yatay dikdörtgen formlu mobilyalar kullan', 'Doğal taşlar ve kristaller bulundur',
+        'Seramik, kil veya çömlek saksılar yerleştir', 'Yumuşak, peluş ve yere yakın dokular seç', 'Sarı, kahverengi ve taba renkli kırlentler kullan',
+        'Çöl veya dağ manzaralı tablolar as', 'Ağır ve sağlam duran masa üstü objeleri ekle', 'Doğal kum veya taş bahçesi (zen garden) kur',
+        'Merkezi dengeleyen kare desenli halılar ser', 'Topraklanma hissi veren doğal tuz kristalleri koy', 'Sarsılmazlığı simgeleyen taş heykeller ekle'
+      ],
+      'Metal': [
+        'Beyaz, gri veya metalik parlak renkler ekle', 'Dairesel, oval veya küre formlu objeler kullan', 'Gümüş, altın veya bakır yansımalı aksesuarlar yerleştir',
+        'Metal çerçeveli aynalar as', 'Pürüzsüz ve sert yüzeyli dekoratif eşyalar seç', 'Metalik ses çıkaran rüzgar çanları veya saatler bulundur',
+        'Beyaz renkli ve sade çiçekler (örneğin beyaz orkide) koy', 'Minimalist ve modern çizgili objeler tercih et', 'Parlak çelik veya krom masa eşyaları kullan',
+        'Gökyüzü veya uzay temalı yuvarlak tablolar as', 'Gereksiz detayı olmayan pürüzsüz yüzeyler yarat', 'Odaklanmayı artıran gümüş tonlu küreler ekle'
+      ],
+      'Su': [
+        'Lacivert, siyah veya koyu mavi tonlar ekle', 'Dalgalı, kıvrımlı veya asimetrik formlar kullan', 'Cam objeler ve şeffaf aksesuarlar yerleştir',
+        'Küçük bir masa çeşmesi veya su şelalesi bulundur', 'Derinliği simgeleyen koyu renkli aynalar as', 'Su manzarası, okyanus veya şelale tabloları ekle',
+        'İçinde taze su bulunan cam vazolar koy', 'Deniz kabukları veya sualtı temalı dekorlar kullan', 'Serbest akışı yansıtan ipek veya saten kumaşlar seç',
+        'Koyu renkli saksılarda su içinde büyüyen bitkiler yetiştir', 'Akışkan formlu ve yansıtıcı yüzeyli biblolar ekle', 'Işığı su gibi kıran kristal prizmalar as'
+      ],
+    };
+
+    final gActivators = {
+      'Para': [
+        'güneydoğu köşesinde bolluk enerjisini canlandır.', 'çalışma masanın sol üst köşesini ferah tutarak bereketi çek.', 'mekanın girişini aydınlık tutarak finansal fırsatlara yer aç.',
+        'zenginlik köşene değer katan küçük bir dokunuş yap.', 'cüzdanını koyduğun alanı temiz ve düzenli tutarak parayı onurlandır.', 'evin bereket merkezinde birikim enerjisini aktive et.',
+        'mutfak ocağının etrafını her zaman pırıl pırıl yaparak bolluğu davet et.', 'para köşende istikrarlı büyümeyi simgeleyen objeler bulundur.', 'finansal evraklarını düzenli tuttuğun alana şık bir kutu ekleyerek değer kat.',
+        'bolluk afirmasyonlarını yazdığın bir kağıdı görünür bir yere as.', 'yemek masasının etrafında bereketi yansıtacak detaylar kullan.', 'giriş kapının karşısına bolluk hissi veren bir dekorasyon yerleştir.'
+      ],
+      'Aşk': [
+        'güneybatı köşesinde ikili ilişkileri güçlendiren adımlar at.', 'yatak odanda simetri yaratarak romantik dengeyi kur.', 'tekli eşyaları çiftleyerek hayatına uyumu davet et.',
+        'ilişki köşesinde sıcaklık ve yakınlık hissini canlandır.', 'evin merkezinde sevgi dolu bir atmosfer oluştur.', 'yatağının iki tarafına da eşit boşluk bırakarak partnerine alan aç.',
+        'aşkı ve tutkuyu çeken objeleri görünür alanlara yerleştir.', 'geçmişteki ilişkilerin enerjisini temizleyip yeni aşka yer aç.', 'romantizmi simgeleyen hoş kokular ve dokular ekle.',
+        'oturma odanda iletişimi teşvik edecek U düzeni kur.', 'aşk köşene çiftleri simgeleyen sanat eserleri veya fotoğraflar as.', 'kendine duyduğun sevgiyi artıracak öz bakım köşeleri yarat.'
+      ],
+      'Kariyer': [
+        'kuzey köşesinde iş ve kariyer fırsatlarını hareketlendir.', 'çalışma alanında yüzünü her zaman kapıya dönecek şekilde ayarla.', 'masanda liderliği ve başarıyı simgeleyen detaylar bulundur.',
+        'iş hayatında önündeki engelleri kaldırmak için vizyonunu temiz tut.', 'kariyer yolculuğunda sana ilham veren mentörlerin sözlerini as.', 'odaklanmayı artırmak için çalışma masanın merkezini tamamen boşalt.',
+        'başarı hedeflerini simgeleyen objeleri görüş alanında tut.', 'profesyonel ağını genişletmek için iletişim köşeni (kuzeybatı) güçlendir.', 'çalışma masanın arkasına sağlam bir duvar alarak destek hissini artır.',
+        'masandaki aydınlatmayı artırarak kariyerindeki belirsizlikleri aydınlat.', 'iş yerindeki ününü (güney) artırmak için başarı belgelerini sergile.', 'odaklanmayı kolaylaştıran düzenleyici ofis aksesuarları kullan.'
+      ],
+      'Huzur': [
+        'evin merkezi olan Tai Chi alanını dengeleyerek içsel huzuru bul.', 'dinlenme alanında zihni yoran her türlü görsel karmaşayı azalt.', 'stresi dışarıda bırakmak için giriş kapısı çevresini sadeleştir.',
+        'meditasyon veya dinlenme köşende sadece sana iyi gelen objeler tut.', 'evin tam ortasında enerjinin serbestçe akabileceği geniş bir boşluk yarat.', 'uyku kaliteni artırmak için yatak odanı olabildiğince minimalist yap.',
+        'odanda doğal ışığı maksimum seviyede kullanarak ruhunu dinlendir.', 'kendinle baş başa kaldığın anlar için rahat bir okuma köşesi oluştur.', 'dijital detoks yapmak için yatak odandan elektronik aletleri çıkar.',
+        'yumuşak ve dingin bir müzik açarak mekanın titreşimini sakinleştir.', 'içsel sessizliği destekleyen pastel veya nötr tonları ön plana çıkar.', 'her sabah evini havalandırarak taze ve huzurlu enerjiyi içeri al.'
+      ],
+      'Sağlık': [
+        'evin doğu köşesinde fiziksel ve zihinsel canlılığı teşvik et.', 'yaşam enerjisi (Chi) akışını hızlandırmak için koridorları açık tut.', 'mutfağını temiz ve düzenli tutarak bedenin beslenme kaynağını koru.',
+        'sağlık köşende canlılığı ve yenilenmeyi temsil eden detaylar bulundur.', 'yatak odanda dinlendirici bir atmosfer yaratarak hücre yenilenmesini destekle.', 'evin merkezindeki enerjiyi temizleyerek genel sağlığı güvenceye al.',
+        'banyo kapısını daima kapalı tutarak enerji kaçaklarını önle.', 'sağlıklı yaşam hedeflerini yansıtan motive edici bir köşe hazırla.', 'odalarındaki hava akışını artırarak durağan enerjiyi dışarı at.',
+        'doğal şifa elementlerini mekanın çeşitli yerlerine entegre et.', 'zararlı kimyasalları yaşam alanından çıkararak doğal bir ortam sağla.', 'güneş ışığının ve temiz havanın evinde serbestçe dolaşmasına izin ver.'
+      ],
+    };
+
+    final safeGoal = gActivators.containsKey(goal) ? goal : 'Para';
+    final safeElement = eActivators.containsKey(element) ? element : 'Toprak';
+
+    final eIdx = ((_weekIndex * 13) + goal.hashCode.abs()) % 12;
+    final gIdx = ((_weekIndex * 17) + element.hashCode.abs()) % 12;
+
+    final eText = eActivators[safeElement]![eIdx];
+    final gText = gActivators[safeGoal]![gIdx];
+
+    return '$eText ve $gText';
   }
 
   String _getPersonalizedRemove(String goal, String element) {
-    if (element == 'Ağaç')
-      return 'Solmuş, ölü bitkiler ve oda akışını kesen gereksiz büyük ve sert mobilyalar.';
-    if (element == 'Ateş')
-      return 'Soguk hissi veren sönük ampuller, durgunluk hissi uyandıran cansız tablolar.';
-    if (element == 'Toprak')
-      return 'Dengesiz veya altı bozuk sallanan mobilyalar, güven sarsan asimetrik yerleşimler.';
-    if (element == 'Metal')
-      return 'Düzensiz kağıt yığınları, çok yorucu ve aşırı parlak karışık renklere sahip eşyalar.';
-    if (element == 'Su')
-      return 'Akışı tıkayan ağır ve hantal kutular, uzun süredir kenarda tozlanmış eşyalar.';
-    return widget.goals[goal]!['remove']!;
+    final eRemoves = {
+      'Ağaç': [
+        'Kurumuş, solmuş veya ölü bitkileri hemen at', 'Kullanılmayan, eski kağıt ve dergi yığınlarını geri dönüşüme ver', 'Gereksiz yer kaplayan ağır ahşap mobilyaları seyrelt',
+        'Çürümüş veya nemlenmiş ahşap objeleri mekandan çıkar', 'Kırık sepetleri ve yıpranmış hasır eşyaları at', 'Mekanı boğan aşırı büyük saksı bitkilerini başka yere taşı',
+        'Tarihi geçmiş dosyaları ve eski mektupları temizle', 'Geçiş yollarını tıkayan ağaç formlu engelleri kaldır', 'Kuru çiçek aranjmanlarını ve cansız yaprakları çöpe at',
+        'Fonksiyonunu yitirmiş eski ahşap kutuları boşalt', 'Canlılığını yitirmiş, sararmış sarmaşıkları buda', 'Göz yoran eski ve tozlu ahşap bibloları kaldır'
+      ],
+      'Ateş': [
+        'Patlamış ampulleri ve çalışmayan aydınlatmaları hemen değiştir', 'Erimiş, formunu kaybetmiş eski mumları at', 'Sivri ve çok keskin üçgen formlu agresif objeleri kaldır',
+        'Çalışmayan, bozuk elektronik aletleri evden çıkar', 'Aşırı parlak, göz yoran kırmızı dekorları azalt', 'Gün ışığını tamamen kesen kalın ve koyu perdeleri değiştir',
+        'Saldırganlık veya tehlike hissi veren tabloları kaldır', 'Gürültülü çalışan bozuk cihazları tamir ettir veya at', 'Karışmış ve tehlike yaratan uzatma kablolarını düzenle',
+        'Eski, yıpranmış ve tüylenen sentetik halıları mekandan çıkar', 'Kasvetli ve karanlık enerji yayan eski lambaderleri at', 'Şömine veya ocak etrafındaki gereksiz kalabalığı temizle'
+      ],
+      'Toprak': [
+        'Çatlamış, kırık seramik veya kil saksıları at', 'Dengesiz duran, sallanan masa ve sandalyeleri tamir et', 'Toz toplayan, kullanılmayan ağır bibloları kaldır',
+        'Zemini daraltan gereksiz büyük halıları veya kilimleri küçült', 'Merkezi tıkayan, geçişi zorlaştıran hantal mobilyaları seyrelt', 'Kırık mermer veya taş objeleri mekandan çıkar',
+        'Tarihi geçmiş, kurumuş makyaj ve toprak bazlı ürünleri at', 'Enerjiyi ağırlaştıran çok koyu kahverengi veya boğucu dekorları azalt', 'Görünür çatlakları olan duvarları veya eşyaları onar',
+        'Altı bozuk, dengesiz raf sistemlerini sabitle', 'İhtiyacından fazla olan dekoratif yastık yığınlarını azalt', 'Durağanlık yaratan, uzun süredir yeri değişmeyen ağır eşyaları hareketlendir'
+      ],
+      'Metal': [
+        'Paslanmış, oksitlenmiş metal eşyaları mekandan çıkar', 'Düzensiz duran bozuk para yığınlarını bir kumbaraya topla', 'Keskin kenarlı, tehditkar görünen metal objeleri kaldır',
+        'Çekmecelerde birikmiş eski anahtarları ve bozuk kilitleri at', 'İçi geçmiş, çalışmayan saatleri ve pilleri geri dönüşüme yolla', 'Gereksiz metal tel askıları ve deforme olmuş mutfak aletlerini at',
+        'Aşırı yansıma yapan, göz yoran krom yüzeyleri azalt', 'Karışık ve düğümlenmiş takıları, kopmuş kolyeleri düzenle', 'Kullanılmayan, eski çatal bıçak takımlarını ayıkla',
+        'Eski, paslı vidalar ve alet çantası dağınıklığını toparla', 'Metal kutularda saklanan gereksiz fatura ve fişleri imha et', 'Soğuk ve mesafeli hissettiren aşırı metalik dekorasyonları yumuşat'
+      ],
+      'Su': [
+        'Sızdıran muslukları ve damlatan boruları hemen tamir et', 'Durgun, kokmuş suyu olan vazo veya kapları temizle', 'Çatlamış, lekelenmiş veya buğulu aynaları yenisiyle değiştir',
+        'Banyo veya lavabo altındaki gereksiz temizlik malzemelerini at', 'Kırık cam bardakları ve yontulmuş cam eşyaları çöpe at', 'Tıkanmış lavabo ve küvet giderlerini mutlaka aç',
+        'Enerjiyi boğan, aşırı koyu lacivert veya siyah duvarları aydınlat', 'Üzüntü veya yalnızlık hissi veren karanlık tabloları kaldır', 'Eski, içi boşalmış parfüm ve kozmetik şişelerini at',
+        'Pencerelerdeki kirli veya lekeli camları silerek netleştir', 'Nemli, küflü köşeleri temizle ve rutubet kaynağını kurut', 'Banyodaki tarihi geçmiş, kullanılmayan ilaç ve ürünleri at'
+      ],
+    };
+
+    final gRemoves = {
+      'Para': [
+        'böylece bolluk enerjisinin önündeki fiziksel tıkanıklıkları aç.', 've finansal akışın mekana daha rahat girmesini sağla.', 'böylece bereket köşendeki (güneydoğu) durgun enerjiyi dağıt.',
+        've gereksiz harcamaları tetikleyen negatif enerjiden kurtul.', 'böylece para girişini engelleyen zihinsel ve fiziksel blokajları kır.', 've fırsatların kapından daha kolay girmesi için alan yarat.',
+        'böylece maddi konulardaki belirsizlikleri netleştir.', 've birikim yapmanı zorlaştıran eski alışkanlıkları arkanda bırak.', 'böylece bolluk bilincini zedeleyen eksiklik hissiyatını temizle.',
+        've paranın evinde serbestçe dolaşabileceği bir ferahlık sağla.', 'böylece değer duygusunu artırıp finansal şansını yükselt.', 've maddi hedeflerine ulaşmanı yavaşlatan yükleri hafiflet.'
+      ],
+      'Aşk': [
+        'böylece ikili ilişkilerde aradığın dengeyi ve uyumu yakala.', 've hayatına girecek veya var olan sevgi enerjisine yer aç.', 'böylece geçmişin bağlarından kurtulup taze başlangıçlara izin ver.',
+        've yalnızlık veya soğukluk hissi veren frekansı mekandan uzaklaştır.', 'böylece romantik ilişkilerdeki iletişim kopukluklarını onar.', 've aşk köşendeki (güneybatı) durgunluğu canlandır.',
+        'böylece partnerinle veya kendinle olan bağını güçlendir.', 've evdeki sevgi titreşimini düşüren anıları temizle.', 'böylece kalbini yeni ihtimallere ve sıcak duygulara açık tut.',
+        've ilişkilerde tekrarlayan olumsuz döngüleri fiziksel olarak kır.', 'böylece sadakat, tutku ve şefkat duygularını mekanında büyüt.', 've romantizmi sabote eden engelleri yaşam alanından çıkar.'
+      ],
+      'Kariyer': [
+        'böylece iş hayatında ilerlemeni durduran engelleri ortadan kaldır.', 've kariyer yolculuğunda önüne çıkacak yeni fırsatlara kapı arala.', 'böylece çalışma alanındaki odaklanma sorunlarını ve ertelemeyi bitir.',
+        've başarı enerjisinin masanda özgürce dolaşmasına izin ver.', 'böylece zihinsel karmaşayı temizleyip profesyonel vizyonunu netleştir.', 've terfi veya yeni iş beklentilerinin önündeki tıkanıklığı aç.',
+        'böylece kariyer alanında (kuzey) daha akıcı ve güçlü bir enerji yarat.', 've iş ortamında itibarını zedeleyen olumsuz titreşimleri dağıt.', 'böylece üretkenliğini düşüren yorgunluk hissinden kurtul.',
+        've mesleki ilişkilerinde daha şeffaf ve güvenilir bir bağ kur.', 'böylece yaratıcılığını engelleyen sınırları fiziksel olarak kaldır.', 've başarıya giden yolda sırtında taşıdığın gereksiz yükleri at.'
+      ],
+      'Huzur': [
+        'böylece zihnini sürekli meşgul eden gizli stres kaynaklarını yok et.', 've evin merkezindeki (Tai Chi) ruhsal dengeyi yeniden kur.', 'böylece içsel sakinliğini bozan kaotik enerjiyi mekandan tahliye et.',
+        've dinlenme saatlerinde daha derin bir sükunet deneyimle.', 'böylece aile içi gerginlikleri ve çatışmaları yatıştırıcı bir zemin hazırla.', 've yaşam alanında nefes almanı kolaylaştıran bir sadelik yarat.',
+        'böylece dış dünyanın gürültüsünü evinin kapısında bırak.', 've anksiyeteyi tetikleyen görsel kirlilikten kurtularak hafifle.', 'böylece uyku kaliteni düşüren enerji kaçaklarını tamir et.',
+        've ruhsal uyanışın veya meditasyonun için saf bir alan oluştur.', 'böylece zihinsel berraklığını gölgeleyen tozlu düşünceleri süpür.', 've evinin her köşesinde güven veren bir barış atmosferi sağla.'
+      ],
+      'Sağlık': [
+        'böylece fiziksel enerjini sömüren ve yoran unsurları yaşamından çıkar.', 've bedensel şifa sürecini destekleyecek temiz bir titreşim alanı yarat.', 'böylece sağlık köşesindeki (doğu) hayat enerjisi (Chi) akışını hızlandır.',
+        've bağışıklık sistemini zayıflatan durağan, negatif havayı dağıt.', 'böylece canlılık ve zindelik hissinin evine dolmasına izin ver.', 've kronik yorgunluğa sebep olan çevresel toksinleri mekandan at.',
+        'böylece hücre yenilenmesini destekleyen ferah bir uyku ortamı sağla.', 've yaşam sevincini gölgeleyen sağlıksız alışkanlıkların izlerini sil.', 'böylece zihinsel ve fiziksel esnekliğini artıracak boşluklar yarat.',
+        've mutfağındaki bereketi ve beslenme enerjisini saf tut.', 'böylece bedeninin doğal ritmine uyum sağlamasını kolaylaştır.', 've hastalık enerjisini barındıran durgun köşeleri havalandırarak şifalandır.'
+      ],
+    };
+
+    final safeGoal = gRemoves.containsKey(goal) ? goal : 'Para';
+    final safeElement = eRemoves.containsKey(element) ? element : 'Toprak';
+
+    final eIdx = ((_weekIndex * 19) + goal.hashCode.abs()) % 12;
+    final gIdx = ((_weekIndex * 23) + element.hashCode.abs()) % 12;
+
+    final eText = eRemoves[safeElement]![eIdx];
+    final gText = gRemoves[safeGoal]![gIdx];
+
+    return '$eText, $gText';
   }
 
   String _getWeeklyTip(String goal, String element) {

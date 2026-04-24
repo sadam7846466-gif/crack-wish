@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'dart:math' as math;
 import '../widgets/glass_back_button.dart';
+import '../widgets/swipe_back_wrapper.dart';
 import '../services/storage_service.dart';
 import '../data/mayan_zodiac_data.dart';
 import 'package:flutter/cupertino.dart';
@@ -109,32 +110,34 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
-      body: Stack(
-        children: [
-          // Zemin: Dev Tzolk'in Takvim Çarkı
-          Positioned.fill(
-            child: _MayanWheelBackground(jade: _jade, gold: _goldBright, bg: _bg),
-          ),
-          
-          // Ana İçerik - SafeArea ve Header'dan bağımsız tam ekran scroll
-          Positioned.fill(
-            child: _buildContent(context),
-          ),
-
-          // Header kısmı üste sabitlendi, böylece içerik scroll edilirken
-          // sert bir şekilde kesilmek yerine header'ın arkasından şeffafça ekran dışına kayacak
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: _buildHeader(),
+    return SwipeBackWrapper(
+      child: Scaffold(
+        backgroundColor: _bg,
+        body: Stack(
+          children: [
+            // Zemin: Dev Tzolk'in Takvim Çarkı
+            Positioned.fill(
+              child: _MayanWheelBackground(jade: _jade, gold: _goldBright, bg: _bg),
             ),
-          ),
-        ],
+            
+            // Ana İçerik - SafeArea ve Header'dan bağımsız tam ekran scroll
+            Positioned.fill(
+              child: _buildContent(context),
+            ),
+
+            // Header kısmı üste sabitlendi, böylece içerik scroll edilirken
+            // sert bir şekilde kesilmek yerine header'ın arkasından şeffafça ekran dışına kayacak
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                bottom: false,
+                child: _buildHeader(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

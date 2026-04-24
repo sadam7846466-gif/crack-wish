@@ -1361,12 +1361,13 @@ class _ZodiacPageState extends State<ZodiacPage>
     final greeting = _userName != null
         ? 'Merhaba $_userName,'
         : 'Kozmik Yolcu,';
-    return Scaffold(
-      backgroundColor: _bg,
-      body: Stack(
-        children: [
-          // Arka plan
-          Container(
+    return SwipeBackWrapper(
+      child: Scaffold(
+        backgroundColor: _bg,
+        body: Stack(
+          children: [
+            // Arka plan
+            Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 center: const Alignment(0, -0.5),
@@ -1728,6 +1729,7 @@ class _ZodiacPageState extends State<ZodiacPage>
             ),
           ),
         ],
+        ),
       ),
     );
   }

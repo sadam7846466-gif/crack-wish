@@ -283,8 +283,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     await Navigator.push(
       context,
       PageRouteBuilder(
+        opaque: false,
         transitionDuration: const Duration(milliseconds: 2600),
-        reverseTransitionDuration: const Duration(milliseconds: 400),
+        reverseTransitionDuration: const Duration(milliseconds: 1),
         pageBuilder: (context, anim1, anim2) {
           final isForward = anim1.status == AnimationStatus.forward || anim1.status == AnimationStatus.completed;
 
@@ -295,7 +296,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
               FadeTransition(
                 opacity: isForward 
                     ? CurvedAnimation(parent: anim1, curve: const Interval(0.4, 1.0, curve: Curves.easeIn))
-                    : anim1, // Geri dönüşte standart fade out
+                    : const AlwaysStoppedAnimation(1.0), // Geri dönüşte fade yok — SwipeBackWrapper kendi animasyonunu yapıyor
                 child: targetPage,
               ),
 
@@ -313,9 +314,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                       children: [
                         Container(color: Colors.black87),
                         
-                        Hero(
-                          tag: 'wheel_$title',
-                          child: SizedBox(
+                        SizedBox(
                             width: wheelSize,
                             height: wheelSize,
                             child: AnimatedBuilder(
@@ -330,7 +329,6 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                           .scale(begin: const Offset(1, 1), end: const Offset(7.5, 7.5), duration: 2600.ms, curve: Curves.easeInOutCubic)
                           .rotate(begin: 0, end: 1.5, duration: 2600.ms, curve: Curves.easeInOutCubic)
                           .fadeOut(delay: 1000.ms, duration: 1600.ms, curve: Curves.easeInOut), // Uzuuun ve pamuk gibi bir erime
-                        ),
                       ],
                     ),
                   ),
@@ -1005,9 +1003,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
         ),
         const SizedBox(height: 6),
         // Çarkın Kendisi - Artık buton (ripple efektli)
-        Hero(
-          tag: 'wheel_$label',
-          child: Material(
+        Material(
             color: Colors.transparent,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -1021,7 +1017,6 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
               )),
             ),
           ),
-        ),
     ]);
   }
 
@@ -1897,3 +1892,4 @@ class MayanWheelPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant MayanWheelPainter old) => old.rotation != rotation;
 }
+
