@@ -1086,19 +1086,25 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 child: ClipOval(
                   child: req.from.avatarUrl != null 
                       ? (req.from.avatarUrl!.startsWith('http') 
-                          ? Image.network(
-                              req.from.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                          ? Transform.scale(
+                              scale: 1.15,
+                              child: Image.network(
+                                req.from.avatarUrl!,
+                                fit: BoxFit.cover,
+                                width: 44,
+                                height: 44,
+                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                              ),
                             )
-                          : Image.asset(
-                              req.from.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                          : Transform.scale(
+                              scale: 1.15,
+                              child: Image.asset(
+                                req.from.avatarUrl!,
+                                fit: BoxFit.cover,
+                                width: 44,
+                                height: 44,
+                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                              ),
                             ))
                       : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
@@ -1411,19 +1417,25 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         child: ClipOval(
                           child: sender.avatarUrl != null 
                               ? (sender.avatarUrl!.startsWith('http') 
-                                  ? Image.network(
-                                      sender.avatarUrl!,
-                                      fit: BoxFit.cover,
-                                      width: 44,
-                                      height: 44,
-                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                  ? Transform.scale(
+                                      scale: 1.15,
+                                      child: Image.network(
+                                        sender.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        width: 44,
+                                        height: 44,
+                                        errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                      ),
                                     )
-                                  : Image.asset(
-                                      sender.avatarUrl!,
-                                      fit: BoxFit.cover,
-                                      width: 44,
-                                      height: 44,
-                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                  : Transform.scale(
+                                      scale: 1.15,
+                                      child: Image.asset(
+                                        sender.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        width: 44,
+                                        height: 44,
+                                        errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                      ),
                                     ))
                               : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                         ),
@@ -2559,22 +2571,28 @@ class _ContactItem extends StatelessWidget {
               child: ClipOval(
                 child: friend?.user.avatarUrl != null 
                     ? (friend!.user.avatarUrl!.startsWith('http') 
-                        ? Image.network(
-                            friend!.user.avatarUrl!,
-                            fit: BoxFit.cover,
-                            width: 44,
-                            height: 44,
-                            errorBuilder: (_, __, ___) => Center(
-                              child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                        ? Transform.scale(
+                            scale: 1.15,
+                            child: Image.network(
+                              friend!.user.avatarUrl!,
+                              fit: BoxFit.cover,
+                              width: 44,
+                              height: 44,
+                              errorBuilder: (_, __, ___) => Center(
+                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                              ),
                             ),
                           )
-                        : Image.asset(
-                            friend!.user.avatarUrl!,
-                            fit: BoxFit.cover,
-                            width: 44,
-                            height: 44,
-                            errorBuilder: (_, __, ___) => Center(
-                              child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                        : Transform.scale(
+                            scale: 1.15,
+                            child: Image.asset(
+                              friend!.user.avatarUrl!,
+                              fit: BoxFit.cover,
+                              width: 44,
+                              height: 44,
+                              errorBuilder: (_, __, ___) => Center(
+                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                              ),
                             ),
                           ))
                     : Center(
