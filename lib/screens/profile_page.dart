@@ -1864,9 +1864,7 @@ For questions: info@crackandwish.com''',
                                   spentAura: _spentAura,
                                   bonusAura: _bonusAura,
                                   onConvertAura: () async {
-                                    final int multiplier = _isPremiumUser ? 3 : 1;
-                                    final int baseAura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5);
-                                    final totalAura = (baseAura * multiplier) + _bonusAura;
+                                    final totalAura = _bonusAura;
                                     final success = await StorageService.convertAuraToSoulStone(currentTotalAura: totalAura, cost: 200);
                                     if (success && mounted) {
                                       setState(() {
