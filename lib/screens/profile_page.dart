@@ -5424,35 +5424,21 @@ class _SettingsListGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Araya divider ekleyelim
-    final List<Widget> dividedChildren = [];
+    final List<Widget> spacedChildren = [];
     for (int i = 0; i < children.length; i++) {
-        dividedChildren.add(children[i]);
+        spacedChildren.add(children[i]);
         if (i < children.length - 1) {
-            dividedChildren.add(Padding(
-              padding: const EdgeInsets.only(left: 54),
-              child: Divider(height: 1, thickness: 0.5, color: Colors.white.withOpacity(0.08)),
-            ));
+            spacedChildren.add(const SizedBox(height: 12));
         }
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1E).withOpacity(0.55),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
-          children: dividedChildren,
-        ),
-      ),
+    return Column(
+      children: spacedChildren,
     );
   }
 }
 
-class _SettingsListTile extends StatelessWidget {
+class _SettingsListTile extends StatefulWidget {
   final IconData icon;
   final Color iconColor;
   final String label;
@@ -5470,49 +5456,91 @@ class _SettingsListTile extends StatelessWidget {
   });
 
   @override
+  State<_SettingsListTile> createState() => _SettingsListTileState();
+}
+
+class _SettingsListTileState extends State<_SettingsListTile> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        highlightColor: Colors.white.withOpacity(0.05),
-        splashColor: Colors.white.withOpacity(0.05),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 150),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: widget.isDestructive 
+                    ? const Color(0xFFF87171).withOpacity(0.08) 
+                    : Colors.white.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: widget.isDestructive 
+                      ? const Color(0xFFF87171).withOpacity(0.2) 
+                      : Colors.white.withOpacity(0.12),
+                  width: 1.0,
                 ),
-                child: Icon(icon, color: iconColor, size: 20),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: isDestructive ? const Color(0xFFFF4D4D) : Colors.white.withOpacity(0.9),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.2,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: widget.iconColor.withOpacity(widget.isDestructive ? 0.2 : 0.15),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.iconColor.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: Icon(widget.icon, color: widget.iconColor, size: 20),
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      widget.label,
+                      style: TextStyle(
+                        color: widget.isDestructive ? const Color(0xFFFF4D4D) : Colors.white.withOpacity(0.95),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  if (widget.subtitle != null && widget.subtitle!.isNotEmpty) ...[
+                    Text(
+                      widget.subtitle!,
+                      style: TextStyle(
+                        color: widget.isDestructive ? const Color(0xFFFF4D4D).withOpacity(0.6) : Colors.white.withOpacity(0.45),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded, 
+                    color: widget.isDestructive ? const Color(0xFFFF4D4D).withOpacity(0.4) : Colors.white.withOpacity(0.25), 
+                    size: 14
+                  ),
+                ],
               ),
-              if (subtitle != null && subtitle!.isNotEmpty) ...[
-                Text(
-                  subtitle!,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withOpacity(0.2), size: 14),
-            ],
+            ),
           ),
         ),
       ),
