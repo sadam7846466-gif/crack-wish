@@ -3308,8 +3308,8 @@ class _BentoHeroCard extends StatelessWidget {
                                         children: [
                                           // Sol: Donut Chart
                                           SizedBox(
-                                            width: 110,
-                                            height: 110,
+                                            width: 95,
+                                            height: 95,
                                             child: CustomPaint(
                                               painter: _EmotionDonutPainter(slices: slices),
                                               child: Center(
@@ -3318,19 +3318,19 @@ class _BentoHeroCard extends StatelessWidget {
                                                   children: [
                                                     Text(
                                                       "$totalCount",
-                                                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, height: 1.0),
+                                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.0),
                                                     ),
                                                     const SizedBox(height: 2),
                                                     Text(
                                                       "rüya",
-                                                      style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                                                      style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w500, letterSpacing: 0.5),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 24),
+                                          const SizedBox(width: 20),
                                           // Sağ: Legend listesi
                                           Expanded(
                                             child: Column(
@@ -3341,24 +3341,24 @@ class _BentoHeroCard extends StatelessWidget {
                                                   child: Row(
                                                     children: [
                                                       Container(
-                                                        width: 10, height: 10,
+                                                        width: 9, height: 9,
                                                         decoration: BoxDecoration(
                                                           color: s.color,
                                                           borderRadius: BorderRadius.circular(3),
-                                                          boxShadow: [BoxShadow(color: s.color.withOpacity(0.5), blurRadius: 6)],
+                                                          boxShadow: [BoxShadow(color: s.color.withOpacity(0.5), blurRadius: 5)],
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
                                                       Expanded(
                                                         child: Text(
                                                           s.label,
-                                                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+                                                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.2),
                                                           overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ),
                                                       Text(
                                                         "%${s.percentage.toInt()}",
-                                                        style: TextStyle(color: s.color.withOpacity(0.95), fontSize: 13, fontWeight: FontWeight.w900),
+                                                        style: TextStyle(color: s.color.withOpacity(0.95), fontSize: 12, fontWeight: FontWeight.w900),
                                                       ),
                                                     ],
                                                   ),
@@ -5589,7 +5589,7 @@ class _EmotionDonutPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    const strokeWidth = 14.0;
+    const strokeWidth = 12.0;
     final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
     
     // Arka plan halkası
@@ -5615,9 +5615,9 @@ class _EmotionDonutPainter extends CustomPainter {
       final glowPaint = Paint()
         ..color = slice.color.withOpacity(0.35)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth + 10
+        ..strokeWidth = strokeWidth + 8
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
       canvas.drawArc(rect, currentAngle, sweepAngle, false, glowPaint);
       
       // Ana dilim
