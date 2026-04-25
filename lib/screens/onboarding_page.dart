@@ -22,6 +22,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/analytics_service.dart';
+
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
 
@@ -532,6 +534,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
        return;
     }
 
+    AnalyticsService().logProfileCreated();
     _transitionToHome();
   }
 
@@ -595,7 +598,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         return SingleChildScrollView(
                           clipBehavior: Clip.none, // Avatarların sağa sola taşmasına izin verir (akıcı geçiş)
                           physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(top: 140, bottom: 120), // Başlık aşağı çekildi, alt boşluk dengelendi
+                          padding: const EdgeInsets.only(top: 140, bottom: 220), // Alt menü ile çakışmayı önlemek için bottom artırıldı
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxHeight - 120),
                             child: Column(

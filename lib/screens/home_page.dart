@@ -9,6 +9,7 @@ import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import '../services/supabase_owl_service.dart';
+import '../services/sound_service.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
@@ -46,7 +47,6 @@ class _HomePageState extends State<HomePage> {
   late String _randomSubtitle;
   String? _userName;
   static final _mottledPainter = _MottledPainter();
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   static const _subtitles = [
     'Kır, Oku, Gülümse.',
@@ -95,7 +95,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     SupabaseOwlService().removeListener(_onMockOwlUpdate);
-    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -157,9 +156,7 @@ class _HomePageState extends State<HomePage> {
 
   void _playOwlNotificationSound() async {
     try {
-      await _audioPlayer.play(AssetSource('sounds/owl_bell.mp3'));
-      // Titreşim de ekleyelim, telefonda hissiyat artsın
-      HapticFeedback.heavyImpact();
+      await SoundService().playOwlLetter();
     } catch (e) {
       debugPrint('Bildirim sesi oynatılamadı: $e');
     }

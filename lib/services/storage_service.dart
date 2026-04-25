@@ -722,10 +722,13 @@ class StorageService {
 
     if (lastDate == yesterday) {
       // Seri devam ediyor
-      await prefs.setInt(_keyStreakDays, currentStreak + 1);
+      final newStreak = currentStreak + 1;
+      await prefs.setInt(_keyStreakDays, newStreak);
+      AnalyticsService().logStreakDay(day: newStreak);
     } else if (lastDate == null || lastDate != today) {
       // Yeni seri başlıyor
       await prefs.setInt(_keyStreakDays, 1);
+      AnalyticsService().logStreakDay(day: 1);
     }
 
     await prefs.setString(_keyLastCookieDate, today);
@@ -1123,6 +1126,7 @@ class StorageService {
     dreams.insert(0, dream); // en yeni en üstte
     await prefs.setString(_keyDreamList, jsonEncode(dreams));
     await incrementTotalDreams();
+    AnalyticsService().logDreamSaved();
   }
 
   static Future<void> clearDreams() async {

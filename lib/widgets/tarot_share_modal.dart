@@ -8,6 +8,7 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import '../services/analytics_service.dart';
 
 class TarotShareModal extends StatefulWidget {
   final String closingMessage;
@@ -164,6 +165,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
         text: "Kartlar bana böyle konuştu! 🔮✨\n#CrackWish #Tarot", 
         sharePositionOrigin: rect,
       );
+      AnalyticsService().logTarotShared();
     } catch(e) { 
       debugPrint('Share error: $e');
     } finally {

@@ -13,10 +13,12 @@ class PremiumPaywallPage extends StatefulWidget {
   State<PremiumPaywallPage> createState() => _PremiumPaywallPageState();
 }
 
-class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTickerProviderStateMixin {
+class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProviderStateMixin {
   late AnimationController _animController;
+  late AnimationController _pulseController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _pulseAnimation;
 
   int _selectedPackageIndex = 2; // Yıllık Varsayılan
   bool _isRestoring = false;
@@ -32,6 +34,9 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
     _animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _fadeAnimation = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic));
+    
+    _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
     
     _animController.forward();
   }
@@ -68,6 +73,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   @override
   void dispose() {
     _animController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -222,16 +228,24 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                             // ── ICON & BAŞLIK ──
-                            Container(
-                              padding: const EdgeInsets.all(10), // reduced
+                            ScaleTransition(
+                              scale: _pulseAnimation,
+                              child: Container(
+                              padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.03),
-                                border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [const Color(0xFFFFD700).withOpacity(0.15), const Color(0xFFC084FC).withOpacity(0.1)],
+                                ),
+                                border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.3), width: 0.5),
+                                boxShadow: [BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.15), blurRadius: 20, spreadRadius: 2)],
                               ),
-                              child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFE5C07B), size: 24), // reduced
+                              child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFE5C07B), size: 26),
                             ),
-                            const SizedBox(height: 8), // reduced
+                            ),
+                            const SizedBox(height: 10),
                             const Text(
                               "Crack Wish Elite",
                               style: TextStyle(
@@ -308,88 +322,113 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
                           borderRadius: BorderRadius.circular(26), // from 30
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(26),
-                                border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                              borderRadius: BorderRadius.circular(30),
-                              onTap: (_isPurchasing || (_isAlreadyElite && _selectedPackageIndex == _activePackageIndex)) ? null : () async {
-                                HapticFeedback.heavyImpact();
-                                setState(() => _isPurchasing = true);
+                            child: Builder(
+                              builder: (context) {
+                                final bool isCurrentPlan = _isAlreadyElite && _selectedPackageIndex == _activePackageIndex;
+                                final bool isDowngrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex < _activePackageIndex!;
+                                final bool isUpgrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex > _activePackageIndex!;
                                 
-                                try {
-                                  // Seçilen pakete göre ürün ID'sini belirle
-                                  final productId = _selectedPackageIndex == 0 
-                                    ? PurchaseService.eliteWeeklyId 
-                                    : (_selectedPackageIndex == 1 
-                                      ? PurchaseService.eliteMonthlyId 
-                                      : PurchaseService.eliteYearlyId);
-                                  
-                                  final success = await PurchaseService().purchase(productId);
-                                  
-                                    if (success && mounted) {
-                                      // Satın alma başarılı — yerel kayıt
-                                      final prefs = await SharedPreferences.getInstance();
-                                      final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
-                                      await prefs.setString('elite_plan_type', plan);
-                                      await prefs.setInt('daily_elite_soul_stones', 5);
-                                      
-                                      // Supabase'e bildir
-                                      await ProfileSyncService().syncEliteStatus(true);
-                                      
-                                      if (!mounted) return;
-                                    setState(() {
-                                      _isPurchasing = false;
-                                      _isAlreadyElite = true;
-                                      _activePackageIndex = _selectedPackageIndex;
-                                    });
-                                    
-                                    _showGlassMessage(
-                                      "Aydınlanmaya Hoşgeldiniz",
-                                      "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
-                                      Icons.auto_awesome,
-                                      const Color(0xFFFFD700),
-                                      onOk: () {
-                                        Navigator.pop(context, true);
-                                      }
-                                    );
-                                  } else if (mounted) {
-                                    setState(() => _isPurchasing = false);
-                                  }
-                                } catch (e) {
-                                  debugPrint('Elite satın alma hatası: \$e');
-                                  if (mounted) setState(() => _isPurchasing = false);
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                child: Center(
-                                  child: _isPurchasing
-                                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                      : Text(
-                                          _isAlreadyElite 
-                                            ? (_selectedPackageIndex == _activePackageIndex 
-                                                ? "Mevcut Planın" 
-                                                : (_selectedPackageIndex > (_activePackageIndex ?? 0) ? "Planı Yükselt" : "Planı Değiştir"))
-                                            : "Elite Sınırlarını Aç",
-                                          style: TextStyle(
-                                            color: (_isAlreadyElite && _selectedPackageIndex == _activePackageIndex) ? Colors.white.withOpacity(0.3) : Colors.white, 
-                                            fontSize: 16, 
-                                            fontWeight: FontWeight.w600, 
-                                            letterSpacing: 1.0,
-                                          ),
+                                final bool useGradient = !isCurrentPlan && !isDowngrade;
+                                final bool isDisabled = _isPurchasing || isCurrentPlan;
+
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: useGradient 
+                                      ? const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [Color(0xFFFFD700), Color(0xFFC084FC)],
+                                        )
+                                      : null,
+                                    color: !useGradient ? Colors.white.withOpacity(0.08) : null,
+                                    borderRadius: BorderRadius.circular(26),
+                                    boxShadow: useGradient 
+                                      ? [BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))]
+                                      : null,
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(26),
+                                      onTap: isDisabled ? null : () async {
+                                        if (isDowngrade) {
+                                          HapticFeedback.lightImpact();
+                                          // Apple/Google store'a yönlendir
+                                          final url = Theme.of(context).platform == TargetPlatform.iOS 
+                                            ? "https://apps.apple.com/account/subscriptions" 
+                                            : "https://play.google.com/store/account/subscriptions";
+                                          _launchURL(url);
+                                          return;
+                                        }
+
+                                        HapticFeedback.heavyImpact();
+                                        setState(() => _isPurchasing = true);
+                                        
+                                        try {
+                                          final productId = _selectedPackageIndex == 0 
+                                            ? PurchaseService.eliteWeeklyId 
+                                            : (_selectedPackageIndex == 1 
+                                              ? PurchaseService.eliteMonthlyId 
+                                              : PurchaseService.eliteYearlyId);
+                                          
+                                          final success = await PurchaseService().purchase(productId);
+                                          
+                                          if (success && mounted) {
+                                            final prefs = await SharedPreferences.getInstance();
+                                            final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
+                                            await prefs.setString('elite_plan_type', plan);
+                                            await prefs.setInt('daily_elite_soul_stones', 5);
+                                            
+                                            await ProfileSyncService().syncEliteStatus(true);
+                                            
+                                            if (!mounted) return;
+                                            setState(() {
+                                              _isPurchasing = false;
+                                              _isAlreadyElite = true;
+                                              _activePackageIndex = _selectedPackageIndex;
+                                            });
+                                            
+                                            _showGlassMessage(
+                                              isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
+                                              isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
+                                              Icons.auto_awesome,
+                                              const Color(0xFFFFD700),
+                                              onOk: () {
+                                                Navigator.pop(context, true);
+                                              }
+                                            );
+                                          } else if (mounted) {
+                                            setState(() => _isPurchasing = false);
+                                          }
+                                        } catch (e) {
+                                          debugPrint('Elite satın alma hatası: $e');
+                                          if (mounted) setState(() => _isPurchasing = false);
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        child: Center(
+                                          child: _isPurchasing
+                                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                              : Text(
+                                                  isCurrentPlan 
+                                                    ? "Mevcut Planın" 
+                                                    : (isDowngrade ? "Mağazadan Yönet" : (isUpgrade ? "Planı Yükselt" : "Elite Sınırlarını Aç")),
+                                                  style: TextStyle(
+                                                    color: useGradient ? const Color(0xFF1A1A2E) : Colors.white.withOpacity(isCurrentPlan ? 0.3 : 0.9), 
+                                                    fontSize: 16, 
+                                                    fontWeight: FontWeight.w800, 
+                                                    letterSpacing: 0.5,
+                                                  ),
+                                                ),
                                         ),
-                                ),
-                              ),
-                                ),
-                              ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
                             ),
                           ),
                         ),
@@ -474,86 +513,91 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with SingleTick
   }
 
   Widget _buildGlassPackageRow(int index, String title, String price, String duration, {String? badge, String? subText}) {
+    final bool isDowngrade = _isAlreadyElite && _activePackageIndex != null && index < _activePackageIndex!;
     final bool isSelected = _selectedPackageIndex == index;
     final bool isActivePlan = _isAlreadyElite && _activePackageIndex == index;
     final Color highlightColor = isActivePlan ? const Color(0xFF10B981) : const Color(0xFFFFD700);
     final String? finalBadge = isActivePlan ? "MEVCUT PLAN" : badge;
 
     return GestureDetector(
-      onTap: () => _selectPackage(index),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16), // from 20
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // from 14, 10
-              decoration: BoxDecoration(
-                color: isSelected 
-                  ? highlightColor.withOpacity(0.08)
-                  : (isActivePlan ? highlightColor.withOpacity(0.04) : Colors.white.withOpacity(0.03)),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? highlightColor.withOpacity(0.5) : (isActivePlan ? highlightColor.withOpacity(0.3) : Colors.white.withOpacity(0.08)),
-                  width: 0.5,
+      onTap: isDowngrade ? null : () => _selectPackage(index),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: isDowngrade ? 0.3 : 1.0,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                    ? highlightColor.withOpacity(0.08)
+                    : (isActivePlan ? highlightColor.withOpacity(0.04) : Colors.white.withOpacity(0.03)),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? highlightColor.withOpacity(0.5) : (isActivePlan ? highlightColor.withOpacity(0.3) : Colors.white.withOpacity(0.08)),
+                    width: 0.5,
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  // Seçim Halkası
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 22,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isSelected ? highlightColor : Colors.transparent,
-                      border: Border.all(
-                        color: isSelected ? highlightColor : (isActivePlan ? highlightColor.withOpacity(0.6) : Colors.white.withOpacity(0.2)),
-                        width: 1.0,
+                child: Row(
+                  children: [
+                    // Seçim Halkası
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? highlightColor : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected ? highlightColor : (isActivePlan ? highlightColor.withOpacity(0.6) : Colors.white.withOpacity(0.2)),
+                          width: 1.0,
+                        ),
+                      ),
+                      child: isSelected ? const Icon(Icons.check, size: 14, color: Colors.black) : null,
+                    ),
+                    const SizedBox(width: 14),
+                    
+                    // Paket Adı ve Alt Metin
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                              if (finalBadge != null) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(color: highlightColor, borderRadius: BorderRadius.circular(6)),
+                                  child: Text(finalBadge.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w900)),
+                                ),
+                              ]
+                            ],
+                          ),
+                          if (subText != null) ...[
+                            const SizedBox(height: 4),
+                            Text(subText, style: TextStyle(color: highlightColor.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w500)),
+                          ]
+                        ],
                       ),
                     ),
-                    child: isSelected ? const Icon(Icons.check, size: 14, color: Colors.black) : null,
-                  ),
-                  const SizedBox(width: 14),
-                  
-                  // Paket Adı ve Alt Metin
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                    // Fiyat
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Row(
-                          children: [
-                            Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-                            if (finalBadge != null) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(color: highlightColor, borderRadius: BorderRadius.circular(6)),
-                                child: Text(finalBadge.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w900)),
-                              ),
-                            ]
-                          ],
-                        ),
-                        if (subText != null) ...[
-                          const SizedBox(height: 4),
-                          Text(subText, style: TextStyle(color: highlightColor.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w500)),
-                        ]
+                        Text(price, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                        Text(duration, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
                       ],
                     ),
-                  ),
-
-                  // Fiyat
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(price, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text(duration, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

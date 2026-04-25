@@ -39,6 +39,7 @@ import '../services/user_stats_service.dart';
 import '../services/sound_service.dart';
 import '../widgets/cosmic_reward_dialog.dart';
 import '../widgets/cosmic_toast.dart';
+import '../services/analytics_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -117,6 +118,11 @@ class ProfilePageState extends State<ProfilePage> {
 
     // Günlük Elite Ruh Taşlarını yenile (merkezi sistem)
     await StorageService.getSoulStones();
+    
+    // Segmentasyon için kullanıcı özelliklerini Analytics'e gönder
+    AnalyticsService().setUserProperty(name: 'user_level', value: _getUserLevel(Localizations.localeOf(context).languageCode).title);
+    AnalyticsService().setUserProperty(name: 'is_elite', value: _isPremiumUser.toString());
+    AnalyticsService().setUserProperty(name: 'streak_days', value: _streakDays.toString());
   }
 
   // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
@@ -150,21 +156,19 @@ class ProfilePageState extends State<ProfilePage> {
 
     final avatars = [
       (!_userAvatar.startsWith('http') && !_userAvatar.startsWith('assets')) ? _userAvatar : 'gallery',
-      'assets/images/owl.png',
-      'assets/images/owl_sleepy.png',
       // 12 adet Kozmik Hazır Avatar
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300',
-      'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300',
+      'assets/images/avatars/avatar_1.png',
+      'assets/images/avatars/avatar_2.png',
+      'assets/images/avatars/avatar_3.png',
+      'assets/images/avatars/avatar_4.png',
+      'assets/images/avatars/avatar_5.png',
+      'assets/images/avatars/avatar_6.png',
+      'assets/images/avatars/avatar_7.png',
+      'assets/images/avatars/avatar_8.png',
+      'assets/images/avatars/avatar_9.png',
+      'assets/images/avatars/avatar_10.png',
+      'assets/images/avatars/avatar_11.png',
+      'assets/images/avatars/avatar_12.png',
     ];
 
     showModalBottomSheet(
@@ -339,7 +343,9 @@ class ProfilePageState extends State<ProfilePage> {
                                             : 0.0,
                                       ),
                                       child: Transform.scale(
-                                        scale: avatar.contains('owl') ? 1.35 : 1.0,
+                                        scale: avatar.contains('owl') 
+                                            ? 1.35 
+                                            : (avatar.contains('avatar_') ? 1.15 : 1.0),
                                         child: Stack(
                                           fit: StackFit.expand,
                                           children: [
@@ -534,6 +540,7 @@ class ProfilePageState extends State<ProfilePage> {
                                   _userName = newName;
                                 }
                               });
+                              AnalyticsService().logAvatarChanged();
                             }
                             if (ctx.mounted) {
                               Navigator.pop(ctx);
@@ -1984,212 +1991,6 @@ For questions: info@crackandwish.com''',
 
                         const SizedBox(height: 24),
 
-                        // ── ⚠️ BİLDİRİM TEST PANELİ (Yayından önce silinecek) ──
-                        _SectionLabel('Test Paneli'),
-                        const SizedBox(height: 10),
-                        _SettingsListGroup(
-                          children: [
-                            // 1. BÜYÜK PANEL TESTİ (CosmicRewardDialog)
-                            _SettingsListTile(
-                              icon: Icons.auto_awesome_rounded,
-                              iconColor: const Color(0xFFC084FC),
-                              label: 'Buyuk Panel (5)',
-                              subtitle: 'CosmicRewardDialog',
-                              onTap: () async {
-                                HapticFeedback.heavyImpact();
-                                final name = await StorageService.getUserName();
-                                final displayName = (name != null && name.isNotEmpty) ? name : 'Gezgin';
-                                if (!context.mounted) return;
-                                final panels = [
-                                  {'title': 'Evrene Hos Geldin', 'desc': 'Yolculuguna baslaman icin sana kucuk bir hediye biraktik.', 'icon': Icons.card_giftcard, 'color': const Color(0xFFC084FC), 'aura': null, 'stones': 3},
-                                  {'title': 'Beklenmedik Bir Hediye', 'desc': 'Bir arkadaşın seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.', 'icon': Icons.mail_outline, 'color': const Color(0xFFC36E6E), 'aura': 50, 'stones': 2},
-                                  {'title': 'Cagrın Duyuldu!', 'desc': '2 arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.', 'icon': Icons.person_add_alt_1, 'color': const Color(0xFF38BDF8), 'aura': 50, 'stones': 4},
-                                  {'title': '$displayName, Dogum Gunun Kutlu Olsun!', 'desc': 'Bugün ruhunun bu dünyaya indiği kutsal gün.', 'icon': Icons.cake_rounded, 'color': const Color(0xFFFF6B9D), 'aura': 30, 'stones': 2},
-                                  {'title': 'Ramazan Bayramınız Kutlu Olsun', 'desc': 'Evren sana huzur diliyor.', 'icon': Icons.mosque_rounded, 'color': const Color(0xFF10B981), 'aura': null, 'stones': null},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_panel_idx') ?? 0) % panels.length;
-                                await prefs.setInt('_test_panel_idx', idx + 1);
-                                final p = panels[idx];
-                                if (!context.mounted) return;
-                                CosmicRewardDialog.show(
-                                  context: context,
-                                  title: p['title'] as String,
-                                  description: p['desc'] as String,
-                                  icon: p['icon'] as IconData,
-                                  glowColor: p['color'] as Color,
-                                  auraReward: p['aura'] as int?,
-                                  stoneReward: p['stones'] as int?,
-                                );
-                              },
-                            ),
-                            // 2. TOAST TESTİ (CosmicToast)
-                            _SettingsListTile(
-                              icon: Icons.notifications_active_rounded,
-                              iconColor: const Color(0xFFFBBF24),
-                              label: 'Toast Bildirim (4)',
-                              subtitle: 'CosmicToast',
-                              onTap: () async {
-                                HapticFeedback.lightImpact();
-                                final toasts = [
-                                  {'title': 'Bugun Kurabiye Kırmadın', 'msg': 'Gunluk sans mesajın seni bekliyor!', 'reward': '3 Hak', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFBBF24)},
-                                  {'title': 'Inanılmaz Odak!', 'msg': 'Gunluk serin tam 30 gune ulastı.', 'reward': '+1 Ruh Tası', 'icon': Icons.diamond_rounded, 'color': const Color(0xFF60A5FA)},
-                                  {'title': 'Basarım Tamamlandı', 'msg': 'Ilk 100 kurabiyeni kırdın!', 'reward': '+5 Aura', 'icon': Icons.emoji_events_rounded, 'color': const Color(0xFFF97316)},
-                                  {'title': 'Kozmik Terfi!', 'msg': 'Aura gucun arttı. Yeni unvanın: Kozmik Kahin', 'reward': 'Yeni Rutbe', 'icon': Icons.workspace_premium_rounded, 'color': const Color(0xFFFFD700)},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_toast_idx') ?? 0) % toasts.length;
-                                await prefs.setInt('_test_toast_idx', idx + 1);
-                                final t = toasts[idx];
-                                if (!context.mounted) return;
-                                CosmicToast.show(
-                                  context: context,
-                                  title: t['title'] as String,
-                                  message: t['msg'] as String,
-                                  reward: t['reward'] as String,
-                                  icon: t['icon'] as IconData,
-                                  iconColor: t['color'] as Color,
-                                  rewardColor: t['color'] as Color,
-                                );
-                              },
-                            ),
-                            // 3. PUSH BİLDİRİM ÖNİZLEME
-                            _SettingsListTile(
-                              icon: Icons.send_rounded,
-                              iconColor: const Color(0xFF38BDF8),
-                              label: 'Push Bildirim (29)',
-                              subtitle: 'FCM onizleme',
-                              onTap: () async {
-                                HapticFeedback.lightImpact();
-                                final pushMessages = [
-                                  {'title': 'Kurabiyenin Icinde Ne Var?', 'body': 'Bugunku sans mesajın hazır. Kır ve kesfet!'},
-                                  {'title': 'Tarot Kartların Hazır', 'body': 'Niyetini tut ve bugunun rehber kartlarını cek.'},
-                                  {'title': 'Ruyalarının Fısıltısı', 'body': 'Dun gece zihnin sana ne anlatmaya calıstı?'},
-                                  {'title': 'Gokyuzu Hareketli', 'body': 'Yıldızlar bugun senin icin parlıyor.'},
-                                  {'title': 'Baykus Agın Seni Ozledi', 'body': 'Arkadaslarına bir mektup yollayalı uzun zaman oldu.'},
-                                  {'title': 'Dogum Gunun Kutlu Olsun!', 'body': 'Bugun senin gunun. Evrenin sana ozel bir mesajı var!'},
-                                  {'title': 'Serin Kırılmasın!', 'body': 'Gunluk giris serini devam ettir.'},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_push_idx') ?? 0) % pushMessages.length;
-                                await prefs.setInt('_test_push_idx', idx + 1);
-                                final pm = pushMessages[idx];
-                                if (!context.mounted) return;
-                                CosmicToast.show(
-                                  context: context,
-                                  title: pm['title']!,
-                                  message: pm['body']!,
-                                  reward: 'Push #${idx + 1}/${pushMessages.length}',
-                                  icon: Icons.notifications_rounded,
-                                  iconColor: const Color(0xFF38BDF8),
-                                  rewardColor: const Color(0xFF38BDF8),
-                                );
-                              },
-                            ),
-                            // 4. ÖZEL GÜN TESTİ
-                            _SettingsListTile(
-                              icon: Icons.flag_rounded,
-                              iconColor: const Color(0xFF10B981),
-                              label: 'Ozel Gun (11 ulke)',
-                              subtitle: 'Ulke bazlı kutlama',
-                              onTap: () async {
-                                HapticFeedback.heavyImpact();
-                                final specialDays = [
-                                  {'title': 'Yeni Yılın Kutlu Olsun!', 'desc': 'Yeni bir yıl, yeni bir baslangıc.', 'icon': Icons.celebration_rounded, 'color': const Color(0xFFFFD700)},
-                                  {'title': '23 Nisan Kutlu Olsun!', 'desc': 'Ulusal Egemenlik ve Cocuk Bayramı.', 'icon': Icons.flag_rounded, 'color': const Color(0xFFEF4444)},
-                                  {'title': 'Happy Independence Day', 'desc': 'Celebrate freedom and the cosmic spark of liberty.', 'icon': Icons.flag_rounded, 'color': const Color(0xFF3B82F6)},
-                                  {'title': 'Joyeux 14 Juillet', 'desc': 'Bastille Day — celebrating freedom.', 'icon': Icons.flag_rounded, 'color': const Color(0xFF3B82F6)},
-                                  {'title': 'Happy German Unity Day', 'desc': 'Celebrating unity and togetherness.', 'icon': Icons.handshake_rounded, 'color': const Color(0xFFFBBF24)},
-                                  {'title': 'Dia de los Muertos', 'desc': 'Honor those who passed. The veil is thinnest today.', 'icon': Icons.local_florist_rounded, 'color': const Color(0xFFF97316)},
-                                  {'title': 'Guy Fawkes Night', 'desc': 'The cosmic fire burns bright tonight.', 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFF97316)},
-                                  {'title': 'Happy Eid al-Fitr', 'desc': 'The universe wishes you peace on this blessed Eid.', 'icon': Icons.mosque_rounded, 'color': const Color(0xFF10B981)},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_special_idx') ?? 0) % specialDays.length;
-                                await prefs.setInt('_test_special_idx', idx + 1);
-                                final sd = specialDays[idx];
-                                if (!context.mounted) return;
-                                CosmicRewardDialog.show(
-                                  context: context,
-                                  title: sd['title'] as String,
-                                  description: sd['desc'] as String,
-                                  icon: sd['icon'] as IconData,
-                                  glowColor: sd['color'] as Color,
-                                );
-                              },
-                            ),
-                            // 5. BAŞARIM TESTİ (10 Achievement)
-                            _SettingsListTile(
-                              icon: Icons.emoji_events_rounded,
-                              iconColor: const Color(0xFFFDE047),
-                              label: 'Basarım (10)',
-                              subtitle: 'Achievement toast',
-                              onTap: () async {
-                                HapticFeedback.heavyImpact();
-                                final achievements = [
-                                  {'title': 'Ilk Adım', 'desc': 'Ilk kurabiyeni kırdın', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFDE047), 'reward': '+5 Aura', 'image': 'assets/icons/splash_cookie.png'},
-                                  {'title': 'Falcı Cıragı', 'desc': 'Ilk tarot falına baktın', 'icon': Icons.auto_awesome_rounded, 'color': const Color(0xFFC084FC), 'reward': '+5 Aura', 'image': null},
-                                  {'title': 'Ruya Avcısı', 'desc': 'Ilk ruya analizini yaptın', 'icon': Icons.nights_stay_rounded, 'color': const Color(0xFF60A5FA), 'reward': '+5 Aura', 'image': null},
-                                  {'title': 'Sosyal Kelebek', 'desc': 'Ilk arkadasını ekledin', 'icon': Icons.people_alt_rounded, 'color': const Color(0xFFF472B6), 'reward': '+10 Aura', 'image': null},
-                                  {'title': 'Kurabiye Ustası', 'desc': '50 kurabiye kırdın', 'icon': Icons.cookie_rounded, 'color': const Color(0xFFFBBF24), 'reward': '+1 Ruh Tası', 'image': 'assets/icons/splash_cookie.png'},
-                                  {'title': 'Bilge Kahin', 'desc': '30 tarot falı baktın', 'icon': Icons.remove_red_eye_rounded, 'color': const Color(0xFFA855F7), 'reward': '+1 Ruh Tası', 'image': null},
-                                  {'title': 'Ruya Koleksiyoncusu', 'desc': '20 ruya analizi yaptın', 'icon': Icons.bedtime_rounded, 'color': const Color(0xFF3B82F6), 'reward': '+1 Ruh Tası', 'image': null},
-                                  {'title': 'Mektup Bagımlısı', 'desc': '10 mektup gonderdin', 'icon': Icons.mail_rounded, 'color': const Color(0xFF34D399), 'reward': '+1 Ruh Tası', 'image': null},
-                                  {'title': 'Topluluk Lideri', 'desc': '5 arkadas davet ettin', 'icon': Icons.groups_rounded, 'color': const Color(0xFFFB923C), 'reward': '+3 Ruh Tası', 'image': null},
-                                  {'title': 'Kozmik Koleksiyoncu', 'desc': '10 farklı kurabiye topladın', 'icon': Icons.stars_rounded, 'color': const Color(0xFFFFD700), 'reward': '+1 Ruh Tası', 'image': 'assets/icons/splash_cookie.png'},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_ach_idx') ?? 0) % achievements.length;
-                                await prefs.setInt('_test_ach_idx', idx + 1);
-                                final a = achievements[idx];
-                                if (!context.mounted) return;
-                                CosmicToast.show(
-                                  context: context,
-                                  title: a['title'] as String,
-                                  message: a['desc'] as String,
-                                  reward: a['reward'] as String,
-                                  icon: a['icon'] as IconData,
-                                  imagePath: a['image'] as String?,
-                                  iconColor: a['color'] as Color,
-                                  rewardColor: a['color'] as Color,
-                                );
-                              },
-                            ),
-                            // 6. UNVAN TESTİ (6 Rütbe)
-                            _SettingsListTile(
-                              icon: Icons.workspace_premium_rounded,
-                              iconColor: const Color(0xFFFFD700),
-                              label: 'Unvan Terfi (6)',
-                              subtitle: 'Rank up toast',
-                              onTap: () async {
-                                HapticFeedback.heavyImpact();
-                                final ranks = [
-                                  {'title': 'Çırak Kahin', 'reward': 10, 'icon': Icons.star_rounded, 'color': const Color(0xFF64B5F6)},
-                                  {'title': 'Kahin', 'reward': 20, 'icon': Icons.visibility_rounded, 'color': const Color(0xFFBA68C8)},
-                                  {'title': 'Bilge Kahin', 'reward': 30, 'icon': Icons.auto_stories_rounded, 'color': const Color(0xFFFFB74D)},
-                                  {'title': 'Usta Kahin', 'reward': 50, 'icon': Icons.shield_rounded, 'color': const Color(0xFFE57373)},
-                                  {'title': 'Kozmik Kahin', 'reward': 100, 'icon': Icons.diamond_rounded, 'color': const Color(0xFFFFD700)},
-                                ];
-                                final prefs = await SharedPreferences.getInstance();
-                                final idx = (prefs.getInt('_test_rank_idx') ?? 0) % ranks.length;
-                                await prefs.setInt('_test_rank_idx', idx + 1);
-                                final r = ranks[idx];
-                                if (!context.mounted) return;
-                                CosmicToast.show(
-                                  context: context,
-                                  title: 'Kozmik Terfi!',
-                                  message: 'Aura gücün arttı. Yeni unvanın: ${r['title']}',
-                                  reward: '+${r['reward']} Aura',
-                                  icon: r['icon'] as IconData,
-                                  iconColor: r['color'] as Color,
-                                  rewardColor: r['color'] as Color,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-
-
                         // ── BÖLÜM 2: DESTEK & DENEYİM ──
                         _SectionLabel(lang == 'tr' ? 'Destek & Deneyim' : 'Support & Experience'),
                         const SizedBox(height: 10),
@@ -2495,7 +2296,9 @@ class _BentoHeroCard extends StatelessWidget {
                                     : 0.0,
                               ),
                               child: Transform.scale(
-                                scale: userAvatar.contains('owl') ? 1.35 : 1.0,
+                                scale: userAvatar.contains('owl') 
+                                    ? 1.35 
+                                    : (userAvatar.contains('avatar_') ? 1.15 : 1.0),
                                 child: userAvatar.startsWith('http')
                                     ? Image.network(
                                         userAvatar,
@@ -3394,8 +3197,55 @@ class _BentoHeroCard extends StatelessWidget {
                                     ),
                                   ),
                                   
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   
+                                  if (totalCount < 3) ...[
+                                    // Minimum 3 rüya gerekli — dönem bazlı mesaj
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              dreamTimeFilter == 3
+                                                ? "Son 3 günde en az 3 rüya kaydet."
+                                                : dreamTimeFilter == 7
+                                                  ? "Son 7 günde en az 3 rüya kaydet."
+                                                  : "Son 1 ayda en az 3 rüya kaydet.",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10, height: 1.4),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) => AlertDialog(
+                                                  backgroundColor: const Color(0xFF1A1A2E),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                  title: Text("Duygu Dağılımı Nedir?", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                                                  content: Text(
+                                                    "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nEn az 3 rüya kaydettikten sonra, seçili zaman diliminde hangi duyguların ön plana çıktığını görebilirsin.",
+                                                    style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.5),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.pop(context),
+                                                      child: const Text("Anladım", style: TextStyle(color: Color(0xFF818CF8))),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                            child: Icon(Icons.help_outline_rounded, color: Colors.white.withOpacity(0.2), size: 14),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ] else ...[
+                                  // Yeterli veri var — grafik göster
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                     child: Row(
@@ -3406,7 +3256,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   
                                   if (emotionCounts.isEmpty)
                                     Padding(
@@ -3414,47 +3264,113 @@ class _BentoHeroCard extends StatelessWidget {
                                       child: Center(child: Text("Grafik oluşturmak için veri bekleniyor.", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10))),
                                     )
                                   else
-                                    Column(
-                                      children: (emotionCounts.entries.toList()..sort((a,b) => b.value.compareTo(a.value))).take(3).map((e) {
-                                        int pct = ((e.value / totalCount) * 100).toInt();
-                                        Map<String, String> localTr = {
-                                          'fear': 'Korku', 'anxiety': 'Kaygı', 'joy': 'Neşe', 'happy': 'Mutluluk', 'happiness': 'Mutluluk',
-                                          'sadness': 'Hüzün', 'sad': 'Hüzün', 'confusion': 'Karmaşa', 'peace': 'Huzur', 'peaceful': 'Huzurlu',
-                                          'anger': 'Öfke', 'angry': 'Öfkeli', 'neutral': 'Nötr'
-                                        };
-                                        String label = localTr[e.key.toLowerCase()] ?? e.key;
-                                        
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 6.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
-                                                  const Spacer(),
-                                                  Text("%$pct", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 9, fontWeight: FontWeight.bold)),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(4),
-                                                child: LinearProgressIndicator(
-                                                  value: pct / 100,
-                                                  backgroundColor: Colors.white.withOpacity(0.05),
-                                                  valueColor: AlwaysStoppedAnimation(
-                                                    label == 'Kaygı' || label == 'Korku' ? const Color(0xFFFF6B6B) : 
-                                                    label == 'Huzur' || label == 'Neşe' ? const Color(0xFF4EE6C5) : 
-                                                    const Color(0xFF818CF8)
-                                                  ),
-                                                  minHeight: 5,
+                                    Builder(builder: (context) {
+                                      // Duygu çevirisi ve renk haritası
+                                      const Map<String, String> localTr = {
+                                        'fear': 'Korku', 'anxiety': 'Kaygı', 'joy': 'Neşe', 'happy': 'Mutluluk', 'happiness': 'Mutluluk',
+                                        'sadness': 'Hüzün', 'sad': 'Hüzün', 'confusion': 'Karmaşa', 'peace': 'Huzur', 'peaceful': 'Huzurlu',
+                                        'anger': 'Öfke', 'angry': 'Öfkeli', 'neutral': 'Nötr', 'curiosity': 'Merak', 'surprise': 'Şaşkınlık',
+                                        'love': 'Aşk', 'hope': 'Umut', 'nostalgia': 'Nostalji', 'excitement': 'Heyecan',
+                                      };
+                                      const Map<String, Color> emotionColors = {
+                                        'Korku': Color(0xFFFF6B6B), 'Kaygı': Color(0xFFFF9F43),
+                                        'Neşe': Color(0xFF4EE6C5), 'Mutluluk': Color(0xFF48DBFB),
+                                        'Hüzün': Color(0xFF818CF8), 'Karmaşa': Color(0xFFFECA57),
+                                        'Huzur': Color(0xFF1DD1A1), 'Huzurlu': Color(0xFF1DD1A1),
+                                        'Öfke': Color(0xFFEE5A6F), 'Öfkeli': Color(0xFFEE5A6F),
+                                        'Nötr': Color(0xFF636E72), 'Merak': Color(0xFFA29BFE),
+                                        'Şaşkınlık': Color(0xFFFF6348), 'Aşk': Color(0xFFFF6B81),
+                                        'Umut': Color(0xFF55EFC4), 'Nostalji': Color(0xFFDDA0DD),
+                                        'Heyecan': Color(0xFFFFD32A),
+                                      };
+                                      const Map<String, String> emotionEmojis = {
+                                        'Korku': '😰', 'Kaygı': '😟', 'Neşe': '😊', 'Mutluluk': '😄',
+                                        'Hüzün': '😢', 'Karmaşa': '😵‍💫', 'Huzur': '😌', 'Huzurlu': '😌',
+                                        'Öfke': '😤', 'Öfkeli': '😤', 'Nötr': '😐', 'Merak': '🧐',
+                                        'Şaşkınlık': '😮', 'Aşk': '❤️', 'Umut': '🌱', 'Nostalji': '🌅',
+                                        'Heyecan': '🤩',
+                                      };
+                                      
+                                      final sorted = emotionCounts.entries.toList()..sort((a,b) => b.value.compareTo(a.value));
+                                      final top = sorted.take(5).toList();
+                                      
+                                      // Donut grafik verileri
+                                      final List<_EmotionSlice> slices = top.map((e) {
+                                        final label = localTr[e.key.toLowerCase()] ?? e.key;
+                                        final pct = (e.value / totalCount * 100);
+                                        final color = emotionColors[label] ?? const Color(0xFF818CF8);
+                                        final emoji = emotionEmojis[label] ?? '🔮';
+                                        return _EmotionSlice(label: label, percentage: pct, color: color, emoji: emoji, count: e.value);
+                                      }).toList();
+                                      
+                                      return Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          // Sol: Donut Chart
+                                          SizedBox(
+                                            width: 90,
+                                            height: 90,
+                                            child: CustomPaint(
+                                              painter: _EmotionDonutPainter(slices: slices),
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "$totalCount",
+                                                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, height: 1.0),
+                                                    ),
+                                                    Text(
+                                                      "rüya",
+                                                      style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 8, fontWeight: FontWeight.w500),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        );
-                                      }).toList(),
-                                    ),
+                                          const SizedBox(width: 14),
+                                          // Sağ: Legend listesi
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: slices.map((s) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(bottom: 5.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 8, height: 8,
+                                                        decoration: BoxDecoration(
+                                                          color: s.color,
+                                                          borderRadius: BorderRadius.circular(2),
+                                                          boxShadow: [BoxShadow(color: s.color.withOpacity(0.4), blurRadius: 4)],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      Text(s.emoji, style: const TextStyle(fontSize: 10)),
+                                                      const SizedBox(width: 4),
+                                                      Expanded(
+                                                        child: Text(
+                                                          s.label,
+                                                          style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 10, fontWeight: FontWeight.w600),
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "%${s.percentage.toInt()}",
+                                                        style: TextStyle(color: s.color.withOpacity(0.9), fontSize: 10, fontWeight: FontWeight.w800),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ], // else (totalCount >= 3)
                                 ],
                               ),
                             );
@@ -5642,5 +5558,83 @@ class _SensorParallaxWidgetState extends State<_SensorParallaxWidget> {
         ..rotateY(_roll),
       child: widget.child,
     );
+  }
+}
+
+// ══════════════════════════════════════════════
+// 🍩 DUYGU DAĞILIMI DONUT GRAFİĞİ
+// ══════════════════════════════════════════════
+
+class _EmotionSlice {
+  final String label;
+  final double percentage;
+  final Color color;
+  final String emoji;
+  final int count;
+  
+  const _EmotionSlice({
+    required this.label,
+    required this.percentage,
+    required this.color,
+    required this.emoji,
+    required this.count,
+  });
+}
+
+class _EmotionDonutPainter extends CustomPainter {
+  final List<_EmotionSlice> slices;
+  
+  _EmotionDonutPainter({required this.slices});
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    const strokeWidth = 10.0;
+    final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
+    
+    // Arka plan halkası
+    final bgPaint = Paint()
+      ..color = Colors.white.withOpacity(0.05)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(center, radius - strokeWidth / 2, bgPaint);
+    
+    // Dilimleri çiz
+    const gapAngle = 0.06; // Dilimler arası boşluk (radyan)
+    const startAngle = -math.pi / 2; // 12 saat yönünden başla
+    final totalGap = gapAngle * slices.length;
+    final availableAngle = 2 * math.pi - totalGap;
+    
+    double currentAngle = startAngle;
+    
+    for (final slice in slices) {
+      final sweepAngle = (slice.percentage / 100) * availableAngle;
+      
+      // Glow efekti
+      final glowPaint = Paint()
+        ..color = slice.color.withOpacity(0.25)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth + 6
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      canvas.drawArc(rect, currentAngle, sweepAngle, false, glowPaint);
+      
+      // Ana dilim
+      final slicePaint = Paint()
+        ..color = slice.color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round;
+      canvas.drawArc(rect, currentAngle, sweepAngle, false, slicePaint);
+      
+      currentAngle += sweepAngle + gapAngle;
+    }
+  }
+  
+  @override
+  bool shouldRepaint(covariant _EmotionDonutPainter oldDelegate) {
+    return oldDelegate.slices.length != slices.length;
   }
 }

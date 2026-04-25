@@ -8,6 +8,7 @@ import '../widgets/swipe_back_wrapper.dart';
 import '../services/storage_service.dart';
 import '../models/owl_models.dart';
 import '../services/supabase_owl_service.dart';
+import '../services/analytics_service.dart';
 import 'compatibility_content.dart';
 
 /// Batı Zodyak Sayfası — "Ben nasıl biriyim?"
@@ -721,6 +722,7 @@ class _ZodiacPageState extends State<ZodiacPage>
           _selectedIndex = _signIndexFromDate(_birthDate);
         }
       });
+      AnalyticsService().logZodiacViewed(sign: 'western_${_signs[_selectedIndex]['nameEn']}');
     }
   }
 

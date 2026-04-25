@@ -7,6 +7,7 @@ import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
+import '../services/analytics_service.dart';
 import 'chinese_zodiac_data.dart';
 
 class ZodiacChinesePage extends StatefulWidget {
@@ -187,6 +188,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         _userElement = ChineseZodiacData.elementFromYear(d.year);
         _userYinYang = ChineseZodiacData.yinYangFromYear(d.year);
       });
+      AnalyticsService().logZodiacViewed(sign: 'chinese_${ChineseZodiacData.animals[_animalIdx]['name']}');
     }
   }
 

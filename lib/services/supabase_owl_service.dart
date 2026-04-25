@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/owl_models.dart';
 import 'storage_service.dart';
 import 'sound_service.dart';
+import 'analytics_service.dart';
 
 class SupabaseOwlService {
   static final SupabaseOwlService _instance = SupabaseOwlService._();
@@ -321,6 +322,7 @@ class SupabaseOwlService {
         'status': 'pending'
       });
       debugPrint("🟢 [SEND] ✅ INSERT SUCCESSFUL! from=$myId to=$targetId");
+      AnalyticsService().logFriendRequestSent();
       return true;
     } catch (e, stack) {
       debugPrint("🔴 [SEND] Error: $e");
@@ -360,6 +362,7 @@ class SupabaseOwlService {
         'status': 'pending',
       });
       debugPrint("🟢 [SEND_BY_ID] ✅ INSERT SUCCESSFUL!");
+      AnalyticsService().logFriendRequestSent();
       return true;
     } catch (e, stack) {
       debugPrint("🔴 [SEND_BY_ID] Error: $e");
@@ -611,6 +614,7 @@ class SupabaseOwlService {
         };
         await _db.from('owl_letters').insert(letterData);
         debugPrint("🦉 Mektup Supabase'e fırlatıldı!");
+        AnalyticsService().logOwlLetterSent();
       } catch (e) {
          debugPrint("🦉 Bağlantı yok ama mektup kasada tutuluyor (CloudSync eşleyene kadar): \$e");
       }

@@ -18,6 +18,24 @@ class SoundService {
   // Ses ayarını kalıcı olarak yükle
   Future<void> _loadSoundPreference() async {
     _isSoundEnabled = await StorageService.getSoundEnabled() ?? true;
+    
+    // iOS'ta telefon sessizdeyken (yandaki tuş) bile oyun seslerinin gelmesi için:
+    final audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+      android: AudioContextAndroid(
+        isSpeakerphoneOn: false,
+        stayAwake: false,
+        contentType: AndroidContentType.sonification,
+        usageType: AndroidUsageType.assistanceSonification,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    await AudioPlayer.global.setAudioContext(audioContext);
   }
 
   // Ses ayarlarını aç/kapat (kalıcı olarak kaydeder)

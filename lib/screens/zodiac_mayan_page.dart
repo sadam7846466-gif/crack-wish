@@ -6,6 +6,7 @@ import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
 import '../services/storage_service.dart';
 import '../data/mayan_zodiac_data.dart';
+import '../services/analytics_service.dart';
 import 'package:flutter/cupertino.dart';
 
 class ZodiacMayanPage extends StatefulWidget {
@@ -51,6 +52,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       setState(() {
         _birthDate = d;
       });
+      AnalyticsService().logZodiacViewed(sign: 'mayan_${MayanZodiacData.nahuales[_userIdx]['name']}');
     }
   }
 
