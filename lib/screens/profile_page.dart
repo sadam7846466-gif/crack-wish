@@ -4158,12 +4158,7 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
         duration: const Duration(milliseconds: 120),
         scale: _pressed ? 0.97 : 1.0,
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-            bottomLeft: Radius.circular(8), // Asymmetric connection
-            bottomRight: Radius.circular(20),
-          ),
+          borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
@@ -4172,12 +4167,7 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                 color: widget.isPremium
                     ? Colors.white.withOpacity(0.08)
                     : const Color(0xFFD4A574).withOpacity(0.15),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(8),
-                  bottomRight: Radius.circular(20),
-                ),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: widget.isPremium
                       ? Colors.white.withOpacity(0.15)
@@ -4307,24 +4297,14 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
         duration: const Duration(milliseconds: 120),
         scale: _pressed ? 0.97 : 1.0,
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8), // Asymmetric connection to Elite above
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
-          ),
+          borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.08), // Bright pure translucent glass
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(24),
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.15),
                   width: 1.2,
