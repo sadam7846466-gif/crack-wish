@@ -2052,7 +2052,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                         children: [
                           Row(
                             children: [
-                              const Text('✨ ', style: TextStyle(fontSize: 14)),
+                              Icon(Icons.auto_awesome_rounded, color: gold, size: 14),
+                              const SizedBox(width: 4),
                               Text(
                                 _isTr ? 'KOZMİK UYUM' : 'COSMIC HARMONY',
                                 style: TextStyle(
@@ -2221,7 +2222,8 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    const Text('✨ ', style: TextStyle(fontSize: 20)),
+                    Icon(Icons.auto_awesome_rounded, color: gold, size: 20),
+                    const SizedBox(width: 8),
                     Text(
                       _isTr ? 'Kozmik Uyum Nedir?' : 'What is Cosmic Harmony?',
                       style: TextStyle(
