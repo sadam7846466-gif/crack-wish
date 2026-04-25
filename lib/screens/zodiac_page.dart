@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:ui';
+import 'package:flutter/services.dart';
+import 'dart:ui' as ui;
 import 'dart:math' as math;
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
@@ -10,6 +14,9 @@ import '../models/owl_models.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/analytics_service.dart';
 import 'compatibility_content.dart';
+import 'profile_page.dart';
+import 'cosmic_profile_page.dart';
+import 'natal_chart_page.dart';
 
 /// Batı Zodyak Sayfası — "Ben nasıl biriyim?"
 /// Psikolojik yorum, kişilik analizi, hayat alanları, uyum
@@ -27,6 +34,8 @@ class _ZodiacPageState extends State<ZodiacPage>
   String? _userAvatar;
   DateTime _birthDate = DateTime(1999, 12, 20);
   Map<String, int> _traitBoosts = {};
+  String? _birthTime;
+  String? _birthPlace;
 
   static const Color _gold = Color(0xFFFFD060);
   static const Color _goldL = Color(0xFFFFE8A1);
@@ -710,11 +719,15 @@ class _ZodiacPageState extends State<ZodiacPage>
     final avatar = await StorageService.getAvatar();
     final savedDate = await StorageService.getBirthDate();
     final boosts = await StorageService.getTraitBoosts();
+    final bTime = await StorageService.getBirthTime();
+    final bPlace = await StorageService.getBirthPlace();
     if (mounted) {
       setState(() {
         _userName = name;
         _userAvatar = avatar ?? 'assets/images/owl.png';
         _traitBoosts = boosts;
+        _birthTime = bTime;
+        _birthPlace = bPlace;
         if (savedDate != null) {
           _birthDate = savedDate;
           _selectedIndex = _signIndexFromDate(savedDate);
@@ -752,7 +765,7 @@ class _ZodiacPageState extends State<ZodiacPage>
       builder: (_) => ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          filter: ui.ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             height: 400,
             decoration: BoxDecoration(
@@ -996,7 +1009,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         builder: (_, scrollController) => ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            filter: ui.ImageFilter.blur(sigmaX: 40, sigmaY: 40),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.08),
@@ -1160,7 +1173,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         builder: (_, scrollController) => ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            filter: ui.ImageFilter.blur(sigmaX: 40, sigmaY: 40),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.08),
@@ -1719,6 +1732,11 @@ class _ZodiacPageState extends State<ZodiacPage>
 
                         const SizedBox(height: 28),
 
+                        // ── DERİN ASTROLOJİ — Doğum Haritası & Yükselen ──
+                        _fadeIn(750, _premiumAstrologyCard(s)),
+
+                        const SizedBox(height: 28),
+
                         // ── KOZMİK BAĞLANTILAR — Burç Uyumu ──
                         _fadeIn(800, _compatibilityCard(s)),
 
@@ -2222,6 +2240,267 @@ class _ZodiacPageState extends State<ZodiacPage>
             ),
           ),
         ],
+      ),
+    );
+  }
+  Widget _premiumAstrologyCard(Map<String, dynamic> s) {
+    final hasBirthInfo = _birthTime != null && _birthTime!.isNotEmpty && _birthPlace != null && _birthPlace!.isNotEmpty;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: _gold.withOpacity(0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShaderMask(
+                shaderCallback: (b) => const LinearGradient(
+                  colors: [
+                    Color(0xFFE8D5B7),
+                    Color(0xFFFFE8A1),
+                    Color(0xFFFFD060),
+                  ],
+                ).createShader(b),
+                child: Text(
+                  'KOZMİK DOĞUM ÇARKI',
+                  style: GoogleFonts.cinzel(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Doğum saati ve yeriyle hesaplanan derin analizin',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          if (hasBirthInfo) ...[
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => NatalChartPage(
+                      birthTime: _birthTime!,
+                      birthPlace: _birthPlace!,
+                      sunSignData: s,
+                      selectedIndex: _selectedIndex,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                decoration: BoxDecoration(
+                  color: _gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: _gold.withOpacity(0.3)),
+                  boxShadow: [
+                    BoxShadow(color: _gold.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 5)),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 68,
+                      height: 68,
+                      child: CustomPaint(
+                        painter: _MiniNatalChartPainter(color: _gold),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'DOĞUM HARİTASI',
+                      style: GoogleFonts.cinzel(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'ASC, Güneş, Ay ve Gezegen Açıları',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('İNCELE', style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                          const SizedBox(width: 6),
+                          Icon(Icons.arrow_forward_ios_rounded, color: _gold, size: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else ...[
+            _buildLockedPremiumInfo(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLockedPremiumInfo() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+          ),
+          child: Column(
+            children: [
+              // Glowing Lock Icon
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: _gold.withOpacity(0.15),
+                          blurRadius: 30,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.04),
+                      border: Border.all(color: _gold.withOpacity(0.4), width: 1),
+                    ),
+                    child: Icon(
+                      Icons.lock_outline_rounded,
+                      color: _gold.withOpacity(0.9),
+                      size: 26,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Title
+              Text(
+                'DOĞUM HARİTASI KİLİTLİ',
+                style: GoogleFonts.cinzel(
+                  color: Colors.white.withOpacity(0.95),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              // Description
+              Text(
+                'Doğum haritanı oluşturabilmemiz için doğum saatine ve yerine ihtiyacımız var.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 13,
+                  height: 1.6,
+                  letterSpacing: 0.3,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              // Premium Button
+              GestureDetector(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => const CosmicProfilePage()),
+                  );
+                  _loadUserData();
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: _gold.withOpacity(0.4), width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _gold.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'KİLİDİ AÇ',
+                        style: TextStyle(
+                          color: _gold,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: _gold,
+                        size: 12,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -6859,7 +7138,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           decoration: BoxDecoration(
@@ -6971,7 +7250,7 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: GestureDetector(
           onTap: () {
             setState(() {
@@ -7957,4 +8236,55 @@ class _HarmonyPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _HarmonyPainter old) => 
       old.spin != spin || old.interact != interact || old.magneticPulse != magneticPulse;
+}
+
+class _MiniNatalChartPainter extends CustomPainter {
+  final Color color;
+  _MiniNatalChartPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
+
+    final pOuter = Paint()..color = color.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0..isAntiAlias = true..strokeCap = StrokeCap.round;
+    final pInner = Paint()..color = color.withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 0.7..isAntiAlias = true..strokeCap = StrokeCap.round;
+    final pTick = Paint()..color = color.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 0.5..isAntiAlias = true..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(c, r * 0.95, pOuter);
+    canvas.drawCircle(c, r * 0.72, pInner);
+    canvas.drawCircle(c, r * 0.45, pInner);
+
+    for (int i = 0; i < 12; i++) {
+      final angle = i * math.pi / 6;
+      canvas.drawLine(
+        Offset(c.dx, c.dy),
+        Offset(c.dx + math.cos(angle) * r * 0.45, c.dy + math.sin(angle) * r * 0.45),
+        pTick);
+      canvas.drawLine(
+        Offset(c.dx + math.cos(angle) * r * 0.72, c.dy + math.sin(angle) * r * 0.72),
+        Offset(c.dx + math.cos(angle) * r * 0.95, c.dy + math.sin(angle) * r * 0.95),
+        pInner);
+    }
+
+    final dotPaint = Paint()..color = color.withOpacity(0.8)..isAntiAlias = true;
+    final angles = [0.4, 1.2, 2.1, 3.0, 3.8, 4.9, 5.5];
+    final dists = [0.56, 0.40, 0.60, 0.52, 0.36, 0.58, 0.46];
+    for (int i = 0; i < angles.length; i++) {
+      canvas.drawCircle(Offset(c.dx + math.cos(angles[i]) * r * dists[i], c.dy + math.sin(angles[i]) * r * dists[i]), 1.5, dotPaint);
+    }
+
+    final aspPaint = Paint()..color = color.withOpacity(0.12)..strokeWidth = 0.4..isAntiAlias = true;
+    for (int i = 0; i < 3; i++) {
+      canvas.drawLine(
+        Offset(c.dx + math.cos(angles[i]) * r * dists[i], c.dy + math.sin(angles[i]) * r * dists[i]),
+        Offset(c.dx + math.cos(angles[i+3]) * r * dists[i+3], c.dy + math.sin(angles[i+3]) * r * dists[i+3]),
+        aspPaint);
+    }
+
+    canvas.drawCircle(c, 1.5, Paint()..color = color..isAntiAlias = true);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
