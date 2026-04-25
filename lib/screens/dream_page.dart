@@ -3456,16 +3456,6 @@ class _DreamPageState extends State<DreamPage>
                   ),
                 ),
               ),
-            // ── 6.5) Kozmik Uyku Bağlantısı (HealthKit) ──
-            SliverToBoxAdapter(
-              child: _PremiumReveal(
-                index: 6,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                  child: _CosmicSyncButton(isTr: isTr),
-                ),
-              ),
-            ),
 
             // ── 7) Yeni Rüya Yaz Butonu (Kapatma) ──
             SliverToBoxAdapter(

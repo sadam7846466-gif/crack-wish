@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:health/health.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -10,9 +9,8 @@ class CosmicEngineService {
   factory CosmicEngineService() => _instance;
   CosmicEngineService._internal();
 
-  // Bildirim ve Sağlık Motorları
+  // Bildirim Motoru
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
-  final Health _health = Health();
 
   bool _isInitialized = false;
 
@@ -42,51 +40,17 @@ class CosmicEngineService {
     debugPrint("🔮 Cosmic Engine & Notifications Initialized");
   }
 
-  /// Kullanıcının HealthKit'ine bağlanarak uyku verilerini analiz eder
-  /// Eğer uyanma saatini tespit ederse, ona özel sabah ritüeli hatırlatıcısı atar
+  /// Kullanıcının uyku verilerini (geçici olarak devre dışı)
+  /// Şimdilik sadece standart sabah ritüeli hatırlatıcısı atar
   Future<void> syncSleepAndSchedulePrediction() async {
     if (kIsWeb) return;
 
     try {
-      // 1. Sağlık İzinlerini İste (Uyku Verisi)
-      final types = [HealthDataType.SLEEP_IN_BED, HealthDataType.SLEEP_ASLEEP];
-      
-      bool requested = await _health.requestAuthorization(types);
-      if (!requested) {
-        debugPrint("Sağlık izni reddedildi. Standart bildirim rutini uygulanacak.");
-        _scheduleStandardReminder();
-        return;
-      }
-
-      // 2. Son 3 günlük uyku verisini çek
-      final now = DateTime.now();
-      final yesterday = now.subtract(const Duration(days: 3));
-      
-      List<HealthDataPoint> healthData = await _health.getHealthDataFromTypes(startTime: yesterday, endTime: now, types: types);
-      
-      if (healthData.isEmpty) {
-        // Veri yoksa standart saatte (Örn 09:00) at
-        _scheduleStandardReminder();
-        return;
-      }
-
-      // 3. Kullanıcının Ortalama Uyanma Saatini Analiz Et (Yapay Zeka Mantığı)
-      // En son uyanış (veya genelde kalktığı) saati hesapla
-      healthData.sort((a, b) => b.dateTo.compareTo(a.dateTo));
-      final lastWakeup = healthData.first.dateTo;
-      
-      debugPrint("🛌 Son uyanma saati tespit edildi: \$lastWakeup");
-
-      // 4. Yarın tam o saatte bildirim at! (Akıllı zamanlama)
-      await _scheduleSmartNotification(
-        id: 101,
-        title: "Kozmik Zihnin Uyandı 🌙",
-        body: "Dün gece gördüğün sembolleri unutmadan analiz etmeye ne dersin?",
-        targetTime: tz.TZDateTime.from(lastWakeup.add(const Duration(days: 1)), tz.local),
-      );
-
+      // TODO: Sağlık izinleri (HealthKit) entegrasyonu ileride eklenecek.
+      // Şimdilik standart bildirim atıyoruz.
+      _scheduleStandardReminder();
     } catch (e) {
-      debugPrint("Cosmic Engine Sağlık Verisi Hatası: \$e");
+      debugPrint("Cosmic Engine Bildirim Zamanlama Hatası: \$e");
       _scheduleStandardReminder();
     }
   }

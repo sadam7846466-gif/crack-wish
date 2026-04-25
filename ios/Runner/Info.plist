@@ -43,10 +43,7 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Rehberinizdeki arkadaşlarınızı bulup Crack&amp;Wish evrenine ekleyebilmeniz için izin gerekiyor. Rehberiniz sunucularımızda saklanmaz.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Rüya yorumlarınızı biyolojik sirkadiyen ritminizle eşleştirmek ve uyku kalitenizi analiz etmek için Health verinize ihtiyaç duyuyoruz.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Crack&amp;Wish sağlık uygulamanızı destekleyerek daha sağlıklı rüya kalitesi ölçümü sunar.</string>
+
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
