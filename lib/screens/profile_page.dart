@@ -824,7 +824,7 @@ info@crackandwish.com''',
                               const Icon(Icons.diamond_rounded, color: Color(0xFF60A5FA), size: 14),
                               const SizedBox(width: 4),
                               Text(
-                                lang == 'tr' ? '+3 Ruh Taşı Kazan' : 'Earn +3 Soul Stones',
+                                lang == 'tr' ? '+2 Ruh Taşı Kazan' : 'Earn +2 Soul Stones',
                                 style: const TextStyle(
                                   color: Color(0xFF60A5FA),
                                   fontSize: 12,
@@ -2000,7 +2000,7 @@ For questions: info@crackandwish.com''',
                               icon: Icons.group_add_rounded,
                               iconColor: const Color(0xFFC084FC).withOpacity(0.8),
                               label: lang == 'tr' ? 'Arkadaşlarını Davet Et' : 'Invite Friends',
-                              subtitle: lang == 'tr' ? '+3 Ruh Taşı' : '+3 Soul Stones',
+                              subtitle: lang == 'tr' ? '+2 Ruh Taşı' : '+2 Soul Stones',
                               onTap: _showInviteModal,
                             ),
                             _SettingsListTile(
