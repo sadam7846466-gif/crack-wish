@@ -2791,7 +2791,7 @@ class _ContactItem extends StatelessWidget {
                                                                 ? Transform.scale(
                                                                     scale: 1.15,
                                                                     child: Image.asset(
-                                                                      friend!.user.avatarUrl,
+                                                                      friend!.user.avatarUrl!,
                                                                       fit: BoxFit.cover,
                                                                     ),
                                                                   )
