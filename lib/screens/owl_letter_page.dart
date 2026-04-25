@@ -2743,24 +2743,91 @@ class _ContactItem extends StatelessWidget {
                                   Colors.redAccent.withOpacity(0.8),
                                   () async {
                                     HapticFeedback.heavyImpact();
-                                    final confirm = await showDialog<bool>(
+                                    final confirm = await showGeneralDialog<bool>(
                                       context: context,
-                                      builder: (context) => AlertDialog(
-                                        backgroundColor: const Color(0xFF2A2A3D),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                        title: const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                                        content: Text('${friend?.user.name} ile arandaki sihirli bağı koparmak istediğine emin misin?', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(false),
-                                            child: Text('İptal', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+                                      barrierDismissible: true,
+                                      barrierLabel: 'Dismiss',
+                                      barrierColor: Colors.black.withOpacity(0.5),
+                                      transitionDuration: const Duration(milliseconds: 300),
+                                      pageBuilder: (context, animation, secondaryAnimation) {
+                                        return ScaleTransition(
+                                          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                                          child: FadeTransition(
+                                            opacity: animation,
+                                            child: Dialog(
+                                              backgroundColor: Colors.transparent,
+                                              elevation: 0,
+                                              insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(24),
+                                                child: BackdropFilter(
+                                                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(24),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFF16151A).withOpacity(0.6),
+                                                      borderRadius: BorderRadius.circular(24),
+                                                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Container(
+                                                          padding: const EdgeInsets.all(12),
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.redAccent.withOpacity(0.15),
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                          child: Icon(Icons.person_remove_rounded, color: Colors.redAccent.withOpacity(0.9), size: 28),
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 0.5)),
+                                                        const SizedBox(height: 8),
+                                                        Text('${friend?.user.name} ile arandaki sihirli bağı koparmak istediğine emin misin?', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4)),
+                                                        const SizedBox(height: 24),
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: GestureDetector(
+                                                                onTap: () => Navigator.of(context).pop(false),
+                                                                child: Container(
+                                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.white.withOpacity(0.05),
+                                                                    borderRadius: BorderRadius.circular(12),
+                                                                  ),
+                                                                  alignment: Alignment.center,
+                                                                  child: Text('İptal', style: TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600, fontSize: 14)),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(width: 12),
+                                                            Expanded(
+                                                              child: GestureDetector(
+                                                                onTap: () => Navigator.of(context).pop(true),
+                                                                child: Container(
+                                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.redAccent.withOpacity(0.15),
+                                                                    border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                                                                    borderRadius: BorderRadius.circular(12),
+                                                                  ),
+                                                                  alignment: Alignment.center,
+                                                                  child: const Text('Evet, Kopar', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700, fontSize: 14)),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(true),
-                                            child: const Text('Evet, Kopar', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-                                          ),
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     );
                                     
                                     if (confirm == true && friend != null) {
