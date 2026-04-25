@@ -3199,8 +3199,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   
                                   const SizedBox(height: 10),
                                   
-                                  int requiredCount = dreamTimeFilter == 3 ? 3 : (dreamTimeFilter == 7 ? 7 : 15);
-                                  if (totalCount < requiredCount) ...[
+                                  if (totalCount < (dreamTimeFilter == 3 ? 3 : (dreamTimeFilter == 7 ? 7 : 15))) ...[
                                     // Minimum rüya gerekli — dönem bazlı mesaj
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 6.0),
