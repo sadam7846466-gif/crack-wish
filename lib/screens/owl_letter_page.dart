@@ -2773,12 +2773,30 @@ class _ContactItem extends StatelessWidget {
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
                                                         Container(
-                                                          padding: const EdgeInsets.all(12),
+                                                          width: 64,
+                                                          height: 64,
                                                           decoration: BoxDecoration(
-                                                            color: Colors.redAccent.withOpacity(0.15),
                                                             shape: BoxShape.circle,
+                                                            border: Border.all(color: Colors.redAccent.withOpacity(0.4), width: 2),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors.redAccent.withOpacity(0.2),
+                                                                blurRadius: 16,
+                                                                spreadRadius: 2,
+                                                              ),
+                                                            ],
                                                           ),
-                                                          child: Icon(Icons.person_remove_rounded, color: Colors.redAccent.withOpacity(0.9), size: 28),
+                                                          child: ClipOval(
+                                                            child: friend?.user.avatarUrl != null
+                                                                ? Transform.scale(
+                                                                    scale: 1.15,
+                                                                    child: Image.asset(
+                                                                      friend!.user.avatarUrl,
+                                                                      fit: BoxFit.cover,
+                                                                    ),
+                                                                  )
+                                                                : const Icon(Icons.person, color: Colors.white54, size: 32),
+                                                          ),
                                                         ),
                                                         const SizedBox(height: 16),
                                                         const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 0.5)),
