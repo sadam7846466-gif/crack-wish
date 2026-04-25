@@ -2572,7 +2572,7 @@ class _ContactItem extends StatelessWidget {
                 child: friend?.user.avatarUrl != null 
                     ? (friend!.user.avatarUrl!.startsWith('http') 
                         ? Transform.scale(
-                            scale: 1.15,
+                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
                             child: Image.network(
                               friend!.user.avatarUrl!,
                               fit: BoxFit.cover,
@@ -2584,7 +2584,7 @@ class _ContactItem extends StatelessWidget {
                             ),
                           )
                         : Transform.scale(
-                            scale: 1.15,
+                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
                             child: Image.asset(
                               friend!.user.avatarUrl!,
                               fit: BoxFit.cover,
@@ -2789,7 +2789,7 @@ class _ContactItem extends StatelessWidget {
                                                           child: ClipOval(
                                                             child: friend?.user.avatarUrl != null
                                                                 ? Transform.scale(
-                                                                    scale: 1.15,
+                                                                    scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
                                                                     child: Image.asset(
                                                                       friend!.user.avatarUrl!,
                                                                       fit: BoxFit.cover,
