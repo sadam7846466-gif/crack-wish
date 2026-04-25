@@ -3199,8 +3199,9 @@ class _BentoHeroCard extends StatelessWidget {
                                   
                                   const SizedBox(height: 10),
                                   
-                                  if (totalCount < 3) ...[
-                                    // Minimum 3 rüya gerekli — dönem bazlı mesaj
+                                  int requiredCount = dreamTimeFilter == 3 ? 3 : (dreamTimeFilter == 7 ? 7 : 15);
+                                  if (totalCount < requiredCount) ...[
+                                    // Minimum rüya gerekli — dönem bazlı mesaj
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                                       child: Row(
@@ -3211,8 +3212,8 @@ class _BentoHeroCard extends StatelessWidget {
                                               dreamTimeFilter == 3
                                                 ? "Son 3 günde en az 3 rüya kaydet."
                                                 : dreamTimeFilter == 7
-                                                  ? "Son 7 günde en az 3 rüya kaydet."
-                                                  : "Son 1 ayda en az 3 rüya kaydet.",
+                                                  ? "Son 7 günde en az 7 rüya kaydet."
+                                                  : "Son 1 ayda en az 15 rüya kaydet.",
                                               textAlign: TextAlign.center,
                                               style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10, height: 1.4),
                                             ),
@@ -3227,7 +3228,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                                   title: Text("Duygu Dağılımı Nedir?", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
                                                   content: Text(
-                                                    "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nEn az 3 rüya kaydettikten sonra, seçili zaman diliminde hangi duyguların ön plana çıktığını görebilirsin.",
+                                                    "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nSeçtiğin zaman dilimi (3, 7 veya 30 gün) için yeterli veri toplandıktan sonra hangi duyguların ön plana çıktığını görebilirsin.",
                                                     style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.5),
                                                   ),
                                                   actions: [
