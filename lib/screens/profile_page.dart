@@ -3310,8 +3310,16 @@ class _BentoHeroCard extends StatelessWidget {
                                           SizedBox(
                                             width: 95,
                                             height: 95,
-                                            child: CustomPaint(
-                                              painter: _EmotionDonutPainter(slices: slices),
+                                            child: TweenAnimationBuilder<double>(
+                                              tween: Tween<double>(begin: 0.0, end: 1.0),
+                                              duration: const Duration(milliseconds: 1400),
+                                              curve: Curves.easeOutCubic,
+                                              builder: (context, value, child) {
+                                                return CustomPaint(
+                                                  painter: _EmotionDonutPainter(slices: slices, animationValue: value),
+                                                  child: child,
+                                                );
+                                              },
                                               child: Center(
                                                 child: Column(
                                                   mainAxisSize: MainAxisSize.min,
@@ -5582,8 +5590,9 @@ class _EmotionSlice {
 
 class _EmotionDonutPainter extends CustomPainter {
   final List<_EmotionSlice> slices;
+  final double animationValue;
   
-  _EmotionDonutPainter({required this.slices});
+  _EmotionDonutPainter({required this.slices, this.animationValue = 1.0});
   
   @override
   void paint(Canvas canvas, Size size) {
@@ -5609,11 +5618,12 @@ class _EmotionDonutPainter extends CustomPainter {
     double currentAngle = startAngle;
     
     for (final slice in slices) {
-      final sweepAngle = (slice.percentage / 100) * availableAngle;
+      final targetSweepAngle = (slice.percentage / 100) * availableAngle;
+      final sweepAngle = targetSweepAngle * animationValue;
       
       // Glow efekti
       final glowPaint = Paint()
-        ..color = slice.color.withOpacity(0.35)
+        ..color = slice.color.withOpacity(0.35 * animationValue)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth + 8
         ..strokeCap = StrokeCap.round
@@ -5628,12 +5638,12 @@ class _EmotionDonutPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round;
       canvas.drawArc(rect, currentAngle, sweepAngle, false, slicePaint);
       
-      currentAngle += sweepAngle + gapAngle;
+      currentAngle += targetSweepAngle + gapAngle;
     }
   }
   
   @override
   bool shouldRepaint(covariant _EmotionDonutPainter oldDelegate) {
-    return oldDelegate.slices.length != slices.length;
+    return oldDelegate.slices.length != slices.length || oldDelegate.animationValue != animationValue;
   }
 }
