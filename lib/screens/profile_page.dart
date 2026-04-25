@@ -3348,8 +3348,6 @@ class _BentoHeroCard extends StatelessWidget {
                                                         ),
                                                       ),
                                                       const SizedBox(width: 6),
-                                                      Text(s.emoji, style: const TextStyle(fontSize: 10)),
-                                                      const SizedBox(width: 4),
                                                       Expanded(
                                                         child: Text(
                                                           s.label,
