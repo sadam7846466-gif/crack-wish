@@ -4162,7 +4162,7 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 color: widget.isPremium
                     ? Colors.white.withOpacity(0.08)
@@ -4178,15 +4178,15 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
               child: Row(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: widget.isPremium
                             ? [const Color(0xFF38BDF8), const Color(0xFF0284C7)]
                             : [const Color(0xFFD4A574), const Color(0xFFB8956A)],
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           color: widget.isPremium
@@ -4201,7 +4201,7 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       child: Icon(
                         widget.isPremium ? Icons.diamond_rounded : Icons.workspace_premium_rounded,
                         color: Colors.white,
-                        size: 16,
+                        size: 20,
                       ),
                     ),
                   ),
@@ -4301,7 +4301,7 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.08), // Bright pure translucent glass
                 borderRadius: BorderRadius.circular(24),
@@ -4313,8 +4313,8 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
               child: Row(
                 children: [
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [
@@ -4322,7 +4322,7 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
                           Color(0xFF9333EA),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFF9333EA).withOpacity(0.4),
@@ -4335,7 +4335,7 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
                       child: Icon(
                         Icons.insights_rounded,
                         color: Colors.white,
-                        size: 26,
+                        size: 20,
                       ),
                     ),
                   ),
