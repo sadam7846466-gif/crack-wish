@@ -498,7 +498,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         'Dürüst',
         'Enerjik',
       ],
-      'allTraits': ['Maceracı', 'Özgür', 'Filozof', 'İyimser', 'Dürüst', 'Enerjik', 'Vizyoner', 'Neşeli', 'Keşşaf', 'Cömert'],
+      'allTraits': ['Maceracı', 'Özgür', 'Filozof', 'İyimser', 'Dürüst', 'Enerjik', 'Vizyoner', 'Neşeli', 'Kaşif', 'Cömert'],
       'strengths': [
         'Vizyon genişliği',
         'Macera ruhu',
@@ -1936,8 +1936,8 @@ class _ZodiacPageState extends State<ZodiacPage>
           // ── RADAR CHART ──
           const SizedBox(height: 8),
           SizedBox(
-            width: 310,
-            height: 290,
+            width: double.infinity,
+            height: 310,
             child: CustomPaint(
               painter: _RadarChartPainter(
                 labels: displayTraits,
@@ -3502,7 +3502,7 @@ class _RadarChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final r = size.width / 2 - 46;
+    final r = (math.min(size.width, size.height) / 2) - 65;
     final n = labels.length;
     final angleStep = 2 * math.pi / n;
     final startAngle = -math.pi / 2;
@@ -4062,6 +4062,30 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
     return (_scoreMap[trait] ?? (isStrength ? 75 : 45)).round();
   }
 
+  String _getFallback(String trait, bool isStrength) {
+    final hints = isStrength
+        ? const [
+            'Potansiyelini keşfet ve öne çık.',
+            'Bu özelliğini günlük hayatta aktif kullan.',
+            'Bunu bir avantaja dönüştürebilirsin.',
+            'Bu yönde adımlar atarak fark yarat.',
+            'Bu eşsiz yeteneğini ön plana çıkar.',
+          ]
+        : const [
+            'Farkındalık geliştirerek dengeyi bul.',
+            'Bu özelliği bir gelişim fırsatı olarak gör.',
+            'Küçük adımlarla bu yönünü törpüle.',
+            'Bilinçli çaba ile bunu dönüştürebilirsin.',
+            'Bu zayıflığın üzerine gidip güçlen.',
+          ];
+    
+    // Her gün farklı bir tavsiye gelmesi için zaman bazlı rotasyon (Günlük döngü)
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
+    
+    return hints[(trait.hashCode.abs() + dayOfYear) % hints.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     final sign = widget.sign;
@@ -4138,6 +4162,88 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           'Sanatsal projeler ve tasarım alanlarında kendini ifade et.',
       'Diplomatik yetenek':
           'Farklı tarafları bir araya getirerek köprüler kur.',
+      // ── Koç ──
+      'Bağımsızlık': 'Kendi rotanı çizerek bağımsız karar alma gücünü kullan.',
+      'Yüksek enerji': 'Yüksek enerjinle çevreni motive et ve projelere öncülük et.',
+      'Öz güven': 'Kendine güvenini ilham kaynağı olarak çevrenle paylaş.',
+      'Hızlı karar verme': 'Kritik anlarda hızlı ve doğru kararlar alarak liderlik et.',
+      'Motivasyon gücü': 'Enerjinle takımını harekete geçir ve motivasyonu yüksek tut.',
+      'Rekabetçi ruh': 'Rekabet gücünü kendini geliştirmek için bir araç olarak kullan.',
+      'Savaşçı irade': 'Zorluklara karşı yılmaz duruşunla engelleri aş.',
+      // ── Boğa ──
+      'Doğa sevgisi': 'Doğa ile kurduğun bağı yaşam tarzına entegre et.',
+      'Lezzet anlayışı': 'Damak tadını gastronomi ve sosyal deneyimlerde değerlendir.',
+      'Konfor yaratma': 'Yaşam alanlarını herkes için konforlu ve ilham verici kıl.',
+      'Istikrarlı dostluk': 'Uzun süreli dostluklarını koruyarak güçlü bir çevre oluştur.',
+      // ── İkizler ──
+      'Meraklı doğa': 'Sonsuz merakını sürekli öğrenme ve gelişim için kullan.',
+      'Çok yönlülük': 'Birçok alanda yetkinlik kazanarak çok yönlü bir profil oluştur.',
+      'Esnek düşünce': 'Esnek düşünce yapınla yaratıcı çözümler üret.',
+      'Espri yeteneği': 'Mizahınla ortamı yumuşat ve insanları bir araya getir.',
+      'Ağ kurma becerisi': 'Sosyal ağını stratejik olarak genişleterek fırsatlar yarat.',
+      'Bilgi sentezi': 'Farklı alanlardan edindiğin bilgileri sentezleyerek yenilik üret.',
+      'Hızlı adaptasyon': 'Değişen koşullara hızla uyum sağlayarak avantaj kazan.',
+      // ── Yengeç ──
+      'Koruyucu yapı': 'Sevdiklerini koruma içgüdünle güvenli ortamlar yarat.',
+      'Şefkat': 'Şefkatinle çevrendeki insanların hayatına dokunmaya devam et.',
+      'Yuva yaratma': 'Sıcak ve huzurlu ortamlar kurarak sevdiklerini destekle.',
+      'Besleyici enerji': 'Besleyici enerjinle çevrendeki insanları büyüt ve güçlendir.',
+      'Hafıza gücü': 'Güçlü hafızanı öğrenme ve derin bağlar kurmada avantaja çevir.',
+      // ── Aslan ──
+      'Liderlik ruhu': 'Doğal liderlik karizmanla ekipleri başarıya taşı.',
+      'Özgüven': 'Güçlü özgüvenini ilham kaynağına dönüştür.',
+      'Cesaret': 'Cesaretinle bilinmeyene adım atarak yeni ufuklar keşfet.',
+      'Sahne hakimiyeti': 'Sahne hakimiyetinle fikirlerin etkili bir şekilde ulaştır.',
+      'İlham verme': 'İlham verici kişiliğinle çevrendeki insanları motive et.',
+      'Asalet': 'Asil duruşunla saygı uyandır ve güvenilir bir figür ol.',
+      'Koruyucu içgüdü': 'Sevdiklerini koruma içgüdünle liderlik pozisyonu üstlen.',
+      // ── Başak ──
+      'Detaycılık': 'Detaylara olan hakimiyetinle projelerde mükemmelliğe ulaş.',
+      'Pratiklik': 'Pratik çözümlerin ile karmaşık sorunları basitleştir.',
+      'Problem çözme': 'Analitik yeteneğinle en zorlu problemlere çözüm üret.',
+      'Sağlık bilinci': 'Sağlık bilincinle hem kendine hem çevrene örnek ol.',
+      'Verimlilik': 'Verimli çalışma tarzınla zamandan ve kaynaklardan tasarruf et.',
+      'Titiz çalışma': 'Titizliğinle yüksek kaliteli işler ortaya koy.',
+      // ── Terazi ──
+      'Zarafet': 'Zarif duruşunla her ortamda fark yaratan bir izlenim bırak.',
+      'Sosyal beceri': 'Sosyal becerilerinle geniş ve güçlü bir network oluştur.',
+      'Arabuluculuk': 'Arabuluculuk yeteneğinle çatışmaları çöz ve uyum sağla.',
+      'Stil duygusu': 'Benzersiz stil anlayışınla kendini ifade et ve ilham ver.',
+      'Ortam yaratma': 'Estetik anlayışınla herkesin keyif alacağı ortamlar tasarla.',
+      'Nezaket': 'Nazik yaklaşımınla derin ve kalıcı ilişkiler kur.',
+      // ── Akrep ──
+      'Tutku': 'Tutkunu hayatının her alanına yansıtarak fark yarat.',
+      'Stratejik zeka': 'Stratejik zekanla uzun vadeli planlar yaparak hedeflerine ulaş.',
+      'Psikolojik derinlik': 'İnsanları anlama yeteneğinle derin ve anlamlı bağlar kur.',
+      'Gizem çekiciliği': 'Gizemli auranla insanları kendine çekerek etki alanını genişlet.',
+      'Kriz yönetimi': 'Kriz anlarındaki soğukkanlılığınla liderlik üstlen.',
+      'Keşif gücü': 'Merakını derinlemesine araştırmalarla bilgiye dönüştür.',
+      // ── Yay ──
+      'İyimserlik': 'İyimser bakış açınla zorlu süreçleri motive edici hale getir.',
+      'Özgür düşünce': 'Özgür düşüncenle kalıpların dışına çıkarak yenilikler yarat.',
+      'Dürüstlük': 'Dürüstlüğünle güven inşa et ve ilişkilerini sağlam temellere ota.',
+      'Kültürel zenginlik': 'Farklı kültürlerden edindiğin bilgiyi çevrene aktararak zenginlik kat.',
+      'Mizah anlayışı': 'Mizah gücünle ortamı aydınlat ve insanları bir araya getir.',
+      'Ruhani arayış': 'Ruhani derinliğinle hayatına anlam katacak keşifler yap.',
+      // ── Oğlak ──
+      'Disiplin': 'Disiplininle hedeflerine kararlılıkla ilerleyerek başarıya ulaş.',
+      'Sabırlı yükseliş': 'Sabırla attığın her adımın seni zirveye taşıyacağını bil.',
+      'Pratik zekâ': 'Pratik zekanla somut çözümler üreterek çevrende fark yarat.',
+      'Otorite': 'Doğal otoritenle güvenilir bir lider figürü ol.',
+      'Dayanıklılık': 'Sarsılmaz dayanıklılığınla en zorlu süreçlerin üstesinden gel.',
+      // ── Kova ──
+      'Gelecek vizyonu': 'Geleceğe yönelik vizyonunla yenilikçi projeler başlat.',
+      'Yenilikçilik': 'Yenilikçi düşüncenle geleneksel kalıpları kırarak ilerleme sağla.',
+      'Teknoloji sevgisi': 'Teknolojiye olan tutkunu geleceği şekillendirmek için kullan.',
+      'Toplumsal bilinç': 'Toplumsal duyarlılığınla anlamlı sosyal projeler başlat.',
+      'Sıra dışı bakış': 'Sıra dışı bakış açınla yaratıcı çözümler üreterek ilham ver.',
+      'Entelektüel derinlik': 'Entelektüel derinliğinle düşünce liderliği üstlen.',
+      // ── Balık ──
+      'Fedakarlık': 'Fedakar ruhunla çevrendeki insanların hayatına değer kat.',
+      'Hayal gücü': 'Sınırsız hayal gücünü yaratıcı projelere dönüştür.',
+      'Müzik yeteneği': 'Müzikal yeteneğini sanatsal ifade aracı olarak geliştir.',
+      'Şifa enerjisi': 'İyileştirici enerjinle çevrendekilere destek ve huzur sağla.',
+      'Rüya yorumlama': 'İç dünyanın mesajlarını keşfederek farkındalığını derinleştir.',
     };
 
     const growthTips = <String, String>{
@@ -4197,6 +4303,70 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
           'İçsel onay mekanizmalarını geliştirerek özgüvenini artır.',
       'Otoriter tavır':
           'Aktif dinleme tekniklerini öğrenerek iletişimini güçlendir.',
+      // ── Ek zayıf yönler (allWeaknesses) ──
+      'Kibir': 'Alçakgönüllülük pratiği yaparak çevrendeki insanlara yaklaş.',
+      'Egoizm': 'Başkalarının ihtiyaçlarına kulak vererek empati kasını çalıştır.',
+      'Evham': 'Somut verilerle düşüncelerini test ederek gerçekçi kal.',
+      'Detaylarda boğulma': 'Büyük resme odaklanarak önceliklendirme yap.',
+      'Soğuk görünüm': 'Samimi küçük jestlerle sıcaklığını göster.',
+      'Hayır diyememe': 'Sınırlarını net koyarak enerjini koru.',
+      'Kendinden ödün verme': 'Kendi ihtiyaçlarını da önceliklendirmeyi öğren.',
+      'Şüphecilik': 'Güven inşa egzersizleri ile insanlara şans ver.',
+      'Gizemlilik': 'Açık iletişim pratiği yaparak yakınlarınla bağını güçlendir.',
+      'Sahiplenicilik': 'Özgürlük ve güven dengesini kurarak ilişkilerini sağlamlaştır.',
+      'Patavatsızlık': 'Düşüncelerini ifade etmeden önce empati filtresinden geçir.',
+      'Aşırı iyimserlik': 'Plan B hazırlama alışkanlığı edinerek dengeli kal.',
+      'Detay atlama': 'Kontrol listesi kullanarak önemli detayları kaçırma.',
+      'Kaçış eğilimi': 'Zorlukların üstüne giderek dayanıklılığını artır.',
+      'Yerleşememe': 'Kısa vadeli rutinler oluşturarak istikrar deneyimle.',
+      'Katı kuralcılık': 'Esneklik denemeleri yaparak yeni yaklaşımlara açıl.',
+      'Duygusal soğukluk': 'Duygularını günlüğe yazarak iç dünyanla bağlan.',
+      'Eğlenememe': 'Haftalık eğlence aktiviteleri planlayarak hayattan keyif al.',
+      'Statü takıntısı': 'İç değerlerine odaklanarak dış onaydan bağımsızlaş.',
+      'Ukalalık': 'Başkalarının bilgisine saygı göstererek dinleme becerisini geliştir.',
+      'Aşırı rasyonalite': 'Sezgilerine de güvenerek duygusal zekanı besle.',
+      'Bağlanma korkusu': 'Küçük bağlılık adımları atarak güven ortamı yarat.',
+      'Üstünlük taslama': 'Alçakgönüllülük pratiği yaparak empatiyi güçlendir.',
+      'Empati eksikliği': 'Başkalarının perspektifinden bakmaya çalışarak empati kur.',
+      'Kurallara karşı çıkma': 'Yapıcı önerilerle değişim yaratmanın yollarını bul.',
+      'Öngörülemezlik': 'Tutarlı davranış kalıpları oluşturarak güvenilirliğini artır.',
+      'Kurban psikolojisi': 'Sorumluluk almayı öğrenerek kendi gücünü keşfet.',
+      'Bağımlılık eğilimi': 'Bağımsız aktivitelerle öz yeterliliğini güçlendir.',
+      'Pasiflik': 'Küçük inisiyatifler alarak aktif katılımı deneyimle.',
+      'Kolay kandırılma': 'Eleştirel düşünme becerini geliştirerek sağlıklı sınırlar koy.',
+      'Erteleme': 'Pomodoro tekniği ile küçük adımlarla başlama alışkanlığı edin.',
+      'Sert tepki': 'Tepki vermeden önce 3 nefes alarak sakinleş.',
+      'Dinlememe': 'Aktif dinleme pratiği yaparak ilişkilerini derinleştir.',
+      'Takım çalışmasında zorlanma': 'Küçük gruplarla işbirliği yaparak takım ruhunu geliştir.',
+      'Aşırı rekabet': 'İşbirliğine dayalı projelerle rekabeti dengeye getir.',
+      'Konfor bağımlılığı': 'Konfor alanının dışına çıkarak yeni deneyimler kazan.',
+      'Rutine sığınma': 'Haftalık bir yenilik deneyerek rutinden çık.',
+      'Risk almama': 'Hesaplanmış küçük risklerle cesaret kasını geliştir.',
+      'Paylaşmaktan kaçınma': 'Küçük paylaşım adımları atarak cömertliği deneyimle.',
+      'Dedikodu eğilimi': 'Yapıcı konuşma pratiği yaparak pozitif iletişim kur.',
+      'Söz tutamama': 'Küçük sözler verip tutarak güvenilirliğini inşa et.',
+      'Dağınıklık': 'Günlük düzen rutini oluşturarak odaklanmayı artır.',
+      'Coşku kaybı': 'İlham veren aktivitelerle motivasyonunu yeniden keşfet.',
+      'Edilgen saldırganlık': 'Duygularını doğrudan ve nazikçe ifade etmeyi öğren.',
+      'Suçluluk manipülasyonu': 'Dürüst iletişim kurarak sağlıklı sınırlar belirle.',
+      'Kapanma refleksi': 'Güvendiğin birine açılarak bağ kurma pratiği yap.',
+      'Aşırı endişe': 'Mindfulness ile şimdiki ana odaklanarak endişeyi azalt.',
+      'Kolay kırılma': 'Dayanıklılık egzersizleri ile öz güvenini pekiştir.',
+      'Gösteriş düşkünlüğü': 'İç değerlerine odaklanarak dış görünümden bağımsızlaş.',
+      'Onay bağımlılığı': 'Kendi başarılarını kutlayarak iç onay mekanizmasını güçlendir.',
+      'Eleştiriye kapalılık': 'Yapıcı geri bildirimi büyüme fırsatı olarak değerlendir.',
+      'Kendini yıpratma': 'Öz bakım rutini oluşturarak enerjini koru.',
+      'Kontrolcülük': 'Akışa bırakma pratiği yaparak esnekliğini geliştir.',
+      'Esneklik eksikliği': 'Farklı yaklaşımları deneyerek adaptasyon yeteneğini güçlendir.',
+      'Duygu bastırma': 'Duygularını güvenli bir ortamda ifade etme pratiği yap.',
+      'Pasif agresiflik': 'Doğrudan ve nazik iletişim kurarak ilişkilerini sağlamlaştır.',
+      'Memnun etme takıntısı': 'Kendi ihtiyaçlarını ön plana koyma cesaretini göster.',
+      'Kendi sesini kaybetme': 'Kişisel değerlerini tanımla ve savunma pratiği yap.',
+      'Yalnızlık korkusu': 'Yalnız kalma pratiği yaparak iç huzurunu keşfet.',
+      'Manipülasyon': 'Dürüst ve açık iletişim kurarak güven inşa et.',
+      'Paranoya': 'Güven egzersizleri yaparak olumlu niyetleri görmayı öğren.',
+      'Kin tutma': 'Affetme pratiği yaparak iç huzurunu bul.',
+      'Obsesif bağlanma': 'Sağlıklı bağlanma kalıpları oluşturarak dengeyi bul.',
     };
 
     return SwipeBackWrapper(
@@ -4227,7 +4397,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
 
                         // ── Geri butonu ──
                         Row(
@@ -4237,8 +4407,8 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                             ),
                             const Spacer(),
                             SizedBox(
-                              width: 28,
-                              height: 28,
+                              width: 24,
+                              height: 24,
                               child: CustomPaint(
                                 painter: _CosmicStarPainter(color: gold),
                               ),
@@ -4248,7 +4418,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           ],
                         ),
 
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 16),
 
                         // ── Başlık ──
                         Center(
@@ -4286,7 +4456,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           ),
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
                         // ── Dekoratif elmas çizgi ──
                         Row(
@@ -4347,7 +4517,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           final trait = strengths[i];
                           final pct = _getPct(trait, true);
                           final hint =
-                              usageHints[trait] ?? 'Potansiyelini keşfet.';
+                              usageHints[trait] ?? _getFallback(trait, true);
                           return _zigzagItem(
                             trait,
                             pct,
@@ -4414,7 +4584,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           final trait = weaknesses[i];
                           final pct = _getPct(trait, false);
                           final hint =
-                              growthTips[trait] ?? 'Farkındalık geliştir.';
+                              growthTips[trait] ?? _getFallback(trait, false);
                           return _zigzagItem(
                             trait,
                             pct,

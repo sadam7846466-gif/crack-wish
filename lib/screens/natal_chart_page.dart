@@ -69,21 +69,22 @@ class _NatalChartPageState extends State<NatalChartPage> {
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1E1C),
+      backgroundColor: const Color(0xFF0F1210),
       body: Stack(children: [
-        // Gold ambient glow — top
-        Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-          gradient: RadialGradient(center: Alignment.topCenter, radius: 1.0,
-            colors: [const Color(0xFFFFD060).withOpacity(0.12), Colors.transparent]),
-        ))),
-        // Gold ambient glow — bottom
-        Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-          gradient: RadialGradient(center: Alignment.bottomCenter, radius: 0.8,
-            colors: [const Color(0xFFD4A055).withOpacity(0.08), Colors.transparent]),
-        ))),
-        Positioned(top: -80, right: -40, child: Container(width: 260, height: 260,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFFFD060).withOpacity(0.08)),
-          child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60), child: const SizedBox()))),
+        Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: const Alignment(0, -0.5),
+              radius: 1.3,
+              colors: [
+                const Color(0xFFB07020).withOpacity(0.25),
+                const Color(0xFF0F1210),
+                const Color(0xFF0A0D0A),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
         SafeArea(child: Column(children: [
           Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -98,15 +99,15 @@ class _NatalChartPageState extends State<NatalChartPage> {
 
             // ── NATAL CHART WHEEL ──
             Center(child: _buildChartWheel(w)),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
 
             // ── PLANET TABLE ──
             _buildPlanetTable(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
 
             // ── ANGULAR POINTS INFO ──
             _buildAngularPointsInfo(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // ── UNIFIED BUBBLE PANEL ──
             Container(
@@ -234,7 +235,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
                 ),
               ]),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
           ])),
         ])),
       ]),
@@ -299,9 +300,9 @@ class _NatalChartPageState extends State<NatalChartPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome_rounded, color: _accent.withOpacity(0.5), size: 14),
+              Icon(Icons.auto_awesome_rounded, color: _accent.withOpacity(0.8), size: 14),
               const SizedBox(width: 8),
-              Text('KÖŞE NOKTALARI', style: TextStyle(color: _accent.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
+              Text('KÖŞE NOKTALARI', style: TextStyle(color: _accent.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
             ],
           ),
           const SizedBox(height: 16),
@@ -322,11 +323,11 @@ class _NatalChartPageState extends State<NatalChartPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 95,
-          child: Text(title, style: const TextStyle(color: _accentLight, fontSize: 11, fontWeight: FontWeight.w600)),
+          width: 105,
+          child: Text(title, style: const TextStyle(color: _accentLight, fontSize: 12, fontWeight: FontWeight.w700)),
         ),
         Expanded(
-          child: Text(desc, style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 11, height: 1.4)),
+          child: Text(desc, style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12, height: 1.4)),
         ),
       ],
     );
