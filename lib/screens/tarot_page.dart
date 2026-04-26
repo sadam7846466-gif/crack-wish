@@ -221,7 +221,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     ),
     TarotCardDef(
       id: 25,
-      nameTr: 'Kâselerin Dörtü',
+      nameTr: 'Kâselerin Dördü',
       nameEn: 'Four of Cups',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Cups.webp',
     ),
@@ -308,7 +308,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     ),
     TarotCardDef(
       id: 39,
-      nameTr: 'Asaların Dörtü',
+      nameTr: 'Asaların Dördü',
       nameEn: 'Four of Wands',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Wands.webp',
     ),
@@ -395,7 +395,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     ),
     TarotCardDef(
       id: 53,
-      nameTr: 'Kılıçların Dörtü',
+      nameTr: 'Kılıçların Dördü',
       nameEn: 'Four of Swords',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Swords.webp',
     ),
@@ -482,7 +482,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     ),
     TarotCardDef(
       id: 67,
-      nameTr: 'Sikkelerin Dörtü',
+      nameTr: 'Sikkelerin Dördü',
       nameEn: 'Four of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Pentacles.webp',
     ),
