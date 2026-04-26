@@ -85,7 +85,7 @@ class _RootShellState extends State<RootShell> {
   @override
   void initState() {
     super.initState();
-    SupabaseOwlService().initialize();
+    // SupabaseOwlService otomatik olarak auth listener'da başlatılır
     PushNotificationService().requestPermissionAndGetToken();
     
     // Başarım kontrolü — yeni kazanılan varsa bildir

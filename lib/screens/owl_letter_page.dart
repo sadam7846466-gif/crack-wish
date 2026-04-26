@@ -428,14 +428,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 ),
                 child: ClipOval(
                   child: avatarUrl != null && avatarUrl.startsWith('http')
-                      ? Image.network(
-                          avatarUrl,
-                          key: ValueKey(avatarUrl),
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                      ? Transform.scale(
+                          scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                          child: Image.network(
+                            avatarUrl,
+                            key: ValueKey(avatarUrl),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                          ),
                         )
                       : avatarUrl != null && avatarUrl.startsWith('assets')
-                          ? Image.asset(avatarUrl, fit: avatarUrl.contains('owl') ? BoxFit.contain : BoxFit.cover)
+                          ? Transform.scale(
+                              scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                              child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                            )
                           : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                 ),
               ),
@@ -569,14 +575,21 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       ),
                       child: ClipOval(
                         child: avatarUrl != null && avatarUrl.startsWith('http')
-                            ? Image.network(
-                                avatarUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                            ? Transform.scale(
+                                scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                                child: Image.network(
+                                  avatarUrl,
+                                  key: ValueKey(avatarUrl),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
+                                ),
                               )
                             : avatarUrl != null && avatarUrl.startsWith('assets')
-                                ? Image.asset(avatarUrl, fit: avatarUrl.contains('owl') ? BoxFit.contain : BoxFit.cover)
-                                : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                                ? Transform.scale(
+                                    scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                                    child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                                  )
+                                : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1087,7 +1100,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   child: req.from.avatarUrl != null 
                       ? (req.from.avatarUrl!.startsWith('http') 
                           ? Transform.scale(
-                              scale: 1.15,
+                              scale: req.from.avatarUrl!.contains('owl') ? 1.35 : (req.from.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                               child: Image.network(
                                 req.from.avatarUrl!,
                                 fit: BoxFit.cover,
@@ -1097,7 +1110,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                               ),
                             )
                           : Transform.scale(
-                              scale: 1.15,
+                              scale: req.from.avatarUrl!.contains('owl') ? 1.35 : (req.from.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                               child: Image.asset(
                                 req.from.avatarUrl!,
                                 fit: BoxFit.cover,
@@ -1418,7 +1431,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                           child: sender.avatarUrl != null 
                               ? (sender.avatarUrl!.startsWith('http') 
                                   ? Transform.scale(
-                                      scale: 1.15,
+                                      scale: sender.avatarUrl!.contains('owl') ? 1.35 : (sender.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                                       child: Image.network(
                                         sender.avatarUrl!,
                                         fit: BoxFit.cover,
@@ -1428,7 +1441,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                       ),
                                     )
                                   : Transform.scale(
-                                      scale: 1.15,
+                                      scale: sender.avatarUrl!.contains('owl') ? 1.35 : (sender.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                                       child: Image.asset(
                                         sender.avatarUrl!,
                                         fit: BoxFit.cover,
@@ -2572,7 +2585,7 @@ class _ContactItem extends StatelessWidget {
                 child: friend?.user.avatarUrl != null 
                     ? (friend!.user.avatarUrl!.startsWith('http') 
                         ? Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
+                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                             child: Image.network(
                               friend!.user.avatarUrl!,
                               fit: BoxFit.cover,
@@ -2584,7 +2597,7 @@ class _ContactItem extends StatelessWidget {
                             ),
                           )
                         : Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
+                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
                             child: Image.asset(
                               friend!.user.avatarUrl!,
                               fit: BoxFit.cover,
@@ -2618,7 +2631,7 @@ class _ContactItem extends StatelessWidget {
                   if (isAppUser) ...[
                     const SizedBox(height: 2),
                     Text(
-                      '@${name.toLowerCase().replaceAll(' ', '')}01',
+                      friend!.user.owlCode.startsWith('@') ? friend!.user.owlCode : '@${friend!.user.owlCode}',
                       style: TextStyle(
                         color: const Color(0xFF6DE8B8).withOpacity(0.7),
                         fontSize: 11,
@@ -2789,11 +2802,22 @@ class _ContactItem extends StatelessWidget {
                                                           child: ClipOval(
                                                             child: friend?.user.avatarUrl != null
                                                                 ? Transform.scale(
-                                                                    scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.25 : 1.0),
-                                                                    child: Image.asset(
-                                                                      friend!.user.avatarUrl!,
-                                                                      fit: BoxFit.cover,
-                                                                    ),
+                                                                    scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                                                    child: friend!.user.avatarUrl!.startsWith('http')
+                                                                        ? Image.network(
+                                                                            friend!.user.avatarUrl!,
+                                                                            fit: BoxFit.cover,
+                                                                            width: 64,
+                                                                            height: 64,
+                                                                            errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white54, size: 32),
+                                                                          )
+                                                                        : Image.asset(
+                                                                            friend!.user.avatarUrl!,
+                                                                            fit: BoxFit.cover,
+                                                                            width: 64,
+                                                                            height: 64,
+                                                                            errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white54, size: 32),
+                                                                          ),
                                                                   )
                                                                 : const Icon(Icons.person, color: Colors.white54, size: 32),
                                                           ),
@@ -2895,24 +2919,23 @@ class _ContactItem extends StatelessWidget {
         },
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 8), // 12'den 8'e düşürdüm, daha minyon oldu
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04), // Sadece yumuşak bir arka plan
-            borderRadius: BorderRadius.circular(10), // Kenar kıvrımını da butona göre kıstım
-            // Çizgiyi (border) tamamen kaldırdım, daha pürüzsüz durması için
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color.withOpacity(0.85), size: 15), // 18'den 15'e düştü
-              const SizedBox(height: 4),
+              Icon(icon, color: color.withOpacity(0.85), size: 13),
+              const SizedBox(width: 5),
               Text(
                 text,
-                textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.7),
-                  fontSize: 9, // 10'dan 9'a düştü, mini tatlı bir yazı oldu
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.2,
                 ),

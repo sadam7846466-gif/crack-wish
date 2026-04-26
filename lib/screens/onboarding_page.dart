@@ -513,8 +513,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         // Hoş Geldin Bonusu (İlk kez kayıt olanlara 3 Ruh Taşı)
         final prefs = await SharedPreferences.getInstance();
         if (!(prefs.getBool('welcome_bonus_claimed') ?? false)) {
-          final currentStones = await StorageService.getSoulStones();
-          await StorageService.updateSoulStones(currentStones + 3);
+          // getSoulStones zaten boş hesaplara otomatik 3 taş atar.
+          // Burada tekrar ekleme (update) yapmaya gerek yok, sadece senkronize ediyoruz.
+          await StorageService.getSoulStones(); 
+          await StorageService.syncEconomyToCloud();
           await prefs.setBool('welcome_bonus_claimed', true);
           await prefs.setBool('needs_welcome_dialog', true); // Ana sayfada kutlama göstermek için bayrak
           debugPrint('🎁 Hoş Geldin Bonusu verildi: +3 Ruh Taşı');

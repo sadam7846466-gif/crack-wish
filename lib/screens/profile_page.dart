@@ -19,10 +19,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'premium_paywall_page.dart';
 import 'onboarding_page.dart';
-import 'welcome_screen.dart';
 import 'notification_settings_page.dart';
 import 'home_page.dart';
-import 'onboarding_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
@@ -37,8 +35,6 @@ import '../services/supabase_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
 import '../services/sound_service.dart';
-import '../widgets/cosmic_reward_dialog.dart';
-import '../widgets/cosmic_toast.dart';
 import '../services/analytics_service.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -1838,6 +1834,7 @@ For questions: info@crackandwish.com''',
                                     final prefs = await SharedPreferences.getInstance();
                                     setState(() => _isPremiumUser = !_isPremiumUser);
                                     await prefs.setBool('is_premium_test_mode', _isPremiumUser);
+                                    await prefs.setBool('is_elite', _isPremiumUser); // Key senkronizasyonu
                                     
                                     // Test butonuna basıldığında Elite olduysa anında 5 günlük RT ver
                                     if (_isPremiumUser) {

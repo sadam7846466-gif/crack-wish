@@ -5,7 +5,6 @@ import '../widgets/glass_back_button.dart';
 import '../widgets/guidance_booklet.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../widgets/fade_page_route.dart';
 import 'zodiac_page.dart';
 import 'zodiac_chinese_page.dart';
 import 'zodiac_mayan_page.dart';

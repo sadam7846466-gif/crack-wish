@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/swipe_back_wrapper.dart';
@@ -14,7 +12,6 @@ import '../models/owl_models.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/analytics_service.dart';
 import 'compatibility_content.dart';
-import 'profile_page.dart';
 import 'cosmic_profile_page.dart';
 import 'natal_chart_page.dart';
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 /// Her burç için benzersiz, el-çizimi estetiğinde altın semboller çizen Painter.
 /// Kullanım: CustomPaint(size: Size(120,120), painter: ZodiacGlyphPainter(signIndex: 0))

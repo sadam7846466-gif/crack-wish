@@ -1,16 +1,13 @@
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../theme/app_theme.dart';
 import 'package:flutter/services.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart' as google_auth;
-import '../constants/colors.dart';
 import 'root_shell.dart';
 import '../services/storage_service.dart';
 import 'onboarding_page.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,6 +45,8 @@ class SupabaseOwlService {
   StreamSubscription? _friendSub;
   StreamSubscription? _requestSub;
   StreamSubscription? _letterSub;
+  Timer? _pollingTimer;
+  bool _isInitializing = false;
 
   void addListener(void Function() listener) => _listeners.add(listener);
   void removeListener(void Function() listener) => _listeners.remove(listener);
@@ -66,28 +67,38 @@ class SupabaseOwlService {
       return;
     }
     
-    // Zaten tamamen yüklüyse ve veriler mevcutsa atla
-    if (_initialized && _initializedUserId == user.id && _friends.isNotEmpty) return;
+    // Zaten tamamen yüklüyse atla
+    if (_initialized && _initializedUserId == user.id) return;
     
-    // Eski realtime aboneliklerini iptal et (hot restart'ta ölü kalmaması için)
+    // Eşzamanlı çağrıları engelle (race condition koruması)
+    if (_isInitializing) return;
+    _isInitializing = true;
+    
+    // Eski realtime aboneliklerini ve timer'ı iptal et
     await _friendSub?.cancel();
     await _requestSub?.cancel();
     await _letterSub?.cancel();
     _friendSub = null;
     _requestSub = null;
     _letterSub = null;
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
     
     _initialized = true;
     _initializedUserId = user.id;
     debugPrint("🟢 [INIT] Initializing SupabaseOwlService for user: ${user.id}");
     
-    await _loadCurrentUser();
-    await _loadInitialData();
-    await _loadInboxFromSupabase();
-    await _loadCosmicLetters();
-    
-    // Her zaman taze realtime abonelikleri kur
-    _setupRealtime();
+    try {
+      await _loadCurrentUser();
+      await _loadInitialData();
+      await _loadInboxFromSupabase();
+      await _loadCosmicLetters();
+      
+      // Her zaman taze realtime abonelikleri kur
+      _setupRealtime();
+    } finally {
+      _isInitializing = false;
+    }
   }
 
   Future<void> _loadCurrentUser() async {
@@ -242,10 +253,12 @@ class SupabaseOwlService {
          _loadInboxFromSupabase(playSound: true);
       });
 
-    // 🔴 HAYAT KURTARAN DÜZELTME: Supabase Realtime ayarı eksikse bile her 5 saniyede bir manuel eşitle
-    Timer.periodic(const Duration(seconds: 30), (timer) {
+    // Supabase Realtime fallback: 30 saniyede bir senkronize et
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (_currentUser == null) {
-        timer.cancel(); // Kullanıcı yoksa durdur
+        timer.cancel();
+        _pollingTimer = null;
         return;
       }
       _loadInitialData();

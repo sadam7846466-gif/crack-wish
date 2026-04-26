@@ -8,13 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../screens/tarot_page.dart';
 import '../screens/dream_page.dart';
 import '../screens/zodiac_hub_page.dart';
-import '../screens/motivation_page.dart';
 import '../screens/coffee_page.dart';
-import '../services/storage_service.dart';
 import '../widgets/fade_page_route.dart';
 import '../widgets/windy_nazar.dart';
-import '../widgets/floating_astronaut1.dart';
-import '../widgets/floating_astronaut2.dart';
 
 class BentoGrid extends StatefulWidget {
   const BentoGrid({super.key});

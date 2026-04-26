@@ -41,6 +41,14 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5096906411582452~3503039037"/>
+
+        <!-- Firebase Default Notification Settings -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -66,4 +74,7 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- Health Connect / Google Fit permissions for sleep data logic -->
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    
+    <!-- Required for Exact Alarms (Local Notifications) on Android 12+ -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 </manifest>

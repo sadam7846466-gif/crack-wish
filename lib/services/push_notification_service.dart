@@ -4,7 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vlucky_flutter/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Arka planda mesaj gelince tetiklenir.
   await Firebase.initializeApp();
@@ -17,65 +21,99 @@ class PushNotificationService {
   PushNotificationService._();
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+
+  bool _isInitialized = false;
 
   Future<void> initialize() async {
+    if (_isInitialized) return;
+
     try {
-      // SADECE Arka plan ve Ön plan dinleyicilerini başlat (İzin isteme penceresini tetiklemez)
+      // 1. Local Notifications (Sabah/Akşam Rutinleri için) Başlat
+      tz.initializeTimeZones();
+      const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+        requestAlertPermission: false, 
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
+      const InitializationSettings initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+      await _localNotifications.initialize(
+        settings: initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          debugPrint('YEREL BİLDİRİME TIKLANDI: ${response.payload}');
+        },
+      );
+
+      // 2. Firebase Cloud Messaging Başlat
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+      // Apple için foreground bildirimi ayarları
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      // Ön Planda (Uygulama Açıkken) Firebase Mesajı Gelirse
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         debugPrint('Uygulama açıkken bildirim geldi: ${message.notification?.title}');
         
         final title = message.notification?.title ?? 'Kozmik Bildirim';
         final body = message.notification?.body ?? '';
 
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-                boxShadow: [
-                  BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 1)
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 4),
-                        Text(body, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                      ],
+        // Şık Custom SnackBar SADECE Android'de çıksın (iOS native banner gösteriyor)
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              duration: const Duration(seconds: 4),
+              margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 20),
+              content: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 1)
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 4),
+                          Text(body, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            duration: const Duration(seconds: 4),
-            margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 20),
-          ),
-        );
+          );
+        }
       });
 
+      _isInitialized = true;
     } catch (e) {
-      debugPrint("Firebase Push Notification dinleyicileri başlatılamadı: $e");
+      debugPrint("Bildirim servisleri başlatılamadı: $e");
     }
   }
 
-  /// Doğru zamanda kullanıcıdan izin istemek ve Token almak için kullanılır (Örn: Rutin belirlendiğinde)
+  /// Kullanıcıdan izin ister, FCM Token alır ve Local Routine'leri kurar
   Future<bool> requestPermissionAndGetToken() async {
     try {
+      // 1. Firebase İzni İste
       NotificationSettings settings = await _fcm.requestPermission(
         alert: true,
         announcement: false,
@@ -91,10 +129,15 @@ class PushNotificationService {
       if (settings.authorizationStatus == AuthorizationStatus.authorized || 
           settings.authorizationStatus == AuthorizationStatus.provisional) {
         
+        // 2. iOS Local Notification İzinlerini de garantile
+        await _localNotifications
+            .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+            ?.requestPermissions(alert: true, badge: true, sound: true);
+            
+        // 3. FCM Token Al ve Kaydet
         final fcmToken = await _fcm.getToken();
         debugPrint('Kazanılan FCM Token: $fcmToken');
         
-        // Supabase'e Token'i Kaydet
         if (fcmToken != null) {
           final user = Supabase.instance.client.auth.currentUser;
           if (user != null) {
@@ -109,6 +152,10 @@ class PushNotificationService {
             }
           }
         }
+        
+        // 4. İzin alındıysa sabah ve akşam otomatik rutinleri kur
+        _scheduleRoutines();
+        
         return true;
       }
       return false;
@@ -116,5 +163,65 @@ class PushNotificationService {
       debugPrint("İzin alma hatası: $e");
       return false;
     }
+  }
+
+  /// Sabah ve Akşam yerel bildirimlerini kurar
+  void _scheduleRoutines() {
+    _scheduleLocalNotification(
+      id: 1,
+      title: 'Güneş doğdu! 🌞',
+      body: 'Dün geceki rüyanı analiz et, taze kurabiyeni kır ve gökyüzünün bugünkü mesajını öğren.',
+      hour: 9,
+      minute: 0,
+      channelId: 'morning_routine',
+      channelName: 'Sabah Kahini',
+    );
+    
+    _scheduleLocalNotification(
+      id: 2,
+      title: 'Ruhsal Dinlenme Vakti ✨',
+      body: 'Günün yorgunluğunu atmak için Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
+      hour: 20,
+      minute: 0,
+      channelId: 'evening_routine',
+      channelName: 'Akşam Tarotu',
+    );
+  }
+
+  Future<void> _scheduleLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    required String channelId,
+    required String channelName,
+  }) async {
+    await _localNotifications.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: _nextInstanceOfTime(hour, minute),
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    return scheduledDate;
   }
 }

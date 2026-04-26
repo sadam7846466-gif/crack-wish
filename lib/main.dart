@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,7 +14,6 @@ import 'services/storage_service.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:vlucky_flutter/services/push_notification_service.dart';
-import 'package:vlucky_flutter/services/auth_service.dart';
 import 'package:vlucky_flutter/services/purchase_service.dart';
 import 'package:vlucky_flutter/services/analytics_service.dart';
 import 'package:vlucky_flutter/services/cosmic_engine_service.dart';
@@ -43,11 +41,8 @@ Future<void> main() async {
   // Uygulama başlar başlamaz Davet Linklerini dinlemeye başla
   ReferralService().initialize();
 
-  // Kullanıcı zaten giriş yapmışsa (Google/Apple), sosyal servisleri başlat
-  final existingSession = Supabase.instance.client.auth.currentSession;
-  if (existingSession != null) {
-    await SupabaseOwlService().initialize();
-  }
+  // SupabaseOwlService constructor'daki onAuthStateChange listener
+  // initialSession event'inde otomatik initialize eder — burada çağırmaya gerek yok.
 
   // Her girişte kendimize gelen davet ödüllerini (Çevrimdışı Ruh Taşları) kontrol edelim
   ReferralService.checkInviterRewards();

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,8 +121,9 @@ class PurchaseService {
     final productId = purchase.productID;
 
     if (_isEliteProduct(productId)) {
-      // Elite abonelik — premium durumunu aç
+      // Elite abonelik — premium durumunu aç (iki key de set edilmeli!)
       await prefs.setBool('is_elite', true);
+      await prefs.setBool('is_premium_test_mode', true); // Tüm ekranlar bu key'i kontrol ediyor
       debugPrint('✅ Elite aktif edildi!');
       AnalyticsService().logElitePurchased(plan: productId);
     } else if (_isCookieProduct(productId)) {
