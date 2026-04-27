@@ -7,21 +7,20 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
-import '../services/supabase_owl_service.dart';
-import '../services/sound_service.dart';
+import '../services/mock_owl_service.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
 import '../widgets/daily_tip_card.dart';
 import '../widgets/bento_grid.dart';
 import '../widgets/cosmic_badge.dart';
+import '../widgets/quote_banner.dart';
 import '../widgets/daily_horoscope_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
 import 'profile_page.dart';
 import 'collection_page.dart';
 import 'owl_letter_page.dart';
-import '../widgets/cosmic_toast.dart';
 
 class HomePage extends StatefulWidget {
   final bool showBottomNav;
@@ -71,7 +70,7 @@ class _HomePageState extends State<HomePage> {
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
     _loadUserName();
-    SupabaseOwlService().addListener(_onMockOwlUpdate);
+    MockOwlService().addListener(_onMockOwlUpdate);
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    SupabaseOwlService().removeListener(_onMockOwlUpdate);
+    MockOwlService().removeListener(_onMockOwlUpdate);
     super.dispose();
   }
 
@@ -118,7 +117,7 @@ class _HomePageState extends State<HomePage> {
     HapticFeedback.heavyImpact();
     
     String rewardText = "";
-    IconData rewardIcon = Icons.auto_awesome;
+    IconData rewardIcon = Icons.auto_awesome_rounded;
     Color rewardColor = const Color(0xFFC084FC);
     
     if (threshold == 7) { rewardText = "+15 Aura"; }
@@ -128,18 +127,165 @@ class _HomePageState extends State<HomePage> {
     else if (threshold == 100) { rewardText = "+3 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
     else if (threshold == 365) { rewardText = "+5 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
 
-    CosmicToast.show(
+    showGeneralDialog(
       context: context,
-      title: 'İnanılmaz Odak!',
-      message: 'Günlük serin tam $threshold güne ulaştı.',
-      reward: rewardText,
-      icon: rewardIcon,
-      iconColor: const Color(0xFFFF6B6B),
-      rewardColor: rewardColor,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: true,
+      barrierLabel: 'MilestoneModal',
+      transitionDuration: const Duration(milliseconds: 400),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 12 * anim1.value, sigmaY: 12 * anim1.value),
+          child: FadeTransition(
+            opacity: anim1,
+            child: Transform.scale(
+              scale: 0.95 + 0.05 * Curves.easeOutCubic.transform(anim1.value),
+              child: child,
+            ),
+          ),
+        );
+      },
+      pageBuilder: (context, anim1, anim2) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(28, 36, 28, 28),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A).withOpacity(0.7),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: rewardColor.withOpacity(0.15),
+                blurRadius: 60,
+                spreadRadius: -10,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Üst İkon
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFFF8A65).withOpacity(0.2),
+                      const Color(0xFFFF8A65).withOpacity(0.0),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFFF8A65).withOpacity(0.4),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF8A65), size: 36),
+              ),
+              const SizedBox(height: 24),
+              // Başlık
+              const Text(
+                "İnanılmaz Odak!",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Açıklama
+              Text(
+                "Günlük serin tam $threshold güne ulaştı.\nEvren bu bağlılığını küçük bir hediyeyle onurlandırıyor.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 14,
+                  height: 1.5,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Ödül Kutusu (Minimalist tasarım)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                decoration: BoxDecoration(
+                  color: rewardColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: rewardColor.withOpacity(0.3), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(rewardIcon, color: rewardColor, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      rewardText,
+                      style: TextStyle(
+                        color: rewardColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Topla Butonu
+              GestureDetector(
+                onTap: () async {
+                  HapticFeedback.mediumImpact();
+                  await StorageService.claimMilestone(threshold);
+                  if (mounted) Navigator.pop(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white,
+                        Colors.white.withOpacity(0.9),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Teşekkür Et ve Al",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-    
-    // Arka planda topla
-    StorageService.claimMilestone(threshold);
   }
 
   Future<void> _loadSelectedCookie() async {
@@ -152,26 +298,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _playOwlNotificationSound() async {
-    try {
-      await SoundService().playOwlLetter();
-    } catch (e) {
-      debugPrint('Bildirim sesi oynatılamadı: $e');
-    }
-  }
-
   Future<void> _checkUnreadOwlLetters() async {
     final count = await StorageService.getUnreadOwlLetterCount();
     if (!mounted) return;
-    
-    // Eğer yeni mektup geldiyse (ve ilk açılış değilse veya sadece 0'dan arttıysa)
-    if (_unreadOwlCount > 0 && count > _unreadOwlCount) {
-      _playOwlNotificationSound();
-    } else if (_unreadOwlCount == 0 && count > 0) {
-      // Daha önceden uygulamanın içinde dolaşırken ilk mektup düştüğünde
-      _playOwlNotificationSound();
-    }
-
     setState(() => _unreadOwlCount = count);
   }
 
@@ -368,6 +497,7 @@ class _HomePageState extends State<HomePage> {
                                   const DailyTipCard(),
                                   const BentoGrid(),
                                   const SizedBox(height: 16),
+                                  const QuoteBanner(),
                                   const DailyHoroscopeCard(),
                                 ],
                               ),
@@ -394,7 +524,7 @@ class _HomePageState extends State<HomePage> {
     final isTr = l10n.localeName == 'tr';
     final hour = DateTime.now().hour;
     
-    final int totalUnread = _unreadOwlCount + SupabaseOwlService().pendingRequestCount + SupabaseOwlService().unreadLetterCount;
+    final int totalUnread = _unreadOwlCount + MockOwlService().pendingRequestCount + MockOwlService().unreadLetterCount;
     
     String greeting;
     String timeSubtitle;

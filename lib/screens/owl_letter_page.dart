@@ -2,20 +2,14 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '../services/supabase_owl_service.dart';
+import '../services/mock_owl_service.dart';
 import '../services/ad_service.dart';
 import '../models/owl_models.dart';
 import '../models/cookie_card.dart';
 import '../widgets/cosmic_badge.dart';
 import '../services/storage_service.dart';
-import 'package:vlucky_flutter/l10n/app_localizations.dart';
 
 /// Baykuş butonundan açılan buzlu cam panel (glassmorphism)
 class OwlLetterPage extends StatefulWidget {
@@ -35,21 +29,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   late PageController _pageCtrl;
   final _searchCtrl = TextEditingController();
   String _searchQuery = '';
-  final Set<String> _sentRequests = {};
   String? _expandedSenderId;
   String? _expandedContactId;
-  final _service = SupabaseOwlService();
-  bool _isPremiumUser = false;
-  bool _isContactsSynced = false;
-  bool _isSyncingContacts = false;
-  List<Map<String, dynamic>> _syncedContacts = [];
+  final _service = MockOwlService();
 
   @override
   void initState() {
     super.initState();
-    _loadPremiumStatus();
-    _loadContactsSyncState();
-    _loadSentRequestsLocal(); // Daha önce gönderilenleri hatırla
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -57,59 +43,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuart);
     _ctrl.forward();
     _pageCtrl = PageController(initialPage: _selectedTab);
-    _service.initialize();
+    _service.loadMockData();
     _service.addListener(_onServiceUpdate);
-  }
-
-  Future<void> _loadSentRequestsLocal() async {
-    final prefs = await SharedPreferences.getInstance();
-    // Tablo yeni oluşturuldu — eski sahte cache'i temizle (bir kerelik)
-    final isCleanedOnce = prefs.getBool('friend_cache_cleaned_v1') ?? false;
-    if (!isCleanedOnce) {
-      await prefs.remove('sent_friend_requests_cache');
-      await prefs.setBool('friend_cache_cleaned_v1', true);
-      return;
-    }
-    final sent = prefs.getStringList('sent_friend_requests_cache') ?? [];
-    if (mounted) {
-      setState(() {
-        _sentRequests.addAll(sent);
-      });
-    }
-  }
-
-  void _markRequestAsSentLocally(String username) async {
-    setState(() {
-      _sentRequests.add(username);
-    });
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('sent_friend_requests_cache', _sentRequests.toList());
-  }
-
-  Future<void> _loadContactsSyncState() async {
-    final syncedOnce = await StorageService.hasContactsSynced();
-    if (syncedOnce && mounted) {
-      setState(() {
-        _isContactsSynced = true;
-        _isSyncingContacts = true;
-      });
-      final results = await _service.syncContactsWithSupabase();
-      if (mounted) {
-        setState(() {
-          _isSyncingContacts = false;
-          _syncedContacts = results;
-        });
-      }
-    }
-  }
-
-  Future<void> _loadPremiumStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
-      });
-    }
   }
 
   void _onServiceUpdate() {
@@ -354,7 +289,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
               style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
               decoration: InputDecoration(
-                hintText: _selectedTab == 1 ? 'Kozmik evrende ara...' : 'Arkadaş ara...',
+                hintText: 'Arkadaş ara...',
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
                 border: InputBorder.none,
                 isDense: true,
@@ -388,604 +323,124 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   Widget _buildMyProfilePlate() {
     final user = _service.currentUser;
     return Container(
-      padding: const EdgeInsets.all(10), // ContactItem ile aynı padding
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.05),
+            Colors.white.withOpacity(0.06),
             Colors.white.withOpacity(0.02),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
+        border: Border.all(color: Colors.white.withOpacity(0.10), width: 0.8),
       ),
-      child: FutureBuilder<List<String?>>(
-        future: Future.wait([
-          StorageService.getUserName(),
-          StorageService.getUserHandle(),
-          StorageService.getAvatar(),
-        ]),
-        builder: (context, snapshot) {
-          final userName = snapshot.data?[0] ?? user.name;
-          final userHandle = snapshot.data?[1];
-          final avatarUrl = snapshot.data?[2];
-          
-          final handleDisplay = (userHandle != null && userHandle.isNotEmpty)
-              ? userHandle
-              : '@${userName.toLowerCase().replaceAll(' ', '')}';
-
-          return Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.2),
-                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                ),
-                child: ClipOval(
-                  child: avatarUrl != null && avatarUrl.startsWith('http')
-                      ? Transform.scale(
-                          scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                          child: Image.network(
-                            avatarUrl,
-                            key: ValueKey(avatarUrl),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withOpacity(0.2),
+              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+            ),
+            child: Center(
+              child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<String?>(
+                  future: StorageService.getUserName(),
+                  initialData: user.name,
+                  builder: (context, snapshot) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data ?? user.name,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.95),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
                           ),
-                        )
-                      : avatarUrl != null && avatarUrl.startsWith('assets')
-                          ? Transform.scale(
-                              scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                              child: Image.asset(avatarUrl, fit: BoxFit.cover),
-                            )
-                          : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '#${user.owlCode}',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.40),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      handleDisplay,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   // YENİ SEKMELER: Uygulama içi olmayan/veya rehberden gelenlerin gösterileceği yer.
   Widget _buildDiscoverTab(Rect br) {
-    if (_searchQuery.isNotEmpty) {
-      return _buildGlobalSearchList();
-    }
-    
     final requests = _service.incomingRequests;
 
     return ListView(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       children: [
-        // Sabit olarak en üstte duran Şık Davet Kartı
-        _addFriendButton(),
-        const SizedBox(height: 24),
+        if (requests.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Text(
+              'Arkadaşlık İstekleri',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ...requests.map((req) => _buildRequestItem(req)),
+          const SizedBox(height: 32),
+        ],
         Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Telefon Rehberin', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+              Icon(Icons.contact_phone_rounded, color: Colors.white.withOpacity(0.15), size: 40),
+              const SizedBox(height: 10),
+              Text(
+                'Rehberine Eriş',
+                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 12),
-              if (!_isContactsSynced)
-                _buildSyncContactsButton()
-              else
-                _buildSyncedContactList(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGlobalSearchList() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: Supabase.instance.client
-          .from('profiles')
-          .select('id, full_name, handle, avatar_url')
-          .or('full_name.ilike.%${_searchQuery}%,handle.ilike.%${_searchQuery}%')
-          .neq('id', Supabase.instance.client.auth.currentUser?.id ?? '00000000-0000-0000-0000-000000000000')
-          .limit(20)
-          .then((res) => List<Map<String, dynamic>>.from(res)),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: CircularProgressIndicator(color: Colors.white24, strokeWidth: 2),
-            ),
-          );
-        }
-
-        final results = snapshot.data ?? [];
-
-        if (results.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.2), size: 32),
-                const SizedBox(height: 8),
-                Text('Kozmik evrende kimse bulunamadı.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
-              ],
-            ),
-          );
-        }
-
-        return ListView(
-          padding: const EdgeInsets.only(top: 16, bottom: 16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text('Kozmik Evrende Bulunanlar', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
-            ),
-            ...results.map((u) {
-              final String name = u['full_name']?.toString() ?? 'Bilinmeyen Profil';
-              final String username = u['handle']?.toString() ?? '';
-              final String userId = u['id']?.toString() ?? '';
-              final String? avatarUrl = u['avatar_url']?.toString();
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.2),
-                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                      ),
-                      child: ClipOval(
-                        child: avatarUrl != null && avatarUrl.startsWith('http')
-                            ? Transform.scale(
-                                scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                                child: Image.network(
-                                  avatarUrl,
-                                  key: ValueKey(avatarUrl),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
-                                ),
-                              )
-                            : avatarUrl != null && avatarUrl.startsWith('assets')
-                                ? Transform.scale(
-                                    scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                                    child: Image.asset(avatarUrl, fit: BoxFit.cover),
-                                  )
-                                : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHighlightedText(
-                            name,
-                            _searchQuery,
-                            TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          _buildHighlightedText(
-                            username,
-                            _searchQuery,
-                            TextStyle(
-                              color: Colors.white.withOpacity(0.3),
-                              fontSize: 11,
-                            ),
-                            const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Builder(
-                      builder: (ctx) {
-                        final isSent = _sentRequests.contains(userId) || _sentRequests.contains(username);
-
-                        return _BouncingNode(
-                          onTap: () async {
-                            if (isSent) return;
-                            HapticFeedback.mediumImpact();
-                            _markRequestAsSentLocally(userId);
-                            _markRequestAsSentLocally(username); // Her ikisi için de cache'le
-                            
-                            // 🪄 GERÇEK BACKEND İSTEĞİ (userId ile doğrudan):
-                            SupabaseOwlService().sendFriendRequestById(userId).then((success) {
-                              debugPrint("🎯 [UI] sendFriendRequestById result: $success for userId=$userId");
-                              if (!success) {
-                               debugPrint("İstek gönderilemedi: $userId");
-                              }
-                            });
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '$name kişisine arkadaşlık isteği gönderildi!',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: const Color(0xFF16151A),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                            );
-                          },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isSent ? Colors.white.withOpacity(0.05) : const Color(0xFF6DE8B8).withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSent ? Colors.white.withOpacity(0.1) : const Color(0xFF6DE8B8).withOpacity(0.3),
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                if (isSent) ...[
-                                  Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
-                                  const SizedBox(width: 4),
-                                ],
-                                Text(
-                                  isSent ? 'Gönderildi' : 'İstek Gönder',
-                                  style: TextStyle(
-                                    color: isSent ? Colors.white.withOpacity(0.4) : const Color(0xFF6DE8B8),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  'Uygulamayı kullananları bul ve kullanmayanlara davet gönder.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11),
                 ),
-              ],
-            ),
-          );
-        }).toList(),
-      ],
-    );
-  },
-);
-}
-
-  Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle highlightStyle) {
-    if (query.isEmpty) return Text(text, style: baseStyle);
-    
-    final lowerText = text.toLowerCase();
-    final lowerQuery = query.toLowerCase();
-    
-    if (!lowerText.contains(lowerQuery)) {
-      return Text(text, style: baseStyle);
-    }
-
-    final spans = <TextSpan>[];
-    int start = 0;
-    while (true) {
-      final index = lowerText.indexOf(lowerQuery, start);
-      if (index < 0) {
-        if (start < text.length) {
-          spans.add(TextSpan(text: text.substring(start), style: baseStyle));
-        }
-        break;
-      }
-      if (index > start) {
-        spans.add(TextSpan(text: text.substring(start, index), style: baseStyle));
-      }
-      spans.add(TextSpan(text: text.substring(index, index + query.length), style: highlightStyle));
-      start = index + query.length;
-    }
-
-    return RichText(text: TextSpan(children: spans));
-  }
-
-  Widget _buildSyncContactsButton() {
-    return GestureDetector(
-      onTap: () async {
-        setState(() => _isSyncingContacts = true);
-        HapticFeedback.mediumImpact();
-        
-        // Servisimizi çağırıyoruz, izin yoksa isteyecek.
-        final results = await _service.syncContactsWithSupabase();
-        
-        await StorageService.setContactsSynced(true);
-        
-        if (mounted) {
-          setState(() {
-            _isSyncingContacts = false;
-            _isContactsSynced = true;
-            _syncedContacts = results;
-          });
-        }
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
-        ),
-        child: Column(
-          children: [
-            if (_isSyncingContacts)
-              const CircularProgressIndicator(color: Color(0xFF6DE8B8))
-            else ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF6DE8B8).withOpacity(0.15),
-                ),
-                child: const Icon(Icons.sync_rounded, color: Color(0xFF6DE8B8), size: 32),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Rehberini Bağla',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
-              ),
-            ]
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSyncedContactList() {
-    if (_syncedContacts.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.0),
-        ),
-        child: Column(
-          children: [
-            Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.3), size: 32),
-            const SizedBox(height: 12),
-            Text(
-              'Crack&Wish Evreninde\nKimseyi Bulamadık',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Onları davet ederek kozmik enerjiyi başlatabilirsin!',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: _syncedContacts.map((contact) {
-        final String name = contact["name"] ?? "Bilinmeyen";
-        final bool isAppUser = contact["isAppUser"] == true;
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.2),
-                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                ),
-                child: Center(
-                  child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      isAppUser ? 'Crack&Wish Kullanıcısı' : 'Rehberinde ekli',
-                      style: TextStyle(
-                        color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.4),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Builder(
-                builder: (ctx) {
-                  final String username = contact["username"] ?? name;
-                  final String? contactUserId = contact["userId"]?.toString();
-                  final String? rawPhone = contact["phone"];
-                  final isSent = _sentRequests.contains(username) || (contactUserId != null && _sentRequests.contains(contactUserId));
-
-                  return _BouncingNode(
-                    onTap: () async {
-                      debugPrint("--- Davet Et / Bağlan Butonuna Tıklandı ---");
-                      try {
-                        if (isAppUser) {
-                          if (isSent) return;
-                          HapticFeedback.mediumImpact();
-                          _markRequestAsSentLocally(username);
-                          if (contactUserId != null) _markRequestAsSentLocally(contactUserId);
-                          
-                          // 🪄 GERÇEK BACKEND İSTEĞİ (userId ile doğrudan):
-                          if (contactUserId != null && contactUserId.isNotEmpty) {
-                            SupabaseOwlService().sendFriendRequestById(contactUserId).then((success) {
-                              debugPrint("🎯 [CONTACTS] sendFriendRequestById result: $success for userId=$contactUserId");
-                              if (!success) {
-                                 debugPrint("İstek gönderilemedi: $contactUserId");
-                              }
-                            });
-                          } else {
-                            // Fallback: handle ile dene
-                            SupabaseOwlService().sendFriendRequest(username).then((success) {
-                              debugPrint("🎯 [CONTACTS] sendFriendRequest fallback result: $success for handle=$username");
-                            });
-                          }
-                          
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                AppLocalizations.of(context)!.inviteRequestSent(name),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: const Color(0xFF16151A),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          );
-                        } else {
-                          debugPrint("Davet gönderme açılıyor...");
-                          HapticFeedback.lightImpact(); 
-                          final String handle = await StorageService.getUserHandle() ?? '';
-                          final inviteLink = 'https://crackwish.com/invite/$handle';
-                          final message = AppLocalizations.of(context)!.inviteShareMessage(handle, inviteLink);
-                          final subject = AppLocalizations.of(context)!.inviteShareSubject;
-                          
-                          // Özel davet tepsisini aç (WhatsApp, SMS, veya Diğer Seçenekler)
-                          if (!context.mounted) return;
-                          final RenderBox? box = ctx.findRenderObject() as RenderBox?;
-                          _showInviteOptions(context, rawPhone, message, subject, box);
-                        }
-                      } catch (e, stack) {
-                        debugPrint("DAVET BUTONU HATASI: $e \n $stack");
-                      }
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSent 
-                                ? Colors.white.withOpacity(0.05)
-                                : isAppUser
-                                    ? const Color(0xFF6DE8B8).withOpacity(0.15)
-                                    : Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSent 
-                                  ? Colors.white.withOpacity(0.1)
-                                  : isAppUser
-                                      ? const Color(0xFF6DE8B8).withOpacity(0.3)
-                                      : Colors.white.withOpacity(0.1),
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (isSent) ...[
-                                Icon(Icons.check_rounded, color: Colors.white.withOpacity(0.4), size: 14),
-                                const SizedBox(width: 4),
-                              ],
-                              Text(
-                                isSent 
-                                    ? AppLocalizations.of(context)!.inviteSentText 
-                                    : (isAppUser ? AppLocalizations.of(context)!.inviteConnectButton : AppLocalizations.of(context)!.inviteSendButton),
-                                style: TextStyle(
-                                  color: isSent
-                                      ? Colors.white.withOpacity(0.4)
-                                      : isAppUser
-                                          ? const Color(0xFF6DE8B8)
-                                          : Colors.white.withOpacity(0.7),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              _addFriendButton(),
             ],
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
@@ -1006,6 +461,10 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               _searchQuery.isEmpty ? 'Henüz arkadaşın yok' : 'Sonuç bulunamadı',
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
+            if (_searchQuery.isEmpty) ...[
+              const SizedBox(height: 8),
+              _addFriendButton(),
+            ],
           ],
         ),
       );
@@ -1021,35 +480,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
       child: ListView(
         padding: const EdgeInsets.only(top: 16, bottom: 16),
         children: [
-          // Gelen İstekler (Arkadaşlarım sekmesinde göster)
-          if (requests.isNotEmpty && _searchQuery.isEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                'Arkadaşlık İstekleri',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            ...requests.map((req) => _buildRequestItem(req)),
-            if (friends.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Arkadaşların',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ],
+          // Arkadaş listesi
           ...friends.map((f) {
             final isExpanded = _expandedContactId == f.user.id;
             return _ContactItem(
@@ -1066,14 +497,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               },
               onShowLetter: () => setState(() => _showingLetter = true),
               onHideLetter: () { if (mounted) setState(() => _showingLetter = false); },
-              onUnfriend: () {
-                _service.unfriend(f.user.id);
-                setState(() {
-                  if (_expandedContactId == f.user.id) {
-                    _expandedContactId = null;
-                  }
-                });
-              },
             );
           }),
         ],
@@ -1093,33 +516,11 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.black.withOpacity(0.2),
                   border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 ),
-                child: ClipOval(
-                  child: req.from.avatarUrl != null 
-                      ? (req.from.avatarUrl!.startsWith('http') 
-                          ? Transform.scale(
-                              scale: req.from.avatarUrl!.contains('owl') ? 1.35 : (req.from.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                              child: Image.network(
-                                req.from.avatarUrl!,
-                                fit: BoxFit.cover,
-                                width: 44,
-                                height: 44,
-                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            )
-                          : Transform.scale(
-                              scale: req.from.avatarUrl!.contains('owl') ? 1.35 : (req.from.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                              child: Image.asset(
-                                req.from.avatarUrl!,
-                                fit: BoxFit.cover,
-                                width: 44,
-                                height: 44,
-                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            ))
-                      : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                child: Center(
+                  child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.5), size: 20),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1133,6 +534,15 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.95),
                         fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Arkadaşlık isteği',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.30),
+                        fontSize: 10,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -1144,172 +554,225 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   HapticFeedback.mediumImpact();
                   _service.acceptRequest(req.id);
                 },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: const Color(0xFF4A7A6A).withOpacity(0.15),
-                        border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.35), width: 1.0),
-                      ),
-                      child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
-                    ),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF6DE8B8).withOpacity(0.10),
+                    border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.30), width: 0.8),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.check_rounded, color: const Color(0xFF6DE8B8).withOpacity(0.9), size: 18),
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               _BouncingNode(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   _service.rejectRequest(req.id);
                 },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: const Color(0xFF9A4A4A).withOpacity(0.15), // Pastel kırmızımsı mat zemin
-                        border: Border.all(color: const Color(0xFFE86D6D).withOpacity(0.35), width: 1.0), // Parlak pastel kırmızı çerçeve
-                      ),
-                      child: const Text('Red', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
-                    ),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFEF9A9A).withOpacity(0.08),
+                    border: Border.all(color: const Color(0xFFEF9A9A).withOpacity(0.25), width: 0.8),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.close_rounded, color: const Color(0xFFEF9A9A).withOpacity(0.8), size: 16),
                   ),
                 ),
               ),
             ],
           ),
         ),
-        Divider(color: Colors.white.withOpacity(0.05), height: 1),
+        // Zarif ayırıcı
+        Row(
+          children: [
+            const SizedBox(width: 60),
+            Expanded(
+              child: Container(
+                height: 0.5,
+                color: Colors.white.withOpacity(0.05),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
 
-
   Widget _addFriendButton() {
-    final rewardColor = _isPremiumUser ? const Color(0xFFFFD700) : const Color(0xFF6DE8B8);
-    final rewardText = _isPremiumUser ? '+1 Kurabiye' : '+3 Ruh Taşı';
-
-    return _BouncingNode(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        final String username = _service.currentUser.name.replaceAll(' ', '').toLowerCase();
-        // Smart Deep Link ile otomatik takip
-        final String shareText = "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackandwish.com/invite?ref=$username";
-        
-        try {
-          Share.share(shareText);
-        } catch (e) {
-          debugPrint("Share error: $e");
-        }
-      },
+    return GestureDetector(
+      onTap: () => _showAddFriendDialog(),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF00E5FF).withOpacity(0.18), // Parlak neon cyan
-                  const Color(0xFF2979FF).withOpacity(0.03), // Derin uzay mavisi eriyiş
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.3), width: 0.5),
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.04), // Tamamen siyah yerine çok şeffaf beyaz buz
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // İkon Çemberi
                 Container(
-                  width: 36,
-                  height: 36,
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [const Color(0xFF00E5FF).withOpacity(0.35), const Color(0xFF2979FF).withOpacity(0.05)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.4), width: 0.5),
+                    color: Colors.white.withOpacity(0.1),
                   ),
-                  child: Center(
-                    child: Icon(Icons.person_add_rounded, color: const Color(0xFF00E5FF), size: 16),
-                  ),
+                  child: Icon(Icons.person_add_rounded, color: Colors.white.withOpacity(0.8), size: 12),
                 ),
-                const SizedBox(width: 12),
-                
-                // Metin Alanı
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Arkadaş Davet Et',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Kozmik evreni yansıt',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Sağ taraf Rozet (Badge)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: rewardColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: rewardColor.withOpacity(0.3), width: 0.5),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _isPremiumUser ? Icons.cookie_rounded : Icons.diamond_rounded, 
-                        color: rewardColor, 
-                        size: 11
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        rewardText,
-                        style: TextStyle(
-                          color: rewardColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
+                const SizedBox(width: 8),
+                Text(
+                  'Arkadaş Ekle',
+                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void _showAddFriendDialog() {
+    final codeCtrl = TextEditingController();
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, a1, a2, child) {
+        return Transform.scale(
+          scale: 0.9 + 0.1 * a1.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: Dialog(
+              backgroundColor: const Color(0xFF2E1420),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset('assets/images/owl.png', width: 32, height: 32),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Senin Baykuş Kodun',
+                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: '#${_service.currentUser.owlCode}'));
+                        HapticFeedback.lightImpact();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white.withOpacity(0.08),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '#${_service.currentUser.owlCode}',
+                              style: TextStyle(
+                                color: Colors.amber[200],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.copy_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(color: Colors.white.withOpacity(0.08)),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Arkadaşının Kodunu Gir',
+                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: codeCtrl,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'OWL-XXXX',
+                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 1.5),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.06),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.amber.withOpacity(0.4)),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    StatefulBuilder(
+                      builder: (ctx2, setDialogState) {
+                        return ElevatedButton(
+                          onPressed: () async {
+                            final code = codeCtrl.text.trim();
+                            if (code.isEmpty) return;
+                            HapticFeedback.mediumImpact();
+                            final success = await _service.sendFriendRequest(code);
+                            if (ctx2.mounted) Navigator.pop(ctx2);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF8A3D),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('İstek Gönder ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                              Image.asset('assets/images/owl.png', width: 14, height: 14),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1424,33 +887,11 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         height: 44,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.2),
                           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                         ),
-                        child: ClipOval(
-                          child: sender.avatarUrl != null 
-                              ? (sender.avatarUrl!.startsWith('http') 
-                                  ? Transform.scale(
-                                      scale: sender.avatarUrl!.contains('owl') ? 1.35 : (sender.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                                      child: Image.network(
-                                        sender.avatarUrl!,
-                                        fit: BoxFit.cover,
-                                        width: 44,
-                                        height: 44,
-                                        errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                                      ),
-                                    )
-                                  : Transform.scale(
-                                      scale: sender.avatarUrl!.contains('owl') ? 1.35 : (sender.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                                      child: Image.asset(
-                                        sender.avatarUrl!,
-                                        fit: BoxFit.cover,
-                                        width: 44,
-                                        height: 44,
-                                        errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                                      ),
-                                    ))
-                              : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                        child: Center(
+                          child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1504,118 +945,70 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               ),
               // Açıldığında alt tarafta beliren zarf listesi
               AnimatedSize(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
                 child: isExpanded
-                    ? Builder(
-                        builder: (ctx) {
-                          Widget buildEnvelopeIcon(OwlLetter l) {
-                            return _BouncingNode(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                _service.markAsRead(l.id);
-                                _showReceivedLetter(context, l, br);
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(40),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: l.isRead 
-                                          ? Colors.white.withOpacity(0.04) 
-                                          : const Color(0xFF4A6A8A).withOpacity(0.15),
-                                      border: Border.all(
-                                        color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
-                                        width: 0.8
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                        color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
-                                        size: l.isRead ? 18 : 20,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-
-                          return ShaderMask(
-                            shaderCallback: (Rect bounds) {
-                              return const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.white,
-                                  Colors.white,
-                                  Colors.transparent,
-                                ],
-                                stops: [0.0, 0.15, 0.95, 1.0], // Sol ve sağdan yavaşça silikleşme
-                              ).createShader(bounds);
-                            },
-                            blendMode: BlendMode.dstIn,
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 16),
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
-                              child: Row(
-                                children: [
-                                  ...senderLetters.take(12).map((l) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 12),
-                                      child: buildEnvelopeIcon(l),
-                                    );
-                                  }),
-                                  if (senderLetters.length > 12)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 12),
-                                      child: _BouncingNode(
-                                        onTap: () {
-                                          HapticFeedback.mediumImpact();
-                                          _showAllLettersPanel(context, sender, senderLetters, br);
-                                        },
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(40),
-                                          child: BackdropFilter(
-                                            filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.white.withOpacity(0.08),
-                                                border: Border.all(
-                                                  color: Colors.white.withOpacity(0.2), 
-                                                  width: 0.8
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '+${senderLetters.length - 12}',
-                                                  style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.9),
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                    ? ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.transparent,
+                              Colors.white,
+                              Colors.white,
+                              Colors.transparent,
+                            ],
+                            stops: [0.0, 0.15, 0.95, 1.0], // Sol ve sağdan yavaşça silikleşme
+                          ).createShader(bounds);
+                        },
+                        blendMode: BlendMode.dstIn,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.only(left: 56, top: 4, bottom: 12, right: 16),
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(), // Şık bir kaydırma efekti
+                          child: Row(
+                            children: senderLetters.map((l) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 12), // Öğeler arası yatay boşluk
+                                child: _BouncingNode(
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    _service.markAsRead(l.id);
+                                    _showReceivedLetter(context, l, br);
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(40),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: l.isRead 
+                                              ? Colors.white.withOpacity(0.04) 
+                                              : const Color(0xFF4A6A8A).withOpacity(0.15),
+                                          border: Border.all(
+                                            color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.35), 
+                                            width: 0.8
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
+                                            color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
+                                            size: l.isRead ? 18 : 20,
                                           ),
                                         ),
                                       ),
                                     ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       )
                     : const SizedBox.shrink(),
               ),
@@ -1624,92 +1017,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           );
         }),
       ],
-    );
-  }
-
-  void _showAllLettersPanel(BuildContext context, OwlUser sender, List<OwlLetter> letters, Rect br) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
-      transitionBuilder: (ctx, a1, a2, child) {
-        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
-        return Transform.scale(
-          scale: 0.9 + 0.1 * curve.value,
-          child: Opacity(
-            opacity: a1.value,
-            child: Align(
-              alignment: Alignment.center,
-              child: Material(
-                color: Colors.transparent,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.88,
-                        maxHeight: MediaQuery.of(context).size.height * 0.6,
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      ),
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          alignment: WrapAlignment.center,
-                          children: letters.map((l) {
-                            return _BouncingNode(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                Navigator.pop(ctx);
-                                _service.markAsRead(l.id);
-                                _showReceivedLetter(context, l, br);
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(40),
-                                child: Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: l.isRead 
-                                        ? Colors.white.withOpacity(0.04) 
-                                        : const Color(0xFF4A6A8A).withOpacity(0.2),
-                                    border: Border.all(
-                                      color: l.isRead ? Colors.white.withOpacity(0.1) : const Color(0xFF6DAEE8).withOpacity(0.4), 
-                                      width: 1.0
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      l.isRead ? Icons.drafts_rounded : Icons.mail_rounded, 
-                                      color: l.isRead ? Colors.white.withOpacity(0.4) : const Color(0xFF6DAEE8), 
-                                      size: l.isRead ? 20 : 22,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -1736,7 +1043,10 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               cookieName: letter.attachedCookieName,
               cookieClaimed: letter.cookieClaimed,
               onClaimCookie: () async {
-                SupabaseOwlService().markCookieClaimed(letter.id);
+                letter.cookieClaimed = true;
+                if (letter.attachedCookieId != null) {
+                  await StorageService.addCookieToCollection(letter.attachedCookieId!);
+                }
                 if (mounted) setState(() {});
               },
               onReply: () {
@@ -1782,198 +1092,6 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     ).then((_) {
       if (mounted) setState(() => _showingLetter = false);
     });
-  }
-
-  void _showFeatureDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A3D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-        content: Text(message, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showInviteOptions(BuildContext context, String? rawPhone, String message, String subject, RenderBox? renderBox) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return ClipRRect(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
-                border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.5),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Üst tutma çubuğu
-                  Container(
-                    width: 36,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Text(
-                    "Nasıl Davet Etmek İstersin?",
-                    style: GoogleFonts.manrope(
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.manrope(
-                      textStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  
-                  if (rawPhone != null && rawPhone.isNotEmpty) ...[
-                    // WhatsApp Seçeneği
-                    _buildInviteOptionTile(
-                      icon: PhosphorIcons.whatsappLogo(PhosphorIconsStyle.regular),
-                      title: "WhatsApp",
-                      subtitle: "Mesaj olarak gönder",
-                      color: const Color(0xFF25D366),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                        final Uri whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
-                        if (await canLaunchUrl(whatsappUri)) {
-                          await launchUrl(whatsappUri);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    
-                    // SMS Seçeneği
-                    _buildInviteOptionTile(
-                      icon: PhosphorIcons.chatCircleText(PhosphorIconsStyle.regular), // Görseldeki gibi oval sohbet balonu
-                      title: "SMS",
-                      subtitle: "Klasik mesaj ile yolla",
-                      color: const Color(0xFF0A84FF),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                        final Uri smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
-                        if (await canLaunchUrl(smsUri)) {
-                          await launchUrl(smsUri);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                  
-                  // Paylaşım Seçeneği (Instagram, TikTok vb)
-                  _buildInviteOptionTile(
-                    icon: PhosphorIcons.shareNetwork(PhosphorIconsStyle.regular),
-                    title: "Diğer Uygulamalar",
-                    subtitle: "Instagram, TikTok, X vb.",
-                    color: const Color(0xFFAB68FF),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await Share.share(
-                        message,
-                        subject: subject,
-                        sharePositionOrigin: renderBox != null ? renderBox.localToGlobal(Offset.zero) & renderBox.size : null,
-                      );
-                    },
-                  ),
-                  
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInviteOptionTile({required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03), // Çok daha mat ve belirsiz arka plan
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.06), width: 1), // Çok ince zarif sınır
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 4), // İkonun soluna hafif boşluk
-            Icon(icon, color: Colors.white, size: 34), // Görseldeki orantıya uygun boyut
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.manrope(
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600, // Görseldeki kalınlık
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.manrope(
-                      textStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.45),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.35), size: 22),
-            const SizedBox(width: 4),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -2082,69 +1200,10 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
     super.dispose();
   }
 
-  void _claimCookie() async {
-    if (_claimed) return;
+  void _claimCookie() {
     HapticFeedback.heavyImpact();
     setState(() => _claimed = true);
-    
-    final imgPath = _cookieImageMap[widget.cookieId];
-    if (widget.cookieId != null) {
-      // isRewardOrGift = true çünkü sana başkası yollamış, bu bir hediye! 
-      // Dolayısıyla varsa x2, x3 olarak yığılabilir.
-      await StorageService.incrementCookieCard(widget.cookieId!, isRewardOrGift: true);
-    }
     widget.onClaimCookie?.call();
-
-    if (!mounted || imgPath == null) return;
-
-    // Ödül animasyonu popup
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.4), // Çok daha şeffaf ve yumuşak bir arka plan
-      barrierDismissible: true,
-      barrierLabel: 'CookieReward',
-      transitionDuration: const Duration(milliseconds: 250), // Hızlıca ekrana gelsin
-      pageBuilder: (context, anim, secondaryAnim) {
-        return GestureDetector(
-          onTap: () => Navigator.of(context).pop(), // Erken kapatmak isterse
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 350), // Elastik değil, yumuşak scale
-                curve: Curves.easeOutCubic,
-                builder: (context, scale, child) {
-                  return Transform.scale(
-                    scale: scale,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFFD700).withOpacity(0.5),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(imgPath, width: 140, height: 140, fit: BoxFit.contain),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    // Daha hızlı kaybolur (toplam 1.2 saniye gibi)
-    Future.delayed(const Duration(milliseconds: 1100), () {
-      if (mounted && Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-    });
   }
 
   @override
@@ -2264,11 +1323,11 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                                     child: Text(
                                       widget.message,
                                       textAlign: TextAlign.center,
-                                      style: GoogleFonts.kalam(
-                                        color: const Color(0xFF4A3928),
-                                        fontSize: 14,
+                                      style: const TextStyle(
+                                        color: Color(0xFF4A3928),
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w500,
-                                        height: 1.4,
+                                        height: 1.6,
                                         letterSpacing: 0.1,
                                       ),
                                     ),
@@ -2276,16 +1335,17 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              // Gönderenin imzası sol alt köşede olur (sağda kurabiye var)
+                              // Gönderenin imzası sağ alt köşede olur
                               Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: Alignment.centerRight,
                                 child: Text(
                                   '~ ${widget.senderName}',
-                                  style: GoogleFonts.kalam(
-                                    color: const Color(0xFF4A3928),
+                                  style: const TextStyle(
+                                    color: Color(0xFF4A3928),
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.2,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.italic,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ),
@@ -2300,22 +1360,30 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                     Positioned(
                       right: 14,
                       bottom: 12,
-                      child: GestureDetector(
-                        onTap: !_claimed ? _claimCookie : null, // Mühre tıkla ve topla
-                        child: AnimatedOpacity(
-                          opacity: _claimed ? 0.3 : 1.0, // Alındıysa soluklaşır
-                          duration: const Duration(milliseconds: 600),
-                          child: ScaleTransition(
-                            scale: _cookieScale,
-                            child: SizedBox(
-                              width: 36,
-                              height: 36,
-                              child: Center(
-                                child: imgPath != null
-                                    ? Image.asset(imgPath, width: 36, height: 36, fit: BoxFit.contain)
-                                    : const Text('🥠', style: TextStyle(fontSize: 24)),
-                              ),
+                      child: ScaleTransition(
+                        scale: _cookieScale,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFFE8D4B8),
+                            border: Border.all(
+                              color: const Color(0xFFD4A574),
+                              width: 1.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.brown.withOpacity(0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: imgPath != null
+                                ? Image.asset(imgPath, width: 24, height: 24, fit: BoxFit.contain)
+                                : const Text('🥠', style: TextStyle(fontSize: 14)),
                           ),
                         ),
                       ),
@@ -2323,9 +1391,67 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
                 ],
               ),
             ),
-            // Zaten alınmış - yazı yok sadece mektuptaki ikon soluklaşır
-            if (hasCookie && _claimed) 
-              const SizedBox.shrink(),
+            // Kurabiye Al butonu
+            if (hasCookie && !_claimed) ...[
+              const SizedBox(height: 16),
+              _BouncingNode(
+                onTap: _claimCookie,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF8A3D), Color(0xFFFF6B2C)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF8A3D).withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (imgPath != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Image.asset(imgPath, width: 20, height: 20, fit: BoxFit.contain),
+                        ),
+                      const Text(
+                        'Kurabiyeyi Al',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Text(' 🥠', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            // Zaten alınmış
+            if (hasCookie && _claimed) ...[
+              const SizedBox(height: 12),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.green[300], size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Kurabiye koleksiyona eklendi!',
+                    style: TextStyle(
+                      color: Colors.green[300],
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             // Yanıtla Butonu (Herkeste çıkmalı)
             const SizedBox(height: 16),
             Row(
@@ -2488,7 +1614,7 @@ class _AnimatedMenuItemState extends State<_AnimatedMenuItem> {
   }
 }
 
-class _ContactItem extends StatelessWidget {
+class _ContactItem extends StatefulWidget {
   final String name;
   final String emoji;
   final bool isAppUser;
@@ -2498,7 +1624,6 @@ class _ContactItem extends StatelessWidget {
   final Friend? friend;
   final VoidCallback? onShowLetter;
   final VoidCallback? onHideLetter;
-  final VoidCallback? onUnfriend;
 
   const _ContactItem({
     required this.name,
@@ -2510,11 +1635,65 @@ class _ContactItem extends StatelessWidget {
     this.friend,
     this.onShowLetter,
     this.onHideLetter,
-    this.onUnfriend,
   });
 
-  void _showLetterPaper(BuildContext context, {bool autoOpenCookie = false}) {
-    onShowLetter?.call();
+  @override
+  State<_ContactItem> createState() => _ContactItemState();
+}
+
+class _ContactItemState extends State<_ContactItem> with TickerProviderStateMixin {
+  late AnimationController _expandCtrl;
+  late Animation<double> _expandAnim;
+  late AnimationController _btn1Ctrl;
+  late AnimationController _btn2Ctrl;
+  late AnimationController _btn3Ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _expandCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 350));
+    _expandAnim = CurvedAnimation(parent: _expandCtrl, curve: Curves.easeOutCubic);
+
+    _btn1Ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _btn2Ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _btn3Ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+
+    if (widget.isExpanded) {
+      _expandCtrl.value = 1.0;
+      _btn1Ctrl.value = 1.0;
+      _btn2Ctrl.value = 1.0;
+      _btn3Ctrl.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _ContactItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isExpanded && !oldWidget.isExpanded) {
+      _expandCtrl.forward();
+      // Staggered entrance: her buton biraz gecikmeyle belirir
+      Future.delayed(const Duration(milliseconds: 80), () { if (mounted) _btn1Ctrl.forward(); });
+      Future.delayed(const Duration(milliseconds: 160), () { if (mounted) _btn2Ctrl.forward(); });
+      Future.delayed(const Duration(milliseconds: 240), () { if (mounted) _btn3Ctrl.forward(); });
+    } else if (!widget.isExpanded && oldWidget.isExpanded) {
+      _btn3Ctrl.reverse();
+      _btn2Ctrl.reverse();
+      _btn1Ctrl.reverse();
+      _expandCtrl.reverse();
+    }
+  }
+
+  @override
+  void dispose() {
+    _expandCtrl.dispose();
+    _btn1Ctrl.dispose();
+    _btn2Ctrl.dispose();
+    _btn3Ctrl.dispose();
+    super.dispose();
+  }
+
+  void _showLetterPaper(BuildContext context) {
+    widget.onShowLetter?.call();
     HapticFeedback.mediumImpact();
     showGeneralDialog(
       context: context,
@@ -2529,181 +1708,320 @@ class _ContactItem extends StatelessWidget {
           scale: 0.9 + 0.1 * curve.value,
           child: Opacity(
             opacity: a1.value,
-            child: _LetterPaper(
-              recipientName: name, 
-              recipientEmoji: emoji, 
-              owlButtonRect: owlButtonRect, 
-              friend: friend,
-              autoOpenCookie: autoOpenCookie,
-            ),
+            child: _LetterPaper(recipientName: widget.name, recipientEmoji: widget.emoji, owlButtonRect: widget.owlButtonRect, friend: widget.friend),
           ),
         );
       },
     ).then((_) {
-      onHideLetter?.call();
+      widget.onHideLetter?.call();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // ── Avatar Widget ──
+    Widget avatar = Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.black.withOpacity(0.2),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+      ),
+      child: Center(
+        child: Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+      ),
+    );
+
+    // ── Mektup Butonu (Sağ) ──
+    Widget letterButton = widget.isAppUser
+        ? _BouncingNode(
+            onTap: () => _showLetterPaper(context),
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.06),
+                border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.8),
+              ),
+              child: Center(
+                child: Opacity(
+                  opacity: 0.85,
+                  child: Image.asset(
+                    'assets/images/letter_icon.png',
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.contain,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          )
+        : _BouncingNode(
+            onTap: () => HapticFeedback.lightImpact(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white.withOpacity(0.06),
+                    border: Border.all(color: Colors.white.withOpacity(0.15), width: 0.6),
+                  ),
+                  child: Text(
+                    'Davet Et',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+
+    // ── Ana Kart İçeriği ──
     Widget content = GestureDetector(
       onTap: () {
-        if (isAppUser) {
-          onToggleExpanded?.call();
+        if (widget.isAppUser) {
+          widget.onToggleExpanded?.call();
           HapticFeedback.lightImpact();
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: isAppUser ? BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF6B429C).withOpacity(0.15),
-              Colors.transparent,
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          border: Border.all(color: const Color(0xFF6B429C).withOpacity(0.25), width: 1.0),
-        ) : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.2) : Colors.white.withOpacity(0.05),
-                border: Border.all(color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.6) : Colors.white.withOpacity(0.1), width: 1.0),
-                boxShadow: isAppUser ? [
-                  BoxShadow(color: const Color(0xFF6B429C).withOpacity(0.3), blurRadius: 8, spreadRadius: 1)
-                ] : [],
-              ),
-              child: ClipOval(
-                child: friend?.user.avatarUrl != null 
-                    ? (friend!.user.avatarUrl!.startsWith('http') 
-                        ? Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                            child: Image.network(
-                              friend!.user.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Center(
-                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            ),
-                          )
-                        : Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                            child: Image.asset(
-                              friend!.user.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Center(
-                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            ),
-                          ))
-                    : Center(
-                        child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 12),
+            avatar,
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    name,
+                    widget.name,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.95),
-                      fontSize: 14,
-                      fontWeight: isAppUser ? FontWeight.w700 : FontWeight.w500,
-                      letterSpacing: 0.3,
+                      fontSize: 15,
+                      fontWeight: widget.isAppUser ? FontWeight.w600 : FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
                   ),
-                  if (isAppUser) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      friend!.user.owlCode.startsWith('@') ? friend!.user.owlCode : '@${friend!.user.owlCode}',
-                      style: TextStyle(
-                        color: const Color(0xFF6DE8B8).withOpacity(0.7),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  if (widget.isAppUser) ...[
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFF6DE8B8).withOpacity(0.7),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF6DE8B8).withOpacity(0.3),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Bağlı',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.35),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ],
               ),
             ),
-            _BouncingNode(
-              onTap: () {
-                if (isAppUser) {
-                  _showLetterPaper(context);
-                } else {
-                  HapticFeedback.lightImpact();
-                }
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: isAppUser ? 8 : 14, vertical: isAppUser ? 4 : 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: isAppUser 
-                          ? Colors.transparent 
-                          : Colors.white.withOpacity(0.04),
-                      border: isAppUser 
-                          ? null 
-                          : Border.all(
-                              color: Colors.white.withOpacity(0.2), 
-                              width: 0.8,
-                            ),
-                    ),
-                    child: isAppUser
-                        ? Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12),
-                              splashColor: Colors.white.withOpacity(0.4),
-                              highlightColor: Colors.white.withOpacity(0.3),
-                              onTap: () {
-                                HapticFeedback.mediumImpact();
-                                _showLetterPaper(context);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Opacity(
-                                  opacity: 0.9,
-                                  child: Image.asset(
-                                    'assets/images/letter_icon.png', 
-                                    width: 24, 
-                                    height: 24, 
-                                    fit: BoxFit.contain,
-                                    color: Colors.white,
-                                  ),
+            letterButton,
+          ],
+        ),
+      ),
+    );
+
+    // ── Genişleyen Aksiyon Menüsü ──
+    return Column(
+      children: [
+        AnimatedBuilder(
+          animation: _expandAnim,
+          builder: (context, _) {
+            final t = _expandAnim.value;
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 3),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: widget.isAppUser
+                      ? [
+                          Color.lerp(Colors.transparent, const Color(0xFF7B5EA7).withOpacity(0.08), t)!,
+                          Color.lerp(Colors.transparent, const Color(0xFF4A3B6E).withOpacity(0.04), t)!,
+                        ]
+                      : [Colors.transparent, Colors.transparent],
+                ),
+                border: Border.all(
+                  color: widget.isAppUser
+                      ? Color.lerp(
+                          Colors.white.withOpacity(0.06),
+                          const Color(0xFF9B6DC6).withOpacity(0.25),
+                          t,
+                        )!
+                      : Colors.transparent,
+                  width: 0.8,
+                ),
+              ),
+              child: Column(
+                children: [
+                  content,
+                  // ── Aksiyon Menüsü ──
+                  SizeTransition(
+                    sizeFactor: _expandAnim,
+                    axisAlignment: -1.0,
+                    child: widget.isExpanded || t > 0
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+                            child: Column(
+                              children: [
+                                // İnce ayırıcı çizgi
+                                Container(
+                                  height: 0.5,
+                                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                                  color: Colors.white.withOpacity(0.08),
                                 ),
-                              ),
+                                const SizedBox(height: 10),
+                                // ── 3 Premium Pill Buton ──
+                                Row(
+                                  children: [
+                                    // Kurabiye At
+                                    Expanded(
+                                      child: FadeTransition(
+                                        opacity: CurvedAnimation(parent: _btn1Ctrl, curve: Curves.easeOut),
+                                        child: SlideTransition(
+                                          position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+                                              .animate(CurvedAnimation(parent: _btn1Ctrl, curve: Curves.easeOutCubic)),
+                                          child: _buildPremiumActionButton(
+                                            icon: Icons.card_giftcard_rounded,
+                                            label: 'Hediye',
+                                            accentColor: const Color(0xFFFFAB40),
+                                            onTap: () {
+                                              HapticFeedback.mediumImpact();
+                                              widget.onToggleExpanded?.call();
+                                              _handleSendGift();
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Mektup Yaz
+                                    Expanded(
+                                      child: FadeTransition(
+                                        opacity: CurvedAnimation(parent: _btn2Ctrl, curve: Curves.easeOut),
+                                        child: SlideTransition(
+                                          position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+                                              .animate(CurvedAnimation(parent: _btn2Ctrl, curve: Curves.easeOutCubic)),
+                                          child: _buildPremiumActionButton(
+                                            icon: Icons.edit_document,
+                                            label: 'Mektup Yaz',
+                                            accentColor: const Color(0xFF90CAF9),
+                                            onTap: () {
+                                              HapticFeedback.mediumImpact();
+                                              widget.onToggleExpanded?.call();
+                                              // Direkt var olan mektup gönderme kağıdını/animasyonunu tetikliyoruz
+                                              widget.onShowLetter?.call();
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Bağı Kes
+                                    Expanded(
+                                      child: FadeTransition(
+                                        opacity: CurvedAnimation(parent: _btn3Ctrl, curve: Curves.easeOut),
+                                        child: SlideTransition(
+                                          position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+                                              .animate(CurvedAnimation(parent: _btn3Ctrl, curve: Curves.easeOutCubic)),
+                                          child: _buildPremiumActionButton(
+                                            icon: Icons.link_off_rounded,
+                                            label: 'Bağı Kes',
+                                            accentColor: const Color(0xFFEF9A9A),
+                                            onTap: () {
+                                              HapticFeedback.heavyImpact();
+                                              widget.onToggleExpanded?.call();
+                                              _showDisconnectDialog();
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           )
-                        : Text(
-                            'Davet Et',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
+                        : const SizedBox.shrink(),
                   ),
+                ],
+              ),
+            );
+          },
+        ),
+        if (!widget.isAppUser) Divider(color: Colors.white.withOpacity(0.05), height: 1),
+      ],
+    );
+  }
+
+  Widget _buildPremiumActionButton({
+    required IconData icon,
+    required String label,
+    required Color accentColor,
+    required VoidCallback onTap,
+  }) {
+    return _BouncingNode(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: accentColor.withOpacity(0.06),
+          border: Border.all(
+            color: accentColor.withOpacity(0.18),
+            width: 0.6,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: accentColor.withOpacity(0.85), size: 12),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.65),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.2,
                 ),
               ),
             ),
@@ -2711,239 +2029,160 @@ class _ContactItem extends StatelessWidget {
         ),
       ),
     );
+  }
 
-    return Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          decoration: isAppUser && isExpanded ? BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color(0xFF6B429C).withOpacity(0.05),
-            border: Border.all(color: const Color(0xFF6B429C).withOpacity(0.3)),
-          ) : BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              content,
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-                child: isExpanded && isAppUser
-                    ? Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 16),
-                        child: Column(
-                          children: [
-                            Divider(color: Colors.white.withOpacity(0.1), height: 1),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _buildIconButton(
-                                  context,
-                                  Icons.card_giftcard_rounded, 
-                                  'Kurabiye At', 
-                                  Colors.orangeAccent,
-                                  () {
-                                    HapticFeedback.mediumImpact();
-                                    _showLetterPaper(context, autoOpenCookie: true); // Mektup menüsünü aç ve direkt kurabiye menüsünü göster
-                                  }
-                                ),
-                                _buildIconButton(
-                                  context,
-                                  Icons.person_remove_rounded, 
-                                  'Bağı Kes', 
-                                  Colors.redAccent.withOpacity(0.8),
-                                  () async {
-                                    HapticFeedback.heavyImpact();
-                                    final confirm = await showGeneralDialog<bool>(
-                                      context: context,
-                                      barrierDismissible: true,
-                                      barrierLabel: 'Dismiss',
-                                      barrierColor: Colors.black.withOpacity(0.5),
-                                      transitionDuration: const Duration(milliseconds: 300),
-                                      pageBuilder: (context, animation, secondaryAnimation) {
-                                        return ScaleTransition(
-                                          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-                                          child: FadeTransition(
-                                            opacity: animation,
-                                            child: Dialog(
-                                              backgroundColor: Colors.transparent,
-                                              elevation: 0,
-                                              insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(24),
-                                                child: BackdropFilter(
-                                                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                                                  child: Container(
-                                                    padding: const EdgeInsets.all(24),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFF16151A).withOpacity(0.6),
-                                                      borderRadius: BorderRadius.circular(24),
-                                                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Container(
-                                                          width: 64,
-                                                          height: 64,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            border: Border.all(color: Colors.redAccent.withOpacity(0.4), width: 2),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors.redAccent.withOpacity(0.2),
-                                                                blurRadius: 16,
-                                                                spreadRadius: 2,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: ClipOval(
-                                                            child: friend?.user.avatarUrl != null
-                                                                ? Transform.scale(
-                                                                    scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                                                                    child: friend!.user.avatarUrl!.startsWith('http')
-                                                                        ? Image.network(
-                                                                            friend!.user.avatarUrl!,
-                                                                            fit: BoxFit.cover,
-                                                                            width: 64,
-                                                                            height: 64,
-                                                                            errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white54, size: 32),
-                                                                          )
-                                                                        : Image.asset(
-                                                                            friend!.user.avatarUrl!,
-                                                                            fit: BoxFit.cover,
-                                                                            width: 64,
-                                                                            height: 64,
-                                                                            errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white54, size: 32),
-                                                                          ),
-                                                                  )
-                                                                : const Icon(Icons.person, color: Colors.white54, size: 32),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 16),
-                                                        const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 0.5)),
-                                                        const SizedBox(height: 8),
-                                                        Text('${friend?.user.name} ile arandaki sihirli bağı koparmak istediğine emin misin?', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4)),
-                                                        const SizedBox(height: 24),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: GestureDetector(
-                                                                onTap: () => Navigator.of(context).pop(false),
-                                                                child: Container(
-                                                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.white.withOpacity(0.05),
-                                                                    borderRadius: BorderRadius.circular(12),
-                                                                  ),
-                                                                  alignment: Alignment.center,
-                                                                  child: Text('İptal', style: TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600, fontSize: 14)),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(width: 12),
-                                                            Expanded(
-                                                              child: GestureDetector(
-                                                                onTap: () => Navigator.of(context).pop(true),
-                                                                child: Container(
-                                                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.redAccent.withOpacity(0.15),
-                                                                    border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-                                                                    borderRadius: BorderRadius.circular(12),
-                                                                  ),
-                                                                  alignment: Alignment.center,
-                                                                  child: const Text('Evet, Kopar', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700, fontSize: 14)),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                    
-                                    if (confirm == true && friend != null) {
-                                      onUnfriend?.call();
-                                    }
-                                  }
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+  // ── 1. Hediye Gönderme (Aura Hediye) ──
+  void _handleSendGift() {
+    // Burada backend çağrısı yapılacak (Arkadaşa +50 Aura yolla). Şimdilik görsel:
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E).withOpacity(0.9),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFFFAB40).withOpacity(0.3), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFFAB40).withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-        ),
-        if (!isAppUser) Divider(color: Colors.white.withOpacity(0.05), height: 1),
-      ],
-    );
-  }
-
-  void _showFeatureDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A3D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-        content: Text(message, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton(BuildContext context, IconData icon, String text, Color color, VoidCallback onTap) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          onToggleExpanded?.call(); // Tıklayınca menüyü kapat
-          onTap();
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(10),
-          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color.withOpacity(0.85), size: 13),
-              const SizedBox(width: 5),
-              Text(
-                text,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.2,
+              const Icon(Icons.auto_awesome, color: Color(0xFFFFAB40), size: 24),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Sihirli Hediye Gönderildi!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    const SizedBox(height: 2),
+                    Text('${widget.name} adlı mistik ruha +50 Aura yolladın.', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+        duration: const Duration(seconds: 3),
       ),
+    );
+  }
+
+  // (Mektup Geçmişi kaldırıldı - yerine direkt Mektup Yaz/Gönder eklendi)
+
+  // ── 3. Bağı Kes (Kalıcı Silme) ──
+  void _showDisconnectDialog() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (ctx, a1, a2) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, a1, a2, child) {
+        final curve = CurvedAnimation(parent: a1, curve: Curves.easeOutBack);
+        return Transform.scale(
+          scale: 0.85 + 0.15 * curve.value,
+          child: Opacity(
+            opacity: a1.value,
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 40), // Daha dar olması için padding
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25), // Bulanıklık
+                    child: Container(
+                      padding: const EdgeInsets.all(20), // Daha küçük iç boşluk
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.08),
+                            const Color(0xFFEF9A9A).withOpacity(0.03), // Çok hafif kırmızı yansıma
+                          ],
+                        ),
+                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.8),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(color: const Color(0xFFEF9A9A).withOpacity(0.15), shape: BoxShape.circle),
+                            child: const Icon(Icons.link_off_rounded, color: Color(0xFFEF9A9A), size: 24), // Daha küçük ikon
+                          ),
+                          const SizedBox(height: 12),
+                          const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)), // Daha küçük başlık
+                          const SizedBox(height: 8),
+                          Text(
+                            '${widget.name} ile arandaki kozmik bağı koparmak üzeresin. Arkadaş listenden silinecek.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 12, height: 1.4), // Daha küçük metin
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => Navigator.pop(ctx),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.06),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text('Vazgeç', style: TextStyle(color: Colors.white.withOpacity(0.8), fontWeight: FontWeight.w600, fontSize: 13)),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(ctx);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text('Bağ kalıcı olarak koparıldı.', style: TextStyle(color: Colors.white)), 
+                                        backgroundColor: const Color(0xFFEF9A9A).withOpacity(0.2), // Cam efekti tarzı hafif kırmızı
+                                        elevation: 0,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEF9A9A).withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: const Color(0xFFEF9A9A).withOpacity(0.3), width: 0.8),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text('Bağı Kopar', style: TextStyle(color: Color(0xFFEF9A9A), fontWeight: FontWeight.bold, fontSize: 13)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ),
+        );
+      },
     );
   }
 }
@@ -2954,14 +2193,12 @@ class _LetterPaper extends StatefulWidget {
   final String recipientEmoji;
   final Rect owlButtonRect;
   final Friend? friend;
-  final bool autoOpenCookie;
 
   const _LetterPaper({
     required this.recipientName,
     required this.recipientEmoji,
     required this.owlButtonRect,
     this.friend,
-    this.autoOpenCookie = false,
   });
 
   @override
@@ -3081,15 +2318,12 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     final collection = await StorageService.getCookieCollection();
     final owned = collection.where((c) => c.firstObtainedDate != null && c.countObtained > 0).toList();
     owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
-    if (mounted) {
-      setState(() {
-        _ownedCookies = owned;
-        if (widget.autoOpenCookie) {
-          _showCookiePicker = true;
-          _textFocusNode.unfocus();
-        }
-      });
-    }
+    // Test: sayıları x1, x2, x3 olarak sınırla
+    final capped = owned.asMap().entries.map((e) {
+      final cap = (e.key % 3) + 1; // 1, 2, 3, 1, 2, 3...
+      return e.value.copyWith(countObtained: cap);
+    }).toList();
+    if (mounted) setState(() => _ownedCookies = capped);
   }
 
   @override
@@ -3141,77 +2375,59 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
         });
       }
       if (!adWatched) return; // Kullanıcı Vazgeç dedi, gönderme
-      
-      // Reklam popup menüsünün (overlay) kapanma animasyonu 
-      // sırasınca bekle, ki asıl animasyon arkada yarılanmasın!
-      await Future.delayed(const Duration(milliseconds: 400));
     }
 
     // Mektup gönderimini kaydet
     await StorageService.recordLetterSent();
-    await StorageService.addPendingAura('baykus', 1);
+    await StorageService.addPendingAura('owl', 1);
 
-    try {
-      setState(() {
-        _isSending = true;
-        _isFolding = true;
-      });
+    setState(() {
+      _isSending = true;
+      _isFolding = true;
+    });
 
-      if (widget.friend != null) {
-        final service = SupabaseOwlService();
-        String? cookieName;
-        if (_selectedCookieId != null && _ownedCookies.isNotEmpty) {
-          final cookie = _ownedCookies.firstWhere(
-            (c) => c.id == _selectedCookieId,
-            orElse: () => CookieCard(id: _selectedCookieId!, name: 'Kurabiye', rarity: 'common', emoji: ''),
-          );
-          cookieName = cookie.name;
-        }
-
-        service.sendLetter(
-          toFriend: widget.friend!,
-          message: _textCtrl.text.trim(),
-          drawingStrokes: _strokes.isNotEmpty
-              ? _strokes.map((s) => s.map((o) => {'x': o.dx, 'y': o.dy}).toList()).toList()
-              : null,
-          attachedCookieId: _selectedCookieId,
-          attachedCookieName: cookieName,
-        );
-        
-        if (_selectedCookieId != null) {
-          await _deductCookie(_selectedCookieId!);
-        }
+    if (widget.friend != null) {
+      final service = MockOwlService();
+      final cookieName = _selectedCookieId != null
+          ? _ownedCookies.firstWhere((c) => c.id == _selectedCookieId, orElse: () => _ownedCookies.first).name
+          : null;
+      service.sendLetter(
+        toFriend: widget.friend!,
+        message: _textCtrl.text.trim(),
+        drawingStrokes: _strokes.isNotEmpty
+            ? _strokes.map((s) => s.map((o) => {'x': o.dx, 'y': o.dy}).toList()).toList()
+            : null,
+        attachedCookieId: _selectedCookieId,
+        attachedCookieName: cookieName,
+      );
+      if (_selectedCookieId != null) {
+        await _deductCookie(_selectedCookieId!);
       }
+    }
 
-      // Adım 1: Muhteşem origami katlama başlar
-      await _foldCtrl.forward().orCancel;
-      if (!mounted) return;
+    // Adım 1: Muhteşem origami katlama başlar
+    await _foldCtrl.forward().orCancel;
+    if (!mounted) return;
 
-      // Kısa bekleme — daha akıcı ve hızlı geçiş
-      await Future.delayed(const Duration(milliseconds: 50));
-      if (!mounted) return;
+    // Kısa bekleme — daha akıcı ve hızlı geçiş
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
 
-      // Adım 2: Mektup zarfa girer, kapak kapanır
-      setState(() => _isEnveloping = true);
-      await _envelopeCtrl.forward().orCancel;
-      if (!mounted) return;
+    // Adım 2: Mektup zarfa girer, kapak kapanır
+    setState(() => _isEnveloping = true);
+    await _envelopeCtrl.forward().orCancel;
+    if (!mounted) return;
 
-      // Adım 3: Zarf havada çok kısa asılı kalır ve sonra baykuşa uçar
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (!mounted) return;
-      
-      HapticFeedback.mediumImpact(); // Uçuşa geçerken hafif titreşim
-      await _sendCtrl.forward().orCancel;
+    // Adım 3: Zarf havada çok kısa asılı kalır ve sonra baykuşa uçar
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
+    
+    HapticFeedback.mediumImpact(); // Uçuşa geçerken hafif titreşim
+    await _sendCtrl.forward().orCancel;
 
-    } on TickerCanceled {
-      // Animasyon iptal edildiyse, sessizce çık.
-    } catch (e) {
-      debugPrint("Mektup animasyonu veya gönderim hatası: $e");
-    } finally {
-      // Animasyon tamamlandığında veya hata olduğunda paneli kapatıp mektup göndermeyi bitir
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
+    // Animasyon tamamlandığında paneli kapatıp mektup göndermeyi bitir
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 
@@ -3256,11 +2472,12 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         child: Text(
                           _textCtrl.text,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.kalam(
-                            color: const Color(0xFF4A3928),
-                            fontSize: 14,
+                          style: const TextStyle(
+                            color: Color(0xFF4A3928),
+                            fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            height: 1.4,
+                            fontFamily: 'Roboto',
+                            height: 1.6,
                             letterSpacing: 0.1,
                           ),
                         ),
@@ -3282,12 +2499,17 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
             right: 10, bottom: 8,
             child: Transform.scale(
               scale: 1.0,
-              child: SizedBox(
+              child: Container(
                 width: 44, height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.15),
+                  border: Border.all(color: (_cookieColorMap[_selectedCookieId!] ?? const Color(0xFFD4A574)).withOpacity(0.7), width: 1.5),
+                ),
                 child: Center(
                   child: _cookieImageMap[_selectedCookieId] != null
-                      ? Image.asset(_cookieImageMap[_selectedCookieId]!, width: 44, height: 44, fit: BoxFit.contain)
-                      : const Text('🥠', style: TextStyle(fontSize: 28)),
+                      ? Image.asset(_cookieImageMap[_selectedCookieId]!, width: 32, height: 32, fit: BoxFit.contain)
+                      : const Text('🥠', style: TextStyle(fontSize: 18)),
                 ),
               ),
             ),
@@ -3625,19 +2847,31 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                 child: Center(
                                   child: GestureDetector(
                                     onTap: () async {
-                                      // Play butonuna tıklandı — gerçek reklam göster
-                                      HapticFeedback.mediumImpact();
-                                      AdService().showRewardedAd(
-                                        () {
-                                          // Reklam izlendi, ödül kazanıldı
-                                          if (_adCompleter != null && !_adCompleter!.isCompleted) {
-                                            _adCompleter!.complete(true);
-                                          }
-                                        },
-                                        () {
-                                          // Reklam kapatıldı (dismiss)
-                                        },
-                                      );
+                                      // Play butonuna tıklandı
+                                      if (mounted) {
+                                        showGeneralDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          pageBuilder: (c, _, __) => Center(
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const CircularProgressIndicator(color: Color(0xFFFF8A3D)),
+                                                  const SizedBox(height: 16),
+                                                  Text('Reklam İzleniyor...', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        await Future.delayed(const Duration(milliseconds: 2500));
+                                        if (mounted) Navigator.of(context).pop(); // Spinner'ı kapat
+                                      }
+                                      if (_adCompleter != null && !_adCompleter!.isCompleted) {
+                                        _adCompleter!.complete(true);
+                                      }
                                     },
                                     child: TweenAnimationBuilder<double>(
                                       tween: Tween(begin: 0.0, end: 1.0),
@@ -3991,19 +3225,18 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                               maxLines: 5,
                                               minLines: 1,
                                               textAlign: TextAlign.center,
-                                              style: GoogleFonts.kalam(
-                                                color: const Color(0xFF4A3928),
-                                                fontSize: 14,
+                                              style: const TextStyle(
+                                                color: Color(0xFF4A3928),
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.w500,
-                                                height: 1.4,
+                                                height: 1.6,
                                                 letterSpacing: 0.1,
                                               ),
-                                              decoration: InputDecoration(
+                                              decoration: const InputDecoration(
                                                 hintText: 'Mektubunu yaz...',
-                                                hintStyle: GoogleFonts.kalam(
-                                                  color: const Color(0xFFB0A484),
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
+                                                hintStyle: TextStyle(
+                                                  color: Color(0xFFB0A484),
+                                                  fontSize: 13,
                                                 ),
                                                 border: InputBorder.none,
                                                 isDense: true,
@@ -4051,18 +3284,33 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                   },
                   child: _BouncingNode(
                     onTap: () => setState(() => _selectedCookieId = null),
-                    child: SizedBox(
+                    child: Container(
                       width: 44,
                       height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: stampColor.withOpacity(0.15),
+                        border: Border.all(
+                          color: stampColor.withOpacity(0.7),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: stampColor.withOpacity(0.25),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: Center(
                         child: _cookieImageMap[_selectedCookieId] != null
                             ? Image.asset(
                                 _cookieImageMap[_selectedCookieId]!,
-                                width: 44,
-                                height: 44,
+                                width: 32,
+                                height: 32,
                                 fit: BoxFit.contain,
                               )
-                            : const Text('🥠', style: TextStyle(fontSize: 28)),
+                            : const Text('🥠', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ),
@@ -4089,19 +3337,30 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         child: Center(
                           child: GestureDetector(
                             onTap: () async {
-                              // Play butonuna tıklandı — gerçek reklam göster
-                              HapticFeedback.mediumImpact();
-                              AdService().showRewardedAd(
-                                () {
-                                  // Reklam izlendi, ödül kazanıldı
-                                  if (_adCompleter != null && !_adCompleter!.isCompleted) {
-                                    _adCompleter!.complete(true);
-                                  }
-                                },
-                                () {
-                                  // Reklam kapatıldı (dismiss)
-                                },
-                              );
+                              if (mounted) {
+                                showGeneralDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  pageBuilder: (c, _, __) => Center(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const CircularProgressIndicator(color: Color(0xFFFF8A3D)),
+                                          const SizedBox(height: 16),
+                                          Text('Reklam İzleniyor...', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                await Future.delayed(const Duration(milliseconds: 2500));
+                                if (mounted) Navigator.of(context).pop();
+                              }
+                              if (_adCompleter != null && !_adCompleter!.isCompleted) {
+                                _adCompleter!.complete(true);
+                              }
                             },
                             child: TweenAnimationBuilder<double>(
                               tween: Tween(begin: 0.0, end: 1.0),
@@ -4347,17 +3606,15 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                           imgPath != null
                                               ? Image.asset(imgPath, width: 28, height: 28, fit: BoxFit.contain)
                                               : const Icon(Icons.stars_rounded, color: Colors.white54, size: 24),
-                                          if (cookie.countObtained > 1) ...[
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'x${cookie.countObtained}',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(0.4),
-                                                fontSize: 7,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'x${cookie.countObtained}',
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.4),
+                                              fontSize: 7,
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                          ],
+                                          ),
                                         ],
                                       ),
                                     ),
