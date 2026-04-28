@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
@@ -14,18 +15,27 @@ import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
 import '../widgets/glass_back_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'premium_paywall_page.dart';
-import 'welcome_screen.dart';
+import 'onboarding_page.dart';
 import 'notification_settings_page.dart';
 import 'home_page.dart';
-import 'onboarding_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
+import '../services/profile_sync_service.dart';
+import '../services/content_moderation_service.dart';
+import 'dart:async';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'package:image_cropper/image_cropper.dart';
 import '../widgets/cosmic_badge.dart';
-import '../services/mock_owl_service.dart';
+import 'cosmic_profile_page.dart';
+import '../services/supabase_owl_service.dart';
 import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
+import '../services/sound_service.dart';
+import '../services/analytics_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -47,6 +57,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   // ── Gerçek kullanıcı verileri ──
   String _userName = '';
+  String _userHandle = '';
   String _userAvatar = 'assets/images/owl.webp';
   int _unreadOwlCount = 0;
   int _totalCookies = 0;
@@ -62,7 +73,7 @@ class ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     loadUserData();
-    MockOwlService().addListener(_onMockOwlUpdate);
+    SupabaseOwlService().addListener(_onMockOwlUpdate);
   }
 
   void _onMockOwlUpdate() {
@@ -71,7 +82,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    MockOwlService().removeListener(_onMockOwlUpdate);
+    SupabaseOwlService().removeListener(_onMockOwlUpdate);
     super.dispose();
   }
 
@@ -88,6 +99,7 @@ class ProfilePageState extends State<ProfilePage> {
     if (!mounted) return;
     setState(() {
       _userName = (snapshot['userName'] as String?) ?? '';
+      _userHandle = (snapshot['userHandle'] as String?) ?? '';
       _totalCookies = (snapshot['totalCookies'] as int?) ?? 0;
       _totalTarots = tarotCount;
       _totalDreams = (snapshot['totalDreams'] as int?) ?? 0;
@@ -102,51 +114,57 @@ class ProfilePageState extends State<ProfilePage> {
 
     // Günlük Elite Ruh Taşlarını yenile (merkezi sistem)
     await StorageService.getSoulStones();
+    
+    // Segmentasyon için kullanıcı özelliklerini Analytics'e gönder
+    AnalyticsService().setUserProperty(name: 'user_level', value: _getUserLevel(Localizations.localeOf(context).languageCode).title);
+    AnalyticsService().setUserProperty(name: 'is_elite', value: _isPremiumUser.toString());
+    AnalyticsService().setUserProperty(name: 'streak_days', value: _streakDays.toString());
   }
 
-  // ── Kullanıcı seviyesi hesapla (Aura bazlı — 12 Ünvan) ──
-  // Her ünvan için özel ikon üretilecek (şimdilik Material Icon placeholder).
-  // Başlarda kolay, sonlara doğru katlanarak zorlaşan eşikler.
+  // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
+  // Emoji yerine Material Icon kullanıyoruz — her cihazda çalışır.
   ({IconData icon, Color color, String title}) _getUserLevel(String lang) {
+    // YENİ SİSTEM: Aura doğrudan eklentiler yerine, sadece toplanan (_bonusAura) havuzundan okunur.
     final int aura = _bonusAura;
     
     if (lang == 'tr') {
-      if (aura < 50)     return (icon: Icons.eco_rounded,                    color: const Color(0xFF4ADE80), title: 'Tohum');
-      if (aura < 150)    return (icon: Icons.nightlight_round,               color: const Color(0xFFFBBF24), title: 'Kıvılcım');
-      if (aura < 400)    return (icon: Icons.cloud_rounded,                  color: const Color(0xFF94A3B8), title: 'Sezgi');
-      if (aura < 1000)   return (icon: Icons.auto_awesome_rounded,           color: const Color(0xFFA78BFA), title: 'Alev');
-      if (aura < 2500)   return (icon: Icons.star_rounded,                   color: const Color(0xFF38BDF8), title: 'Yıldız');
-      if (aura < 5000)   return (icon: Icons.bedtime_rounded,                color: const Color(0xFFC084FC), title: 'Kahin');
-      if (aura < 10000)  return (icon: Icons.visibility_rounded,             color: const Color(0xFFF97316), title: 'Büyücü');
-      if (aura < 18000)  return (icon: Icons.diamond_rounded,                color: const Color(0xFFE879F9), title: 'Bilge');
-      if (aura < 30000)  return (icon: Icons.remove_red_eye_rounded,         color: const Color(0xFF6366F1), title: 'Gölge');
-      if (aura < 50000)  return (icon: Icons.bolt_rounded,                   color: const Color(0xFFEC4899), title: 'Üstat');
-      if (aura < 100000) return (icon: Icons.whatshot_rounded,               color: const Color(0xFFF43F5E), title: 'Efsane');
-      return             (icon: Icons.workspace_premium_rounded,             color: const Color(0xFFFFD700), title: 'Kozmik');
+      if (aura < 51) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Acemi Kahin');
+      if (aura < 151) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Çırak Kahin');
+      if (aura < 301) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Kahin');
+      if (aura < 601) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Bilge Kahin');
+      if (aura < 1001) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Usta Kahin');
+      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Kozmik Kahin');
     } else {
-      if (aura < 50)     return (icon: Icons.eco_rounded,                    color: const Color(0xFF4ADE80), title: 'Seed');
-      if (aura < 150)    return (icon: Icons.nightlight_round,               color: const Color(0xFFFBBF24), title: 'Spark');
-      if (aura < 400)    return (icon: Icons.cloud_rounded,                  color: const Color(0xFF94A3B8), title: 'Sense');
-      if (aura < 1000)   return (icon: Icons.auto_awesome_rounded,           color: const Color(0xFFA78BFA), title: 'Flame');
-      if (aura < 2500)   return (icon: Icons.star_rounded,                   color: const Color(0xFF38BDF8), title: 'Star');
-      if (aura < 5000)   return (icon: Icons.bedtime_rounded,                color: const Color(0xFFC084FC), title: 'Seer');
-      if (aura < 10000)  return (icon: Icons.visibility_rounded,             color: const Color(0xFFF97316), title: 'Mage');
-      if (aura < 18000)  return (icon: Icons.diamond_rounded,                color: const Color(0xFFE879F9), title: 'Sage');
-      if (aura < 30000)  return (icon: Icons.remove_red_eye_rounded,         color: const Color(0xFF6366F1), title: 'Shadow');
-      if (aura < 50000)  return (icon: Icons.bolt_rounded,                   color: const Color(0xFFEC4899), title: 'Master');
-      if (aura < 100000) return (icon: Icons.whatshot_rounded,               color: const Color(0xFFF43F5E), title: 'Legend');
-      return             (icon: Icons.workspace_premium_rounded,             color: const Color(0xFFFFD700), title: 'Cosmic');
+      if (aura < 51) return (icon: Icons.eco_rounded, color: const Color(0xFF4ADE80), title: 'Novice Seer');
+      if (aura < 151) return (icon: Icons.local_fire_department_rounded, color: const Color(0xFFFBBF24), title: 'Apprentice Seer');
+      if (aura < 301) return (icon: Icons.auto_awesome_rounded, color: const Color(0xFFA78BFA), title: 'Seer');
+      if (aura < 601) return (icon: Icons.visibility_rounded, color: const Color(0xFF38BDF8), title: 'Wise Seer');
+      if (aura < 1001) return (icon: Icons.bolt_rounded, color: const Color(0xFFF97316), title: 'Master Seer');
+      return (icon: Icons.workspace_premium_rounded, color: const Color(0xFFFFD700), title: 'Cosmic Seer');
     }
   }
 
   // ── İsim & Profil Düzenleme ──
   void _editProfile() {
-    final controller = TextEditingController(text: _userName);
+    final nameController = TextEditingController(text: _userName);
     final lang = Localizations.localeOf(context).languageCode;
     String selectedAvatar = _userAvatar;
 
     final avatars = [
-      'assets/images/owl.png',
+      (!_userAvatar.startsWith('http') && !_userAvatar.startsWith('assets')) ? _userAvatar : 'gallery',
+      // 12 adet Kozmik Hazır Avatar
+      'assets/images/avatars/avatar_1.png',
+      'assets/images/avatars/avatar_2.png',
+      'assets/images/avatars/avatar_3.png',
+      'assets/images/avatars/avatar_4.png',
+      'assets/images/avatars/avatar_5.png',
+      'assets/images/avatars/avatar_6.png',
+      'assets/images/avatars/avatar_7.png',
+      'assets/images/avatars/avatar_8.png',
+      'assets/images/avatars/avatar_9.png',
+      'assets/images/avatars/avatar_10.png',
+      'assets/images/avatars/avatar_11.png',
+      'assets/images/avatars/avatar_12.png',
     ];
 
     showModalBottomSheet(
@@ -154,6 +172,7 @@ class ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {
+        bool _isSaving = false;
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             return Padding(
@@ -171,10 +190,12 @@ class ProfilePageState extends State<ProfilePage> {
                       border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
                     ),
                     padding: const EdgeInsets.fromLTRB(28, 16, 28, 36),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                         Center(
                           child: Container(
                             width: 48,
@@ -220,16 +241,67 @@ class ProfilePageState extends State<ProfilePage> {
                               final avatar = avatars[index];
                               final isSelected = avatar == selectedAvatar;
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   HapticFeedback.selectionClick();
-                                  setModalState(() => selectedAvatar = avatar);
+                                  if (index == 0) {
+                                    try {
+                                      final picker = ImagePicker();
+                                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                      if (pickedFile != null) {
+                                        final croppedFile = await ImageCropper().cropImage(
+                                          sourcePath: pickedFile.path,
+                                          aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+                                          compressQuality: 85,
+                                          uiSettings: [
+                                            AndroidUiSettings(
+                                                toolbarTitle: 'Kozmik Kesim',
+                                                toolbarColor: AppColors.bgDark1,
+                                                toolbarWidgetColor: Colors.white,
+                                                initAspectRatio: CropAspectRatioPreset.square,
+                                                cropStyle: CropStyle.circle,
+                                                lockAspectRatio: true),
+                                            IOSUiSettings(
+                                              title: 'Kozmik Kesim',
+                                              cancelButtonTitle: 'İptal',
+                                              doneButtonTitle: 'Tamam',
+                                              cropStyle: CropStyle.circle,
+                                              aspectRatioLockEnabled: true,
+                                              resetAspectRatioEnabled: false,
+                                              rotateButtonsHidden: true,
+                                              rotateClockwiseButtonHidden: true,
+                                              aspectRatioPickerButtonHidden: true,
+                                            ),
+                                          ],
+                                        );
+
+                                        if (croppedFile != null) {
+                                          setModalState(() {
+                                            selectedAvatar = croppedFile.path;
+                                            avatars[0] = croppedFile.path;
+                                          });
+                                        } else {
+                                          if (avatars[0] != 'gallery') {
+                                            setModalState(() => selectedAvatar = avatars[0]);
+                                          }
+                                        }
+                                      } else {
+                                        if (avatars[0] != 'gallery') {
+                                          setModalState(() => selectedAvatar = avatars[0]);
+                                        }
+                                      }
+                                    } catch (e) {
+                                      debugPrint('Image pick error: \$e');
+                                    }
+                                  } else {
+                                    setModalState(() => selectedAvatar = avatar);
+                                  }
                                 },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeOutCubic,
                                   margin: const EdgeInsets.only(right: 20),
-                                  width: isSelected ? 104 : 90,
-                                  height: isSelected ? 104 : 90,
+                                  width: 96,
+                                  height: 96,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
@@ -264,17 +336,58 @@ class ProfilePageState extends State<ProfilePage> {
                                       padding: EdgeInsets.all(
                                         avatar.contains('owl')
                                             ? (isSelected ? 2.0 : 6.0)
-                                            : avatar.contains('cookies')
-                                                ? (isSelected ? 16.0 : 20.0)
-                                                : 0.0,
+                                            : 0.0,
                                       ),
                                       child: Transform.scale(
-                                        scale: avatar.contains('owl') ? 1.35 : 1.0,
-                                        child: Image.asset(
-                                          avatar,
-                                          fit: (avatar.contains('cookies') || avatar.contains('owl'))
-                                              ? BoxFit.contain
-                                              : BoxFit.cover,
+                                        scale: avatar.contains('owl') 
+                                            ? 1.35 
+                                            : (avatar.contains('avatar_') ? 1.15 : 1.0),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            if (avatar == 'gallery')
+                                              Icon(Icons.add_photo_alternate_rounded, color: Colors.white.withOpacity(0.5), size: 36)
+                                            else if (avatar.startsWith('http'))
+                                              Image.network(
+                                                avatar,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) => Icon(
+                                                  Icons.person_rounded,
+                                                  color: Colors.white.withOpacity(0.3),
+                                                  size: 40,
+                                                ),
+                                              )
+                                            else if (avatar.startsWith('assets'))
+                                              Image.asset(
+                                                avatar,
+                                                fit: avatar.contains('owl')
+                                                    ? BoxFit.contain
+                                                    : BoxFit.cover,
+                                              )
+                                            else
+                                              Image.file(
+                                                File(avatar),
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) => Icon(
+                                                  Icons.person_rounded,
+                                                  color: Colors.white.withOpacity(0.3),
+                                                  size: 40,
+                                                ),
+                                              ),
+                                              
+                                            // Ön İzleme üstündeki minik galeri butonu işareti (1. Sıra ise)
+                                            if (index == 0 && avatar != 'gallery')
+                                              Container(
+                                                color: Colors.black.withOpacity(0.35),
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.cameraswitch_rounded,
+                                                    color: Colors.white.withOpacity(0.8),
+                                                    size: 26,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -295,7 +408,7 @@ class ProfilePageState extends State<ProfilePage> {
                             border: Border.all(color: Colors.white.withOpacity(0.1)),
                           ),
                           child: TextField(
-                            controller: controller,
+                            controller: nameController,
                             style: const TextStyle(color: Colors.white, fontSize: 16),
                             cursorColor: AppColors.primaryOrange,
                             decoration: InputDecoration(
@@ -307,43 +420,142 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 12),
+
+                        // @Handle — Salt Okunur (Onboarding'de belirleniyor)
+                        Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.02),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white.withOpacity(0.06)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.alternate_email_rounded, color: Colors.white.withOpacity(0.25), size: 22),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _userHandle.isNotEmpty
+                                      ? _userHandle
+                                      : '@${_userName.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.35),
+                                    fontSize: 15,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ),
+                              Icon(Icons.lock_outline_rounded, color: Colors.white.withOpacity(0.15), size: 16),
+                            ],
+                          ),
+                        ),
+
                         const SizedBox(height: 24),
                         
                         // Kaydet Butonu
                         GestureDetector(
-                          onTap: () async {
+                          onTap: _isSaving ? null : () async {
                             HapticFeedback.mediumImpact();
                             
-                            final newName = controller.text.trim();
+                            setModalState(() => _isSaving = true);
+                            
+                            final newName = nameController.text.trim();
+                            String finalAvatarToSave = selectedAvatar;
+                            
+                            // Eğer lokalden bir resim seçilmişse (URL/Asset değilse) Yapay Zeka denetimden geçir ve Supabase'e yükle
+                            if (!selectedAvatar.startsWith('http') && !selectedAvatar.startsWith('assets')) {
+                               final imageFile = File(selectedAvatar);
+
+                               // 1. YAPAY ZEKA GÜVENLİK KONTROLÜ
+                               final moderationResult = await ContentModerationService().analyzeImage(imageFile);
+                               
+                               if (moderationResult != ModerationResult.approved) {
+                                 final errorMessage = ContentModerationService().getErrorMessage(moderationResult);
+                                 setModalState(() => _isSaving = false);
+                                 
+                                 ScaffoldMessenger.of(context).showSnackBar(
+                                   SnackBar(
+                                     content: Row(
+                                       children: [
+                                         const Icon(Icons.shield_rounded, color: Colors.orangeAccent),
+                                         const SizedBox(width: 12),
+                                         Expanded(
+                                           child: Text(
+                                             errorMessage,
+                                             style: const TextStyle(color: Colors.white, fontSize: 13),
+                                           ),
+                                         ),
+                                       ],
+                                     ),
+                                     backgroundColor: const Color(0xFF1E1E2A),
+                                     behavior: SnackBarBehavior.floating,
+                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                   ),
+                                 );
+                                 return; // İŞLEMİ İPTAL ET (Asla Buluta Çıkartma!)
+                               }
+
+                               // 2. ONAYLANDI -> BULUTA YÜKLE
+                               final publicUrl = await ProfileSyncService().uploadAvatar(imageFile);
+                               if (publicUrl != null) {
+                                   finalAvatarToSave = publicUrl;
+                               } else {
+                                  // YÜKLEME BAŞARISIZ OLDU! Geçici dosyayı kaydetmeyi engelle.
+                                  if (mounted) {
+                                    setModalState(() => _isSaving = false);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.'),
+                                        backgroundColor: Colors.redAccent,
+                                      )
+                                    );
+                                  }
+                                  return;
+                               }
+                            }
+                            
                             if (newName.isNotEmpty) {
                               await StorageService.setUserName(newName);
                             }
-                            await StorageService.setAvatar(selectedAvatar);
+                            await StorageService.setAvatar(finalAvatarToSave);
+                            
+                            // SUPABASE BULUTUNA SENKRONİZE ET
+                            await ProfileSyncService().syncProfileData(
+                                userName: newName.isNotEmpty ? newName : _userName,
+                                userHandle: _userHandle,
+                                avatarUrl: finalAvatarToSave,
+                            );
 
                             if (mounted) {
                               setState(() {
-                                _userAvatar = selectedAvatar;
+                                _userAvatar = finalAvatarToSave;
                                 if (newName.isNotEmpty) {
                                   _userName = newName;
                                 }
                               });
+                              AnalyticsService().logAvatarChanged();
                             }
-                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (ctx.mounted) {
+                              Navigator.pop(ctx);
+                            }
                           },
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
                             width: double.infinity,
                             height: 60,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(22),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.primaryOrange,
-                                  Color(0xFFFF7A00),
-                                ],
+                              gradient: LinearGradient(
+                                colors: _isSaving 
+                                  ? [Colors.grey.shade800, Colors.grey.shade900]
+                                  : [AppColors.primaryOrange, const Color(0xFFFF7A00)],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
-                              boxShadow: [
+                              boxShadow: _isSaving ? [] : [
                                 BoxShadow(
                                   color: AppColors.primaryOrange.withOpacity(0.4),
                                   blurRadius: 20,
@@ -352,25 +564,31 @@ class ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                             child: Center(
-                              child: Text(
-                                lang == 'tr' ? 'Mührü Onayla' : 'Seal Profile',
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: 0.6,
-                                ),
-                              ),
+                              child: _isSaving 
+                                ? const SizedBox(
+                                    width: 24, height: 24,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                  )
+                                : Text(
+                                    lang == 'tr' ? 'Mührü Onayla' : 'Seal Profile',
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      letterSpacing: 0.6,
+                                    ),
+                                  ),
                             ),
                           ),
                         ),
 
                       ],
                     ),
-                  ),
-                ),
-              ),
-            );
+                  ), // end SingleChildScrollView
+                ), // end Container
+              ), // end BackdropFilter
+            ), // end ClipRRect
+            ); // end Padding
           },
         );
       },
@@ -425,209 +643,12 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   // ── Kozmik Harita (Otomatik Burç Hesaplayıcı) ──
-  void _openCosmicChart() async {
-    final lang = Localizations.localeOf(context).languageCode;
-    final savedBirthDate = await StorageService.getBirthDate();
-
-    if (!mounted) return;
-
-    DateTime? currentBirthDate = savedBirthDate;
-
-    String getWesternZodiac(DateTime? d) {
-      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
-      final month = d.month;
-      final day = d.day;
-      final signs = lang == 'tr'
-          ? ['Oğlak', 'Kova', 'Balık', 'Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak']
-          : ['Capricorn', 'Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'];
-      const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
-      return day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+  Future<void> _openCosmicChart() async {
+    HapticFeedback.lightImpact();
+    final result = await Navigator.push(context, SwipeFadePageRoute(page: const CosmicProfilePage()));
+    if (result == true && mounted) {
+      await loadUserData();
     }
-
-    String getChineseZodiac(DateTime? d) {
-      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
-      final animals = lang == 'tr'
-          ? ['Fare', 'Öküz', 'Kaplan', 'Tavşan', 'Ejderha', 'Yılan', 'At', 'Keçi', 'Maymun', 'Horoz', 'Köpek', 'Domuz']
-          : ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
-      // Very basic approximation: (Year - 4) % 12
-      return animals[(d.year - 4) % 12];
-    }
-
-    String getMayanZodiac(DateTime? d) {
-      if (d == null) return lang == 'tr' ? 'Sır' : 'Secret';
-      final mayanSigns = lang == 'tr'
-          ? ['Timsah', 'Rüzgar', 'Gece', 'Tohum', 'Yılan', 'Ölüm', 'Geyik', 'Yıldız', 'Su', 'Köpek', 'Maymun', 'Yol', 'Saz', 'Jaguar', 'Kartal', 'Baykuş', 'Toprak', 'Ayna', 'Fırtına', 'Güneş']
-          : ['Crocodile', 'Wind', 'Night', 'Seed', 'Serpent', 'Death', 'Deer', 'Star', 'Water', 'Dog', 'Monkey', 'Road', 'Reed', 'Jaguar', 'Eagle', 'Owl', 'Earth', 'Mirror', 'Storm', 'Sun'];
-      // Just a pseudo-calculation for fun, a real Tzolk'in requires complex math
-      final pseudoIndex = (d.month * d.day + d.year) % 20;
-      return mayanSigns[pseudoIndex];
-    }
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setModalState) {
-            return Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF16151A).withOpacity(0.85),
-                    const Color(0xFF0D0C11).withOpacity(0.95),
-                  ],
-                ),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
-              ),
-              padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 48,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  Text(
-                    lang == 'tr' ? 'Kozmik Haritan' : 'Cosmic Chart',
-                    style: const TextStyle(
-                      color: AppColors.textWhite,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    lang == 'tr'
-                        ? 'Dünyaya iniş tarihini gir, evrensel sırlarını çözelim.'
-                        : 'Enter your arrival date, let cosmos reveal your secrets.',
-                    style: TextStyle(
-                      color: AppColors.textWhite.withOpacity(0.5),
-                      fontSize: 14,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  
-                  // Doğum Tarihi Seçici Row
-                  _SettingsRow(
-                    icon: Icons.calendar_month_rounded,
-                    label: lang == 'tr' ? 'Dünyaya İniş' : 'Arrival Date',
-                    value: currentBirthDate == null
-                        ? (lang == 'tr' ? 'Belirle' : 'Set Date')
-                        : '${currentBirthDate!.day.toString().padLeft(2, '0')}.${currentBirthDate!.month.toString().padLeft(2, '0')}.${currentBirthDate!.year}',
-                    onTap: () async {
-                      HapticFeedback.lightImpact();
-                      final picked = await showDatePicker(
-                        context: ctx,
-                        initialDate: currentBirthDate ?? DateTime(2000, 1, 1),
-                        firstDate: DateTime(1920),
-                        lastDate: DateTime.now(),
-                        builder: (context, child) {
-                          return Theme(
-                            data: ThemeData.dark().copyWith(
-                              colorScheme: const ColorScheme.dark(
-                                primary: AppColors.primaryOrange,
-                                surface: Color(0xFF0F1F2A),
-                              ),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (picked != null) {
-                        await StorageService.setBirthDate(picked);
-                        await StorageService.setZodiacSign(getWesternZodiac(picked));
-                        setModalState(() => currentBirthDate = picked);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Kozmik Sonuçlar (Only show if date is selected)
-                  if (currentBirthDate != null)
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      ),
-                      child: Column(
-                        children: [
-                          _buildZodiacInfo(
-                            icon: Icons.auto_awesome_rounded,
-                            title: lang == 'tr' ? 'Batı Astrolojisi' : 'Western Zodiac',
-                            value: getWesternZodiac(currentBirthDate),
-                            color: const Color(0xFFC084FC),
-                          ),
-                          const Divider(height: 32, color: Colors.white10),
-                          _buildZodiacInfo(
-                            icon: Icons.pentagon_rounded,
-                            title: lang == 'tr' ? 'Çin Burcu' : 'Chinese Zodiac',
-                            value: getChineseZodiac(currentBirthDate),
-                            color: const Color(0xFFFF6B6B),
-                          ),
-                          const Divider(height: 32, color: Colors.white10),
-                          _buildZodiacInfo(
-                            icon: Icons.light_mode_rounded,
-                            title: lang == 'tr' ? 'Maya İşareti' : 'Mayan Sign',
-                            value: getMayanZodiac(currentBirthDate),
-                            color: const Color(0xFF2DD4BF),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildZodiacInfo({required IconData icon, required String title, required String value, required Color color}) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   // ── Yardım merkezi ──
@@ -683,6 +704,391 @@ info@crackandwish.com''',
     );
   }
 
+  // ── Davet Et & Kazan Sistemi Modalı ──
+  void _showInviteModal() {
+    final lang = Localizations.localeOf(context).languageCode;
+    HapticFeedback.heavyImpact();
+    
+    // Geçici sahte kod üretimi (ileride Supabase'den gerçek kod çekilecek)
+    final inviteCode = _userName.trim().isNotEmpty 
+        ? '${_userName.trim().toUpperCase()}-777' 
+        : 'MYSTIC-777';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF16151A).withOpacity(0.95),
+                  const Color(0xFF0D0C11).withOpacity(0.98),
+                ],
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE879F9).withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.group_add_rounded, color: Color(0xFFE879F9), size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lang == 'tr' ? 'Bağlarını Güçlendir' : 'Strengthen Bonds',
+                            style: const TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            lang == 'tr'
+                                ? 'Kozmik evreni arkadaşlarınla büyüt.'
+                                : 'Expand the cosmic universe with friends.',
+                            style: TextStyle(
+                              color: AppColors.textWhite.withOpacity(0.5),
+                              fontSize: 14,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 36),
+                
+                // Senin Davet Kodun Bölümü
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFE879F9).withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            lang == 'tr' ? 'Ritüel Kodun' : 'Ritual Code',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.diamond_rounded, color: Color(0xFF60A5FA), size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                lang == 'tr' ? '+2 Ruh Taşı Kazan' : 'Earn +2 Soul Stones',
+                                style: const TextStyle(
+                                  color: Color(0xFF60A5FA),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white.withOpacity(0.08)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              inviteCode,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                Clipboard.setData(ClipboardData(text: inviteCode));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      lang == 'tr' ? 'Kod kopyalandı!' : 'Code copied!',
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: const Color(0xFFE879F9),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE879F9).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.copy_rounded, color: Color(0xFFE879F9), size: 18),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Paylaş Butonu
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Share.share(
+                            lang == 'tr'
+                                ? 'Crack&Wish evrenine katıl! ✨\nRitüel Kodum: $inviteCode\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com'
+                                : 'Join the Crack&Wish universe! ✨\nMy Ritual Code: $inviteCode\n\nEnter this code to earn +1 Soul Stone, +50 Aura, and a surprise Premium Cookie!\nhttps://crackandwish.com',
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC084FC), Color(0xFFE879F9)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.share_rounded, color: Colors.white, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  lang == 'tr' ? 'Kodu Paylaş' : 'Share Code',
+                                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                  // Removed code entering section since it's "coming soon"
+              ],
+            ),
+          ),
+        );
+      },
+      useSafeArea: true,
+    );
+  }
+
+  // ── Bağlı e-posta adresini al ──
+  String _getConnectedEmail() {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null && user.email != null && user.email!.isNotEmpty) {
+        final email = user.email!;
+        // E-postayı kısalt: sa***@gmail.com
+        final parts = email.split('@');
+        if (parts.length == 2 && parts[0].length > 2) {
+          return '${parts[0].substring(0, 2)}***@${parts[1]}';
+        }
+        return email;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  // ── Kozmik bilgi düzenleme ──
+
+
+  String _calculateZodiacFromDate(DateTime date) {
+    final int d = date.day;
+    final int m = date.month;
+    if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) return 'aries';
+    if ((m == 4 && d >= 20) || (m == 5 && d <= 20)) return 'taurus';
+    if ((m == 5 && d >= 21) || (m == 6 && d <= 20)) return 'gemini';
+    if ((m == 6 && d >= 21) || (m == 7 && d <= 22)) return 'cancer';
+    if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) return 'leo';
+    if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) return 'virgo';
+    if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) return 'libra';
+    if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) return 'scorpio';
+    if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) return 'sagittarius';
+    if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return 'capricorn';
+    if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return 'aquarius';
+    return 'pisces';
+  }
+
+  // ── Hesap silme ──
+  void _deleteAccount() {
+    final lang = Localizations.localeOf(context).languageCode;
+    HapticFeedback.heavyImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              height: 310,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+              ),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40, height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    width: 60, height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF2D55).withOpacity(0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.delete_forever_rounded, color: Color(0xFFFF2D55), size: 28),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    lang == 'tr' ? 'Hesabı Sil' : 'Delete Account',
+                    style: const TextStyle(color: AppColors.textWhite, fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 40,
+                    child: Text(
+                      lang == 'tr'
+                          ? 'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.'
+                          : 'All your data will be deleted.\nThis action cannot be undone.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.textWhite.withOpacity(0.5), fontSize: 13, height: 1.4),
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(ctx),
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            ),
+                            child: Center(
+                              child: Text(
+                                lang == 'tr' ? 'Vazgeç' : 'Cancel',
+                                style: const TextStyle(color: AppColors.textWhite, fontSize: 15, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            Navigator.pop(ctx);
+                            try { 
+                              // 1. Önce buluttan kullanıcının kendi data'sını kalıcı sil (Postgres RPC)
+                              await Supabase.instance.client.rpc('delete_user');
+                              // 2. Auth statüsünü temizle
+                              await Supabase.instance.client.auth.signOut(); 
+                            } catch (e) { 
+                              debugPrint("Delete Account Error: $e");
+                            }
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.clear();
+                            if (mounted) {
+                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const OnboardingPage(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
+                            }
+                          },
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF2D55),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: Text(
+                                lang == 'tr' ? 'Hesabı Sil' : 'Delete',
+                                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // ── Çıkış yap ──
   void _signOut() {
     final lang = Localizations.localeOf(context).languageCode;
@@ -691,140 +1097,109 @@ info@crackandwish.com''',
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1F2A),
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              height: 310,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
               ),
-              const SizedBox(height: 24),
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF4D4D).withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.logout_rounded,
-                  color: Color(0xFFFF4D4D),
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
-                style: const TextStyle(
-                  color: AppColors.textWhite,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                lang == 'tr'
-                    ? 'Hesabından çıkış yapmak istediğine emin misin?'
-                    : 'Are you sure you want to sign out?',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textWhite.withOpacity(0.5),
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(ctx),
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            lang == 'tr' ? 'Vazgeç' : 'Cancel',
-                            style: const TextStyle(
-                              color: AppColors.textWhite,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+                  Center(
+                    child: Container(
+                      width: 40, height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        Navigator.pop(ctx);
-                        
-                        // Clear Supabase session if any
-                        try {
-                          await Supabase.instance.client.auth.signOut();
-                        } catch(e) {
-                          debugPrint("SignOut Error: $e");
-                        }
-                        
-                        // Reset Welcome state
-                        await StorageService.setHasSeenWelcome(false);
-                        
-                        // Navigate to WelcomeScreen and reset stack
-                        if (mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => const WelcomeScreen(),
-                              transitionsBuilder: (_, anim, __, child) =>
-                                  FadeTransition(opacity: anim, child: child),
-                              transitionDuration: const Duration(milliseconds: 600),
+                  const Spacer(),
+                  Container(
+                    width: 60, height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF4D4D).withOpacity(0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.logout_rounded, color: Color(0xFFFF4D4D), size: 28),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                    style: const TextStyle(color: AppColors.textWhite, fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 40,
+                    child: Text(
+                      lang == 'tr'
+                          ? 'Hesap oturumundan çıkış yapmak\nüzere olduğundan emin misin?'
+                          : 'Are you sure you want to sign out\nof your active account session?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.textWhite.withOpacity(0.5), fontSize: 13, height: 1.4),
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(ctx),
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
                             ),
-                            (route) => false,
-                          );
-                        }
-                      },
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF4D4D),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Center(
-                          child: Text(
-                            lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                            child: Center(
+                              child: Text(
+                                lang == 'tr' ? 'Vazgeç' : 'Cancel',
+                                style: const TextStyle(color: AppColors.textWhite, fontSize: 15, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            Navigator.pop(ctx);
+                            try { await Supabase.instance.client.auth.signOut(); } catch(e) { debugPrint("SignOut Error: $e"); }
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.clear();
+                            if (mounted) {
+                              Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(pageBuilder: (_, __, ___) => const OnboardingPage(), transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child), transitionDuration: const Duration(milliseconds: 600)), (route) => false);
+                            }
+                          },
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF4D4D),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: Text(
+                                lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -832,44 +1207,181 @@ info@crackandwish.com''',
   }
 
   // ── Gizlilik Politikası ──
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        debugPrint('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Launch URL error: $e');
+    }
+  }
+
   void _openPrivacyPolicy() {
     final lang = Localizations.localeOf(context).languageCode;
+    _launchURL("https://crackwish.com/privacy.html#$lang");
+    return;
     _showLegalSheet(
       title: lang == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
       content: lang == 'tr'
           ? '''Crack&Wish Gizlilik Politikası
-Son güncelleme: Nisan 2026
+Son güncelleme: 23 Nisan 2026
 
-1. Toplanan Veriler
-Crack&Wish, kullanıcı verilerini cihazınızda yerel olarak saklar. Kurabiye geçmişi, rüya kayıtları, tarot okumaları ve kullanıcı tercihleri yalnızca cihazınızda tutulur.
+Bu gizlilik politikası, Crack&Wish mobil uygulamasının ("Uygulama") kişisel verilerinizi nasıl topladığını, kullandığını, sakladığını ve koruduğunu açıklar.
 
-2. Veri Paylaşımı
-Kişisel verileriniz üçüncü taraflarla paylaşılmaz. Rüya analizi için anonim olarak AI servislerine metin gönderilir; bu metinler saklanmaz.
+1. TOPLANAN VERİLER
 
-3. Çerezler ve İzleme
-Uygulama çerez kullanmaz ve kullanıcı davranışlarını izlemez.
+1.1 Hesap Verileri
+Google veya Apple hesabınızla giriş yaptığınızda; adınız, e-posta adresiniz ve benzersiz kullanıcı kimliğiniz (User ID) Supabase altyapısında güvenle saklanır.
 
-4. Veri Güvenliği
-Verileriniz cihazınızın yerel depolama alanında şifreli olarak saklanır.
+1.2 Profil Verileri
+Kullanıcı adınız (@handle), doğum tarihiniz, burç bilginiz, doğum yeriniz ve seçtiğiniz profil fotoğrafı bulut sunucularımızda depolanır.
 
-5. İletişim
+1.3 Uygulama İçi Veriler
+Kurabiye falları, rüya kayıtları, tarot okumaları, ruh taşı bakiyesi ve ayarlarınız öncelikle cihazınızda yerel olarak saklanır. Giriş yaptığınızda bu veriler Supabase bulut sunucusuna şifreli olarak yedeklenir.
+
+1.4 Sosyal Veriler
+Arkadaş istekleri, kabul edilen bağlantılar ve Baykuş Postası (Owl Letter) mektupları Supabase veritabanında saklanır. Mektup içerikleri yalnızca gönderen ve alıcı tarafından görüntülenebilir.
+
+1.5 Profil Fotoğrafı
+Yüklediğiniz profil fotoğrafları, uygunsuz içerik tespiti için yapay zeka tabanlı içerik moderasyon sisteminden geçirilir. Uygun bulunan fotoğraflar Supabase Storage'da saklanır.
+
+1.6 Rüya Analizi
+Rüya metinleriniz analiz için Google Gemini AI servisine anonim olarak gönderilir. Gönderilen metinler kullanıcı kimliğinizle ilişkilendirilmez ve AI servisi tarafından kalıcı olarak saklanmaz.
+
+1.7 Rehber Erişimi
+Arkadaş bulma özelliği için cihaz rehberinize erişim izni istenebilir. Rehber verileri yalnızca eşleşme amacıyla kullanılır ve sunucularımızda saklanmaz.
+
+2. VERİ KULLANIMI
+
+Verileriniz yalnızca şu amaçlarla kullanılır:
+• Hesap yönetimi ve kimlik doğrulama
+• Bulut senkronizasyonu (cihaz değişikliğinde verilerinizi koruma)
+• Sosyal özellikler (arkadaşlık, mektup gönderme)
+• Rüya analizi ve kişiselleştirilmiş yorumlar
+• Uygulama içi satın alma işlemleri (RevenueCat)
+• Reklam gösterimi (Google AdMob)
+
+3. ÜÇÜNCÜ TARAF HİZMETLER
+
+Uygulama şu üçüncü taraf hizmetleri kullanır:
+• Supabase: Veritabanı, kimlik doğrulama ve dosya depolama
+• Google Gemini AI: Rüya analizi
+• Google AdMob: Reklam gösterimi
+• RevenueCat: Abonelik yönetimi
+• Google/Apple Sign-In: Kimlik doğrulama
+
+Her hizmet sağlayıcı kendi gizlilik politikasına tabidir.
+
+4. VERİ GÜVENLİĞİ
+
+• Tüm veri iletişimi HTTPS/TLS şifreleme ile korunur.
+• Supabase veritabanı Row Level Security (RLS) ile korunmaktadır.
+• Her kullanıcı yalnızca kendi verilerine erişebilir.
+• Profil fotoğrafları içerik moderasyonundan geçirilir.
+
+5. VERİ SAKLAMA SÜRESİ
+
+Verileriniz hesabınız aktif olduğu sürece saklanır. Hesabınızı sildiğinizde tüm verileriniz (profil, mektuplar, arkadaşlıklar, bulut yedekleri) kalıcı olarak silinir.
+
+6. KULLANICI HAKLARI
+
+Aşağıdaki haklara sahipsiniz:
+• Verilerinize erişim talep etme
+• Verilerinizin düzeltilmesini isteme
+• Hesabınızı ve tüm verilerinizi silme (Profil → Hesabı Sil)
+• Bildirim tercihlerini değiştirme
+
+7. ÇOCUKLARIN GİZLİLİĞİ
+
+Crack&Wish 13 yaş altı kullanıcılara yönelik değildir. Bilerek 13 yaş altı kullanıcılardan veri toplamayız.
+
+8. DEĞİŞİKLİKLER
+
+Bu politika gerektiğinde güncellenebilir. Önemli değişikliklerde uygulama içi bildirim yapılır.
+
+9. İLETİŞİM
+
 Sorularınız için: info@crackandwish.com'''
           : '''Crack&Wish Privacy Policy
-Last updated: April 2026
+Last updated: April 23, 2026
 
-1. Data Collection
-Crack&Wish stores user data locally on your device. Cookie history, dream entries, tarot readings, and preferences are kept only on your device.
+This privacy policy explains how the Crack&Wish mobile application ("App") collects, uses, stores, and protects your personal data.
 
-2. Data Sharing
-Your personal data is not shared with third parties. For dream analysis, anonymous text is sent to AI services; these texts are not stored.
+1. DATA COLLECTED
 
-3. Cookies and Tracking
-The app does not use cookies and does not track user behavior.
+1.1 Account Data
+When you sign in with Google or Apple, your name, email address, and unique user ID are securely stored on Supabase infrastructure.
 
-4. Data Security
-Your data is stored encrypted in your device's local storage.
+1.2 Profile Data
+Your username (@handle), date of birth, zodiac sign, birth location, and profile photo are stored on our cloud servers.
 
-5. Contact
+1.3 In-App Data
+Fortune cookies, dream entries, tarot readings, soul stone balance, and preferences are primarily stored locally on your device. When signed in, this data is encrypted and backed up to Supabase cloud.
+
+1.4 Social Data
+Friend requests, accepted connections, and Owl Letter messages are stored in the Supabase database. Letter contents are viewable only by the sender and recipient.
+
+1.5 Profile Photo
+Uploaded profile photos pass through an AI-based content moderation system. Approved photos are stored in Supabase Storage.
+
+1.6 Dream Analysis
+Dream texts are sent anonymously to Google Gemini AI for analysis. Submitted texts are not associated with your identity and are not permanently stored by the AI service.
+
+1.7 Contact Access
+Permission to access your device contacts may be requested for friend discovery. Contact data is used only for matching and is not stored on our servers.
+
+2. DATA USAGE
+
+Your data is used solely for:
+• Account management and authentication
+• Cloud synchronization (protecting your data across devices)
+• Social features (friendships, letter sending)
+• Dream analysis and personalized interpretations
+• In-app purchases (RevenueCat)
+• Advertisement display (Google AdMob)
+
+3. THIRD-PARTY SERVICES
+
+The App uses the following third-party services:
+• Supabase: Database, authentication, and file storage
+• Google Gemini AI: Dream analysis
+• Google AdMob: Advertisement display
+• RevenueCat: Subscription management
+• Google/Apple Sign-In: Authentication
+
+Each service provider is subject to its own privacy policy.
+
+4. DATA SECURITY
+
+• All data transmission is protected with HTTPS/TLS encryption.
+• Supabase database is protected with Row Level Security (RLS).
+• Each user can only access their own data.
+• Profile photos undergo content moderation.
+
+5. DATA RETENTION
+
+Your data is retained as long as your account is active. When you delete your account, all your data (profile, letters, friendships, cloud backups) is permanently deleted.
+
+6. USER RIGHTS
+
+You have the following rights:
+• Request access to your data
+• Request correction of your data
+• Delete your account and all data (Profile → Delete Account)
+• Change notification preferences
+
+7. CHILDREN'S PRIVACY
+
+Crack&Wish is not intended for users under 13. We do not knowingly collect data from children under 13.
+
+8. CHANGES
+
+This policy may be updated as needed. Important changes will be communicated via in-app notification.
+
+9. CONTACT
+
 For questions: info@crackandwish.com''',
     );
   }
@@ -877,55 +1389,167 @@ For questions: info@crackandwish.com''',
   // ── Kullanım Koşulları ──
   void _openTermsOfService() {
     final lang = Localizations.localeOf(context).languageCode;
+    _launchURL("https://crackwish.com/terms.html#$lang");
+    return;
     _showLegalSheet(
-      title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Service',
+      title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use',
       content: lang == 'tr'
           ? '''Crack&Wish Kullanım Koşulları
-Son güncelleme: Nisan 2026
+Son güncelleme: 23 Nisan 2026
 
-1. Kabul
-Uygulamayı kullanarak bu koşulları kabul etmiş olursunuz.
+Crack&Wish uygulamasını ("Uygulama") kullanarak aşağıdaki koşulları kabul etmiş olursunuz.
 
-2. Hizmet Tanımı
-Crack&Wish bir eğlence uygulamasıdır. Kurabiye falı, tarot okumaları ve rüya yorumları tamamen eğlence amaçlıdır ve profesyonel tavsiye niteliği taşımaz.
+1. HİZMET TANIMI
 
-3. Kullanıcı Sorumlulukları
-Uygulamayı yasal amaçlarla kullanmayı kabul edersiniz. İçerikleri ticari amaçla kopyalayamazsınız.
+Crack&Wish bir eğlence ve kişisel keşif uygulamasıdır. Kurabiye falları, tarot okumaları, rüya yorumları ve burç analizleri tamamen eğlence amaçlıdır ve profesyonel psikolojik, tıbbi veya finansal tavsiye niteliği taşımaz.
 
-4. Fikri Mülkiyet
-Uygulama içeriği, tasarımı ve kodu Crack&Wish'e aittir.
+2. HESAP VE GÜVENLİK
 
-5. Sorumluluk Sınırı
-Uygulama "olduğu gibi" sunulur. Fallar ve yorumlar eğlence amaçlıdır.
+• Uygulamayı kullanmak için Google veya Apple hesabıyla giriş yapmanız gerekir.
+• Hesap bilgilerinizin güvenliği sizin sorumluluğunuzdadır.
+• Her kullanıcı yalnızca bir hesap oluşturabilir.
+• Kullanıcı adınız (@handle) kayıt sonrası değiştirilemez.
 
-6. Değişiklikler
-Bu koşullar önceden bildirimde bulunmaksızın güncellenebilir.
+3. KULLANICI DAVRANIŞLARI
 
-7. İletişim
-info@crackandwish.com'''
-          : '''Crack&Wish Terms of Service
-Last updated: April 2026
+Aşağıdaki davranışlar kesinlikle yasaktır:
+• Spam, hakaret, taciz veya uygunsuz içerik gönderme
+• Başka kullanıcıları taklit etme
+• Uygunsuz profil fotoğrafı yükleme
+• Uygulamanın güvenlik sistemlerini atlatmaya çalışma
+• Bot veya otomatik araçlar kullanma
+• Uygulama içeriklerini izinsiz kopyalama veya dağıtma
 
-1. Acceptance
-By using the app, you accept these terms.
+İhlal durumunda hesabınız önceden uyarı yapılmaksızın askıya alınabilir veya kalıcı olarak silinebilir.
 
-2. Service Description
-Crack&Wish is an entertainment app. Fortune cookies, tarot readings, and dream interpretations are for entertainment only and do not constitute professional advice.
+4. SOSYAL ÖZELLİKLER
 
-3. User Responsibilities
-You agree to use the app for lawful purposes only. You may not copy content for commercial use.
+• Baykuş Postası (Owl Letter) ile gönderdiğiniz mektuplar yalnızca alıcı tarafından okunabilir.
+• Arkadaşlık bağlantıları karşılıklı onay gerektirir.
+• Gönderilen kurabiyeler envanterden düşer ve geri alınamaz.
+• Uygunsuz içerikli mektuplar sistem tarafından filtrelenebilir.
 
-4. Intellectual Property
-App content, design, and code belong to Crack&Wish.
+5. SATIN ALMALAR VE ABONELİKLER
 
-5. Limitation of Liability
-The app is provided "as is." Fortunes and readings are for entertainment purposes.
+• Crack&Wish Elite aboneliği aylık yenilenen bir abonelik hizmetidir.
+• Abonelikler Apple App Store veya Google Play Store üzerinden yönetilir.
+• İptal işlemi ilgili mağaza üzerinden yapılmalıdır.
+• Ruh taşları ve premium kurabiyeler sanal ürünlerdir ve gerçek para karşılığı iade edilemez.
+• Satın alımlar Apple/Google hesabınız üzerinden faturalandırılır.
 
-6. Changes
-These terms may be updated without prior notice.
+6. FİKRİ MÜLKİYET
 
-7. Contact
-info@crackandwish.com''',
+Uygulama içindeki tüm tasarımlar, görseller, metinler, animasyonlar ve kaynak kodu Crack&Wish'e aittir ve telif hakkı ile korunmaktadır. İzinsiz kullanım yasaktır.
+
+7. YAPAY ZEKA KULLANIMI
+
+• Rüya yorumları Google Gemini AI tarafından üretilir.
+• AI tarafından üretilen içerikler profesyonel tavsiye değildir.
+• AI yorumları her seferinde farklılık gösterebilir.
+• Crack&Wish, AI tarafından üretilen içeriklerin doğruluğunu garanti etmez.
+
+8. SORUMLULUK SINIRLAMALARI
+
+• Uygulama "olduğu gibi" sunulur, herhangi bir garanti verilmez.
+• Kurabiye falları, tarot okumaları ve rüya yorumları eğlence amaçlıdır.
+• Bu içeriklere dayanarak alınan kararlardan Crack&Wish sorumlu tutulamaz.
+• Uygulama kesintisiz veya hatasız çalışmayı garanti etmez.
+
+9. HESAP SONLANDIRMA
+
+• Hesabınızı istediğiniz zaman Profil → Hesabı Sil seçeneğiyle silebilirsiniz.
+• Hesap silme işlemi geri alınamaz ve tüm verileriniz kalıcı olarak kaldırılır.
+• Koşulları ihlal eden hesaplar önceden bildirim yapılmaksızın sonlandırılabilir.
+
+10. UYGULANACAK HUKUK
+
+Bu koşullar Türkiye Cumhuriyeti yasalarına tabidir. Uyuşmazlıklar İstanbul mahkemelerinde çözümlenir.
+
+11. DEĞİŞİKLİKLER
+
+Bu koşullar gerektiğinde güncellenebilir. Önemli değişikliklerde uygulama içi bildirim yapılır. Değişiklik sonrası uygulamayı kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.
+
+12. İLETİŞİM
+
+Sorularınız için: info@crackandwish.com'''
+          : '''Crack&Wish Terms of Use
+Last updated: April 23, 2026
+
+By using the Crack&Wish application ("App"), you agree to the following terms.
+
+1. SERVICE DESCRIPTION
+
+Crack&Wish is an entertainment and personal discovery application. Fortune cookies, tarot readings, dream interpretations, and zodiac analyses are purely for entertainment and do not constitute professional psychological, medical, or financial advice.
+
+2. ACCOUNT AND SECURITY
+
+• You must sign in with a Google or Apple account to use the App.
+• You are responsible for the security of your account credentials.
+• Each user may create only one account.
+• Your username (@handle) cannot be changed after registration.
+
+3. USER CONDUCT
+
+The following behaviors are strictly prohibited:
+• Sending spam, insults, harassment, or inappropriate content
+• Impersonating other users
+• Uploading inappropriate profile photos
+• Attempting to bypass the App's security systems
+• Using bots or automated tools
+• Copying or distributing App content without permission
+
+In case of violations, your account may be suspended or permanently deleted without prior notice.
+
+4. SOCIAL FEATURES
+
+• Letters sent via Owl Letter can only be read by the recipient.
+• Friend connections require mutual approval.
+• Sent cookies are deducted from inventory and cannot be retrieved.
+• Letters with inappropriate content may be filtered by the system.
+
+5. PURCHASES AND SUBSCRIPTIONS
+
+• Crack&Wish Elite subscription is a monthly auto-renewing subscription.
+• Subscriptions are managed through Apple App Store or Google Play Store.
+• Cancellation must be done through the respective store.
+• Soul stones and premium cookies are virtual products and are non-refundable.
+• Purchases are billed through your Apple/Google account.
+
+6. INTELLECTUAL PROPERTY
+
+All designs, images, texts, animations, and source code within the App are owned by Crack&Wish and protected by copyright. Unauthorized use is prohibited.
+
+7. ARTIFICIAL INTELLIGENCE USAGE
+
+• Dream interpretations are generated by Google Gemini AI.
+• AI-generated content is not professional advice.
+• AI interpretations may vary each time.
+• Crack&Wish does not guarantee the accuracy of AI-generated content.
+
+8. LIMITATION OF LIABILITY
+
+• The App is provided "as is" without any warranties.
+• Fortune cookies, tarot readings, and dream interpretations are for entertainment.
+• Crack&Wish cannot be held liable for decisions made based on this content.
+• The App does not guarantee uninterrupted or error-free operation.
+
+9. ACCOUNT TERMINATION
+
+• You may delete your account at any time via Profile → Delete Account.
+• Account deletion is irreversible and all your data is permanently removed.
+• Accounts violating these terms may be terminated without prior notice.
+
+10. GOVERNING LAW
+
+These terms are governed by the laws of the Republic of Turkey. Disputes shall be resolved in Istanbul courts.
+
+11. CHANGES
+
+These terms may be updated as needed. Important changes will be communicated via in-app notification. Continued use of the App after changes constitutes acceptance of the new terms.
+
+12. CONTACT
+
+For questions: info@crackandwish.com''',
     );
   }
 
@@ -1194,8 +1818,12 @@ info@crackandwish.com''',
                             return ValueListenableBuilder<int>(
                               valueListenable: StorageService.soulStonesNotifier,
                               builder: (context, currentSoulStones, child) {
+                                final displayHandle = _userHandle.isNotEmpty 
+                                    ? _userHandle 
+                                    : '@${_userName.toLowerCase().replaceAll(RegExp(r'\s+'), '_')}';
                                 return _BentoHeroCard(
                                   userName: _userName,
+                                  userHandle: displayHandle,
                                   userAvatar: _userAvatar,
                                   levelTitle: level.title,
                                   levelIcon: level.icon,
@@ -1206,6 +1834,18 @@ info@crackandwish.com''',
                                     final prefs = await SharedPreferences.getInstance();
                                     setState(() => _isPremiumUser = !_isPremiumUser);
                                     await prefs.setBool('is_premium_test_mode', _isPremiumUser);
+                                    await prefs.setBool('is_elite', _isPremiumUser); // Key senkronizasyonu
+                                    
+                                    // Test butonuna basıldığında Elite olduysa anında 5 günlük RT ver
+                                    if (_isPremiumUser) {
+                                      await prefs.setInt('daily_elite_soul_stones', 5);
+                                    } else {
+                                      await prefs.setInt('daily_elite_soul_stones', 0);
+                                    }
+                                    
+                                    // Supabase'e Premium durumunu kaydet
+                                    await ProfileSyncService().syncEliteStatus(_isPremiumUser);
+                                    
                                     HapticFeedback.heavyImpact();
                                     if (mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('TEST MODU: Elite Üyelik ${_isPremiumUser ? "AKTİF 💎" : "KAPALI 🛑"}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: Colors.black87));
@@ -1221,9 +1861,7 @@ info@crackandwish.com''',
                                   spentAura: _spentAura,
                                   bonusAura: _bonusAura,
                                   onConvertAura: () async {
-                                    final int multiplier = _isPremiumUser ? 3 : 1;
-                                    final int baseAura = (_totalCookies * 1) + (_totalTarots * 2) + (_totalDreams * 3) + (_streakDays * 5);
-                                    final totalAura = (baseAura * multiplier) + _bonusAura;
+                                    final totalAura = _bonusAura;
                                     final success = await StorageService.convertAuraToSoulStone(currentTotalAura: totalAura, cost: 200);
                                     if (success && mounted) {
                                       setState(() {
@@ -1245,7 +1883,7 @@ info@crackandwish.com''',
                         ),
                         const SizedBox(height: 24),
 
-                        // ── 3. PREMİUM BANNER ──
+                        // ── 3. PREMİUM BANNER (TICKET) ──
                         _BentoPremiumBanner(
                           lang: lang,
                           isPremium: _isPremiumUser,
@@ -1268,248 +1906,211 @@ info@crackandwish.com''',
                             );
                           },
                         ),
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.clear(); // TAMAMEN SIFIRLA (Borçlar, isim vs her şey)!
-                            if (mounted) {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()));
-                            }
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.redAccent),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              '🛠️ TEST (Profili Sıfırla): Login Ekranına Git',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8),
 
-                        // ── 4. QUICK ACTIONS (2x2 Bento Grid) ──
-                        _SectionLabel(lang == 'tr' ? 'Genel' : 'General'),
+                        // ── 3B. KOZMİK PROFIL BANNERI (HERO) ──
+                        _BentoCosmicBanner(
+                          lang: lang,
+                          onTap: _openCosmicChart,
+                        ),
+                        const SizedBox(height: 16),
+
+
+
+                        // ── BÖLÜM 1: HESAP ──
+                        _SectionLabel(lang == 'tr' ? 'Hesap' : 'Account'),
                         const SizedBox(height: 10),
-                        Row(
+                        _SettingsListGroup(
                           children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.local_post_office_rounded,
-                                iconColor: const Color(0xFFD4AF37), // Altın rengi Baykuş Postası
-                                label: lang == 'tr' ? 'Baykuş Postası' : 'Owl Mail',
-                                hasBadge: _unreadOwlCount > 0 || MockOwlService().pendingRequestCount > 0 || MockOwlService().unreadLetterCount > 0,
-                                onTap: () {
-                                  // TODO: Arkadaş Ekle / Kurabiye Gönder modalı eklenecek
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        lang == 'tr' ? 'Baykuş postası hazırlanıyor! Yakında...' : 'Owl mail is preparing! Coming soon...',
-                                        style: const TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: const Color(0xFF16151A),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            _SettingsListTile(
+                              icon: Icons.email_outlined,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'E-posta' : 'Email',
+                              subtitle: _getConnectedEmail(),
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      lang == 'tr'
+                                          ? 'E-posta hesabınız bağlı giriş yönteminize aittir.'
+                                          : 'Your email is linked to your sign-in method.',
+                                      style: const TextStyle(color: Colors.white, fontSize: 13),
                                     ),
-                                  );
-                                },
-                              ),
+                                    backgroundColor: const Color(0xFF1A1A2E),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.insights_rounded,
-                                iconColor: const Color(0xFFC084FC),
-                                label: lang == 'tr' ? 'Kozmik Haritan' : 'Cosmic Chart',
-                                onTap: _openCosmicChart,
-                              ),
+                            _SettingsListTile(
+                              icon: Icons.language_rounded,
+                              iconColor: Colors.white54,
+                              label: l10n.language,
+                              subtitle: languageValue,
+                              onTap: _openLanguagePicker,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.notifications_none_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Bildirimler' : 'Notifications',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  SwipeFadePageRoute(
+                                    page: const NotificationSettingsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _SettingsListTile(
+                              icon: SoundService().isSoundEnabled 
+                                  ? Icons.volume_up_rounded 
+                                  : Icons.volume_off_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Ses Efektleri' : 'Sound Effects',
+                              subtitle: SoundService().isSoundEnabled
+                                  ? (lang == 'tr' ? 'Açık' : 'On')
+                                  : (lang == 'tr' ? 'Kapalı' : 'Off'),
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                final newVal = !SoundService().isSoundEnabled;
+                                await SoundService().toggleSound(newVal);
+                                setState(() {});
+                              },
                             ),
                           ],
                         ),
+
+
+                        const SizedBox(height: 24),
+
+                        // ── BÖLÜM 2: DESTEK & DENEYİM ──
+                        _SectionLabel(lang == 'tr' ? 'Destek & Deneyim' : 'Support & Experience'),
                         const SizedBox(height: 10),
-                        Row(
+                        _SettingsListGroup(
                           children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.language_rounded,
-                                iconColor: const Color(0xFF5A8BFF),
-                                label: l10n.language,
-                                subtitle: languageValue,
-                                onTap: _openLanguagePicker,
-                              ),
+                            _SettingsListTile(
+                              icon: Icons.group_add_rounded,
+                              iconColor: const Color(0xFFC084FC).withOpacity(0.8),
+                              label: lang == 'tr' ? 'Arkadaşlarını Davet Et' : 'Invite Friends',
+                              subtitle: lang == 'tr' ? '+2 Ruh Taşı' : '+2 Soul Stones',
+                              onTap: _showInviteModal,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.notifications_none_rounded,
-                                iconColor: const Color(0xFFFF6B6B),
-                                label: lang == 'tr' ? 'Bildirimler' : 'Notifications',
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    SwipeFadePageRoute(
-                                      page: const NotificationSettingsPage(),
+                            _SettingsListTile(
+                              icon: Icons.help_outline_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Yardım' : 'Help',
+                              onTap: _openHelpCenter,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.share_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Paylaş' : 'Share',
+                              onTap: _shareApp,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.star_border_rounded,
+                              iconColor: Colors.white54,
+                              label: lang == 'tr' ? 'Değerlendir' : 'Rate',
+                              onTap: _rateApp,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // ── BÖLÜM 3: TEHLİKELİ ALAN ──
+                        _SectionLabel(lang == 'tr' ? 'Tehlikeli Alan' : 'Danger Zone'),
+                        const SizedBox(height: 10),
+                        _SettingsListGroup(
+                          children: [
+                            _SettingsListTile(
+                              icon: Icons.logout_rounded,
+                              iconColor: const Color(0xFFFCA5A5), // Soft red
+                              label: lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                              isDestructive: true,
+                              onTap: _signOut,
+                            ),
+                            _SettingsListTile(
+                              icon: Icons.delete_forever_rounded,
+                              iconColor: const Color(0xFFF87171), // Little darker soft red
+                              label: lang == 'tr' ? 'Hesabı Sil' : 'Delete Account',
+                              isDestructive: true,
+                              onTap: _deleteAccount,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+
+
+
+
+                        // ── FOOTER & YASAL ──
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: _openPrivacyPolicy,
+                                  child: Text(
+                                    lang == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.35),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                  );
-                                },
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  width: 4,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: _openTermsOfService,
+                                  child: Text(
+                                    lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.35),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Crack&Wish  v1.0.0',
+                              style: TextStyle(
+                                color: AppColors.textWhite.withOpacity(0.2),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              lang == 'tr'
+                                  ? 'Sevgiyle yapıldı ✨'
+                                  : 'Made with love ✨',
+                              style: TextStyle(
+                                color: AppColors.textWhite.withOpacity(0.15),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // ── 5. PAYLAŞ & DESTEK (Compact Row) ──
-                        _SectionLabel(
-                          lang == 'tr' ? 'Paylaş & Destek' : 'Share & Support',
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.share_rounded,
-                                iconColor: const Color(0xFF2DD4BF),
-                                label: lang == 'tr' ? 'Paylaş' : 'Share',
-                                onTap: _shareApp,
-                                compact: true,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.star_border_rounded,
-                                iconColor: const Color(0xFFFFD166),
-                                label: lang == 'tr' ? 'Değerlendir' : 'Rate',
-                                onTap: _rateApp,
-                                compact: true,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.help_outline_rounded,
-                                iconColor: const Color(0xFFC084FC),
-                                label: lang == 'tr' ? 'Yardım' : 'Help',
-                                onTap: _openHelpCenter,
-                                compact: true,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // ── 6. YASAL ──
-                        _SectionLabel(lang == 'tr' ? 'Yasal' : 'Legal'),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.shield_outlined,
-                                iconColor: const Color(0xFF4CAF50),
-                                label: lang == 'tr' ? 'Gizlilik & Koşullar' : 'Privacy & Terms',
-                                onTap: _openPrivacyPolicy,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.logout_rounded,
-                                iconColor: const Color(0xFFFF4D4D),
-                                label: lang == 'tr' ? 'Çıkış' : 'Sign Out',
-                                onTap: _signOut,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // ── DEV ──
-                        _SectionLabel('Dahili Test (Sonra Silinecek)'),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.rocket_launch_rounded,
-                                iconColor: const Color(0xFFF7941D),
-                                label: 'Onboarding Test',
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OnboardingPage()));
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _BentoActionTile(
-                                icon: Icons.local_fire_department_rounded,
-                                iconColor: const Color(0xFFFF6B6B),
-                                label: 'Seri (Ateş) Ekle',
-                                onTap: () async {
-                                  final prefs = await SharedPreferences.getInstance();
-                                  final now = DateTime.now();
-                                  final days = prefs.getStringList('app_open_days') ?? [];
-                                  final claimed = prefs.getStringList('claimed_aura_days') ?? [];
-                                  
-                                  // Geçmiş 5 gün ekle ve claim durumlarını sıfırla:
-                                  for (int i = 1; i <= 5; i++) {
-                                    final d = now.subtract(Duration(days: i));
-                                    final key = "${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-                                    if (!days.contains(key)) {
-                                      days.add(key);
-                                    }
-                                    claimed.remove(key); // Test için toplanmamış hale getir
-                                  }
-                                  
-                                  await prefs.setStringList('app_open_days', days);
-                                  await prefs.setStringList('claimed_aura_days', claimed);
-                                  await prefs.setInt('app_streak_days', 7); // Seri sayısını da 7 yapalım ki profilde görünsün
-                                  
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Geçmiş 5 gün test için eklendi! Yenilemek için Profil sayfasına tekrar tıklayın.")),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-
-                        // ── 7. VERSİYON ──
-                        Center(
-                          child: Text(
-                            'Crack&Wish  v1.0.0',
-                            style: TextStyle(
-                              color: AppColors.textWhite.withOpacity(0.2),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Center(
-                          child: Text(
-                            lang == 'tr'
-                                ? 'Sevgiyle yapıldı ✨'
-                                : 'Made with love ✨',
-                            style: TextStyle(
-                              color: AppColors.textWhite.withOpacity(0.15),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
                         ),
                         const SizedBox(height: 40),
                       ],
@@ -1533,6 +2134,7 @@ info@crackandwish.com''',
 
 class _BentoHeroCard extends StatelessWidget {
   final String userName;
+  final String userHandle;
   final String userAvatar;
   final String levelTitle;
   final IconData levelIcon;
@@ -1555,6 +2157,7 @@ class _BentoHeroCard extends StatelessWidget {
 
   const _BentoHeroCard({
     required this.userName,
+    required this.userHandle,
     required this.userAvatar,
     required this.levelTitle,
     required this.levelIcon,
@@ -1684,19 +2287,42 @@ class _BentoHeroCard extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.all(
                                 userAvatar.contains('owl')
-                                    ? 4.0 // Baykuş avatarı pofuduk olduğu için paddingi sıfıra yaklaştırdım
-                                    : userAvatar.contains('cookies')
-                                        ? 22.0
-                                        : 0.0,
+                                    ? 4.0
+                                    : 0.0,
                               ),
                               child: Transform.scale(
-                                scale: userAvatar.contains('owl') ? 1.35 : 1.0,
-                                child: Image.asset(
-                                  userAvatar,
-                                  fit: (userAvatar.contains('cookies') || userAvatar.contains('owl'))
-                                      ? BoxFit.contain
-                                      : BoxFit.cover,
-                                ),
+                                scale: userAvatar.contains('owl') 
+                                    ? 1.35 
+                                    : (userAvatar.contains('avatar_') ? 1.15 : 1.0),
+                                child: userAvatar.startsWith('http')
+                                    ? Image.network(
+                                        userAvatar,
+                                        key: ValueKey(userAvatar),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Icon(
+                                          Icons.person_rounded,
+                                          color: Colors.white.withOpacity(0.3),
+                                          size: 48,
+                                        ),
+                                      )
+                                    : userAvatar.startsWith('assets')
+                                        ? Image.asset(
+                                            userAvatar,
+                                            key: ValueKey(userAvatar),
+                                            fit: userAvatar.contains('owl')
+                                                ? BoxFit.contain
+                                                : BoxFit.cover,
+                                          )
+                                        : Image.file(
+                                            File(userAvatar),
+                                            key: ValueKey(userAvatar),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Icon(
+                                              Icons.person_rounded,
+                                              color: Colors.white.withOpacity(0.3),
+                                              size: 48,
+                                            ),
+                                          ),
                               ),
                             ),
                           ),
@@ -1724,6 +2350,18 @@ class _BentoHeroCard extends StatelessWidget {
                             letterSpacing: 0.3,
                           ),
                         ),
+                        if (userHandle.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            userHandle,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.45),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 4),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1759,16 +2397,14 @@ class _BentoHeroCard extends StatelessWidget {
                       builder: (context, snapshot) {
                         bool hasUnclaimed = false;
                         if (snapshot.hasData) {
-                          final claimed = snapshot.data![0] as Set<String>;
+                          // Gün içinde birden fazla toplanabileceği için 'claimed' kilidi kapatıldı. (Sadece bekleyen fona bakılır)
                           final pendingFal = snapshot.data![1] as int;
                           final pendingCookie = snapshot.data![2] as int;
                           final pendingDream = snapshot.data![3] as int;
                           final pendingOwl = snapshot.data![4] as int;
+                          
                           // Nokta sadece gerçekten toplanacak Aura varsa yansın
-                          hasUnclaimed = (!claimed.contains('fal') && pendingFal > 0) ||
-                              (!claimed.contains('kurabiye') && pendingCookie > 0) ||
-                              (!claimed.contains('ruya') && pendingDream > 0) ||
-                              (!claimed.contains('baykus') && pendingOwl > 0);
+                          hasUnclaimed = pendingFal > 0 || pendingCookie > 0 || pendingDream > 0 || pendingOwl > 0;
                         }
                         return _GlassBadge(
                           imagePath: 'assets/images/aura_core.png',
@@ -1881,20 +2517,17 @@ class _BentoHeroCard extends StatelessWidget {
   }
 
   static Future<bool> _hasUnclaimedReward(int streakDays) async {
+    // Takvimde bugün toplanmamış ateş var mı?
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final claimedDays = await StorageService.getClaimedAuraDays();
+    if (!claimedDays.contains(today)) return true;
+    
     // Milestone eşikleri
     const thresholds = [7, 14, 30, 50, 100, 365];
     final claimed = await StorageService.getClaimedMilestones();
     for (final t in thresholds) {
       if (streakDays >= t && !claimed.contains(t)) return true;
     }
-    
-    // YENİ SİSTEM: Herhangi bir toplanmamış bekleyen (pending) Aura var mı?
-    final fal = await StorageService.getPendingAura('fal');
-    final cookie = await StorageService.getPendingAura('kurabiye');
-    final dream = await StorageService.getPendingAura('ruya');
-    final owl = await StorageService.getPendingAura('baykus');
-    
-    if (fal > 0 || cookie > 0 || dream > 0 || owl > 0) return true;
     
     return false;
   }
@@ -1961,7 +2594,7 @@ class _BentoHeroCard extends StatelessWidget {
               });
             }
             final int baseAvailable = (modalAuraTotal - modalSpentAura).clamp(0, 999999);
-            final int availableAura = baseAvailable + collectedBonus;
+            final int availableAura = baseAvailable; // collectedBonus zaten modalAuraTotal içine eklendiği için tekrar eklenmemeli
             final bool canConvert = availableAura >= conversionCost;
 
             return GestureDetector(
@@ -2559,8 +3192,55 @@ class _BentoHeroCard extends StatelessWidget {
                                     ),
                                   ),
                                   
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   
+                                  if (totalCount < (dreamTimeFilter == 3 ? 3 : (dreamTimeFilter == 7 ? 7 : 15))) ...[
+                                    // Minimum rüya gerekli — dönem bazlı mesaj
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              dreamTimeFilter == 3
+                                                ? "Son 3 günde en az 3 rüya kaydet."
+                                                : dreamTimeFilter == 7
+                                                  ? "Son 7 günde en az 7 rüya kaydet."
+                                                  : "Son 1 ayda en az 15 rüya kaydet.",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10, height: 1.4),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) => AlertDialog(
+                                                  backgroundColor: const Color(0xFF1A1A2E),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                  title: Text("Duygu Dağılımı Nedir?", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                                                  content: Text(
+                                                    "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nSeçtiğin zaman dilimi (3, 7 veya 30 gün) için yeterli veri toplandıktan sonra hangi duyguların ön plana çıktığını görebilirsin.",
+                                                    style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, height: 1.5),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.pop(context),
+                                                      child: const Text("Anladım", style: TextStyle(color: Color(0xFF818CF8))),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                            child: Icon(Icons.help_outline_rounded, color: Colors.white.withOpacity(0.2), size: 14),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ] else ...[
+                                  // Yeterli veri var — grafik göster
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                     child: Row(
@@ -2571,7 +3251,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   
                                   if (emotionCounts.isEmpty)
                                     Padding(
@@ -2579,47 +3259,120 @@ class _BentoHeroCard extends StatelessWidget {
                                       child: Center(child: Text("Grafik oluşturmak için veri bekleniyor.", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10))),
                                     )
                                   else
-                                    Column(
-                                      children: (emotionCounts.entries.toList()..sort((a,b) => b.value.compareTo(a.value))).take(3).map((e) {
-                                        int pct = ((e.value / totalCount) * 100).toInt();
-                                        Map<String, String> localTr = {
-                                          'fear': 'Korku', 'anxiety': 'Kaygı', 'joy': 'Neşe', 'happy': 'Mutluluk', 'happiness': 'Mutluluk',
-                                          'sadness': 'Hüzün', 'sad': 'Hüzün', 'confusion': 'Karmaşa', 'peace': 'Huzur', 'peaceful': 'Huzurlu',
-                                          'anger': 'Öfke', 'angry': 'Öfkeli', 'neutral': 'Nötr'
-                                        };
-                                        String label = localTr[e.key.toLowerCase()] ?? e.key;
-                                        
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 6.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
-                                                  const Spacer(),
-                                                  Text("%$pct", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 9, fontWeight: FontWeight.bold)),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(4),
-                                                child: LinearProgressIndicator(
-                                                  value: pct / 100,
-                                                  backgroundColor: Colors.white.withOpacity(0.05),
-                                                  valueColor: AlwaysStoppedAnimation(
-                                                    label == 'Kaygı' || label == 'Korku' ? const Color(0xFFFF6B6B) : 
-                                                    label == 'Huzur' || label == 'Neşe' ? const Color(0xFF4EE6C5) : 
-                                                    const Color(0xFF818CF8)
-                                                  ),
-                                                  minHeight: 5,
+                                    Builder(builder: (context) {
+                                      // Duygu çevirisi ve renk haritası
+                                      const Map<String, String> localTr = {
+                                        'fear': 'Korku', 'anxiety': 'Kaygı', 'joy': 'Neşe', 'happy': 'Mutluluk', 'happiness': 'Mutluluk',
+                                        'sadness': 'Hüzün', 'sad': 'Hüzün', 'confusion': 'Karmaşa', 'peace': 'Huzur', 'peaceful': 'Huzurlu',
+                                        'anger': 'Öfke', 'angry': 'Öfkeli', 'neutral': 'Nötr', 'curiosity': 'Merak', 'surprise': 'Şaşkınlık',
+                                        'love': 'Aşk', 'hope': 'Umut', 'nostalgia': 'Nostalji', 'excitement': 'Heyecan',
+                                      };
+                                      const Map<String, Color> emotionColors = {
+                                        'Korku': Color(0xFFFF6B6B), 'Kaygı': Color(0xFFFF9F43),
+                                        'Neşe': Color(0xFF4EE6C5), 'Mutluluk': Color(0xFF48DBFB),
+                                        'Hüzün': Color(0xFF818CF8), 'Karmaşa': Color(0xFFFECA57),
+                                        'Huzur': Color(0xFF1DD1A1), 'Huzurlu': Color(0xFF1DD1A1),
+                                        'Öfke': Color(0xFFEE5A6F), 'Öfkeli': Color(0xFFEE5A6F),
+                                        'Nötr': Color(0xFF636E72), 'Merak': Color(0xFFA29BFE),
+                                        'Şaşkınlık': Color(0xFFFF6348), 'Aşk': Color(0xFFFF6B81),
+                                        'Umut': Color(0xFF55EFC4), 'Nostalji': Color(0xFFDDA0DD),
+                                        'Heyecan': Color(0xFFFFD32A),
+                                      };
+                                      const Map<String, String> emotionEmojis = {
+                                        'Korku': '😰', 'Kaygı': '😟', 'Neşe': '😊', 'Mutluluk': '😄',
+                                        'Hüzün': '😢', 'Karmaşa': '😵‍💫', 'Huzur': '😌', 'Huzurlu': '😌',
+                                        'Öfke': '😤', 'Öfkeli': '😤', 'Nötr': '😐', 'Merak': '🧐',
+                                        'Şaşkınlık': '😮', 'Aşk': '❤️', 'Umut': '🌱', 'Nostalji': '🌅',
+                                        'Heyecan': '🤩',
+                                      };
+                                      
+                                      final sorted = emotionCounts.entries.toList()..sort((a,b) => b.value.compareTo(a.value));
+                                      final top = sorted.take(5).toList();
+                                      
+                                      // Donut grafik verileri
+                                      final List<_EmotionSlice> slices = top.map((e) {
+                                        final label = localTr[e.key.toLowerCase()] ?? e.key;
+                                        final pct = (e.value / totalCount * 100);
+                                        final color = emotionColors[label] ?? const Color(0xFF818CF8);
+                                        final emoji = emotionEmojis[label] ?? '🔮';
+                                        return _EmotionSlice(label: label, percentage: pct, color: color, emoji: emoji, count: e.value);
+                                      }).toList();
+                                      
+                                      return Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          // Sol: Donut Chart
+                                          SizedBox(
+                                            width: 95,
+                                            height: 95,
+                                            child: TweenAnimationBuilder<double>(
+                                              tween: Tween<double>(begin: 0.0, end: 1.0),
+                                              duration: const Duration(milliseconds: 1400),
+                                              curve: Curves.easeOutCubic,
+                                              builder: (context, value, child) {
+                                                return CustomPaint(
+                                                  painter: _EmotionDonutPainter(slices: slices, animationValue: value),
+                                                  child: child,
+                                                );
+                                              },
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "$totalCount",
+                                                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.0),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      "rüya",
+                                                      style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        );
-                                      }).toList(),
-                                    ),
+                                          const SizedBox(width: 20),
+                                          // Sağ: Legend listesi
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: slices.map((s) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(bottom: 5.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 9, height: 9,
+                                                        decoration: BoxDecoration(
+                                                          color: s.color,
+                                                          borderRadius: BorderRadius.circular(3),
+                                                          boxShadow: [BoxShadow(color: s.color.withOpacity(0.5), blurRadius: 5)],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Expanded(
+                                                        child: Text(
+                                                          s.label,
+                                                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "%${s.percentage.toInt()}",
+                                                        style: TextStyle(color: s.color.withOpacity(0.95), fontSize: 12, fontWeight: FontWeight.w900),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ], // else (totalCount >= 3)
                                 ],
                               ),
                             );
@@ -2690,8 +3443,19 @@ class _BentoHeroCard extends StatelessWidget {
                                   final isToday = testDate.year == nowNorm.year && testDate.month == nowNorm.month && testDate.day == nowNorm.day;
                                   final isFuture = testDate.isAfter(nowNorm);
                                   final dateKey = "${targetYear.toString().padLeft(4, '0')}-${targetMonth.toString().padLeft(2, '0')}-${i.toString().padLeft(2, '0')}";
-                                  final isAppOpenDay = appOpenDays.contains(dateKey);
+                                  final isAppOpenDay = isToday || appOpenDays.contains(dateKey); // Bugün her zaman açık — kullanıcı şu an uygulamada
                                   final isClaimed = claimedDays.contains(dateKey);
+
+                                  final prevDate = testDate.subtract(const Duration(days: 1));
+                                  final nextDate = testDate.add(const Duration(days: 1));
+                                  final prevKey = "${prevDate.year.toString().padLeft(4, '0')}-${prevDate.month.toString().padLeft(2, '0')}-${prevDate.day.toString().padLeft(2, '0')}";
+                                  final nextKey = "${nextDate.year.toString().padLeft(4, '0')}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}";
+                                  
+                                  final dayIdx = firstWeekday - 1 + i - 1;
+                                  final isPrevOpen = appOpenDays.contains(prevKey) || (prevDate.year == nowNorm.year && prevDate.month == nowNorm.month && prevDate.day == nowNorm.day);
+                                  final isNextOpen = appOpenDays.contains(nextKey) || (nextDate.year == nowNorm.year && nextDate.month == nowNorm.month && nextDate.day == nowNorm.day);
+                                  final isConnectedLeft = dayIdx % 7 != 0 && isAppOpenDay && isPrevOpen;
+                                  final isConnectedRight = dayIdx % 7 != 6 && isAppOpenDay && isNextOpen;
 
                                   calendarDays.add(
                                     _ClaimableFireCell(
@@ -2700,11 +3464,15 @@ class _BentoHeroCard extends StatelessWidget {
                                       isFuture: isFuture,
                                       isAppOpenDay: isAppOpenDay,
                                       isClaimed: isClaimed,
+                                      isConnectedLeft: isConnectedLeft,
+                                      isConnectedRight: isConnectedRight,
+                                      isWeekend: testDate.weekday == DateTime.saturday || testDate.weekday == DateTime.sunday,
                                       dateKey: dateKey,
                                       onClaimed: () {
+                                        final weekendBonus = (testDate.weekday == DateTime.saturday || testDate.weekday == DateTime.sunday) ? 2 : 1;
                                         setModalState(() {
                                           claimedDays.add(dateKey);
-                                          modalAuraTotal += 1;
+                                          modalAuraTotal += weekendBonus;
                                         });
                                         if (onAuraClaimed != null) {
                                           onAuraClaimed!();
@@ -3385,6 +4153,258 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
         duration: const Duration(milliseconds: 120),
         scale: _pressed ? 0.97 : 1.0,
         child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: widget.isPremium
+                    ? Colors.white.withOpacity(0.08)
+                    : const Color(0xFFD4A574).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: widget.isPremium
+                      ? Colors.white.withOpacity(0.15)
+                      : const Color(0xFFD4A574).withOpacity(0.3),
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: widget.isPremium
+                            ? [const Color(0xFF38BDF8), const Color(0xFF0284C7)]
+                            : [const Color(0xFFD4A574), const Color(0xFFB8956A)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.isPremium
+                              ? const Color(0xFF0284C7).withOpacity(0.3)
+                              : const Color(0xFFD4A574).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        widget.isPremium ? Icons.diamond_rounded : Icons.workspace_premium_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.isPremium
+                              ? (widget.lang == 'tr' ? 'Elite Büyücüsün' : 'You are Elite')
+                              : (widget.lang == 'tr' ? 'Elite\'e Geç' : 'Go Elite'),
+                          style: TextStyle(
+                            color: widget.isPremium ? const Color(0xFFE0F2FE) : const Color(0xFFD4A574),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          widget.isPremium
+                              ? (widget.lang == 'tr' ? 'Mistik kapıları incele' : 'View mystical gates')
+                              : (widget.lang == 'tr' ? 'Farkındalığa giden kapı' : 'Door to awareness'),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.55),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (widget.isPremium) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Aktif', 
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9), 
+                          fontSize: 9, 
+                          fontWeight: FontWeight.bold, 
+                          letterSpacing: 0.5
+                        )
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: widget.isPremium 
+                        ? Colors.white.withOpacity(0.2) 
+                        : const Color(0xFFD4A574).withOpacity(0.5),
+                    size: 12,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BentoCosmicBanner extends StatefulWidget {
+  final String lang;
+  final VoidCallback onTap;
+
+  const _BentoCosmicBanner({
+    required this.lang,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoCosmicBanner> createState() => _BentoCosmicBannerState();
+}
+
+class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08), // Bright pure translucent glass
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFC084FC),
+                          Color(0xFF9333EA),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF9333EA).withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.insights_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.lang == 'tr' ? 'Kozmik Profilim' : 'My Cosmic Profile',
+                          style: const TextStyle(
+                            color: Color(0xFFF3E8FF),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          widget.lang == 'tr' 
+                              ? 'Harita, Saat ve Konum Bilgileri' 
+                              : 'Chart, Time, and Place Details',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.white.withOpacity(0.25),
+                    size: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _BentoInviteBanner extends StatefulWidget {
+  final String lang;
+  final VoidCallback onTap;
+
+  const _BentoInviteBanner({
+    required this.lang,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoInviteBanner> createState() => _BentoInviteBannerState();
+}
+
+class _BentoInviteBannerState extends State<_BentoInviteBanner> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
@@ -3394,25 +4414,24 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: widget.isPremium
-                      ? [
-                          const Color(0xFF22D3EE).withOpacity(0.25),
-                          const Color(0xFF14B8A6).withOpacity(0.10),
-                          const Color(0xFF0EA5E9).withOpacity(0.08),
-                        ]
-                      : [
-                          const Color(0xFFD4A574).withOpacity(0.25),
-                          const Color(0xFFFFD166).withOpacity(0.10),
-                          const Color(0xFFFF9A5C).withOpacity(0.08),
-                        ],
+                  colors: [
+                    const Color(0xFFC084FC).withOpacity(0.20),
+                    const Color(0xFFE879F9).withOpacity(0.10),
+                    const Color(0xFFFF6B6B).withOpacity(0.05),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: widget.isPremium
-                      ? const Color(0xFF22D3EE).withOpacity(0.2)
-                      : const Color(0xFFD4A574).withOpacity(0.2),
-                  width: 0.5,
+                  color: const Color(0xFFE879F9).withOpacity(0.2),
+                  width: 1,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE879F9).withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -3420,26 +4439,13 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: widget.isPremium
-                            ? [const Color(0xFF22D3EE), const Color(0xFF0EA5E9)]
-                            : [const Color(0xFFD4A574), const Color(0xFFB8956A)],
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: widget.isPremium
-                              ? const Color(0xFF22D3EE).withOpacity(0.3)
-                              : const Color(0xFFD4A574).withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      color: const Color(0xFFE879F9).withOpacity(0.15),
+                      shape: BoxShape.circle,
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Icon(
-                        widget.isPremium ? Icons.diamond_rounded : Icons.workspace_premium_rounded,
-                        color: Colors.white,
+                        Icons.group_add_rounded,
+                        color: Color(0xFFE879F9),
                         size: 22,
                       ),
                     ),
@@ -3450,11 +4456,9 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.isPremium
-                              ? (widget.lang == 'tr' ? 'Elite Büyücüsün' : 'You are Elite')
-                              : (widget.lang == 'tr' ? 'Premium\'a Geç' : 'Go Premium'),
-                          style: TextStyle(
-                            color: widget.isPremium ? const Color(0xFF22D3EE) : const Color(0xFFD4A574),
+                          widget.lang == 'tr' ? 'Arkadaşlarını Davet Et' : 'Invite Friends',
+                          style: const TextStyle(
+                            color: Color(0xFFE879F9),
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.3,
@@ -3462,9 +4466,9 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          widget.isPremium
-                              ? (widget.lang == 'tr' ? 'Mistk kapılar emrinde' : 'Mystical gates await')
-                              : (widget.lang == 'tr' ? 'Sınırsız kurabiye ve özel özellikler' : 'Unlimited cookies and exclusive features'),
+                          widget.lang == 'tr' 
+                              ? 'Kozmik bağlar kur, birlikte kazan' 
+                              : 'Build cosmic bonds, earn together',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.45),
                             fontSize: 11,
@@ -3474,21 +4478,28 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       ],
                     ),
                   ),
-                  if (!widget.isPremium)
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: const Color(0xFFD4A574).withOpacity(0.5),
-                      size: 16,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE879F9).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFE879F9).withOpacity(0.3)),
                     ),
-                  if (widget.isPremium)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF22D3EE).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text('Aktif', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 10, fontWeight: FontWeight.bold)),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.diamond_rounded, color: Color(0xFF60A5FA), size: 12),
+                        const SizedBox(width: 4),
+                        const Text(
+                          '+3',
+                          style: TextStyle(
+                            color: Color(0xFF60A5FA), 
+                            fontSize: 12, 
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
@@ -3832,98 +4843,163 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
     final firstDate = cookie.firstObtainedDate;
     final dateStr = firstDate != null ? "${firstDate.day.toString().padLeft(2, '0')}.${firstDate.month.toString().padLeft(2, '0')}.${firstDate.year}" : "—";
 
-    showModalBottomSheet(
+    showGeneralDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1E).withOpacity(0.65),
-              border: Border.all(color: Colors.white.withOpacity(0.12), width: 0.5),
-              boxShadow: [
-                BoxShadow(color: rarityColor.withOpacity(0.1), blurRadius: 40, spreadRadius: -5),
+      barrierDismissible: true,
+      barrierLabel: 'CookiePopup',
+      barrierColor: Colors.black.withOpacity(0.65), // Yumuşak karanlık arkaplan
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                // Arkaplan Pırıltısı (Arkada devasa bir aydınlanma)
+                Positioned(
+                  top: 20,
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: rarityColor.withOpacity(0.35), blurRadius: 100, spreadRadius: 30),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Ana Cam Kart
+                Container(
+                  margin: const EdgeInsets.only(top: 80, left: 32, right: 32),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30.0, sigmaY: 30.0),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(28, 70, 28, 36), // Üst padding kurabiyeye yer açar
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.12), // Çok hafif açık tonlu cam (Frosty effect)
+                          borderRadius: BorderRadius.circular(40),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.4),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 40),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              meta['name']!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Date & Adet Pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.calendar_today_rounded, color: rarityColor, size: 14),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "Keşif: $dateStr", 
+                                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
+                                  if (cookie.countObtained > 1) ...[
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                                      width: 1, height: 12, color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Icon(Icons.auto_awesome_motion_rounded, color: rarityColor, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      "x${cookie.countObtained}", 
+                                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                  ]
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+                            // Açıklama
+                            Text(
+                              meta['desc']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.85), 
+                                fontSize: 15, 
+                                height: 1.6, 
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Panele Taşan (Overflow) Animasyonlu Merkez Kurabiye
+                Positioned(
+                  top: 0, 
+                  child: _SensorParallaxWidget(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.2, end: 1.0),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.elasticOut,
+                      builder: (context, scale, child) {
+                        return Transform.scale(
+                          scale: scale,
+                          child: Transform.translate(
+                            offset: Offset(0, 15 * (1 - scale)), // Pop up as it grows
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 140,
+                        height: 140,
+                        child: Image.asset(
+                          'assets/images/cookies/${cookie.id}.webp',
+                          errorBuilder: (_, __, ___) => Icon(Icons.bakery_dining_rounded, color: rarityColor, size: 80),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Kurabiye görseli + glow
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: rarityColor.withOpacity(0.2), blurRadius: 30, spreadRadius: 2),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/cookies/${cookie.id}.webp',
-                  errorBuilder: (_, __, ___) => Icon(Icons.bakery_dining_rounded, color: rarityColor, size: 48),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // İsim
-              Text(
-                meta['name']!,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.3),
-              ),
-              const SizedBox(height: 6),
-              // Nadirlik rozeti
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: rarityColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: rarityColor.withOpacity(0.3), width: 0.5),
-                ),
-                child: Text(
-                  meta['rarity']!,
-                  style: TextStyle(color: rarityColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                ),
-              ),
-              const SizedBox(height: 14),
-              // Açıklama
-              Text(
-                meta['desc']!,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 13, height: 1.5, fontStyle: FontStyle.italic),
-              ),
-              const SizedBox(height: 18),
-              // Alt bilgi satırı
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.calendar_today_rounded, color: Colors.white.withOpacity(0.3), size: 13),
-                    const SizedBox(width: 6),
-                    Text("İlk bulunma: $dateStr", style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Mini bilgelik mesajı
-              Text(
-                meta['quote'] ?? '',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: rarityColor.withOpacity(0.7), fontSize: 11.5, height: 1.4, letterSpacing: 0.2),
-              ),
-            ],
           ),
-        ),
-       ),
-      ),
-     ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curve = CurvedAnimation(parent: animation, curve: Curves.easeOutBack);
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10 * animation.value, sigmaY: 10 * animation.value),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.8, end: 1.0).animate(curve),
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+        );
+      },
     );
   }
 
@@ -4077,6 +5153,9 @@ class _ClaimableFireCell extends StatefulWidget {
   final bool isFuture;
   final bool isAppOpenDay;
   final bool isClaimed;
+  final bool isConnectedLeft;
+  final bool isConnectedRight;
+  final bool isWeekend;
   final String dateKey;
   final VoidCallback? onClaimed;
 
@@ -4086,6 +5165,9 @@ class _ClaimableFireCell extends StatefulWidget {
     required this.isFuture,
     required this.isAppOpenDay,
     required this.isClaimed,
+    this.isConnectedLeft = false,
+    this.isConnectedRight = false,
+    this.isWeekend = false,
     required this.dateKey,
     this.onClaimed,
   });
@@ -4101,6 +5183,8 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
   late Animation<double> _glowAnim;
   late Animation<double> _flyUpAnim;
   late Animation<double> _flyFadeAnim;
+  late AnimationController _breatheController;
+  late Animation<double> _breatheAnim;
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _justClaimed = false;
 
@@ -4111,6 +5195,21 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
+    
+    _breatheController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    
+    _breatheAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 1.2).chain(CurveTween(curve: Curves.easeInOutSine)), weight: 50),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.2, end: 1.0).chain(CurveTween(curve: Curves.easeInOutSine)), weight: 50),
+    ]).animate(_breatheController);
+
+    final bool canClaimInit = widget.isAppOpenDay && !widget.isClaimed && !widget.isFuture && !_justClaimed;
+    if (canClaimInit) {
+      _breatheController.repeat();
+    }
     
     // Aniden 2.5 katına fırlayıp geri oturma
     _scaleAnim = TweenSequence<double>([
@@ -4143,8 +5242,23 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
   void dispose() {
     _explosionController.dispose();
     _flyController.dispose();
+    _breatheController.dispose();
     _audioPlayer.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ClaimableFireCell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final bool canClaim = widget.isAppOpenDay && !widget.isClaimed && !widget.isFuture && !_justClaimed;
+    if (canClaim) {
+      if (!_breatheController.isAnimating) _breatheController.repeat();
+    } else {
+      if (_breatheController.isAnimating) {
+        _breatheController.stop();
+        _breatheController.reset();
+      }
+    }
   }
 
   Future<void> _handleTap() async {
@@ -4160,7 +5274,11 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
 
     final success = await StorageService.claimDailyAura(widget.dateKey);
     if (success && mounted) {
-      setState(() => _justClaimed = true);
+      setState(() {
+        _justClaimed = true;
+        _breatheController.stop();
+        _breatheController.reset();
+      });
       
       _explosionController.forward(from: 0);
       _flyController.forward(from: 0);
@@ -4178,14 +5296,35 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
       onTap: canClaim ? _handleTap : null,
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
-        animation: Listenable.merge([_explosionController, _flyController]),
+        animation: Listenable.merge([_explosionController, _flyController, _breatheController]),
         builder: (context, child) {
           return Stack(
             clipBehavior: Clip.none,
             children: [
+              // Bağlantı çubuğu (Seriyi birleştirmek için arkada kalacak çizgi)
+              if (widget.isConnectedLeft || widget.isConnectedRight)
+                Positioned(
+                  top: 0, bottom: 0,
+                  left: widget.isConnectedLeft ? -3 : 19.5, // 19.5 radius merkeze denk getirir yaklaşık olarak, dengelemek için
+                  right: widget.isConnectedRight ? -3 : 19.5,
+                  child: Center(
+                    child: Container(
+                      height: 1.5,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.35),
+                        borderRadius: BorderRadius.horizontal(
+                          left: widget.isConnectedLeft ? Radius.zero : const Radius.circular(1),
+                          right: widget.isConnectedRight ? Radius.zero : const Radius.circular(1),
+                        )
+                      ),
+                    ),
+                  )
+                ),
               // Ana hücre (Pop efekti ile)
               Transform.scale(
-                scale: _explosionController.isAnimating ? _scaleAnim.value : 1.0,
+                scale: _explosionController.isAnimating 
+                    ? _scaleAnim.value 
+                    : (canClaim ? _breatheAnim.value : 1.0),
                 child: Container(
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -4232,7 +5371,7 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
                     opacity: _flyFadeAnim.value,
                     child: Center(
                       child: Text(
-                        "+1",
+                        widget.isWeekend ? "+2" : "+1",
                         style: const TextStyle(
                           color: Color(0xFFFFC107), 
                           fontSize: 22, 
@@ -4250,5 +5389,264 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell> with TickerProvi
         },
       ),
     );
+  }
+}
+
+class _SettingsListGroup extends StatelessWidget {
+  final List<Widget> children;
+  
+  const _SettingsListGroup({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> spacedChildren = [];
+    for (int i = 0; i < children.length; i++) {
+        spacedChildren.add(children[i]);
+        if (i < children.length - 1) {
+            spacedChildren.add(const SizedBox(height: 12));
+        }
+    }
+
+    return Column(
+      children: spacedChildren,
+    );
+  }
+}
+
+class _SettingsListTile extends StatefulWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final bool isDestructive;
+
+  const _SettingsListTile({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.onTap,
+    this.subtitle,
+    this.isDestructive = false,
+  });
+
+  @override
+  State<_SettingsListTile> createState() => _SettingsListTileState();
+}
+
+class _SettingsListTileState extends State<_SettingsListTile> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTap();
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 150),
+        scale: _pressed ? 0.97 : 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: widget.isDestructive 
+                    ? const Color(0xFFF87171).withOpacity(0.08) 
+                    : Colors.white.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: widget.isDestructive 
+                      ? const Color(0xFFF87171).withOpacity(0.2) 
+                      : Colors.white.withOpacity(0.12),
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: widget.iconColor.withOpacity(widget.isDestructive ? 0.2 : 0.15),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.iconColor.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: Icon(widget.icon, color: widget.iconColor, size: 20),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      widget.label,
+                      style: TextStyle(
+                        color: widget.isDestructive ? const Color(0xFFFF4D4D) : Colors.white.withOpacity(0.95),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  if (widget.subtitle != null && widget.subtitle!.isNotEmpty) ...[
+                    Text(
+                      widget.subtitle!,
+                      style: TextStyle(
+                        color: widget.isDestructive ? const Color(0xFFFF4D4D).withOpacity(0.6) : Colors.white.withOpacity(0.45),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded, 
+                    color: widget.isDestructive ? const Color(0xFFFF4D4D).withOpacity(0.4) : Colors.white.withOpacity(0.25), 
+                    size: 14
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SensorParallaxWidget extends StatefulWidget {
+  final Widget child;
+  const _SensorParallaxWidget({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<_SensorParallaxWidget> createState() => _SensorParallaxWidgetState();
+}
+
+class _SensorParallaxWidgetState extends State<_SensorParallaxWidget> {
+  double _pitch = 0.0;
+  double _roll = 0.0;
+  StreamSubscription<AccelerometerEvent>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _subscription = accelerometerEventStream().listen((AccelerometerEvent event) {
+        if (mounted) {
+          setState(() {
+            _pitch = (event.y * 0.05).clamp(-0.25, 0.25);
+            _roll = (event.x * -0.05).clamp(-0.25, 0.25);
+          });
+        }
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100), // Hızlı ama pürüzsüz tepki
+      transformAlignment: FractionalOffset.center,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001) // perspective
+        ..rotateX(_pitch)
+        ..rotateY(_roll),
+      child: widget.child,
+    );
+  }
+}
+
+// ══════════════════════════════════════════════
+// 🍩 DUYGU DAĞILIMI DONUT GRAFİĞİ
+// ══════════════════════════════════════════════
+
+class _EmotionSlice {
+  final String label;
+  final double percentage;
+  final Color color;
+  final String emoji;
+  final int count;
+  
+  const _EmotionSlice({
+    required this.label,
+    required this.percentage,
+    required this.color,
+    required this.emoji,
+    required this.count,
+  });
+}
+
+class _EmotionDonutPainter extends CustomPainter {
+  final List<_EmotionSlice> slices;
+  final double animationValue;
+  
+  _EmotionDonutPainter({required this.slices, this.animationValue = 1.0});
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    const strokeWidth = 12.0;
+    final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
+    
+    // Arka plan halkası
+    final bgPaint = Paint()
+      ..color = Colors.white.withOpacity(0.04)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(center, radius - strokeWidth / 2, bgPaint);
+    
+    // Dilimleri çiz
+    const gapAngle = 0.06; // Dilimler arası boşluk (radyan)
+    const startAngle = -math.pi / 2; // 12 saat yönünden başla
+    final totalGap = gapAngle * slices.length;
+    final availableAngle = 2 * math.pi - totalGap;
+    
+    double currentAngle = startAngle;
+    
+    for (final slice in slices) {
+      final targetSweepAngle = (slice.percentage / 100) * availableAngle;
+      final sweepAngle = targetSweepAngle * animationValue;
+      
+      // Glow efekti
+      final glowPaint = Paint()
+        ..color = slice.color.withOpacity(0.35 * animationValue)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth + 8
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+      canvas.drawArc(rect, currentAngle, sweepAngle, false, glowPaint);
+      
+      // Ana dilim
+      final slicePaint = Paint()
+        ..color = slice.color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round;
+      canvas.drawArc(rect, currentAngle, sweepAngle, false, slicePaint);
+      
+      currentAngle += targetSweepAngle + gapAngle;
+    }
+  }
+  
+  @override
+  bool shouldRepaint(covariant _EmotionDonutPainter oldDelegate) {
+    return oldDelegate.slices.length != slices.length || oldDelegate.animationValue != animationValue;
   }
 }
