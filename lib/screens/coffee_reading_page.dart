@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'coffee_detailed_reading_page.dart';
 import '../services/storage_service.dart';
 import 'dart:ui' as ui;
@@ -33,6 +34,8 @@ class CoffeeReadingPage extends StatefulWidget {
 
 class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProviderStateMixin {
   bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
   int _loadingTextIndex = 0;
   Timer? _loadingTimer;
   int _soulStones = 0;
@@ -41,6 +44,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
   
   int _smokeStep = 0;
   Timer? _smokeTimer;
+
+  // Dinamik API sonuçları
+  Map<String, dynamic>? _readingData;
   
   late AnimationController _pulseController;
   late AnimationController _rotationController;
@@ -97,8 +103,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
       }
     });
 
-    // Sahte API bekleme süresi (UI testleri için 10 saniye)
-    _simulateApiCall();
+    // Gerçek API çağrısı
+    _callCoffeeApi();
   }
 
   Future<void> _loadSoulStones() async {
@@ -106,36 +112,115 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
     if (mounted) setState(() => _soulStones = stones);
   }
 
-  void _simulateApiCall() async {
-    // Gelecekte burası gerçek Supabase/Edge Function API çağrısı olacak.
-    
-    // Kullanıcı sayfadan çıksa bile falı hazır olduğunda bildirim gitsin
-    CosmicEngineService().scheduleInstantLocalNotification(
-      title: "Kahve Falın Hazır! ☕️",
-      body: "Fincanındaki sırlar çözüldü. Yorumunu okumak için tıkla.",
-      secondsDelay: 14,
-    );
+  /// Fotoğrafları base64'e çevir
+  Future<String> _imageToBase64(File file) async {
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
 
-    await Future.delayed(const Duration(seconds: 14));
-    
-    // Arka planda falı kaydet (Sayfadan çıkmış olsa bile kaydedilir)
-    final dummyReading = {
-      "summary": "Bir süredir beklediğin bir haber yakında geliyor.\nÖnünde açılan bir yol, seni ferahlatacak.\nKüçük bir kısmet, eline beklenmedik bir şekilde geçebilir.\nNetleşen bir konu sayesinde iç huzurun artıyor.",
-      "symbols": ["Kuş - Haber/Müjde", "Açık Yol - Ferahlık", "Kalp - Sevgi"],
-    };
-    
-    final prefs = await SharedPreferences.getInstance();
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    dummyReading['time'] = DateTime.now().toIso8601String();
-    await prefs.setString('coffee_last_reading_date', today);
-    await prefs.setString('coffee_last_reading', jsonEncode(dummyReading));
-    
-    if (mounted) {
-      HapticFeedback.heavyImpact();
-      setState(() {
-        _isLoading = false;
-      });
-      _resultEntranceController.forward();
+  /// Gerçek Supabase Edge Function çağrısı (2 aşamalı)
+  Future<void> _callCoffeeApi() async {
+    try {
+      // Kullanıcı sayfadan çıksa bile falı hazır olduğunda bildirim gitsin
+      CosmicEngineService().scheduleInstantLocalNotification(
+        title: "Kahve Falın Hazır! ☕️",
+        body: "Fincanındaki sırlar çözüldü. Yorumunu okumak için tıkla.",
+        secondsDelay: 30,
+      );
+
+      // Fotoğrafları base64'e çevir
+      final images = await Future.wait([
+        _imageToBase64(widget.insideAngle),
+        _imageToBase64(widget.leftAngle),
+        _imageToBase64(widget.rightAngle),
+        _imageToBase64(widget.plateAngle),
+      ]);
+
+      final supabase = Supabase.instance.client;
+
+      // ═══ AŞAMA 1: Fotoğraf Doğrulama ═══
+      // (Fail-safe: Doğrulama başarısız olursa direkt yoruma geç)
+      try {
+        final validateResponse = await supabase.functions.invoke(
+          'interpret-coffee',
+          body: {
+            'mode': 'validate',
+            'images': images,
+            'locale': 'tr',
+          },
+        );
+
+        if (validateResponse.data != null && validateResponse.data['results'] != null) {
+          final results = validateResponse.data['results'] as List;
+          final invalidSlots = <int>[];
+          for (int i = 0; i < results.length; i++) {
+            if (results[i]['valid'] != true) {
+              invalidSlots.add(i);
+            }
+          }
+          
+          if (invalidSlots.isNotEmpty) {
+            // Hatalı fotoğraf(lar) var — kullanıcıya bildir
+            // Ruh Taşı zaten düştü, iade etmiyoruz ama yeniden çekim hakkı veriyoruz
+            final slotNames = ['Fincan İçi', 'Sol Profil', 'Sağ Profil', 'Tabak'];
+            final errorSlots = invalidSlots.map((i) => slotNames[i]).join(', ');
+            
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+                _hasError = true;
+                _errorMessage = 'Şu fotoğraf(lar) kahve fincanı olarak algılanamadı: $errorSlots. Lütfen geri dönüp yeniden çek.';
+              });
+            }
+            return;
+          }
+        }
+      } catch (validationError) {
+        // Doğrulama hatası — fail-safe: yoruma devam et
+        debugPrint('Fotoğraf doğrulama hatası (devam ediliyor): $validationError');
+      }
+
+      // ═══ AŞAMA 2: Fal Yorumu ═══
+      final interpretResponse = await supabase.functions.invoke(
+        'interpret-coffee',
+        body: {
+          'mode': 'interpret',
+          'images': images,
+          'locale': 'tr',
+        },
+      );
+
+      if (interpretResponse.data == null || interpretResponse.data['error'] != null) {
+        throw Exception(interpretResponse.data?['error'] ?? 'AI servisinden yanıt alınamadı');
+      }
+
+      final reading = interpretResponse.data as Map<String, dynamic>;
+      
+      // Sonucu kaydet (Sayfadan çıkmış olsa bile kaydedilir)
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      reading['time'] = DateTime.now().toIso8601String();
+      await prefs.setString('coffee_last_reading_date', today);
+      await prefs.setString('coffee_last_reading', jsonEncode(reading));
+      
+      if (mounted) {
+        HapticFeedback.heavyImpact();
+        setState(() {
+          _readingData = reading;
+          _isLoading = false;
+          _hasError = false;
+        });
+        _resultEntranceController.forward();
+      }
+    } catch (e) {
+      debugPrint('Kahve falı API hatası: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+          _errorMessage = 'Bir sorun oluştu. Lütfen tekrar dene.';
+        });
+      }
     }
   }
 
@@ -152,12 +237,14 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0A09), // Çok derin siyah/kahve
+      backgroundColor: const Color(0xFF0C0A09),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 1200),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
-        child: _isLoading ? _buildLoadingScreen() : _buildResultScreen(),
+        child: _isLoading 
+            ? _buildLoadingScreen() 
+            : (_hasError ? _buildErrorScreen() : _buildResultScreen()),
       ),
     );
   }
@@ -450,9 +537,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         const SizedBox(height: 20),
                         _ExpandablePhotoItem(
                           file: widget.insideAngle,
-                          title: 'Fincan İçi',
-                          shortDesc: 'İç dünyan, düşüncelerin, duygusal halin.',
-                          detailedDesc: 'İç dünyanı yansıtır. Telvelerin durumu kafandaki karışıklığın yakında dağılacağını söylüyor.',
+                          title: _readingData?['cup_inside']?['title'] ?? 'Fincan İçi',
+                          shortDesc: _readingData?['cup_inside']?['short'] ?? 'İç dünyan, düşüncelerin, duygusal halin.',
+                          detailedDesc: _readingData?['cup_inside']?['detailed'] ?? 'Yorum yükleniyor...',
                           icon: Icons.local_cafe_rounded,
                           isExpanded: _expandedPhotoIndex == 0,
                           onTap: () {
@@ -463,9 +550,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         ),
                         _ExpandablePhotoItem(
                           file: widget.leftAngle,
-                          title: 'Kenar',
-                          shortDesc: 'Yakın gelecek, haber, mesaj, görüşme.',
-                          detailedDesc: 'Dış dünyayla bağlantındır. Dışa açılan izler sevindirici bir haber ya da görüşmeye işaret ediyor.',
+                          title: _readingData?['cup_side']?['title'] ?? 'Kenar',
+                          shortDesc: _readingData?['cup_side']?['short'] ?? 'Yakın gelecek, haber, mesaj, görüşme.',
+                          detailedDesc: _readingData?['cup_side']?['detailed'] ?? 'Yorum yükleniyor...',
                           icon: Icons.blur_circular_rounded,
                           isExpanded: _expandedPhotoIndex == 1,
                           onTap: () {
@@ -476,9 +563,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         ),
                         _ExpandablePhotoItem(
                           file: widget.rightAngle,
-                          title: 'Dip',
-                          shortDesc: 'Geçmişten kalan konu, yük, kapanmamış mesele.',
-                          detailedDesc: 'Geçmişi ve köklerini simgeler. Dipte biriken tortular, arkada bırakman gereken eski bir konuyu gösteriyor.',
+                          title: _readingData?['cup_bottom']?['title'] ?? 'Dip',
+                          shortDesc: _readingData?['cup_bottom']?['short'] ?? 'Geçmişten kalan konu, yük, kapanmamış mesele.',
+                          detailedDesc: _readingData?['cup_bottom']?['detailed'] ?? 'Yorum yükleniyor...',
                           icon: Icons.fingerprint_rounded,
                           isExpanded: _expandedPhotoIndex == 2,
                           onTap: () {
@@ -489,9 +576,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         ),
                         _ExpandablePhotoItem(
                           file: widget.plateAngle,
-                          title: 'Tabak',
-                          shortDesc: 'Dilek, sonuç, kısmet, son enerji.',
-                          detailedDesc: 'Genel enerji ve niyetindir. Tabağın temizliği, dileğinin umduğundan daha hızlı gerçekleşeceğini fısıldıyor.',
+                          title: _readingData?['saucer']?['title'] ?? 'Tabak',
+                          shortDesc: _readingData?['saucer']?['short'] ?? 'Dilek, sonuç, kısmet, son enerji.',
+                          detailedDesc: _readingData?['saucer']?['detailed'] ?? 'Yorum yükleniyor...',
                           icon: Icons.radio_button_unchecked_rounded,
                           isExpanded: _expandedPhotoIndex == 3,
                           onTap: () {
@@ -546,7 +633,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Fincanında ilk dikkat çeken şey, uzun süredir içinde taşıdığın ama tam olarak kimseye açmadığın bir düşünce. Dışarıdan sakin görünsen de, iç dünyanda bir konuyu tekrar tekrar tartıyorsun. Kenara doğru açılan izler, bu bekleyişin çok uzun sürmeyeceğini söylüyor. Yakın zamanda bir mesaj, konuşma ya da küçük bir gelişme seni rahatlatabilir.',
+                            _readingData?['story'] ?? 'Yorum yükleniyor...',
                             style: GoogleFonts.inter(
                               color: Colors.white.withOpacity(0.85),
                               fontSize: 14,
@@ -608,14 +695,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                                     child: Wrap(
                                       spacing: 10,
                                       runSpacing: 10,
-                                      children: [
-                                        _buildPremiumSymbolChip(Icons.edit_road_rounded, 'Yol', 'Yeni başlangıç'),
-                                        _buildPremiumSymbolChip(Icons.flutter_dash_rounded, 'Kuş', 'Haber'),
-                                        _buildPremiumSymbolChip(Icons.favorite_rounded, 'Kalp', 'Duygusal konuşma'),
-                                        _buildPremiumSymbolChip(Icons.vpn_key_rounded, 'Anahtar', 'Çözüm'),
-                                        _buildPremiumSymbolChip(Icons.radio_button_unchecked_rounded, 'Halka', 'Bütünlük'),
-                                        _buildPremiumSymbolChip(Icons.access_time_rounded, 'Saat', 'Zaman'),
-                                      ],
+                                      children: _buildSymbolChips(),
                                     ),
                                   )
                                 : const SizedBox(width: double.infinity, height: 0),
@@ -630,21 +710,21 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 // 4. Aşk Yorumu
                 _buildAnimatedResultChild(
                   0.3,
-                  _buildSectionCard('Aşk & İlişkiler', 'Duygusal tarafta konuşulmamış bir şey var. Açık bir konuşma olursa rahatlama görünüyor. Bekarsan yeni bir tanışma ya da geçmişten gelen bir iletişim olabilir.'),
+                  _buildSectionCard('Aşk & İlişkiler', _readingData?['love'] ?? 'Yorum yükleniyor...'),
                 ),
                 const SizedBox(height: 16),
 
                 // 5. İş & Para Yorumu
                 _buildAnimatedResultChild(
                   0.4,
-                  _buildSectionCard('İş & Para', 'İş veya para tarafında küçük ama moral veren bir gelişme görünüyor. Büyük bir sıçrama değil; daha çok haber, teklif, ödeme ya da yeni bir fırsat gibi.'),
+                  _buildSectionCard('İş & Para', _readingData?['career'] ?? 'Yorum yükleniyor...'),
                 ),
                 const SizedBox(height: 16),
 
                 // 6. Aile & Çevre
                 _buildAnimatedResultChild(
                   0.5,
-                  _buildSectionCard('Aile & Yakın Çevre', 'Yakın çevrenden biriyle yapılacak bir konuşma bazı şeyleri netleştirebilir. Küçük bir yanlış anlaşılma düzelebilir.'),
+                  _buildSectionCard('Aile & Yakın Çevre', _readingData?['family'] ?? 'Yorum yükleniyor...'),
                 ),
                 const SizedBox(height: 16),
 
@@ -664,9 +744,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                       children: [
                         _buildPremiumHeader(Icons.timeline_rounded, 'Yakın Gelecek'),
                         const SizedBox(height: 20),
-                        _buildTimelineItem('Çok Yakında', 'Küçük bir haber veya işaret kapıda.'),
-                        _buildTimelineItem('3 Vakte Kadar', 'Bir görüşme, mesaj veya netleşme anı.'),
-                        _buildTimelineItem('Zamanı Geldiğinde', 'Yeni bir başlangıç ya da karar süreci.', isLast: true),
+                        ..._buildTimelineItems(),
                       ],
                     ),
                   ),
@@ -676,7 +754,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 // 8. Dilek Mesajı
                 _buildAnimatedResultChild(
                   0.7,
-                  _buildSectionCard('Dilek Mesajı', 'Dileğin hemen değil ama adım adım oluyor gibi. Önce küçük bir işaret, sonra daha net bir gelişme görünüyor. Sabırla ilerlersen sonuç daha olumlu olabilir.', icon: Icons.auto_awesome_rounded),
+                  _buildSectionCard('Dilek Mesajı', _readingData?['wish'] ?? 'Yorum yükleniyor...', icon: Icons.auto_awesome_rounded),
                 ),
                 const SizedBox(height: 16),
 
@@ -706,7 +784,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Acele karar verme. Önce gelen işaretleri gör, sonra adım at. Şu an en doğru şey sabırlı ama açık olmak.',
+                          _readingData?['advice'] ?? 'Yorum yükleniyor...',
                           style: GoogleFonts.inter(color: Colors.white.withOpacity(0.8), fontSize: 14, height: 1.5),
                         ),
                       ],
@@ -885,6 +963,144 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
         const Icon(Icons.flare_rounded, color: Color(0xFFD4A373), size: 14),
       ],
     );
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // HATA EKRANI
+  // ═══════════════════════════════════════════════════════════════
+  Widget _buildErrorScreen() {
+    return Center(
+      key: const ValueKey('error'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFD4A373).withOpacity(0.1),
+              ),
+              child: const Icon(Icons.coffee_rounded, color: Color(0xFFD4A373), size: 48),
+            ),
+            const SizedBox(height: 32),
+            Text(
+              _errorMessage,
+              style: GoogleFonts.inter(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 15,
+                height: 1.6,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _isLoading = true;
+                  _hasError = false;
+                  _loadingTextIndex = 0;
+                });
+                _callCoffeeApi();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: const Color(0xFFD4A373),
+                ),
+                child: Text(
+                  'Tekrar Dene',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF161311),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Geri Dön',
+                style: GoogleFonts.inter(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DİNAMİK SEMBOL CHİPLERİ
+  // ═══════════════════════════════════════════════════════════════
+  List<Widget> _buildSymbolChips() {
+    final symbols = _readingData?['symbols'] as List?;
+    if (symbols == null || symbols.isEmpty) {
+      return [
+        _buildPremiumSymbolChip(Icons.auto_awesome, 'Sembol', 'Yükleniyor...'),
+      ];
+    }
+    return symbols.map<Widget>((s) {
+      final name = s['name']?.toString() ?? 'Sembol';
+      final meaning = s['meaning']?.toString() ?? '';
+      final iconName = s['icon']?.toString() ?? 'auto_awesome';
+      return _buildPremiumSymbolChip(_iconFromString(iconName), name, meaning);
+    }).toList();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DİNAMİK TİMELİNE ÖĞELERİ
+  // ═══════════════════════════════════════════════════════════════
+  List<Widget> _buildTimelineItems() {
+    final nearFuture = _readingData?['near_future'] as List?;
+    if (nearFuture == null || nearFuture.isEmpty) {
+      return [
+        _buildTimelineItem('Çok Yakında', 'Yorum yükleniyor...', isLast: true),
+      ];
+    }
+    return List.generate(nearFuture.length, (i) {
+      final item = nearFuture[i];
+      return _buildTimelineItem(
+        item['time']?.toString() ?? '',
+        item['prediction']?.toString() ?? '',
+        isLast: i == nearFuture.length - 1,
+      );
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // İKON STRING → IconData DÖNÜŞTÜRÜCÜ
+  // ═══════════════════════════════════════════════════════════════
+  IconData _iconFromString(String name) {
+    const iconMap = {
+      'edit_road_rounded': Icons.edit_road_rounded,
+      'flutter_dash_rounded': Icons.flutter_dash_rounded,
+      'favorite_rounded': Icons.favorite_rounded,
+      'vpn_key_rounded': Icons.vpn_key_rounded,
+      'radio_button_unchecked_rounded': Icons.radio_button_unchecked_rounded,
+      'access_time_rounded': Icons.access_time_rounded,
+      'visibility_rounded': Icons.visibility_rounded,
+      'pets_rounded': Icons.pets_rounded,
+      'park_rounded': Icons.park_rounded,
+      'water_drop_rounded': Icons.water_drop_rounded,
+      'home_rounded': Icons.home_rounded,
+      'mail_rounded': Icons.mail_rounded,
+      'auto_awesome': Icons.auto_awesome,
+      'local_cafe_rounded': Icons.local_cafe_rounded,
+      'star_rounded': Icons.star_rounded,
+      'nightlight_rounded': Icons.nightlight_rounded,
+    };
+    return iconMap[name] ?? Icons.auto_awesome;
   }
 
   Widget _buildSectionCard(String title, String content, {bool highlightTitle = false, IconData? icon}) {

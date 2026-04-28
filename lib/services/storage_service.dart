@@ -10,6 +10,17 @@ import '../models/cookie_card.dart';
 import '../models/owl_letter.dart';
 
 class StorageService {
+  /// Güvenli getStringList — String olarak kaydedilmiş anahtarları da yönetir
+  static List<String> _safeGetStringList(SharedPreferences prefs, String key) {
+    try {
+      return prefs.getStringList(key) ?? [];
+    } catch (_) {
+      // Anahtar String olarak kaydedilmişse (veri bozulması), temizle
+      prefs.remove(key);
+      return [];
+    }
+  }
+
   static const String _keyCookieCount = 'cookie_count';
   static const String _keyTotalCookies = 'total_cookies';
   static const String _keyTotalDreams = 'total_dreams';
@@ -172,8 +183,8 @@ class StorageService {
       final totalFriends = prefs.getInt('total_friends_count') ?? 0;
       final totalLetters = prefs.getInt('total_letters_sent') ?? 0;
       final totalReferrals = prefs.getInt('total_referrals_count') ?? 0;
-      final uniqueCookies = (prefs.getStringList(_keyCookieCollection) ?? []).length;
-      final unlockedAchievements = prefs.getStringList('achievements_claimed') ?? [];
+      final uniqueCookies = _safeGetStringList(prefs, _keyCookieCollection).length;
+      final unlockedAchievements = _safeGetStringList(prefs, 'achievements_claimed');
 
       await ProfileSyncService().syncEconomyData(
         aura: aura, 
@@ -944,7 +955,7 @@ class StorageService {
   /// Başarım kontrolü yap ve yeni kazanılan varsa döndür
   static Future<List<Map<String, dynamic>>> checkAndClaimAchievements() async {
     final prefs = await SharedPreferences.getInstance();
-    final claimed = (prefs.getStringList('claimed_achievements') ?? []).toSet();
+    final claimed = _safeGetStringList(prefs, 'claimed_achievements').toSet();
     final newlyUnlocked = <Map<String, dynamic>>[];
 
     // Kullanıcı verilerini topla
@@ -955,7 +966,7 @@ class StorageService {
       'total_friends': prefs.getInt('total_friends_count') ?? 0,
       'total_letters_sent': prefs.getInt('total_letters_sent') ?? 0,
       'total_referrals': prefs.getInt('total_referrals_count') ?? 0,
-      'unique_cookies': (prefs.getStringList(_keyCookieCollection) ?? []).length,
+      'unique_cookies': _safeGetStringList(prefs, _keyCookieCollection).length,
     };
 
     for (final achievement in achievementDefinitions) {

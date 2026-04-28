@@ -28,10 +28,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   // Arka plandaki fincan animasyonu için
   late AnimationController _floatCtrl;
 
-  // Sahte Economy State (Entegrasyonda globale bağlanacak)
-  bool _isPremium = false; // BAŞLANGIÇTA ÜCRETSİZ KULLANICI (PREMIUM DEĞİL)
-  int _soulStones = 120;
-  final int _fortuneCost = 30; // 1 Fal Maliyeti: 30 Ruh Taşı
+  // Economy State (Gerçek StorageService ile bağlı)
+  bool _isPremium = false;
+  int _soulStones = 0;
+  final int _fortuneCost = 1; // 1 Fal Maliyeti: 1 Ruh Taşı
 
   // Görselleri tutacağımız değişkenler
   final ImagePicker _picker = ImagePicker();
@@ -61,12 +61,19 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     );
     _entranceController.forward();
     _loadSoulStones();
+    _loadPremiumStatus();
     _loadTodaysReadings();
   }
 
   Future<void> _loadSoulStones() async {
     final stones = await StorageService.getSoulStones();
     if (mounted) setState(() => _soulStones = stones);
+  }
+
+  Future<void> _loadPremiumStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final premium = prefs.getBool('is_premium_test_mode') ?? false;
+    if (mounted) setState(() => _isPremium = premium);
   }
 
   void dispose() {
@@ -91,7 +98,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   }
 
   // Ruh Taşı ile Satın Alma / Başlatma
-  void _startAnalysisWithSoulStones() {
+  Future<void> _startAnalysisWithSoulStones() async {
     if (_soulStones < _fortuneCost) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Yetersiz Ruh Taşı! ✨')),
@@ -100,21 +107,43 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     }
 
     // Seçili fotoğraf kontrolü
-    if (_leftAngle == null || _rightAngle == null || _insideAngle == null) {
+    if (_leftAngle == null || _rightAngle == null || _insideAngle == null || _plateAngle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen fincanın 3 açısını da çekin!')),
+        const SnackBar(content: Text('Lütfen tüm fotoğrafları çekin!')),
       );
       return;
     }
 
     HapticFeedback.heavyImpact();
     
-    // Ruh taşını düş
-    setState(() {
-      _soulStones -= _fortuneCost;
-    });
+    // Gerçek Ruh Taşı düşür (StorageService üzerinden)
+    final success = await StorageService.deductSoulStones(_fortuneCost);
+    if (!success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Yetersiz Ruh Taşı! ✨')),
+        );
+      }
+      return;
+    }
+    
+    // Bakiyeyi güncelle
+    await _loadSoulStones();
 
-    _nextStep();
+    // Fotoğraflar hazır, CoffeeReadingPage'e git
+    if (mounted) {
+      Navigator.push(
+        context,
+        FadePageRoute(
+          page: CoffeeReadingPage(
+            insideAngle: _insideAngle!,
+            leftAngle: _leftAngle!,
+            rightAngle: _rightAngle!,
+            plateAngle: _plateAngle!,
+          ),
+        ),
+      );
+    }
   }
 
   // Premium Paywall (Popup)
@@ -1315,22 +1344,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         return TapScaleButton(
                           onTap: () {
                             if (hasImage) {
-                              if (_currentStep == 4 && _insideAngle != null && _leftAngle != null && _rightAngle != null && _plateAngle != null) {
-                                HapticFeedback.heavyImpact();
-                                Navigator.push(
-                                  context,
-                                  FadePageRoute(
-                                    page: CoffeeReadingPage(
-                                      insideAngle: _insideAngle!,
-                                      leftAngle: _leftAngle!,
-                                      rightAngle: _rightAngle!,
-                                      plateAngle: _plateAngle!,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                _nextStep();
-                              }
+                              // Tüm adımlarda "Sonraki Adım" ile ilerle
+                              // Adım 4'te _nextStep() çağrılırsa _buildFinalReadyScreen()'e gider
+                              // Oradan Ruh Taşı düşürülüp CoffeeReadingPage'e geçilir
+                              _nextStep();
                             } else {
                               _pickImage(stepIndex, isPlate: stepIndex == 4);
                             }
@@ -1351,7 +1368,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                               children: [
                                 Icon(
                                   hasImage 
-                                      ? (_currentStep == 4 ? Icons.visibility_rounded : Icons.arrow_forward_rounded) 
+                                      ? Icons.arrow_forward_rounded
                                       : Icons.camera_alt_rounded, 
                                   color: hasImage ? const Color(0xFF161311) : const Color(0xFFD4A373), 
                                   size: 18
@@ -1359,7 +1376,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                 const SizedBox(width: 10),
                                 Text(
                                   hasImage 
-                                      ? (_currentStep == 4 ? 'Sırları Arala' : 'Sonraki Adım') 
+                                      ? 'Sonraki Adım'
                                       : buttonText,
                                   style: GoogleFonts.inter(
                                     color: hasImage ? const Color(0xFF161311) : const Color(0xFFD4A373),
