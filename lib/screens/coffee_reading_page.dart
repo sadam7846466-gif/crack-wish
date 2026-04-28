@@ -35,6 +35,7 @@ class CoffeeReadingPage extends StatefulWidget {
 class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProviderStateMixin {
   bool _isLoading = true;
   bool _hasError = false;
+  bool _isValidationError = false;
   String _errorMessage = '';
   int _loadingTextIndex = 0;
   Timer? _loadingTimer;
@@ -138,48 +139,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
 
       final supabase = Supabase.instance.client;
 
-      // ═══ AŞAMA 1: Fotoğraf Doğrulama ═══
-      // (Fail-safe: Doğrulama başarısız olursa direkt yoruma geç)
-      try {
-        final validateResponse = await supabase.functions.invoke(
-          'interpret-coffee',
-          body: {
-            'mode': 'validate',
-            'images': images,
-            'locale': 'tr',
-          },
-        );
-
-        if (validateResponse.data != null && validateResponse.data['results'] != null) {
-          final results = validateResponse.data['results'] as List;
-          final invalidSlots = <int>[];
-          for (int i = 0; i < results.length; i++) {
-            if (results[i]['valid'] != true) {
-              invalidSlots.add(i);
-            }
-          }
-          
-          if (invalidSlots.isNotEmpty) {
-            // Hatalı fotoğraf(lar) var — kullanıcıya bildir
-            // Ruh Taşı zaten düştü, iade etmiyoruz ama yeniden çekim hakkı veriyoruz
-            final slotNames = ['Fincan İçi', 'Sol Profil', 'Sağ Profil', 'Tabak'];
-            final errorSlots = invalidSlots.map((i) => slotNames[i]).join(', ');
-            
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-                _hasError = true;
-                _errorMessage = 'Şu fotoğraf(lar) kahve fincanı olarak algılanamadı: $errorSlots. Lütfen geri dönüp yeniden çek.';
-              });
-            }
-            return;
-          }
-        }
-      } catch (validationError) {
-        // Doğrulama hatası — fail-safe: yoruma devam et
-        debugPrint('Fotoğraf doğrulama hatası (devam ediliyor): $validationError');
-      }
-
+      // Doğrulama ana sayfada (CoffeePage) yapıldığı için direkt yoruma geçiyoruz.
       // ═══ AŞAMA 2: Fal Yorumu ═══
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
@@ -218,6 +178,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
         setState(() {
           _isLoading = false;
           _hasError = true;
+          _isValidationError = false;
           _errorMessage = 'Bir sorun oluştu. Lütfen tekrar dene.';
         });
       }
@@ -998,12 +959,16 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
             GestureDetector(
               onTap: () {
                 HapticFeedback.lightImpact();
-                setState(() {
-                  _isLoading = true;
-                  _hasError = false;
-                  _loadingTextIndex = 0;
-                });
-                _callCoffeeApi();
+                if (_isValidationError) {
+                  Navigator.of(context).pop('retake');
+                } else {
+                  setState(() {
+                    _isLoading = true;
+                    _hasError = false;
+                    _loadingTextIndex = 0;
+                  });
+                  _callCoffeeApi();
+                }
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -1012,7 +977,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                   color: const Color(0xFFD4A373),
                 ),
                 child: Text(
-                  'Tekrar Dene',
+                  _isValidationError ? 'Geri Dön & Yeniden Çek' : 'Tekrar Dene',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF161311),
                     fontSize: 15,
@@ -1022,18 +987,19 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
               ),
             ),
             const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Geri Dön',
-                style: GoogleFonts.inter(
-                  color: Colors.white.withOpacity(0.4),
-                  fontSize: 14,
+            if (!_isValidationError)
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'İptal Et',
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 14,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

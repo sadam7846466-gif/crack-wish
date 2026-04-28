@@ -13,6 +13,7 @@ import 'premium_paywall_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../widgets/fade_page_route.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CoffeePage extends StatefulWidget {
   const CoffeePage({super.key});
@@ -24,6 +25,11 @@ class CoffeePage extends StatefulWidget {
 class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   late PageController _pageCtrl;
   int _currentStep = 0;
+  
+  // Validation state
+  bool _isValidating = false;
+  bool _isValidated = false;
+  List<int> _invalidSlots = [];
   
   // Arka plandaki fincan animasyonu için
   late AnimationController _floatCtrl;
@@ -97,7 +103,62 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     }
   }
 
-  // Ruh Taşı ile Satın Alma / Başlatma
+  Future<String> _imageToBase64(File file) async {
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
+
+  Future<void> _validateImages() async {
+    setState(() {
+      _isValidating = true;
+      _isValidated = false;
+      _invalidSlots.clear();
+    });
+
+    try {
+      final images = await Future.wait([
+        _imageToBase64(_insideAngle!),
+        _imageToBase64(_leftAngle!),
+        _imageToBase64(_rightAngle!),
+        _imageToBase64(_plateAngle!),
+      ]);
+
+      final validateResponse = await Supabase.instance.client.functions.invoke(
+        'interpret-coffee',
+        body: {
+          'mode': 'validate',
+          'images': images,
+          'locale': 'tr',
+        },
+      );
+
+      if (validateResponse.data != null && validateResponse.data['results'] != null) {
+        final results = validateResponse.data['results'] as List;
+        final invalidSlots = <int>[];
+        for (int i = 0; i < results.length; i++) {
+          if (results[i]['valid'] != true) {
+            invalidSlots.add(i);
+          }
+        }
+        
+        if (mounted) {
+          setState(() {
+            _isValidating = false;
+            _isValidated = invalidSlots.isEmpty;
+            _invalidSlots = invalidSlots;
+          });
+        }
+      } else {
+        // Fail-safe
+        if (mounted) setState(() { _isValidating = false; _isValidated = true; });
+      }
+    } catch (e) {
+      debugPrint('Doğrulama hatası: $e');
+      if (mounted) setState(() { _isValidating = false; _isValidated = true; });
+    }
+  }
+
+  // Ruh Taşı ile Satın Alma / Başlatma (Sadece doğrulama başarılıysa çağrılır)
   Future<void> _startAnalysisWithSoulStones() async {
     if (_soulStones < _fortuneCost) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +167,6 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
       return;
     }
 
-    // Seçili fotoğraf kontrolü
     if (_leftAngle == null || _rightAngle == null || _insideAngle == null || _plateAngle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Lütfen tüm fotoğrafları çekin!')),
@@ -132,7 +192,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
     // Fotoğraflar hazır, CoffeeReadingPage'e git
     if (mounted) {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         FadePageRoute(
           page: CoffeeReadingPage(
@@ -143,6 +203,12 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
           ),
         ),
       );
+
+      if (result == 'retake' && mounted) {
+        setState(() {
+          _currentStep = 1; // Başlangıca dön, hatalı fotoğrafı tekrar çekebilsin
+        });
+      }
     }
   }
 
@@ -291,11 +357,6 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
       if (stepIndex == 1) _insideAngle = file;
       if (stepIndex == 2) _leftAngle = file;
       if (stepIndex == 3) _rightAngle = file;
-      if (isPlate) _plateAngle = file;
-    });
-    
-    // Sadece mevcut adımda çekim yapıyorsak bir sonrakine geç. 
-    // Geçmiş bir adımı "Yeniden Çek" ile değiştirdiysek sayfayı atlatma.
     if (stepIndex == _currentStep) {
       if (!isPlate) {
         _nextStep();
@@ -461,7 +522,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     
                     // Sadece mevcut adımda henüz 'Sonraki Adım'a tıklanmadıysa değiştirebilir. 
                     // Geçmiş adımlara dönmek KİLİTLİDİR.
-                    if (imageFile != null && stepNum == _currentStep) {
+                    if (imageFile != null && (stepNum == _currentStep || (_currentStep == 5 && _invalidSlots.contains(i)))) {
                       HapticFeedback.lightImpact();
                       _pickImage(stepNum, isPlate: stepNum == 4);
                     }
@@ -487,12 +548,14 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                             : Colors.white.withOpacity(0.02),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _currentStep == (i + 1) 
-                              ? const Color(0xFFD4A373).withOpacity(0.6)
-                              : _currentStep > (i + 1)
-                                  ? const Color(0xFFD4A373).withOpacity(0.2)
-                                  : Colors.white.withOpacity(0.05),
-                          width: _currentStep == (i + 1) ? 1.5 : 1.0,
+                          color: _invalidSlots.contains(i)
+                              ? Colors.redAccent.withOpacity(0.8)
+                              : _currentStep == (i + 1) 
+                                  ? const Color(0xFFD4A373).withOpacity(0.6)
+                                  : _currentStep > (i + 1)
+                                      ? const Color(0xFFD4A373).withOpacity(0.2)
+                                      : Colors.white.withOpacity(0.05),
+                          width: _invalidSlots.contains(i) ? 2.5 : (_currentStep == (i + 1) ? 1.5 : 1.0),
                         ),
                         image: () {
                           File? img;
@@ -516,7 +579,20 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           if (i == 2) img = _rightAngle;
                           if (i == 3) img = _plateAngle;
                           
-                          if (img != null) return const SizedBox.shrink(); // Resim varsa ikon gösterme
+                          if (img != null) {
+                            if (_invalidSlots.contains(i)) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withOpacity(0.6),
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.refresh_rounded, color: Colors.white, size: 24),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink(); // Resim geçerliyse ikon yok
+                          }
                           
                           return Center(
                             child: Icon(
@@ -1439,44 +1515,158 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 60),
           
-          // SADECE RUH TAŞI BUTONU
-          GestureDetector(
-            onTap: _startAnalysisWithSoulStones, // Yeni Fonksiyon (Ruh taşı düşüyor)
-            child: Container(
-               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100), // Yuvarlatılmış köşeler
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)], // Premium mor tonlar
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF6D28D9).withOpacity(0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Falı Yorumla - $_fortuneCost Ruh Taşı',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+          // SADECE RUH TAŞI BUTONU VEYA TARAMA BUTONU
+          Builder(
+            builder: (context) {
+              if (_isValidating) {
+                return Column(
+                  children: [
+                    const CircularProgressIndicator(color: Color(0xFFB084F4)),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Görseller Kontrol Ediliyor...',
+                      style: GoogleFonts.inter(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              if (_invalidSlots.isNotEmpty) {
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Geçersiz görseller var, kırmızı ile işaretlendi.',
+                            style: GoogleFonts.inter(color: Colors.redAccent, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        // Otomatik olarak ilk hatalı olanı aç
+                        final firstInvalid = _invalidSlots.first;
+                        _pickImage(firstInvalid + 1, isPlate: firstInvalid == 3);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.white.withOpacity(0.05),
+                          border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Hatalı Olanları Yeniden Çek',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              if (_isValidated) {
+                return GestureDetector(
+                  onTap: _startAnalysisWithSoulStones,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF6D28D9).withOpacity(0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Falı Yorumla - $_fortuneCost Ruh Taşı',
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
+                );
+              }
+
+              // Henüz doğrulanmadıysa "Sırları Arala" butonu göster
+              return GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _validateImages();
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: const Color(0xFFD4A373).withOpacity(0.15),
+                    border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.5)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.search_rounded, color: Color(0xFFD4A373), size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Sırları Arala',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFD4A373),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
           ),
         ],
       ),
