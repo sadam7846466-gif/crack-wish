@@ -19,6 +19,8 @@ class CoffeeReadingPage extends StatefulWidget {
   final File leftAngle;
   final File rightAngle;
   final File plateAngle;
+  final Map<String, dynamic>? initialData;
+  final void Function(bool success, String? error)? onBackgroundResult;
 
   const CoffeeReadingPage({
     super.key,
@@ -26,13 +28,16 @@ class CoffeeReadingPage extends StatefulWidget {
     required this.leftAngle,
     required this.rightAngle,
     required this.plateAngle,
+    this.initialData,
+    this.onBackgroundResult,
   });
 
   @override
   State<CoffeeReadingPage> createState() => _CoffeeReadingPageState();
 }
 
-class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProviderStateMixin {
+class _CoffeeReadingPageState extends State<CoffeeReadingPage>
+    with TickerProviderStateMixin {
   bool _isLoading = true;
   bool _hasError = false;
   bool _isValidationError = false;
@@ -42,13 +47,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
   int _soulStones = 0;
   int? _expandedPhotoIndex;
   bool _isSymbolsExpanded = false;
-  
+
   int _smokeStep = 0;
   Timer? _smokeTimer;
 
   // Dinamik API sonuçları
   Map<String, dynamic>? _readingData;
-  
+
   late AnimationController _pulseController;
   late AnimationController _rotationController;
 
@@ -60,7 +65,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
     "Telvelerdeki semboller evrensel enerjiyle eşleşiyor...",
     "Ruh rehberleri dinleniyor...",
     "Kader çizgilerin haritalanıyor...",
-    "Sırlar açığa çıkıyor..."
+    "Sırlar açığa çıkıyor...",
   ];
 
   @override
@@ -104,13 +109,57 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
       }
     });
 
-    // Gerçek API çağrısı
-    _callCoffeeApi();
+    // Gerçek API çağrısı veya hazır veriyi yükleme
+    if (widget.initialData != null) {
+      _isLoading = false;
+      _readingData = widget.initialData;
+      // UI build edildikten sonra animasyonu başlat
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _resultEntranceController.forward();
+      });
+    } else {
+      _callCoffeeApi();
+    }
   }
 
   Future<void> _loadSoulStones() async {
     final stones = await StorageService.getSoulStones();
     if (mounted) setState(() => _soulStones = stones);
+  }
+
+  /// AI'ın image_map'ine göre doğru fotoğrafı döndür.
+  /// AI her bölüm için hangi fotoğrafı (1-4) kullandığını bildirir.
+  /// Fallback: image_map yoksa sabit slot sırasına güvenir.
+  File _getImageForSection(String sectionKey) {
+    final allImages = [
+      widget.insideAngle,
+      widget.leftAngle,
+      widget.rightAngle,
+      widget.plateAngle,
+    ];
+
+    // AI'dan gelen image_map varsa, onu kullan
+    final imageMap = _readingData?['image_map'];
+    if (imageMap != null && imageMap[sectionKey] != null) {
+      final idx = (imageMap[sectionKey] as int) - 1; // 1-indexed → 0-indexed
+      if (idx >= 0 && idx < allImages.length) {
+        return allImages[idx];
+      }
+    }
+
+    // Fallback: sabit slot sırası
+    switch (sectionKey) {
+      case 'cup_inside':
+        return widget.insideAngle;
+      case 'cup_side':
+        return widget.leftAngle;
+      case 'cup_bottom':
+        return widget.rightAngle;
+      case 'saucer':
+        return widget.plateAngle;
+      default:
+        return widget.insideAngle;
+    }
   }
 
   /// Fotoğrafları base64'e çevir
@@ -121,14 +170,15 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
 
   /// Gerçek Supabase Edge Function çağrısı (2 aşamalı)
   Future<void> _callCoffeeApi() async {
-    try {
-      // Kullanıcı sayfadan çıksa bile falı hazır olduğunda bildirim gitsin
-      CosmicEngineService().scheduleInstantLocalNotification(
-        title: "Kahve Falın Hazır! ☕️",
-        body: "Fincanındaki sırlar çözüldü. Yorumunu okumak için tıkla.",
-        secondsDelay: 30,
-      );
+    // ÖNEMLİ: Eğer sayfa arka plana atılırsa (dispose olursa) widget'a erişim hata fırlatır!
+    // Bu yüzden arka planda kullanılacak tüm widget referanslarını yerel değişkene alıyoruz.
+    final insidePath = widget.insideAngle.path;
+    final leftPath = widget.leftAngle.path;
+    final rightPath = widget.rightAngle.path;
+    final platePath = widget.plateAngle.path;
+    final backgroundCallback = widget.onBackgroundResult;
 
+    try {
       // Fotoğrafları base64'e çevir
       final images = await Future.wait([
         _imageToBase64(widget.insideAngle),
@@ -143,41 +193,74 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
       // ═══ AŞAMA 2: Fal Yorumu ═══
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
-        body: {
-          'mode': 'interpret',
-          'images': images,
-          'locale': 'tr',
-        },
+        body: {'mode': 'interpret', 'images': images, 'locale': 'tr'},
       );
 
-      if (interpretResponse.data == null || interpretResponse.data['error'] != null) {
-        throw Exception(interpretResponse.data?['error'] ?? 'AI servisinden yanıt alınamadı');
+      if (interpretResponse.data == null ||
+          interpretResponse.data['error'] != null) {
+        throw Exception(
+          interpretResponse.data?['error'] ?? 'AI servisinden yanıt alınamadı',
+        );
       }
 
       final reading = interpretResponse.data as Map<String, dynamic>;
-      
-      // FALLA BİRLİKTE RUH TAŞINI ŞİMDİ KES! (Kullanıcıyı çökme ve kopmalardan korur)
-      // Eğer _fortuneCost değişkeni burada bilinmiyorsa 1 olarak sabitliyoruz.
-      await StorageService.deductSoulStones(1);
-      
+
+      // Ruh taşı Ana Sayfa'da "Kaderini Keşfet" butonuna basıldığı an peşin olarak kesildiği için burada tekrar KESMİYORUZ!
+
       // Sonucu kaydet (Sayfadan çıkmış olsa bile kaydedilir)
       final prefs = await SharedPreferences.getInstance();
       final today = DateTime.now().toIso8601String().split('T')[0];
       reading['time'] = DateTime.now().toIso8601String();
       await prefs.setString('coffee_last_reading_date', today);
       await prefs.setString('coffee_last_reading', jsonEncode(reading));
-      
-      if (mounted) {
-        HapticFeedback.heavyImpact();
-        setState(() {
-          _readingData = reading;
-          _isLoading = false;
-          _hasError = false;
-        });
-        _resultEntranceController.forward();
+
+      // Save image paths to restore the UI later
+      await prefs.setStringList('coffee_last_images', [
+        insidePath,
+        leftPath,
+        rightPath,
+        platePath,
+      ]);
+
+      // Kahve falı başarılı! Aura ödülü ver (Premium: 3x çarpan)
+      final isPremium =
+          prefs.getBool('is_premium_test_mode') ??
+          prefs.getBool('is_premium_user') ??
+          false;
+      await StorageService.addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
+      await StorageService.incrementTotalCoffee();
+
+      backgroundCallback?.call(true, null);
+
+      if (!mounted) {
+        // Kullanıcı 'Ana Sayfaya Dön' diyerek çıkmış, bildirimi gönder
+        CosmicEngineService().scheduleInstantLocalNotification(
+          title: "Kahve Falın Hazır! ☕️",
+          body: "Fincanındaki sırlar çözüldü. Ana menüden okuyabilirsin.",
+          secondsDelay: 1,
+        );
+        return;
       }
+
+      HapticFeedback.heavyImpact();
+      setState(() {
+        _readingData = reading;
+        _isLoading = false;
+        _hasError = false;
+      });
+      _resultEntranceController.forward();
     } catch (e) {
       debugPrint('Kahve falı API hatası: $e');
+
+      // İşlem başarısız olduysa (Örn: İnternet koptu, AI cevap vermedi) peşin aldığımız taşı İADE EDİYORUZ!
+      await StorageService.updateSoulStones(1);
+
+      // Arka planda hata aldıysa Ana sayfaya bildir
+      backgroundCallback?.call(
+        false,
+        e.toString().replaceAll('Exception: ', ''),
+      );
+
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -207,8 +290,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
         duration: const Duration(milliseconds: 1200),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
-        child: _isLoading 
-            ? _buildLoadingScreen() 
+        child: _isLoading
+            ? _buildLoadingScreen()
             : (_hasError ? _buildErrorScreen() : _buildResultScreen()),
       ),
     );
@@ -242,28 +325,42 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                             animation: _rotationController,
                             builder: (context, child) {
                               // Hızı yavaşlatıldı (*4 yerine daha sakin bir ritim)
-                              final progress = ((_rotationController.value * 3.5) + (index * 0.33)) % 1.0;
-                              
+                              final progress =
+                                  ((_rotationController.value * 3.5) +
+                                      (index * 0.33)) %
+                                  1.0;
+
                               // Hareketi yumuşatmak için yavaşlayarak çıkan bir eğri kullanıyoruz
-                              final easeProgress = Curves.easeOut.transform(progress);
-                              
+                              final easeProgress = Curves.easeOut.transform(
+                                progress,
+                              );
+
                               // Aşağıdan yukarıya çok daha yumuşak ve kavisli bir yükseliş
                               final dy = -45 * easeProgress;
-                              
+
                               // Ortada en belirgin, başta ve sonda tamamen silik (yumuşak geçiş)
-                              final opacity = math.sin(progress * math.pi) * 0.7; // Biraz daha şeffaf ve elit
-                              
+                              final opacity =
+                                  math.sin(progress * math.pi) *
+                                  0.7; // Biraz daha şeffaf ve elit
+
                               // X ekseninde yan yana dizilim (24, 34, 44)
                               final leftPos = 24.0 + (index * 10.0);
-                              
+
                               return Positioned(
-                                top: 15 + dy, // Fincanın üstünden süzülerek çıkıyor
+                                top:
+                                    15 +
+                                    dy, // Fincanın üstünden süzülerek çıkıyor
                                 left: leftPos,
                                 child: Opacity(
                                   opacity: opacity,
                                   child: CustomPaint(
-                                    size: const Size(12, 28), // Kullanıcının çizdiği zarif "S" boyutu
-                                    painter: SmokeWispPainter(color: const Color(0xFFD4A373)),
+                                    size: const Size(
+                                      12,
+                                      28,
+                                    ), // Kullanıcının çizdiği zarif "S" boyutu
+                                    painter: SmokeWispPainter(
+                                      color: const Color(0xFFD4A373),
+                                    ),
                                   ),
                                 ),
                               );
@@ -282,7 +379,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                                 height: 40,
                                 decoration: const BoxDecoration(
                                   color: Color(0xFFD4A373),
-                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                                  borderRadius: BorderRadius.vertical(
+                                    bottom: Radius.circular(20),
+                                  ),
                                 ),
                               ),
                               // Kulp
@@ -291,14 +390,19 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                                 height: 22,
                                 margin: const EdgeInsets.only(top: 4),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xFFD4A373), width: 3.5),
-                                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(12)),
+                                  border: Border.all(
+                                    color: const Color(0xFFD4A373),
+                                    width: 3.5,
+                                  ),
+                                  borderRadius: const BorderRadius.horizontal(
+                                    right: Radius.circular(12),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        
+
                         // Tabak
                         Positioned(
                           top: 84.0, // Fincanın altına oturtuldu
@@ -307,7 +411,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                width: 72, 
+                                width: 72,
                                 height: 6,
                                 decoration: const BoxDecoration(
                                   color: Color(0xFFD4A373),
@@ -322,7 +426,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                                 height: 4,
                                 decoration: const BoxDecoration(
                                   color: Color(0xFFD4A373),
-                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(6)),
+                                  borderRadius: BorderRadius.vertical(
+                                    bottom: Radius.circular(6),
+                                  ),
                                 ),
                               ),
                             ],
@@ -334,9 +440,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 ),
               ),
             ),
-            
+
             const Spacer(flex: 2),
-            
+
             // ─── Bilgilendirme Alanı ───
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -360,7 +466,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                           const TextSpan(text: 'Sonucu ana sayfadaki  '),
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
-                            child: Icon(Icons.coffee_rounded, size: 18, color: Colors.white.withOpacity(0.65)),
+                            child: Icon(
+                              Icons.coffee_rounded,
+                              size: 18,
+                              color: Colors.white.withOpacity(0.65),
+                            ),
                           ),
                           const TextSpan(text: '  butonundan görebilirsin'),
                         ],
@@ -375,9 +485,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 ],
               ),
             ),
-            
+
             const Spacer(flex: 1),
-            
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: GestureDetector(
@@ -426,7 +536,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
             shape: BoxShape.circle,
             color: const Color(0xFFD4A373).withOpacity(0.10),
           ),
-          child: Icon(icon, size: 20, color: const Color(0xFFD4A373).withOpacity(0.8)),
+          child: Icon(
+            icon,
+            size: 20,
+            color: const Color(0xFFD4A373).withOpacity(0.8),
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -448,22 +562,27 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
   Widget _buildAnimatedResultChild(double start, Widget child) {
     final fadeAnim = CurvedAnimation(
       parent: _resultEntranceController,
-      curve: Interval(start, math.min(1.0, start + 0.4), curve: Curves.easeOutCubic),
+      curve: Interval(
+        start,
+        math.min(1.0, start + 0.4),
+        curve: Curves.easeOutCubic,
+      ),
     );
-    final slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _resultEntranceController,
-      curve: Interval(start, math.min(1.0, start + 0.5), curve: Curves.easeOutQuart),
-    ));
+    final slideAnim =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _resultEntranceController,
+            curve: Interval(
+              start,
+              math.min(1.0, start + 0.5),
+              curve: Curves.easeOutQuart,
+            ),
+          ),
+        );
 
     return FadeTransition(
       opacity: fadeAnim,
-      child: SlideTransition(
-        position: slideAnim,
-        child: child,
-      ),
+      child: SlideTransition(position: slideAnim, child: child),
     );
   }
 
@@ -474,10 +593,16 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
         // 1. Kaydırılabilir İçerik (Tam Ekran)
         Positioned.fill(
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 90, // App Bar için boşluk
-              bottom: MediaQuery.of(context).padding.bottom + 24, // Alt sınırda kararında boşluk
+              top:
+                  MediaQuery.of(context).padding.top +
+                  90, // App Bar için boşluk
+              bottom:
+                  MediaQuery.of(context).padding.bottom +
+                  24, // Alt sınırda kararında boşluk
               left: 24,
               right: 24,
             ),
@@ -493,62 +618,98 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                     decoration: BoxDecoration(
                       color: const Color(0xFF140F0C),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: const Color(0xFFD4A373).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPremiumHeader(Icons.coffee_rounded, 'Fincanın Bölümleri'),
+                        _buildPremiumHeader(
+                          Icons.coffee_rounded,
+                          'Fincanın Bölümleri',
+                        ),
                         const SizedBox(height: 20),
                         _ExpandablePhotoItem(
-                          file: widget.insideAngle,
-                          title: _readingData?['cup_inside']?['title'] ?? 'Fincan İçi',
-                          shortDesc: _readingData?['cup_inside']?['short'] ?? 'İç dünyan, düşüncelerin, duygusal halin.',
-                          detailedDesc: _readingData?['cup_inside']?['detailed'] ?? 'Yorum yükleniyor...',
+                          file: _getImageForSection('cup_inside'),
+                          title:
+                              _readingData?['cup_inside']?['title'] ??
+                              'Fincan İçi',
+                          shortDesc:
+                              _readingData?['cup_inside']?['short'] ??
+                              'İç dünyan, düşüncelerin, duygusal halin.',
+                          detailedDesc:
+                              _readingData?['cup_inside']?['detailed'] ??
+                              'Yorum yükleniyor...',
                           icon: Icons.local_cafe_rounded,
                           isExpanded: _expandedPhotoIndex == 0,
                           onTap: () {
                             setState(() {
-                              _expandedPhotoIndex = _expandedPhotoIndex == 0 ? null : 0;
+                              _expandedPhotoIndex = _expandedPhotoIndex == 0
+                                  ? null
+                                  : 0;
                             });
                           },
                         ),
                         _ExpandablePhotoItem(
-                          file: widget.leftAngle,
-                          title: _readingData?['cup_side']?['title'] ?? 'Kenar',
-                          shortDesc: _readingData?['cup_side']?['short'] ?? 'Yakın gelecek, haber, mesaj, görüşme.',
-                          detailedDesc: _readingData?['cup_side']?['detailed'] ?? 'Yorum yükleniyor...',
+                          file: _getImageForSection('cup_side'),
+                          title:
+                              _readingData?['cup_side']?['title'] ??
+                              'Fincan Kenarı',
+                          shortDesc:
+                              _readingData?['cup_side']?['short'] ??
+                              'Yakın gelecek, haber, mesaj, görüşme.',
+                          detailedDesc:
+                              _readingData?['cup_side']?['detailed'] ??
+                              'Yorum yükleniyor...',
                           icon: Icons.blur_circular_rounded,
                           isExpanded: _expandedPhotoIndex == 1,
                           onTap: () {
                             setState(() {
-                              _expandedPhotoIndex = _expandedPhotoIndex == 1 ? null : 1;
+                              _expandedPhotoIndex = _expandedPhotoIndex == 1
+                                  ? null
+                                  : 1;
                             });
                           },
                         ),
                         _ExpandablePhotoItem(
-                          file: widget.rightAngle,
-                          title: _readingData?['cup_bottom']?['title'] ?? 'Dip',
-                          shortDesc: _readingData?['cup_bottom']?['short'] ?? 'Geçmişten kalan konu, yük, kapanmamış mesele.',
-                          detailedDesc: _readingData?['cup_bottom']?['detailed'] ?? 'Yorum yükleniyor...',
+                          file: _getImageForSection('cup_bottom'),
+                          title:
+                              _readingData?['cup_bottom']?['title'] ??
+                              'Fincan Dibi',
+                          shortDesc:
+                              _readingData?['cup_bottom']?['short'] ??
+                              'Geçmişten kalan konu, yük, kapanmamış mesele.',
+                          detailedDesc:
+                              _readingData?['cup_bottom']?['detailed'] ??
+                              'Yorum yükleniyor...',
                           icon: Icons.fingerprint_rounded,
                           isExpanded: _expandedPhotoIndex == 2,
                           onTap: () {
                             setState(() {
-                              _expandedPhotoIndex = _expandedPhotoIndex == 2 ? null : 2;
+                              _expandedPhotoIndex = _expandedPhotoIndex == 2
+                                  ? null
+                                  : 2;
                             });
                           },
                         ),
                         _ExpandablePhotoItem(
-                          file: widget.plateAngle,
+                          file: _getImageForSection('saucer'),
                           title: _readingData?['saucer']?['title'] ?? 'Tabak',
-                          shortDesc: _readingData?['saucer']?['short'] ?? 'Dilek, sonuç, kısmet, son enerji.',
-                          detailedDesc: _readingData?['saucer']?['detailed'] ?? 'Yorum yükleniyor...',
+                          shortDesc:
+                              _readingData?['saucer']?['short'] ??
+                              'Dilek, sonuç, kısmet, son enerji.',
+                          detailedDesc:
+                              _readingData?['saucer']?['detailed'] ??
+                              'Yorum yükleniyor...',
                           icon: Icons.radio_button_unchecked_rounded,
                           isExpanded: _expandedPhotoIndex == 3,
                           onTap: () {
                             setState(() {
-                              _expandedPhotoIndex = _expandedPhotoIndex == 3 ? null : 3;
+                              _expandedPhotoIndex = _expandedPhotoIndex == 3
+                                  ? null
+                                  : 3;
                             });
                           },
                           isLast: true,
@@ -568,46 +729,59 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                     decoration: BoxDecoration(
                       color: const Color(0xFF140F0C),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: const Color(0xFFD4A373).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFD4A373).withOpacity(0.15),
-                                  border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.4)),
-                                ),
-                                child: const Icon(Icons.remove_red_eye_rounded, color: Color(0xFFD4A373), size: 18),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Telvelerin Anlattığı Hikaye',
-                                style: GoogleFonts.playfairDisplay(
-                                  color: const Color(0xFFE8D5C4),
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(
+                                  0xFFD4A373,
+                                ).withOpacity(0.15),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFFD4A373,
+                                  ).withOpacity(0.4),
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _readingData?['story'] ?? 'Yorum yükleniyor...',
-                            style: GoogleFonts.inter(
-                              color: Colors.white.withOpacity(0.85),
-                              fontSize: 14,
-                              height: 1.6,
-                              fontStyle: FontStyle.italic,
+                              child: const Icon(
+                                Icons.remove_red_eye_rounded,
+                                color: Color(0xFFD4A373),
+                                size: 18,
+                              ),
                             ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Telvelerin Anlattığı Hikaye',
+                              style: GoogleFonts.playfairDisplay(
+                                color: const Color(0xFFE8D5C4),
+                                fontSize: 19,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _readingData?['story'] ?? 'Yorum yükleniyor...',
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 14,
+                            height: 1.6,
+                            fontStyle: FontStyle.italic,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -628,11 +802,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: _isSymbolsExpanded ? const Color(0xFF1C1714) : const Color(0xFF140F0C),
+                        color: _isSymbolsExpanded
+                            ? const Color(0xFF1C1714)
+                            : const Color(0xFF140F0C),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: _isSymbolsExpanded 
-                              ? const Color(0xFFD4A373).withOpacity(0.4) 
+                          color: _isSymbolsExpanded
+                              ? const Color(0xFFD4A373).withOpacity(0.4)
                               : const Color(0xFFD4A373).withOpacity(0.3),
                           width: 1,
                         ),
@@ -642,11 +818,20 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                         children: [
                           Row(
                             children: [
-                              Expanded(child: _buildPremiumHeader(Icons.auto_awesome, 'Falında Görülen Semboller')),
+                              Expanded(
+                                child: _buildPremiumHeader(
+                                  Icons.auto_awesome,
+                                  'Falında Görülen Semboller',
+                                ),
+                              ),
                               AnimatedRotation(
                                 turns: _isSymbolsExpanded ? 0.25 : 0,
                                 duration: const Duration(milliseconds: 300),
-                                child: Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.3), size: 20),
+                                child: Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: Colors.white.withOpacity(0.3),
+                                  size: 20,
+                                ),
                               ),
                             ],
                           ),
@@ -663,7 +848,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                                       children: _buildSymbolChips(),
                                     ),
                                   )
-                                : const SizedBox(width: double.infinity, height: 0),
+                                : const SizedBox(
+                                    width: double.infinity,
+                                    height: 0,
+                                  ),
                           ),
                         ],
                       ),
@@ -675,21 +863,30 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 // 4. Aşk Yorumu
                 _buildAnimatedResultChild(
                   0.3,
-                  _buildSectionCard('Aşk & İlişkiler', _readingData?['love'] ?? 'Yorum yükleniyor...'),
+                  _buildSectionCard(
+                    'Aşk & İlişkiler',
+                    _readingData?['love'] ?? 'Yorum yükleniyor...',
+                  ),
                 ),
                 const SizedBox(height: 16),
 
                 // 5. İş & Para Yorumu
                 _buildAnimatedResultChild(
                   0.4,
-                  _buildSectionCard('İş & Para', _readingData?['career'] ?? 'Yorum yükleniyor...'),
+                  _buildSectionCard(
+                    'İş & Para',
+                    _readingData?['career'] ?? 'Yorum yükleniyor...',
+                  ),
                 ),
                 const SizedBox(height: 16),
 
                 // 6. Aile & Çevre
                 _buildAnimatedResultChild(
                   0.5,
-                  _buildSectionCard('Aile & Yakın Çevre', _readingData?['family'] ?? 'Yorum yükleniyor...'),
+                  _buildSectionCard(
+                    'Aile & Yakın Çevre',
+                    _readingData?['family'] ?? 'Yorum yükleniyor...',
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -702,12 +899,18 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                     decoration: BoxDecoration(
                       color: const Color(0xFF140F0C),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: const Color(0xFFD4A373).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPremiumHeader(Icons.timeline_rounded, 'Yakın Gelecek'),
+                        _buildPremiumHeader(
+                          Icons.timeline_rounded,
+                          'Yakın Gelecek',
+                        ),
                         const SizedBox(height: 20),
                         ..._buildTimelineItems(),
                       ],
@@ -719,7 +922,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 // 8. Dilek Mesajı
                 _buildAnimatedResultChild(
                   0.7,
-                  _buildSectionCard('Dilek Mesajı', _readingData?['wish'] ?? 'Yorum yükleniyor...', icon: Icons.auto_awesome_rounded),
+                  _buildSectionCard(
+                    'Dilek Mesajı',
+                    _readingData?['wish'] ?? 'Yorum yükleniyor...',
+                    icon: Icons.auto_awesome_rounded,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -732,25 +939,40 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                     decoration: BoxDecoration(
                       color: const Color(0xFF140F0C),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.5), width: 1.5),
+                      border: Border.all(
+                        color: const Color(0xFFD4A373).withOpacity(0.5),
+                        width: 1.5,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.stars_rounded, color: Color(0xFFD4A373), size: 18),
+                            const Icon(
+                              Icons.stars_rounded,
+                              color: Color(0xFFD4A373),
+                              size: 18,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Falının Sana Tavsiyesi',
-                              style: GoogleFonts.outfit(color: const Color(0xFFD4A373), fontSize: 18, fontWeight: FontWeight.w500),
+                              style: GoogleFonts.outfit(
+                                color: const Color(0xFFD4A373),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         Text(
                           _readingData?['advice'] ?? 'Yorum yükleniyor...',
-                          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.8), fontSize: 14, height: 1.5),
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
                         ),
                       ],
                     ),
@@ -772,13 +994,19 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.3)),
+                            border: Border.all(
+                              color: const Color(0xFFD4A373).withOpacity(0.3),
+                            ),
                             color: Colors.transparent,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.ios_share_rounded, color: Color(0xFFD4A373), size: 18),
+                              const Icon(
+                                Icons.ios_share_rounded,
+                                color: Color(0xFFD4A373),
+                                size: 18,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Falımı Paylaş',
@@ -808,7 +1036,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.local_cafe_rounded, color: Color(0xFF161311), size: 18),
+                              const Icon(
+                                Icons.local_cafe_rounded,
+                                color: Color(0xFF161311),
+                                size: 18,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Yeni Fal Bak',
@@ -869,7 +1101,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white.withOpacity(0.08)),
                     ),
-                    child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white70, size: 18),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white70,
+                      size: 18,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -886,7 +1122,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                   ),
                 ),
                 // Sağ tarafı dengelemek için kahve ikonu
-                const Icon(Icons.local_cafe_rounded, color: Color(0xFFD4A373), size: 24),
+                const Icon(
+                  Icons.local_cafe_rounded,
+                  color: Color(0xFFD4A373),
+                  size: 24,
+                ),
               ],
             ),
           ),
@@ -946,7 +1186,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 shape: BoxShape.circle,
                 color: const Color(0xFFD4A373).withOpacity(0.1),
               ),
-              child: const Icon(Icons.coffee_rounded, color: Color(0xFFD4A373), size: 48),
+              child: const Icon(
+                Icons.coffee_rounded,
+                color: Color(0xFFD4A373),
+                size: 48,
+              ),
             ),
             const SizedBox(height: 32),
             Text(
@@ -974,7 +1218,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
                   color: const Color(0xFFD4A373),
@@ -1072,14 +1319,22 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
     return iconMap[name] ?? Icons.auto_awesome;
   }
 
-  Widget _buildSectionCard(String title, String content, {bool highlightTitle = false, IconData? icon}) {
+  Widget _buildSectionCard(
+    String title,
+    String content, {
+    bool highlightTitle = false,
+    IconData? icon,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFF140F0C),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.3), width: 1),
+        border: Border.all(
+          color: const Color(0xFFD4A373).withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1111,8 +1366,6 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
     );
   }
 
-
-
   Widget _buildPremiumSymbolChip(IconData icon, String title, String subtitle) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -1133,12 +1386,15 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
         children: [
           Icon(icon, color: const Color(0xFFD4A373), size: 16),
           const SizedBox(width: 8),
-          Text(
-            '$title — $subtitle',
-            style: GoogleFonts.outfit(
-              color: const Color(0xFFE8D5C4), 
-              fontSize: 13, 
-              fontWeight: FontWeight.w400,
+          Flexible(
+            child: Text(
+              '$title — $subtitle',
+              style: GoogleFonts.outfit(
+                color: const Color(0xFFE8D5C4),
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -1181,9 +1437,23 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(time, style: GoogleFonts.outfit(color: const Color(0xFFE8D5C4), fontSize: 15, fontWeight: FontWeight.w500)),
+                  Text(
+                    time,
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFFE8D5C4),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(desc, style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.4)),
+                  Text(
+                    desc,
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1232,8 +1502,8 @@ class _ExpandablePhotoItem extends StatelessWidget {
           color: isExpanded ? const Color(0xFF1C1714) : const Color(0xFF1A1512),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isExpanded 
-                ? const Color(0xFFD4A373).withOpacity(0.4) 
+            color: isExpanded
+                ? const Color(0xFFD4A373).withOpacity(0.4)
                 : const Color(0xFFD4A373).withOpacity(0.15),
           ),
         ),
@@ -1246,8 +1516,14 @@ class _ExpandablePhotoItem extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.5), width: 1.5),
-                    image: DecorationImage(image: FileImage(file), fit: BoxFit.cover),
+                    border: Border.all(
+                      color: const Color(0xFFD4A373).withOpacity(0.5),
+                      width: 1.5,
+                    ),
+                    image: DecorationImage(
+                      image: FileImage(file),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -1255,25 +1531,49 @@ class _ExpandablePhotoItem extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.2)),
+                    border: Border.all(
+                      color: const Color(0xFFD4A373).withOpacity(0.2),
+                    ),
                   ),
-                  child: Icon(icon, color: const Color(0xFFD4A373).withOpacity(0.7), size: 16),
+                  child: Icon(
+                    icon,
+                    color: const Color(0xFFD4A373).withOpacity(0.7),
+                    size: 16,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: GoogleFonts.outfit(color: const Color(0xFFE8D5C4), fontSize: 16, fontWeight: FontWeight.w500)),
+                      Text(
+                        title,
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFFE8D5C4),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text(shortDesc, style: GoogleFonts.inter(color: Colors.white.withOpacity(0.6), fontSize: 12, height: 1.3)),
+                      Text(
+                        shortDesc,
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                          height: 1.3,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 AnimatedRotation(
                   turns: isExpanded ? 0.25 : 0,
                   duration: const Duration(milliseconds: 300),
-                  child: Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.3), size: 20),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withOpacity(0.3),
+                    size: 20,
+                  ),
                 ),
               ],
             ),
@@ -1283,7 +1583,12 @@ class _ExpandablePhotoItem extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: isExpanded
                   ? Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 4, left: 4, right: 4),
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        bottom: 4,
+                        left: 4,
+                        right: 4,
+                      ),
                       child: Text(
                         detailedDesc,
                         style: GoogleFonts.inter(
@@ -1320,9 +1625,12 @@ class SmokeWispPainter extends CustomPainter {
     path.moveTo(size.width / 2, size.height); // Alt orta
     // Zarif ve pürüzsüz bir 'S' harfi (Küpük Bezier)
     path.cubicTo(
-      0, size.height * 0.75, // Sola çek
-      size.width, size.height * 0.25, // Sağa çek
-      size.width / 2, 0, // Üst orta
+      0,
+      size.height * 0.75, // Sola çek
+      size.width,
+      size.height * 0.25, // Sağa çek
+      size.width / 2,
+      0, // Üst orta
     );
 
     canvas.drawPath(path, paint);
@@ -1331,5 +1639,3 @@ class SmokeWispPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-

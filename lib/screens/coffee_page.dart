@@ -22,17 +22,18 @@ class CoffeePage extends StatefulWidget {
   State<CoffeePage> createState() => _CoffeePageState();
 }
 
-class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
+class _CoffeePageState extends State<CoffeePage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late PageController _pageCtrl;
   int _currentStep = 0;
-  
+
   // Validation state
   bool _isValidating = false;
   bool _isValidated = false;
   bool _hasPaidForScan = false;
   List<int> _invalidSlots = [];
   Map<int, String> _invalidMessages = {};
-  
+
   // Arka plandaki fincan animasyonu için
   late AnimationController _floatCtrl;
 
@@ -50,6 +51,8 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
   // Son kahve falı kaydı (sadece 1 tane, yenisi eskiyi siler)
   Map<String, dynamic>? _lastReading;
+  Timer? _backgroundPollTimer;
+  bool _waitingForBackgroundResult = false;
 
   // Giriş animasyonu için
   late AnimationController _entranceController;
@@ -57,6 +60,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkAndRefundPendingFortune();
     _pageCtrl = PageController(initialPage: 0);
     _floatCtrl = AnimationController(
@@ -71,28 +75,34 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     _entranceController.forward();
     _loadSoulStones();
     _loadPremiumStatus();
+    _loadTodaysReadings();
   }
 
   // Yarım Kalan Fal İade Sistemi
   Future<void> _checkAndRefundPendingFortune() async {
     final prefs = await SharedPreferences.getInstance();
     final isPending = prefs.getBool('pending_fortune_paid') ?? false;
-    
+
     if (isPending) {
       // Ruh taşını geri ver
       await StorageService.updateSoulStones(1);
       await prefs.setBool('pending_fortune_paid', false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Yarım kalan falınızdan dolayı 1 Ruh Taşı iade edildi. ✨',
-              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             backgroundColor: const Color(0xFF6D28D9), // Zarif mor
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             duration: const Duration(seconds: 4),
           ),
         );
@@ -111,7 +121,94 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     if (mounted) setState(() => _isPremium = premium);
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _waitingForBackgroundResult) {
+      _loadTodaysReadings();
+    }
+  }
+
+  void _startBackgroundPolling() {
+    _waitingForBackgroundResult = true;
+    _backgroundPollTimer?.cancel();
+    _backgroundPollTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      _checkBackgroundResult();
+    });
+  }
+
+  Future<void> _checkBackgroundResult() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final savedDate = prefs.getString('coffee_last_reading_date') ?? '';
+    if (savedDate != today) return;
+
+    final raw = prefs.getString('coffee_last_reading');
+    if (raw != null && _lastReading == null) {
+      // Fal arka planda tamamlanmış!
+      _backgroundPollTimer?.cancel();
+      _waitingForBackgroundResult = false;
+
+      try {
+        final data = jsonDecode(raw) as Map<String, dynamic>;
+        if (mounted) {
+          setState(() => _lastReading = data);
+          _loadSoulStones();
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: const Color(0xFF1E1E1E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: const Color(0xFFD4A373).withOpacity(0.3),
+                  width: 0.5,
+                ),
+              ),
+              title: const Text(
+                '☕️ Falın Hazır!',
+                style: TextStyle(color: Colors.white),
+              ),
+              content: const Text(
+                'Fincanındaki sırlar çözüldü.',
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(
+                    'Sonra',
+                    style: TextStyle(color: Colors.white.withOpacity(0.4)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showLastReadingPanel();
+                  },
+                  child: const Text(
+                    'Falına Göz At',
+                    style: TextStyle(
+                      color: Color(0xFFD4A373),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      } catch (_) {}
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _backgroundPollTimer?.cancel();
     _pageCtrl.dispose();
     _floatCtrl.dispose();
     _entranceController.dispose();
@@ -120,12 +217,16 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
   void _nextStep() {
     int nextStep = 5;
-    if (_insideAngle == null) nextStep = 1;
-    else if (_leftAngle == null) nextStep = 2;
-    else if (_rightAngle == null) nextStep = 3;
-    else if (_plateAngle == null) nextStep = 4;
+    if (_insideAngle == null)
+      nextStep = 1;
+    else if (_leftAngle == null)
+      nextStep = 2;
+    else if (_rightAngle == null)
+      nextStep = 3;
+    else if (_plateAngle == null)
+      nextStep = 4;
 
-    // Tüm fotoğraflar yüklendiyse ama henüz 'Kaderini Keşfet' (ödeme) butonuna basılmadıysa, 
+    // Tüm fotoğraflar yüklendiyse ama henüz 'Kaderini Keşfet' (ödeme) butonuna basılmadıysa,
     // tarama ekranına (5. adım) SIZMASINI engelle. Kronolojik olarak bir sonraki fotoğrafa geçir.
     if (nextStep == 5 && !_hasPaidForScan) {
       nextStep = _currentStep + 1;
@@ -134,11 +235,12 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
     HapticFeedback.mediumImpact();
     setState(() => _currentStep = nextStep);
-    
+
     _pageCtrl.animateToPage(
       _currentStep,
       duration: const Duration(milliseconds: 900), // Çok daha yavaş ve sakin
-      curve: Curves.easeInOutQuart, // Başlarken ve biterken çok yumuşak bir ivme
+      curve:
+          Curves.easeInOutQuart, // Başlarken ve biterken çok yumuşak bir ivme
     );
   }
 
@@ -165,22 +267,21 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
       final validateResponse = await Supabase.instance.client.functions.invoke(
         'interpret-coffee',
-        body: {
-          'mode': 'validate',
-          'images': images,
-          'locale': 'tr',
-        },
+        body: {'mode': 'validate', 'images': images, 'locale': 'tr'},
       );
 
-      if (validateResponse.data != null && validateResponse.data['results'] != null) {
+      if (validateResponse.data != null &&
+          validateResponse.data['results'] != null) {
         final results = validateResponse.data['results'] as List;
         final invalidSlots = <int>[];
         final invalidMessages = <int, String>{};
-        
+
         for (int i = 0; i < results.length; i++) {
           if (results[i]['valid'] != true) {
             invalidSlots.add(i);
-            invalidMessages[i] = results[i]['error'] ?? 'Bu görselde net bir kahve telvesi seçilemiyor.';
+            invalidMessages[i] =
+                results[i]['error'] ??
+                'Bu görselde net bir kahve telvesi seçilemiyor.';
           }
         }
         if (mounted) {
@@ -193,17 +294,28 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
         }
       } else {
         // Fail-safe
-        if (mounted) setState(() { _isValidating = false; _isValidated = true; });
+        if (mounted)
+          setState(() {
+            _isValidating = false;
+            _isValidated = true;
+          });
       }
     } catch (e) {
       debugPrint('Doğrulama hatası: $e');
-      if (mounted) setState(() { _isValidating = false; _isValidated = true; });
+      if (mounted)
+        setState(() {
+          _isValidating = false;
+          _isValidated = true;
+        });
     }
   }
 
   // Ruh Taşı Kontrolü ve Taramayı Başlatma (Gerçek kesim fal başarılı olunca CoffeeReadingPage'de yapılır)
   Future<void> _startAnalysisWithSoulStones() async {
-    if (_leftAngle == null || _rightAngle == null || _insideAngle == null || _plateAngle == null) {
+    if (_leftAngle == null ||
+        _rightAngle == null ||
+        _insideAngle == null ||
+        _plateAngle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Lütfen tüm fotoğrafları çekin!')),
       );
@@ -221,13 +333,24 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     bool confirmed = await _checkPremiumAccess();
     if (confirmed) {
       HapticFeedback.heavyImpact();
-      
-      // NOT: Ruh taşını burada KESMİYORUZ. Kullanıcı tarama veya yorumlama sırasında uygulamayı kapatırsa taşı yanmasın.
-      // Kesim işlemi CoffeeReadingPage'de, yapay zeka falı başarıyla ürettiği an yapılacak.
+
+      // Herkes 1 Ruh Taşı öder! (Elite kullanıcılar onay paneli görmez ama taş yine de kesilir)
+      bool success = await StorageService.deductSoulStones(1);
+
+      if (!success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Yeterli Ruh Taşın yok!')),
+          );
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() {
-          _hasPaidForScan = true; // Sadece izin bayrağı olarak kullanıyoruz
+          _hasPaidForScan = true; // Bilet alındı bayrağı
         });
+        _loadSoulStones(); // Taş sayısını güncelle
         // 5. Aşamaya (Minimalist Tarama Ekranı) geçiş yap
         _nextStep();
         // Taramayı başlat
@@ -238,7 +361,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
   Future<bool> _checkPremiumAccess() async {
     final prefs = await SharedPreferences.getInstance();
-    final isPremiumUser = prefs.getBool('is_premium_test_mode') ?? prefs.getBool('is_premium_user') ?? false;
+    final isPremiumUser =
+        prefs.getBool('is_premium_test_mode') ??
+        prefs.getBool('is_premium_user') ??
+        false;
 
     // Elite kullanıcı: sessizce onaylar (dialog yok)
     if (isPremiumUser) {
@@ -277,7 +403,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           color: Colors.white.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.25), 
+                            color: Colors.white.withOpacity(0.25),
                             width: 0.5,
                           ),
                           boxShadow: [
@@ -296,32 +422,56 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.diamond_rounded, 
-                                  color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), 
-                                  size: 48
+                                  Icons.diamond_rounded,
+                                  color: hasEnough
+                                      ? const Color(0xFF22D3EE)
+                                      : Colors.white.withOpacity(0.3),
+                                  size: 48,
                                 ),
                                 const SizedBox(height: 12),
                                 const Text(
                                   'Kozmik Kahve Yorumu',
-                                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF22D3EE).withOpacity(0.12),
+                                    color: const Color(
+                                      0xFF22D3EE,
+                                    ).withOpacity(0.12),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 1),
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFF22D3EE,
+                                      ).withOpacity(0.3),
+                                      width: 1,
+                                    ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
+                                      const Icon(
+                                        Icons.diamond_outlined,
+                                        size: 14,
+                                        color: Color(0xFF22D3EE),
+                                      ),
                                       const SizedBox(width: 6),
                                       Text(
                                         "$soulStones Ruh Taşın var",
-                                        style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600),
+                                        style: const TextStyle(
+                                          color: Color(0xFF22D3EE),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -353,23 +503,38 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: hasEnough
-                                              ? const Color(0xFF22D3EE).withOpacity(0.15)
+                                              ? const Color(
+                                                  0xFF22D3EE,
+                                                ).withOpacity(0.15)
                                               : Colors.white.withOpacity(0.05),
                                           elevation: 0,
-                                          padding: const EdgeInsets.symmetric(vertical: 0),
-                                          minimumSize: const Size(double.infinity, 48),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 0,
+                                          ),
+                                          minimumSize: const Size(
+                                            double.infinity,
+                                            48,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                             side: BorderSide(
                                               color: hasEnough
-                                                  ? const Color(0xFF22D3EE).withOpacity(0.4)
-                                                  : Colors.white.withOpacity(0.1),
+                                                  ? const Color(
+                                                      0xFF22D3EE,
+                                                    ).withOpacity(0.4)
+                                                  : Colors.white.withOpacity(
+                                                      0.1,
+                                                    ),
                                             ),
                                           ),
                                         ),
-                                        onPressed: hasEnough ? () {
-                                          Navigator.pop(dialogCtx, true);
-                                        } : null,
+                                        onPressed: hasEnough
+                                            ? () {
+                                                Navigator.pop(dialogCtx, true);
+                                              }
+                                            : null,
                                         child: FittedBox(
                                           fit: BoxFit.scaleDown,
                                           child: Text(
@@ -377,7 +542,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                             style: TextStyle(
                                               color: hasEnough
                                                   ? const Color(0xFF22D3EE)
-                                                  : Colors.white.withOpacity(0.3),
+                                                  : Colors.white.withOpacity(
+                                                      0.3,
+                                                    ),
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -389,24 +556,47 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                       Expanded(
                                         child: ElevatedButton.icon(
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                            backgroundColor: const Color(
+                                              0xFF22D3EE,
+                                            ).withOpacity(0.15),
                                             elevation: 0,
-                                            minimumSize: const Size(double.infinity, 48),
+                                            minimumSize: const Size(
+                                              double.infinity,
+                                              48,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                              side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              side: BorderSide(
+                                                color: const Color(
+                                                  0xFF22D3EE,
+                                                ).withOpacity(0.4),
+                                              ),
                                             ),
                                           ),
                                           onPressed: () {
                                             Navigator.pop(dialogCtx, false);
-                                            Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const PremiumPaywallPage(),
+                                              ),
+                                            );
                                           },
-                                          icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
+                                          icon: const Icon(
+                                            Icons.workspace_premium,
+                                            color: Color(0xFF22D3EE),
+                                            size: 18,
+                                          ),
                                           label: const FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: Text(
                                               "Elite Al",
-                                              style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                              style: TextStyle(
+                                                color: Color(0xFF22D3EE),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -452,24 +642,39 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
       ),
     );
 
+    // Ana ekrana her dönüşte listeyi tazele
+    if (mounted) {
+      await _loadTodaysReadings();
+      _loadSoulStones();
+
+      // Eğer fal henüz hazır değilse (kullanıcı erken çıktı), polling başlat
+      if (_lastReading == null) {
+        _startBackgroundPolling();
+      }
+    }
+
     if (result == 'retake' && mounted) {
       setState(() {
-        _currentStep = 1; // Başlangıca dön, hatalı fotoğrafı tekrar çekebilsin
-        _hasPaidForScan = false; // Tekrar ödeme gereksin (isteğe bağlı)
+        _currentStep = 1;
+        _hasPaidForScan = false;
         _isValidated = false;
+        _invalidSlots.clear();
+        _invalidMessages.clear();
       });
-      _pageCtrl.jumpToPage(0);
+      _pageCtrl.jumpToPage(1);
     } else if (result == 'new' && mounted) {
       setState(() {
         _currentStep = 1;
         _hasPaidForScan = false;
         _isValidated = false;
+        _invalidSlots.clear();
+        _invalidMessages.clear();
         _insideAngle = null;
         _leftAngle = null;
         _rightAngle = null;
         _plateAngle = null;
       });
-      _pageCtrl.jumpToPage(0);
+      _pageCtrl.jumpToPage(1);
     }
   }
 
@@ -490,17 +695,28 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD4A373), size: 64),
+              const Icon(
+                Icons.workspace_premium_rounded,
+                color: Color(0xFFD4A373),
+                size: 64,
+              ),
               const SizedBox(height: 16),
               Text(
                 'Sadece Premium Özeldir',
-                style: GoogleFonts.inter(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
                 'Kahve Falı özelliği uygulamanın elit üyelerine aittir. Premium\'a geç ve Ruh Taşlarınla geleceğin sırlarını arala.',
-                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 14,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -520,7 +736,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                   child: Center(
                     child: Text(
                       'Premium Ol (Simülasyon)',
-                      style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.inter(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -535,7 +754,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   // GERÇEK FOTOĞRAF SEÇİCİ
   Future<void> _pickImage(int stepIndex, {bool isPlate = false}) async {
     HapticFeedback.lightImpact();
-    
+
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -552,7 +771,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             children: [
               Text(
                 'Fotoğraf Kaynağı',
-                style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -561,8 +784,16 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     child: GestureDetector(
                       onTap: () async {
                         Navigator.pop(ctx);
-                        final picked = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
-                        if (picked != null) _saveAndNext(File(picked.path), stepIndex, isPlate: isPlate);
+                        final picked = await _picker.pickImage(
+                          source: ImageSource.camera,
+                          imageQuality: 70,
+                        );
+                        if (picked != null)
+                          _saveAndNext(
+                            File(picked.path),
+                            stepIndex,
+                            isPlate: isPlate,
+                          );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -572,9 +803,19 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.camera_alt_rounded, color: Color(0xFFD4A373), size: 32),
+                            const Icon(
+                              Icons.camera_alt_rounded,
+                              color: Color(0xFFD4A373),
+                              size: 32,
+                            ),
                             const SizedBox(height: 12),
-                            Text('Kamera', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500)),
+                            Text(
+                              'Kamera',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -585,8 +826,16 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     child: GestureDetector(
                       onTap: () async {
                         Navigator.pop(ctx);
-                        final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-                        if (picked != null) _saveAndNext(File(picked.path), stepIndex, isPlate: isPlate);
+                        final picked = await _picker.pickImage(
+                          source: ImageSource.gallery,
+                          imageQuality: 70,
+                        );
+                        if (picked != null)
+                          _saveAndNext(
+                            File(picked.path),
+                            stepIndex,
+                            isPlate: isPlate,
+                          );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -596,16 +845,26 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.photo_library_rounded, color: Color(0xFFD4A373), size: 32),
+                            const Icon(
+                              Icons.photo_library_rounded,
+                              color: Color(0xFFD4A373),
+                              size: 32,
+                            ),
                             const SizedBox(height: 12),
-                            Text('Galeri', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500)),
+                            Text(
+                              'Galeri',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -624,7 +883,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
       _invalidSlots.remove(stepIndex - 1);
       _isValidated = false; // Yeni fotoğraf geldiği için doğrulamayı sıfırla
 
-      bool allUploaded = _insideAngle != null && _leftAngle != null && _rightAngle != null && _plateAngle != null;
+      bool allUploaded =
+          _insideAngle != null &&
+          _leftAngle != null &&
+          _rightAngle != null &&
+          _plateAngle != null;
 
       if (allUploaded) {
         // Eğer tüm fotoğraflar tamamsa ve hatalı bir fotoğraf değiştirildiyse,
@@ -651,21 +914,29 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF161311), // Biraz daha açık, sıcak ve zengin espresso tonu
+      backgroundColor: const Color(
+        0xFF161311,
+      ), // Biraz daha açık, sıcak ve zengin espresso tonu
       body: Stack(
         children: [
           // Background Mists (Daha yumuşak ve geniş)
           Positioned(
             top: -150,
             left: -100,
-            child: _buildBlurryBlob(color: const Color(0xFF5E3A20).withOpacity(0.25), size: 500),
+            child: _buildBlurryBlob(
+              color: const Color(0xFF5E3A20).withOpacity(0.25),
+              size: 500,
+            ),
           ),
           Positioned(
             bottom: -100,
             right: -100,
-            child: _buildBlurryBlob(color: const Color(0xFFD4A373).withOpacity(0.15), size: 400),
+            child: _buildBlurryBlob(
+              color: const Color(0xFFD4A373).withOpacity(0.15),
+              size: 400,
+            ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
@@ -678,57 +949,58 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         child: PageView(
                           controller: _pageCtrl,
                           physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildIntroScreen(),
-                      _buildUploadStep(
-                        stepIndex: 1,
-                        title: 'Fincan İçi',
-                        desc: 'Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.',
-                        icon: Icons.keyboard_arrow_down_rounded,
+                          children: [
+                            _buildIntroScreen(),
+                            _buildUploadStep(
+                              stepIndex: 1,
+                              title: 'Fincan İçi',
+                              desc:
+                                  'Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.',
+                              icon: Icons.keyboard_arrow_down_rounded,
+                            ),
+                            _buildUploadStep(
+                              stepIndex: 2,
+                              title: 'Sol Profil',
+                              desc:
+                                  'Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.',
+                              icon: Icons.screen_rotation_rounded,
+                            ),
+                            _buildUploadStep(
+                              stepIndex: 3,
+                              title: 'Sağ Profil',
+                              desc:
+                                  'Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.',
+                              icon: Icons.screen_rotation_alt_rounded,
+                            ),
+                            _buildUploadStep(
+                              stepIndex: 4,
+                              title: 'Tabağın Sırrı',
+                              desc:
+                                  'Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.',
+                              icon: Icons.blur_circular_rounded,
+                              buttonText: 'Tabak Fotoğrafı Çek',
+                            ),
+                            _buildFinalReadyScreen(),
+                            _buildAnalyzingScreen(),
+                          ],
+                        ),
                       ),
-                      _buildUploadStep(
-                        stepIndex: 2,
-                        title: 'Sol Profil',
-                        desc: 'Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.',
-                        icon: Icons.screen_rotation_rounded,
-                      ),
-                      _buildUploadStep(
-                        stepIndex: 3,
-                        title: 'Sağ Profil',
-                        desc: 'Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.',
-                        icon: Icons.screen_rotation_alt_rounded,
-                      ),
-                      _buildUploadStep(
-                        stepIndex: 4,
-                        title: 'Tabağın Sırrı',
-                        desc: 'Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.',
-                        icon: Icons.blur_circular_rounded,
-                        buttonText: 'Tabak Fotoğrafı Çek',
-                      ),
-                      _buildFinalReadyScreen(),
-                      _buildAnalyzingScreen(),
+
+                      // Üstte Yüzen İlerleme Çubuğu ve Yuvalar (Sayfanın Spacer(flex:3) boşluğuna denk gelir, düzeni asla kaydırmaz)
+                      if (_currentStep > 0 && _currentStep < 6)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: Column(
+                            key: ValueKey(_currentStep > 0),
+                            mainAxisSize: MainAxisSize.min,
+                            children: [_buildProgressBar(), _buildImageSlots()],
+                          ),
+                        ),
                     ],
                   ),
                 ),
-                
-                // Üstte Yüzen İlerleme Çubuğu ve Yuvalar (Sayfanın Spacer(flex:3) boşluğuna denk gelir, düzeni asla kaydırmaz)
-                if (_currentStep > 0 && _currentStep < 6)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Column(
-                      key: ValueKey(_currentStep > 0),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildProgressBar(),
-                        _buildImageSlots(),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
               ],
             ),
           ),
@@ -746,15 +1018,26 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
           for (int i = 0; i < 4; i++) ...[
             Expanded(
               child: TweenAnimationBuilder<double>(
-                key: const ValueKey('progress_bar'), // Yalnızca ilk ekrana girişte (montajda) oynar
+                key: const ValueKey(
+                  'progress_bar',
+                ), // Yalnızca ilk ekrana girişte (montajda) oynar
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: Duration(milliseconds: 1400 + (i * 250)), // Süreyi uzattık ki gecikme payı olsun
-                curve: const Interval(0.6, 1.0, curve: Curves.easeOutCubic), // Animasyonun ilk %60'ında (sayfa geçerken) bekle, sonra gel!
+                duration: Duration(
+                  milliseconds: 1400 + (i * 250),
+                ), // Süreyi uzattık ki gecikme payı olsun
+                curve: const Interval(
+                  0.6,
+                  1.0,
+                  curve: Curves.easeOutCubic,
+                ), // Animasyonun ilk %60'ında (sayfa geçerken) bekle, sonra gel!
                 builder: (context, val, child) {
                   return Opacity(
                     opacity: val,
                     child: Transform.translate(
-                      offset: Offset(0, 15 * (1 - val)), // Aşağıdan yukarı doğru hafifçe kayarak gelir
+                      offset: Offset(
+                        0,
+                        15 * (1 - val),
+                      ), // Aşağıdan yukarı doğru hafifçe kayarak gelir
                       child: child,
                     ),
                   );
@@ -763,18 +1046,18 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 400),
                   height: 4,
                   decoration: BoxDecoration(
-                    color: (i + 1) < _currentStep 
-                        ? const Color(0xFFD4A373) 
-                        : (i + 1) == _currentStep 
-                            ? const Color(0xFFD4A373).withOpacity(0.7) 
-                            : Colors.white.withOpacity(0.1),
+                    color: (i + 1) < _currentStep
+                        ? const Color(0xFFD4A373)
+                        : (i + 1) == _currentStep
+                        ? const Color(0xFFD4A373).withOpacity(0.7)
+                        : Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
             ),
             if (i < 3) const SizedBox(width: 8),
-          ]
+          ],
         ],
       ),
     );
@@ -798,10 +1081,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     if (stepNum == 2) imageFile = _leftAngle;
                     if (stepNum == 3) imageFile = _rightAngle;
                     if (stepNum == 4) imageFile = _plateAngle;
-                    
+
                     if (imageFile != null) {
                       HapticFeedback.lightImpact();
-                      
+
                       if (_currentStep == 5) {
                         // 5. Adımda (Özet/Doğrulama ekranında) sayfadan çıkmadan doğrudan menüyü aç
                         _pickImage(stepNum, isPlate: stepNum == 4);
@@ -809,9 +1092,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         // 1. O sayfaya geri kaydır
                         setState(() {
                           _currentStep = stepNum;
-                          _isValidated = false; // Sayfa değiştiği için doğrulamayı sıfırlıyoruz
+                          _isValidated =
+                              false; // Sayfa değiştiği için doğrulamayı sıfırlıyoruz
                         });
-                        
+
                         _pageCtrl.animateToPage(
                           _currentStep,
                           duration: const Duration(milliseconds: 900),
@@ -820,16 +1104,25 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
 
                         // 2. Sayfaya gider gitmez otomatik olarak Kamera/Galeri menüsünü de aç!
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          if (mounted) _pickImage(stepNum, isPlate: stepNum == 4);
+                          if (mounted)
+                            _pickImage(stepNum, isPlate: stepNum == 4);
                         });
                       }
                     }
                   },
                   child: TweenAnimationBuilder<double>(
-                    key: const ValueKey('image_slots'), // Sadece ekrana ilk girişte animasyon oynar
+                    key: const ValueKey(
+                      'image_slots',
+                    ), // Sadece ekrana ilk girişte animasyon oynar
                     tween: Tween(begin: 0.0, end: 1.0),
-                    duration: Duration(milliseconds: 1100 + (i * 150)), // Süreyi uzattık (bekleme payı)
-                    curve: const Interval(0.45, 1.0, curve: Curves.easeOutCubic), // Sayfa geçişi bitene kadar (ilk ~500ms) tamamen görünmez!
+                    duration: Duration(
+                      milliseconds: 1100 + (i * 150),
+                    ), // Süreyi uzattık (bekleme payı)
+                    curve: const Interval(
+                      0.45,
+                      1.0,
+                      curve: Curves.easeOutCubic,
+                    ), // Sayfa geçişi bitene kadar (ilk ~500ms) tamamen görünmez!
                     builder: (context, val, child) {
                       return Opacity(
                         opacity: val,
@@ -841,19 +1134,21 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: _currentStep > (i + 1) 
+                        color: _currentStep > (i + 1)
                             ? Colors.white.withOpacity(0.08)
                             : Colors.white.withOpacity(0.02),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: _invalidSlots.contains(i)
                               ? Colors.redAccent.withOpacity(0.8)
-                              : _currentStep == (i + 1) 
-                                  ? const Color(0xFFD4A373).withOpacity(0.6)
-                                  : _currentStep > (i + 1)
-                                      ? const Color(0xFFD4A373).withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.05),
-                          width: _invalidSlots.contains(i) ? 2.5 : (_currentStep == (i + 1) ? 1.5 : 1.0),
+                              : _currentStep == (i + 1)
+                              ? const Color(0xFFD4A373).withOpacity(0.6)
+                              : _currentStep > (i + 1)
+                              ? const Color(0xFFD4A373).withOpacity(0.2)
+                              : Colors.white.withOpacity(0.05),
+                          width: _invalidSlots.contains(i)
+                              ? 2.5
+                              : (_currentStep == (i + 1) ? 1.5 : 1.0),
                         ),
                         image: () {
                           File? img;
@@ -876,7 +1171,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           if (i == 1) img = _leftAngle;
                           if (i == 2) img = _rightAngle;
                           if (i == 3) img = _plateAngle;
-                          
+
                           if (img != null) {
                             if (_invalidSlots.contains(i)) {
                               return Container(
@@ -885,25 +1180,31 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                   color: Colors.black.withOpacity(0.6),
                                 ),
                                 child: const Center(
-                                  child: Icon(Icons.refresh_rounded, color: Colors.white, size: 24),
+                                  child: Icon(
+                                    Icons.refresh_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
                                 ),
                               );
                             }
                             return const SizedBox.shrink(); // Resim geçerliyse ikon yok
                           }
-                          
+
                           return Center(
                             child: Icon(
-                              _currentStep > (i + 1) ? Icons.check_circle_outline_rounded : Icons.photo_camera_rounded,
-                              color: _currentStep == (i + 1) 
-                                  ? const Color(0xFFD4A373).withOpacity(0.8) 
-                                  : _currentStep > (i + 1) 
-                                      ? const Color(0xFFD4A373).withOpacity(0.5)
-                                      : Colors.white.withOpacity(0.15),
+                              _currentStep > (i + 1)
+                                  ? Icons.check_circle_outline_rounded
+                                  : Icons.photo_camera_rounded,
+                              color: _currentStep == (i + 1)
+                                  ? const Color(0xFFD4A373).withOpacity(0.8)
+                                  : _currentStep > (i + 1)
+                                  ? const Color(0xFFD4A373).withOpacity(0.5)
+                                  : Colors.white.withOpacity(0.15),
                               size: 20,
                             ),
                           );
-                        }
+                        },
                       ),
                     ),
                   ),
@@ -911,7 +1212,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
               ),
             ),
             if (i < 3) const SizedBox(width: 6),
-          ]
+          ],
         ],
       ),
     );
@@ -972,7 +1273,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withOpacity(0.08)),
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white70, size: 18),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white70,
+                    size: 18,
+                  ),
                 ),
               ),
               // Sağ: Fallarım + Ruh Taşı
@@ -1044,7 +1349,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                     Icons.diamond_outlined,
                                     size: 11,
                                     color: stones > 0
-                                        ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                        ? const Color(
+                                            0xFF22D3EE,
+                                          ).withOpacity(0.9)
                                         : Colors.white.withOpacity(0.25),
                                   ),
                                   const SizedBox(width: 1),
@@ -1052,7 +1359,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                     '$stones',
                                     style: TextStyle(
                                       color: stones > 0
-                                          ? const Color(0xFF22D3EE).withOpacity(0.9)
+                                          ? const Color(
+                                              0xFF22D3EE,
+                                            ).withOpacity(0.9)
                                           : Colors.white.withOpacity(0.3),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -1114,8 +1423,6 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
     await prefs.setString(_keyCoffeeReading, jsonEncode(reading));
   }
 
-
-
   Widget _preparingInfoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -1126,7 +1433,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             shape: BoxShape.circle,
             color: const Color(0xFFD4A373).withOpacity(0.10),
           ),
-          child: Icon(icon, size: 16, color: const Color(0xFFD4A373).withOpacity(0.8)),
+          child: Icon(
+            icon,
+            size: 16,
+            color: const Color(0xFFD4A373).withOpacity(0.8),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1144,6 +1455,41 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   }
 
   Future<void> _showLastReadingPanel() async {
+    final hasReading = _lastReading != null;
+
+    if (hasReading) {
+      final prefs = await SharedPreferences.getInstance();
+      final imagePaths = prefs.getStringList('coffee_last_images');
+
+      if (imagePaths != null && imagePaths.length == 4) {
+        final inside = File(imagePaths[0]);
+        final left = File(imagePaths[1]);
+        final right = File(imagePaths[2]);
+        final plate = File(imagePaths[3]);
+
+        // Sadece dosyalar hala cihazdaysa (önbellekten silinmemişse) tam ekrana git
+        if (await inside.exists() &&
+            await left.exists() &&
+            await right.exists() &&
+            await plate.exists()) {
+          if (!mounted) return;
+          Navigator.push(
+            context,
+            FadePageRoute(
+              page: CoffeeReadingPage(
+                insideAngle: inside,
+                leftAngle: left,
+                rightAngle: right,
+                plateAngle: plate,
+                initialData: _lastReading,
+              ),
+            ),
+          );
+          return; // Dialog açma, tam sayfaya git
+        }
+      }
+    }
+
     await showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -1157,10 +1503,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
         if (hasReading) {
           try {
             final dt = DateTime.parse(_lastReading!['time'] ?? '');
-            timeStr = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+            timeStr =
+                '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
           } catch (_) {}
         }
-        final summary = _lastReading?['summary'] ?? '';
+        final summary = _lastReading?['story'] ?? 'Yorum bulunamadı.';
 
         return Center(
           child: SizedBox(
@@ -1184,22 +1531,22 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.coffee_rounded,
-                          color: hasReading
-                              ? const Color(0xFFD4A373)
-                              : Colors.white.withOpacity(0.3),
-                          size: 40,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          hasReading ? 'Son Falın' : 'Kahve Falı',
-                          style: GoogleFonts.outfit(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        if (hasReading) ...[
+                          Icon(
+                            Icons.coffee_rounded,
+                            color: const Color(0xFFD4A373),
+                            size: 40,
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Son Falın',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                         if (hasReading && timeStr.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
@@ -1267,7 +1614,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             FadeTransition(
               opacity: anim1,
               child: ScaleTransition(
-                scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+                scale: CurvedAnimation(
+                  parent: anim1,
+                  curve: Curves.easeOutBack,
+                ),
                 child: child,
               ),
             ),
@@ -1334,7 +1684,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF22D3EE).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
@@ -1346,10 +1699,16 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
+                              const Icon(
+                                Icons.diamond_outlined,
+                                size: 14,
+                                color: Color(0xFF22D3EE),
+                              ),
                               const SizedBox(width: 6),
                               Text(
-                                soulStones > 0 ? '$soulStones Ruh Taşın var' : 'Ruh Taşın bitti',
+                                soulStones > 0
+                                    ? '$soulStones Ruh Taşın var'
+                                    : 'Ruh Taşın bitti',
                                 style: const TextStyle(
                                   color: Color(0xFF22D3EE),
                                   fontSize: 13,
@@ -1360,9 +1719,17 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _premiumInfoRow(Icons.coffee_rounded, 'Kahve falı yorumlaması için gerekli', true),
+                        _premiumInfoRow(
+                          Icons.coffee_rounded,
+                          'Kahve falı yorumlaması için gerekli',
+                          true,
+                        ),
                         const SizedBox(height: 10),
-                        _premiumInfoRow(Icons.diamond_outlined, 'Her yorum 1 Ruh Taşı harcar', soulStones >= 1),
+                        _premiumInfoRow(
+                          Icons.diamond_outlined,
+                          'Her yorum 1 Ruh Taşı harcar',
+                          soulStones >= 1,
+                        ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.workspace_premium,
@@ -1375,21 +1742,35 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           const Spacer(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                              backgroundColor: const Color(
+                                0xFF22D3EE,
+                              ).withOpacity(0.15),
                               elevation: 0,
                               minimumSize: const Size(double.infinity, 44),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                side: BorderSide(
+                                  color: const Color(
+                                    0xFF22D3EE,
+                                  ).withOpacity(0.4),
+                                ),
                               ),
                             ),
                             onPressed: () {
                               Navigator.pop(context);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PremiumPaywallPage(),
+                                ),
+                              );
                             },
                             child: const Text(
                               'Elite Abone Ol',
-                              style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Color(0xFF22D3EE),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -1412,7 +1793,10 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             FadeTransition(
               opacity: anim1,
               child: ScaleTransition(
-                scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+                scale: CurvedAnimation(
+                  parent: anim1,
+                  curve: Curves.easeOutBack,
+                ),
                 child: child,
               ),
             ),
@@ -1462,22 +1846,27 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
   Widget _buildAnimatedChild(double start, Widget child) {
     final fadeAnim = CurvedAnimation(
       parent: _entranceController,
-      curve: Interval(start, math.min(1.0, start + 0.4), curve: Curves.easeOutCubic),
+      curve: Interval(
+        start,
+        math.min(1.0, start + 0.4),
+        curve: Curves.easeOutCubic,
+      ),
     );
-    final slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.4),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: Interval(start, math.min(1.0, start + 0.5), curve: Curves.easeOutQuart),
-    ));
+    final slideAnim =
+        Tween<Offset>(begin: const Offset(0, 0.4), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _entranceController,
+            curve: Interval(
+              start,
+              math.min(1.0, start + 0.5),
+              curve: Curves.easeOutQuart,
+            ),
+          ),
+        );
 
     return FadeTransition(
       opacity: fadeAnim,
-      child: SlideTransition(
-        position: slideAnim,
-        child: child,
-      ),
+      child: SlideTransition(position: slideAnim, child: child),
     );
   }
 
@@ -1495,15 +1884,15 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(flex: 3), // Üstteki itme gücünü artırdık ki blok komple aşağı insin
-                    
+                    const Spacer(
+                      flex: 3,
+                    ), // Üstteki itme gücünü artırdık ki blok komple aşağı insin
                     // Özel Fal Ritüeli Animasyonu
-                    _buildAnimatedChild(
-                      0.0,
-                      const _CoffeeRitualAnimation(),
-                    ),
-                    const SizedBox(height: 16), // Fincan aşağıdaki yazılara biraz daha yaklaştı
-                    
+                    _buildAnimatedChild(0.0, const _CoffeeRitualAnimation()),
+                    const SizedBox(
+                      height: 16,
+                    ), // Fincan aşağıdaki yazılara biraz daha yaklaştı
+
                     _buildAnimatedChild(
                       0.15,
                       Text(
@@ -1544,27 +1933,42 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 24), // Üstteki açıklama ile liste arasındaki boşluğu daralttık
-                    
+                    const SizedBox(
+                      height: 24,
+                    ), // Üstteki açıklama ile liste arasındaki boşluğu daralttık
                     // Ritüel Adımları - Minimalist
                     _buildAnimatedChild(
                       0.55,
-                      _buildRitualRow(Icons.self_improvement_rounded, 'Niyetini Belirle', 'Yudumlarken zihninden bir soru veya dilek geçir.'),
+                      _buildRitualRow(
+                        Icons.self_improvement_rounded,
+                        'Niyetini Belirle',
+                        'Yudumlarken zihninden bir soru veya dilek geçir.',
+                      ),
                     ),
                     _buildAnimatedChild(0.6, _buildDivider()),
                     _buildAnimatedChild(
                       0.65,
-                      _buildRitualRow(Icons.coffee_rounded, 'Aynı Yerden İç', 'Şekillerin bozulmaması için hep aynı taraftan yudumla.'),
+                      _buildRitualRow(
+                        Icons.coffee_rounded,
+                        'Aynı Yerden İç',
+                        'Şekillerin bozulmaması için hep aynı taraftan yudumla.',
+                      ),
                     ),
                     _buildAnimatedChild(0.7, _buildDivider()),
                     _buildAnimatedChild(
                       0.75,
-                      _buildRitualRow(Icons.flip_camera_android_rounded, 'Ters Çevir', 'Fincanı kapat, soğumasını bekle ve yavaşça aç.'),
+                      _buildRitualRow(
+                        Icons.flip_camera_android_rounded,
+                        'Ters Çevir',
+                        'Fincanı kapat, soğumasını bekle ve yavaşça aç.',
+                      ),
                     ),
-                    
-                    const SizedBox(height: 24), // Dar ekranlarda butonun metne yapışmasını/bindirmesini engeller
+
+                    const SizedBox(
+                      height: 24,
+                    ), // Dar ekranlarda butonun metne yapışmasını/bindirmesini engeller
                     const Spacer(),
-                    
+
                     // Fotoğraf Çekimine Geçiş Butonu
                     _buildAnimatedChild(
                       0.85,
@@ -1575,9 +1979,13 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(100),
-                            color: const Color(0xFFD4A373).withOpacity(0.1), // Hafif ve şık bir arka plan
+                            color: const Color(
+                              0xFFD4A373,
+                            ).withOpacity(0.1), // Hafif ve şık bir arka plan
                             border: Border.all(
-                              color: const Color(0xFFD4A373).withOpacity(0.5), // Etrafında zarif bir çizgi
+                              color: const Color(
+                                0xFFD4A373,
+                              ).withOpacity(0.5), // Etrafında zarif bir çizgi
                             ),
                           ),
                           child: Center(
@@ -1601,13 +2009,16 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             ),
           ),
         );
-      }
+      },
     );
   }
 
   Widget _buildDivider() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8), // 20'den 12'ye düşürerek satırları sıkıştırdık
+      padding: const EdgeInsets.symmetric(
+        vertical: 12,
+        horizontal: 8,
+      ), // 20'den 12'ye düşürerek satırları sıkıştırdık
       child: Container(
         height: 1,
         width: double.infinity,
@@ -1666,15 +2077,20 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32), // 24'ten 32'ye çıkardık, ilk sayfayla tamamen aynı oldu
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                ), // 24'ten 32'ye çıkardık, ilk sayfayla tamamen aynı oldu
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(flex: 2), // İlk sayfaya göre biraz daha yukarı çektik (Spacer(flex:2))
-                    
+                    const Spacer(
+                      flex: 2,
+                    ), // İlk sayfaya göre biraz daha yukarı çektik (Spacer(flex:2))
+
                     _CameraAngleInstruction(stepIndex: stepIndex),
-                    const SizedBox(height: 48), // Eski boşluğa geri döndük ki animasyon yukarı kaymasın
-                    
+                    const SizedBox(
+                      height: 48,
+                    ), // Eski boşluğa geri döndük ki animasyon yukarı kaymasın
                     // Sadece yazıları aşağı kaydırıyoruz (Layout'u etkilemeden)
                     Transform.translate(
                       offset: const Offset(0, 30),
@@ -1702,10 +2118,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
                     const Spacer(), // İlk sayfadaki gibi butonu aşağı iten Spacer
-                    
                     // Ana Aksiyon Butonu
                     Builder(
                       builder: (context) {
@@ -1715,8 +2130,12 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         if (stepIndex == 3) hasImage = _rightAngle != null;
                         if (stepIndex == 4) hasImage = _plateAngle != null;
 
-                        bool allUploaded = _insideAngle != null && _leftAngle != null && _rightAngle != null && _plateAngle != null;
-                        
+                        bool allUploaded =
+                            _insideAngle != null &&
+                            _leftAngle != null &&
+                            _rightAngle != null &&
+                            _plateAngle != null;
+
                         // Eğer tüm fotoğraflar yüklendiyse VE kullanıcı son adımdaysa (4. adım Tabak), buton "Kaderini Keşfet" olur!
                         if (allUploaded && stepIndex == 4) {
                           return TapScaleButton(
@@ -1726,10 +2145,14 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                               height: 60,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(100),
-                                color: const Color(0xFFD4A373), // Gradyan yerine düz, net ve şık bir ton
+                                color: const Color(
+                                  0xFFD4A373,
+                                ), // Gradyan yerine düz, net ve şık bir ton
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFD4A373).withOpacity(0.25), // Çok daha hafif ve zarif bir parlama
+                                    color: const Color(0xFFD4A373).withOpacity(
+                                      0.25,
+                                    ), // Çok daha hafif ve zarif bir parlama
                                     blurRadius: 30,
                                     offset: const Offset(0, 10),
                                   ),
@@ -1749,14 +2172,23 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                   ),
                                   const SizedBox(width: 10),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF161311).withOpacity(0.1),
+                                      color: const Color(
+                                        0xFF161311,
+                                      ).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.diamond_rounded, color: Color(0xFF161311), size: 14),
+                                        const Icon(
+                                          Icons.diamond_rounded,
+                                          color: Color(0xFF161311),
+                                          size: 14,
+                                        ),
                                         const SizedBox(width: 4),
                                         Text(
                                           '$_fortuneCost',
@@ -1789,28 +2221,34 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                             height: 60,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(100),
-                              color: hasImage ? const Color(0xFFD4A373) : Colors.transparent,
+                              color: hasImage
+                                  ? const Color(0xFFD4A373)
+                                  : Colors.transparent,
                               border: Border.all(
-                                color: hasImage ? Colors.transparent : const Color(0xFFD4A373).withOpacity(0.5),
+                                color: hasImage
+                                    ? Colors.transparent
+                                    : const Color(0xFFD4A373).withOpacity(0.5),
                               ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  hasImage 
+                                  hasImage
                                       ? Icons.arrow_forward_rounded
-                                      : Icons.camera_alt_rounded, 
-                                  color: hasImage ? const Color(0xFF161311) : const Color(0xFFD4A373), 
-                                  size: 18
+                                      : Icons.camera_alt_rounded,
+                                  color: hasImage
+                                      ? const Color(0xFF161311)
+                                      : const Color(0xFFD4A373),
+                                  size: 18,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  hasImage 
-                                      ? 'Sonraki Adım'
-                                      : buttonText,
+                                  hasImage ? 'Sonraki Adım' : buttonText,
                                   style: GoogleFonts.inter(
-                                    color: hasImage ? const Color(0xFF161311) : const Color(0xFFD4A373),
+                                    color: hasImage
+                                        ? const Color(0xFF161311)
+                                        : const Color(0xFFD4A373),
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.5,
@@ -1820,10 +2258,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                             ),
                           ),
                         );
-
-                      }
+                      },
                     ),
-                    const SizedBox(height: 32), // Butonun sayfa altına yapışmasını engeller
+                    const SizedBox(
+                      height: 32,
+                    ), // Butonun sayfa altına yapışmasını engeller
                   ],
                 ),
               ),
@@ -1833,7 +2272,6 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
       },
     );
   }
-
 
   Widget _buildFinalReadyScreen() {
     return Padding(
@@ -1848,46 +2286,52 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                 Builder(
                   builder: (context) {
                     if (_isValidated) {
-                       return Column(
-                         mainAxisSize: MainAxisSize.min,
-                         children: [
-                           const SizedBox(height: 80),
-                           Container(
-                             padding: const EdgeInsets.all(20),
-                             decoration: BoxDecoration(
-                               shape: BoxShape.circle,
-                               boxShadow: [
-                                 BoxShadow(
-                                   color: const Color(0xFFD4A373).withOpacity(0.1),
-                                   blurRadius: 40,
-                                   spreadRadius: 10,
-                                 ),
-                               ],
-                             ),
-                             child: const Icon(Icons.auto_awesome_rounded, color: Color(0xFFD4A373), size: 56),
-                           ),
-                           const SizedBox(height: 24),
-                           Text(
-                             'Kozmik Bağ Kuruldu',
-                             style: GoogleFonts.outfit(
-                               color: Colors.white,
-                               fontSize: 24,
-                               fontWeight: FontWeight.w300,
-                               letterSpacing: 1.0,
-                             ),
-                           ),
-                           const SizedBox(height: 12),
-                           Text(
-                             'Fincanının sırları çözülmeye hazır.',
-                             style: TextStyle(
-                               color: Colors.white.withOpacity(0.5),
-                               fontSize: 14,
-                               height: 1.5,
-                             ),
-                             textAlign: TextAlign.center,
-                           ),
-                         ],
-                       );
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 80),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFD4A373,
+                                  ).withOpacity(0.1),
+                                  blurRadius: 40,
+                                  spreadRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.auto_awesome_rounded,
+                              color: Color(0xFFD4A373),
+                              size: 56,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Kozmik Bağ Kuruldu',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Fincanının sırları çözülmeye hazır.',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      );
                     }
 
                     // Hata varsa zarif bir yazı ve şık bir buton
@@ -1898,7 +2342,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                           uniqueErrors.add('• ${_invalidMessages[index]}');
                         }
                       }
-                      final dynamicErrorMessage = uniqueErrors.isNotEmpty 
+                      final dynamicErrorMessage = uniqueErrors.isNotEmpty
                           ? uniqueErrors.join('\n\n')
                           : 'İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.';
 
@@ -1906,7 +2350,11 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(height: 80),
-                          Icon(Icons.error_outline_rounded, color: Colors.redAccent.withOpacity(0.8), size: 48),
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.redAccent.withOpacity(0.8),
+                            size: 48,
+                          ),
                           const SizedBox(height: 24),
                           Text(
                             'Kozmik Uyumsuzluk',
@@ -1930,7 +2378,6 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                               textAlign: TextAlign.center,
                             ),
                           ),
-
                         ],
                       );
                     }
@@ -1947,7 +2394,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFD4A373).withOpacity(0.05),
+                                color: const Color(
+                                  0xFFD4A373,
+                                ).withOpacity(0.05),
                                 blurRadius: 60,
                                 spreadRadius: 20,
                               ),
@@ -1961,7 +2410,9 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                                 width: 120,
                                 height: 120,
                                 child: CircularProgressIndicator(
-                                  color: const Color(0xFFD4A373).withOpacity(0.8),
+                                  color: const Color(
+                                    0xFFD4A373,
+                                  ).withOpacity(0.8),
                                   strokeWidth: 1.5,
                                 ),
                               ),
@@ -1996,12 +2447,12 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                         ),
                       ],
                     );
-                  }
+                  },
                 ),
               ],
             ),
           ),
-          
+
           // Always visible, only active on success (Same position and size as step 1-4 buttons)
           AnimatedOpacity(
             duration: const Duration(milliseconds: 300),
@@ -2022,27 +2473,31 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
-                    color: _isValidated 
-                        ? const Color(0xFFD4A373).withOpacity(0.5) 
+                    color: _isValidated
+                        ? const Color(0xFFD4A373).withOpacity(0.5)
                         : Colors.white.withOpacity(0.1),
                   ),
-                  color: _isValidated 
-                      ? const Color(0xFFD4A373).withOpacity(0.1) 
+                  color: _isValidated
+                      ? const Color(0xFFD4A373).withOpacity(0.1)
                       : Colors.white.withOpacity(0.02),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.visibility_rounded, 
-                      color: _isValidated ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.3), 
-                      size: 18
+                      Icons.visibility_rounded,
+                      color: _isValidated
+                          ? const Color(0xFFD4A373)
+                          : Colors.white.withOpacity(0.3),
+                      size: 18,
                     ),
                     const SizedBox(width: 10),
                     Text(
                       'Sır Perdesini Arala',
                       style: GoogleFonts.inter(
-                        color: _isValidated ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.3),
+                        color: _isValidated
+                            ? const Color(0xFFD4A373)
+                            : Colors.white.withOpacity(0.3),
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -2077,10 +2532,7 @@ class _CoffeePageState extends State<CoffeePage> with TickerProviderStateMixin {
         const SizedBox(height: 16),
         Text(
           'Geleceğin kapıları aralanıyor, bekle.',
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.5),
-            fontSize: 15,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 15),
         ),
       ],
     );
@@ -2095,13 +2547,14 @@ class _CoffeeRitualAnimation extends StatefulWidget {
   State<_CoffeeRitualAnimation> createState() => _CoffeeRitualAnimationState();
 }
 
-class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with SingleTickerProviderStateMixin {
-  int _step = 0; 
+class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation>
+    with SingleTickerProviderStateMixin {
+  int _step = 0;
   // 0: İçiliyor (Tabak altta, Buhar var)
   // 1: Tabak Kapanıyor (Buhar yok, Tabak üste çıkıyor) ve Telveler için Sallanıyor
   // 2: Ters Çevriliyor (Grup 180 derece dönüyor)
   // 3: Bekleniyor (Mistik parlamalar çıkıyor)
-  
+
   Timer? _timer;
   late AnimationController _swirlController;
 
@@ -2122,10 +2575,10 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with Sin
     _timer?.cancel();
     _timer = Timer(Duration(milliseconds: delayMs), () {
       if (!mounted) return;
-      
+
       setState(() {
         _step = (_step + 1) % 4;
-        
+
         if (_step == 1) {
           // Tabak kapandıktan sonra sallanma
           Future.delayed(const Duration(milliseconds: 1200), () {
@@ -2147,7 +2600,7 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with Sin
       } else if (_step == 3) {
         nextDelay = 4000; // Soğuma bekleme süresi
       }
-      
+
       _scheduleNextStep(nextDelay);
     });
   }
@@ -2164,7 +2617,7 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with Sin
     double plateY;
     double groupRotation;
     double plateRotation;
-    
+
     if (_step == 0) {
       plateY = 44.0; // Fincanın altında
       groupRotation = 0.0;
@@ -2174,7 +2627,7 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with Sin
       groupRotation = 0.0;
       plateRotation = 0.5; // Kapanırken havada 180 derece takla atıp kapanıyor!
     } else if (_step == 2 || _step == 3) {
-      plateY = -6.0; 
+      plateY = -6.0;
       groupRotation = 0.5; // Bütün sistem ters çevrildi (180 derece)
       plateRotation = 0.5; // Tabak grup içinde zaten tersti
     } else {
@@ -2193,148 +2646,184 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation> with Sin
             // Çalkalama (Swirl) Matematiği
             // _swirlController 0'dan 1'e giderken sadece 2 tam tur atar (Çok daha yavaş)
             double angle = _swirlController.value * 2 * 2 * math.pi;
-            
+
             // Titremenin çok sert başlamayıp yavaşça bitmesi için yumuşatıcı çarpan (sinüs çanı)
             double intensity = math.sin(_swirlController.value * math.pi);
-            
+
             // Yatay dairesel hareket (Çok yassı, yataya yakın gerçekçi bir yörünge)
             double dx = 40.0 * math.cos(angle) * intensity;
-            double dy = 2.0 * math.sin(angle) * intensity; // Yukarı aşağı hareketi çok kıstık
+            double dy =
+                2.0 *
+                math.sin(angle) *
+                intensity; // Yukarı aşağı hareketi çok kıstık
 
-            return Transform.translate(
-              offset: Offset(dx, dy),
-              child: child,
-            );
+            return Transform.translate(offset: Offset(dx, dy), child: child);
           },
           child: AnimatedRotation(
             turns: groupRotation,
-            duration: const Duration(milliseconds: 1500), // Çok daha yavaş dönüş
+            duration: const Duration(
+              milliseconds: 1500,
+            ), // Çok daha yavaş dönüş
             curve: Curves.easeInOutQuart, // Pürüzsüz başlama ve bitiş
             child: Transform.scale(
               scale: 1.35, // Tüm animasyonu %35 büyütüyoruz
               child: SizedBox(
-              width: 80, // Genişliği artırdık ki kulpu da rahatça sığdırsın
-              height: 60,
-              child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                // Buhar Efekti (Adım 0)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOut,
-                  top: _step == 0 ? -15 : -5,
-                  left: 28, // Gövde merkezine (40) hizalandı
-                  child: AnimatedOpacity(
-                    opacity: _step == 0 ? 0.6 : 0.0,
-                    duration: const Duration(milliseconds: 800),
-                    child: const Icon(Icons.waves_rounded, color: Color(0xFFD4A373), size: 24),
-                  ),
-                ),
-                
-                // Kupa Gövdesi
-                Positioned(
-                  top: 0,
-                  left: 16, // Kupanın gövdesi tam olarak 80 birimlik kutunun ortasına (40) gelecek şekilde ayarlandı
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 40,
-                        decoration: const BoxDecoration(
+                width: 80, // Genişliği artırdık ki kulpu da rahatça sığdırsın
+                height: 60,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    // Buhar Efekti (Adım 0)
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeOut,
+                      top: _step == 0 ? -15 : -5,
+                      left: 28, // Gövde merkezine (40) hizalandı
+                      child: AnimatedOpacity(
+                        opacity: _step == 0 ? 0.6 : 0.0,
+                        duration: const Duration(milliseconds: 800),
+                        child: const Icon(
+                          Icons.waves_rounded,
                           color: Color(0xFFD4A373),
-                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                          size: 24,
                         ),
                       ),
-                      // Kulp
-                      Container(
-                        width: 14,
-                        height: 22,
-                        margin: const EdgeInsets.only(top: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFD4A373), width: 3.5),
-                          borderRadius: const BorderRadius.horizontal(right: Radius.circular(12)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Tabak (Daha geniş, kıvrımlı, taban çıkıntılı ve gövdeye ortalı)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 1200), // Tabak süzülerek yavaşça kapanacak
-                  curve: Curves.easeInOutCubic,
-                  top: plateY,
-                  left: 4, // Tabağın tam ortası kupa gövdesinin ortasına (40) hizalandı
-                  child: AnimatedRotation(
-                    turns: plateRotation,
-                    duration: const Duration(milliseconds: 1200), // Yukarı çıkarken aynı anda dönecek
-                    curve: Curves.easeInOutCubic,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Tabağın ana geniş gövdesi
-                        Container(
-                          width: 72, 
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFD4A373),
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(8), // Alt kısımlar daha yuvarlak
-                              top: Radius.circular(2),    // Üst kısım daha düz
-                            ),
-                          ),
-                        ),
-                        // Tabağın altındaki gerçekçi o ufak oturtma çıkıntısı
-                        Container(
-                          width: 36, 
-                          height: 2.5,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFD4A373),
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(3), // Çok hafif yumuşaklık
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
+
+                    // Kupa Gövdesi
+                    Positioned(
+                      top: 0,
+                      left:
+                          16, // Kupanın gövdesi tam olarak 80 birimlik kutunun ortasına (40) gelecek şekilde ayarlandı
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFD4A373),
+                              borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(20),
+                              ),
+                            ),
+                          ),
+                          // Kulp
+                          Container(
+                            width: 14,
+                            height: 22,
+                            margin: const EdgeInsets.only(top: 4),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFFD4A373),
+                                width: 3.5,
+                              ),
+                              borderRadius: const BorderRadius.horizontal(
+                                right: Radius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Tabak (Daha geniş, kıvrımlı, taban çıkıntılı ve gövdeye ortalı)
+                    AnimatedPositioned(
+                      duration: const Duration(
+                        milliseconds: 1200,
+                      ), // Tabak süzülerek yavaşça kapanacak
+                      curve: Curves.easeInOutCubic,
+                      top: plateY,
+                      left:
+                          4, // Tabağın tam ortası kupa gövdesinin ortasına (40) hizalandı
+                      child: AnimatedRotation(
+                        turns: plateRotation,
+                        duration: const Duration(
+                          milliseconds: 1200,
+                        ), // Yukarı çıkarken aynı anda dönecek
+                        curve: Curves.easeInOutCubic,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Tabağın ana geniş gövdesi
+                            Container(
+                              width: 72,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFD4A373),
+                                borderRadius: BorderRadius.vertical(
+                                  bottom: Radius.circular(
+                                    8,
+                                  ), // Alt kısımlar daha yuvarlak
+                                  top: Radius.circular(2), // Üst kısım daha düz
+                                ),
+                              ),
+                            ),
+                            // Tabağın altındaki gerçekçi o ufak oturtma çıkıntısı
+                            Container(
+                              width: 36,
+                              height: 2.5,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFD4A373),
+                                borderRadius: BorderRadius.vertical(
+                                  bottom: Radius.circular(
+                                    3,
+                                  ), // Çok hafif yumuşaklık
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Soğuma Efekti (Adım 3) - Fincanın soğuduğunu belirtmek için
+                    Positioned(
+                      top:
+                          42, // Kupa ters döndüğünde görsel olarak en üst burası olur (Tabanın üstü)
+                      left: 24,
+                      child: AnimatedOpacity(
+                        opacity: _step == 3 ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 1000),
+                        child: const Icon(
+                          Icons.ac_unit_rounded,
+                          color: Color(0xFFD4A373),
+                          size: 14,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 54,
+                      left: 40,
+                      child: AnimatedOpacity(
+                        opacity: _step == 3 ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 1200),
+                        child: const Icon(
+                          Icons.ac_unit_rounded,
+                          color: Color(0xFFE8D5C4),
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 46,
+                      left: 54,
+                      child: AnimatedOpacity(
+                        opacity: _step == 3 ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 1400),
+                        child: const Icon(
+                          Icons.ac_unit_rounded,
+                          color: Color(0xFFD4A373),
+                          size: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                
-                // Soğuma Efekti (Adım 3) - Fincanın soğuduğunu belirtmek için
-                Positioned(
-                  top: 42, // Kupa ters döndüğünde görsel olarak en üst burası olur (Tabanın üstü)
-                  left: 24,
-                  child: AnimatedOpacity(
-                    opacity: _step == 3 ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 1000),
-                    child: const Icon(Icons.ac_unit_rounded, color: Color(0xFFD4A373), size: 14),
-                  ),
-                ),
-                Positioned(
-                  top: 54, 
-                  left: 40,
-                  child: AnimatedOpacity(
-                    opacity: _step == 3 ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 1200),
-                    child: const Icon(Icons.ac_unit_rounded, color: Color(0xFFE8D5C4), size: 18),
-                  ),
-                ),
-                Positioned(
-                  top: 46, 
-                  left: 54,
-                  child: AnimatedOpacity(
-                    opacity: _step == 3 ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 1400),
-                    child: const Icon(Icons.ac_unit_rounded, color: Color(0xFFD4A373), size: 12),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-        ),
         ),
       ),
     );
@@ -2346,16 +2835,21 @@ class _CameraAngleInstruction extends StatefulWidget {
   const _CameraAngleInstruction({super.key, required this.stepIndex});
 
   @override
-  State<_CameraAngleInstruction> createState() => _CameraAngleInstructionState();
+  State<_CameraAngleInstruction> createState() =>
+      _CameraAngleInstructionState();
 }
 
-class _CameraAngleInstructionState extends State<_CameraAngleInstruction> with SingleTickerProviderStateMixin {
+class _CameraAngleInstructionState extends State<_CameraAngleInstruction>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 5000))..repeat(); // Çok daha yavaş
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5000),
+    )..repeat(); // Çok daha yavaş
   }
 
   @override
@@ -2380,320 +2874,506 @@ class _CameraAngleInstructionState extends State<_CameraAngleInstruction> with S
             children: [
               Builder(
                 builder: (context) {
-                    // Mükemmel Widget Tabanlı 3D Eğilme Animasyonu (Tüm adımlarda çalışır)
-                    double tilt = 0.0;
-                    if (val < 0.3) {
-                      tilt = Curves.easeInOutSine.transform(val / 0.3); // 0 -> 1 (Yavaşça eğilir)
-                    } else if (val < 0.7) {
-                      tilt = 1.0; // İçten görünüm sabit bekler
-                    } else {
-                      tilt = 1.0 - Curves.easeInOutSine.transform((val - 0.7) / 0.3); // Geri döner
-                    }
+                  // Mükemmel Widget Tabanlı 3D Eğilme Animasyonu (Tüm adımlarda çalışır)
+                  double tilt = 0.0;
+                  if (val < 0.3) {
+                    tilt = Curves.easeInOutSine.transform(
+                      val / 0.3,
+                    ); // 0 -> 1 (Yavaşça eğilir)
+                  } else if (val < 0.7) {
+                    tilt = 1.0; // İçten görünüm sabit bekler
+                  } else {
+                    tilt =
+                        1.0 -
+                        Curves.easeInOutSine.transform(
+                          (val - 0.7) / 0.3,
+                        ); // Geri döner
+                  }
 
-                    if (widget.stepIndex == 4) {
-                      // YENİ ANİMASYON: Tabak yukarı kalkar, büyür ve içi görünür (Kupa aşağıda kalır)
-                      return Transform.scale(
-                        scale: 1.35,
-                        child: SizedBox(
-                          width: 80.0,
-                          height: 80.0,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.center,
-                            children: [
-                              // Kupa Gövdesi (Aşağıda kalıyor, tabağın altına iniyor ve tamamen ayrılıyor)
-                              Positioned(
-                                top: tilt * 70.0, // 0'dan 70'e inerek tabaktan tamamen ayrılıp aşağı düşer
-                                left: 16.0,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 48.0,
-                                      height: 40.0,
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFD4A373),
-                                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20.0)),
-                                      ),
-                                    ),
-                                    // Kulp
-                                    Container(
-                                      width: 14.0,
-                                      height: 22.0,
-                                      margin: const EdgeInsets.only(top: 4.0),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: const Color(0xFFD4A373), width: 3.5),
-                                        borderRadius: const BorderRadius.horizontal(right: Radius.circular(12.0)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              
-                              // Tabak (Yukarı kalkıyor ve açılıyor)
-                              Positioned(
-                                top: 36.0 - (tilt * 42.0), // 36'dan -6'ya çıkar (Kupadan tamamen kopar ve kameraya yaklaşır)
-                                left: 4.0,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // Tabağın ana gövdesi (Düz çizgiden daireye dönüşür)
-                                    Container(
-                                      width: 72.0, 
-                                      height: 6.0 + (tilt * 66.0), // 6'dan 72'ye büyür (Tam daire olur)
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFD4A373),
-                                        borderRadius: BorderRadius.vertical(
-                                          bottom: Radius.circular(8.0 + (tilt * 28.0)), // 8 -> 36
-                                          top: Radius.circular(2.0 + (tilt * 34.0)),    // 2 -> 36
-                                        ),
-                                      ),
-                                      // Tabağın içi (Telveler)
-                                      child: Center(
-                                        child: Opacity(
-                                          opacity: tilt, // Sadece yukarı kalkarken belirginleşir
-                                          child: Container(
-                                            width: 62.0, // 72 tabağın içinde 62 siyah alan
-                                            height: tilt * 62.0, // 0'dan 62'ye açılır (Elips illüzyonu)
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF161311),
-                                              borderRadius: BorderRadius.circular(31.0),
-                                            ),
-                                            child: Center(
-                                              child: Icon(
-                                                Icons.blur_on_rounded, // Tabağa akan telveler
-                                                size: 32.0 * tilt,
-                                                color: const Color(0xFFD4A373).withOpacity(0.6),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Tabağın altındaki çıkıntı (Tepeden bakılınca yok olur)
-                                    if (tilt < 1.0)
-                                      Container(
-                                        width: 36.0, 
-                                        height: math.max(0.0, 2.5 * (1.0 - tilt)), // 2.5'ten 0'a küçülür
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFD4A373).withOpacity(1.0 - tilt),
-                                          borderRadius: const BorderRadius.vertical(
-                                            bottom: Radius.circular(3.0),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              
-                              // Telefon ve Fotoğraf Çekim Animasyonu (Adım 4 İçin)
-                              if (val > 0.3 && val < 0.7) // Sadece tabak tam ortadayken çalışır
-                                Builder(
-                                  builder: (context) {
-                                    // 0.3 ile 0.7 arasını kendi içinde 0.0 - 1.0 bir zaman dilimine dönüştürüyoruz
-                                    double p = (val - 0.3) / 0.4;
-                                    
-                                    double phoneOpacity = 0.0;
-                                    double phoneY = 0.0;
-                                    double flashOpacity = 0.0;
-
-                                    if (p < 0.2) {
-                                      // Giriş: Telefon aşağıdan süzülerek gelir
-                                      phoneOpacity = p / 0.2;
-                                      phoneY = 30 * (1.0 - phoneOpacity);
-                                    } else if (p < 0.8) {
-                                      // Sabit duruş ve Fotoğraf Çekimi
-                                      phoneOpacity = 1.0;
-                                      phoneY = 0.0;
-                                      // Flaş patlaması (Tam ortada, p: 0.4 ile 0.6 arası)
-                                      if (p > 0.4 && p < 0.6) {
-                                        double flashP = (p - 0.4) / 0.2; // 0.0 -> 1.0
-                                        flashOpacity = flashP < 0.5 ? (flashP / 0.5) : (1.0 - ((flashP - 0.5) / 0.5));
-                                      }
-                                    } else {
-                                      // Çıkış: Telefon yukarı doğru kayıp gözden kaybolur
-                                      phoneOpacity = 1.0 - ((p - 0.8) / 0.2);
-                                      phoneY = -30 * (1.0 - phoneOpacity);
-                                    }
-
-                                    return OverflowBox(
-                                      maxWidth: double.infinity,
-                                      maxHeight: double.infinity,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // Flaş Işığı (Soft, lüks bir parlama)
-                                          if (flashOpacity > 0)
-                                            Transform.translate(
-                                              offset: Offset(0, phoneY),
-                                              child: Container(
-                                                width: 220,
-                                                height: 220,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  gradient: RadialGradient(
-                                                    colors: [
-                                                      Colors.white.withOpacity(flashOpacity * 0.25),
-                                                      Colors.white.withOpacity(0.0),
-                                                    ],
-                                                    stops: const [0.0, 1.0],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          // Telefon Cihazı
-                                          Transform.translate(
-                                            offset: Offset(0, phoneY),
-                                            child: Transform.scale(
-                                              scale: 0.75 + (1.0 - phoneOpacity) * 0.1, // Biraz daha küçülttük
-                                              child: Opacity(
-                                                opacity: phoneOpacity,
-                                                child: Stack(
-                                                  clipBehavior: Clip.none,
-                                                  alignment: Alignment.center,
-                                                  children: [
-                                                    // Sol Ses Açma Tuşu
-                                                    Positioned(
-                                                      left: -2,
-                                                      top: 36,
-                                                      child: Container(width: 2.5, height: 12, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(left: Radius.circular(2)))),
-                                                    ),
-                                                    // Sol Ses Kısma Tuşu
-                                                    Positioned(
-                                                      left: -2,
-                                                      top: 52,
-                                                      child: Container(width: 2.5, height: 12, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(left: Radius.circular(2)))),
-                                                    ),
-                                                    // Sağ Güç Tuşu
-                                                    Positioned(
-                                                      right: -2,
-                                                      top: 44,
-                                                      child: Container(width: 2.5, height: 16, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(right: Radius.circular(2)))),
-                                                    ),
-                                                    // Telefon Gövdesi (Ekran Yüzü)
-                                                    Container(
-                                                      width: 76,
-                                                      height: 160,
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(color: const Color(0xFFE8D5C4).withOpacity(0.5), width: 2.5),
-                                                        borderRadius: BorderRadius.circular(18),
-                                                        color: Colors.white.withOpacity(0.02),
-                                                      ),
-                                                      child: Stack(
-                                                        alignment: Alignment.center,
-                                                        children: [
-                                                          // Odak Karesi (Vizör)
-                                                          Icon(Icons.crop_free_rounded, color: const Color(0xFFD4A373).withOpacity(0.8), size: 36),
-                                                          // Dynamic Island
-                                                          Positioned(
-                                                            top: 6,
-                                                            child: Row(
-                                                              mainAxisSize: MainAxisSize.min,
-                                                              children: [
-                                                                Container(width: 22, height: 7, decoration: BoxDecoration(color: Colors.black.withOpacity(0.85), borderRadius: BorderRadius.circular(4))),
-                                                                const SizedBox(width: 2.5),
-                                                                Container(width: 7, height: 7, decoration: BoxDecoration(color: Colors.black.withOpacity(0.85), shape: BoxShape.circle)),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    // Tilt calculation is now at the top.
-
+                  if (widget.stepIndex == 4) {
+                    // YENİ ANİMASYON: Tabak yukarı kalkar, büyür ve içi görünür (Kupa aşağıda kalır)
                     return Transform.scale(
-                      scale: 1.35, // İlk ekrandaki boyutla birebir aynı olması için büyüttük
+                      scale: 1.35,
                       child: SizedBox(
-                        width: 80,
-                        height: 80,
+                        width: 80.0,
+                        height: 80.0,
                         child: Stack(
                           clipBehavior: Clip.none,
                           alignment: Alignment.center,
-                        children: [
-                          // Kupa Gövdesi ve Kulp (Adım 1, 2, 3)
-                          Positioned(
-                            top: 24.0 - (tilt * 4.0), // Eğildikçe tam ortaya yerleşmek için yukarı kayar
-                            left: 16.0, 
-                            child: Transform.rotate(
-                                  angle: widget.stepIndex == 2 ? -0.25 : (widget.stepIndex == 3 ? 0.25 : 0.0),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Fincan Gövdesi
-                                      Container(
-                                        width: 48.0,
-                                        height: 40.0 + (tilt * 8.0), // 40'tan 48'e (Tam Daire Olur)
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFD4A373),
-                                          borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(20.0 + (tilt * 4.0)), // 20 -> 24
-                                            bottomRight: Radius.circular(20.0 + (tilt * 4.0)),
-                                            topLeft: Radius.circular(tilt * 24.0), // 0 -> 24
-                                            topRight: Radius.circular(tilt * 24.0),
+                          children: [
+                            // Kupa Gövdesi (Aşağıda kalıyor, tabağın altına iniyor ve tamamen ayrılıyor)
+                            Positioned(
+                              top:
+                                  tilt *
+                                  70.0, // 0'dan 70'e inerek tabaktan tamamen ayrılıp aşağı düşer
+                              left: 16.0,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 48.0,
+                                    height: 40.0,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFD4A373),
+                                      borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(20.0),
+                                      ),
+                                    ),
+                                  ),
+                                  // Kulp
+                                  Container(
+                                    width: 14.0,
+                                    height: 22.0,
+                                    margin: const EdgeInsets.only(top: 4.0),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: const Color(0xFFD4A373),
+                                        width: 3.5,
+                                      ),
+                                      borderRadius:
+                                          const BorderRadius.horizontal(
+                                            right: Radius.circular(12.0),
                                           ),
-                                        ),
-                                        // Fincanın ağzı (İçi)
-                                        alignment: Alignment(0.0, -1.0 + tilt), // Üst kenardan merkeze kayar
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Tabak (Yukarı kalkıyor ve açılıyor)
+                            Positioned(
+                              top:
+                                  36.0 -
+                                  (tilt *
+                                      42.0), // 36'dan -6'ya çıkar (Kupadan tamamen kopar ve kameraya yaklaşır)
+                              left: 4.0,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Tabağın ana gövdesi (Düz çizgiden daireye dönüşür)
+                                  Container(
+                                    width: 72.0,
+                                    height:
+                                        6.0 +
+                                        (tilt *
+                                            66.0), // 6'dan 72'ye büyür (Tam daire olur)
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD4A373),
+                                      borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(
+                                          8.0 + (tilt * 28.0),
+                                        ), // 8 -> 36
+                                        top: Radius.circular(
+                                          2.0 + (tilt * 34.0),
+                                        ), // 2 -> 36
+                                      ),
+                                    ),
+                                    // Tabağın içi (Telveler)
+                                    child: Center(
+                                      child: Opacity(
+                                        opacity:
+                                            tilt, // Sadece yukarı kalkarken belirginleşir
                                         child: Container(
-                                          width: 44.0, // Ağız genişliği hep aynı
-                                          height: tilt * 44.0, // Yükseklik 0'dan 44'e açılarak elips illüzyonu yaratır
+                                          width:
+                                              62.0, // 72 tabağın içinde 62 siyah alan
+                                          height:
+                                              tilt *
+                                              62.0, // 0'dan 62'ye açılır (Elips illüzyonu)
                                           decoration: BoxDecoration(
                                             color: const Color(0xFF161311),
-                                            borderRadius: BorderRadius.circular(22.0),
+                                            borderRadius: BorderRadius.circular(
+                                              31.0,
+                                            ),
                                           ),
                                           child: Center(
-                                            child: Opacity(
-                                              opacity: tilt,
-                                              child: Icon(
-                                                Icons.blur_on_rounded, // Telveler
-                                                size: 24.0 * tilt,
-                                                color: const Color(0xFFD4A373).withOpacity(0.6),
-                                              ),
+                                            child: Icon(
+                                              Icons
+                                                  .blur_on_rounded, // Tabağa akan telveler
+                                              size: 32.0 * tilt,
+                                              color: const Color(
+                                                0xFFD4A373,
+                                              ).withOpacity(0.6),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      // Kulp (Gerçekçi Fizik: Tepeden bakıldığında ince ve kısa bir çıkıntı)
-                                      Container(
-                                        width: 14.0 - (tilt * 4.0), // Biraz kısalır (14 -> 10)
-                                        height: 22.0 - (tilt * 16.0), // Çok daha ince hale gelir (22 -> 6)
-                                        // Gövde 48 olacak. 6 boyundaki kulpu ortalamak için (48-6)/2 = 21.
-                                        // 4'ten 21'e: 4 + (tilt * 17)
-                                        margin: EdgeInsets.only(top: 4.0 + (tilt * 17.0)), 
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFD4A373).withOpacity(tilt), // İçi dolar
-                                          border: Border.all(color: const Color(0xFFD4A373), width: 3.5 - (tilt * 2.5)), // Hata vermemesi için kenarlık da incelir
-                                          borderRadius: const BorderRadius.horizontal(right: Radius.circular(12.0)), // Ucu her zaman tam yuvarlak kalsın
+                                    ),
+                                  ),
+                                  // Tabağın altındaki çıkıntı (Tepeden bakılınca yok olur)
+                                  if (tilt < 1.0)
+                                    Container(
+                                      width: 36.0,
+                                      height: math.max(
+                                        0.0,
+                                        2.5 * (1.0 - tilt),
+                                      ), // 2.5'ten 0'a küçülür
+                                      decoration: BoxDecoration(
+                                        color: const Color(
+                                          0xFFD4A373,
+                                        ).withOpacity(1.0 - tilt),
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              bottom: Radius.circular(3.0),
+                                            ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+
+                            // Telefon ve Fotoğraf Çekim Animasyonu (Adım 4 İçin)
+                            if (val > 0.3 &&
+                                val <
+                                    0.7) // Sadece tabak tam ortadayken çalışır
+                              Builder(
+                                builder: (context) {
+                                  // 0.3 ile 0.7 arasını kendi içinde 0.0 - 1.0 bir zaman dilimine dönüştürüyoruz
+                                  double p = (val - 0.3) / 0.4;
+
+                                  double phoneOpacity = 0.0;
+                                  double phoneY = 0.0;
+                                  double flashOpacity = 0.0;
+
+                                  if (p < 0.2) {
+                                    // Giriş: Telefon aşağıdan süzülerek gelir
+                                    phoneOpacity = p / 0.2;
+                                    phoneY = 30 * (1.0 - phoneOpacity);
+                                  } else if (p < 0.8) {
+                                    // Sabit duruş ve Fotoğraf Çekimi
+                                    phoneOpacity = 1.0;
+                                    phoneY = 0.0;
+                                    // Flaş patlaması (Tam ortada, p: 0.4 ile 0.6 arası)
+                                    if (p > 0.4 && p < 0.6) {
+                                      double flashP =
+                                          (p - 0.4) / 0.2; // 0.0 -> 1.0
+                                      flashOpacity = flashP < 0.5
+                                          ? (flashP / 0.5)
+                                          : (1.0 - ((flashP - 0.5) / 0.5));
+                                    }
+                                  } else {
+                                    // Çıkış: Telefon yukarı doğru kayıp gözden kaybolur
+                                    phoneOpacity = 1.0 - ((p - 0.8) / 0.2);
+                                    phoneY = -30 * (1.0 - phoneOpacity);
+                                  }
+
+                                  return OverflowBox(
+                                    maxWidth: double.infinity,
+                                    maxHeight: double.infinity,
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.center,
+                                      children: [
+                                        // Flaş Işığı (Soft, lüks bir parlama)
+                                        if (flashOpacity > 0)
+                                          Transform.translate(
+                                            offset: Offset(0, phoneY),
+                                            child: Container(
+                                              width: 220,
+                                              height: 220,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                gradient: RadialGradient(
+                                                  colors: [
+                                                    Colors.white.withOpacity(
+                                                      flashOpacity * 0.25,
+                                                    ),
+                                                    Colors.white.withOpacity(
+                                                      0.0,
+                                                    ),
+                                                  ],
+                                                  stops: const [0.0, 1.0],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        // Telefon Cihazı
+                                        Transform.translate(
+                                          offset: Offset(0, phoneY),
+                                          child: Transform.scale(
+                                            scale:
+                                                0.75 +
+                                                (1.0 - phoneOpacity) *
+                                                    0.1, // Biraz daha küçülttük
+                                            child: Opacity(
+                                              opacity: phoneOpacity,
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  // Sol Ses Açma Tuşu
+                                                  Positioned(
+                                                    left: -2,
+                                                    top: 36,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 12,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              left:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Sol Ses Kısma Tuşu
+                                                  Positioned(
+                                                    left: -2,
+                                                    top: 52,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 12,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              left:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Sağ Güç Tuşu
+                                                  Positioned(
+                                                    right: -2,
+                                                    top: 44,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 16,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              right:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Telefon Gövdesi (Ekran Yüzü)
+                                                  Container(
+                                                    width: 76,
+                                                    height: 160,
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.5),
+                                                        width: 2.5,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+                                                      color: Colors.white
+                                                          .withOpacity(0.02),
+                                                    ),
+                                                    child: Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        // Odak Karesi (Vizör)
+                                                        Icon(
+                                                          Icons
+                                                              .crop_free_rounded,
+                                                          color: const Color(
+                                                            0xFFD4A373,
+                                                          ).withOpacity(0.8),
+                                                          size: 36,
+                                                        ),
+                                                        // Dynamic Island
+                                                        Positioned(
+                                                          top: 6,
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              Container(
+                                                                width: 22,
+                                                                height: 7,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                        0.85,
+                                                                      ),
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        4,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 2.5,
+                                                              ),
+                                                              Container(
+                                                                width: 7,
+                                                                height: 7,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                        0.85,
+                                                                      ),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Tilt calculation is now at the top.
+
+                  return Transform.scale(
+                    scale:
+                        1.35, // İlk ekrandaki boyutla birebir aynı olması için büyüttük
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          // Kupa Gövdesi ve Kulp (Adım 1, 2, 3)
+                          Positioned(
+                            top:
+                                24.0 -
+                                (tilt *
+                                    4.0), // Eğildikçe tam ortaya yerleşmek için yukarı kayar
+                            left: 16.0,
+                            child: Transform.rotate(
+                              angle: widget.stepIndex == 2
+                                  ? -0.25
+                                  : (widget.stepIndex == 3 ? 0.25 : 0.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Fincan Gövdesi
+                                  Container(
+                                    width: 48.0,
+                                    height:
+                                        40.0 +
+                                        (tilt *
+                                            8.0), // 40'tan 48'e (Tam Daire Olur)
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD4A373),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(
+                                          20.0 + (tilt * 4.0),
+                                        ), // 20 -> 24
+                                        bottomRight: Radius.circular(
+                                          20.0 + (tilt * 4.0),
+                                        ),
+                                        topLeft: Radius.circular(
+                                          tilt * 24.0,
+                                        ), // 0 -> 24
+                                        topRight: Radius.circular(tilt * 24.0),
+                                      ),
+                                    ),
+                                    // Fincanın ağzı (İçi)
+                                    alignment: Alignment(
+                                      0.0,
+                                      -1.0 + tilt,
+                                    ), // Üst kenardan merkeze kayar
+                                    child: Container(
+                                      width: 44.0, // Ağız genişliği hep aynı
+                                      height:
+                                          tilt *
+                                          44.0, // Yükseklik 0'dan 44'e açılarak elips illüzyonu yaratır
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF161311),
+                                        borderRadius: BorderRadius.circular(
+                                          22.0,
                                         ),
                                       ),
-                                    ],
+                                      child: Center(
+                                        child: Opacity(
+                                          opacity: tilt,
+                                          child: Icon(
+                                            Icons.blur_on_rounded, // Telveler
+                                            size: 24.0 * tilt,
+                                            color: const Color(
+                                              0xFFD4A373,
+                                            ).withOpacity(0.6),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  // Kulp (Gerçekçi Fizik: Tepeden bakıldığında ince ve kısa bir çıkıntı)
+                                  Container(
+                                    width:
+                                        14.0 -
+                                        (tilt *
+                                            4.0), // Biraz kısalır (14 -> 10)
+                                    height:
+                                        22.0 -
+                                        (tilt *
+                                            16.0), // Çok daha ince hale gelir (22 -> 6)
+                                    // Gövde 48 olacak. 6 boyundaki kulpu ortalamak için (48-6)/2 = 21.
+                                    // 4'ten 21'e: 4 + (tilt * 17)
+                                    margin: EdgeInsets.only(
+                                      top: 4.0 + (tilt * 17.0),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(
+                                        0xFFD4A373,
+                                      ).withOpacity(tilt), // İçi dolar
+                                      border: Border.all(
+                                        color: const Color(0xFFD4A373),
+                                        width: 3.5 - (tilt * 2.5),
+                                      ), // Hata vermemesi için kenarlık da incelir
+                                      borderRadius:
+                                          const BorderRadius.horizontal(
+                                            right: Radius.circular(12.0),
+                                          ), // Ucu her zaman tam yuvarlak kalsın
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ), // Positioned'ı kapatıyoruz
                           // Telefon ve Fotoğraf Çekim Animasyonu
-                          if (val > 0.3 && val < 0.7) // Sadece fincan tam tepedeyken çalışır
+                          if (val > 0.3 &&
+                              val < 0.7) // Sadece fincan tam tepedeyken çalışır
                             Builder(
                               builder: (context) {
                                 // 0.3 ile 0.7 arasını kendi içinde 0.0 - 1.0 bir zaman dilimine dönüştürüyoruz
                                 double p = (val - 0.3) / 0.4;
-                                
+
                                 double phoneOpacity = 0.0;
                                 double phoneY = 0.0;
                                 double flashOpacity = 0.0;
@@ -2708,22 +3388,28 @@ class _CameraAngleInstructionState extends State<_CameraAngleInstruction> with S
                                   phoneY = 0.0;
                                   // Flaş patlaması (Tam ortada, p: 0.4 ile 0.6 arası)
                                   if (p > 0.4 && p < 0.6) {
-                                    double flashP = (p - 0.4) / 0.2; // 0.0 -> 1.0
-                                    flashOpacity = flashP < 0.5 ? (flashP / 0.5) : (1.0 - ((flashP - 0.5) / 0.5));
+                                    double flashP =
+                                        (p - 0.4) / 0.2; // 0.0 -> 1.0
+                                    flashOpacity = flashP < 0.5
+                                        ? (flashP / 0.5)
+                                        : (1.0 - ((flashP - 0.5) / 0.5));
                                   }
                                 } else {
                                   // Çıkış: Telefon yukarı doğru kayıp gözden kaybolur
                                   phoneOpacity = 1.0 - ((p - 0.8) / 0.2);
                                   phoneY = -30 * (1.0 - phoneOpacity);
                                 }
-                                
+
                                 // Sol ve Sağ Profil İçin Telefonun Yeri/Açısı Değişir!
                                 double phoneOffsetX = 0.0;
                                 double phoneRotation = 0.0;
-                                if (widget.stepIndex == 2) { // Sol Profil
+                                if (widget.stepIndex == 2) {
+                                  // Sol Profil
                                   phoneOffsetX = -25.0; // Sola kaydır
-                                  phoneRotation = -0.2; // Sola hafif eğ (radyan)
-                                } else if (widget.stepIndex == 3) { // Sağ Profil
+                                  phoneRotation =
+                                      -0.2; // Sola hafif eğ (radyan)
+                                } else if (widget.stepIndex == 3) {
+                                  // Sağ Profil
                                   phoneOffsetX = 25.0; // Sağa kaydır
                                   phoneRotation = 0.2; // Sağa hafif eğ
                                 }
@@ -2735,117 +3421,202 @@ class _CameraAngleInstructionState extends State<_CameraAngleInstruction> with S
                                     clipBehavior: Clip.none,
                                     alignment: Alignment.center,
                                     children: [
-                                    // Flaş Işığı (Soft, lüks bir parlama)
-                                    if (flashOpacity > 0)
+                                      // Flaş Işığı (Soft, lüks bir parlama)
+                                      if (flashOpacity > 0)
+                                        Transform.translate(
+                                          offset: Offset(phoneOffsetX, phoneY),
+                                          child: Container(
+                                            width: 220,
+                                            height: 220,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: RadialGradient(
+                                                colors: [
+                                                  Colors.white.withOpacity(
+                                                    flashOpacity * 0.25,
+                                                  ),
+                                                  Colors.white.withOpacity(0.0),
+                                                ],
+                                                stops: const [0.0, 1.0],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      // Telefon Cihazı
                                       Transform.translate(
                                         offset: Offset(phoneOffsetX, phoneY),
-                                        child: Container(
-                                          width: 220,
-                                          height: 220,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: RadialGradient(
-                                              colors: [
-                                                Colors.white.withOpacity(flashOpacity * 0.25),
-                                                Colors.white.withOpacity(0.0),
-                                              ],
-                                              stops: const [0.0, 1.0],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    // Telefon Cihazı
-                                    Transform.translate(
-                                      offset: Offset(phoneOffsetX, phoneY),
-                                      child: Transform.rotate(
-                                        angle: phoneRotation,
-                                        child: Transform.scale(
-                                          scale: 0.75 + (1.0 - phoneOpacity) * 0.1, // Biraz daha küçülttük (0.85 -> 0.75)
-                                          child: Opacity(
-                                            opacity: phoneOpacity,
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              alignment: Alignment.center,
-                                              children: [
-                                                // Sol Ses Açma Tuşu
-                                                Positioned(
-                                                  left: -2,
-                                                  top: 36,
-                                                  child: Container(width: 2.5, height: 12, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(left: Radius.circular(2)))),
-                                                ),
-                                                // Sol Ses Kısma Tuşu
-                                                Positioned(
-                                                  left: -2,
-                                                  top: 52,
-                                                  child: Container(width: 2.5, height: 12, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(left: Radius.circular(2)))),
-                                                ),
-                                                // Sağ Güç Tuşu
-                                                Positioned(
-                                                  right: -2,
-                                                  top: 44,
-                                                  child: Container(width: 2.5, height: 16, decoration: BoxDecoration(color: const Color(0xFFE8D5C4).withOpacity(0.7), borderRadius: const BorderRadius.horizontal(right: Radius.circular(2)))),
-                                                ),
-
-                                                // Telefon Gövdesi (Ekran Yüzü)
-                                                Container(
-                                                  width: 76,
-                                                  height: 160, // Tam olarak 6.3 inç (1:2.1 civarı) gerçekçi oran!
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: const Color(0xFFE8D5C4).withOpacity(0.5), width: 2.5), // Metalik kasa kenarı
-                                                    borderRadius: BorderRadius.circular(18),
-                                                    // İçi şeffaf kalıyor ki kahve görünsün
-                                                    color: Colors.white.withOpacity(0.02),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      // Odak Karesi (Vizör)
-                                                      Icon(Icons.crop_free_rounded, color: const Color(0xFFD4A373).withOpacity(0.8), size: 36),
-                                                      // Dynamic Island (Kullanıcının Çizdiği: Hap + Nokta Çentik)
-                                                      Positioned(
-                                                        top: 6,
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            // Hap şeklindeki çentik
-                                                            Container(
-                                                              width: 22,
-                                                              height: 7,
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.black.withOpacity(0.85),
-                                                                borderRadius: BorderRadius.circular(4),
-                                                              ),
+                                        child: Transform.rotate(
+                                          angle: phoneRotation,
+                                          child: Transform.scale(
+                                            scale:
+                                                0.75 +
+                                                (1.0 - phoneOpacity) *
+                                                    0.1, // Biraz daha küçülttük (0.85 -> 0.75)
+                                            child: Opacity(
+                                              opacity: phoneOpacity,
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  // Sol Ses Açma Tuşu
+                                                  Positioned(
+                                                    left: -2,
+                                                    top: 36,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 12,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              left:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
                                                             ),
-                                                            const SizedBox(width: 2.5),
-                                                            // Yuvarlak sensör / ön kamera noktası
-                                                            Container(
-                                                              width: 7,
-                                                              height: 7,
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.black.withOpacity(0.85),
-                                                                shape: BoxShape.circle,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                  // Sol Ses Kısma Tuşu
+                                                  Positioned(
+                                                    left: -2,
+                                                    top: 52,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 12,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              left:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Sağ Güç Tuşu
+                                                  Positioned(
+                                                    right: -2,
+                                                    top: 44,
+                                                    child: Container(
+                                                      width: 2.5,
+                                                      height: 16,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.7),
+                                                        borderRadius:
+                                                            const BorderRadius.horizontal(
+                                                              right:
+                                                                  Radius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  // Telefon Gövdesi (Ekran Yüzü)
+                                                  Container(
+                                                    width: 76,
+                                                    height:
+                                                        160, // Tam olarak 6.3 inç (1:2.1 civarı) gerçekçi oran!
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: const Color(
+                                                          0xFFE8D5C4,
+                                                        ).withOpacity(0.5),
+                                                        width: 2.5,
+                                                      ), // Metalik kasa kenarı
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            18,
+                                                          ),
+                                                      // İçi şeffaf kalıyor ki kahve görünsün
+                                                      color: Colors.white
+                                                          .withOpacity(0.02),
+                                                    ),
+                                                    child: Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        // Odak Karesi (Vizör)
+                                                        Icon(
+                                                          Icons
+                                                              .crop_free_rounded,
+                                                          color: const Color(
+                                                            0xFFD4A373,
+                                                          ).withOpacity(0.8),
+                                                          size: 36,
+                                                        ),
+                                                        // Dynamic Island (Kullanıcının Çizdiği: Hap + Nokta Çentik)
+                                                        Positioned(
+                                                          top: 6,
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              // Hap şeklindeki çentik
+                                                              Container(
+                                                                width: 22,
+                                                                height: 7,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                        0.85,
+                                                                      ),
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        4,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 2.5,
+                                                              ),
+                                                              // Yuvarlak sensör / ön kamera noktası
+                                                              Container(
+                                                                width: 7,
+                                                                height: 7,
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                        0.85,
+                                                                      ),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                         ],
                       ),
-                    ));
+                    ),
+                  );
                 },
               ),
             ],
@@ -2877,9 +3648,9 @@ class CupFlipPainter extends CustomPainter {
 
     double cupWidth = 44.0;
     double cupHeight = 36.0;
-    
+
     double currentCupWidth = cupWidth + (tilt * (56 - cupWidth));
-    
+
     // 1. BUHAR (Steam) - Yavaşça kaybolur
     if (tilt < 0.3) {
       double steamOpacity = 1.0 - (tilt / 0.3);
@@ -2888,11 +3659,11 @@ class CupFlipPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0
         ..strokeCap = StrokeCap.round;
-      
+
       for (int i = -1; i <= 1; i++) {
         Path steamPath = Path();
         double sx = cx + (i * 8);
-        double sy = cy - cupHeight/2 - 10;
+        double sy = cy - cupHeight / 2 - 10;
         steamPath.moveTo(sx, sy);
         steamPath.quadraticBezierTo(sx - 4, sy - 4, sx, sy - 8);
         steamPath.quadraticBezierTo(sx + 4, sy - 12, sx, sy - 16);
@@ -2906,10 +3677,17 @@ class CupFlipPainter extends CustomPainter {
       final platePaint = Paint()
         ..color = const Color(0xFFD4A373).withOpacity(0.3 * plateOpacity)
         ..style = PaintingStyle.fill;
-      
-      double plateY = cy + cupHeight/2 + 6 + (tilt * 10);
-      Rect plateRect = Rect.fromCenter(center: Offset(cx, plateY), width: 56, height: 4);
-      canvas.drawRRect(RRect.fromRectAndRadius(plateRect, const Radius.circular(2)), platePaint);
+
+      double plateY = cy + cupHeight / 2 + 6 + (tilt * 10);
+      Rect plateRect = Rect.fromCenter(
+        center: Offset(cx, plateY),
+        width: 56,
+        height: 4,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(plateRect, const Radius.circular(2)),
+        platePaint,
+      );
     }
 
     // 3. KULP (Handle) - İçe doğru kaybolur
@@ -2920,61 +3698,95 @@ class CupFlipPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.5
         ..strokeCap = StrokeCap.round;
-      
-      double handleX = cx + currentCupWidth/2;
+
+      double handleX = cx + currentCupWidth / 2;
       double handleY = cy - 2;
       Rect handleRect = Rect.fromLTWH(handleX, handleY, 14, 20);
-      canvas.drawArc(handleRect, -math.pi/2, math.pi, false, handlePaint);
+      canvas.drawArc(handleRect, -math.pi / 2, math.pi, false, handlePaint);
     }
 
     // 4. FİNCAN GÖVDESİ VE AĞZI
-    double bodyTopY = cy - cupHeight/2 + (tilt * cupHeight/2);
-    double bodyBottomY = cy + cupHeight/2 - (tilt * cupHeight/2);
-    
+    double bodyTopY = cy - cupHeight / 2 + (tilt * cupHeight / 2);
+    double bodyBottomY = cy + cupHeight / 2 - (tilt * cupHeight / 2);
+
     double topOvalHeight = 4 + (tilt * 52);
-    Rect topOval = Rect.fromCenter(center: Offset(cx, bodyTopY), width: currentCupWidth, height: topOvalHeight);
-    
+    Rect topOval = Rect.fromCenter(
+      center: Offset(cx, bodyTopY),
+      width: currentCupWidth,
+      height: topOvalHeight,
+    );
+
     Path bodyPath = Path();
     double bottomRadius = 18 + (tilt * 10);
-    
-    bodyPath.moveTo(cx - currentCupWidth/2, bodyTopY);
-    bodyPath.lineTo(cx - currentCupWidth/2, bodyBottomY - bottomRadius);
-    bodyPath.quadraticBezierTo(cx - currentCupWidth/2, bodyBottomY, cx - currentCupWidth/2 + bottomRadius, bodyBottomY);
-    bodyPath.lineTo(cx + currentCupWidth/2 - bottomRadius, bodyBottomY);
-    bodyPath.quadraticBezierTo(cx + currentCupWidth/2, bodyBottomY, cx + currentCupWidth/2, bodyBottomY - bottomRadius);
-    bodyPath.lineTo(cx + currentCupWidth/2, bodyTopY);
-    
+
+    bodyPath.moveTo(cx - currentCupWidth / 2, bodyTopY);
+    bodyPath.lineTo(cx - currentCupWidth / 2, bodyBottomY - bottomRadius);
+    bodyPath.quadraticBezierTo(
+      cx - currentCupWidth / 2,
+      bodyBottomY,
+      cx - currentCupWidth / 2 + bottomRadius,
+      bodyBottomY,
+    );
+    bodyPath.lineTo(cx + currentCupWidth / 2 - bottomRadius, bodyBottomY);
+    bodyPath.quadraticBezierTo(
+      cx + currentCupWidth / 2,
+      bodyBottomY,
+      cx + currentCupWidth / 2,
+      bodyBottomY - bottomRadius,
+    );
+    bodyPath.lineTo(cx + currentCupWidth / 2, bodyTopY);
+
     canvas.drawPath(bodyPath, paint);
     canvas.drawPath(bodyPath, borderPaint);
-    
+
     // Fincan İçi
     final insidePaint = Paint()
       ..color = const Color(0xFF161311)
       ..style = PaintingStyle.fill;
-    
+
     canvas.drawOval(topOval, insidePaint);
     canvas.drawOval(topOval, borderPaint);
-    
+
     // 5. TELVELER
     if (tilt > 0.3) {
       double groundsOpacity = (tilt - 0.3) / 0.7;
-      
+
       final blurPaint = Paint()
         ..color = const Color(0xFFD4A373).withOpacity(0.15 * groundsOpacity)
         ..style = PaintingStyle.fill
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-        
-      canvas.drawCircle(Offset(cx, bodyTopY), currentCupWidth * 0.35, blurPaint);
-      
+
+      canvas.drawCircle(
+        Offset(cx, bodyTopY),
+        currentCupWidth * 0.35,
+        blurPaint,
+      );
+
       final dotPaint = Paint()
         ..color = const Color(0xFFD4A373).withOpacity(0.5 * groundsOpacity)
         ..style = PaintingStyle.fill;
-        
+
       canvas.drawCircle(Offset(cx, bodyTopY), 2 + (tilt * 4), dotPaint);
-      canvas.drawCircle(Offset(cx - 8, bodyTopY + 5), 1.5 + (tilt * 3), dotPaint);
-      canvas.drawCircle(Offset(cx + 10, bodyTopY - 4), 1.5 + (tilt * 3), dotPaint);
-      canvas.drawCircle(Offset(cx - 6, bodyTopY - 10), 1 + (tilt * 2), dotPaint);
-      canvas.drawCircle(Offset(cx + 8, bodyTopY + 10), 2 + (tilt * 2), dotPaint);
+      canvas.drawCircle(
+        Offset(cx - 8, bodyTopY + 5),
+        1.5 + (tilt * 3),
+        dotPaint,
+      );
+      canvas.drawCircle(
+        Offset(cx + 10, bodyTopY - 4),
+        1.5 + (tilt * 3),
+        dotPaint,
+      );
+      canvas.drawCircle(
+        Offset(cx - 6, bodyTopY - 10),
+        1 + (tilt * 2),
+        dotPaint,
+      );
+      canvas.drawCircle(
+        Offset(cx + 8, bodyTopY + 10),
+        2 + (tilt * 2),
+        dotPaint,
+      );
     }
   }
 

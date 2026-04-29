@@ -25,6 +25,7 @@ class StorageService {
   static const String _keyTotalCookies = 'total_cookies';
   static const String _keyTotalDreams = 'total_dreams';
   static const String _keyTotalTarots = 'total_tarots';
+  static const String _keyTotalCoffee = 'total_coffee';
   static const String _keyLongestStreak = 'longest_streak';
   static const String _keyUserName = 'user_name';
   static const String _keyUserHandle = 'user_handle';
@@ -380,6 +381,17 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = await getTotalTarots();
     await prefs.setInt(_keyTotalTarots, current + 1);
+  }
+
+  static Future<int> getTotalCoffee() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyTotalCoffee) ?? 0;
+  }
+
+  static Future<void> incrementTotalCoffee() async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await getTotalCoffee();
+    await prefs.setInt(_keyTotalCoffee, current + 1);
   }
 
   static Future<int> getLongestStreak() async {

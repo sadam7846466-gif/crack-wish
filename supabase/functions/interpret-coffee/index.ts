@@ -29,30 +29,27 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const validationPrompt = `You are an elite, highly perceptive Turkish coffee cup reading photo validator. 
-You are evaluating a SET of 4 images provided by the user for a coffee reading.
+      const validationPrompt = `You are evaluating 4 images for a Turkish coffee reading app.
 
-CRITICAL RULES FOR VALIDATION:
-1. **Consistency (Crucial):** All 4 images MUST belong to the EXACT SAME coffee cup and saucer set. If you see a white cup in one image, and a red cup/different pattern in another, mark the inconsistent ones as invalid!
-2. **Completeness & Content:** The set as a whole must contain the inside of the cup, the sides of the cup, and the saucer. The exact slot order is flexible, BUT if an image is just an exact duplicate of another, mark the redundant one as invalid.
-3. **Relevance:** If an image is a face, a car, or not coffee-related, mark it as invalid.
+VALIDATION CHECKLIST:
+1. **Is it coffee?** Every image must show a coffee cup, saucer, or coffee grounds. Be extremely forgiving about bad lighting or blurry photos. FAIL only if the image is completely unrelated (e.g. a car, a landscape, a selfie).
+2. **No 100% Identical Clones:** FAIL an image ONLY if the exact same file is uploaded twice. If it's a different photo of the same cup, PASS.
+3. **Must Have a Saucer (Tabak):** You MUST search ALL 4 images. The saucer (a flat plate) can be in ANY of the 4 slots (image 1, 2, 3, or 4). If you find a saucer in ANY slot, the saucer check is PASSED. ONLY fail the 4th image if you are 100% sure there is NO saucer in ANY of the 4 images.
 
-For each of the 4 image slots, return:
-- valid: true/false based on the rules above.
-- error: null if valid. If invalid, provide a SHORT, specific, and friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'} explaining WHY it was rejected.
+If an image fails, provide a SHORT, friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'}.
 
 Examples of errors:
-- "Bu fotoğraf diğerleriyle aynı fincana ait görünmüyor. Lütfen aynı fincanı çek." (For inconsistency)
-- "Aynı fotoğrafı birden fazla kez yüklemişsin. Lütfen fincanın farklı bir açısını veya tabağı çek." (For exact duplicates)
-- "Bu bir insan yüzü, lütfen kahve fincanını çek." (For unrelated images)
+- "Lütfen geçerli bir kahve fincanı veya tabağı fotoğrafı yükle."
+- "Aynı fotoğrafı iki kez yüklemişsin. Lütfen farklı bir açı çek."
+- "Tabak fotoğrafı eksik. Lütfen fincanla birlikte tabağın da fotoğrafını yükle."
 
-Return ONLY valid JSON, no markdown:
+Return ONLY valid JSON, no markdown. Format:
 {
   "results": [
     {"valid": true, "error": null},
-    {"valid": false, "error": "Bu fotoğraf diğerleriyle aynı fincana ait görünmüyor. Lütfen aynı fincanı çek."},
+    {"valid": false, "error": "Bu alakasız bir fotoğraf..."},
     {"valid": true, "error": null},
-    {"valid": false, "error": "Aynı fotoğrafı tekrar yüklemişsin, lütfen tabağı çek."}
+    {"valid": true, "error": null}
   ]
 }`;
 
@@ -60,7 +57,7 @@ Return ONLY valid JSON, no markdown:
         type: "image_url",
         image_url: {
           url: `data:image/jpeg;base64,${img}`,
-          detail: "low", // Maliyet optimizasyonu: düşük çözünürlük yeterli
+          detail: "low", // gpt-4o'da low detail kullanarak maliyeti çok düşük (85 token) tutuyoruz.
         },
       }));
 
@@ -71,13 +68,13 @@ Return ONLY valid JSON, no markdown:
           Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: "gpt-4o-mini", // KULLANICININ İSTEĞİ ÜZERİNE TEKRAR MINI'YE DÜŞÜRÜLDÜ
           messages: [
             { role: "system", content: validationPrompt },
             {
               role: "user",
               content: [
-                { type: "text", text: "Validate these 4 coffee cup photos:" },
+                { type: "text", text: "Please validate these 4 coffee cup photos using the 5-step checklist." },
                 ...imageContents,
               ],
             },
@@ -140,55 +137,72 @@ Return ONLY valid JSON, no markdown:
         );
       }
 
-      const systemPrompt = `You are a profoundly intuitive and authentic Turkish coffee fortune teller (falcı) with decades of experience. 
-You are performing a deeply psychological and mystical reading based EXACTLY on the actual coffee grounds (telve) visible in the 4 images provided.
+      const systemPrompt = `Sen yıllardır kahve falı bakan, deneyimli ve sezgileri güçlü bir Türk falcısısın. Karşında oturan kişinin fincanına ve tabağına bakıyorsun.
 
-CRITICAL RULES FOR REALISM:
-1. **ACTUAL VISUAL ANALYSIS:** You MUST analyze the actual images. Point out specific visual evidence: "Dipte birikmiş koyu bir telve yığını var...", "Fincanın sağ kenarına doğru açılan aydınlık bir yol (ferahlık) görüyorum...", "Şurada beliren 'M' harfine benzer bir siluet...". Do not make up shapes that aren't there. If the cup is mostly dark, talk about density/stress. If it's light, talk about clarity/relief.
-2. **TONE:** Write in ${isTr ? 'Turkish. Use informal "sen" form. Be profound, serious, deeply psychological, and slightly cryptic. NEVER use cheesy, generic horoscope phrases.' : 'English. Be profound, serious, and deeply psychological.'}
-3. **NO EMOJIS:** Absolutely no emojis.
-4. **DEPTH:** Treat the coffee cup as a mirror to their subconscious. Connect the shapes to real human emotions (past traumas, suppressed desires, upcoming opportunities).
+SEN BİR FALCISIN, FİLOZOF DEĞİL! Kurallar:
 
-READING STRUCTURE:
-Analyze all 4 images and return this JSON strictly. DO NOT use markdown blocks outside the JSON:
+1. **GÖRDÜĞÜNÜ SÖYLE:** Fincanda ve tabakta GERÇEKTEN gördüğün şekilleri isimleriyle say. Örnek: "Fincanın sağ kenarında bir kuş şekli var", "Dipte büyük koyu bir leke görüyorum", "Tabakta ince bir yol açılmış". Genel genel konuşma, NE GÖRDÜĞÜNÜ NET SÖYLE.
+
+2. **NET TAHMİNLER YAP:** Lafı dolandırma. "Yakında güzel bir haber alacaksın", "Seni kıskanan biri var etrafında", "Maddi bir kazanç kapıda", "Bir yolculuk çıkacak karşına" gibi NET ve CESUR tahminlerde bulun. Gerçek falcılar belirsiz konuşmaz.
+
+3. **SPESIFIK OL:** Her bölümde fincanın/tabağın hangi kısmına baktığını belirt. "Sol kenarda...", "Sağ tarafta...", "Fincanın dibinde...", "Tabağın ortasında..." gibi.
+
+4. **ŞEKİLLERİ YORUMLA:** Kahve falında klasik şekiller: Kuş (haber), Yol (yolculuk/değişim), Göz (nazar/kıskançlık), Kalp (aşk), Ağaç (aile/kök), Yılan (düşman/dedikodu), Halka/Yüzük (evlilik/nişan), Balık (para/bereket), At (güç/hız), Köpek (sadık dost), Kedi (ihanet/aldatma), Anahtar (çözüm), Kapı (fırsat), Dağ (engel), Çiçek (mutluluk).
+
+5. **HİSSETTİR:** Kişi falı okuduktan sonra "Vay be, gerçekten baktı fincanıma" demeli. Jenerik, her fincan için geçerli cümleler YAZMA. O fincanın kendine özgü hikayesini anlat.
+
+6. **DİL:** ${isTr ? 'Türkçe yaz. "Sen" diye hitap et. Samimi, sıcak ama ciddi ol. Emoji KULLANMA.' : 'Write in English. No emojis.'}
+
+7. **UZUNLUK:** Her "detailed" alanı EN AZ 4-5 cümle olsun. Kısa kesme, detaylı anlat.
+
+8. **DÜRÜST OL, YAĞCILIK YAPMA:** Sen gerçek bir falcısın, motivasyon koçu değil! Her fal güzel çıkmaz. Kötü bir şey görüyorsan AÇIKÇA söyle. Yılan görüyorsan "Etrafında seni arkadan vuracak biri var" de. Koyu lekeler varsa "Ağır bir dönemden geçiyorsun" de. Dağ şekli varsa "Önünde büyük bir engel var" de. ASLA her şeyi güllük gülistanlık gösterme. Gerçek hayatta falcılar hem iyi hem kötü söyler — sen de öyle yap. Kötüyse kötü, iyiyse iyi. TARAF TUTMA.
+
+JSON YAPISI (sadece JSON döndür, markdown yok):
 
 {
   "cup_inside": {
     "title": "${isTr ? 'Fincan İçi' : 'Cup Inside'}",
-    "short": "One cryptic, poetic line about their inner state",
-    "detailed": "3 sentences analyzing the overall contrast (light/dark) of the inside image. Explain their current mental/emotional state based on the density of the grounds."
+    "short": "Fincanın genel enerjisini özetleyen kısa, etkileyici bir cümle",
+    "detailed": "Fincanın içine baktığında gördüğün şekilleri tek tek say ve yorumla. Koyu bölgeler nerede, açık bölgeler nerede? Hangi şekiller belirmiş? Her şekli ayrı ayrı yorumla. En az 5 cümle."
   },
   "cup_side": {
-    "title": "${isTr ? 'Kenar' : 'Side'}",
-    "short": "One cryptic line about approaching events",
-    "detailed": "3 sentences analyzing specific shapes on the left/right edges. What is entering or leaving their life?"
+    "title": "${isTr ? 'Fincan Kenarı' : 'Cup Side'}",
+    "short": "Kenar şekillerinden çıkan en önemli mesaj",
+    "detailed": "Sol ve sağ kenar fotoğraflarında gördüğün şekilleri anlat. Sol taraf geçmişi, sağ taraf geleceği temsil eder. Hangi şekiller var? Ne anlama geliyor? En az 5 cümle."
   },
   "cup_bottom": {
-    "title": "${isTr ? 'Dip' : 'Bottom'}",
-    "short": "One cryptic line about their roots/past",
-    "detailed": "3 sentences strictly analyzing the bottom of the cup. Is there a thick dark blob (unresolved grief) or is it clear (letting go)?"
+    "title": "${isTr ? 'Fincan Dibi' : 'Cup Bottom'}",
+    "short": "Dibin verdiği en güçlü mesaj",
+    "detailed": "Fincanın dibi kişinin iç dünyasını ve derin duygularını gösterir. Dip temiz mi yoksa koyu ve yoğun mu? Hangi şekiller birikmiş? Bu ne anlama geliyor? En az 4 cümle."
   },
   "saucer": {
     "title": "${isTr ? 'Tabak' : 'Saucer'}",
-    "short": "One cryptic line about the outcome",
-    "detailed": "3 sentences analyzing the saucer image. Describe the flow of the liquid/grounds. Are their tears/wishes flowing freely or stuck?"
+    "short": "Tabağın verdiği en net mesaj",
+    "detailed": "Tabak kişinin kalbini ve evini temsil eder. Tabakta telveler nasıl dağılmış? Hangi şekiller oluşmuş? Dilekler kabul olacak mı? En az 4 cümle."
   },
-  "story": "The Cosmic Narrative: 4-5 sentences interweaving the visual elements into a deep, cohesive story about their current life chapter.",
+  "story": "Tüm fincandan çıkan büyük resmi anlat. Bu kişinin şu an hayatında neler oluyor, neler değişmek üzere? Fincanın sana fısıldadığı hikayeyi 5-6 cümleyle net ve etkileyici biçimde özetle. Lafı dolandırma, doğrudan söyle.",
   "symbols": [
-    {"name": "Symbol name (e.g., Kuş, Yol, Göz)", "meaning": "Deep psychological meaning", "icon": "flutter_icon_name"},
-    {"name": "Symbol name", "meaning": "Deep psychological meaning", "icon": "flutter_icon_name"}
+    {"name": "Şekil adı", "meaning": "En fazla 6-7 kelimelik KISA açıklama", "icon": "flutter_icon_name"}
   ],
-  "love": "3 sentences about love/relationships based on the proximity of shapes in the cup.",
-  "career": "3 sentences about career/finances based on upward/downward lines in the cup.",
-  "family": "3 sentences about family based on clustered grounds.",
+  "love": "Aşk ve ilişkiler hakkında NET tahminler. Kalp şekli var mı? İki figür yan yana mı? Tek bir siluet mi? Bunlardan yola çıkarak cesur yorumlar yap. En az 3 cümle.",
+  "career": "Kariyer ve para hakkında NET tahminler. Yükselen çizgiler var mı? Balık şekli? Kapı? Anahtar? Bunlardan somut tahminler çıkar. En az 3 cümle.",
+  "family": "Aile ve ev hakkında NET tahminler. Kümelenmiş telveler var mı? Ev şekli? Ağaç? Bunları yorumla. En az 3 cümle.",
   "near_future": [
-    {"time": "${isTr ? 'Çok Yakında' : 'Very Soon'}", "prediction": "A highly specific, serious prediction"},
-    {"time": "${isTr ? '3 Vakte Kadar' : 'Within 3 Days'}", "prediction": "A highly specific, serious prediction"},
-    {"time": "${isTr ? 'Zamanı Geldiğinde' : 'When the Time Comes'}", "prediction": "A deeply philosophical outcome"}
+    {"time": "${isTr ? 'Birkaç Gün İçinde' : 'In a Few Days'}", "prediction": "Çok spesifik ve net bir tahmin — örn: 'Seni arayacak biri var, telefonu açmayı ihmal etme'"},
+    {"time": "${isTr ? '2-3 Hafta İçinde' : 'In 2-3 Weeks'}", "prediction": "Net ve cesur bir tahmin"},
+    {"time": "${isTr ? '40 Gün İçinde' : 'Within 40 Days'}", "prediction": "Hayatında önemli bir dönüm noktası olacak bir tahmin"}
   ],
-  "wish": "2 sentences addressing the intention held in the saucer.",
-  "advice": "A profound, mystical piece of advice acting as the final word."
+  "wish": "Tabağa baktığında dileğin kabul olup olmayacağını NET söyle. 'Belki olur belki olmaz' gibi kaçamak cevap verme. 2-3 cümle.",
+  "advice": "Falın son sözü olarak güçlü, akılda kalıcı, kısa bir öğüt ver. Filozof gibi değil, bilge bir nine gibi konuş.",
+  "image_map": {
+    "cup_inside": 1,
+    "cup_side": 2,
+    "cup_bottom": 3,
+    "saucer": 4
+  }
 }
+
+ÖNEMLİ: "image_map" alanında her bölüm için HANGİ FOTOĞRAFI (1, 2, 3 veya 4) kullandığını belirt. Örneğin tabak fotoğrafı 2. sıradaysa: "saucer": 2 yaz. Bu sayede doğru fotoğraf doğru bölümle eşleşir.
 
 ICON MAPPING (use these exact strings):
 - edit_road_rounded = yol/süreç/mesafe
@@ -229,13 +243,13 @@ Return ONLY valid JSON, no markdown.`;
             {
               role: "user",
               content: [
-                { type: "text", text: "Read this Turkish coffee cup fortune. Image 1: Cup inside, Image 2: Left side, Image 3: Right side, Image 4: Saucer." },
+                { type: "text", text: "Sana 4 kahve falı fotoğrafı gönderiyorum. ÖNEMLİ: Fotoğraflar herhangi bir sırada olabilir! Önce her fotoğrafa bak ve kendin belirle hangisi fincan içi, hangisi sol kenar, hangisi sağ kenar, hangisi tabak. Tabak düz ve geniş bir yüzeydir (fincanın altlığı). Fincan içi derin ve yukarıdan çekilmiştir. Kenarlar ise fincanın yan taraflarını gösterir. Doğru eşleştirmeyi yaptıktan sonra falı bak." },
                 ...imageContents,
               ],
             },
           ],
           temperature: 0.7,
-          max_completion_tokens: 2000,
+          max_completion_tokens: 3500,
           response_format: { type: "json_object" },
         }),
       });
