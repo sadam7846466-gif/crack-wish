@@ -7,12 +7,13 @@ class CosmicToast {
     required BuildContext context,
     required String title,
     required String message,
-    required String reward,
+    String? reward,
     IconData? icon,
     String? imagePath, // Özel resim ikonları için (örneğin kurabiye)
     Color iconColor = const Color(0xFFE9D5FF),
     Color rewardColor = const Color(0xFFD8B4FE),
     Duration duration = const Duration(seconds: 4),
+    VoidCallback? onTap,
   }) {
     // Ses ve titreşim efektini tetikle
     SoundService().playCosmicToast();
@@ -53,11 +54,17 @@ class CosmicToast {
             opacity: fadeAnimation,
             child: SlideTransition(
               position: slideAnimation,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                  child: Container(
+              child: GestureDetector(
+                onTap: () {
+                  if (onTap != null) {
+                    onTap();
+                  }
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                    child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.05), // Daha transparan cam
@@ -122,23 +129,24 @@ class CosmicToast {
                             ],
                           ),
                         ),
-                        // Ödül Miktarı
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFC084FC).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            reward, 
-                            style: TextStyle(
-                              color: rewardColor, 
-                              fontWeight: FontWeight.w800, 
-                              fontSize: 12,
-                              letterSpacing: 0.5,
+                        // Ödül Miktarı (Eğer varsa)
+                        if (reward != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFC084FC).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              reward, 
+                              style: TextStyle(
+                                color: rewardColor, 
+                                fontWeight: FontWeight.w800, 
+                                fontSize: 12,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -147,6 +155,7 @@ class CosmicToast {
             ),
           ),
         ),
+      ),
       ),
     );
 

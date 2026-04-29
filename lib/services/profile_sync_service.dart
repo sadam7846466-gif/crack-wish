@@ -119,6 +119,7 @@ class ProfileSyncService {
     int? totalCookies,
     int? totalTarots,
     int? totalDreams,
+    int? totalCoffee,
     int? streakDays,
     int? totalFriends,
     int? totalLetters,
@@ -138,6 +139,7 @@ class ProfileSyncService {
       if (totalCookies != null) updateData['total_cookies'] = totalCookies;
       if (totalTarots != null) updateData['total_tarots'] = totalTarots;
       if (totalDreams != null) updateData['total_dreams'] = totalDreams;
+      if (totalCoffee != null) updateData['total_coffee'] = totalCoffee;
       if (streakDays != null) updateData['streak_days'] = streakDays;
       
       if (totalFriends != null) updateData['total_friends'] = totalFriends;

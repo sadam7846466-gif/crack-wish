@@ -48,9 +48,9 @@ class PushNotificationService {
       // 2. Firebase Cloud Messaging Başlat
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // Apple için foreground bildirimi ayarları
+      // Apple için foreground bildirimi ayarları (Ön plandayken native banner ÇIKMASIN, custom UI kullanacağız)
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: true,
+        alert: false, // native banner in-app iken gizlensin
         badge: true,
         sound: true,
       );
@@ -62,46 +62,44 @@ class PushNotificationService {
         final title = message.notification?.title ?? 'Kozmik Bildirim';
         final body = message.notification?.body ?? '';
 
-        // Şık Custom SnackBar SADECE Android'de çıksın (iOS native banner gösteriyor)
-        if (defaultTargetPlatform == TargetPlatform.android) {
-          scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBar(
-              elevation: 0,
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.transparent,
-              duration: const Duration(seconds: 4),
-              margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 20),
-              content: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 1)
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 28),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                          const SizedBox(height: 4),
-                          Text(body, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                        ],
-                      ),
+        // Şık Custom SnackBar HER PLATFORMDA çıksın
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            duration: const Duration(seconds: 4),
+            margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 20),
+            content: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 1)
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 4),
+                        Text(body, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        }
+          ),
+        );
       });
 
       _isInitialized = true;

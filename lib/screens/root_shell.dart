@@ -11,6 +11,11 @@ import '../widgets/cosmic_reward_dialog.dart';
 import '../widgets/cosmic_toast.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'coffee_reading_page.dart';
+import 'coffee_page.dart';
 
 /// Ortak tab shell: alt menü sabit, sayfalar IndexedStack ile korunur.
 class RootShell extends StatefulWidget {
@@ -25,6 +30,8 @@ class RootShell extends StatefulWidget {
 class _RootShellState extends State<RootShell> {
   late int _currentIndex = widget.initialIndex.clamp(0, 1);
   final GlobalKey<ProfilePageState> _profileKey = GlobalKey<ProfilePageState>();
+  Timer? _coffeePollTimer;
+
 
   late final List<Widget> _tabs = [
     HomePage(showBottomNav: false, onNavTapOverride: _handleNavTap),
@@ -99,6 +106,93 @@ class _RootShellState extends State<RootShell> {
     
     // Cihazdaki güncel Aura ve Ruh Taşını anında veritabanına yansıt (Senkronize et)
     StorageService.syncEconomyToCloud();
+    
+    // Global Kahve Falı Polling (Ana sayfaya dönüldüğünde bildirimin gelmesi için)
+    _startGlobalCoffeePolling();
+  }
+
+  void _startGlobalCoffeePolling() {
+    _coffeePollTimer?.cancel();
+    _coffeePollTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!mounted) return;
+      
+      // Sadece API çalışıyorken veya okunmamış bir fal varsa kontrol et
+      final prefs = await SharedPreferences.getInstance();
+      final isNotified = prefs.getBool('coffee_last_reading_notified') ?? true;
+      final isViewed = prefs.getBool('coffee_last_reading_viewed') ?? true;
+      
+      if (CoffeeReadingPage.isApiRunning || (!isNotified && !isViewed)) {
+        final today = DateTime.now().toIso8601String().split('T')[0];
+        final savedDate = prefs.getString('coffee_last_reading_date') ?? '';
+        
+        if (savedDate == today) {
+          final raw = prefs.getString('coffee_last_reading');
+          // Eğer fal verisi varsa
+          if (raw != null) {
+            // Zaten bildirim gösterildiyse geç
+            if (isNotified) return;
+            // Eğer kullanıcı şu an zaten fal sonucunu (CoffeeReadingPage) izliyorsa toast gösterme!
+            if (CoffeeReadingPage.isViewingReading) return;
+            
+            // Bildirimin gösterildiğini kaydet
+            await prefs.setBool('coffee_last_reading_notified', true);
+            
+            if (mounted) {
+              HapticFeedback.heavyImpact();
+              CosmicToast.show(
+                context: context,
+                title: 'Falın Hazır!',
+                message: 'Fincanındaki sırlar çözüldü.',
+                icon: Icons.local_cafe_rounded,
+                iconColor: const Color(0xFFD4A373),
+                reward: 'Göz At',
+                rewardColor: const Color(0xFFD4A373),
+                duration: const Duration(seconds: 8), // Biraz uzun tutalım
+                onTap: () async {
+                  final imagePaths = prefs.getStringList('coffee_last_images');
+                  File? inside;
+                  File? left;
+                  File? right;
+                  File? plate;
+
+                  if (imagePaths != null && imagePaths.length == 4) {
+                    inside = File(imagePaths[0]);
+                    left = File(imagePaths[1]);
+                    right = File(imagePaths[2]);
+                    plate = File(imagePaths[3]);
+                  }
+                  
+                  if (!mounted) return;
+                  await prefs.setBool('coffee_last_reading_viewed', true);
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          CoffeeReadingPage(
+                        insideAngle: inside,
+                        leftAngle: left,
+                        rightAngle: right,
+                        plateAngle: plate,
+                        initialData: jsonDecode(raw),
+                      ),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                    ),
+                  );
+                },
+              );
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _coffeePollTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkPendingRewardDialogs() async {

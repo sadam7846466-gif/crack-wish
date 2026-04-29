@@ -31,6 +31,7 @@ class _CoffeePageState extends State<CoffeePage>
   bool _isValidating = false;
   bool _isValidated = false;
   bool _hasPaidForScan = false;
+  bool _lastReadingViewed = true;
   List<int> _invalidSlots = [];
   Map<int, String> _invalidMessages = {};
 
@@ -80,11 +81,21 @@ class _CoffeePageState extends State<CoffeePage>
 
   // Yarım Kalan Fal İade Sistemi
   Future<void> _checkAndRefundPendingFortune() async {
+    // Eğer API şu anda arka planda harıl harıl çalışıyorsa sakın iade yapma!
+    if (CoffeeReadingPage.isApiRunning) return;
+
     final prefs = await SharedPreferences.getInstance();
     final isPending = prefs.getBool('pending_fortune_paid') ?? false;
+    final pendingTime = prefs.getInt('pending_fortune_time') ?? 0;
 
+    // Eğer son fal ödemesinin üzerinden 3 dakikadan az zaman geçtiyse, API hala çalışıyor olabilir, bekle!
     if (isPending) {
-      // Ruh taşını geri ver
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now - pendingTime < 3 * 60 * 1000) {
+        return; // Henüz 3 dakika dolmadı, bekle
+      }
+
+      // 3 dakikadan fazla olduysa ve hala pending ise, uygulama kesin çökmüştür, iade et.
       await StorageService.updateSoulStones(1);
       await prefs.setBool('pending_fortune_paid', false);
 
@@ -147,61 +158,24 @@ class _CoffeePageState extends State<CoffeePage>
     if (savedDate != today) return;
 
     final raw = prefs.getString('coffee_last_reading');
-    if (raw != null && _lastReading == null) {
+    if (raw != null && (_lastReading == null || _waitingForBackgroundResult)) {
       // Fal arka planda tamamlanmış!
       _backgroundPollTimer?.cancel();
       _waitingForBackgroundResult = false;
 
       try {
         final data = jsonDecode(raw) as Map<String, dynamic>;
+        final isViewed = prefs.getBool('coffee_last_reading_viewed') ?? true;
         if (mounted) {
-          setState(() => _lastReading = data);
+          setState(() {
+            _lastReading = data;
+            _lastReadingViewed = isViewed;
+          });
           _loadSoulStones();
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: const Color(0xFF1E1E1E),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: const Color(0xFFD4A373).withOpacity(0.3),
-                  width: 0.5,
-                ),
-              ),
-              title: const Text(
-                '☕️ Falın Hazır!',
-                style: TextStyle(color: Colors.white),
-              ),
-              content: const Text(
-                'Fincanındaki sırlar çözüldü.',
-                style: TextStyle(color: Colors.white70),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(
-                    'Sonra',
-                    style: TextStyle(color: Colors.white.withOpacity(0.4)),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _showLastReadingPanel();
-                  },
-                  child: const Text(
-                    'Falına Göz At',
-                    style: TextStyle(
-                      color: Color(0xFFD4A373),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
         }
-      } catch (_) {}
+      } catch (_) {
+        if (mounted) setState(() => _lastReading = null);
+      }
     }
   }
 
@@ -346,6 +320,12 @@ class _CoffeePageState extends State<CoffeePage>
         return;
       }
 
+      // Ödeme yapıldı ama fal henüz tamamlanmadı — bayrak koy.
+      // Uygulama kill edilirse bir sonraki açılışta taş iade edilir.
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('pending_fortune_paid', true);
+      await prefs.setInt('pending_fortune_time', DateTime.now().millisecondsSinceEpoch);
+
       if (mounted) {
         setState(() {
           _hasPaidForScan = true; // Bilet alındı bayrağı
@@ -478,7 +458,7 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                                 const SizedBox(height: 16),
                                 _premiumInfoRow(
-                                  Icons.coffee_rounded,
+                                  Icons.local_cafe_rounded,
                                   "Yapay zeka kahve analizi izni",
                                   true,
                                 ),
@@ -1289,31 +1269,53 @@ class _CoffeePageState extends State<CoffeePage>
                       HapticFeedback.lightImpact();
                       _showLastReadingPanel();
                     },
-                    child: ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.10),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _lastReading != null
-                                  ? const Color(0xFFD4A373).withOpacity(0.4)
-                                  : Colors.white.withOpacity(0.12),
-                              width: 0.6,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ClipOval(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.10),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _lastReading != null
+                                      ? const Color(0xFFD4A373).withOpacity(0.4)
+                                      : Colors.white.withOpacity(0.12),
+                                  width: 0.6,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.local_cafe_rounded,
+                                size: 16,
+                                color: _lastReading != null
+                                    ? const Color(0xFFD4A373).withOpacity(0.9)
+                                    : Colors.white.withOpacity(0.3),
+                              ),
                             ),
                           ),
-                          child: Icon(
-                            Icons.coffee_rounded,
-                            size: 16,
-                            color: _lastReading != null
-                                ? const Color(0xFFD4A373).withOpacity(0.9)
-                                : Colors.white.withOpacity(0.3),
-                          ),
                         ),
-                      ),
+                        if (_lastReading != null && !_lastReadingViewed)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF22D3EE),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF140F0C),
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1407,7 +1409,13 @@ class _CoffeePageState extends State<CoffeePage>
     if (raw != null) {
       try {
         final data = jsonDecode(raw) as Map<String, dynamic>;
-        if (mounted) setState(() => _lastReading = data);
+        final isViewed = prefs.getBool('coffee_last_reading_viewed') ?? true;
+        if (mounted) {
+          setState(() {
+            _lastReading = data;
+            _lastReadingViewed = isViewed;
+          });
+        }
       } catch (_) {
         if (mounted) setState(() => _lastReading = null);
       }
@@ -1461,33 +1469,34 @@ class _CoffeePageState extends State<CoffeePage>
       final prefs = await SharedPreferences.getInstance();
       final imagePaths = prefs.getStringList('coffee_last_images');
 
-      if (imagePaths != null && imagePaths.length == 4) {
-        final inside = File(imagePaths[0]);
-        final left = File(imagePaths[1]);
-        final right = File(imagePaths[2]);
-        final plate = File(imagePaths[3]);
+      File? inside;
+      File? left;
+      File? right;
+      File? plate;
 
-        // Sadece dosyalar hala cihazdaysa (önbellekten silinmemişse) tam ekrana git
-        if (await inside.exists() &&
-            await left.exists() &&
-            await right.exists() &&
-            await plate.exists()) {
-          if (!mounted) return;
-          Navigator.push(
-            context,
-            FadePageRoute(
-              page: CoffeeReadingPage(
-                insideAngle: inside,
-                leftAngle: left,
-                rightAngle: right,
-                plateAngle: plate,
-                initialData: _lastReading,
-              ),
-            ),
-          );
-          return; // Dialog açma, tam sayfaya git
-        }
+      if (imagePaths != null && imagePaths.length == 4) {
+        inside = File(imagePaths[0]);
+        left = File(imagePaths[1]);
+        right = File(imagePaths[2]);
+        plate = File(imagePaths[3]);
       }
+
+      if (!mounted) return;
+      await prefs.setBool('coffee_last_reading_viewed', true);
+      setState(() => _lastReadingViewed = true);
+      Navigator.push(
+        context,
+        FadePageRoute(
+          page: CoffeeReadingPage(
+            insideAngle: inside,
+            leftAngle: left,
+            rightAngle: right,
+            plateAngle: plate,
+            initialData: _lastReading,
+          ),
+        ),
+      );
+      return; // Dialog açma, her zaman tam sayfaya git
     }
 
     await showGeneralDialog(
@@ -1533,7 +1542,7 @@ class _CoffeePageState extends State<CoffeePage>
                       children: [
                         if (hasReading) ...[
                           Icon(
-                            Icons.coffee_rounded,
+                            Icons.local_cafe_rounded,
                             color: const Color(0xFFD4A373),
                             size: 40,
                           ),
@@ -1579,7 +1588,7 @@ class _CoffeePageState extends State<CoffeePage>
                         if (!hasReading) ...[
                           const SizedBox(height: 20),
                           Icon(
-                            Icons.local_cafe_outlined,
+                            Icons.local_cafe_rounded,
                             color: Colors.white.withOpacity(0.08),
                             size: 60,
                           ),
@@ -1720,7 +1729,7 @@ class _CoffeePageState extends State<CoffeePage>
                         ),
                         const SizedBox(height: 16),
                         _premiumInfoRow(
-                          Icons.coffee_rounded,
+                          Icons.local_cafe_rounded,
                           'Kahve falı yorumlaması için gerekli',
                           true,
                         ),
@@ -1949,7 +1958,7 @@ class _CoffeePageState extends State<CoffeePage>
                     _buildAnimatedChild(
                       0.65,
                       _buildRitualRow(
-                        Icons.coffee_rounded,
+                        Icons.local_cafe_rounded,
                         'Aynı Yerden İç',
                         'Şekillerin bozulmaması için hep aynı taraftan yudumla.',
                       ),

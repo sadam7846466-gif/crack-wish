@@ -49,6 +49,12 @@ serve(async (req) => {
         body = `${senderName} seninle arkadaş olmak istiyor.`;
         sound = "default"; // Arkadaşlık isteklerinde normal telefon sesi çalar
         dataPayload = { type: "friend_request", request_id: record.id };
+    } else if (tableName === "coffee_reading") {
+        const isTr = record.locale === 'tr';
+        title = isTr ? "Kahve Falın Hazır! ☕️" : "Coffee Reading Ready! ☕️";
+        body = isTr ? "Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨" : "The secrets in your cup have been revealed. Read it now ✨";
+        sound = "default";
+        dataPayload = { type: "coffee_reading_ready" };
     } else {
         return new Response("Bilinmeyen tablo", { status: 200 });
     }

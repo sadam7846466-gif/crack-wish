@@ -127,9 +127,8 @@ class StorageService {
     }
     final today = DateTime.now().toIso8601String().split('T')[0];
     final lastDate = prefs.getString(_keyDailyEliteSoulDate) ?? '';
-    final currentDaily = prefs.getInt(_keyDailyEliteSoulStones) ?? 0;
-    if (lastDate != today || currentDaily == 0) {
-      // Yeni gün VEYA Elite'e yeni geçmiş (aynı gün ama taş 0)
+    if (lastDate != today) {
+      // Yeni gün VEYA ilk kez Elite olmuş (lastDate boş)
       await prefs.setInt(_keyDailyEliteSoulStones, 5);
       await prefs.setString(_keyDailyEliteSoulDate, today);
     }
@@ -179,6 +178,7 @@ class StorageService {
       final totalCookies = prefs.getInt('total_cookies') ?? 0;
       final totalTarots = prefs.getInt('total_tarots') ?? 0; // Düzeltildi
       final totalDreams = prefs.getInt('total_dreams') ?? 0; // Düzeltildi
+      final totalCoffee = prefs.getInt('total_coffee') ?? 0; 
       final streakDays = prefs.getInt('streak_days') ?? 0;
       
       final totalFriends = prefs.getInt('total_friends_count') ?? 0;
@@ -193,6 +193,7 @@ class StorageService {
         totalCookies: totalCookies,
         totalTarots: totalTarots,
         totalDreams: totalDreams,
+        totalCoffee: totalCoffee,
         streakDays: streakDays,
         totalFriends: totalFriends,
         totalLetters: totalLetters,
@@ -392,6 +393,12 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = await getTotalCoffee();
     await prefs.setInt(_keyTotalCoffee, current + 1);
+    
+    // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
+    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    await addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
+    // 📊 Analytics
+    AnalyticsService().logCoffeeAnalyzed();
   }
 
   static Future<int> getLongestStreak() async {
@@ -600,6 +607,7 @@ class StorageService {
           prefs.getInt(_keyTotalCookies) ?? prefs.getInt(_keyCookieCount) ?? 0,
       'totalDreams': prefs.getInt(_keyTotalDreams) ?? 0,
       'totalTarots': prefs.getInt(_keyTotalTarots) ?? 0,
+      'totalCoffee': prefs.getInt(_keyTotalCoffee) ?? 0,
       'longestStreak': prefs.getInt(_keyLongestStreak) ?? 0,
       'soulStones': prefs.getInt(_keySoulStones) ?? 3, // Eğer boşsa default hediye miktarını alıyoruz gibi düşün ama getSoulStones handle ediyor, buraya direkt yansıtalım.
       'userName': prefs.getString(_keyUserName),

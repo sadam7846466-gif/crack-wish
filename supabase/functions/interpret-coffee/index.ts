@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -15,7 +16,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { mode, images, locale } = await req.json();
+    const { mode, images, locale, userId } = await req.json();
     const isTr = locale === "tr";
 
     // ═══════════════════════════════════════════════════════════════
@@ -32,9 +33,9 @@ Deno.serve(async (req: Request) => {
       const validationPrompt = `You are evaluating 4 images for a Turkish coffee reading app.
 
 VALIDATION CHECKLIST:
-1. **Is it coffee?** Every image must show a coffee cup, saucer, or coffee grounds. Be extremely forgiving about bad lighting or blurry photos. FAIL only if the image is completely unrelated (e.g. a car, a landscape, a selfie).
-2. **No 100% Identical Clones:** FAIL an image ONLY if the exact same file is uploaded twice. If it's a different photo of the same cup, PASS.
-3. **Must Have a Saucer (Tabak):** You MUST search ALL 4 images. The saucer (a flat plate) can be in ANY of the 4 slots (image 1, 2, 3, or 4). If you find a saucer in ANY slot, the saucer check is PASSED. ONLY fail the 4th image if you are 100% sure there is NO saucer in ANY of the 4 images.
+1. **Is it coffee?** Every image MUST clearly show a coffee cup, saucer, or coffee grounds. Be STRICT. If an image is just a blank wall, a face, or something completely unrelated, you MUST FAIL it.
+2. **No Identical Clones:** FAIL an image if the exact same file is uploaded twice.
+3. **Must Have a Saucer (Tabak):** Look at ALL 4 images. At least ONE of them MUST be a saucer (a flat plate, usually under the cup). If none of the 4 images is a saucer, you MUST FAIL the 4th image.
 
 If an image fails, provide a SHORT, friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'}.
 
@@ -68,19 +69,19 @@ Return ONLY valid JSON, no markdown. Format:
           Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini", // KULLANICININ İSTEĞİ ÜZERİNE TEKRAR MINI'YE DÜŞÜRÜLDÜ
+          model: "gpt-4o-mini", // KESİNLİKLE SADECE gpt-4o-mini KULLANILACAK
           messages: [
             { role: "system", content: validationPrompt },
             {
               role: "user",
               content: [
-                { type: "text", text: "Please validate these 4 coffee cup photos using the 5-step checklist." },
+                { type: "text", text: "Please validate these 4 coffee cup photos using the 3-step checklist." },
                 ...imageContents,
               ],
             },
           ],
           temperature: 0.1,
-          max_completion_tokens: 300,
+          max_tokens: 300,
           response_format: { type: "json_object" },
         }),
       });
@@ -249,7 +250,7 @@ Return ONLY valid JSON, no markdown.`;
             },
           ],
           temperature: 0.7,
-          max_completion_tokens: 3500,
+          max_tokens: 3500,
           response_format: { type: "json_object" },
         }),
       });
@@ -306,6 +307,29 @@ Return ONLY valid JSON, no markdown.`;
       };
 
       const fixedResult = deepFix(parsed);
+
+      // --- SEND PUSH NOTIFICATION ---
+      try {
+        if (userId) {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+          const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+          const supabase = createClient(supabaseUrl, supabaseKey);
+
+          await supabase.functions.invoke('push-notification', {
+            body: {
+              table: 'coffee_reading',
+              record: {
+                to_user: userId,
+                from_user: userId, // Kendisinden geliyormuş gibi yapabiliriz
+                locale: locale
+              }
+            }
+          });
+          console.log("Triggered push-notification for user", userId);
+        }
+      } catch(e) {
+        console.error("FCM Error:", e);
+      }
 
       return new Response(JSON.stringify(fixedResult), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

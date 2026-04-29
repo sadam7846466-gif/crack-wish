@@ -36,7 +36,7 @@ import '../models/cookie_card.dart';
 import '../services/user_stats_service.dart';
 import '../services/sound_service.dart';
 import '../services/analytics_service.dart';
-import '../services/cosmic_engine_service.dart';
+
 
 class ProfilePage extends StatefulWidget {
   final bool showBottomNav;
@@ -2353,30 +2353,7 @@ For questions: info@crackandwish.com''',
                               );
                             },
                           ),
-                          // ── TEST BUTONU (GEÇİCİ — SONRA SİLİNECEK) ──
-                          _SettingsListTile(
-                            icon: Icons.coffee_rounded,
-                            iconColor: const Color(0xFFD4A373),
-                            label: '☕ TEST: Kahve Bildirimi',
-                            onTap: () {
-                              HapticFeedback.heavyImpact();
-                              CosmicEngineService()
-                                  .scheduleInstantLocalNotification(
-                                    title: "Kahve Falın Hazır! ☕️",
-                                    body:
-                                        "Fincanındaki sırlar çözüldü. Ana menüden okuyabilirsin.",
-                                    secondsDelay: 3,
-                                  );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    '3 saniye sonra bildirim gelecek!',
-                                  ),
-                                  backgroundColor: Color(0xFFD4A373),
-                                ),
-                              );
-                            },
-                          ),
+
                           _SettingsListTile(
                             icon: SoundService().isSoundEnabled
                                 ? Icons.volume_up_rounded
@@ -3588,7 +3565,7 @@ class _BentoHeroCard extends StatelessWidget {
                                         color: const Color(0xFF4EE6C5),
                                       ),
                                       _buildAuraSource(
-                                        Icons.coffee_rounded,
+                                        Icons.local_cafe_rounded,
                                         "Kahve",
                                         pendingKahve,
                                         () {

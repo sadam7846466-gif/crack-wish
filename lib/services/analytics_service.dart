@@ -67,6 +67,11 @@ class AnalyticsService {
   // 🌙 RÜYA
   // ══════════════════════════════════════════════
   
+  /// Kahve falı bakıldığında
+  Future<void> logCoffeeAnalyzed() async {
+    await _log('coffee_analyzed', {});
+  }
+  
   /// Rüya yorumlandığında
   Future<void> logDreamAnalyzed({String? emotion}) async {
     await _log('dream_analyzed', {

@@ -74,7 +74,7 @@ class CosmicCalendar {
     ),
     "10-01": const CosmicDayEvent(
       emoji: '☕',
-      iconWidget: Icon(Icons.coffee_rounded, size: 18, color: Colors.brown),
+      iconWidget: Icon(Icons.local_cafe_rounded, size: 18, color: Colors.brown),
       trTitle: 'Bugün Kahve Günü', enTitle: 'Today is World Coffee Day',
       descTr: 'Zihnini canlandır. Bugün yaratıcı bir sohbet için harika bir gün.',
       descEn: 'Revitalize your mind. Today is a great day for a creative chat.',

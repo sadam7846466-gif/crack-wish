@@ -211,7 +211,7 @@ class _BentoGridState extends State<BentoGrid>
                           _BentoCard(
                             compact: true,
                             iconWidget: const Icon(
-                              Icons.coffee_rounded,
+                              Icons.local_cafe_rounded,
                               size: 16,
                               color: AppColors.textWhite,
                             ),
@@ -232,7 +232,7 @@ class _BentoGridState extends State<BentoGrid>
                                 child: Transform.rotate(
                                   angle: -0.2,
                                   child: const Icon(
-                                    Icons.coffee_rounded,
+                                    Icons.local_cafe_rounded,
                                     size: 140,
                                     color: Colors.white,
                                   ),

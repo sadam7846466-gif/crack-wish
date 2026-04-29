@@ -15,19 +15,21 @@ import '../services/cosmic_engine_service.dart';
 import 'coffee_page.dart';
 
 class CoffeeReadingPage extends StatefulWidget {
-  final File insideAngle;
-  final File leftAngle;
-  final File rightAngle;
-  final File plateAngle;
+  static bool isApiRunning = false; // Add static flag
+  static bool isViewingReading = false;
+  final File? insideAngle;
+  final File? leftAngle;
+  final File? rightAngle;
+  final File? plateAngle;
   final Map<String, dynamic>? initialData;
   final void Function(bool success, String? error)? onBackgroundResult;
 
   const CoffeeReadingPage({
     super.key,
-    required this.insideAngle,
-    required this.leftAngle,
-    required this.rightAngle,
-    required this.plateAngle,
+    this.insideAngle,
+    this.leftAngle,
+    this.rightAngle,
+    this.plateAngle,
     this.initialData,
     this.onBackgroundResult,
   });
@@ -71,6 +73,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   @override
   void initState() {
     super.initState();
+    CoffeeReadingPage.isViewingReading = true;
     _loadSoulStones();
 
     // Aura animasyonları
@@ -130,7 +133,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   /// AI'ın image_map'ine göre doğru fotoğrafı döndür.
   /// AI her bölüm için hangi fotoğrafı (1-4) kullandığını bildirir.
   /// Fallback: image_map yoksa sabit slot sırasına güvenir.
-  File _getImageForSection(String sectionKey) {
+  File? _getImageForSection(String sectionKey) {
     final allImages = [
       widget.insideAngle,
       widget.leftAngle,
@@ -163,7 +166,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   }
 
   /// Fotoğrafları base64'e çevir
-  Future<String> _imageToBase64(File file) async {
+  Future<String> _imageToBase64(File? file) async {
+    if (file == null) return '';
     final bytes = await file.readAsBytes();
     return base64Encode(bytes);
   }
@@ -172,11 +176,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   Future<void> _callCoffeeApi() async {
     // ÖNEMLİ: Eğer sayfa arka plana atılırsa (dispose olursa) widget'a erişim hata fırlatır!
     // Bu yüzden arka planda kullanılacak tüm widget referanslarını yerel değişkene alıyoruz.
-    final insidePath = widget.insideAngle.path;
-    final leftPath = widget.leftAngle.path;
-    final rightPath = widget.rightAngle.path;
-    final platePath = widget.plateAngle.path;
+    final insidePath = widget.insideAngle?.path ?? '';
+    final leftPath = widget.leftAngle?.path ?? '';
+    final rightPath = widget.rightAngle?.path ?? '';
+    final platePath = widget.plateAngle?.path ?? '';
     final backgroundCallback = widget.onBackgroundResult;
+
+    CoffeeReadingPage.isApiRunning = true;
 
     try {
       // Fotoğrafları base64'e çevir
@@ -191,9 +197,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
       // Doğrulama ana sayfada (CoffeePage) yapıldığı için direkt yoruma geçiyoruz.
       // ═══ AŞAMA 2: Fal Yorumu ═══
+      final user = supabase.auth.currentUser;
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
-        body: {'mode': 'interpret', 'images': images, 'locale': 'tr'},
+        body: {'mode': 'interpret', 'images': images, 'locale': 'tr', 'userId': user?.id},
       );
 
       if (interpretResponse.data == null ||
@@ -213,6 +220,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       reading['time'] = DateTime.now().toIso8601String();
       await prefs.setString('coffee_last_reading_date', today);
       await prefs.setString('coffee_last_reading', jsonEncode(reading));
+      await prefs.setBool('coffee_last_reading_viewed', false);
+      await prefs.setBool('coffee_last_reading_notified', false);
+
+      // Fal başarıyla tamamlandı — iade bayrağını kaldır
+      await prefs.setBool('pending_fortune_paid', false);
 
       // Save image paths to restore the UI later
       await prefs.setStringList('coffee_last_images', [
@@ -222,23 +234,20 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         platePath,
       ]);
 
-      // Kahve falı başarılı! Aura ödülü ver (Premium: 3x çarpan)
-      final isPremium =
-          prefs.getBool('is_premium_test_mode') ??
-          prefs.getBool('is_premium_user') ??
-          false;
-      await StorageService.addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
       await StorageService.incrementTotalCoffee();
 
       backgroundCallback?.call(true, null);
 
+      // Kullanıcı sayfada olsun ya da olmasın, her zaman bildirim at
+      CosmicEngineService().scheduleInstantLocalNotification(
+        title: "Kahve Falın Hazır! ☕️",
+        body: "Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨",
+        secondsDelay: 1,
+      );
+
       if (!mounted) {
-        // Kullanıcı 'Ana Sayfaya Dön' diyerek çıkmış, bildirimi gönder
-        CosmicEngineService().scheduleInstantLocalNotification(
-          title: "Kahve Falın Hazır! ☕️",
-          body: "Fincanındaki sırlar çözüldü. Ana menüden okuyabilirsin.",
-          secondsDelay: 1,
-        );
+        CoffeeReadingPage.isApiRunning = false;
+        // Kullanıcı 'Ana Sayfaya Dön' diyerek çıkmış
         return;
       }
 
@@ -248,12 +257,16 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         _isLoading = false;
         _hasError = false;
       });
+      CoffeeReadingPage.isApiRunning = false;
       _resultEntranceController.forward();
     } catch (e) {
       debugPrint('Kahve falı API hatası: $e');
 
       // İşlem başarısız olduysa (Örn: İnternet koptu, AI cevap vermedi) peşin aldığımız taşı İADE EDİYORUZ!
       await StorageService.updateSoulStones(1);
+      // İade yapıldı — bekleyen ödeme bayrağını temizle
+      final errorPrefs = await SharedPreferences.getInstance();
+      await errorPrefs.setBool('pending_fortune_paid', false);
 
       // Arka planda hata aldıysa Ana sayfaya bildir
       backgroundCallback?.call(
@@ -269,11 +282,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           _errorMessage = 'Bir sorun oluştu. Lütfen tekrar dene.';
         });
       }
+      CoffeeReadingPage.isApiRunning = false;
     }
   }
 
   @override
   void dispose() {
+    CoffeeReadingPage.isViewingReading = false;
     _loadingTimer?.cancel();
     _smokeTimer?.cancel();
     _pulseController.dispose();
@@ -454,7 +469,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                   ),
                   const SizedBox(height: 18),
                   _buildLoadingInfoRow(
-                    Icons.coffee_rounded,
+                    Icons.local_cafe_rounded,
                     Text.rich(
                       TextSpan(
                         style: TextStyle(
@@ -467,7 +482,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
                             child: Icon(
-                              Icons.coffee_rounded,
+                              Icons.local_cafe_rounded,
                               size: 18,
                               color: Colors.white.withOpacity(0.65),
                             ),
@@ -493,7 +508,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
               child: GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.popUntil(context, (route) => route.isFirst); // Tamamen ana sayfaya dön
                 },
                 child: Container(
                   width: double.infinity,
@@ -627,7 +642,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildPremiumHeader(
-                          Icons.coffee_rounded,
+                          Icons.local_cafe_rounded,
                           'Fincanın Bölümleri',
                         ),
                         const SizedBox(height: 20),
@@ -1092,7 +1107,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pop();
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -1121,12 +1136,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                     ),
                   ),
                 ),
-                // Sağ tarafı dengelemek için kahve ikonu
-                const Icon(
-                  Icons.local_cafe_rounded,
-                  color: Color(0xFFD4A373),
-                  size: 24,
-                ),
+                // Sağ tarafı dengelemek için boşluk (Geri butonu genişliğinde)
+                const SizedBox(width: 38),
               ],
             ),
           ),
@@ -1187,7 +1198,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 color: const Color(0xFFD4A373).withOpacity(0.1),
               ),
               child: const Icon(
-                Icons.coffee_rounded,
+                Icons.local_cafe_rounded,
                 color: Color(0xFFD4A373),
                 size: 48,
               ),
@@ -1465,7 +1476,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 }
 
 class _ExpandablePhotoItem extends StatelessWidget {
-  final File file;
+  final File? file;
   final String title;
   final String shortDesc;
   final String detailedDesc;
@@ -1520,11 +1531,21 @@ class _ExpandablePhotoItem extends StatelessWidget {
                       color: const Color(0xFFD4A373).withOpacity(0.5),
                       width: 1.5,
                     ),
-                    image: DecorationImage(
-                      image: FileImage(file),
-                      fit: BoxFit.cover,
-                    ),
+                    color: file == null || !file!.existsSync() ? const Color(0xFFD4A373).withOpacity(0.1) : null,
+                    image: file != null && file!.existsSync()
+                        ? DecorationImage(
+                            image: FileImage(file!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
+                  child: file == null || !file!.existsSync()
+                      ? Icon(
+                          icon,
+                          color: const Color(0xFFD4A373).withOpacity(0.5),
+                          size: 24,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Container(
