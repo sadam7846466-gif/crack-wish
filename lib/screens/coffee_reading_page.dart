@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'coffee_detailed_reading_page.dart';
+
 import '../services/storage_service.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
@@ -155,6 +155,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
       }
 
       final reading = interpretResponse.data as Map<String, dynamic>;
+      
+      // FALLA BİRLİKTE RUH TAŞINI ŞİMDİ KES! (Kullanıcıyı çökme ve kopmalardan korur)
+      // Eğer _fortuneCost değişkeni burada bilinmiyorsa 1 olarak sabitliyoruz.
+      await StorageService.deductSoulStones(1);
       
       // Sonucu kaydet (Sayfadan çıkmış olsa bile kaydedilir)
       final prefs = await SharedPreferences.getInstance();
@@ -473,7 +477,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).padding.top + 90, // App Bar için boşluk
-              bottom: MediaQuery.of(context).padding.bottom + 80, // Alt sınırda rahatlık
+              bottom: MediaQuery.of(context).padding.bottom + 24, // Alt sınırda kararında boşluk
               left: 24,
               right: 24,
             ),
@@ -792,7 +796,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                       GestureDetector(
                         onTap: () {
                           HapticFeedback.lightImpact();
-                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          Navigator.of(context).pop('new');
                         },
                         child: Container(
                           width: double.infinity,
@@ -821,7 +825,6 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage> with TickerProvid
                     ],
                   ),
                 ),
-                  const SizedBox(height: 40),
               ],
             ),
           ),

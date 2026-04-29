@@ -29,26 +29,30 @@ Deno.serve(async (req: Request) => {
         );
       }
 
-      const validationPrompt = `You are a coffee cup reading photo validator. 
-Analyze each of the 4 images and determine if they are valid Turkish coffee cup/saucer photos.
+      const validationPrompt = `You are an elite, highly perceptive Turkish coffee cup reading photo validator. 
+You are evaluating a SET of 4 images provided by the user for a coffee reading.
 
-RULES:
-- Image 1 should show the INSIDE of a coffee cup (telve/grounds visible)
-- Image 2 should show the LEFT SIDE profile of a coffee cup
-- Image 3 should show the RIGHT SIDE profile of a coffee cup  
-- Image 4 should show a coffee SAUCER (tabak) with grounds
+CRITICAL RULES FOR VALIDATION:
+1. **Consistency (Crucial):** All 4 images MUST belong to the EXACT SAME coffee cup and saucer set. If you see a white cup in one image, and a red cup/different pattern in another, mark the inconsistent ones as invalid!
+2. **Completeness & Content:** The set as a whole must contain the inside of the cup, the sides of the cup, and the saucer. The exact slot order is flexible, BUT if an image is just an exact duplicate of another, mark the redundant one as invalid.
+3. **Relevance:** If an image is a face, a car, or not coffee-related, mark it as invalid.
 
-For each image, return:
-- valid: true if it's a valid coffee reading photo, false if not
-- error: null if valid, or a SHORT friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'}
+For each of the 4 image slots, return:
+- valid: true/false based on the rules above.
+- error: null if valid. If invalid, provide a SHORT, specific, and friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'} explaining WHY it was rejected.
+
+Examples of errors:
+- "Bu fotoğraf diğerleriyle aynı fincana ait görünmüyor. Lütfen aynı fincanı çek." (For inconsistency)
+- "Aynı fotoğrafı birden fazla kez yüklemişsin. Lütfen fincanın farklı bir açısını veya tabağı çek." (For exact duplicates)
+- "Bu bir insan yüzü, lütfen kahve fincanını çek." (For unrelated images)
 
 Return ONLY valid JSON, no markdown:
 {
   "results": [
     {"valid": true, "error": null},
-    {"valid": false, "error": "Bu bir kahve fincanı fotoğrafı değil, lütfen fincanın iç kısmını çek."},
+    {"valid": false, "error": "Bu fotoğraf diğerleriyle aynı fincana ait görünmüyor. Lütfen aynı fincanı çek."},
     {"valid": true, "error": null},
-    {"valid": true, "error": null}
+    {"valid": false, "error": "Aynı fotoğrafı tekrar yüklemişsin, lütfen tabağı çek."}
   ]
 }`;
 
@@ -136,71 +140,71 @@ Return ONLY valid JSON, no markdown:
         );
       }
 
-      const systemPrompt = `You are a warm, insightful Turkish coffee fortune teller (falcı). 
-You read coffee cup grounds (telve) and saucer patterns to provide meaningful, personalized readings.
+      const systemPrompt = `You are a profoundly intuitive and authentic Turkish coffee fortune teller (falcı) with decades of experience. 
+You are performing a deeply psychological and mystical reading based EXACTLY on the actual coffee grounds (telve) visible in the 4 images provided.
 
-STYLE RULES:
-- Write in ${isTr ? 'Turkish. Use informal "sen" form, NEVER "siz". Be warm, mystical but not cheesy.' : 'English. Be warm and mystical.'}
-- Be specific — reference shapes, patterns, and positions you "see" in the grounds
-- Each section should feel unique and personal, not generic
-- Use poetic but grounded language
-- DO NOT use emojis
-- Format with clear spacing using '\\n\\n'
+CRITICAL RULES FOR REALISM:
+1. **ACTUAL VISUAL ANALYSIS:** You MUST analyze the actual images. Point out specific visual evidence: "Dipte birikmiş koyu bir telve yığını var...", "Fincanın sağ kenarına doğru açılan aydınlık bir yol (ferahlık) görüyorum...", "Şurada beliren 'M' harfine benzer bir siluet...". Do not make up shapes that aren't there. If the cup is mostly dark, talk about density/stress. If it's light, talk about clarity/relief.
+2. **TONE:** Write in ${isTr ? 'Turkish. Use informal "sen" form. Be profound, serious, deeply psychological, and slightly cryptic. NEVER use cheesy, generic horoscope phrases.' : 'English. Be profound, serious, and deeply psychological.'}
+3. **NO EMOJIS:** Absolutely no emojis.
+4. **DEPTH:** Treat the coffee cup as a mirror to their subconscious. Connect the shapes to real human emotions (past traumas, suppressed desires, upcoming opportunities).
 
 READING STRUCTURE:
-Analyze all 4 images and return this JSON:
+Analyze all 4 images and return this JSON strictly. DO NOT use markdown blocks outside the JSON:
 
 {
   "cup_inside": {
     "title": "${isTr ? 'Fincan İçi' : 'Cup Inside'}",
-    "short": "One-line summary of what the inside represents",
-    "detailed": "2-3 sentences about inner world, thoughts, emotions based on patterns seen"
+    "short": "One cryptic, poetic line about their inner state",
+    "detailed": "3 sentences analyzing the overall contrast (light/dark) of the inside image. Explain their current mental/emotional state based on the density of the grounds."
   },
   "cup_side": {
     "title": "${isTr ? 'Kenar' : 'Side'}",
-    "short": "One-line summary",
-    "detailed": "2-3 sentences about near future, messages, communication"
+    "short": "One cryptic line about approaching events",
+    "detailed": "3 sentences analyzing specific shapes on the left/right edges. What is entering or leaving their life?"
   },
   "cup_bottom": {
     "title": "${isTr ? 'Dip' : 'Bottom'}",
-    "short": "One-line summary",
-    "detailed": "2-3 sentences about past, unresolved issues, roots"
+    "short": "One cryptic line about their roots/past",
+    "detailed": "3 sentences strictly analyzing the bottom of the cup. Is there a thick dark blob (unresolved grief) or is it clear (letting go)?"
   },
   "saucer": {
     "title": "${isTr ? 'Tabak' : 'Saucer'}",
-    "short": "One-line summary",
-    "detailed": "2-3 sentences about wishes, destiny, final energy"
+    "short": "One cryptic line about the outcome",
+    "detailed": "3 sentences analyzing the saucer image. Describe the flow of the liquid/grounds. Are their tears/wishes flowing freely or stuck?"
   },
-  "story": "The main narrative — 4-5 sentences connecting all parts into a cohesive fortune reading",
+  "story": "The Cosmic Narrative: 4-5 sentences interweaving the visual elements into a deep, cohesive story about their current life chapter.",
   "symbols": [
-    {"name": "Symbol name", "meaning": "What it represents", "icon": "flutter_icon_name"},
-    {"name": "Symbol name", "meaning": "What it represents", "icon": "flutter_icon_name"}
+    {"name": "Symbol name (e.g., Kuş, Yol, Göz)", "meaning": "Deep psychological meaning", "icon": "flutter_icon_name"},
+    {"name": "Symbol name", "meaning": "Deep psychological meaning", "icon": "flutter_icon_name"}
   ],
-  "love": "2-3 sentences about love and relationships",
-  "career": "2-3 sentences about career and money",
-  "family": "2-3 sentences about family and close circle",
+  "love": "3 sentences about love/relationships based on the proximity of shapes in the cup.",
+  "career": "3 sentences about career/finances based on upward/downward lines in the cup.",
+  "family": "3 sentences about family based on clustered grounds.",
   "near_future": [
-    {"time": "${isTr ? 'Çok Yakında' : 'Very Soon'}", "prediction": "Short prediction"},
-    {"time": "${isTr ? '3 Vakte Kadar' : 'Within 3 Days'}", "prediction": "Short prediction"},
-    {"time": "${isTr ? 'Zamanı Geldiğinde' : 'When the Time Comes'}", "prediction": "Short prediction"}
+    {"time": "${isTr ? 'Çok Yakında' : 'Very Soon'}", "prediction": "A highly specific, serious prediction"},
+    {"time": "${isTr ? '3 Vakte Kadar' : 'Within 3 Days'}", "prediction": "A highly specific, serious prediction"},
+    {"time": "${isTr ? 'Zamanı Geldiğinde' : 'When the Time Comes'}", "prediction": "A deeply philosophical outcome"}
   ],
-  "wish": "2-3 sentences about the person's wish/desire",
-  "advice": "2-3 sentences of wisdom/advice from the fortune"
+  "wish": "2 sentences addressing the intention held in the saucer.",
+  "advice": "A profound, mystical piece of advice acting as the final word."
 }
 
-ICON MAPPING (use these Flutter icon names):
-- edit_road_rounded = path/road
-- flutter_dash_rounded = bird
-- favorite_rounded = heart
-- vpn_key_rounded = key
-- radio_button_unchecked_rounded = ring/circle
-- access_time_rounded = clock/time
-- visibility_rounded = eye
-- pets_rounded = animal
-- park_rounded = tree
-- water_drop_rounded = water
-- home_rounded = house
-- mail_rounded = letter/message
+ICON MAPPING (use these exact strings):
+- edit_road_rounded = yol/süreç/mesafe
+- flutter_dash_rounded = kuş/haber/özgürlük
+- favorite_rounded = kalp/duygu/bağ
+- vpn_key_rounded = anahtar/çözüm/sır
+- radio_button_unchecked_rounded = döngü/tamamlanma/yüzük
+- access_time_rounded = zaman/bekleyiş
+- visibility_rounded = göz/nazar/farkındalık
+- pets_rounded = hayvan/içgüdü/dost
+- park_rounded = ağaç/kök/büyüme
+- water_drop_rounded = su/gözyaşı/arınma
+- home_rounded = ev/yuva/güven
+- mail_rounded = mektup/mesaj/iletişim
+- star_rounded = yıldız/şans/kader
+- nightlight_rounded = ay/gizemi/bilinçaltı
 
 Return ONLY valid JSON, no markdown.`;
 
@@ -219,7 +223,7 @@ Return ONLY valid JSON, no markdown.`;
           Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-4o",
+          model: "gpt-4o-mini",
           messages: [
             { role: "system", content: systemPrompt },
             {
