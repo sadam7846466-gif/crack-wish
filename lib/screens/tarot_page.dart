@@ -199,89 +199,89 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       frontAsset: 'assets/images/tarot/tarot/The_World.webp',
     ),
     // ============================================================
-    // MINOR ARCANA — CUPS (Kâseler) — 14 kart (id: 22–35)
+    // MINOR ARCANA — CUPS (Kupalar) — 14 kart (id: 22–35)
     // ============================================================
     TarotCardDef(
       id: 22,
-      nameTr: 'Kâselerin Ası',
+      nameTr: 'Kupaların Ası',
       nameEn: 'Ace of Cups',
       frontAsset: 'assets/images/tarot/tarot/Ace_of_Cups.webp',
     ),
     TarotCardDef(
       id: 23,
-      nameTr: 'Kâselerin İkisi',
+      nameTr: 'Kupaların İkilisi',
       nameEn: 'Two of Cups',
       frontAsset: 'assets/images/tarot/tarot/Two_of_Cups.webp',
     ),
     TarotCardDef(
       id: 24,
-      nameTr: 'Kâselerin Üçü',
+      nameTr: 'Kupaların Üçlüsü',
       nameEn: 'Three of Cups',
       frontAsset: 'assets/images/tarot/tarot/Three_of_Cups.webp',
     ),
     TarotCardDef(
       id: 25,
-      nameTr: 'Kâselerin Dördü',
+      nameTr: 'Kupaların Dörtlüsü',
       nameEn: 'Four of Cups',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Cups.webp',
     ),
     TarotCardDef(
       id: 26,
-      nameTr: 'Kâselerin Beşi',
+      nameTr: 'Kupaların Beşlisi',
       nameEn: 'Five of Cups',
       frontAsset: 'assets/images/tarot/tarot/Five_of_Cups.webp',
     ),
     TarotCardDef(
       id: 27,
-      nameTr: 'Kâselerin Altısı',
+      nameTr: 'Kupaların Altısı',
       nameEn: 'Six of Cups',
       frontAsset: 'assets/images/tarot/tarot/Six_of_Cups.webp',
     ),
     TarotCardDef(
       id: 28,
-      nameTr: 'Kâselerin Yedisi',
+      nameTr: 'Kupaların Yedisi',
       nameEn: 'Seven of Cups',
       frontAsset: 'assets/images/tarot/tarot/Seven_of_Cups.webp',
     ),
     TarotCardDef(
       id: 29,
-      nameTr: 'Kâselerin Sekizi',
+      nameTr: 'Kupaların Sekizi',
       nameEn: 'Eight of Cups',
       frontAsset: 'assets/images/tarot/tarot/Eight_of_Cups.webp',
     ),
     TarotCardDef(
       id: 30,
-      nameTr: 'Kâselerin Dokuzu',
+      nameTr: 'Kupaların Dokuzu',
       nameEn: 'Nine of Cups',
       frontAsset: 'assets/images/tarot/tarot/Nine_of_Cups.webp',
     ),
     TarotCardDef(
       id: 31,
-      nameTr: 'Kâselerin Onu',
+      nameTr: 'Kupaların Onu',
       nameEn: 'Ten of Cups',
       frontAsset: 'assets/images/tarot/tarot/Ten_of_Cups.webp',
     ),
     TarotCardDef(
       id: 32,
-      nameTr: 'Kâselerin Uşağı',
+      nameTr: 'Kupaların Uşağı',
       nameEn: 'Page of Cups',
       frontAsset: 'assets/images/tarot/tarot/Page_of_Cups.webp',
     ),
     TarotCardDef(
       id: 33,
-      nameTr: 'Kâselerin Şövalyesi',
+      nameTr: 'Kupaların Şövalyesi',
       nameEn: 'Knight of Cups',
       frontAsset: 'assets/images/tarot/tarot/Knight_of_Cups.webp',
     ),
     TarotCardDef(
       id: 34,
-      nameTr: 'Kâselerin Kraliçesi',
+      nameTr: 'Kupaların Kraliçesi',
       nameEn: 'Queen of Cups',
       frontAsset: 'assets/images/tarot/tarot/Queen_of_Cups.webp',
     ),
     TarotCardDef(
       id: 35,
-      nameTr: 'Kâselerin Kralı',
+      nameTr: 'Kupaların Kralı',
       nameEn: 'King of Cups',
       frontAsset: 'assets/images/tarot/tarot/King_of_Cups.webp',
     ),
@@ -1407,6 +1407,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         _state = RitualState.revealed;
         _latestFullReading = fullReading;
         _latestReading = null;
+        _fullCardPageIndex = 0; // Ensure carousel starts at first card
       });
     }
     _updateCtaText();
@@ -4971,7 +4972,15 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       _reservedSlotCount = 0;
       _revealedCount = 0;
       _selectedCardIndexes = [];
+      _fullCardPageIndex = 0; // Fixes bug where PageView opens at a wrong index
     });
+    
+    _fullCardPageCtrl?.dispose();
+    _fullCardPageCtrl = null;
+    
+    _infoRevealCtrl?.dispose();
+    _infoRevealCtrl = null;
+    
     _resetDeck();
   }
 
