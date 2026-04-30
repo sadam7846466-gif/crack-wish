@@ -2168,55 +2168,7 @@ For questions: info@crackandwish.com''',
                                 levelColor: level.color,
                                 isLoading: _isLoading,
                                 isPremium: _isPremiumUser,
-                                onAvatarLongPress: () async {
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  setState(
-                                    () => _isPremiumUser = !_isPremiumUser,
-                                  );
-                                  await prefs.setBool(
-                                    'is_premium_test_mode',
-                                    _isPremiumUser,
-                                  );
-                                  await prefs.setBool(
-                                    'is_elite',
-                                    _isPremiumUser,
-                                  ); // Key senkronizasyonu
-
-                                  // Test butonuna basıldığında Elite olduysa anında 5 günlük RT ver
-                                  if (_isPremiumUser) {
-                                    await prefs.setInt(
-                                      'daily_elite_soul_stones',
-                                      5,
-                                    );
-                                  } else {
-                                    await prefs.setInt(
-                                      'daily_elite_soul_stones',
-                                      0,
-                                    );
-                                  }
-
-                                  // Supabase'e Premium durumunu kaydet
-                                  await ProfileSyncService().syncEliteStatus(
-                                    _isPremiumUser,
-                                  );
-
-                                  HapticFeedback.heavyImpact();
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'TEST MODU: Elite Üyelik ${_isPremiumUser ? "AKTİF 💎" : "KAPALI 🛑"}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.black87,
-                                      ),
-                                    );
-                                  }
-                                },
+                                onAvatarLongPress: null,
                                 onEditTap: _editProfile,
                                 profileTitle: l10n.profileUserTitle,
                                 totalCookies: _totalCookies,

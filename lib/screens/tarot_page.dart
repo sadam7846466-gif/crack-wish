@@ -8546,23 +8546,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 }
 
 // ============================================================
-// Rewarded Ad Service (stub)
-// ============================================================
-class RewardedAdService {
-  RewardedAdService._();
-  static final instance = RewardedAdService._();
-
-  Future<bool> showRewardedAd() async {
-    // TODO: google_mobile_ads ile RewardedAd entegre et
-    if (kDebugMode) {
-      await Future.delayed(const Duration(milliseconds: 900));
-      return true;
-    }
-    return false;
-  }
-}
-
-// ============================================================
 // UI Widgets
 // ============================================================
 

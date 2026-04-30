@@ -155,17 +155,7 @@ class PurchaseService {
     final product = _products[productId];
     if (product == null) {
       debugPrint('Ürün bulunamadı: $productId');
-      // [BETA/TEST MODU KODU] - Gerçek mağaza ID'leri bağlanana kadar UI testleri için onay simülasyonu:
-      debugPrint('BETA/TEST MODU: Sanal Satın Alma Başarılı Kabul Ediliyor...');
-      await Future.delayed(const Duration(seconds: 1)); // Gerçekçi ağ bekleme süresi
-      _verifyAndDeliver(PurchaseDetails(
-        productID: productId,
-        purchaseID: 'test_purchase_id',
-        status: PurchaseStatus.purchased,
-        transactionDate: DateTime.now().millisecondsSinceEpoch.toString(),
-        verificationData: PurchaseVerificationData(localVerificationData: 'test', serverVerificationData: 'test', source: 'test'),
-      ));
-      return true;
+      return false;
     }
 
     try {
