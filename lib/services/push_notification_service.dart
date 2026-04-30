@@ -214,6 +214,43 @@ class PushNotificationService {
     );
   }
 
+  /// Belirli bir süre sonra (örneğin Kahve falı için) tetiklenecek bildirim
+  Future<void> scheduleDelayedNotification({
+    required int id,
+    required String title,
+    required String body,
+    required Duration delay,
+    required String channelId,
+    required String channelName,
+  }) async {
+    if (!_isInitialized) return;
+    
+    final scheduledDate = tz.TZDateTime.now(tz.local).add(delay);
+    
+    await _localNotifications.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  /// Bir bildirimi iptal eder (Örneğin fal sayfasında kaldıysa ve sonucu gördüyse)
+  Future<void> cancelNotification(int id) async {
+    if (!_isInitialized) return;
+    await _localNotifications.cancel(id: id);
+  }
+
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);

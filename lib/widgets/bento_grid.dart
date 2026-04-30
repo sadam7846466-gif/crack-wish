@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,8 +22,11 @@ class BentoGrid extends StatefulWidget {
 }
 
 class _BentoGridState extends State<BentoGrid>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, RouteAware {
   late final AnimationController _tarotFloatController;
+  bool _hasUnreadCoffee = false;
+  bool _hasUnreadZodiac = false;
+  Timer? _statusTimer;
 
   @override
   void initState() {
@@ -31,10 +36,30 @@ class _BentoGridState extends State<BentoGrid>
       duration: const Duration(milliseconds: 8000),
       value: 0.25, // Sabit pozisyon
     );
+    _checkUnreadStatuses();
+
+    // Arka planda biten işlemleri (Kahve vb.) anında ekrana yansıtmak için periyodik kontrol
+    _statusTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      _checkUnreadStatuses();
+    });
+  }
+
+  Future<void> _checkUnreadStatuses() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final lastZodiacDate = prefs.getString('last_zodiac_read_date') ?? '';
+
+    setState(() {
+      _hasUnreadCoffee = prefs.getBool('coffee_last_reading_viewed') == false;
+      _hasUnreadZodiac = lastZodiacDate != today;
+    });
   }
 
   @override
   void dispose() {
+    _statusTimer?.cancel();
     _tarotFloatController.dispose();
     super.dispose();
   }
@@ -203,7 +228,7 @@ class _BentoGridState extends State<BentoGrid>
                           SwipeFadePageRoute(
                             page: const CoffeePage(),
                           ),
-                        );
+                        ).then((_) => _checkUnreadStatuses());
                       },
                       child: Stack(
                         clipBehavior: Clip.none,
@@ -217,10 +242,11 @@ class _BentoGridState extends State<BentoGrid>
                             ),
                             title: l10n.localeName == 'tr' ? 'Kahve Falı' : 'Coffee Reading',
                             desc: l10n.localeName == 'tr' ? 'Telvelerin dili' : 'Whispers of grounds',
-                            accent: const Color(0xFFD4A373), // Sütlü kahve
+                            accent: const Color(0xFFD4A373),
                             accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
-                            badgeText: l10n.localeName == 'tr' ? 'YENİ' : 'NEW',
-                            badgeHidden: false, // Badge'i açtım!
+                            badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : (l10n.localeName == 'tr' ? 'YENİ' : 'NEW'),
+                            badgeHidden: !_hasUnreadCoffee && false,
+                            badgeColor: _hasUnreadCoffee ? const Color(0xFF22D3EE) : null,
                           ),
                           // Büyük kahve arka plan ikonu
                           Positioned(
@@ -281,7 +307,7 @@ class _BentoGridState extends State<BentoGrid>
                           SwipeFadePageRoute(
                             page: const ZodiacHubPage(),
                           ),
-                        );
+                        ).then((_) => _checkUnreadStatuses());
                       },
                       child: Stack(
                       clipBehavior: Clip.none,
@@ -297,8 +323,9 @@ class _BentoGridState extends State<BentoGrid>
                           desc: l10n.bentoZodiacDesc,
                           accent: const Color(0xFFFFD060), // Parlak altın sarısı
                           accentSoft: const Color(0xFFB07020), // Doygun koyu altın
-                          badgeText: l10n.bentoZodiacBadge,
-                          badgeHidden: true,
+                          badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
+                          badgeHidden: !_hasUnreadZodiac,
+                          badgeColor: _hasUnreadZodiac ? const Color(0xFF22D3EE) : null,
                         ),
                         // Zodyak görseli - yavaş dönen
                         Positioned(
@@ -483,6 +510,8 @@ class _BentoCard extends StatefulWidget {
   final Color accentSoft;
   final String? badgeText;
   final bool badgeHidden;
+  final Color? badgeColor;
+  final Color? badgeTextColor;
   final VoidCallback? onTap;
   final bool compact;
   final bool contentBottom;
@@ -517,6 +546,8 @@ class _BentoCard extends StatefulWidget {
     required this.accentSoft,
     this.badgeText,
     this.badgeHidden = false,
+    this.badgeColor,
+    this.badgeTextColor,
     this.onTap,
     this.compact = false,
     this.contentBottom = false,
@@ -561,6 +592,8 @@ class _BentoCardState extends State<_BentoCard> {
           accentOverlay: accentOverlay,
           badgeText: widget.badgeText,
           badgeHidden: widget.badgeHidden,
+          badgeColor: widget.badgeColor,
+          badgeTextColor: widget.badgeTextColor,
           icon: widget.icon,
           iconWidget: widget.iconWidget,
           title: widget.title,
@@ -607,6 +640,8 @@ class _InteractiveCard extends StatefulWidget {
   final Color accentOverlay;
   final String? badgeText;
   final bool badgeHidden;
+  final Color? badgeColor;
+  final Color? badgeTextColor;
   final VoidCallback? onTap;
   final bool compact;
   final bool contentBottom;
@@ -644,6 +679,8 @@ class _InteractiveCard extends StatefulWidget {
     required this.accentOverlay,
     required this.badgeText,
     required this.badgeHidden,
+    this.badgeColor,
+    this.badgeTextColor,
     required this.onTap,
     required this.compact,
     required this.contentBottom,
@@ -844,16 +881,23 @@ class _InteractiveCardState extends State<_InteractiveCard>
                                     vertical: badgePadV,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: widget.accent.withOpacity(0.16),
+                                    color: widget.badgeColor != null ? widget.badgeColor!.withOpacity(0.12) : widget.accent.withOpacity(0.16),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: widget.accent.withOpacity(0.3),
+                                      color: widget.badgeColor != null ? widget.badgeColor!.withOpacity(0.5) : widget.accent.withOpacity(0.3),
                                     ),
+                                    boxShadow: widget.badgeColor != null ? [
+                                      BoxShadow(
+                                        color: widget.badgeColor!.withOpacity(0.2),
+                                        blurRadius: 8,
+                                        spreadRadius: 0,
+                                      )
+                                    ] : null,
                                   ),
                                   child: Text(
                                     widget.badgeText!,
                                     style: TextStyle(
-                                      color: AppColors.textWhite,
+                                      color: widget.badgeColor ?? AppColors.textWhite,
                                       fontSize: badgeFont,
                                       fontWeight: FontWeight.w700,
                                     ),

@@ -1,0 +1,48 @@
+Analyzing bento_grid.dart...
+
+warning - bento_grid.dart:3:8 - Unused import: '../services/storage_service.dart'. Try removing the import directive. - unused_import
+warning - bento_grid.dart:338:7 - The declaration '_MoodCard' isn't referenced. Try removing the declaration of '_MoodCard'. - unused_element
+warning - bento_grid.dart:517:10 - A value for optional parameter 'icon' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:526:10 - A value for optional parameter 'onTap' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:529:10 - A value for optional parameter 'backgroundImageAsset' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:531:10 - A value for optional parameter 'backgroundImageDraggable' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:533:10 - A value for optional parameter 'overlayScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:534:10 - A value for optional parameter 'overlayOffset' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:536:10 - A value for optional parameter 'overlayPadding' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:540:10 - A value for optional parameter 'overlayBottom' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:545:10 - A value for optional parameter 'overlayFit' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:546:10 - A value for optional parameter 'overlayUseBottom' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:548:10 - A value for optional parameter 'overlayDragUpdate' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:549:10 - A value for optional parameter 'overlayDragEnd' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - bento_grid.dart:1235:7 - The declaration '_FloatingWidget' isn't referenced. Try removing the declaration of '_FloatingWidget'. - unused_element
+   info - bento_grid.dart:356:43 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:374:34 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:375:34 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:379:56 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:423:41 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:425:60 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:430:68 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:435:47 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:467:26 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:468:26 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:472:48 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:475:57 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:561:41 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:809:60 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:814:45 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:817:47 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:821:49 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:826:50 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:835:43 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:836:47 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:860:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:875:52 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:876:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:883:62 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:926:49 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:929:51 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:934:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:952:70 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - bento_grid.dart:964:55 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+44 issues found.

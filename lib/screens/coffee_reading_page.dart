@@ -238,16 +238,14 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
       backgroundCallback?.call(true, null);
 
-      // Kullanıcı sayfada olsun ya da olmasın, her zaman bildirim at
-      CosmicEngineService().scheduleInstantLocalNotification(
-        title: "Kahve Falın Hazır! ☕️",
-        body: "Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨",
-        secondsDelay: 1,
-      );
-
       if (!mounted) {
+        // Kullanıcı sayfada değilse (Ana sayfaya dönmüşse veya arka plana atmışsa) bildirim at
+        CosmicEngineService().scheduleInstantLocalNotification(
+          title: "Kahve Falın Hazır! ☕️",
+          body: "Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨",
+          secondsDelay: 1,
+        );
         CoffeeReadingPage.isApiRunning = false;
-        // Kullanıcı 'Ana Sayfaya Dön' diyerek çıkmış
         return;
       }
 

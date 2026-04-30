@@ -42,6 +42,13 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     _t2 = CurvedAnimation(parent: _entrance, curve: const Interval(.15, .55, curve: Curves.easeOutCubic));
     _t3 = CurvedAnimation(parent: _entrance, curve: const Interval(.3, .7, curve: Curves.easeOutCubic));
     _initPremiumState();
+    _markZodiacAsRead();
+  }
+
+  Future<void> _markZodiacAsRead() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    await prefs.setString('last_zodiac_read_date', today);
   }
 
   Future<void> _initPremiumState() async {

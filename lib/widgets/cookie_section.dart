@@ -15,6 +15,7 @@ import 'share_modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../services/purchase_service.dart';
 import '../services/sound_service.dart';
+import '../models/cookie_card.dart';
 
 class CookieSection extends StatefulWidget {
   final VoidCallback? onCookieTapped;
