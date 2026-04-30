@@ -390,7 +390,19 @@ class _CookieSectionState extends State<CookieSection>
     // Ücretli kurabiye kontrolü
     final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
     if (_paidCookieIds.contains(cookieId)) {
-      _showPremiumDialog();
+      final collection = await StorageService.getCookieCollection();
+      final cookieCard = collection.firstWhere(
+        (c) => c.id == cookieId,
+        orElse: () => CookieCard(id: cookieId, emoji: '', name: '', rarity: ''),
+      );
+
+      if (cookieCard.countObtained > 0) {
+        // Zaten sahip, kırmaya geç
+        _performCrack();
+      } else {
+        // Sahip değil, satın alma dialogunu aç
+        await _showPremiumDialog();
+      }
       return;
     }
 
@@ -461,7 +473,7 @@ class _CookieSectionState extends State<CookieSection>
 
     await StorageService.recordCookieCrack();
     StorageService.incrementCookieCount();
-    StorageService.incrementCookieCard(cookieId);
+    StorageService.consumeCookieCard(cookieId, isPaid: _paidCookieIds.contains(cookieId));
 
     final newCracks = await StorageService.getCookieCracksToday();
     final limitReached = newCracks >= StorageService.kMaxDailyCookieCracks;
@@ -535,10 +547,10 @@ class _CookieSectionState extends State<CookieSection>
   Widget _buildLimitOverlayContent() {
     return const _CircularLimitOverlay();
   }
-  void _showPremiumDialog() {
+  Future<void> _showPremiumDialog() async {
     final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
     final imagePath = _cookieImageMap[cookieId];
-    Navigator.of(context).push(
+    final result = await Navigator.of(context).push<bool>(
       PageRouteBuilder(
         opaque: false,
         barrierDismissible: false,
@@ -550,6 +562,27 @@ class _CookieSectionState extends State<CookieSection>
         ),
       ),
     );
+
+    if (result == true) {
+      // Satın alındı, envantere ekle
+      await StorageService.incrementCookieCard(cookieId);
+      
+      // Bildirim göster
+      if (mounted) {
+        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isTr ? 'Kurabiye başarıyla "My Cookie" koleksiyonuna eklendi!' : 'Cookie successfully added to your "My Cookie" collection!',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFFC084FC).withOpacity(0.9),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -1723,7 +1756,9 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
       final productId = 'cookie_${widget.cookieId}';
       final success = await PurchaseService().purchase(productId);
 
-      if (!success && mounted) {
+      if (success) {
+        if (mounted) Navigator.pop(context, true);
+      } else if (mounted) {
         HapticFeedback.heavyImpact();
         final isTr = Localizations.localeOf(context).languageCode == 'tr';
         ScaffoldMessenger.of(context).showSnackBar(

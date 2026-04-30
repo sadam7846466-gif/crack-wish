@@ -2090,8 +2090,7 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
     final imgPath = _cookieImageMap[widget.cookieId];
     if (widget.cookieId != null) {
       // isRewardOrGift = true çünkü sana başkası yollamış, bu bir hediye! 
-      // Dolayısıyla varsa x2, x3 olarak yığılabilir.
-      await StorageService.incrementCookieCard(widget.cookieId!, isRewardOrGift: true);
+      // StorageService.incrementCookieCard işlemi SupabaseOwlService.markCookieClaimed içinde yapılıyor!
     }
     widget.onClaimCookie?.call();
 

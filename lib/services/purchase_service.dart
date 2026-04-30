@@ -22,9 +22,9 @@ class PurchaseService {
   static const String cookieGoldenArabesqueId = 'cookie_golden_arabesque';
   static const String cookieMidnightMosaicId = 'cookie_midnight_mosaic';
   static const String cookiePearlLaceId = 'cookie_pearl_lace';
-  static const String cookieSpringWreathId = 'cookie_spring_wreath';
-  static const String cookieImperialDragonId = 'cookie_imperial_dragon';
-  static const String cookieNebulaDustId = 'cookie_nebula_dust';
+  static const String cookieGoldenSakuraId = 'cookie_golden_sakura';
+  static const String cookieDragonPhoenixId = 'cookie_dragon_phoenix';
+  static const String cookieGoldBeastsId = 'cookie_gold_beasts';
 
   static const Set<String> _allProductIds = {
     eliteWeeklyId,
@@ -33,9 +33,9 @@ class PurchaseService {
     cookieGoldenArabesqueId,
     cookieMidnightMosaicId,
     cookiePearlLaceId,
-    cookieSpringWreathId,
-    cookieImperialDragonId,
-    cookieNebulaDustId,
+    cookieGoldenSakuraId,
+    cookieDragonPhoenixId,
+    cookieGoldBeastsId,
   };
 
   // Yüklenen ürün detayları

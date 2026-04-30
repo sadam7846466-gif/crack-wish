@@ -918,8 +918,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
 
   Future<void> _loadOwnedCookies() async {
     final collection = await StorageService.getCookieCollection();
-    final owned =
-        collection.where((c) => c.firstObtainedDate != null).toList();
+    final owned = collection.where((c) => _paidCookieIds.contains(c.id) && c.countObtained > 0).toList();
     // Çok kırılandan aza doğru sırala
     owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
     if (mounted) {

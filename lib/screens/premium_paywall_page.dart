@@ -401,6 +401,12 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                             );
                                           } else if (mounted) {
                                             setState(() => _isPurchasing = false);
+                                            _showGlassMessage(
+                                              "Bağlantı Hatası",
+                                              "Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.",
+                                              Icons.error_outline_rounded,
+                                              const Color(0xFFF87171),
+                                            );
                                           }
                                         } catch (e) {
                                           debugPrint('Elite satın alma hatası: $e');

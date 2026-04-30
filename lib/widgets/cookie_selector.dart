@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'dart:ui' show Color, ImageFilter;
+import '../services/storage_service.dart';
 
 class CookieSelector extends StatefulWidget {
   final Function(String)? onCookieSelected;
@@ -21,6 +22,7 @@ class _CookieSelectorState extends State<CookieSelector> {
   late int _selectedIndex;
   final AudioPlayer _audioPlayer = AudioPlayer();
   late ScrollController _scrollController;
+  Set<String> _ownedPaidCookieIds = {};
 
   // Her bir kurabiye item'ının yaklaşık genişliği (padding dahil)
   static const double _itemWidth = 60.0; // 48 (item) + 12 (horizontal padding)
@@ -65,6 +67,19 @@ class _CookieSelectorState extends State<CookieSelector> {
   void initState() {
     super.initState();
     _selectedIndex = widget.initialSelectedIndex ?? 0;
+    _loadOwnedCookies();
+  }
+
+  Future<void> _loadOwnedCookies() async {
+    final collection = await StorageService.getCookieCollection();
+    if (mounted) {
+      setState(() {
+        _ownedPaidCookieIds = collection
+            .where((c) => c.countObtained > 0)
+            .map((c) => c.id)
+            .toSet();
+      });
+    }
   }
   
   @override
@@ -189,11 +204,15 @@ class _CookieSelectorState extends State<CookieSelector> {
                           widget.initialSelectedIndex ?? _selectedIndex;
                       final isSelected = currentSelectedIndex == index;
 
+                      final cookieId = _cookieTypes[index]['id'] as String;
+                      final isOwned = _ownedPaidCookieIds.contains(cookieId);
+
                       return _CookieSelectorItem(
                         imagePath: _cookieTypes[index]['imagePath'] as String,
                         label: _cookieLabel(l10n, _cookieTypes[index]['key'] as String),
                         isSelected: isSelected,
                         isPaid: _cookieTypes[index]['isPaid'] as bool,
+                        isOwned: isOwned,
                         accentColor: _cookieTypes[index]['color'] as Color,
                         onTap: () {
                           // Kilitli kurabiyeler de dahil olmak üzere seçimi güncelle
@@ -201,9 +220,7 @@ class _CookieSelectorState extends State<CookieSelector> {
                           // Satın al paneli büyük kurabiyeye tıklandığında açılır
                           setState(() => _selectedIndex = index);
                           _playSelectSound();
-                          widget.onCookieSelected?.call(
-                            _cookieTypes[index]['id'] as String,
-                          );
+                          widget.onCookieSelected?.call(cookieId);
                         },
                       );
                     },
@@ -349,6 +366,7 @@ class _CookieSelectorItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final bool isPaid;
+  final bool isOwned;
   final Color accentColor;
   final VoidCallback onTap;
 
@@ -358,6 +376,7 @@ class _CookieSelectorItem extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.isPaid,
+    required this.isOwned,
     required this.accentColor,
     required this.onTap,
   });
@@ -417,7 +436,7 @@ class _CookieSelectorItem extends StatelessWidget {
                 ),
                 child: Center(
                 child: ImageFiltered(
-                  imageFilter: isPaid
+                  imageFilter: isPaid && !isOwned
                       ? ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0)
                       : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                   child: Image.asset(
@@ -433,7 +452,7 @@ class _CookieSelectorItem extends StatelessWidget {
               ),
               ),
               // Ücretli kurabiye kilit ikonu
-              if (isPaid)
+              if (isPaid && !isOwned)
                 Positioned(
                   right: -2,
                   bottom: -2,

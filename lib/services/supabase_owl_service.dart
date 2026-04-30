@@ -656,8 +656,14 @@ class SupabaseOwlService {
     try {
       final index = _inbox.indexWhere((l) => l.id == letterId);
       if (index != -1) {
-        _inbox[index].cookieClaimed = true;
+        final letter = _inbox[index];
+        letter.cookieClaimed = true;
         _notify();
+        
+        // Hediyeyi teslim al: Kullanıcının envanterine (koleksiyonuna) ekle
+        if (letter.attachedCookieId != null && letter.attachedCookieId!.isNotEmpty) {
+          await StorageService.incrementCookieCard(letter.attachedCookieId!, isRewardOrGift: true);
+        }
       }
 
       final prefs = await SharedPreferences.getInstance();

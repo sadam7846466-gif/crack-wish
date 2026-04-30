@@ -1362,17 +1362,30 @@ class StorageService {
     final updated = cards.map((c) {
       if (c.id != id) return c;
       
-      int newCount = c.countObtained;
-      if (newCount == 0) {
-        newCount = 1; // İlk kez kırıldığında koleksiyona (envantere) katılır.
-      } else if (isRewardOrGift) {
-        newCount++; // Eğer özel bir ödül veya hediye ise stok birikir (x2, x3...).
-      }
-      // Gündelik aynı hediye kurabiyeyi şansına denediğinde yeni kurabiye kırmadığı için sayısı artmaz.
+      int newCount = c.countObtained + 1; // Her zaman envanteri artır
 
       return c.copyWith(
         countObtained: newCount,
-        firstObtainedDate: c.firstObtainedDate ?? DateTime.now(),
+        firstObtainedDate: c.firstObtainedDate ?? DateTime.now(), // İlk kez alınıyorsa tarihi setle (Açılan kurabiyelerde görünmesi için)
+      );
+    }).toList();
+    await _saveCookieCollection(updated);
+  }
+
+  /// Kurabiyeyi kır (kullan)
+  static Future<void> consumeCookieCard(String id, {required bool isPaid}) async {
+    final cards = await getCookieCollection();
+    final updated = cards.map((c) {
+      if (c.id != id) return c;
+      
+      int newCount = c.countObtained;
+      if (isPaid) {
+        newCount = (c.countObtained - 1).clamp(0, 999); // Ücretli kurabiye kırılınca envanterden düşer
+      }
+      
+      return c.copyWith(
+        countObtained: newCount,
+        firstObtainedDate: c.firstObtainedDate ?? DateTime.now(), // Kırıldığı için artık 'Açılan Kurabiyeler' geçmişinde görünür
       );
     }).toList();
     await _saveCookieCollection(updated);
