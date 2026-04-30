@@ -397,16 +397,7 @@ class _CookieSectionState extends State<CookieSection>
 
     // Debug: Hot restart'ta hakları sıfırla (SADECE 1 KEZ per session)
     // Production'da bu blok çalışmaz
-    assert(() {
-      if (!_debugResetDone) {
-        _debugResetDone = true;
-        prefs.setInt('cookie_cracks_today', 0);
-        _cachedCracksToday = 0;
-        _cachedDailyLimitReached = false;
-        _cacheLoaded = false;
-      }
-      return true;
-    }());
+    // Debug reset kaldırıldı, limitler kalıcı olacak.
 
     final cracks = await StorageService.getCookieCracksToday();
     // Statik cache güncelle (tüm instance’lar için)
@@ -424,46 +415,38 @@ class _CookieSectionState extends State<CookieSection>
   void _onCookieTap() async {
     if (_showFortune) return;
 
-    // Ücretli kurabiye kontrolü
+    // 1. ÖNCE SAHİPLİK KONTROLÜ (ÜCRETLİ KURABİYEYSE)
     final cookieId = widget.selectedCookieEmoji ?? 'spring_wreath';
     if (_paidCookieIds.contains(cookieId)) {
-      final collection = await StorageService.getCookieCollection();
-      final cookieCard = collection.firstWhere(
-        (c) => c.id == cookieId,
-        orElse: () => CookieCard(id: cookieId, emoji: '', name: '', rarity: ''),
-      );
-
-      if (_ownedCount > 0) {
-        // Zaten sahip, kırmaya geç
-        _performCrack();
-      } else {
-        // Sahip değil, satın alma dialogunu aç
+      if (_ownedCount <= 0) {
+        // Sahip değil, kırmaya kalkamaz. Önce satın alma ekranı çıksın.
         await _showPremiumDialog();
+        return;
       }
-      return;
+      // SAHİP İSE AŞAĞIDAKİ LİMİT VE REKLAM KONTROLLERİNE DEVAM EDER!
     }
 
-    // ── Günlük limit kontrolü (Herkes için 3/gün) ──
+    // ── GÜNLÜK LİMİT VE REKLAM KONTROLÜ (Herkes ve Her Kurabiye için 3/gün) ──
     final cracksUsed = await StorageService.getCookieCracksToday();
 
-    // Premium test modunu gerçek zamanlı oku (Profilde kapatılmış olabilir)
+    // Premium test modunu gerçek zamanlı oku
     final prefs = await SharedPreferences.getInstance();
     _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
 
-    // Limit doldu (hem ücretsiz hem premium için)
+    // 2. LİMİT KONTROLÜ
     if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
       HapticFeedback.heavyImpact();
       setState(() => _showLimitOverlay = true);
       return;
     }
 
-    // Ücretsiz kullanıcı: 2. ve 3. hak için reklam gerekli
+    // 3. REKLAM KONTROLÜ (Ücretsiz kullanıcı: 2. ve 3. hak için reklam gerekli)
     if (!_isPremiumUser && cracksUsed >= 1) {
       setState(() => _showAdOverlay = true);
       return;
     }
-    // Premium kullanıcı: reklam yok, doğrudan devam
 
+    // 4. HER ŞEY TAMAM, KIR GİTSİN!
     _performCrack();
   }
 

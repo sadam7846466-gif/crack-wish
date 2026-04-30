@@ -500,8 +500,8 @@ class _CookieSelectorItem extends StatelessWidget {
                     ),
                   ),
                 ),
-              // Stok (Bakiye) Rozeti
-              if (isPaid && ownedCount > 0)
+              // Stok (Bakiye) Rozeti (Legacy kurabiyelerde stok/sayı göstermeyelim, sınırsız açık görünsün)
+              if (isPaid && ownedCount > 0 && !const {'fortune_cat.webp', 'wildflower.webp', 'cupid_ribbon.webp', 'panda_bamboo.webp', 'ramadan_cute.webp', 'enchanted_forest.webp'}.any((img) => imagePath.contains(img)))
                 Positioned(
                   right: -6,
                   top: -6,
