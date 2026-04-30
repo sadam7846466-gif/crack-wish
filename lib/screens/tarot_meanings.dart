@@ -211,7 +211,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     7: [ // The Chariot
       CardSymbol(emoji: '🐱', nameTr: 'Sfenks', nameEn: 'Sphinx', meaningsTr: ['Zıt güçlerin kontrolü', 'Kaos içinde denge bul', 'İç çatışmanı yönet'], meaningsEn: ['Control opposing forces']),
       CardSymbol(emoji: '⭐', nameTr: 'Yıldız', nameEn: 'Stars', meaningsTr: ['Evrenin sana rehberliği', 'Sana bakan yıldızlar', 'Seni çağıran kaderin'], meaningsEn: ['Universe guides you']),
-      CardSymbol(emoji: '🛡️', nameTr: 'Zırh', nameEn: 'Armor', meaningsTr: ['İradeyle korunman', 'Kararların kalkanın', 'Güçlü irade güçlü koruma'], meaningsEn: ['Shielded by willpower']),
+      CardSymbol(emoji: '🛡️', nameTr: 'Zırh', nameEn: 'Armor', meaningsTr: ['İradeyle korunman', 'Sarsılmaz iraden', 'Güçlü irade güçlü koruma'], meaningsEn: ['Shielded by willpower']),
     ],
     8: [ // Strength
       CardSymbol(emoji: '🦁', nameTr: 'Aslan', nameEn: 'Lion', meaningsTr: ['Ehlileşecek tutkuların', 'Gücün yumuşaklıkta saklı', 'Kontrol sevgiyle gelir'], meaningsEn: ['Passions to be tamed']),
@@ -306,7 +306,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '☀️', nameTr: 'Güneş', nameEn: 'Sun', meaningsTr: ['Kalbini aydınlatan ışık', 'İçindeki sıcaklık', 'Sevgi güneşin doğuyor'], meaningsEn: ['The light illuminating your heart']),
       CardSymbol(emoji: '💧', nameTr: 'Su', nameEn: 'Water', meaningsTr: ['Duygularının serbest akışı', 'Hissettiklerini bırak aksın', 'Engelsiz duygusal akış'], meaningsEn: ['Free flow of your emotions']),
       CardSymbol(emoji: '🐟', nameTr: 'Balık', nameEn: 'Fish', meaningsTr: ['Bilinçaltından gelen mesajlar', 'Rüyaların sana konuşuyor', 'Derinlerden gelen fısıltı'], meaningsEn: ['Messages from your subconscious']),
-      CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Ruhani rehberliğin', 'Manevi pusulan aktif', 'Görünmez el seni yönlendiriyor'], meaningsEn: ['Your spiritual guidance']),
+      CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Ruhani rehberliğin', 'Manevi pusulan aktif', 'İlahi ışık seni yönlendiriyor'], meaningsEn: ['Your spiritual guidance']),
     ],
     23: [ // Two of Cups
       CardSymbol(emoji: '👩', nameTr: 'Kadın', nameEn: 'Woman', meaningsTr: ['Seni tamamlayan enerji'], meaningsEn: ['The energy that completes you']),
@@ -319,7 +319,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     24: [ // Three of Cups
       CardSymbol(emoji: '💃', nameTr: 'Dost', nameEn: 'Friend', meaningsTr: ['Seni destekleyen bağlar'], meaningsEn: ['Bonds that support you']),
       CardSymbol(emoji: '💃', nameTr: 'Kutlama', nameEn: 'Celebration', meaningsTr: ['Paylaşılan sevinç'], meaningsEn: ['Shared joy']),
-      CardSymbol(emoji: '💃', nameTr: 'Birlik', nameEn: 'Unity', meaningsTr: ['Birlikte daha güçsünüz'], meaningsEn: ['Stronger together']),
+      CardSymbol(emoji: '💃', nameTr: 'Birlik', nameEn: 'Unity', meaningsTr: ['Birlikte daha güçlüsünüz'], meaningsEn: ['Stronger together']),
       CardSymbol(emoji: '🥂', nameTr: 'Kupalar', nameEn: 'Cups', meaningsTr: ['Kutlanacak başarıların'], meaningsEn: ['Your achievements to celebrate']),
       CardSymbol(emoji: '🍇', nameTr: 'Meyve', nameEn: 'Fruit', meaningsTr: ['Emeğinin hasadı geldi'], meaningsEn: ['Harvest of your efforts arrived']),
       CardSymbol(emoji: '✨', nameTr: 'Yıldız', nameEn: 'Star', meaningsTr: ['Evren seninle kutluyor'], meaningsEn: ['The universe celebrates with you']),
@@ -539,7 +539,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
     56: [ // Seven of Swords
       CardSymbol(emoji: '🥷', nameTr: 'Hırsız', nameEn: 'Thief', meaningsTr: ['Gizlice yapılan hamleler'], meaningsEn: ['Moves made in secret']),
       CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Strateji ve kurnazlık'], meaningsEn: ['Strategy and cunning']),
-      CardSymbol(emoji: '⚔️', nameTr: 'Kılıçlar', nameEn: 'Swords', meaningsTr: ['Geride bıraktıkların'], meaningsEn: ['What you left behind']),
+      CardSymbol(emoji: '👤', nameTr: 'Gölgeler', nameEn: 'Shadows', meaningsTr: ['Kimliğini saklamak'], meaningsEn: ['Hiding your identity']),
       CardSymbol(emoji: '⛺', nameTr: 'Çadır', nameEn: 'Tent', meaningsTr: ['Sessiz ve gizli kaçış'], meaningsEn: ['Escaping without being noticed']),
       CardSymbol(emoji: '🔥', nameTr: 'Ateş', nameEn: 'Fire', meaningsTr: ['Tehlikenin yakınlığı'], meaningsEn: ['The nearness of danger']),
       CardSymbol(emoji: '🌕', nameTr: 'Ay', nameEn: 'Moon', meaningsTr: ['Kaçınılmaz ortaya çıkış'], meaningsEn: ['Everything will come to light']),
@@ -900,8 +900,8 @@ const Map<int, CardMeaning> cardMeanings = {
     pastEn: 'You harnessed the black and white sphinxes pulling the chariot. You drove opposing forces to a single goal and passed that rocky road.',
     presentTr: 'Zırhın ve yıldızlı gölgeliğin altındasın. Önündeki sfenksler farklı yönlere gitmek istese de iradenle onları kontrol ediyorsun.',
     presentEn: 'You are under the armor and starry canopy. The sphinxes want to go different ways, but your will controls them.',
-    directionTr: 'Asanın gücüyle zıtlıkları dengele. Arkandaki şehri bırak, gözünü hedefe dik ve dizginleri sıkı tutarak ilerle.',
-    directionEn: 'Balance contradictions with the power of your wand. Leave the city behind, set your eyes on the goal, and ride forward.',
+    directionTr: 'İradenin gücüyle zıtlıkları dengele. Arkandaki şehri bırak, gözünü hedefe dik ve dizginleri sıkı tutarak ilerle.',
+    directionEn: 'Balance contradictions with the power of your will. Leave the city behind, set your eyes on the goal, and ride forward.',
   ),
   8: CardMeaning(
     id: 8,
@@ -940,9 +940,9 @@ const Map<int, CardMeaning> cardMeanings = {
     phase: CardPhase.neutral,
     pastTr: 'Çarkın üstündeki kılıçlı Sfenks hükmünü vermiş, Anubis seni yukarı taşırken Yılan aşağı çekmiş. Hayatın büyük döngüsü seni buraya getirmiş.',
     pastEn: 'The sword-wielding Sphinx passed judgment, Anubis carried you up while the Snake pulled you down. Lifes great cycle brought you here.',
-    presentTr: 'Burç sembolleriyle dolu dev tekerlek durmaksızın dönüyor. İyi ya da kötü yok; şu an sadece kadersel bir değişimin tam merkezindesin.',
+    presentTr: 'Burç sembolleriyle dolu dev çark durmaksızın dönüyor. İyi ya da kötü yok; şu an sadece kadersel bir değişimin tam merkezindesin.',
     presentEn: 'The giant wheel filled with zodiac symbols spins endlessly. There is no good or bad; you are directly at the center of fateful change.',
-    directionTr: 'Çarkın üzerindeki yılan da, Anubis de dönmeye mecburdur. Kontrolü bırak, tekerlek dönerken merkeze odaklan ve değişimi kabul et.',
+    directionTr: 'Çarkın üzerindeki yılan da, Anubis de dönmeye mecburdur. Kontrolü bırak, çark dönerken merkeze odaklan ve değişimi kabul et.',
     directionEn: 'Both the snake and Anubis must turn with the wheel. Let go of control, focus on the center as it spins, and accept the change.',
   ),
   11: CardMeaning(
@@ -1103,12 +1103,12 @@ const Map<int, CardMeaning> cardMeanings = {
   // MINOR ARCANA — CUPS (Kupalar) — 14 kart (id: 22–35)
   // ============================================================
   22: CardMeaning(id: 22, themeTr: 'Duygusal bolluk, yeni aşk, ruhani hediye', themeEn: 'Emotional abundance, new love, spiritual gift', tone: CardTone.soft, movement: CardMovement.stillness, phase: CardPhase.beginning,
-    pastTr: 'Gökyüzünden uzanan gizemli bir el sana altın bir kupa sunmuş ve o kupadan beş saf su akışı dökülmüş. Kalbine ilk kez dokunan o duygu, ruhunu sonsuza dek değiştirmiş.',
-    pastEn: 'A mysterious hand from the sky offered you a golden cup with five streams of pure water flowing from it. That first emotion that touched your heart changed your soul forever.',
-    presentTr: 'Kupanın içinden yükselen güvercin, ağzında kutsal bir ekmekle sana barış getiriyor. Duygusal bir bereket kapısı ardına kadar açık; nilüferler suyun üzerinde senin için çiçek açıyor.',
-    presentEn: 'The dove rising from the cup brings peace with sacred bread in its mouth. A door of emotional abundance is wide open; lotus flowers bloom on the water just for you.',
-    directionTr: 'Kupadan taşan o beş su akışını takip et — her biri bir duygunun nehridir. Kalbin ne söylüyorsa onu yap, çünkü evren sana duygusal bir armağan sunuyor.',
-    directionEn: 'Follow the five streams overflowing from the cup — each is a river of emotion. Do what your heart says, for the universe offers you an emotional gift.',
+    pastTr: 'Gökyüzündeki parlak yıldızın altında parıldayan altın kupa karşına çıkmış ve o kupadan saf su akışları dökülmüş. Kalbine ilk kez dokunan o duygu, ruhunu sonsuza dek değiştirmiş.',
+    pastEn: 'A golden cup shimmering beneath the bright star in the sky appeared to you, with streams of pure water flowing from it. That first emotion that touched your heart changed your soul forever.',
+    presentTr: 'Parıldayan altın kupanın etrafında yüzen balıklar, sana derinlerden gelen saf duyguları fısıldıyor. Duygusal bir bereket kapısı ardına kadar açık; gökyüzündeki güneş tüm sıcaklığıyla kalbini aydınlatıyor.',
+    presentEn: 'Fish swimming around the gleaming golden cup whisper pure emotions from the depths to you. A door of emotional abundance is wide open; the sun in the sky illuminates your heart with all its warmth.',
+    directionTr: 'Kupadan taşan o saf su akışlarını takip et — her biri bir duygunun nehridir. Kalbin ne söylüyorsa onu yap, çünkü evren sana duygusal bir armağan sunuyor.',
+    directionEn: 'Follow those streams of pure water overflowing from the cup — each is a river of emotion. Do what your heart says, for the universe offers you an emotional gift.',
   ),
   23: CardMeaning(id: 23, themeTr: 'Karşılıklı bağ, ortaklık, derin çekim', themeEn: 'Mutual bond, partnership, deep attraction', tone: CardTone.soft, movement: CardMovement.stillness, phase: CardPhase.neutral,
     pastTr: 'İki kişi birbirinin gözüne bakarak kupalarını buluşturmuş. Aralarında ışıldayan şifa ve denge asası Caduceus, bu bağı kutsal ilan etmiş. O karşılıklı söz hâlâ geçerliliğini koruyor.',
@@ -1119,12 +1119,12 @@ const Map<int, CardMeaning> cardMeanings = {
     directionEn: 'Raise your cup and extend it to the one before you. True bonds exist in equal sharing. Let go of fears and cross that bridge.',
   ),
   24: CardMeaning(id: 24, themeTr: 'Kutlama, dostluk, topluluk neşesi', themeEn: 'Celebration, friendship, communal joy', tone: CardTone.soft, movement: CardMovement.motion, phase: CardPhase.neutral,
-    pastTr: 'Üç dost kupalarını havaya kaldırıp dans etmiş. Etraflarındaki meyveler ve çiçekler bu birlikteliğin bereketinin kanıtıymış. O kutlama senin ruhuna kazınmış.',
-    pastEn: 'Three friends raised their cups to the sky and danced. The fruits and flowers around them symbolized the abundance of this unity. That celebration is etched in your soul.',
-    presentTr: 'Hayatında kutlamaya değer bir an var. Üç kupanın buluştuğu o neşe halkasında sen de varsın. Sevdiklerinle paylaşılan mutluluk ikiye katlanıyor.',
-    presentEn: 'There is a moment worth celebrating in your life. You are part of that circle of joy where three cups meet. Happiness shared with loved ones doubles.',
-    directionTr: 'Sevinçlerini paylaş, yalnız kutlama yapma. Üç kupanın dansı gibi, topluluk seni güçlendirecek. Dostlarını topla ve hayatı kutla.',
-    directionEn: 'Share your joys, do not celebrate alone. Like the dance of three cups, community will strengthen you. Gather your friends and celebrate life.',
+    pastTr: 'Dostlar kupalarını havaya kaldırıp dans etmiş. Etraflarındaki meyveler ve çiçekler bu birlikteliğin bereketinin kanıtıymış. O kutlama senin ruhuna kazınmış.',
+    pastEn: 'Friends raised their cups to the sky and danced. The fruits and flowers around them symbolized the abundance of this unity. That celebration is etched in your soul.',
+    presentTr: 'Hayatında kutlamaya değer bir an var. Kupaların buluştuğu o neşe halkasında sen de varsın. Sevdiklerinle paylaşılan mutluluk ikiye katlanıyor.',
+    presentEn: 'There is a moment worth celebrating in your life. You are part of that circle of joy where cups meet. Happiness shared with loved ones doubles.',
+    directionTr: 'Sevinçlerini paylaş, yalnız kutlama yapma. Kupaların dansı gibi, topluluk seni güçlendirecek. Dostlarını topla ve hayatı kutla.',
+    directionEn: 'Share your joys, do not celebrate alone. Like the dance of cups, community will strengthen you. Gather your friends and celebrate life.',
   ),
   25: CardMeaning(id: 25, themeTr: 'İç sıkıntısı, kaçırılan fırsat, bezginlik', themeEn: 'Apathy, missed opportunity, discontent', tone: CardTone.heavy, movement: CardMovement.stillness, phase: CardPhase.neutral,
     pastTr: 'Ağacın altında kollarını kavuşturup oturmuşsun. Önündeki üç kupaya bakmışsın ama arkandan uzanan gizemli elin sunduğu dördüncü kupayı fark etmemişsin.',
@@ -1381,12 +1381,12 @@ const Map<int, CardMeaning> cardMeanings = {
     directionEn: 'Keep rowing. The opposite shore is near and peace awaits you there. Do not drop your swords — they are the medals of the warrior who taught you lessons.',
   ),
   56: CardMeaning(id: 56, themeTr: 'Hile, strateji, gizli hamle', themeEn: 'Deception, strategy, hidden move', tone: CardTone.heavy, movement: CardMovement.motion, phase: CardPhase.neutral,
-    pastTr: 'Gizlice beş kılıcı toplayan figür, askeri kamptan sessizce uzaklaşmış. İki kılıç geride kalmış. Zekice bir hamle mi yoksa aldatma mı — buna sen karar vermişsin.',
-    pastEn: 'The figure secretly gathered five swords and slipped away from the camp. Two swords remained. A clever move or deception — you decided that.',
-    presentTr: 'Beş kılıcı taşıyorsun ama iki tanesi geride kaldı. Her şeyi elde etmeye çalışıyorsun ama bu yolun sonu tehlikeli. Arkana bak — fark eden biri var mı?',
-    presentEn: 'You carry five swords but two remain behind. You try to obtain everything, but this path leads to danger. Look back — has anyone noticed?',
-    directionTr: 'Kurnazlık bir stratejidir ama dürüstlük bir kaledir. Beş kılıçla kaçmak yerine, yedi kılıcın sahibi olmak için doğru yolu seç.',
-    directionEn: 'Cunning is a strategy but honesty is a fortress. Instead of fleeing with five swords, choose the right path to own all seven.',
+    pastTr: 'Gecenin karanlığından faydalanan figür, kılıçları toplayıp kamptan sessizce uzaklaşmış. Zekice bir strateji mi yoksa aldatmaca mı — buna sen karar vermişsin.',
+    pastEn: 'Taking advantage of the darkness of the night, the figure gathered the swords and silently walked away from the camp. A clever strategy or a deception — you decided that.',
+    presentTr: 'Elde ettiklerinle gizlice uzaklaşmaya çalışıyorsun ama bu yolun sonu tehlikeli. Kurnazca adımlar atarak kazanmaya çalışmak seni sadece daha fazla şüpheye sürüklüyor. Arkana bak — izlerini gerçekten silebildin mi?',
+    presentEn: 'You are trying to walk away secretly with what you have acquired, but this path leads to danger. Trying to win with cunning steps only drags you into more doubt. Look back — have you really erased your tracks?',
+    directionTr: 'Kurnazlık anlık bir stratejidir, ancak dürüstlük kalıcı bir fetihtir. Karanlıkta eksik kılıçlarla kaçmak yerine, cesaretle yüzleşerek asıl zaferi kazan.',
+    directionEn: 'Cunning is a momentary strategy, but honesty is a lasting conquest. Instead of fleeing with missing swords in the dark, face it with courage and win the true victory.',
   ),
   57: CardMeaning(id: 57, themeTr: 'Zihinsel hapishane, kendi kendini sınırlama', themeEn: 'Mental prison, self-limitation, restriction', tone: CardTone.heavy, movement: CardMovement.stillness, phase: CardPhase.neutral,
     pastTr: 'Bağlanmış ve gözleri örtülü kadın, sekiz kılıcın arasında bataklıkta mahsur kalmış. Ama bağlar aslında gevşek — sen kendi korkularınla kendini hapsetmişsin.',
@@ -1868,65 +1868,65 @@ String _buildClosing(
   switch (flow) {
     case FlowType.harmonious:
       pool = isTr ? [
-        '"$k1" seni buraya getirdi.\n"$k3" seni ileriye taşıyacak.\nSadece güven.',
-        '"$k1" bir kapıydı.\n"$k3" o kapının ardındaki hazine.\nSen zaten içindesin.',
-        '"$k1" tohumdu.\n"$k2" topraktı.\n"$k3" açan çiçek.\nŞimdi kokla.',
-        'Hayat sana "$k1" fısıldadı.\nSen "$k2" ile cevap verdin.\n"$k3" yolunu aydınlattı.\nDevam et.',
-        '"$k1" sessizce hayatına girdi.\n"$k3" sessizce seni dönüştürecek.\nArada sen varsın.\nVe bu yeterli.',
-        'Her şey "$k1" ile başladı.\n"$k2" yolculuğun oldu.\n"$k3" seni bekliyor.\nAma yol daha bitmedi.',
-        'Hayat sana "$k1" öğretti.\n"$k2" ile büyüdün.\nŞimdi "$k3" seninle.\nKullan.',
-        '"$k3" sana bakıyor.\nİçinde "$k1" var.\nYanında "$k2".\nDinle.',
+        '$k1 seni buraya getirdi.\n$k3 seni ileriye taşıyacak.\nSadece güven.',
+        '$k1 bir kapıydı.\n$k3 o kapının ardındaki hazine.\nSen zaten içindesin.',
+        '$k1 tohumdu.\n$k2 topraktı.\n$k3 açan çiçek.\nŞimdi kokla.',
+        'Hayat sana $k1 fısıldadı.\nSen $k2 ile cevap verdin.\n$k3 yolunu aydınlattı.\nDevam et.',
+        '$k1 sessizce hayatına girdi.\n$k3 sessizce seni dönüştürecek.\nArada sen varsın.\nVe bu yeterli.',
+        'Her şey $k1 ile başladı.\n$k2 yolculuğun oldu.\n$k3 seni bekliyor.\nAma yol daha bitmedi.',
+        'Hayat sana $k1 öğretti.\n$k2 ile büyüdün.\nŞimdi $k3 seninle.\nKullan.',
+        '$k3 sana bakıyor.\nİçinde $k1 var.\nYanında $k2.\nDinle.',
       ] : [
-        '"$k1" brought you here.\n"$k3" will carry you forward.\nJust trust.',
-        '"$k1" was a door.\n"$k3" is the treasure behind it.\nYou are already inside.',
-        '"$k1" was the seed.\n"$k2" was the soil.\n"$k3" is the bloom.\nBreathe it in.',
-        'Life whispered "$k1."\nYou answered with "$k2."\n"$k3" lit the way.\nKeep going.',
-        '"$k1" entered your life quietly.\n"$k3" will quietly transform you.\nIn between, there is you.\nAnd that is enough.',
-        'It all began with "$k1."\n"$k2" became your journey.\n"$k3" awaits.\nBut the road goes on.',
-        'Life taught you "$k1."\nYou grew with "$k2."\nNow "$k3" is with you.\nUse it.',
-        '"$k3" watches over you.\n"$k1" within.\n"$k2" beside you.\nListen.',
+        '$k1 brought you here.\n$k3 will carry you forward.\nJust trust.',
+        '$k1 was a door.\n$k3 is the treasure behind it.\nYou are already inside.',
+        '$k1 was the seed.\n$k2 was the soil.\n$k3 is the bloom.\nBreathe it in.',
+        'Life whispered $k1.\nYou answered with $k2.\n$k3 lit the way.\nKeep going.',
+        '$k1 entered your life quietly.\n$k3 will quietly transform you.\nIn between, there is you.\nAnd that is enough.',
+        'It all began with $k1.\n$k2 became your journey.\n$k3 awaits.\nBut the road goes on.',
+        'Life taught you $k1.\nYou grew with $k2.\nNow $k3 is with you.\nUse it.',
+        '$k3 watches over you.\n$k1 within.\n$k2 beside you.\nListen.',
       ];
       break;
     case FlowType.conflicting:
       pool = isTr ? [
-        '"$k1" seni sarstı.\nAma "$k3" seni yeniden kuracak.\nHer yara bir kapıdır.',
-        '"$k1" acıttı.\n"$k2" sordu: neden?\n"$k3" cevapladı: güçlenmek için.\nŞimdi bil.',
-        'Zorluk yaşadın.\n"$k1" seni sınadı.\n"$k2" dağıttı.\nAma "$k3" diyor ki:\nKırık yerlerden ışık girer.',
-        '"$k1" bir darbe gibiydi.\n"$k2" onu derinleştirdi.\n"$k3" ise uzanan bir el.\nTut.',
-        'Acı "$k1" ile başladı.\n"$k2" ile derinleşti.\nAma "$k3"...\n"$k3" seni tanımlayacak olan.',
-        '"$k1" karanlıktı.\n"$k2" fırtına.\nAma "$k3" şafak.\nVe şafak her zaman kazanır.',
-        'Düştün.\n"$k1" zorladı.\n"$k2" sınadı.\nAma "$k3" sana el uzatıyor.\nYakala.',
-        '"$k1" yakıcıydı.\n"$k2" küllere dönüştürdü.\n"$k3" anka kuşu gibi yeniden doğuş.\nSen de öylesin.',
+        '$k1 seni sarstı.\nAma $k3 seni yeniden kuracak.\nHer yara bir kapıdır.',
+        '$k1 acıttı.\n$k2 sordu: neden?\n$k3 cevapladı: güçlenmek için.\nŞimdi bil.',
+        'Zorluk yaşadın.\n$k1 seni sınadı.\n$k2 dağıttı.\nAma $k3 diyor ki:\nKırık yerlerden ışık girer.',
+        '$k1 bir darbe gibiydi.\n$k2 onu derinleştirdi.\n$k3 ise uzanan bir el.\nTut.',
+        'Acı $k1 ile başladı.\n$k2 ile derinleşti.\nAma $k3...\n$k3 seni tanımlayacak olan.',
+        '$k1 karanlıktı.\n$k2 fırtına.\nAma $k3 şafak.\nVe şafak her zaman kazanır.',
+        'Düştün.\n$k1 zorladı.\n$k2 sınadı.\nAma $k3 sana el uzatıyor.\nYakala.',
+        '$k1 yakıcıydı.\n$k2 küllere dönüştürdü.\n$k3 anka kuşu gibi yeniden doğuş.\nSen de öylesin.',
       ] : [
-        '"$k1" shook you.\nBut "$k3" will rebuild you.\nEvery wound is a door.',
-        '"$k1" hurt.\n"$k2" asked: why?\n"$k3" answered: to grow stronger.\nNow you know.',
-        'You faced hardship.\n"$k1" tested you.\n"$k2" scattered.\nBut "$k3" says:\nLight enters through the cracks.',
-        '"$k1" was a blow.\n"$k2" deepened it.\n"$k3" is the hand reaching out.\nGrab it.',
-        'Pain began with "$k1."\nDeepened with "$k2."\nBut "$k3"...\n"$k3" is what will define you.',
-        '"$k1" was the darkness.\n"$k2" was the storm.\nBut "$k3" is the dawn.\nAnd dawn always wins.',
-        'You fell.\n"$k1" challenged you.\n"$k2" tested you.\nBut "$k3" reaches out.\nGrab on.',
-        '"$k1" was the fire.\n"$k2" became the ashes.\n"$k3" is the rebirth.\nSo are you.',
+        '$k1 shook you.\nBut $k3 will rebuild you.\nEvery wound is a door.',
+        '$k1 hurt.\n$k2 asked: why?\n$k3 answered: to grow stronger.\nNow you know.',
+        'You faced hardship.\n$k1 tested you.\n$k2 scattered.\nBut $k3 says:\nLight enters through the cracks.',
+        '$k1 was a blow.\n$k2 deepened it.\n$k3 is the hand reaching out.\nGrab it.',
+        'Pain began with $k1.\nDeepened with $k2.\nBut $k3...\n$k3 is what will define you.',
+        '$k1 was the darkness.\n$k2 was the storm.\nBut $k3 is the dawn.\nAnd dawn always wins.',
+        'You fell.\n$k1 challenged you.\n$k2 tested you.\nBut $k3 reaches out.\nGrab on.',
+        '$k1 was the fire.\n$k2 became the ashes.\n$k3 is the rebirth.\nSo are you.',
       ];
       break;
     case FlowType.transformative:
       pool = isTr ? [
-        '"$k1" sona erdi.\n"$k3" doğuyor.\nSen de.',
-        '"$k1" bitti.\nAma "$k3" başlıyor.\nFinaller her zaman yeni sezonların ilk sahnesidir.',
-        'Eski sen "$k1" ile vedalaştı.\n"$k2" geçiş dönemiydi.\n"$k3" yeniden doğuş.\nKalk.',
-        '"$k1" son sayfaydı.\n"$k2" sessizlikti.\n"$k3" yeni bir hikâyenin ilk satırı.\nYeniden doğdun.',
-        '"$k1" yıkımı getirdi.\n"$k2" temizledi.\n"$k3" inşa edecek.\nMimar sensin.',
-        '"$k1" tırtıldı.\n"$k2" kozaydı.\n"$k3" kelebek.\nArtık uçabilirsin.',
-        '"$k1" seni aldı.\n"$k2" seni değiştirdi.\n"$k3" seni geri verdi.\nAma farklı.\nÇok farklı.',
-        '"$k1" bir vedaydı.\n"$k2" yolculuk.\n"$k3" yeni bir merhaba.\nGülümse.',
+        '$k1 sona erdi.\n$k3 doğuyor.\nSen de.',
+        '$k1 bitti.\nAma $k3 başlıyor.\nFinaller her zaman yeni sezonların ilk sahnesidir.',
+        'Eski sen $k1 ile vedalaştı.\n$k2 geçiş dönemiydi.\n$k3 yeniden doğuş.\nKalk.',
+        '$k1 son sayfaydı.\n$k2 sessizlikti.\n$k3 yeni bir hikâyenin ilk satırı.\nYeniden doğdun.',
+        '$k1 yıkımı getirdi.\n$k2 temizledi.\n$k3 inşa edecek.\nMimar sensin.',
+        '$k1 tırtıldı.\n$k2 kozaydı.\n$k3 kelebek.\nArtık uçabilirsin.',
+        '$k1 seni aldı.\n$k2 seni değiştirdi.\n$k3 seni geri verdi.\nAma farklı.\nÇok farklı.',
+        '$k1 bir vedaydı.\n$k2 yolculuk.\n$k3 yeni bir merhaba.\nGülümse.',
       ] : [
-        '"$k1" has ended.\n"$k3" is being born.\nSo are you.',
-        '"$k1" ended.\nBut "$k3" begins.\nFinales are always the opening scenes of new seasons.',
-        'The old you said goodbye with "$k1."\n"$k2" was the transition.\n"$k3" is resurrection.\nRise.',
-        '"$k1" was the last page.\n"$k2" was silence.\n"$k3" is the first line of a new story.\nYou are reborn.',
-        '"$k1" brought the fall.\n"$k2" cleared the ground.\n"$k3" will build.\nYou are the architect.',
-        '"$k1" was the caterpillar.\n"$k2" was the cocoon.\n"$k3" is the butterfly.\nYou can fly now.',
-        '"$k1" took you.\n"$k2" changed you.\n"$k3" gave you back.\nBut different.\nVery different.',
-        '"$k1" was a goodbye.\n"$k2" the journey.\n"$k3" a new hello.\nSmile.',
+        '$k1 has ended.\n$k3 is being born.\nSo are you.',
+        '$k1 ended.\nBut $k3 begins.\nFinales are always the opening scenes of new seasons.',
+        'The old you said goodbye with $k1.\n$k2 was the transition.\n$k3 is resurrection.\nRise.',
+        '$k1 was the last page.\n$k2 was silence.\n$k3 is the first line of a new story.\nYou are reborn.',
+        '$k1 brought the fall.\n$k2 cleared the ground.\n$k3 will build.\nYou are the architect.',
+        '$k1 was the caterpillar.\n$k2 was the cocoon.\n$k3 is the butterfly.\nYou can fly now.',
+        '$k1 took you.\n$k2 changed you.\n$k3 gave you back.\nBut different.\nVery different.',
+        '$k1 was a goodbye.\n$k2 the journey.\n$k3 a new hello.\nSmile.',
       ];
       break;
   }
@@ -2286,17 +2286,17 @@ String _buildFullAdvice(List<CardMeaning> meanings, List<String> names, FlowType
   final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
   final poolTr = [
-    'Geçmişteki o "$t0" dönemi artık kapandı. Karşına çıkan "$t3" engelini ancak içindeki o "$t5" hissine sıkı sıkı tutunarak aşabilirsin. Yolu açtığında "$t6" seni bekliyor olacak.',
-    'Eski "$t0" bağları geride kaldı. Şimdiki sahip olduğun "$t1" enerjisi sana ihtiyacın olan gücü zaten veriyor. Sadece iç sesinin fısıldadığı o "$t5" çağrısına kulak ver ve "$t6" hedefine doğru yürümeye başla.',
-    'Şu an önünü kapatan "$t3" zorluğunu gözünde büyütme. Aradığın cevap dışarıda değil, içindeki o derin "$t2" sessizliğinde yatıyor. Düşüncelerindeki "$t5" ışığını takip edersen karanlık dağılır.',
-    'Bu açılım sana şunu fısıldıyor: Gözlerini "$t0" gölgesinden ayır, bugünü mevcut "$t1" enerjinle yaşa. Önündeki o "$t3" sisine takılma, yegane pusulan "$t5" olsun ki "$t6" baharına uyanabilesin.',
+    'Geçmişteki o $t0 dönemi artık kapandı. Karşına çıkan $t3 engelini ancak içindeki o $t5 hissine sıkı sıkı tutunarak aşabilirsin. Yolu açtığında $t6 seni bekliyor olacak.',
+    'Eski $t0 bağları geride kaldı. Şimdiki sahip olduğun $t1 enerjisi sana ihtiyacın olan gücü zaten veriyor. Sadece iç sesinin fısıldadığı o $t5 çağrısına kulak ver ve $t6 hedefine doğru yürümeye başla.',
+    'Şu an önünü kapatan $t3 zorluğunu gözünde büyütme. Aradığın cevap dışarıda değil, içindeki o derin $t2 sessizliğinde yatıyor. Düşüncelerindeki $t5 ışığını takip edersen karanlık dağılır.',
+    'Bu açılım sana şunu fısıldıyor: Gözlerini $t0 gölgesinden ayır, bugünü mevcut $t1 enerjinle yaşa. Önündeki o $t3 sisine takılma, yegane pusulan $t5 olsun ki $t6 baharına uyanabilesin.',
   ];
 
   final poolEn = [
-    'That past era of "$t0en" is now over. You can only overcome the obstacle of "$t3en" ahead of you by fiercely holding on to the feeling of "$t5en". Once the path clears, "$t6en" will be waiting for you.',
-    'Old ties of "$t0en" are left behind. The current "$t1en" energy you possess already grants you the strength you need. Just listen to the call of "$t5en" echoing within you, and start walking towards your target of "$t6en".',
-    'Do not exaggerate the difficulty of "$t3en" blocking your way right now. The answer you seek is not out there, but deep within the silence of your "$t2en". If you follow the light of "$t5en" in your thoughts, the darkness will fade.',
-    'This reading whispers to you: Take your eyes off the shadow of "$t0en", live today with your current "$t1en" energy. Do not get stuck in the fog of "$t3en" ahead—let your true compass be "$t5en" so you can awaken to the spring of "$t6en".',
+    'That past era of $t0en is now over. You can only overcome the obstacle of $t3en ahead of you by fiercely holding on to the feeling of $t5en. Once the path clears, $t6en will be waiting for you.',
+    'Old ties of $t0en are left behind. The current $t1en energy you possess already grants you the strength you need. Just listen to the call of $t5en echoing within you, and start walking towards your target of $t6en.',
+    'Do not exaggerate the difficulty of $t3en blocking your way right now. The answer you seek is not out there, but deep within the silence of your $t2en. If you follow the light of $t5en in your thoughts, the darkness will fade.',
+    'This reading whispers to you: Take your eyes off the shadow of $t0en, live today with your current $t1en energy. Do not get stuck in the fog of $t3en ahead—let your true compass be $t5en so you can awaken to the spring of $t6en.',
   ];
 
   return isTr ? poolTr[rng.nextInt(poolTr.length)] : poolEn[rng.nextInt(poolEn.length)];
@@ -2315,35 +2315,35 @@ String _buildFullClosing(List<String> promises, FlowType flow, bool isTr) {
   switch (flow) {
     case FlowType.harmonious:
       pool = isTr ? [
-        '"$k1" seni çağırıyor.\n"$k2" seni karşılıyor.\n"$k3" seni sarıyor.\n"$k4" seni tamamlıyor.\nEvren seninle dans ediyor.',
-        'Yedi kartın fısıltısı tek bir kelimeye dönüşüyor:\n"$k1."\nVe bu kelime senin için yazıldı.',
-        '"$k1" başlangıç.\n"$k2" yolculuk.\n"$k3" keşif.\n"$k4" zafer.\nBu hikâye senin.',
+        '$k1 seni çağırıyor.\n$k2 seni karşılıyor.\n$k3 seni sarıyor.\n$k4 seni tamamlıyor.\nEvren seninle dans ediyor.',
+        'Yedi kartın fısıltısı tek bir kelimeye dönüşüyor:\n$k1.\nVe bu kelime senin için yazıldı.',
+        '$k1 başlangıç.\n$k2 yolculuk.\n$k3 keşif.\n$k4 zafer.\nBu hikâye senin.',
       ] : [
-        '"$k1" calls you.\n"$k2" welcomes you.\n"$k3" embraces you.\n"$k4" completes you.\nThe universe dances with you.',
-        'The whisper of seven cards becomes one word:\n"$k1."\nAnd this word was written for you.',
-        '"$k1" is the beginning.\n"$k2" the journey.\n"$k3" the discovery.\n"$k4" the triumph.\nThis story is yours.',
+        '$k1 calls you.\n$k2 welcomes you.\n$k3 embraces you.\n$k4 completes you.\nThe universe dances with you.',
+        'The whisper of seven cards becomes one word:\n$k1.\nAnd this word was written for you.',
+        '$k1 is the beginning.\n$k2 the journey.\n$k3 the discovery.\n$k4 the triumph.\nThis story is yours.',
       ];
       break;
     case FlowType.conflicting:
       pool = isTr ? [
-        '"$k1" acıttı.\n"$k2" sorguladı.\n"$k3" sınadı.\nAma "$k4" diyor ki:\nHer fırtınadan sonra bir gökkuşağı var.',
-        'Yedi kartın savaşı sona erdi.\n"$k1" yenilmedi.\n"$k2" güçlendi.\n"$k3" direndi.\n"$k4" kazandı.\nSen kazandın.',
-        '"$k1" kırıldı.\n"$k2" döküldü.\nAma "$k3" ve "$k4" seni yeniden inşa ediyor.\nKırık yerlerden altın akar.',
+        '$k1 acıttı.\n$k2 sorguladı.\n$k3 sınadı.\nAma $k4 diyor ki:\nHer fırtınadan sonra bir gökkuşağı var.',
+        'Yedi kartın savaşı sona erdi.\n$k1 yenilmedi.\n$k2 güçlendi.\n$k3 direndi.\n$k4 kazandı.\nSen kazandın.',
+        '$k1 kırıldı.\n$k2 döküldü.\nAma $k3 ve $k4 seni yeniden inşa ediyor.\nKırık yerlerden altın akar.',
       ] : [
-        '"$k1" hurt.\n"$k2" questioned.\n"$k3" tested.\nBut "$k4" says:\nAfter every storm, there is a rainbow.',
-        'The battle of seven cards has ended.\n"$k1" didn\'t lose.\n"$k2" grew stronger.\n"$k3" endured.\n"$k4" won.\nYou won.',
-        '"$k1" broke.\n"$k2" spilled.\nBut "$k3" and "$k4" rebuild you.\nGold flows through the cracks.',
+        '$k1 hurt.\n$k2 questioned.\n$k3 tested.\nBut $k4 says:\nAfter every storm, there is a rainbow.',
+        'The battle of seven cards has ended.\n$k1 didn\'t lose.\n$k2 grew stronger.\n$k3 endured.\n$k4 won.\nYou won.',
+        '$k1 broke.\n$k2 spilled.\nBut $k3 and $k4 rebuild you.\nGold flows through the cracks.',
       ];
       break;
     case FlowType.transformative:
       pool = isTr ? [
-        '"$k1" öldü.\n"$k2" gömüldü.\n"$k3" filizlendi.\n"$k4" çiçek açtı.\nBu senin yeniden doğuşun.',
-        'Eski sen "$k1" ile vedalaştı.\n"$k2" yas tuttu.\n"$k3" yeni tohum ekti.\n"$k4" güneşi doğurdu.\nŞimdi yeni seni kutla.',
-        '"$k1" son nefesti.\n"$k2" sessizlik.\n"$k3" ilk hareket.\n"$k4" yeni bir çığlık.\nYeniden doğdun.',
+        '$k1 öldü.\n$k2 gömüldü.\n$k3 filizlendi.\n$k4 çiçek açtı.\nBu senin yeniden doğuşun.',
+        'Eski sen $k1 ile vedalaştı.\n$k2 yas tuttu.\n$k3 yeni tohum ekti.\n$k4 güneşi doğurdu.\nŞimdi yeni seni kutla.',
+        '$k1 son nefesti.\n$k2 sessizlik.\n$k3 ilk hareket.\n$k4 yeni bir çığlık.\nYeniden doğdun.',
       ] : [
-        '"$k1" died.\n"$k2" was buried.\n"$k3" sprouted.\n"$k4" bloomed.\nThis is your rebirth.',
-        'The old you said goodbye to "$k1."\n"$k2" mourned.\n"$k3" planted new seeds.\n"$k4" birthed the sun.\nCelebrate the new you.',
-        '"$k1" was the last breath.\n"$k2" silence.\n"$k3" first movement.\n"$k4" a new cry.\nYou are reborn.',
+        '$k1 died.\n$k2 was buried.\n$k3 sprouted.\n$k4 bloomed.\nThis is your rebirth.',
+        'The old you said goodbye to $k1.\n$k2 mourned.\n$k3 planted new seeds.\n$k4 birthed the sun.\nCelebrate the new you.',
+        '$k1 was the last breath.\n$k2 silence.\n$k3 first movement.\n$k4 a new cry.\nYou are reborn.',
       ];
       break;
   }
@@ -2499,7 +2499,7 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
       if (m1.movement != m2.movement) {
         score += 2;
         final opts = [
-          {'tr': 'zıt yönlere çekerek içsel bir kaos yaratıyor. Bu gerilim aydınlanma ateşini yakacak.', 'en': 'creates inner chaos by pulling in opposite directions. This tension will ignite your fire of enlightenment.', 'e': '⚡'},
+          {'tr': 'zıt yönlere çekerek içsel bir kaos yaratıyor. Bu gerilim senin asıl uyanışını tetikleyecek.', 'en': 'creates inner chaos by pulling in opposite directions. This tension will trigger your true awakening.', 'e': '⚡'},
           {'tr': 'bir yanda eylem, diğer yanda durgunluk... Seni durduran dışarısı değil, zihninin ta kendisi.', 'en': 'action on one side, stillness on the other... It is not the outside stopping you, it is your very mind.', 'e': '🌪️'},
           {'tr': 'farklı ritimlerde çarpışıyor. Dengen tamamen bozulduğunda asıl gücünü bulacaksın.', 'en': 'clashes in different rhythms. You will find your true power when your balance is completely disrupted.', 'e': '🔄'},
           {'tr': 'aradığın o tuhaf dinginliği tam da bu kaotik çarpışmada sana hediye ediyor.', 'en': 'gifts you that strange serenity you seek right in this chaotic collision.', 'e': '🎭'},
@@ -2635,19 +2635,19 @@ Map<String, String> _generateSecretMessage(List<CardMeaning> meanings, List<Stri
   final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
   final poolTr = [
-    'Şu an içten içe bildiğin ama kendine bile itiraf edemediğin bir yalanı yaşıyorsun. İçindeki o "$t2" enerjisi sana bunu haykırıyor. O çok korktuğun "$t6", aslında cezan değil, tek kurtuluşun. Artık uyan.',
-    'Evren sana bir ayna tutuyor: Geçmişte yaşadığın o "$t0" senaryosunu zihninde tekrar tekrar oynatarak şimdiki "$t1" zamanını sabote eden ta kendisisin. Engel olan bir dış güç yok. En büyük düşmanın şu an bu satırları okuyor.',
-    'Zihnindeki o sessiz pazarlığı biliyoruz: İçindeki o asıl "$t2" dürtüsünü bastırmak için karşındaki "$t3" engelini sen bilerek kurguladın. Kolay olanı seçip kurbanı oynamayı bırak. Evren senden sadece sarsıcı bir dürüstlük istiyor.',
-    'Önündeki o ihtişamlı "$t6" hedefine öylesine saplantılısın ki, şu an zihninin o derin "$t1" karmaşasında çürüdüğünü göremiyorsun. İçindeki mezarlığı temizlemeden yeni bir hayat inşa edemezsin.',
-    'Birilerinin artık sana şu sert gerçeği söylemesi gerekiyordu: Aradığın cevap ışıkta değil, o karanlığa gömdüğün "$t2" arzusunda saklı. O sözde "$t3" mazeretinin ardına saklanmaktan vazgeçtiğin gün her şey paramparça olup yeniden doğacak.',
+    'Şu an içten içe bildiğin ama kendine bile itiraf edemediğin bir yalanı yaşıyorsun. İçindeki o $t2 enerjisi sana bunu haykırıyor. O çok korktuğun $t6, aslında cezan değil, tek kurtuluşun. Artık uyan.',
+    'Evren sana bir ayna tutuyor: Geçmişte yaşadığın o $t0 senaryosunu zihninde tekrar tekrar oynatarak şimdiki $t1 zamanını sabote eden ta kendisisin. Engel olan bir dış güç yok. En büyük düşmanın şu an bu satırları okuyor.',
+    'Zihnindeki o sessiz pazarlığı biliyoruz: İçindeki o asıl $t2 dürtüsünü bastırmak için karşındaki $t3 engelini sen bilerek kurguladın. Kolay olanı seçip kurbanı oynamayı bırak. Evren senden sadece sarsıcı bir dürüstlük istiyor.',
+    'Önündeki o ihtişamlı $t6 hedefine öylesine saplantılısın ki, şu an zihninin o derin $t1 karmaşasında çürüdüğünü göremiyorsun. İçindeki mezarlığı temizlemeden yeni bir hayat inşa edemezsin.',
+    'Birilerinin artık sana şu sert gerçeği söylemesi gerekiyordu: Aradığın cevap ışıkta değil, o karanlığa gömdüğün $t2 arzusunda saklı. O sözde $t3 mazeretinin ardına saklanmaktan vazgeçtiğin gün her şey paramparça olup yeniden doğacak.',
   ];
 
   final poolEn = [
-    'You are currently living a lie that you know deep down but cannot even admit to yourself. That suppressed energy of "$t2en" inside you is screaming this at you. That "$t6en" you fear so much is not your punishment, it is your only salvation. Wake up now.',
-    'The universe is holding a mirror to you: By replaying that "$t0en" scenario from your past over and over in your mind, YOU are the one sabotaging your present "$t1en" reality. There is no external force blocking you. Your greatest enemy is reading these lines right now.',
-    'We have deciphered that silent bargain within your mind: You orchestrated your current obstacle of "$t3en" yourself just to suppress your deep urge for "$t2en". Stop choosing the easy way out and playing the victim. The universe only asks for your shattering honesty.',
-    'You are so obsessed with that glorious "$t6en" goal ahead of you that you cannot see your mind rotting in the current vortex of "$t1en". You cannot build a new life without cleaning the graveyard inside you.',
-    'Someone finally had to tell you this harsh truth: The answer you seek is not in the light, it is hidden in the deep "$t2en" desire you buried in the dark. The day you stop hiding behind your "$t3en" excuse, everything will shatter and be reborn.',
+    'You are currently living a lie that you know deep down but cannot even admit to yourself. That suppressed energy of $t2en inside you is screaming this at you. That $t6en you fear so much is not your punishment, it is your only salvation. Wake up now.',
+    'The universe is holding a mirror to you: By replaying that $t0en scenario from your past over and over in your mind, YOU are the one sabotaging your present $t1en reality. There is no external force blocking you. Your greatest enemy is reading these lines right now.',
+    'We have deciphered that silent bargain within your mind: You orchestrated your current obstacle of $t3en yourself just to suppress your deep urge for $t2en. Stop choosing the easy way out and playing the victim. The universe only asks for your shattering honesty.',
+    'You are so obsessed with that glorious $t6en goal ahead of you that you cannot see your mind rotting in the current vortex of $t1en. You cannot build a new life without cleaning the graveyard inside you.',
+    'Someone finally had to tell you this harsh truth: The answer you seek is not in the light, it is hidden in the deep $t2en desire you buried in the dark. The day you stop hiding behind your $t3en excuse, everything will shatter and be reborn.',
   ];
 
   final idx = rng.nextInt(poolTr.length);
