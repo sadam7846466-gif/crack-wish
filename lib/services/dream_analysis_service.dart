@@ -402,6 +402,10 @@ $advice''';
             : 'Melankoli ve nostalji sinyalleri mevcut. Bilinçaltı, geçmiş deneyimleri yeniden değerlendiriyor ve duygusal kapanış (closure) arıyor.';
       case Emotion.confusion:
         return 'Bilişsel belirsizlik ve karar verme güçlüğü sinyalleri aktif. Beyin, birden fazla senaryoyu aynı anda simüle ediyor. Bu, hayatınızda netlik gerektiren bir konunun varlığına işaret edebilir.';
+      case Emotion.surprise:
+        return hasIntensifier
+            ? 'Yüksek düzeyde şaşkınlık ve beklenmedik durum sinyalleri tespit edildi. Beyin, uyanık hayattaki yeni ve öngörülemeyen bir duruma rüya yoluyla adapte olmaya çalışıyor.'
+            : 'Hafif bir şaşkınlık hissi mevcut. Bilinçaltı, beklentiler ile gerçekleşen olaylar arasındaki uyumsuzlukları keşfediyor ve esneklik kazanmaya çalışıyor.';
     }
   }
 
@@ -443,6 +447,9 @@ $advice''';
       case Emotion.confusion:
         parts.add('• Belirsizlik, bilinçaltınızın birden fazla seçenek arasında kaldığını gösteriyor. Rüyanız, netlik ihtiyacınızı yansıtıyor.');
         break;
+      case Emotion.surprise:
+        parts.add('• Şaşkınlık, hayatınızdaki öngörülemeyen gelişmelere karşı bilinçaltınızın verdiği doğal bir tepkidir. Rüyanız, beklenmeyene adapte olma sürecinizi yansıtıyor.');
+        break;
     }
 
     if (symbols.isNotEmpty) {
@@ -483,6 +490,9 @@ $advice''';
         break;
       case Emotion.confusion:
         advice.add('Tavsiye: Karar vermekte zorlandığınız konuyu kağıda yazın. Rüya günlüğü tutarak bilinçaltınızın size verdiği ipuçlarını zamanla daha net görmeye başlayacaksınız.');
+        break;
+      case Emotion.surprise:
+        advice.add('Tavsiye: Beklenmedik olaylara direnç göstermek yerine onları birer keşif fırsatı olarak görün. Hayatınızdaki yeni gelişmeleri esneklikle karşılayın.');
         break;
     }
 

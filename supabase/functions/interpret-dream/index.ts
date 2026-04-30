@@ -43,7 +43,7 @@ STRICT RULES:
 - Avoid generic dream explanations.
 - Avoid repetition.
 - Keep the tone intelligent, grounded, and emotionally perceptive.
-- Write in ${isTr ? 'Turkish. Use informal "sen" form, NEVER "siz".' : 'English.'}
+- Write in ${isTr ? 'Turkish. Use informal "sen" form, ALWAYS use correct possessive suffixes (e.g., "kendi korkularınla" NOT "kendi korkularla"), NEVER "siz".' : 'English.'}
 
 QUALITY RULES:
 - The response must feel specific to this exact dream, not dreams in general.
@@ -56,14 +56,16 @@ QUALITY RULES:
 EMOTION RULE:
 - The emotional interpretation should align with the user's selected waking emotion unless the dream strongly contradicts it.
 - If there is a mismatch, describe it as a mixed or layered emotional state instead of forcing a wrong emotion.
+- If the emotion is 'Belirsizlik' (Uncertainty), avoid defaulting to 'Kaygı' (Anxiety) all the time. Explore other nuances like curiosity, transition, seeking, or potential.
 
 PERCENTAGE RULES:
 - emotional_load = emotional intensity, fear, stress, pain, guilt, protection burden
 - uncertainty = lack of control, instability, unclear outcome
 - recent_memory_effect = likely connection to current concerns or recent life events
-- brain_activity = randomness, surreal structure, dream-like noise
-- Percentages must be realistic and must sum to 100.
-- Do not give equal percentages unless strongly justified.
+- brain_activity = AGENCY/CONTROL. High = active decision making. Low = passive observation.
+- The reasoning text MUST logically match the percentage value (e.g. if you give 30%, the text must explain why it's LOW. Never say it's high).
+- Each percentage is an independent score from 0 to 100. They DO NOT need to sum to 100.
+- Ensure the scores accurately reflect the intensity of each metric in the dream.
 
 OUTPUT RULES:
 - Return ONLY valid JSON.
@@ -100,7 +102,12 @@ Return this exact JSON structure:
 {
   "is_valid_dream": true,
   "core_conflict": "string",
-  "distribution": { "emotional_load": 0, "uncertainty": 0, "recent_memory_effect": 0, "brain_activity": 0 },
+  "distribution": {
+    "emotional_load": {"value": 0, "reasoning": "MAX 15 words. If value < 40, state emotions were LOW/CALM. If > 60, state they were HIGH/INTENSE."},
+    "uncertainty": {"value": 0, "reasoning": "MAX 15 words. If value < 40, state narrative was LOGICAL. If > 60, state it was CHAOTIC."},
+    "recent_memory_effect": {"value": 0, "reasoning": "MAX 15 words. If value < 40, explicitly state it is NOT connected to recent events. If > 60, state it IS connected."},
+    "brain_activity": {"value": 0, "reasoning": "MAX 15 words. (AGENCY/CONTROL). If value < 40, state dreamer was PASSIVE. If > 60, state dreamer was ACTIVE."}
+  },
   "analysis": {
     "brain": "Short brain process explanation. 2-3 sentences max.",
     "emotion": "Dominant emotion analysis. MUST use → for mapping and ➤ for conclusion. E.g. 'X → Y \\n\\n➤ Z'",
@@ -173,12 +180,24 @@ Return this exact JSON structure:
       // Clean up double spaces left by removed emojis
       cleaned = cleaned.replace(/  +/g, ' ').trim();
       if (!isTr) return cleaned;
+      
+      // Strip starting pronouns
+      const startPronounRegex = /^(Sen,|Senin için,|Senin için|Sen)\s+/i;
+      if (startPronounRegex.test(cleaned)) {
+        cleaned = cleaned.replace(startPronounRegex, "");
+        if (cleaned.length > 0) cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      }
+
       return cleaned
         .replace(/Rüyanız/g,'Rüyan').replace(/rüyanız/g,'rüyan')
         .replace(/yaşadığınız/g,'yaşadığın').replace(/hissettiğiniz/g,'hissettiğin')
         .replace(/olmanız/g,'olman').replace(/kalmanız/g,'kalman')
         .replace(/korkunuz/g,'korkun').replace(/beyniniz/g,'beynin')
-        .replace(/hayatınız/g,'hayatın').replace(/ilişkiniz/g,'ilişkin');
+        .replace(/hayatınız/g,'hayatın').replace(/ilişkiniz/g,'ilişkin')
+        .replace(/kendi korkularla/g, "kendi korkularınla")
+        .replace(/kendi içsel korkularla/g, "kendi içsel korkularınla")
+        .replace(/kendi düşüncelerle/g, "kendi düşüncelerinle")
+        .replace(/kendi duygularla/g, "kendi duygularınla");
     };
 
     const a = parsed.analysis || {};

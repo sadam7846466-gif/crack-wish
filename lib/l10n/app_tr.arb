@@ -252,7 +252,8 @@
   "emotionCalm": "Huzurlu",
   "emotionHappy": "Mutlu",
   "emotionSad": "Üzgün",
-  "emotionConfusion": "Belirsiz"
+  "emotionConfusion": "Belirsiz",
+  "emotionSurprise": "Şaşkın"
   ,
   "dreamMoodQuestion": "Uyandığında nasıl hissettin?",
   "dreamMetricEmotional": "Duygusal Yük",

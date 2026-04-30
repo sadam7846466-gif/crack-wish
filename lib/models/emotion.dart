@@ -5,7 +5,8 @@ enum Emotion {
   calm('Huzurlu', 'Sakin, rahat'),
   happiness('Mutlu', 'Neşeli, keyifli'),
   sadness('Üzgün', 'Kederli, melankolik'),
-  confusion('Belirsiz', 'Duygum net değil, emin değilim');
+  confusion('Belirsiz', 'Duygum net değil, emin değilim'),
+  surprise('Şaşkın', 'Beklenmedik, hayrete düşmüş');
 
   final String label;
   final String description;

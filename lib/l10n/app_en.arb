@@ -252,7 +252,8 @@
   "emotionCalm": "Calm",
   "emotionHappy": "Happy",
   "emotionSad": "Sad",
-  "emotionConfusion": "Uncertain"
+  "emotionConfusion": "Uncertain",
+  "emotionSurprise": "Surprised"
   ,
   "dreamMoodQuestion": "How did you feel when you woke up?",
   "dreamMetricEmotional": "Emotional Load",

@@ -52,6 +52,8 @@ class _DreamPageState extends State<DreamPage>
         return _l10n.emotionSad;
       case Emotion.confusion:
         return _l10n.emotionConfusion;
+      case Emotion.surprise:
+        return _l10n.emotionSurprise;
     }
   }
 
@@ -1816,6 +1818,8 @@ class _DreamPageState extends State<DreamPage>
           return Emotion.sadness;
         case 'Belirsiz':
           return Emotion.confusion;
+        case 'Şaşkın':
+          return Emotion.surprise;
         default:
           return null;
       }
@@ -1882,6 +1886,9 @@ class _DreamPageState extends State<DreamPage>
     }
     if (mood == Emotion.confusion) {
       return _trEn('Tuhaf Sahne', 'Strange Scene');
+    }
+    if (mood == Emotion.surprise) {
+      return _trEn('Beklenmedik An', 'Unexpected Moment');
     }
 
     // Varsayılan
@@ -2194,34 +2201,73 @@ class _DreamPageState extends State<DreamPage>
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: Colors.white.withOpacity(0.25)),
                     ),
+                    clipBehavior: Clip.antiAlias, // Taşan yazı köşelerden taşmasın
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 22,
+                      vertical: 0, // Alt-üst görünmez duvarı sıfırladık
                     ),
-                    child: TextField(
-                      focusNode: _dreamFocusNode,
-                      controller: _dreamController,
-                      onTapOutside: (_) => _dreamFocusNode.unfocus(),
-                      minLines: 7,
-                      maxLines: 7,
-                      style: const TextStyle(
-                        color: AppColors.textWhite70,
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: _currentPrompt,
-                        hintStyle: TextStyle(
-                          color: AppColors.textWhite50,
-                          fontSize: 13,
-                          height: 1.6,
-                        ),
-                        border: InputBorder.none,
+                    child: SizedBox(
+                      height: 181, // Panelin tam olarak orijinal yüksekliği (7 satır + 44px boşluk)
+                      child: Stack(
+                        children: [
+                          TextField(
+                            focusNode: _dreamFocusNode,
+                            controller: _dreamController,
+                            onTapOutside: (_) => _dreamFocusNode.unfocus(),
+                            expands: true, // Yazı alanını kutunun tamamına yay
+                            maxLines: null,
+                            minLines: null,
+                            maxLength: 1200,
+                            style: const TextStyle(
+                              color: AppColors.textWhite70,
+                              fontSize: 13,
+                              height: 1.5,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: _currentPrompt,
+                              counterText: '', // Varsayılan sayacı gizle
+                              hintStyle: TextStyle(
+                                color: AppColors.textWhite50,
+                                fontSize: 13,
+                                height: 1.6,
+                              ),
+                              border: InputBorder.none,
+                              // Yazının başladığı yer güzel dursun diye üstte biraz boşluk, altta sınır yok
+                              contentPadding: const EdgeInsets.only(top: 16, bottom: 2), 
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 6),
+                // Özel Karakter Sayacı (Panelin dışında, sağ alt köşede)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _dreamController,
+                      builder: (context, value, child) {
+                        final count = value.text.length;
+                        final isNearLimit = count >= 1100;
+                        final isOverLimit = count >= 1200;
+                        return Text(
+                          '$count/1200',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isNearLimit ? FontWeight.bold : FontWeight.normal,
+                            color: isOverLimit
+                                ? Colors.redAccent
+                                : (isNearLimit ? Colors.orangeAccent : Colors.white.withOpacity(0.35)),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
                 // Mood Section
                 Column(
                   children: [
@@ -2934,6 +2980,8 @@ class _DreamPageState extends State<DreamPage>
         return const Color(0xFF5C7CFF);
       case Emotion.confusion:
         return AppColors.textGrey;
+      case Emotion.surprise:
+        return const Color(0xFFFFCA28); // Amber
       default:
         return AppColors.primaryPurple;
     }
@@ -3334,23 +3382,7 @@ class _DreamPageState extends State<DreamPage>
               ),
             ),
 
-            // ── 4.5) Analizi Netleştiren Yanıtlar (Soru-Cevap) ──
-            if (_premiumAnswers.isNotEmpty)
-              SliverToBoxAdapter(
-                child: _PremiumReveal(
-                  index: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
-                    child: _ClinicalAnswersSection(
-                      isTr: isTr,
-                      answers: _premiumAnswers,
-                      insights: _deepAnalysisResult!.clarifyingInsights,
-                      globalInsight:
-                          _deepAnalysisResult!.shadowSelf.answerInsight,
-                    ),
-                  ),
-                ),
-              ),
+
 
             // ── 5) Açılır Detaylar (Akordeon) (Katman 3) ──
             SliverPadding(
@@ -3374,7 +3406,7 @@ class _DreamPageState extends State<DreamPage>
                           : 'Suppressed and unexamined aspects of the subconscious',
                       icon: Icons.person_off_outlined,
                       content:
-                          '${_deepAnalysisResult!.shadowSelf.revealed}\n\n${_deepAnalysisResult!.shadowSelf.answerInsight}',
+                          '${_deepAnalysisResult!.shadowSelf.revealed} ${_deepAnalysisResult!.shadowSelf.answerInsight}'.trim(),
                     ),
                   ],
                   if (_deepAnalysisResult!
@@ -3391,7 +3423,7 @@ class _DreamPageState extends State<DreamPage>
                           : 'Recurring loops and psychological blockages',
                       icon: Icons.replay,
                       content:
-                          '${_deepAnalysisResult!.recurringPattern.description}\n\n${isTr ? "Öneri:" : "Hint:"} ${_deepAnalysisResult!.recurringPattern.resolutionHint}',
+                          _deepAnalysisResult!.recurringPattern.description,
                     ),
                   ],
                   if (_deepAnalysisResult!.ritual.action.isNotEmpty) ...[
@@ -3787,6 +3819,8 @@ class _DreamPageState extends State<DreamPage>
         return 8;
       case Emotion.calm:
         return 6;
+      case Emotion.surprise:
+        return 12;
     }
   }
 
@@ -3916,19 +3950,20 @@ class _DreamPageState extends State<DreamPage>
                       color: isSelected
                           ? Colors.white.withOpacity(0.95)
                           : Colors.white.withOpacity(0.6),
-                      fontSize: 12,
+                      fontSize: isSelected ? 12 : 11,
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.w500,
+                      letterSpacing: -0.3,
                     );
                     final itemWidth = constraints.maxWidth / emotions.length;
                     final painter = TextPainter(
                       text: TextSpan(text: label, style: baseStyle),
                       textDirection: TextDirection.ltr,
                     )..layout();
-                    final available = itemWidth - 4;
-                    final targetScale = isSelected && painter.width > available
-                        ? (available / painter.width).clamp(0.85, 1.0)
+                    final available = itemWidth - 2;
+                    final targetScale = painter.width > available
+                        ? (available / painter.width).clamp(0.75, 1.0)
                         : 1.0;
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
@@ -8586,8 +8621,8 @@ class _ClinicalReflectionQuestionState
                     const SizedBox(height: 12),
                     Text(
                       widget.isTr
-                          ? 'Klinik sonuç derleniyor...'
-                          : 'Gathering clinical deduction...',
+                          ? 'Rüyanın özü derleniyor...'
+                          : 'Extracting dream essence...',
                       style: const TextStyle(
                         color: Color(0xFFB39DDB),
                         fontSize: 11,
@@ -8608,7 +8643,7 @@ class _ClinicalReflectionQuestionState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          widget.isTr ? 'KLİNİK TESPİT' : 'CLINICAL DEDUCTION',
+                          widget.isTr ? 'RÜYANIN ÖZÜ' : 'DREAM ESSENCE',
                           style: const TextStyle(
                             color: Color(0xFFB39DDB),
                             fontSize: 10,

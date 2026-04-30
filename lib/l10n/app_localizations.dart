@@ -1283,6 +1283,12 @@ abstract class AppLocalizations {
   /// **'Belirsiz'**
   String get emotionConfusion;
 
+  /// No description provided for @emotionSurprise.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şaşkın'**
+  String get emotionSurprise;
+
   /// No description provided for @dreamMoodQuestion.
   ///
   /// In tr, this message translates to:

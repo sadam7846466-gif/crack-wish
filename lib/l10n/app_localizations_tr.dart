@@ -633,6 +633,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get emotionConfusion => 'Belirsiz';
 
   @override
+  String get emotionSurprise => 'Şaşkın';
+
+  @override
   String get dreamMoodQuestion => 'Uyandığında nasıl hissettin?';
 
   @override
