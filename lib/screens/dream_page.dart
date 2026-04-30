@@ -25,7 +25,8 @@ import '../models/clarification_answer.dart';
 import '../widgets/stars_background.dart';
 
 class DreamPage extends StatefulWidget {
-  const DreamPage({super.key});
+  final bool openLatestDream;
+  const DreamPage({super.key, this.openLatestDream = false});
 
   @override
   State<DreamPage> createState() => _DreamPageState();
@@ -283,6 +284,7 @@ class _DreamPageState extends State<DreamPage>
 
   int _currentNavIndex = 0;
   int _currentTab = 0; // 0: Yeni Rüya, 1: Rüyalarım
+  bool _hasUnreadDream = false; // Okunmamış rüya yorumu var mı?
   late String _currentDreamQuote; // Rastgele bilimsel söz
   final TextEditingController _dreamController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -338,6 +340,7 @@ class _DreamPageState extends State<DreamPage>
   String _overlayRandomMessage = '';
   String _overlayNotAnalyzableMessage = '';
   bool _overlayShowNotAnalyzable = false;
+  bool _isDeepAnalyzingPhase = false;
   List<_ClarificationQuestion> _overlayQuestions = [];
   Color _overlayAccentColor = AppColors.primaryPurple;
   Completer<List<ClarificationAnswer>>? _answersCompleter;
@@ -434,6 +437,19 @@ class _DreamPageState extends State<DreamPage>
     _emotionOrder.shuffle(math.Random());
     _currentTipIndex = math.Random().nextInt(50); // Biliyor muydun? sabit tip
     _loadPremiumStatus();
+    
+    if (widget.openLatestDream) {
+      _loadAndShowLatestDream();
+    }
+  }
+
+  Future<void> _loadAndShowLatestDream() async {
+    final dreams = await StorageService.getDreams();
+    if (dreams.isNotEmpty && mounted) {
+      // Go to the history tab automatically so user sees the list behind the modal
+      setState(() { _currentTab = 1; });
+      _showDreamDetail(dreams.first);
+    }
   }
 
   Future<void> _loadPremiumStatus() async {
@@ -467,6 +483,12 @@ class _DreamPageState extends State<DreamPage>
           prefs.setString(_kDreamPremiumReadsDate, today);
         } else {
           _dreamPremiumReadsUsed = prefs.getInt(_kDreamPremiumReadsCount) ?? 0;
+        }
+
+        // Okunmamış yorum var mı kontrolü (Bento Card'da "HAZIR" yazmasına sebep olan flag)
+        final unread = prefs.getBool('dream_last_reading_viewed') == false;
+        if (unread) {
+          _hasUnreadDream = true;
         }
       });
     }
@@ -884,6 +906,7 @@ class _DreamPageState extends State<DreamPage>
       _overlayShowNotAnalyzable = false;
       _overlayQuestions = [];
       _overlayAccentColor = const Color(0xFF7C6CF3); // Premium Kozmik İndigo
+      _isDeepAnalyzingPhase = false;
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -937,6 +960,7 @@ class _DreamPageState extends State<DreamPage>
     if (mounted) {
       setState(() {
         _overlayQuestions = [];
+        _isDeepAnalyzingPhase = true;
       });
     }
 
@@ -988,48 +1012,60 @@ class _DreamPageState extends State<DreamPage>
       return await _interpretDream(skipOverlaySetup: true);
     }
 
-    // Premium sonucu kaydet ve göster
-    if (mounted) {
-      _deepAnalysisResult = deepResult;
-      _premiumAnswers = finalAnswers;
-      _isPremiumResult = true;
-      _isFromHistory = false;
-      _isDreamSaved = true;
-      _currentDreamId ??= DateTime.now().millisecondsSinceEpoch.toString();
-      _selectedReflectionAction = null;
+    _currentDreamId ??= DateTime.now().millisecondsSinceEpoch.toString();
+    _selectedReflectionAction = null;
 
-      // Otomatik Premium Kayıt
-      final now = DateTime.now().toIso8601String();
-      StorageService.saveDream({
-        'id': _currentDreamId,
-        'isPremium': true,
-        'title': deepResult.title,
-        'text': trimmed, // local trimmed from _analyzeDream
-        'emotion': _selectedEmotion?.name,
-        'date': now,
-        'premiumAnswers': jsonEncode(finalAnswers),
-        'premiumData': jsonEncode(deepResult.rawJson),
-        'reflectionAction': _selectedReflectionAction,
-      }).catchError((e) {
-        print('Oto-kayıt hatası: $e');
-      });
-      StorageService.setDreamDoneToday().catchError((e) => null);
+    // Her durumda kaydet (Kullanıcı Ana Sayfaya dönse bile)
+    final now = DateTime.now().toIso8601String();
+    await StorageService.saveDream({
+      'id': _currentDreamId,
+      'isPremium': true,
+      'title': deepResult.title,
+      'text': trimmed, // local trimmed from _analyzeDream
+      'emotion': _selectedEmotion?.name,
+      'date': now,
+      'premiumAnswers': jsonEncode(finalAnswers),
+      'premiumData': jsonEncode(deepResult.rawJson),
+      'reflectionAction': _selectedReflectionAction,
+    }).catchError((e) {
+      print('Oto-kayıt hatası: $e');
+    });
+    await StorageService.setDreamDoneToday().catchError((e) => null);
 
-      // Durumu hemen results'a geçecek şekilde güncelle ki kayıt işlemi asılı kalırsa UI'yi kilitlemesin
-      print(
-        '🔮🔮🔮 Setting _isPremiumResult = true, switching to gap then results',
+    if (!mounted) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('dream_last_reading_viewed', false);
+      await prefs.setBool('dream_last_reading_notified', false);
+      
+      // Kullanıcı sayfadan çıkmış, bildirimi gönder
+      CosmicEngineService().scheduleInstantLocalNotification(
+        title: "Rüyan Yorumlandı 🌙",
+        body: "Bilinçaltının mesajları çözüldü. Geçmiş Rüyalarım'dan hemen oku ✨",
+        secondsDelay: 1,
       );
-      setState(() {
-        _overlayContent = 'gap';
-        _isWriting = true;
-      });
-
-      Future.delayed(const Duration(milliseconds: 520), () {
-        if (mounted) {
-          setState(() => _overlayContent = 'results');
-        }
-      });
+      return true;
     }
+
+    // Premium sonucu göster
+    _deepAnalysisResult = deepResult;
+    _premiumAnswers = finalAnswers;
+    _isPremiumResult = true;
+    _isFromHistory = false;
+    _isDreamSaved = true;
+
+    // Durumu hemen results'a geçecek şekilde güncelle
+    print('🔮🔮🔮 Setting _isPremiumResult = true, switching to gap then results');
+    setState(() {
+      _overlayContent = 'gap';
+      _isWriting = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 520), () {
+      if (mounted) {
+        setState(() => _overlayContent = 'results');
+      }
+    });
+
     _retryCompleter = null;
     return true;
   }
@@ -2082,6 +2118,7 @@ class _DreamPageState extends State<DreamPage>
                                 label: _l10n.dreamTabHistory,
                                 isActive: _currentTab == 1,
                                 isPremium: true,
+                                hasDot: _hasUnreadDream,
                                 onTap: () {
                                   HapticFeedback.selectionClick();
                                   setState(() => _currentTab = 1);
@@ -3102,6 +3139,7 @@ class _DreamPageState extends State<DreamPage>
           showNotAnalyzable: _overlayShowNotAnalyzable,
           notAnalyzableMessage: _overlayNotAnalyzableMessage,
           accentColor: _overlayAccentColor,
+          showHomeButton: _isDeepAnalyzingPhase,
           onComplete: _completeAnalysisAnswers,
           onRetry: _handleAnalysisRetry,
         ),
@@ -4194,7 +4232,27 @@ class _DreamPageState extends State<DreamPage>
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    if (index == 0 && _hasUnreadDream) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF22D3EE),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF22D3EE).withOpacity(0.5),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ] else ...[
+                      const SizedBox(width: 12),
+                    ],
                     if (emotionName != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -4227,14 +4285,7 @@ class _DreamPageState extends State<DreamPage>
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    if (!_isPremiumUser) ...[
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.lock_outline_rounded,
-                        size: 14,
-                        color: const Color(0xFF22D3EE).withOpacity(0.4),
-                      ),
-                    ],
+
                   ],
                 ),
               ),
@@ -4442,173 +4493,16 @@ class _DreamPageState extends State<DreamPage>
   }
 
   Future<void> _showDreamDetail(Map<String, dynamic> dream) async {
-    // ── Premium Kapısı: Ücretsiz kullanıcılar rüya detaylarını açamaz ──
-    if (!_isPremiumUser) {
-      final soulStones = await StorageService.getSoulStones();
-      if (!mounted) return;
+    HapticFeedback.lightImpact();
 
-      final bool? confirm = await showGeneralDialog<bool>(
-        context: context,
-        barrierColor: Colors.black.withOpacity(0.5),
-        barrierDismissible: true,
-        barrierLabel: 'DreamDetailGate',
-        transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder: (context, anim1, anim2) {
-          return Center(
-            child: ScaleTransition(
-              scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.25),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.lock_outline_rounded,
-                              color: const Color(0xFF22D3EE).withOpacity(0.9),
-                              size: 48,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _isTr ? 'Rüya Arşivi' : 'Dream Archive',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _isTr
-                                  ? 'Geçmiş rüya analizlerini görüntülemek için Elite abonelik veya Ruh Taşı gereklidir.\n\nMevcut Ruh Taşın: $soulStones'
-                                  : 'Viewing past dream analyses requires Elite subscription or Soul Stones.\n\nCurrent Soul Stones: $soulStones',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                                height: 1.4,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: soulStones >= 1
-                                          ? const Color(
-                                              0xFF22D3EE,
-                                            ).withOpacity(0.15)
-                                          : Colors.white.withOpacity(0.05),
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 14,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        side: BorderSide(
-                                          color: soulStones >= 1
-                                              ? const Color(
-                                                  0xFF22D3EE,
-                                                ).withOpacity(0.4)
-                                              : Colors.white.withOpacity(0.1),
-                                        ),
-                                      ),
-                                    ),
-                                    onPressed: soulStones >= 1
-                                        ? () => Navigator.pop(context, true)
-                                        : null,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        _isTr
-                                            ? '1 Ruh Taşı Kullan'
-                                            : 'Use 1 Stone',
-                                        style: TextStyle(
-                                          color: soulStones >= 1
-                                              ? const Color(0xFF22D3EE)
-                                              : Colors.white30,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(
-                                        0xFF22D3EE,
-                                      ).withOpacity(0.15),
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 14,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        side: BorderSide(
-                                          color: const Color(
-                                            0xFF22D3EE,
-                                          ).withOpacity(0.4),
-                                        ),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context, false);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const PremiumPaywallPage(),
-                                        ),
-                                      );
-                                    },
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        _isTr ? 'Elite Abone Ol' : 'Get Elite',
-                                        style: const TextStyle(
-                                          color: Color(0xFF22D3EE),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-
-      if (confirm == true && soulStones >= 1) {
-        await StorageService.deductSoulStones(1);
-      } else {
-        return; // İptal veya yetersiz taş
+    // Eğer okunmamış rüyaya tıklandıysa rozetleri temizle
+    if (_hasUnreadDream) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('dream_last_reading_viewed', true);
+      if (mounted) {
+        setState(() {
+          _hasUnreadDream = false;
+        });
       }
     }
 
@@ -5326,12 +5220,14 @@ class _TabButton extends StatelessWidget {
   final String label;
   final bool isActive;
   final bool isPremium;
+  final bool hasDot;
   final VoidCallback onTap;
 
   const _TabButton({
     required this.label,
     required this.isActive,
     this.isPremium = false,
+    this.hasDot = false,
     required this.onTap,
   });
 
@@ -5460,6 +5356,30 @@ class _TabButton extends StatelessWidget {
                 ],
               ),
             ),
+            if (hasDot)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22D3EE),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF140F0C),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF22D3EE).withOpacity(0.5),
+                        blurRadius: 4,
+                        spreadRadius: 1,
+                      )
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -5506,6 +5426,7 @@ class _AnalysisDialog extends StatefulWidget {
   final VoidCallback? onRetry;
   final String notAnalyzableMessage;
   final Color accentColor;
+  final bool showHomeButton;
 
   const _AnalysisDialog({
     required this.randomMessage,
@@ -5514,6 +5435,7 @@ class _AnalysisDialog extends StatefulWidget {
     required this.showNotAnalyzable,
     required this.notAnalyzableMessage,
     required this.accentColor,
+    this.showHomeButton = false,
     this.onRetry,
   });
 
@@ -5569,6 +5491,18 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
   void dispose() {
     _spinnerTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_AnalysisDialog oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.showHomeButton && !oldWidget.showHomeButton) {
+      if (!_questionVisible) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) setState(() => _questionVisible = true);
+        });
+      }
+    }
   }
 
   @override
@@ -5741,7 +5675,7 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
                                 decoration: TextDecoration.none,
                               ),
                             )
-                          else if (showInfo)
+                          else if (showInfo) ...[
                             Text(
                               widget.randomMessage,
                               textAlign: TextAlign.center,
@@ -5752,6 +5686,51 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
                                 decoration: TextDecoration.none,
                               ),
                             ),
+                            if (widget.showHomeButton) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                AppLocalizations.of(context)?.localeName == 'tr' 
+                                  ? 'Burada bekleyebilir veya ana sayfaya dönebilirsin. Yorumun hazır olduğunda sana bildirim göndereceğiz ve "Rüyalarım" sekmesinden okuyabileceksin.'
+                                  : 'You can wait here or return to home page. We will notify you when it\'s ready, and you can read it from the "My Dreams" section.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.55),
+                                  fontSize: 12,
+                                  height: 1.4,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  Navigator.popUntil(context, (route) => route.isFirst);
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.white.withOpacity(0.06),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.15),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      AppLocalizations.of(context)?.localeName == 'tr' ? 'Ana Sayfaya Dön' : 'Return to Home Page',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                           if (showQuestion) ...[
                             const SizedBox(height: 14),
                             _ChoiceRail(

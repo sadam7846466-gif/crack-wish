@@ -57,6 +57,7 @@ class _CookieSectionState extends State<CookieSection>
   bool _isPremiumUser = false;
   bool _showAdOverlay = false;
   bool _showLimitOverlay = false;
+  int _ownedCount = 0;
 
   // Statik cache: widget rebuild olsa bile flickerlamasın
   static int _cachedCracksToday = 0;
@@ -170,6 +171,7 @@ class _CookieSectionState extends State<CookieSection>
       _dailyLimitReached = _cachedDailyLimitReached;
     }
     _loadDailyCookieCredits();
+    _checkOwnership();
     
     // Reklamı arka planda önden yükleyelim:
     AdService().loadRewardedAd();
@@ -219,6 +221,30 @@ class _CookieSectionState extends State<CookieSection>
     if (oldWidget.selectedCookieEmoji != widget.selectedCookieEmoji) {
       _cracksToday = _cachedCracksToday;
       _dailyLimitReached = _cachedDailyLimitReached;
+      _checkOwnership();
+    }
+  }
+
+  Future<void> _checkOwnership() async {
+    final emoji = widget.selectedCookieEmoji ?? 'spring_wreath';
+    if (!_paidCookieIds.contains(emoji)) {
+      if (mounted) setState(() => _ownedCount = 0);
+      return;
+    }
+
+    final collection = await StorageService.getCookieCollection();
+    final card = collection.firstWhere((c) => c.id == emoji, orElse: () => CookieCard(id: emoji, emoji: '', name: '', rarity: ''));
+    
+    int count = card.countObtained;
+    
+    // Legacy simülasyonu (cookie_selector.dart ile senkronize kalması için)
+    const legacy = {'fortune_cat', 'wildflower', 'cupid_ribbon', 'panda_bamboo', 'ramadan_cute', 'enchanted_forest'};
+    if (legacy.contains(emoji)) {
+      count = 50; // Mock inventory
+    }
+
+    if (mounted) {
+      setState(() => _ownedCount = count);
     }
   }
 
@@ -283,9 +309,9 @@ class _CookieSectionState extends State<CookieSection>
       );
     }
 
-    if (!isPaid) return cookieWidget;
+    if (!isPaid || _ownedCount > 0) return cookieWidget;
 
-    // Ücretli kurabiye: bulanık + kilit ikonu
+    // Ücretli kurabiye VE sahip değil: bulanık + kilit ikonu
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -301,18 +327,18 @@ class _CookieSectionState extends State<CookieSection>
             shape: BoxShape.circle,
             color: Colors.black.withOpacity(0.3),
             border: Border.all(
-              color: const Color(0xFFFFD700).withOpacity(0.5),
+              color: Colors.white.withOpacity(0.6),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFFD700).withOpacity(0.2),
+                color: Colors.white.withOpacity(0.2),
                 blurRadius: 12,
               ),
             ],
           ),
           child: const Center(
-            child: Icon(Icons.lock_rounded, color: Color(0xFFFFD700), size: 22),
+            child: Icon(Icons.lock_rounded, color: Colors.white, size: 22),
           ),
         ),
       ],
@@ -347,12 +373,22 @@ class _CookieSectionState extends State<CookieSection>
   };
 
   static const Set<String> _paidCookieIds = {
+    // 8 Vitrin
     'golden_arabesque',
     'midnight_mosaic',
     'pearl_lace',
     'golden_sakura',
     'dragon_phoenix',
     'gold_beasts',
+    'blue_porcelain',
+    'pink_blossom',
+    // 6 Eski/Legacy
+    'fortune_cat',
+    'wildflower',
+    'cupid_ribbon',
+    'panda_bamboo',
+    'ramadan_cute',
+    'enchanted_forest',
   };
 
   Future<void> _loadDailyCookieCredits() async {
@@ -397,7 +433,7 @@ class _CookieSectionState extends State<CookieSection>
         orElse: () => CookieCard(id: cookieId, emoji: '', name: '', rarity: ''),
       );
 
-      if (cookieCard.countObtained > 0) {
+      if (_ownedCount > 0) {
         // Zaten sahip, kırmaya geç
         _performCrack();
       } else {
@@ -475,6 +511,9 @@ class _CookieSectionState extends State<CookieSection>
     await StorageService.recordCookieCrack();
     StorageService.incrementCookieCount();
     StorageService.consumeCookieCard(cookieId, isPaid: _paidCookieIds.contains(cookieId));
+    
+    // Kırdıktan sonra ownedCount'u güncelle
+    _checkOwnership();
 
     final newCracks = await StorageService.getCookieCracksToday();
     final limitReached = newCracks >= StorageService.kMaxDailyCookieCracks;
@@ -583,6 +622,8 @@ class _CookieSectionState extends State<CookieSection>
           ),
         );
       }
+      
+      _checkOwnership(); // Güncel durumu yükle
     }
   }
 

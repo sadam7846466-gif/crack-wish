@@ -11,14 +11,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _fadeOut;
-  late final Animation<double> _scale;
-  late final Animation<double> _gradientFadeIn;
-  bool _navigating = false;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -30,102 +23,83 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      
+      final session = Supabase.instance.client.auth.currentSession;
+      final isLoggedIn = session != null;
 
-    // Gradient arka plan: Yavaşça belir (native solid renk → gradient geçişi gizler)
-    _gradientFadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.35, curve: Curves.easeOut)),
-    );
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 1000), // Daha hızlı (1400ms -> 1000ms)
+          pageBuilder: (_, __, ___) => isLoggedIn ? const RootShell() : const OnboardingPage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // easeInQuart: easeInExpo'ya göre çok daha yumuşak ve pürüzsüz hızlanır
+            final scaleAnimation = Tween<double>(begin: 1.0, end: 30.0).animate(
+              CurvedAnimation(
+                parent: animation, 
+                curve: const Interval(0.1, 1.0, curve: Curves.easeInQuart),
+              ),
+            );
 
-    // Fade out: Sadece son %30'da kaybol (başlangıçta tam görünür — native ile eşleşir)
-    _fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: const Interval(0.70, 1.0, curve: Curves.easeIn)),
-    );
-    
-    // Scale: Kurabiye 1.0'dan başlasın (native ile aynı), hafifçe büyüsün
-    _scale = Tween<double>(begin: 1.0, end: 1.08).animate(
-      CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.70, curve: Curves.easeOutCubic)),
-    );
+            // Büyüdükçe eriyerek kaybolur (arkasından uygulama çıkar)
+            final fadeOutAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+              CurvedAnimation(
+                parent: animation, 
+                curve: const Interval(0.45, 0.95, curve: Curves.easeOut),
+              ),
+            );
 
-    _ctrl.forward();
-    _ctrl.addStatusListener((status) async {
-      if (status == AnimationStatus.completed && !_navigating) {
-        _navigating = true;
-        
-        // Kullanıcının aktif Supabase oturumu (Google/Apple ile giriş) var mı?
-        final session = Supabase.instance.client.auth.currentSession;
-        final isLoggedIn = session != null;
+            // Native ile pürüzsüz eşleşme
+            final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+            final logicalSize = 168.0 / pixelRatio; 
 
-        if (!mounted) return;
-        
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => isLoggedIn ? const RootShell() : const OnboardingPage(),
-            transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
-            transitionDuration: const Duration(milliseconds: 600),
-          ),
-        );
-      }
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                child,
+                IgnorePointer(
+                  ignoring: animation.value > 0.5,
+                  child: Opacity(
+                    opacity: fadeOutAnimation.value,
+                    child: Container(
+                      color: const Color(0xFFB46471),
+                      child: Center(
+                        child: Transform.scale(
+                          scale: scaleAnimation.value,
+                          child: Image.asset(
+                            'assets/icons/splash_cookie.png',
+                            width: logicalSize,
+                            height: logicalSize,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
     });
   }
 
   @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final logicalSize = 168.0 / pixelRatio; 
+
     return Scaffold(
-      // Native launch screen ile aynı renk — geçiş görünmez olur
       backgroundColor: const Color(0xFFB46471),
-      body: AnimatedBuilder(
-        animation: _ctrl,
-        builder: (context, _) {
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              // Gradient arka plan — yavaşça belirerek native solid renkten yumuşak geçiş
-              Opacity(
-                opacity: _gradientFadeIn.value.clamp(0.0, 1.0),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFD18471),
-                        Color(0xFFC36E6E),
-                        Color(0xFFA85A74),
-                        Color(0xFF776288),
-                      ],
-                      stops: [0.0, 0.35, 0.65, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-              // Kurabiye ikonu — baştan görünür (native ile eşleşir), fade out ile kaybolur
-              Opacity(
-                opacity: _fadeOut.value.clamp(0.0, 1.0),
-                child: Center(
-                  child: Transform.scale(
-                    scale: _scale.value,
-                    child: Image.asset(
-                      'assets/icons/splash_cookie.png',
-                      width: 75,
-                      height: 75,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+      body: Center(
+        child: Image.asset(
+          'assets/icons/splash_cookie.png',
+          width: logicalSize, 
+          height: logicalSize,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }

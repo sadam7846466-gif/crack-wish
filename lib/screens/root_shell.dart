@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'coffee_reading_page.dart';
 import 'coffee_page.dart';
+import 'dream_page.dart';
 
 /// Ortak tab shell: alt menü sabit, sayfalar IndexedStack ile korunur.
 class RootShell extends StatefulWidget {
@@ -30,7 +31,7 @@ class RootShell extends StatefulWidget {
 class _RootShellState extends State<RootShell> {
   late int _currentIndex = widget.initialIndex.clamp(0, 1);
   final GlobalKey<ProfilePageState> _profileKey = GlobalKey<ProfilePageState>();
-  Timer? _coffeePollTimer;
+  Timer? _globalPollTimer;
 
 
   late final List<Widget> _tabs = [
@@ -107,13 +108,13 @@ class _RootShellState extends State<RootShell> {
     // Cihazdaki güncel Aura ve Ruh Taşını anında veritabanına yansıt (Senkronize et)
     StorageService.syncEconomyToCloud();
     
-    // Global Kahve Falı Polling (Ana sayfaya dönüldüğünde bildirimin gelmesi için)
-    _startGlobalCoffeePolling();
+    // Global Background Polling (Ana sayfaya dönüldüğünde bildirimin gelmesi için)
+    _startGlobalPolling();
   }
 
-  void _startGlobalCoffeePolling() {
-    _coffeePollTimer?.cancel();
-    _coffeePollTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+  void _startGlobalPolling() {
+    _globalPollTimer?.cancel();
+    _globalPollTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       if (!mounted) return;
       
       // Sadece API çalışıyorken veya okunmamış bir fal varsa kontrol et
@@ -186,12 +187,48 @@ class _RootShellState extends State<RootShell> {
           }
         }
       }
+
+      // --- RÜYA BİLDİRİMİ KONTROLÜ ---
+      final isDreamNotified = prefs.getBool('dream_last_reading_notified') ?? true;
+      final isDreamViewed = prefs.getBool('dream_last_reading_viewed') ?? true;
+      
+      if (!isDreamNotified && !isDreamViewed) {
+        // Bildirimin gösterildiğini kaydet
+        await prefs.setBool('dream_last_reading_notified', true);
+        
+        if (mounted) {
+          HapticFeedback.heavyImpact();
+          CosmicToast.show(
+            context: context,
+            title: 'Rüyan Yorumlandı!',
+            message: 'Bilinçaltının mesajları çözüldü.',
+            icon: Icons.nights_stay_rounded,
+            iconColor: const Color(0xFF60E0FF),
+            reward: 'Göz At',
+            rewardColor: const Color(0xFF60E0FF),
+            duration: const Duration(seconds: 8),
+            onTap: () {
+              if (!mounted) return;
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const DreamPage(openLatestDream: true),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              );
+            },
+          );
+        }
+      }
     });
   }
 
   @override
   void dispose() {
-    _coffeePollTimer?.cancel();
+    _globalPollTimer?.cancel();
     super.dispose();
   }
 

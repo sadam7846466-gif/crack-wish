@@ -22,7 +22,7 @@ class _CookieSelectorState extends State<CookieSelector> {
   late int _selectedIndex;
   final AudioPlayer _audioPlayer = AudioPlayer();
   late ScrollController _scrollController;
-  Set<String> _ownedPaidCookieIds = {};
+  Map<String, int> _ownedPaidCookieCounts = {};
 
   // Her bir kurabiye item'ının yaklaşık genişliği (padding dahil)
   static const double _itemWidth = 60.0; // 48 (item) + 12 (horizontal padding)
@@ -32,40 +32,50 @@ class _CookieSelectorState extends State<CookieSelector> {
   
   // Başlangıç offset'ini hesapla
   double _calculateInitialOffset(int selectedIndex, double screenWidth) {
-    final middleStart = (_infiniteCount ~/ 2) - ((_infiniteCount ~/ 2) % _cookieTypes.length);
+    final middleStart = (_infiniteCount ~/ 2) - ((_infiniteCount ~/ 2) % _displayCookies.length);
     final targetIndex = middleStart + selectedIndex;
     // Artık centerPadding kullanıyoruz, offset sadece index * itemWidth
     return targetIndex * _itemWidth;
   }
 
-  static final List<Map<String, dynamic>> _cookieTypes = [
-    // Ücretsiz (14 adet)
+  // Sabit Vitrin (14 Kurabiye: 6 Ücretsiz + 8 Ücretli)
+  static final List<Map<String, dynamic>> _baseShowcaseCookies = [
+    // 6 Ücretsiz
     {'id': 'spring_wreath', 'key': 'cookieSpringWreath', 'imagePath': 'assets/images/cookies/spring_wreath.webp', 'isPaid': false, 'color': const Color(0xFF8BC34A)},
     {'id': 'lucky_clover', 'key': 'cookieLuckyClover', 'imagePath': 'assets/images/cookies/lucky_clover.webp', 'isPaid': false, 'color': const Color(0xFF4CAF50)},
     {'id': 'royal_hearts', 'key': 'cookieRoyalHearts', 'imagePath': 'assets/images/cookies/royal_hearts.webp', 'isPaid': false, 'color': const Color(0xFFE91E63)},
     {'id': 'evil_eye', 'key': 'cookieEvilEye', 'imagePath': 'assets/images/cookies/evil_eye.webp', 'isPaid': false, 'color': const Color(0xFF2196F3)},
     {'id': 'pizza_party', 'key': 'cookiePizzaParty', 'imagePath': 'assets/images/cookies/pizza_party.webp', 'isPaid': false, 'color': const Color(0xFFFF9800)},
     {'id': 'sakura_bloom', 'key': 'cookieSakuraBloom', 'imagePath': 'assets/images/cookies/sakura_bloom.webp', 'isPaid': false, 'color': const Color(0xFFF48FB1)},
-    {'id': 'blue_porcelain', 'key': 'cookieBluePorcelain', 'imagePath': 'assets/images/cookies/blue_porcelain.webp', 'isPaid': false, 'color': const Color(0xFF42A5F5)},
-    {'id': 'pink_blossom', 'key': 'cookiePinkBlossom', 'imagePath': 'assets/images/cookies/pink_blossom.webp', 'isPaid': false, 'color': const Color(0xFFEC407A)},
-    {'id': 'fortune_cat', 'key': 'cookieFortuneCat', 'imagePath': 'assets/images/cookies/fortune_cat.webp', 'isPaid': false, 'color': const Color(0xFFFFB74D)},
-    {'id': 'wildflower', 'key': 'cookieWildflower', 'imagePath': 'assets/images/cookies/wildflower.webp', 'isPaid': false, 'color': const Color(0xFFAB47BC)},
-    {'id': 'cupid_ribbon', 'key': 'cookieCupidRibbon', 'imagePath': 'assets/images/cookies/cupid_ribbon.webp', 'isPaid': false, 'color': const Color(0xFFEF5350)},
-    {'id': 'panda_bamboo', 'key': 'cookiePandaBamboo', 'imagePath': 'assets/images/cookies/panda_bamboo.webp', 'isPaid': false, 'color': const Color(0xFF66BB6A)},
-    {'id': 'ramadan_cute', 'key': 'cookieRamadanCute', 'imagePath': 'assets/images/cookies/ramadan_cute.webp', 'isPaid': false, 'color': const Color(0xFF7E57C2)},
-    {'id': 'enchanted_forest', 'key': 'cookieEnchantedForest', 'imagePath': 'assets/images/cookies/enchanted_forest.webp', 'isPaid': false, 'color': const Color(0xFF26A69A)},
-    // Ücretli (6 adet)
+    
+    // 8 Ücretli
     {'id': 'golden_arabesque', 'key': 'cookieGoldenArabesque', 'imagePath': 'assets/images/cookies/golden_arabesque.webp', 'isPaid': true, 'color': const Color(0xFFFFD700)},
     {'id': 'midnight_mosaic', 'key': 'cookieMidnightMosaic', 'imagePath': 'assets/images/cookies/midnight_mosaic.webp', 'isPaid': true, 'color': const Color(0xFF5C6BC0)},
     {'id': 'pearl_lace', 'key': 'cookiePearlLace', 'imagePath': 'assets/images/cookies/pearl_lace.webp', 'isPaid': true, 'color': const Color(0xFFE0E0E0)},
     {'id': 'golden_sakura', 'key': 'cookieGoldenSakura', 'imagePath': 'assets/images/cookies/golden_sakura.webp', 'isPaid': true, 'color': const Color(0xFFF8BBD0)},
     {'id': 'dragon_phoenix', 'key': 'cookieDragonPhoenix', 'imagePath': 'assets/images/cookies/dragon_phoenix.webp', 'isPaid': true, 'color': const Color(0xFFFF5722)},
     {'id': 'gold_beasts', 'key': 'cookieGoldBeasts', 'imagePath': 'assets/images/cookies/gold_beasts.webp', 'isPaid': true, 'color': const Color(0xFFFFAB00)},
+    {'id': 'blue_porcelain', 'key': 'cookieBluePorcelain', 'imagePath': 'assets/images/cookies/blue_porcelain.webp', 'isPaid': true, 'color': const Color(0xFF42A5F5)},
+    {'id': 'pink_blossom', 'key': 'cookiePinkBlossom', 'imagePath': 'assets/images/cookies/pink_blossom.webp', 'isPaid': true, 'color': const Color(0xFFEC407A)},
   ];
+
+  // Eski sezonlardan satın alınan ve kullanıcının yuvalarına (max 6) yerleşen kurabiyeler
+  static final List<Map<String, dynamic>> _legacyPurchasedCookies = [
+    {'id': 'fortune_cat', 'key': 'cookieFortuneCat', 'imagePath': 'assets/images/cookies/fortune_cat.webp', 'isPaid': true, 'color': const Color(0xFFFFB74D)},
+    {'id': 'wildflower', 'key': 'cookieWildflower', 'imagePath': 'assets/images/cookies/wildflower.webp', 'isPaid': true, 'color': const Color(0xFFAB47BC)},
+    {'id': 'cupid_ribbon', 'key': 'cookieCupidRibbon', 'imagePath': 'assets/images/cookies/cupid_ribbon.webp', 'isPaid': true, 'color': const Color(0xFFEF5350)},
+    {'id': 'panda_bamboo', 'key': 'cookiePandaBamboo', 'imagePath': 'assets/images/cookies/panda_bamboo.webp', 'isPaid': true, 'color': const Color(0xFF66BB6A)},
+    {'id': 'ramadan_cute', 'key': 'cookieRamadanCute', 'imagePath': 'assets/images/cookies/ramadan_cute.webp', 'isPaid': true, 'color': const Color(0xFF7E57C2)},
+    {'id': 'enchanted_forest', 'key': 'cookieEnchantedForest', 'imagePath': 'assets/images/cookies/enchanted_forest.webp', 'isPaid': true, 'color': const Color(0xFF26A69A)},
+  ];
+
+  late List<Map<String, dynamic>> _displayCookies;
 
   @override
   void initState() {
     super.initState();
+    // 14 Vitrin + 6 Yuva = 20 Kurabiye
+    _displayCookies = List.from(_baseShowcaseCookies)..addAll(_legacyPurchasedCookies);
     _selectedIndex = widget.initialSelectedIndex ?? 0;
     _loadOwnedCookies();
   }
@@ -74,10 +84,17 @@ class _CookieSelectorState extends State<CookieSelector> {
     final collection = await StorageService.getCookieCollection();
     if (mounted) {
       setState(() {
-        _ownedPaidCookieIds = collection
-            .where((c) => c.countObtained > 0)
-            .map((c) => c.id)
-            .toSet();
+        _ownedPaidCookieCounts.clear();
+        for (final c in collection) {
+          if (c.countObtained > 0) {
+            _ownedPaidCookieCounts[c.id] = c.countObtained;
+          }
+        }
+            
+        // Kullanıcının denemesi için legacy kurabiyeleri manuel olarak 'sahiplenilmiş' işaretleyelim (Örnek: 50 adet stok)
+        for (final c in _legacyPurchasedCookies) {
+          _ownedPaidCookieCounts[c['id'] as String] = 50;
+        }
       });
     }
   }
@@ -119,7 +136,7 @@ class _CookieSelectorState extends State<CookieSelector> {
     if (!_scrollController.hasClients) return;
     
     final currentOffset = _scrollController.offset;
-    final totalWidth = _cookieTypes.length * _itemWidth;
+    final totalWidth = _displayCookies.length * _itemWidth;
     
     // Mevcut pozisyona en yakın hedefi bul
     // Önce mevcut "tekrar"ı hesapla
@@ -199,21 +216,22 @@ class _CookieSelectorState extends State<CookieSelector> {
                     ),
                     itemCount: _infiniteCount,
                     itemBuilder: (context, i) {
-                      final index = i % _cookieTypes.length;
+                      final index = i % _displayCookies.length;
                       final currentSelectedIndex =
                           widget.initialSelectedIndex ?? _selectedIndex;
                       final isSelected = currentSelectedIndex == index;
 
-                      final cookieId = _cookieTypes[index]['id'] as String;
-                      final isOwned = _ownedPaidCookieIds.contains(cookieId);
+                      final cookieId = _displayCookies[index]['id'] as String;
+                      final ownedCount = _ownedPaidCookieCounts[cookieId] ?? 0;
+                      final isOwned = ownedCount > 0;
 
                       return _CookieSelectorItem(
-                        imagePath: _cookieTypes[index]['imagePath'] as String,
-                        label: _cookieLabel(l10n, _cookieTypes[index]['key'] as String),
+                        imagePath: _displayCookies[index]['imagePath'] as String,
+                        label: _cookieLabel(l10n, _displayCookies[index]['key'] as String),
                         isSelected: isSelected,
-                        isPaid: _cookieTypes[index]['isPaid'] as bool,
-                        isOwned: isOwned,
-                        accentColor: _cookieTypes[index]['color'] as Color,
+                        isPaid: _displayCookies[index]['isPaid'] as bool,
+                        ownedCount: ownedCount,
+                        accentColor: _displayCookies[index]['color'] as Color,
                         onTap: () {
                           // Kilitli kurabiyeler de dahil olmak üzere seçimi güncelle
                           // Böylece büyük kurabiye ekranda gösterilir (kilitliyse bulanık + kilit ikonu ile)
@@ -366,7 +384,7 @@ class _CookieSelectorItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final bool isPaid;
-  final bool isOwned;
+  final int ownedCount;
   final Color accentColor;
   final VoidCallback onTap;
 
@@ -376,7 +394,7 @@ class _CookieSelectorItem extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.isPaid,
-    required this.isOwned,
+    required this.ownedCount,
     required this.accentColor,
     required this.onTap,
   });
@@ -436,7 +454,7 @@ class _CookieSelectorItem extends StatelessWidget {
                 ),
                 child: Center(
                 child: ImageFiltered(
-                  imageFilter: isPaid && !isOwned
+                  imageFilter: isPaid && ownedCount == 0
                       ? ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0)
                       : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                   child: Image.asset(
@@ -452,7 +470,7 @@ class _CookieSelectorItem extends StatelessWidget {
               ),
               ),
               // Ücretli kurabiye kilit ikonu
-              if (isPaid && !isOwned)
+              if (isPaid && ownedCount == 0)
                 Positioned(
                   right: -2,
                   bottom: -2,
@@ -460,15 +478,15 @@ class _CookieSelectorItem extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFD700),
+                      color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFF2E1420),
-                        width: 1.5,
+                        color: Colors.white.withOpacity(0.8),
+                        width: 1.0,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFFD700).withOpacity(0.4),
+                          color: Colors.white.withOpacity(0.3),
                           blurRadius: 4,
                         ),
                       ],
@@ -477,7 +495,36 @@ class _CookieSelectorItem extends StatelessWidget {
                       child: Icon(
                         Icons.lock,
                         size: 9,
-                        color: Color(0xFF2E1420),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              // Stok (Bakiye) Rozeti
+              if (isPaid && ownedCount > 0)
+                Positioned(
+                  right: -6,
+                  top: -6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB74D), // Turuncu/Altın renk
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withOpacity(0.9), width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFB74D).withOpacity(0.5),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'x$ownedCount',
+                      style: const TextStyle(
+                        color: Color(0xFF4E342E),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),

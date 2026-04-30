@@ -26,6 +26,7 @@ class _BentoGridState extends State<BentoGrid>
   late final AnimationController _tarotFloatController;
   bool _hasUnreadCoffee = false;
   bool _hasUnreadZodiac = false;
+  bool _hasUnreadDream = false;
   Timer? _statusTimer;
 
   @override
@@ -53,6 +54,7 @@ class _BentoGridState extends State<BentoGrid>
 
     setState(() {
       _hasUnreadCoffee = prefs.getBool('coffee_last_reading_viewed') == false;
+      _hasUnreadDream = prefs.getBool('dream_last_reading_viewed') == false;
       _hasUnreadZodiac = lastZodiacDate != today;
     });
   }
@@ -187,8 +189,9 @@ class _BentoGridState extends State<BentoGrid>
                           desc: l10n.bentoDreamDesc,
                           accent: const Color(0xFF60E0FF), // Parlak neon mavi
                           accentSoft: const Color(0xFF2080C0), // Doygun derin mavi
-                          badgeText: l10n.bentoDreamBadge,
-                          badgeHidden: true,
+                          badgeText: _hasUnreadDream ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : l10n.bentoDreamBadge,
+                          badgeHidden: !_hasUnreadDream,
+                          badgeColor: _hasUnreadDream ? Colors.white : null,
                         ),
                         Positioned(
                           right: -26,
@@ -246,7 +249,7 @@ class _BentoGridState extends State<BentoGrid>
                             accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
                             badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : (l10n.localeName == 'tr' ? 'YENİ' : 'NEW'),
                             badgeHidden: !_hasUnreadCoffee && false,
-                            badgeColor: _hasUnreadCoffee ? const Color(0xFF22D3EE) : null,
+                            badgeColor: _hasUnreadCoffee ? Colors.white : null,
                           ),
                           // Büyük kahve arka plan ikonu
                           Positioned(
@@ -325,7 +328,7 @@ class _BentoGridState extends State<BentoGrid>
                           accentSoft: const Color(0xFFB07020), // Doygun koyu altın
                           badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
                           badgeHidden: !_hasUnreadZodiac,
-                          badgeColor: _hasUnreadZodiac ? const Color(0xFF22D3EE) : null,
+                          badgeColor: _hasUnreadZodiac ? Colors.white : null,
                         ),
                         // Zodyak görseli - yavaş dönen
                         Positioned(
@@ -881,25 +884,25 @@ class _InteractiveCardState extends State<_InteractiveCard>
                                     vertical: badgePadV,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: widget.badgeColor != null ? widget.badgeColor!.withOpacity(0.12) : widget.accent.withOpacity(0.16),
+                                    color: widget.badgeColor != null ? widget.badgeColor! : widget.accent.withOpacity(0.16),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: widget.badgeColor != null ? widget.badgeColor!.withOpacity(0.5) : widget.accent.withOpacity(0.3),
+                                      color: widget.badgeColor != null ? widget.badgeColor! : widget.accent.withOpacity(0.3),
                                     ),
                                     boxShadow: widget.badgeColor != null ? [
                                       BoxShadow(
-                                        color: widget.badgeColor!.withOpacity(0.2),
-                                        blurRadius: 8,
-                                        spreadRadius: 0,
+                                        color: widget.badgeColor!.withOpacity(0.4),
+                                        blurRadius: 10,
+                                        spreadRadius: 1,
                                       )
                                     ] : null,
                                   ),
                                   child: Text(
                                     widget.badgeText!,
                                     style: TextStyle(
-                                      color: widget.badgeColor ?? AppColors.textWhite,
+                                      color: widget.badgeColor == Colors.white ? const Color(0xFF1A1A1E) : (widget.badgeColor ?? AppColors.textWhite),
                                       fontSize: badgeFont,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),

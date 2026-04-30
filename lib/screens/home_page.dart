@@ -194,26 +194,29 @@ class _HomePageState extends State<HomePage> {
     ).then((_) => _checkUnreadOwlLetters());
   }
   static const List<String> _cookieTypes = [
+    // 6 Ücretsiz
     'spring_wreath',
     'lucky_clover',
     'royal_hearts',
     'evil_eye',
     'pizza_party',
     'sakura_bloom',
-    'blue_porcelain',
-    'pink_blossom',
-    'fortune_cat',
-    'wildflower',
-    'cupid_ribbon',
-    'panda_bamboo',
-    'ramadan_cute',
-    'enchanted_forest',
+    // 8 Ücretli Vitrin
     'golden_arabesque',
     'midnight_mosaic',
     'pearl_lace',
     'golden_sakura',
     'dragon_phoenix',
     'gold_beasts',
+    'blue_porcelain',
+    'pink_blossom',
+    // 6 Eski/Envanter
+    'fortune_cat',
+    'wildflower',
+    'cupid_ribbon',
+    'panda_bamboo',
+    'ramadan_cute',
+    'enchanted_forest',
   ];
 
   void _hideFortune() {
