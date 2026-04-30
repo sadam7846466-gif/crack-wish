@@ -101,12 +101,10 @@ class _DailyTipCardState extends State<DailyTipCard> {
       _SuggestionType.allDone => Icons.check_circle_rounded,
     };
 
-    final List<Color> accentColors = switch (suggestion) {
-      _SuggestionType.dream => [const Color(0xFF8B5CF6), const Color(0xFFC084FC)], // Purples
-      _SuggestionType.tarot => [const Color(0xFFD97706), const Color(0xFFFBBF24)], // Ambers/Golds
-      _SuggestionType.zodiac => [const Color(0xFFE11D48), const Color(0xFFFB7185)], // Rose/Crimson
-      _SuggestionType.allDone => [const Color(0xFF11998E), const Color(0xFF38EF7D)], // Emerald
-    };
+    final List<Color> accentColors = [
+      Colors.white,
+      Colors.white.withOpacity(0.7),
+    ];
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
