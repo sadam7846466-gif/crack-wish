@@ -330,16 +330,20 @@ class _BentoGridState extends State<BentoGrid>
                           badgeHidden: !_hasUnreadZodiac,
                           badgeColor: _hasUnreadZodiac ? Colors.white : null,
                           underlayWidget: Positioned(
-                            right: -4 * scale,
-                            top: -3 * scale,
+                            right: 4 * scale,
+                            top: 0,
+                            bottom: 0,
                             child: IgnorePointer(
-                              child: _SlowRotatingWidget(
-                                child: RepaintBoundary(
-                                  child: Image.asset(
-                                    'assets/images/zodiac.webp',
-                                    width: 120 * scale,
-                                    height: 120 * scale,
-                                    fit: BoxFit.contain,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: _SlowRotatingWidget(
+                                  child: RepaintBoundary(
+                                    child: Image.asset(
+                                      'assets/images/zodiac.webp',
+                                      width: 105 * scale,
+                                      height: 105 * scale,
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                 ),
                               ),
