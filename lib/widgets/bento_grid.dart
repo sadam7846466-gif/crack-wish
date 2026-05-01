@@ -329,14 +329,22 @@ class _BentoGridState extends State<BentoGrid>
                           badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
                           badgeHidden: !_hasUnreadZodiac,
                           badgeColor: _hasUnreadZodiac ? Colors.white : null,
-                          overlayImageAsset: 'assets/images/zodiac.webp',
-                          overlayPositioned: true,
-                          overlayRight: -4 * scale,
-                          overlayTop: -3 * scale,
-                          overlayWidth: 120 * scale,
-                          overlayHeight: 120 * scale,
-                          overlayClipToCard: false,
-                          overlayRotate: false,
+                          underlayWidget: Positioned(
+                            right: -4 * scale,
+                            top: -3 * scale,
+                            child: IgnorePointer(
+                              child: _SlowRotatingWidget(
+                                child: RepaintBoundary(
+                                  child: Image.asset(
+                                    'assets/images/zodiac.webp',
+                                    width: 120 * scale,
+                                    height: 120 * scale,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -511,6 +519,7 @@ class _BentoCard extends StatefulWidget {
   final bool contentBottom;
   final String? backgroundImageAsset;
   final String? overlayImageAsset;
+  final Widget? underlayWidget;
   final bool backgroundImageDraggable;
   final bool overlayImageDraggable;
   final double overlayScale;
@@ -547,6 +556,7 @@ class _BentoCard extends StatefulWidget {
     this.contentBottom = false,
     this.backgroundImageAsset,
     this.overlayImageAsset,
+    this.underlayWidget,
     this.backgroundImageDraggable = false,
     this.overlayImageDraggable = false,
     this.overlayScale = 1.0,
@@ -596,6 +606,7 @@ class _BentoCardState extends State<_BentoCard> {
           contentBottom: widget.contentBottom,
           backgroundImageAsset: widget.backgroundImageAsset,
           overlayImageAsset: widget.overlayImageAsset,
+          underlayWidget: widget.underlayWidget,
           backgroundImageDraggable: widget.backgroundImageDraggable,
           overlayImageDraggable: widget.overlayImageDraggable,
           overlayScale: widget.overlayScale,
@@ -641,6 +652,7 @@ class _InteractiveCard extends StatefulWidget {
   final bool contentBottom;
   final String? backgroundImageAsset;
   final String? overlayImageAsset;
+  final Widget? underlayWidget;
   final bool backgroundImageDraggable;
   final bool overlayImageDraggable;
   final double overlayScale;
@@ -680,6 +692,7 @@ class _InteractiveCard extends StatefulWidget {
     required this.contentBottom,
     required this.backgroundImageAsset,
     required this.overlayImageAsset,
+    this.underlayWidget,
     required this.backgroundImageDraggable,
     required this.overlayImageDraggable,
     required this.overlayScale,
@@ -830,6 +843,7 @@ class _InteractiveCardState extends State<_InteractiveCard>
                     Positioned.fill(
                       child: Container(color: Colors.white.withOpacity(0.05)),
                     ),
+                    if (widget.underlayWidget != null) widget.underlayWidget!,
                     Container(
                       padding: EdgeInsets.all(edgePadding),
                       decoration: BoxDecoration(
