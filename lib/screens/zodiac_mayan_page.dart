@@ -22,6 +22,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
   
   DateTime _birthDate = DateTime(1999, 12, 20);
   bool _isDailyEnergyExpanded = false;
+  bool _hasOpenedDaily = false;
   int _selectedRuhPanel = 0;
   int _selectedTrecenaDay = 0; // Trecena grafiğinde seçilen gün (0 ile 12 arası)
 
@@ -591,29 +592,30 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFF22D3EE).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 0.5),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 4, height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF22D3EE),
-                      shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: const Color(0xFF22D3EE).withOpacity(0.6), blurRadius: 4, spreadRadius: 1)],
+            if (!_hasOpenedDaily)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF22D3EE).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 0.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 4, height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF22D3EE),
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: const Color(0xFF22D3EE).withOpacity(0.6), blurRadius: 4, spreadRadius: 1)],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                ],
+                    const SizedBox(width: 4),
+                    const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -632,6 +634,9 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                 onTap: () {
                   setState(() {
                     _isDailyEnergyExpanded = !_isDailyEnergyExpanded;
+                    if (_isDailyEnergyExpanded) {
+                      _hasOpenedDaily = true;
+                    }
                   });
                 },
                 child: Stack(

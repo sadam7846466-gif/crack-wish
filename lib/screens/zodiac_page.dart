@@ -7710,32 +7710,79 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
             ),
             const SizedBox(height: 12),
             // YENİ: TARİH BADGE'İ BAŞLANGIÇ PANELİNDE
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _gold.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: _gold.withOpacity(0.25),
-                  width: 0.5,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.calendar_today, color: _gold.withOpacity(0.7), size: 12),
-                  const SizedBox(width: 6),
-                  Text(
-                    _formatCurrentDate(),
-                    style: TextStyle(
-                      color: _gold.withOpacity(0.9),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _gold.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: _gold.withOpacity(0.25),
+                      width: 0.5,
                     ),
                   ),
-                ],
-              ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.calendar_today, color: _gold.withOpacity(0.7), size: 12),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatCurrentDate(),
+                        style: TextStyle(
+                          color: _gold.withOpacity(0.9),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // DIŞARIDA GÖSTERİLEN YENİ BADGE
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22D3EE).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: const Color(0xFF22D3EE).withOpacity(0.3),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 4, height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF22D3EE),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF22D3EE).withOpacity(0.6),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'YENİ',
+                        style: TextStyle(
+                          color: Color(0xFF22D3EE),
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Text(
@@ -7926,49 +7973,6 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      // YENİLENDİĞİNİ BELİRTEN YENİ BADGE
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF22D3EE).withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: const Color(0xFF22D3EE).withOpacity(0.3),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 4, height: 4,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF22D3EE),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF22D3EE).withOpacity(0.6),
-                                    blurRadius: 4,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              'YENİ',
-                              style: TextStyle(
-                                color: Color(0xFF22D3EE),
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],

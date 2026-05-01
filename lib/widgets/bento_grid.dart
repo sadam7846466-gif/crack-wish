@@ -251,49 +251,17 @@ class _BentoGridState extends State<BentoGrid>
                             badgeHidden: !_hasUnreadCoffee && false,
                             badgeColor: _hasUnreadCoffee ? Colors.white : null,
                           ),
-                          // Büyük kahve arka plan ikonu
+                          // Özel kahve görseli
                           Positioned(
-                            right: -20 * scale,
-                            bottom: -20 * scale,
+                            right: -15 * scale,
+                            bottom: -15 * scale,
                             child: IgnorePointer(
-                              child: Opacity(
-                                opacity: 0.15,
-                                child: Transform.rotate(
-                                  angle: -0.2,
-                                  child: const Icon(
-                                    Icons.local_cafe_rounded,
-                                    size: 140,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Küçük yıldız dekorasyonları
-                          Positioned(
-                            left: 80 * scale,
-                            top: 20 * scale,
-                            child: IgnorePointer(
-                              child: Opacity(
-                                opacity: 0.25,
-                                child: const Icon(
-                                  Icons.star_rounded,
-                                  size: 24,
-                                  color: Colors.amberAccent,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            right: 40 * scale,
-                            top: 10 * scale,
-                            child: IgnorePointer(
-                              child: Opacity(
-                                opacity: 0.2,
-                                child: const Icon(
-                                  Icons.auto_awesome_rounded,
-                                  size: 32,
-                                  color: Colors.white,
+                              child: RepaintBoundary(
+                                child: Image.asset(
+                                  'assets/images/kahve_bento.webp',
+                                  width: 135 * scale,
+                                  height: 135 * scale,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
