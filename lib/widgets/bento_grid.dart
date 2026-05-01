@@ -329,23 +329,14 @@ class _BentoGridState extends State<BentoGrid>
                           badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
                           badgeHidden: !_hasUnreadZodiac,
                           badgeColor: _hasUnreadZodiac ? Colors.white : null,
-                        ),
-                        // Zodyak görseli - yavaş dönen
-                        Positioned(
-                          right: -4 * scale,
-                          top: -3 * scale,
-                          child: IgnorePointer(
-                            child: _SlowRotatingWidget(
-                              child: RepaintBoundary(
-                                child: Image.asset(
-                                  'assets/images/zodiac.webp',
-                                  width: 120 * scale,
-                                  height: 120 * scale,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
+                          overlayImageAsset: 'assets/images/zodiac.webp',
+                          overlayPositioned: true,
+                          overlayRight: -4 * scale,
+                          overlayTop: -3 * scale,
+                          overlayWidth: 120 * scale,
+                          overlayHeight: 120 * scale,
+                          overlayClipToCard: false,
+                          overlayRotate: false,
                         ),
                       ],
                     ),

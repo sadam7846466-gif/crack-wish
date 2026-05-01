@@ -988,6 +988,7 @@ class _CoffeePageState extends State<CoffeePage>
             ),
           ),
         ],
+      ), // Stack
       ), // Scaffold
     ); // TickerMode
   }
