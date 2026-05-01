@@ -584,9 +584,37 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'GÜNÜN KUTSAL TZOLK\'İN ENERJİSİ',
-          style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2),
+        Row(
+          children: [
+            const Text(
+              'GÜNÜN KUTSAL TZOLK\'İN ENERJİSİ',
+              style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFF22D3EE).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 0.5),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 4, height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF22D3EE),
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: const Color(0xFF22D3EE).withOpacity(0.6), blurRadius: 4, spreadRadius: 1)],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                ],
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 6),
         _buildAncientCard(

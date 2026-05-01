@@ -329,21 +329,17 @@ class _BentoGridState extends State<BentoGrid>
                           badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
                           badgeHidden: !_hasUnreadZodiac,
                           badgeColor: _hasUnreadZodiac ? Colors.white : null,
-                          underlayWidget: Positioned(
-                            right: 4 * scale,
-                            top: 0,
-                            bottom: 0,
+                          backgroundWidget: Positioned(
+                            right: -4 * scale,
+                            top: -3 * scale,
                             child: IgnorePointer(
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: _SlowRotatingWidget(
-                                  child: RepaintBoundary(
-                                    child: Image.asset(
-                                      'assets/images/zodiac.webp',
-                                      width: 105 * scale,
-                                      height: 105 * scale,
-                                      fit: BoxFit.contain,
-                                    ),
+                              child: _SlowRotatingWidget(
+                                child: RepaintBoundary(
+                                  child: Image.asset(
+                                    'assets/images/zodiac.webp',
+                                    width: 120 * scale,
+                                    height: 120 * scale,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
@@ -523,7 +519,6 @@ class _BentoCard extends StatefulWidget {
   final bool contentBottom;
   final String? backgroundImageAsset;
   final String? overlayImageAsset;
-  final Widget? underlayWidget;
   final bool backgroundImageDraggable;
   final bool overlayImageDraggable;
   final double overlayScale;
@@ -543,6 +538,7 @@ class _BentoCard extends StatefulWidget {
   final Offset? overlayDragOffset;
   final ValueChanged<Offset>? overlayDragUpdate;
   final VoidCallback? overlayDragEnd;
+  final Widget? backgroundWidget;
 
   const _BentoCard({
     this.icon = '',
@@ -560,7 +556,6 @@ class _BentoCard extends StatefulWidget {
     this.contentBottom = false,
     this.backgroundImageAsset,
     this.overlayImageAsset,
-    this.underlayWidget,
     this.backgroundImageDraggable = false,
     this.overlayImageDraggable = false,
     this.overlayScale = 1.0,
@@ -580,6 +575,7 @@ class _BentoCard extends StatefulWidget {
     this.overlayDragOffset,
     this.overlayDragUpdate,
     this.overlayDragEnd,
+    this.backgroundWidget,
   });
 
   @override
@@ -610,7 +606,6 @@ class _BentoCardState extends State<_BentoCard> {
           contentBottom: widget.contentBottom,
           backgroundImageAsset: widget.backgroundImageAsset,
           overlayImageAsset: widget.overlayImageAsset,
-          underlayWidget: widget.underlayWidget,
           backgroundImageDraggable: widget.backgroundImageDraggable,
           overlayImageDraggable: widget.overlayImageDraggable,
           overlayScale: widget.overlayScale,
@@ -630,6 +625,7 @@ class _BentoCardState extends State<_BentoCard> {
           overlayDragOffset: widget.overlayDragOffset,
           overlayDragUpdate: widget.overlayDragUpdate,
           overlayDragEnd: widget.overlayDragEnd,
+          backgroundWidget: widget.backgroundWidget,
           onTap: widget.onTap,
           pressed: _pressed,
           onPressedChange: (v) => setState(() => _pressed = v),
@@ -656,7 +652,6 @@ class _InteractiveCard extends StatefulWidget {
   final bool contentBottom;
   final String? backgroundImageAsset;
   final String? overlayImageAsset;
-  final Widget? underlayWidget;
   final bool backgroundImageDraggable;
   final bool overlayImageDraggable;
   final double overlayScale;
@@ -676,6 +671,7 @@ class _InteractiveCard extends StatefulWidget {
   final Offset? overlayDragOffset;
   final ValueChanged<Offset>? overlayDragUpdate;
   final VoidCallback? overlayDragEnd;
+  final Widget? backgroundWidget;
   final bool pressed;
   final ValueChanged<bool> onPressedChange;
 
@@ -696,7 +692,6 @@ class _InteractiveCard extends StatefulWidget {
     required this.contentBottom,
     required this.backgroundImageAsset,
     required this.overlayImageAsset,
-    this.underlayWidget,
     required this.backgroundImageDraggable,
     required this.overlayImageDraggable,
     required this.overlayScale,
@@ -716,6 +711,7 @@ class _InteractiveCard extends StatefulWidget {
     required this.overlayDragOffset,
     required this.overlayDragUpdate,
     required this.overlayDragEnd,
+    this.backgroundWidget,
     required this.pressed,
     required this.onPressedChange,
   });
@@ -811,77 +807,89 @@ class _InteractiveCardState extends State<_InteractiveCard>
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Stack(
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    if (widget.backgroundImageAsset != null)
-                      Positioned.fill(
-                        child: Opacity(
-                          opacity: 0.95,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onPanUpdate: widget.backgroundImageDraggable
-                                ? (details) {
-                                    setState(() {
-                                      _dragOffset += details.delta;
-                                    });
-                                  }
-                                : null,
-                            child: Transform.translate(
-                              offset: _dragOffset,
-                              child: Transform.scale(
-                                scale: 1.2,
-                                alignment: Alignment.bottomRight,
-                                child: Image.asset(
-                                  widget.backgroundImageAsset!,
-                                  fit: BoxFit.contain,
-                                  alignment: Alignment.bottomRight,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    Positioned.fill(
-                      child: Container(color: Colors.white.withOpacity(0.05)),
+              // 1. Base Gradient Background
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(pressed ? 0.07 : 0.06),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.18),
                     ),
-                    if (widget.underlayWidget != null) widget.underlayWidget!,
-                    Container(
-                      padding: EdgeInsets.all(edgePadding),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(pressed ? 0.07 : 0.06),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.18),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.10),
-                            blurRadius: pressed ? 10 : 8,
-                            offset: const Offset(0, 4),
-                          ),
-                          BoxShadow(
-                            color: widget.accent.withOpacity(0.30),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            widget.accent.withOpacity(pressed ? 1.0 : 1.0),
-                            widget.accentSoft.withOpacity(
-                              pressed ? 1.0 : 1.0,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.10),
+                        blurRadius: pressed ? 10 : 8,
+                        offset: const Offset(0, 4),
+                      ),
+                      BoxShadow(
+                        color: widget.accent.withOpacity(0.30),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        widget.accent.withOpacity(pressed ? 1.0 : 1.0),
+                        widget.accentSoft.withOpacity(pressed ? 1.0 : 1.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // 2. Clipped Background Image
+              if (widget.backgroundImageAsset != null)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Opacity(
+                      opacity: 0.95,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onPanUpdate: widget.backgroundImageDraggable
+                            ? (details) {
+                                setState(() {
+                                  _dragOffset += details.delta;
+                                });
+                              }
+                            : null,
+                        child: Transform.translate(
+                          offset: _dragOffset,
+                          child: Transform.scale(
+                            scale: 1.2,
+                            alignment: Alignment.bottomRight,
+                            child: Image.asset(
+                              widget.backgroundImageAsset!,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.bottomRight,
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                    ),
+                  ),
+                ),
+
+              // 3. Subtle overlay
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(color: Colors.white.withOpacity(0.05)),
+                ),
+              ),
+
+              // 4. Custom Unclipped Background (Zodiac etc.)
+              if (widget.backgroundWidget != null) widget.backgroundWidget!,
+
+              // 5. Content Layer
+              Container(
+                padding: EdgeInsets.all(edgePadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                           if (widget.badgeText != null)
                             Align(
                               alignment: Alignment.topRight,
@@ -988,9 +996,6 @@ class _InteractiveCardState extends State<_InteractiveCard>
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
               if (widget.overlayImageAsset != null && widget.overlayPositioned)
                 (widget.overlayClipToCard
                     ? Positioned.fill(

@@ -32,6 +32,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   static const Color _bg = Color(0xFF0F1210);
 
   bool _isPremiumUser = false;
+  bool _westernUnread = false;
+  bool _asianUnread = false;
+  bool _mayanUnread = false;
 
   @override
   void initState() {
@@ -42,7 +45,20 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     _t2 = CurvedAnimation(parent: _entrance, curve: const Interval(.15, .55, curve: Curves.easeOutCubic));
     _t3 = CurvedAnimation(parent: _entrance, curve: const Interval(.3, .7, curve: Curves.easeOutCubic));
     _initPremiumState();
+    _initUnreadStatus();
     _markZodiacAsRead();
+  }
+
+  Future<void> _initUnreadStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    if (mounted) {
+      setState(() {
+        _westernUnread = (prefs.getString(_kWesternFreeDate) ?? '') != today;
+        _asianUnread = !(prefs.getBool('zodiac_unlocked_asian_$today') ?? false);
+        _mayanUnread = !(prefs.getBool('zodiac_unlocked_mayan_$today') ?? false);
+      });
+    }
   }
 
   Future<void> _markZodiacAsRead() async {
@@ -370,6 +386,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
       await prefs.setString(_kWesternAdUsed, today);
       await prefs.setInt(_kWesternAdCount, 0);
       await StorageService.addPendingAura('zodiac', 1);
+      if (mounted) setState(() => _westernUnread = false);
       onUnlock();
       return;
     }
@@ -607,6 +624,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
       bool success = await StorageService.deductSoulStones(1);
       if (success) {
         await prefs.setBool(unlockKey, true);
+        if (mounted) {
+          setState(() {
+            if (moduleKey == 'asian') _asianUnread = false;
+            if (moduleKey == 'mayan') _mayanUnread = false;
+          });
+        }
         HapticFeedback.lightImpact(); // Başarılı, hızlı geçiş hissi.
         onUnlock();
         return;
@@ -739,6 +762,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                     if (success) {
                                                       await prefs.setBool(unlockKey, true);
                                                       if (context.mounted) {
+                                                        setState(() {
+                                                          if (moduleKey == 'asian') _asianUnread = false;
+                                                          if (moduleKey == 'mayan') _mayanUnread = false;
+                                                        });
                                                         Navigator.pop(dialogCtx);
                                                         onUnlock();
                                                       }
@@ -857,6 +884,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                 _animWrap(_t1, _wheelSection(
                   wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
                   painter: (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
+                  showBadge: _westernUnread,
                   onTap: () => _handleWesternAccess(context, () async {
                     await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
                   }),
@@ -866,6 +894,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
                   painter: (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
+                  showBadge: _asianUnread,
                   onTap: () => _handlePremiumAccess(context, 'asian', () async {
                     await _playPortalOpenRitual('ASYA ASTROLOJİSİ', (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
                   }),
@@ -875,6 +904,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
                   painter: (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
+                  showBadge: _mayanUnread,
                   onTap: () => _handlePremiumAccess(context, 'mayan', () async {
                     await _playPortalOpenRitual('MAYA ASTROLOJİSİ', (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
                   }),
@@ -992,6 +1022,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     required CustomPainter Function(double progress) painter, 
     required VoidCallback onTap,
     bool isPremium = false,
+    bool showBadge = false,
   }) {
     return Column(children: [
         // Çark Etiketi ve Ruh Taşı İkonu (Merkez bozulmasın diye Stack kullanıldı)
@@ -1004,6 +1035,25 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
               Positioned(
                 right: -20,
                 child: const Icon(Icons.diamond_outlined, color: Color(0xFF22D3EE), size: 14),
+              ),
+            if (showBadge)
+              Positioned(
+                right: isPremium ? -32 : -14,
+                top: -4,
+                child: Container(
+                  width: 8, height: 8,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22D3EE), // Göz alıcı turkuaz/mavi nokta
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF22D3EE).withOpacity(0.6),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      )
+                    ],
+                  ),
+                ),
               ),
           ],
         ),
