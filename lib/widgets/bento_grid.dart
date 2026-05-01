@@ -247,8 +247,8 @@ class _BentoGridState extends State<BentoGrid>
                             desc: l10n.localeName == 'tr' ? 'Telvelerin dili' : 'Whispers of grounds',
                             accent: const Color(0xFFD4A373),
                             accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
-                            badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : (l10n.localeName == 'tr' ? 'YENİ' : 'NEW'),
-                            badgeHidden: !_hasUnreadCoffee && false,
+                            badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : '',
+                            badgeHidden: !_hasUnreadCoffee,
                             badgeColor: _hasUnreadCoffee ? Colors.white : null,
                           ),
                           // Özel kahve görseli
