@@ -4157,7 +4157,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         const SizedBox(height: 2),
         // Carousel — tam ekran genişliğinde (parent padding yok)
         SizedBox(
-          height: 420, // Metnin taşmasını engelleyecek kadar artırıldı, absürt boşluk bırakılmaz.
+          height: 440, // Metnin taşmasını engelleyecek kadar artırıldı, absürt boşluk bırakılmaz.
           child: PageView.builder(
             controller: _fullCardPageCtrl,
             itemCount: reading.cardReadings.length,

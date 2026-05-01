@@ -206,7 +206,7 @@ List<CardSymbol> getCardSymbols(int cardId) {
       CardSymbol(emoji: '🌳', nameTr: 'Bilgi Ağacı', nameEn: 'Tree of Knowledge', meaningsTr: ['Doğru ile arzu arası', 'Kalbinle aklın yarışıyor', 'Seçim zamanı geldi'], meaningsEn: ['Between right and desire']),
       CardSymbol(emoji: '🚻', nameTr: 'Adem ve Havva', nameEn: 'Adam & Eve', meaningsTr: ['Ruh eşinle bütünleşme', 'İki zıt kutbun uyumu', 'Seçimini kalbinle yap'], meaningsEn: ['Union with soulmate']),
       CardSymbol(emoji: '🐍', nameTr: 'Yılan', nameEn: 'Snake', meaningsTr: ['Tutkularının fısıltısı', 'Seni kışkırtan dürtü', 'Dönüşüm kapıda'], meaningsEn: ['Whispers of passion']),
-      CardSymbol(emoji: '🌊', nameTr: 'Nehir', nameEn: 'River', meaningsTr: ['Birlikte akacağınız hayat', 'Aşkın çağlayan gücü', 'Duyguların sonsuz akışı'], meaningsEn: ['Life flowing together']),
+      CardSymbol(emoji: '🛤️', nameTr: 'Patika', nameEn: 'Path', meaningsTr: ['Birlikte yürüyeceğiniz hayat', 'Ortak hedefe giden yol', 'İlişkinizin serüveni'], meaningsEn: ['Life walking together']),
     ],
     7: [ // The Chariot
       CardSymbol(emoji: '🐱', nameTr: 'Sfenks', nameEn: 'Sphinx', meaningsTr: ['Zıt güçlerin kontrolü', 'Kaos içinde denge bul', 'İç çatışmanı yönet'], meaningsEn: ['Control opposing forces']),
@@ -884,8 +884,8 @@ const Map<int, CardMeaning> cardMeanings = {
     phase: CardPhase.neutral,
     pastTr: 'Tıpkı Adem ile Havva ve arkalarındaki Bilgi Ağacı ile yılan gibi, masumiyetten çıkıp önemli bir seçim yapmak zorunda kalmışsın.',
     pastEn: 'Like Adam and Eve and the Tree of Knowledge with the snake, you stepped out of innocence and had to make an important choice.',
-    presentTr: 'Yukarıdaki dev melek Rafael in kanatları altında, kalbin ve aklın omuz omuza. Bir yanda tutku, diğer yanda doğru değerler var.',
-    presentEn: 'Under the wings of the giant angel Raphael, your heart and mind stand side by side. On one side is passion, the other, true values.',
+    presentTr: 'Yukarıdaki dev meleğin kanatları altında, kalbin ve aklın omuz omuza. Bir yanda tutku, diğer yanda doğru değerler var.',
+    presentEn: 'Under the wings of the giant angel, your heart and mind stand side by side. On one side is passion, the other, true values.',
     directionTr: 'Meleğin kutsadığı şekilde, sadece kendi ruhunla uyumlu olana yönel. Gözlerini kaçırma ve o gerçek seçimi yap.',
     directionEn: 'As the angel blesses, turn only to what aligns with your soul. Do not look away; make that true choice.',
   ),
@@ -1068,8 +1068,8 @@ const Map<int, CardMeaning> cardMeanings = {
     pastEn: 'The sun pierced all darkness. Experiencing true joy, the naked playful child rode the white horse from behind the wall like a blessing.',
     presentTr: 'Ayçiçekleri yüzünü sana değil güneşe dönmüş — çünkü sen zaten güneşin kendisisin. Saklayacak bir şeyin yok, her şey apaçık ve aydınlık. En parlak dönemini yaşıyorsun.',
     presentEn: 'The yellow sunflowers behind face the magnificent Sun, not you. You are bathed in a shining light that requires hiding absolutely nothing.',
-    directionTr: 'Çocuğun tuttuğu kırmızı zafer bayrağını sen devral. Gökyüzündeki neşeli Güneş gibi adımlarını aydınlat, kalbin ısınsın ve başarıya koş.',
-    directionEn: 'Take the red banner of victory the child holds. Let your steps be illuminated like the joyful Sun, let your heart warm up, and run to success.',
+    directionTr: 'O çocuk gibi kollarını aç ve güneşin altında özgürce ilerle. Saklayacak hiçbir şeyin yok, ayçiçekleri gibi yüzünü ışığa dön ve başarıya koş.',
+    directionEn: 'Open your arms like that child and move forward freely under the sun. You have nothing to hide, turn your face to the light like the sunflowers and run to success.',
   ),
   20: CardMeaning(
     id: 20,
@@ -1357,8 +1357,8 @@ const Map<int, CardMeaning> cardMeanings = {
     directionEn: 'Accept the pain but do not marry it. Pull the three swords from your heart — healing begins with courage. Wounds close, scars strengthen.',
   ),
   53: CardMeaning(id: 53, themeTr: 'Dinlenme, iyileşme, stratejik bekleme', themeEn: 'Rest, recovery, strategic waiting', tone: CardTone.soft, movement: CardMovement.stillness, phase: CardPhase.neutral,
-    pastTr: 'Şövalye kilisede el pençe divan yatıyordu, üç kılıç duvarda asılı, dördüncüsü altında. Vitray pencereden süzülen renkli ışık onu iyileştirmiş. Durduğun o dönem seni onarmış.',
-    pastEn: 'The knight lay in prayer in the church, three swords on the wall, the fourth beneath him. Colorful light through stained glass healed him. That pause restored you.',
+    pastTr: 'Şövalye kilisede el pençe divan yatıyordu, kılıçları duvarda asılı. Vitray pencereden süzülen renkli ışık onu iyileştirmiş. Durduğun o dönem seni onarmış.',
+    pastEn: 'The knight lay in prayer in the church, swords hung on the wall. Colorful light through stained glass healed him. That pause restored you.',
     presentTr: 'Mücadeleyi durdur ve dinlen. Şövalye gibi kılıçlarını duvara as ve iyileşmeye izin ver. Bu bir yenilgi değil, stratejik bir geri çekilme.',
     presentEn: 'Stop the fight and rest. Hang your swords on the wall like the knight and let healing happen. This is not defeat, but a strategic retreat.',
     directionTr: 'Vitray pencerenin ışığına yüzünü dön. İyileşmek zaman ister ve bu zamanı kendin için ayırmak güçsüzlük değil, bilgeliktir.',
@@ -1389,10 +1389,10 @@ const Map<int, CardMeaning> cardMeanings = {
     directionEn: 'Cunning is a momentary strategy, but honesty is a lasting conquest. Instead of fleeing with missing swords in the dark, face it with courage and win the true victory.',
   ),
   57: CardMeaning(id: 57, themeTr: 'Zihinsel hapishane, kendi kendini sınırlama', themeEn: 'Mental prison, self-limitation, restriction', tone: CardTone.heavy, movement: CardMovement.stillness, phase: CardPhase.neutral,
-    pastTr: 'Bağlanmış ve gözleri örtülü kadın, sekiz kılıcın arasında bataklıkta mahsur kalmış. Ama bağlar aslında gevşek — sen kendi korkularınla kendini hapsetmişsin.',
-    pastEn: 'The bound and blindfolded woman was trapped among eight swords in the marsh. But the bindings were loose — you imprisoned yourself with your own fears.',
-    presentTr: 'Etrafındaki sekiz kılıç bir kafes oluşturuyor ama bağların gevşek. Bataklıkta sıkıştığını düşünüyorsun ama çıkış var — görmüyorsun çünkü gözlerin bağıyla.',
-    presentEn: 'Eight swords around you form a cage but your bindings are loose. You think you are stuck in the marsh, but there is an exit — you cannot see it because of the blindfold.',
+    pastTr: 'Bağlanmış ve gözleri örtülü kadın, kılıçların arasında bataklıkta mahsur kalmış. Ama bağlar aslında gevşek — sen kendi korkularınla kendini hapsetmişsin.',
+    pastEn: 'The bound and blindfolded woman was trapped among the swords in the marsh. But the bindings were loose — you imprisoned yourself with your own fears.',
+    presentTr: 'Etrafındaki kılıçlar bir kafes oluşturuyor ama bağların gevşek. Bataklıkta sıkıştığını düşünüyorsun ama çıkış var — görmüyorsun çünkü gözlerin bağlı.',
+    presentEn: 'The swords around you form a cage but your bindings are loose. You think you are stuck in the marsh, but there is an exit — you cannot see it because of the blindfold.',
     directionTr: 'Bağı çöz, gözlerini aç. Kılıçlar arasından geçebileceğin bir boşluk var. Zindan senin zihninde — anahtarı da orada ara.',
     directionEn: 'Untie the binding, open your eyes. There is a gap between the swords you can pass through. The prison is in your mind — look for the key there too.',
   ),
@@ -1431,10 +1431,10 @@ const Map<int, CardMeaning> cardMeanings = {
   62: CardMeaning(id: 62, themeTr: 'Bağımsız düşünce, duygusal netlik, sert adalet', themeEn: 'Independent thought, emotional clarity, firm justice', tone: CardTone.decision, movement: CardMovement.stillness, phase: CardPhase.neutral,
     pastTr: 'Bulutların üzerindeki tahtında oturan kraliçe, bir eliyle kılıcını kaldırmış diğeriyle uzaklara uzanmış. Kelebekler etrafında uçuşurken o acı gerçeği cesurca söylemiş.',
     pastEn: 'The queen on her throne above the clouds raised her sword with one hand and reached out with the other. As butterflies fluttered around, she spoke the painful truth bravely.',
-    presentTr: 'Tahtında tek başına oturuyorsun, bulutların üzerinde. Kılıcın gerçeği kesiyor, kelebeklerin dönüşümü temsil ediyor. Zihinsel netliğin seni yalancı acılardan koruyor.',
-    presentEn: 'You sit alone on your throne above the clouds. Your sword cuts truth, your butterflies represent transformation. Mental clarity protects you from false pains.',
-    directionTr: 'Kılıcınla gerçeği kes ama kalbini de dinle. Kraliçenin gücü soğuklukta değil, cesurca dürüst olmaktadır. Bağımsız düşün ama yalnız kalma.',
-    directionEn: 'Cut truth with your sword but also listen to your heart. The queens power lies not in coldness, but in courageous honesty. Think independently but do not isolate.',
+    presentTr: 'Tahtında tek başına oturuyorsun, bulutların üzerinde. Kılıcın yalanları kesiyor, kelebeklerin dönüşümü temsil ediyor. Zihinsel netliğin seni yalancı acılardan koruyor.',
+    presentEn: 'You sit alone on your throne above the clouds. Your sword cuts through illusions, your butterflies represent transformation. Mental clarity protects you from false pains.',
+    directionTr: 'Kılıcınla yalanları kes ve gerçeğe ulaş ama kalbini de dinle. Kraliçenin gücü soğuklukta değil, cesurca dürüst olmaktadır. Bağımsız düşün ama yalnız kalma.',
+    directionEn: 'Cut through the lies with your sword and reach the truth, but also listen to your heart. The queens power lies not in coldness, but in courageous honesty. Think independently but do not isolate.',
   ),
   63: CardMeaning(id: 63, themeTr: 'Entelektüel otorite, adil yönetim, stratejik güç', themeEn: 'Intellectual authority, fair governance, strategic power', tone: CardTone.decision, movement: CardMovement.stillness, phase: CardPhase.neutral,
     pastTr: 'Mavi cüppeli kral tahtında oturarak kılıcını dimdik tutmuş. Arkasındaki bulutlar ve kelebekler zihninin hem gücünü hem zarafetini yansıtıyormuş. Adil ve keskin kararlarınla saygı kazanmışsın.',
@@ -2174,13 +2174,11 @@ String _fullPositionReading(CardMeaning meaning, int positionIndex, bool isTr, R
         'Çevrenden gelen bu enerji seni derinden etkiliyor.',
         'Etrafındaki insanlar bu kartın enerjisini taşıyor.',
         'Çevrenin sessiz etkisi hafife alınmamalı.',
-        'Yakınlarından gelen bu titreşim, kararlarını şekillendiriyor.',
         'Dış dünyanın sana gönderdiği bir mesaj bu.',
       ] : [
         'This energy from your surroundings deeply affects you.',
         'People around you carry this cards energy.',
         'The silent influence of your environment should not be underestimated.',
-        'This vibration from those close to you shapes your decisions.',
         'This is a message the outer world sends you.',
       ];
       break;
@@ -2286,10 +2284,10 @@ String _buildFullAdvice(List<CardMeaning> meanings, List<String> names, FlowType
   final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
   final poolTr = [
-    'Geçmişteki o $t0 dönemi artık kapandı. Karşına çıkan $t3 engelini ancak içindeki o $t5 hissine sıkı sıkı tutunarak aşabilirsin. Yolu açtığında $t6 seni bekliyor olacak.',
-    'Eski $t0 bağları geride kaldı. Şimdiki sahip olduğun $t1 enerjisi sana ihtiyacın olan gücü zaten veriyor. Sadece iç sesinin fısıldadığı o $t5 çağrısına kulak ver ve $t6 hedefine doğru yürümeye başla.',
-    'Şu an önünü kapatan $t3 zorluğunu gözünde büyütme. Aradığın cevap dışarıda değil, içindeki o derin $t2 sessizliğinde yatıyor. Düşüncelerindeki $t5 ışığını takip edersen karanlık dağılır.',
-    'Bu açılım sana şunu fısıldıyor: Gözlerini $t0 gölgesinden ayır, bugünü mevcut $t1 enerjinle yaşa. Önündeki o $t3 sisine takılma, yegane pusulan $t5 olsun ki $t6 baharına uyanabilesin.',
+    'Geçmişte yaşadığın $t0 seni derinden etkilemiş. Şu an $t1 ile karşı karşıyasın ve bu süreci yaşamak seni hem zorluyor hem dönüştürüyor. Yolundaki $t3 seni engelliyor gibi görünse de içindeki $t5 sana destek oluyor. Bu sese kulak ver çünkü yolun sonunda $t6 seni bekliyor.',
+    'Şu an $t1 ile ilerliyorsun ve bu süreçte $t3 seni zorlasa da asıl gücünü içindeki $t5 ile elde edeceksin. Geçmişte yaşadığın $t0 sana çok şey öğretti. O dersleri unutma ve ilerle çünkü yolun sonunda $t6 seni bekliyor.',
+    'İçindeki $t2 seni sessizce yönlendiriyor ama sen henüz farkında değilsin. Yolundaki $t3 seni zorlayan en büyük etken ama içindeki $t5 tam da bu noktada devreye giriyor. Geçmişte $t0 ile tanıştın ve şimdi $t6 ile tanışma vaktin geldi.',
+    'Geçmişte $t0 seni şekillendirdi ve şu an $t1 seni sınıyor. Yolundaki $t3 işini zorlaştırsa da içindeki $t5 sana destek oluyor. İlerle çünkü sonunda $t6 seni bekliyor.',
   ];
 
   final poolEn = [
@@ -2473,14 +2471,20 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
             {'tr': 'ışığı öyle yoğunlaştırıyor ki, saklandığın gölgelerde bile artık güvendesin.', 'en': 'intensifies the light so much that you are safe even in the shadows you hide in.', 'e': '☀️'},
             {'tr': 'aynı frekansta titreşiyor. Ruhundaki o sönmüş umudu yeniden tutuşturmak için birleştiler.', 'en': 'vibrate at the same frequency. They united to reignite that extinguished hope in your soul.', 'e': '💫'},
             {'tr': 'birleşerek o beklediğin mucizenin kırılgan ama kesin tohumunu ekiyor.', 'en': 'combine to plant the fragile yet certain seed of the miracle you wait for.', 'e': '🌟'},
+            {'tr': 'sessizce birbirini besliyor. Bu iki enerji sana iç huzurunu geri getirecek.', 'en': 'quietly nourish each other. These two energies will bring back your inner peace.', 'e': '🕊️'},
+            {'tr': 'sana unuttuğun o yumuşak gücü hatırlatıyor. Sertlik değil, şefkat seni iyileştirecek.', 'en': 'remind you of that gentle strength you forgot. Not harshness but compassion will heal you.', 'e': '🌸'},
+            {'tr': 'birlikte seni saran koruyucu bir enerji oluşturuyor. Güvende olduğunu hisset.', 'en': 'together form a protective energy surrounding you. Feel that you are safe.', 'e': '🛡️'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
         } else if (m1.tone == CardTone.heavy) {
           final opts = [
             {'tr': 'birleşerek karanlığın en dibine iniyor. En çok korktuğun o yüzleşme tam da burada yatıyor.', 'en': 'descend into the very bottom of the darkness together. The confrontation you fear most lies right here.', 'e': '🌑'},
-            {'tr': 'kusursuz bir kriz yaratıyor. Sırf parçalanıp yeniden daha güçlü doğabilesin diye.', 'en': 'create a perfect crisis. Just so you can shatter and be reborn stronger.', 'e': '🔮'},
             {'tr': 'ağır bir karmayı sonlandırmak için buluştu. Kaçma, tam içinden geç.', 'en': 'came together to end a heavy karma. Do not run, pass right through it.', 'e': '⚗️'},
+            {'tr': 'seni bu sefer gerçekten dibe çekiyor ama dip vurmadan yükselemezsin.', 'en': 'are truly pulling you to the bottom this time, but you cannot rise without hitting rock bottom.', 'e': '🔮'},
+            {'tr': 'birlikte seni o kaçtığın acıyla yüzleştiriyor. Canın yanacak ama iyileşeceksin.', 'en': 'together confront you with the pain you have been avoiding. It will hurt but you will heal.', 'e': '⚡'},
+            {'tr': 'seni sarsıyor ama bu sarsıntı tam da ihtiyacın olan şey. Uyanmanın tek yolu bu.', 'en': 'are shaking you but this tremor is exactly what you need. This is the only way to wake up.', 'e': '💀'},
+            {'tr': 'eski yaralarını açıyor. Acıtacak ama bu sefer kalıcı şifa getirecek.', 'en': 'are reopening old wounds. It will sting but this time it will bring lasting healing.', 'e': '🩸'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2489,6 +2493,9 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
             {'tr': 'karar anında zihnini bıçak gibi keskinleştiriyor. O adım artık ertelenemez.', 'en': 'sharpens your mind like a knife at the moment of decision. That step can no longer be delayed.', 'e': '⚖️'},
             {'tr': 'önüne kaçınılmaz bir kavşak seriyor. Seçim yapmamak da en karanlık seçimdir.', 'en': 'lays out an inevitable crossroads before you. Refusing to choose is also the darkest choice.', 'e': '🧭'},
             {'tr': 'o ertelediğin kırılma anını ayağına getiriyor. Sadece dürüst ol.', 'en': 'brings the breaking point you delayed right to your feet. Just be honest.', 'e': '🔀'},
+            {'tr': 'seni bir tercih yapmaya zorluyor. Ortada kalmak artık bir seçenek değil.', 'en': 'are forcing you to make a choice. Staying in the middle is no longer an option.', 'e': '⚔️'},
+            {'tr': 'zihnindeki sis perdesini kaldırıyor. Cevabı aslında çoktan biliyorsun.', 'en': 'are lifting the fog in your mind. You actually already know the answer.', 'e': '🔍'},
+            {'tr': 'sana net bir mesaj veriyor. Yüzleş, karar ver ve arkana bakma.', 'en': 'are giving you a clear message. Face it, decide, and do not look back.', 'e': '🎯'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2499,10 +2506,14 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
       if (m1.movement != m2.movement) {
         score += 2;
         final opts = [
-          {'tr': 'zıt yönlere çekerek içsel bir kaos yaratıyor. Bu gerilim senin asıl uyanışını tetikleyecek.', 'en': 'creates inner chaos by pulling in opposite directions. This tension will trigger your true awakening.', 'e': '⚡'},
-          {'tr': 'bir yanda eylem, diğer yanda durgunluk... Seni durduran dışarısı değil, zihninin ta kendisi.', 'en': 'action on one side, stillness on the other... It is not the outside stopping you, it is your very mind.', 'e': '🌪️'},
-          {'tr': 'farklı ritimlerde çarpışıyor. Dengen tamamen bozulduğunda asıl gücünü bulacaksın.', 'en': 'clashes in different rhythms. You will find your true power when your balance is completely disrupted.', 'e': '🔄'},
+          {'tr': 'seni iki farklı yöne çekiyor. Bu gerilim rahatsız edici ama büyümen tam da buradan gelecek.', 'en': 'are pulling you in two different directions. This tension is uncomfortable but your growth will come from exactly here.', 'e': '⚡'},
+          {'tr': 'farklı ritimlerde çarpışıyor. Bu uyumsuzluk seni sarssa da sonunda dengeyi bulacaksın.', 'en': 'clash in different rhythms. This dissonance may shake you but you will eventually find your balance.', 'e': '🔄'},
           {'tr': 'aradığın o tuhaf dinginliği tam da bu kaotik çarpışmada sana hediye ediyor.', 'en': 'gifts you that strange serenity you seek right in this chaotic collision.', 'e': '🎭'},
+          {'tr': 'birbirine ters gibi görünse de aslında aynı dersi farklı yollardan öğretiyor.', 'en': 'may seem contradictory but are actually teaching the same lesson through different paths.', 'e': '🌀'},
+          {'tr': 'sana hem durmanı hem hareket etmeni söylüyor. Çelişki gibi ama ikisi de doğru.', 'en': 'are telling you to both stop and move. It seems contradictory but both are true.', 'e': '☯️'},
+          {'tr': 'arasındaki gerilim seni germese de aslında tam ihtiyacın olan dengeyi kuruyor.', 'en': 'the tension between them is actually establishing the exact balance you need.', 'e': '🌊'},
+          {'tr': 'seni aynı anda hem sakinleştiriyor hem harekete geçiriyor. Bu ikilemi kucakla.', 'en': 'are simultaneously calming you and pushing you to act. Embrace this duality.', 'e': '🦋'},
+          {'tr': 'biri dur diyor, diğeri koş. Ama ikisini de dinlersen zamanlamayı bulacaksın.', 'en': 'one says stop, the other says run. But if you listen to both you will find the right timing.', 'e': '⏳'},
         ];
         final pick = opts[rng.nextInt(opts.length)];
         typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2515,6 +2526,9 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
           final opts = [
             {'tr': 'birlikte yepyeni, ürkütücü ama çok güçlü bir sayfa açıyor. Eskiyi tamamen sil.', 'en': 'opens a brand new, scary but very powerful chapter together. Erase the old completely.', 'e': '🌅'},
             {'tr': 'hiç beklemediğin bir anda o yeni döngünün sarsılmaz temellerini atıyor.', 'en': 'lays the unshakable foundations of that new cycle precisely when you least expect it.', 'e': '🌱'},
+            {'tr': 'sana taze bir başlangıcın kapısını açıyor. Bu sefer gerçekten farklı olacak.', 'en': 'are opening the door to a fresh beginning for you. This time it will truly be different.', 'e': '🚪'},
+            {'tr': 'birlikte seni yenilenmeye çağırıyor. Eski halini geride bırakma zamanı geldi.', 'en': 'are calling you to renewal together. The time has come to leave your old self behind.', 'e': '🌿'},
+            {'tr': 'hayatına giren bu yeni enerji tesadüf değil. Evren seni bir şeye hazırlıyor.', 'en': 'this new energy entering your life is no coincidence. The universe is preparing you for something.', 'e': '✨'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2522,6 +2536,9 @@ List<CardRelation> _analyzeCardRelations(List<CardMeaning> meanings, List<String
           final opts = [
             {'tr': 'o döneme acımasızca ve kesin olarak nokta koyuyor. Bitti.', 'en': 'ruthlessly and definitively puts an end to that era. It is done.', 'e': '🌙'},
             {'tr': 'kapanan kapının arkasından bakmanı sana tamamen yasaklıyor. Bu final özgürlüğün için.', 'en': 'forbids you completely from looking behind the closed door. This finale is for your freedom.', 'e': '🏁'},
+            {'tr': 'birlikte bir döngüyü sonlandırıyor. Yasını tut ve bırak gitsin.', 'en': 'are ending a cycle together. Mourn it and let it go.', 'e': '🍂'},
+            {'tr': 'sana artık geride kalanı taşımaman gerektiğini söylüyor. Bırak ve hafifle.', 'en': 'are telling you that you no longer need to carry what is behind. Let go and lighten up.', 'e': '🕯️'},
+            {'tr': 'eski bir hikayeyi bitiriyor. Acıtsa da bu kapanış senin özgürlüğün.', 'en': 'are finishing an old story. Even if it hurts, this closure is your freedom.', 'e': '📖'},
           ];
           final pick = opts[rng.nextInt(opts.length)];
           typeTr = pick['tr']!; typeEn = pick['en']!; emoji = pick['e']!;
@@ -2635,11 +2652,11 @@ Map<String, String> _generateSecretMessage(List<CardMeaning> meanings, List<Stri
   final t6en = meanings[6].themeEn.split(',').first.trim().toLowerCase();
 
   final poolTr = [
-    'Şu an içten içe bildiğin ama kendine bile itiraf edemediğin bir yalanı yaşıyorsun. İçindeki o $t2 enerjisi sana bunu haykırıyor. O çok korktuğun $t6, aslında cezan değil, tek kurtuluşun. Artık uyan.',
-    'Evren sana bir ayna tutuyor: Geçmişte yaşadığın o $t0 senaryosunu zihninde tekrar tekrar oynatarak şimdiki $t1 zamanını sabote eden ta kendisisin. Engel olan bir dış güç yok. En büyük düşmanın şu an bu satırları okuyor.',
-    'Zihnindeki o sessiz pazarlığı biliyoruz: İçindeki o asıl $t2 dürtüsünü bastırmak için karşındaki $t3 engelini sen bilerek kurguladın. Kolay olanı seçip kurbanı oynamayı bırak. Evren senden sadece sarsıcı bir dürüstlük istiyor.',
-    'Önündeki o ihtişamlı $t6 hedefine öylesine saplantılısın ki, şu an zihninin o derin $t1 karmaşasında çürüdüğünü göremiyorsun. İçindeki mezarlığı temizlemeden yeni bir hayat inşa edemezsin.',
-    'Birilerinin artık sana şu sert gerçeği söylemesi gerekiyordu: Aradığın cevap ışıkta değil, o karanlığa gömdüğün $t2 arzusunda saklı. O sözde $t3 mazeretinin ardına saklanmaktan vazgeçtiğin gün her şey paramparça olup yeniden doğacak.',
+    'İçten içe bildiğin ama kendine itiraf edemediğin bir şey var. İçindeki $t2 sana gerçeği haykırıyor ama sen duymak istemiyorsun. Kaçtığın $t6 ile yüzleşmek aslında senin cezan değil, tek kurtuluşun. Uyanma vakti geldi.',
+    'Evren sana acımasız bir ayna tutuyor. Geçmişte yaşadığın $t0 seni yaraladı ve sen o yarayı zihninde tekrar tekrar kanatarak şu anını sabote ediyorsun. Karşında duran $t1 ile yüzleşmen gerekirken sen hâlâ geçmişe takılı kaldın. Seni durduran dışarıdan bir güç yok, en büyük engelin şu an bu satırları okuyor.',
+    'Zihnindeki o sessiz pazarlığı biliyoruz. İçinde bastırdığın $t2 var ve onun yerine sığındığın mazeret de $t3. Birinden kaçabilmek için diğerine sığınıyorsun. Kurbanı oynamayı bırak, evren senden sadece kendine karşı dürüst olmanı bekliyor.',
+    'Hayalini kurduğun $t6 seni o kadar çok cezbediyor ki şu an yaşadığın $t1 ile boğuştuğunu göremiyorsun bile. Kendi içindeki bu sessiz enkazı temizlemeden dışarıda yepyeni bir hayat inşa edemezsin.',
+    'Birilerinin artık sana şu sert gerçeği söylemesi gerekiyordu. Aradığın çıkış yolu dışarıda değil, karanlığa gömdüğün $t2 ile yüzleşmekte saklı. Sen ise onun yerine $t3 ile oyalanıyorsun. O oyalanmadan vazgeçtiğin gün her şey paramparça olup yeniden doğacak.',
   ];
 
   final poolEn = [
