@@ -20,6 +20,8 @@ import 'dart:io';
 import 'premium_paywall_page.dart';
 import 'onboarding_page.dart';
 import 'notification_settings_page.dart';
+import 'account_details_page.dart';
+import 'language_settings_page.dart';
 import 'home_page.dart';
 import 'collection_page.dart';
 import '../services/locale_controller.dart';
@@ -816,31 +818,38 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   // ── Uygulamayı değerlendir ──
-  void _rateApp() {
+  void _rateApp() async {
     HapticFeedback.lightImpact();
-    final lang = Localizations.localeOf(context).languageCode;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Text('•', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                lang == 'tr'
-                    ? 'Uygulama yayınlandığında değerlendirebilirsiniz!'
-                    : 'You can rate the app once it\'s published!',
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF1A1A2E),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
+    
+    // Uygulama yayınlandığında mağaza linkleriyle çalışacak profesyonel yapı
+    final Uri url = Uri.parse(
+      Platform.isIOS
+          ? 'https://apps.apple.com/app/idYOUR_APP_ID' // iOS App Store Linki
+          : 'https://play.google.com/store/apps/details?id=com.sadam.vlucky_flutter' // Google Play Linki
     );
+    
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        // Mağaza bulunamazsa zarif bir hata göster
+        final lang = Localizations.localeOf(context).languageCode;
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              lang == 'tr' ? 'Mağaza bağlantısı şu an kurulamıyor.' : 'Store link is unavailable.',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+            backgroundColor: const Color(0xFF1A1A2E),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Rate app error: $e");
+    }
   }
 
   // ── Kozmik Harita (Otomatik Burç Hesaplayıcı) ──
@@ -856,56 +865,39 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   // ── Yardım merkezi ──
-  void _openHelpCenter() {
-    final lang = Localizations.localeOf(context).languageCode;
-    _showLegalSheet(
-      title: lang == 'tr' ? 'Yardım Merkezi' : 'Help Center',
-      content: lang == 'tr'
-          ? '''Sıkça Sorulan Sorular
-
-• Kurabiye nasıl kırılır?
-Ana sayfadaki kurabiyeye dokun ve kırmak için kaydır. Her gün yeni bir kurabiye seni bekliyor.
-
-• Tarot falı nasıl bakılır?
-Ana sayfadan Tarot kartına dokun. 3 kart seç ve günlük mesajını oku.
-
-• Rüya yorumu nasıl yapılır?
-Rüya sayfasına git, rüyanı yaz ve AI destekli yorumunu al.
-
-• Burç yorumum nerede?
-Ana sayfadan Burç kartına dokun. Batı, Çin ve Maya burç yorumlarını keşfet.
-
-• Gün serisi nedir?
-Her gün uygulamayı kullandığında serin artar. Bir gün atlarsan seri sıfırlanır.
-
-• Verilerim güvende mi?
-Evet! Tüm verilerin cihazında yerel olarak saklanır, hiçbir yere gönderilmez.
-
-• İletişim
-info@crackandwish.com'''
-          : '''Frequently Asked Questions
-
-• How to crack a cookie?
-Tap the cookie on the home page and swipe to crack it. A new cookie awaits you every day.
-
-• How to read tarot?
-Tap the Tarot card on the home page. Select 3 cards and read your daily message.
-
-• How to interpret dreams?
-Go to the Dream page, write your dream, and get an AI-powered interpretation.
-
-• Where is my horoscope?
-Tap the Zodiac card on the home page. Discover Western, Chinese, and Mayan horoscopes.
-
-• What is a day streak?
-Your streak increases every day you use the app. Miss a day and it resets.
-
-• Is my data safe?
-Yes! All your data is stored locally on your device and is never sent anywhere.
-
-• Contact
-info@crackandwish.com''',
+  void _openHelpCenter() async {
+    HapticFeedback.lightImpact();
+    // Destek ekibine doğrudan mail atan ciddi yapı
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'support@crackandwish.com',
+      queryParameters: {
+        'subject': 'Crack&Wish Support / Destek',
+      },
     );
+    
+    try {
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri);
+      } else {
+        // Mail uygulaması yoksa zarif fallback
+        final lang = Localizations.localeOf(context).languageCode;
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              lang == 'tr' ? 'Mail uygulaması bulunamadı. support@crackandwish.com adresine yazabilirsiniz.' : 'No mail app found. You can write to support@crackandwish.com',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+            backgroundColor: const Color(0xFF1A1A2E),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Help center error: $e");
+    }
   }
 
   // ── Davet Et & Kazan Sistemi Modalı ──
@@ -1992,99 +1984,7 @@ For questions: info@crackandwish.com''',
   }
 
   // ── Dil seçici (mevcut — çalışıyor) ──
-  void _openLanguagePicker() {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = context.read<LocaleController>();
-    final options = <_LanguageOption>[
-      _LanguageOption(const Locale('tr'), l10n.turkish),
-      _LanguageOption(const Locale('en'), l10n.english),
-    ];
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (ctx) {
-        final palette = AppThemeController.current;
-        return Container(
-          decoration: BoxDecoration(
-            color: palette.cardBackground,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.selectLanguage,
-                        style: const TextStyle(
-                          color: AppColors.textWhite,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(ctx),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            l10n.close,
-                            style: const TextStyle(color: AppColors.textWhite),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ...options.map((opt) {
-                    final bool isSelected =
-                        controller.locale?.languageCode ==
-                            opt.locale?.languageCode &&
-                        (controller.locale == null) == (opt.locale == null);
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        isSelected
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color: AppColors.textWhite,
-                      ),
-                      title: Text(
-                        opt.label,
-                        style: const TextStyle(
-                          color: AppColors.textWhite,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      onTap: () async {
-                        await controller.setLocale(opt.locale);
-                        if (mounted) Navigator.pop(ctx);
-                      },
-                    );
-                  }),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+
 
   // ── Alt navigasyon ──
   void _onNavTap(int index) {
@@ -2205,50 +2105,42 @@ For questions: info@crackandwish.com''',
                       ),
                       const SizedBox(height: 24),
 
-                      // ── 3. PREMİUM BANNER (TICKET) ──
-                      _BentoPremiumBanner(
-                        lang: lang,
-                        isPremium: _isPremiumUser,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              opaque: false,
-                              transitionDuration: const Duration(
-                                milliseconds: 300,
-                              ),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const PremiumPaywallPage(),
-                              transitionsBuilder:
-                                  (
-                                    context,
-                                    animation,
-                                    secondaryAnimation,
-                                    child,
-                                  ) {
+                      // ── 3. PREMİUM & KOZMİK PROFIL ──
+                      _SettingsListGroup(
+                        children: [
+                          _SettingsListTile(
+                            icon: Icons.workspace_premium_rounded,
+                            iconColor: const Color(0xFFFFD166),
+                            label: lang == 'tr' ? 'Elite\'e Geç' : 'Get Elite',
+                            subtitle: lang == 'tr' ? 'Farkındalığa giden kapı' : 'Doorway to awareness',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  opaque: false,
+                                  transitionDuration: const Duration(milliseconds: 300),
+                                  pageBuilder: (context, animation, secondaryAnimation) => const PremiumPaywallPage(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                     return SlideTransition(
-                                      position:
-                                          Tween<Offset>(
-                                            begin: const Offset(0, 1),
-                                            end: Offset.zero,
-                                          ).animate(
-                                            CurvedAnimation(
-                                              parent: animation,
-                                              curve: Curves.easeOutCubic,
-                                            ),
-                                          ),
+                                      position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(
+                                        CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                                      ),
                                       child: child,
                                     );
                                   },
-                            ),
-                          );
-                        },
+                                ),
+                              );
+                            },
+                          ),
+                          _SettingsListTile(
+                            icon: Icons.auto_graph_rounded,
+                            iconColor: const Color(0xFFC084FC),
+                            label: lang == 'tr' ? 'Kozmik Profilim' : 'Cosmic Profile',
+                            subtitle: lang == 'tr' ? 'Harita, Saat ve Konum Bilgileri' : 'Chart, Time and Location',
+                            onTap: _openCosmicChart,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-
-                      // ── 3B. KOZMİK PROFIL BANNERI (HERO) ──
-                      _BentoCosmicBanner(lang: lang, onTap: _openCosmicChart),
                       const SizedBox(height: 16),
 
                       // ── BÖLÜM 1: HESAP ──
@@ -2262,22 +2154,13 @@ For questions: info@crackandwish.com''',
                             label: lang == 'tr' ? 'E-posta' : 'Email',
                             subtitle: _getConnectedEmail(),
                             onTap: () {
-                              HapticFeedback.lightImpact();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    lang == 'tr'
-                                        ? 'E-posta hesabınız bağlı giriş yönteminize aittir.'
-                                        : 'Your email is linked to your sign-in method.',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  backgroundColor: const Color(0xFF1A1A2E),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                              Navigator.push(
+                                context,
+                                SwipeFadePageRoute(
+                                  page: AccountDetailsPage(
+                                    userName: _userHandle.isNotEmpty 
+                                        ? _userHandle 
+                                        : '@${_userName.toLowerCase().replaceAll(' ', '')}',
                                   ),
                                 ),
                               );
@@ -2288,7 +2171,14 @@ For questions: info@crackandwish.com''',
                             iconColor: Colors.white54,
                             label: l10n.language,
                             subtitle: languageValue,
-                            onTap: _openLanguagePicker,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                SwipeFadePageRoute(
+                                  page: LanguageSettingsPage(),
+                                ),
+                              );
+                            },
                           ),
                           _SettingsListTile(
                             icon: Icons.notifications_none_rounded,
@@ -2306,24 +2196,7 @@ For questions: info@crackandwish.com''',
                             },
                           ),
 
-                          _SettingsListTile(
-                            icon: SoundService().isSoundEnabled
-                                ? Icons.volume_up_rounded
-                                : Icons.volume_off_rounded,
-                            iconColor: Colors.white54,
-                            label: lang == 'tr'
-                                ? 'Ses Efektleri'
-                                : 'Sound Effects',
-                            subtitle: SoundService().isSoundEnabled
-                                ? (lang == 'tr' ? 'Açık' : 'On')
-                                : (lang == 'tr' ? 'Kapalı' : 'Off'),
-                            onTap: () async {
-                              HapticFeedback.lightImpact();
-                              final newVal = !SoundService().isSoundEnabled;
-                              await SoundService().toggleSound(newVal);
-                              setState(() {});
-                            },
-                          ),
+
                         ],
                       ),
 
@@ -2338,17 +2211,7 @@ For questions: info@crackandwish.com''',
                       const SizedBox(height: 10),
                       _SettingsListGroup(
                         children: [
-                          _SettingsListTile(
-                            icon: Icons.group_add_rounded,
-                            iconColor: const Color(0xFFC084FC).withOpacity(0.8),
-                            label: lang == 'tr'
-                                ? 'Arkadaşlarını Davet Et'
-                                : 'Invite Friends',
-                            subtitle: lang == 'tr'
-                                ? '+2 Ruh Taşı'
-                                : '+2 Soul Stones',
-                            onTap: _showInviteModal,
-                          ),
+
                           _SettingsListTile(
                             icon: Icons.help_outline_rounded,
                             iconColor: Colors.white54,
@@ -2386,17 +2249,7 @@ For questions: info@crackandwish.com''',
                             isDestructive: true,
                             onTap: _signOut,
                           ),
-                          _SettingsListTile(
-                            icon: Icons.delete_forever_rounded,
-                            iconColor: const Color(
-                              0xFFF87171,
-                            ), // Little darker soft red
-                            label: lang == 'tr'
-                                ? 'Hesabı Sil'
-                                : 'Delete Account',
-                            isDestructive: true,
-                            onTap: _deleteAccount,
-                          ),
+
                         ],
                       ),
 
@@ -2448,30 +2301,9 @@ For questions: info@crackandwish.com''',
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Crack&Wish  v1.0.0',
-                            style: TextStyle(
-                              color: AppColors.textWhite.withOpacity(0.2),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            lang == 'tr'
-                                ? 'Sevgiyle yapıldı ✨'
-                                : 'Made with love ✨',
-                            style: TextStyle(
-                              color: AppColors.textWhite.withOpacity(0.15),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -7458,17 +7290,25 @@ class _SettingsListTileState extends State<_SettingsListTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _pressed = true),
       onTapCancel: () => setState(() => _pressed = false),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTap: () {
+      onTap: () async {
         HapticFeedback.lightImpact();
+        if (!_pressed && mounted) setState(() => _pressed = true);
+        await Future.delayed(const Duration(milliseconds: 80));
+        if (mounted) setState(() => _pressed = false);
+        await Future.delayed(const Duration(milliseconds: 140));
         widget.onTap();
       },
       child: AnimatedScale(
         duration: const Duration(milliseconds: 150),
-        scale: _pressed ? 0.97 : 1.0,
-        child: ClipRRect(
+        scale: _pressed ? 0.90 : 1.0,
+        curve: Curves.easeOutBack,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 100),
+          opacity: _pressed ? 0.6 : 1.0,
+          child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
@@ -7476,15 +7316,22 @@ class _SettingsListTileState extends State<_SettingsListTile> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 color: widget.isDestructive
-                    ? const Color(0xFFF87171).withOpacity(0.08)
-                    : Colors.white.withOpacity(0.06),
+                    ? const Color(0xFFF87171).withOpacity(0.12)
+                    : const Color(0xFF1E1E1E).withOpacity(0.55),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: widget.isDestructive
-                      ? const Color(0xFFF87171).withOpacity(0.2)
+                      ? const Color(0xFFF87171).withOpacity(0.3)
                       : Colors.white.withOpacity(0.12),
-                  width: 1.0,
+                  width: 0.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -7545,6 +7392,7 @@ class _SettingsListTileState extends State<_SettingsListTile> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
