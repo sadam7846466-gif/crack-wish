@@ -112,8 +112,11 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   @override
   Widget build(BuildContext context) {
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return SwipeBackWrapper(
-      child: Scaffold(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
         backgroundColor: _bg,
         body: Stack(
           children: [
@@ -139,9 +142,10 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ), // Stack
+      ), // Scaffold
+      ), // TickerMode
+    ); // SwipeBackWrapper
   }
 
   Widget _buildHeader() {

@@ -1373,8 +1373,11 @@ class _ZodiacPageState extends State<ZodiacPage>
     final greeting = _userName != null
         ? 'Merhaba $_userName,'
         : 'Kozmik Yolcu,';
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return SwipeBackWrapper(
-      child: Scaffold(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
         backgroundColor: _bg,
         body: Stack(
           children: [
@@ -1746,9 +1749,10 @@ class _ZodiacPageState extends State<ZodiacPage>
             ),
           ),
         ],
-        ),
-      ),
-    );
+        ), // Stack
+      ), // Scaffold
+      ), // TickerMode
+    ); // SwipeBackWrapper
   }
 
   // ═══════════════════════════════════════════

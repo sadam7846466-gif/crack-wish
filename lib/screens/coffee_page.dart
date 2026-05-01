@@ -893,8 +893,11 @@ class _CoffeePageState extends State<CoffeePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
+        backgroundColor: const Color(
         0xFF161311,
       ), // Biraz daha açık, sıcak ve zengin espresso tonu
       body: Stack(
@@ -985,8 +988,8 @@ class _CoffeePageState extends State<CoffeePage>
             ),
           ),
         ],
-      ),
-    );
+      ), // Scaffold
+    ); // TickerMode
   }
 
   Widget _buildProgressBar() {

@@ -2015,10 +2015,13 @@ For questions: info@crackandwish.com''',
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final lang = l10n.localeName;
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
 
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: Colors.transparent,
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: Colors.transparent,
       body: ValueListenableBuilder(
         valueListenable: AppThemeController.notifier,
         builder: (context, palette, _) {
@@ -2315,7 +2318,8 @@ For questions: info@crackandwish.com''',
       bottomNavigationBar: widget.showBottomNav
           ? BottomNav(currentIndex: _currentNavIndex, onTap: _onNavTap)
           : null,
-    );
+      ), // Scaffold
+    ); // TickerMode
   }
 }
 

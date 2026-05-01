@@ -290,9 +290,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: Colors.transparent,
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
+    
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: Colors.transparent,
       body: ValueListenableBuilder(
         valueListenable: AppThemeController.notifier,
         builder: (context, palette, _) {
@@ -390,6 +394,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: widget.showBottomNav
           ? BottomNav(currentIndex: _currentNavIndex, onTap: _onNavTap)
           : null,
+      ),
     );
   }
 

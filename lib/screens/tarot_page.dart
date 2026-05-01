@@ -5877,6 +5877,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return PopScope(
       canPop: _state != RitualState.revealed,
       onPopInvokedWithResult: (didPop, _) {
@@ -5884,7 +5885,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           _resetToIdle();
         }
       },
-      child: Scaffold(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
         extendBody: true,
         backgroundColor: const Color(0xFF0E0E2A),
         body: Stack(
@@ -8541,6 +8544,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             ],
           ), // body: Stack
       ), // Scaffold
+      ), // TickerMode
     ); // PopScope
   }
 }

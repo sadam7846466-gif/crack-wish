@@ -446,8 +446,11 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
   @override
   Widget build(BuildContext context) {
     final lang = Localizations.localeOf(context).languageCode;
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     
-    return Scaffold(
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
       backgroundColor: Colors.transparent, // Allow underlying page to show through with SwipeFadePageRoute
       extendBodyBehindAppBar: true,
       body: Stack(
@@ -984,8 +987,9 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
         ),
       ),
       ],
-    ),
-  );
+    ), // Stack
+    ), // Scaffold
+    ); // TickerMode
   }
 }
 

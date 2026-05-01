@@ -297,7 +297,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
       backgroundColor: const Color(0xFF0C0A09),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 1200),
@@ -307,7 +310,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
             ? _buildLoadingScreen()
             : (_hasError ? _buildErrorScreen() : _buildResultScreen()),
       ),
-    );
+      ), // Scaffold
+    ); // TickerMode
   }
 
   Widget _buildLoadingScreen() {

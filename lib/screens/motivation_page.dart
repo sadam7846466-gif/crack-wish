@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/guidance_booklet.dart';
+import '../widgets/swipe_back_wrapper.dart';
 
 class MotivationPage extends StatefulWidget {
   const MotivationPage({super.key});
@@ -153,11 +154,14 @@ class _MotivationPageState extends State<MotivationPage>
     final screenWidth = MediaQuery.of(context).size.width;
     final swipeProgress = (_swipeOffset / screenWidth).clamp(0.0, 1.0);
     final scale = 1.0 - (swipeProgress * 0.08);
-    final opacity = 1.0 - (swipeProgress * 0.5);
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
 
-    return Scaffold(
-      body: Stack(
-        children: [
+    return SwipeBackWrapper(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
+        body: Stack(
+          children: [
           // Animated cosmic background
           RepaintBoundary(
             child: SizedBox.expand(
@@ -379,8 +383,10 @@ class _MotivationPageState extends State<MotivationPage>
             ),
           ),
         ],
-      ),
-    );
+      ), // Stack
+      ), // Scaffold
+      ), // TickerMode
+    ); // SwipeBackWrapper
   }
 }
 

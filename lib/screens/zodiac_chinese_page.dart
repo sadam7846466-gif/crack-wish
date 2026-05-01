@@ -206,8 +206,11 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   @override
   Widget build(BuildContext context) {
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return SwipeBackWrapper(
-      child: Scaffold(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
         backgroundColor: _bg,
         body: Stack(
           children: [
@@ -255,9 +258,10 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ), // Stack
+      ), // Scaffold
+      ), // TickerMode
+    ); // SwipeBackWrapper
   }
 
   // ── SECTION TABS — Ayrı Liquid Glass Kartları ──

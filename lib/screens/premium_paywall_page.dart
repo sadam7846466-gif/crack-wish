@@ -79,7 +79,10 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
+    return TickerMode(
+      enabled: isCurrent,
+      child: Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
@@ -473,9 +476,10 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
             ),
           ),
         ],
-      ),
-      ),
-    );
+      ), // Stack
+      ), // GestureDetector
+      ), // Scaffold
+    ); // TickerMode
   }
 
   void _selectPackage(int index) {

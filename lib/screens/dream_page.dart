@@ -1938,6 +1938,7 @@ class _DreamPageState extends State<DreamPage>
     final backgroundGradient = _resolveBackgroundGradient();
     final bottomContentPadding = MediaQuery.of(context).padding.bottom + 24;
 
+    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return PopScope(
       canPop: !(_showAnalysisOverlay || _isWriting),
       onPopInvokedWithResult: (didPop, result) {
@@ -1945,7 +1946,9 @@ class _DreamPageState extends State<DreamPage>
           _closeWritingModal();
         }
       },
-      child: Scaffold(
+      child: TickerMode(
+        enabled: isCurrent,
+        child: Scaffold(
         extendBody: true,
         backgroundColor: const Color(0xFF0F162B),
         body: Stack(
@@ -2144,8 +2147,9 @@ class _DreamPageState extends State<DreamPage>
               Positioned.fill(child: _buildMetricOverlay()),
           ],
         ),
-      ),
-    );
+      ), // Scaffold
+      ), // TickerMode
+    ); // PopScope
   }
 
   Widget _buildNewDreamTab() {
