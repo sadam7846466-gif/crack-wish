@@ -250,12 +250,6 @@ class _CookieSectionState extends State<CookieSection>
     final card = collection.firstWhere((c) => c.id == emoji, orElse: () => CookieCard(id: emoji, emoji: '', name: '', rarity: ''));
     
     int count = card.countObtained;
-    
-    // Legacy simülasyonu (cookie_selector.dart ile senkronize kalması için)
-    const legacy = {'fortune_cat', 'wildflower', 'cupid_ribbon', 'panda_bamboo', 'ramadan_cute', 'enchanted_forest'};
-    if (legacy.contains(emoji)) {
-      count = 50; // Mock inventory
-    }
 
     if (mounted) {
       setState(() {
@@ -510,7 +504,7 @@ class _CookieSectionState extends State<CookieSection>
 
     await StorageService.recordCookieCrack();
     StorageService.incrementCookieCount();
-    StorageService.consumeCookieCard(cookieId, isPaid: _paidCookieIds.contains(cookieId));
+    StorageService.consumeCookieCard(cookieId, isPaid: false);
     
     // Kırdıktan sonra ownedCount'u güncelle
     _checkOwnership();

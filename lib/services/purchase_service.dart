@@ -126,12 +126,10 @@ class PurchaseService {
       debugPrint('✅ Elite aktif edildi!');
       AnalyticsService().logElitePurchased(plan: productId);
     } else if (_isCookieProduct(productId)) {
-      // Kurabiye — satın alınan kurabiyeyi kaydet
-      final ownedCookies = prefs.getStringList('owned_cookies') ?? [];
-      if (!ownedCookies.contains(productId)) {
-        ownedCookies.add(productId);
-        await prefs.setStringList('owned_cookies', ownedCookies);
-      }
+      // Kurabiye — satın alınan kurabiyeyi envantere ekle
+      // Satın alınan ürün ID'si örn: "cookie_golden_arabesque". Ön ekini temizle:
+      final String cookieId = productId.replaceFirst('cookie_', '');
+      await StorageService.incrementCookieCard(cookieId);
       debugPrint('✅ Kurabiye satın alındı: $productId');
       AnalyticsService().logCookiePurchased(cookieId: productId, price: 'store');
     }
@@ -160,12 +158,11 @@ class PurchaseService {
     try {
       final purchaseParam = PurchaseParam(productDetails: product);
 
-      if (_isEliteProduct(productId)) {
-        // Abonelik
+      if (_isEliteProduct(purchaseParam.productDetails.id)) {
         await _iap.buyNonConsumable(purchaseParam: purchaseParam);
       } else {
-        // Kurabiye (tek seferlik)
-        await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+        // Kurabiye (tüketilebilir/hediye edilebilir, stoklu ürün)
+        await _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: true);
       }
       return true;
     } catch (e) {
@@ -182,9 +179,10 @@ class PurchaseService {
 
   /// Kullanıcı bu kurabiyeye sahip mi?
   Future<bool> ownsCookie(String cookieProductId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final owned = prefs.getStringList('owned_cookies') ?? [];
-    return owned.contains(cookieProductId);
+    final cookieId = cookieProductId.replaceFirst('cookie_', '');
+    final collection = await StorageService.getCookieCollection();
+    final card = collection.firstWhere((c) => c.id == cookieId, orElse: () => CookieCard(id: cookieId, emoji: '', name: '', rarity: ''));
+    return card.countObtained > 0;
   }
 
   /// Eski satın almaları geri yükle (Apple zorunlu kılıyor)

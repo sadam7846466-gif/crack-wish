@@ -80,9 +80,6 @@ class _CookieSelectorState extends State<CookieSelector> {
     _loadOwnedCookies();
   }
 
-  Future<void> _loadOwnedCookies() async {
-    final collection = await StorageService.getCookieCollection();
-
     if (mounted) {
       setState(() {
         _ownedPaidCookieCounts.clear();
@@ -93,7 +90,6 @@ class _CookieSelectorState extends State<CookieSelector> {
         }
       });
     }
-  }
   
   @override
   void didChangeDependencies() {
