@@ -128,7 +128,7 @@ class _CoffeePageState extends State<CoffeePage>
 
   Future<void> _loadPremiumStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    final premium = prefs.getBool('is_premium_test_mode') ?? false;
+    final premium = prefs.getBool('is_elite') ?? false;
     if (mounted) setState(() => _isPremium = premium);
   }
 
@@ -342,7 +342,7 @@ class _CoffeePageState extends State<CoffeePage>
   Future<bool> _checkPremiumAccess() async {
     final prefs = await SharedPreferences.getInstance();
     final isPremiumUser =
-        prefs.getBool('is_premium_test_mode') ??
+        prefs.getBool('is_elite') ??
         prefs.getBool('is_premium_user') ??
         false;
 

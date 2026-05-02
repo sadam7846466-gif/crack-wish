@@ -112,7 +112,7 @@ class ProfilePageState extends State<ProfilePage> {
       _userAvatar = avatar;
       _unreadOwlCount = unreadOwl;
       _isLoading = false;
-      _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+      _isPremiumUser = prefs.getBool('is_elite') ?? false;
     });
 
     // Günlük Elite Ruh Taşlarını yenile (merkezi sistem)

@@ -13,7 +13,7 @@ class ZodiacAccessService {
   // Batı Astrolojisi için giriş kontrolü
   static Future<void> handleWesternAccess(BuildContext context, VoidCallback onUnlock) async {
     final prefs = await SharedPreferences.getInstance();
-    final bool isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+    final bool isPremiumUser = prefs.getBool('is_elite') ?? false;
     final today = DateTime.now().toIso8601String().split('T')[0];
 
     // Elite isen
@@ -54,7 +54,7 @@ class ZodiacAccessService {
   // Asya/Maya Astrolojisi için giriş kontrolü
   static Future<void> handlePremiumAccess(BuildContext context, String moduleKey, VoidCallback onUnlock) async {
     final prefs = await SharedPreferences.getInstance();
-    final bool isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+    final bool isPremiumUser = prefs.getBool('is_elite') ?? false;
     await StorageService.getSoulStones(); // Günlük taşları garantiye al
     final today = DateTime.now().toIso8601String().split('T')[0];
     final dailyKey = 'zodiac_elite_unlocked_${moduleKey}_$today';

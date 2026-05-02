@@ -190,7 +190,7 @@ class UserStatsService {
     await StorageService.incrementTotalTarots();
     
     // YENİ SİSTEM: Kullanıcının toplaması için Bekleyen Aura Havuzuna (Vault) ekle
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
     final int pts = 2 * (isPremium ? 3 : 1);
     await StorageService.addPendingAura('fal', pts);
     // 📊 Analytics

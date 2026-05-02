@@ -457,7 +457,7 @@ class _DreamPageState extends State<DreamPage>
     if (mounted) {
       final today = DateTime.now().toIso8601String().split('T')[0];
       setState(() {
-        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+        _isPremiumUser = prefs.getBool('is_elite') ?? false;
 
         // Günlük ücretsiz hak kontrolü
         _dreamDailyFreeUsed = (prefs.getString(_kDreamFreeDate) == today);

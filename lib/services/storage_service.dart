@@ -119,7 +119,7 @@ class StorageService {
   /// Elite kullanıcının günlük 5 taşını yenile (gün değiştiyse)
   static Future<void> refreshDailyEliteSoulStones() async {
     final prefs = await SharedPreferences.getInstance();
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
     if (!isPremium) {
       // Ücretsiz kullanıcı: günlük taş = 0
       await prefs.setInt(_keyDailyEliteSoulStones, 0);
@@ -367,7 +367,7 @@ class StorageService {
     await prefs.setInt(_keyTotalDreams, current + 1);
     
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
     await addPendingAura('ruya', 3 * (isPremium ? 3 : 1));
     // 📊 Analytics
     AnalyticsService().logDreamAnalyzed();
@@ -395,7 +395,7 @@ class StorageService {
     await prefs.setInt(_keyTotalCoffee, current + 1);
     
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
     await addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
     // 📊 Analytics
     AnalyticsService().logCoffeeAnalyzed();
@@ -630,7 +630,7 @@ class StorageService {
     await _updateStreak();
     
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+1) ekliyoruz
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
     await addPendingAura('kurabiye', 1 * (isPremium ? 3 : 1));
   }
 

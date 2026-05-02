@@ -646,7 +646,7 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
     SharedPreferences.getInstance().then((prefs) {
       if (mounted) {
         setState(() {
-          _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+          _isPremiumUser = prefs.getBool('is_elite') ?? false;
         });
       }
     });

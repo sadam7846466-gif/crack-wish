@@ -107,7 +107,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+        _isPremiumUser = prefs.getBool('is_elite') ?? false;
       });
     }
   }
@@ -3113,7 +3113,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
     // ── Günlük mektup limit kontrolü ──
     final sentToday = await StorageService.getLettersSentToday();
     final prefs = await SharedPreferences.getInstance();
-    final isPremium = prefs.getBool('is_premium_test_mode') ?? false;
+    final isPremium = prefs.getBool('is_elite') ?? false;
 
     // ── 1. DURUM: GÜNLÜK MAKSİMUM LİMİT (5) DOLDU ──
     if (sentToday >= StorageService.kMaxDailyLetters) {

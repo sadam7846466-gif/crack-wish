@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -137,103 +136,92 @@ class _DailyTipCardState extends State<DailyTipCard> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14), // 30 → 14 (performans)
-                child: GlassContainer(
-                  useOwnLayer: true,
-                  height: null,
-                  settings: const LiquidGlassSettings(
-                    thickness: 16,
-                    blur: 2,
-                    glassColor: Colors.transparent,
-                    chromaticAberration: 0.1,
-                    lightIntensity: 0.7,
-                    ambientStrength: 0.6,
-                    refractiveIndex: 1.2,
-                    saturation: 1.0,
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          accentColors[0].withOpacity(0.20),
-                          accentColors[1].withOpacity(0.08),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.25),
-                        width: 0.8,
-                      ),
-                    ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
+                filter: ImageFilter.blur(
+                  sigmaX: 14,
+                  sigmaY: 14,
+                ), // 30 → 14 (performans)
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: accentColors,
-                    ).createShader(bounds),
-                    child: Icon(
-                      iconData,
-                      color: Colors.white,
-                      size: 38,
-                      shadows: [
-                        Shadow(
-                          color: accentColors[1].withOpacity(0.5),
-                          blurRadius: 12,
-                          offset: const Offset(0, 2),
-                        ),
+                      colors: [
+                        accentColors[0].withOpacity(0.20),
+                        accentColors[1].withOpacity(0.08),
                       ],
                     ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.25),
+                      width: 0.8,
+                    ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
                       children: [
-                        Text(
-                          l10n.discoverDailySuggestionTitle,
-                          style: TextStyle(
-                            color: AppColors.textWhite.withOpacity(0.75),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: accentColors,
+                          ).createShader(bounds),
+                          child: Icon(
+                            iconData,
+                            color: Colors.white,
+                            size: 38,
+                            shadows: [
+                              Shadow(
+                                color: accentColors[1].withOpacity(0.5),
+                                blurRadius: 12,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          headline,
-                          style: TextStyle(
-                            color: AppColors.textWhite,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.discoverDailySuggestionTitle,
+                                style: TextStyle(
+                                  color: AppColors.textWhite.withOpacity(0.75),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                headline,
+                                style: TextStyle(
+                                  color: AppColors.textWhite,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                subtitle,
+                                style: TextStyle(
+                                  color: AppColors.textWhite70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: AppColors.textWhite70,
-                            fontSize: 12,
-                          ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppColors.textWhite50,
+                          size: 18,
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: AppColors.textWhite50,
-                    size: 18,
-                  ),
-                ],
-              ),
-            ),
-            ),
-          ),
+                ),
               ),
             ),
           ),

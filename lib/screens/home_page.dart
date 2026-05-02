@@ -41,8 +41,8 @@ class _HomePageState extends State<HomePage> {
       GlobalKey<State<CookieSection>>();
   final GlobalKey _owlButtonKey = GlobalKey();
   int _unreadOwlCount = 0;
-  bool _owlPressed = false;
   late String _randomSubtitle;
+  late bool _showTimeSubtitle;
   String? _userName;
   static final _mottledPainter = _MottledPainter();
 
@@ -68,6 +68,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
+    _showTimeSubtitle = math.Random().nextBool();
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
     _loadUserName();
@@ -87,7 +88,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onMockOwlUpdate() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    // Sadece unread count değiştiyse rebuild et — gereksiz zıplamayı önler
+    _checkUnreadOwlLetters();
   }
 
   @override
@@ -172,16 +175,22 @@ class _HomePageState extends State<HomePage> {
       _playOwlNotificationSound();
     }
 
-    setState(() => _unreadOwlCount = count);
+    // Sadece değer değiştiyse rebuild et — gereksiz rebuild'leri önle
+    if (_unreadOwlCount != count) {
+      setState(() => _unreadOwlCount = count);
+    }
   }
 
   void _openOwlLetterPage() {
     HapticFeedback.mediumImpact();
+    // _owlButtonKey artık _OwlButton içinde — fallback rect kullan
+    Rect rect = const Rect.fromLTWH(0, 0, 52, 52);
     final box = _owlButtonKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final pos = box.localToGlobal(Offset.zero);
-    final size = box.size;
-    final rect = Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
+    if (box != null) {
+      final pos = box.localToGlobal(Offset.zero);
+      final size = box.size;
+      rect = Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
+    }
 
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -290,10 +299,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     
     return TickerMode(
-      enabled: isCurrent,
+      enabled: true,
       child: Scaffold(
         extendBody: true,
         backgroundColor: Colors.transparent,
@@ -439,8 +447,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Yarı rastgele, yarı zamana özel bir alt başlık
-    final showTimeSubtitle = math.Random().nextBool(); // %50 ihtimalle zamana özel, %50 rastgele mottolar
-    final finalSubtitle = showTimeSubtitle ? timeSubtitle : _randomSubtitle;
+    final finalSubtitle = _showTimeSubtitle ? timeSubtitle : _randomSubtitle;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -490,101 +497,134 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(width: 12),
         // Baykuş butonu — tıklanınca buzlu cam mektup paneli açılır
-        GestureDetector(
-          onTapDown: (_) => setState(() => _owlPressed = true),
-          onTapUp: (_) {
-            Future.delayed(const Duration(milliseconds: 100), () {
-              if (mounted) setState(() => _owlPressed = false);
-              _openOwlLetterPage();
-            });
-          },
-          onTapCancel: () => setState(() => _owlPressed = false),
-          child: RepaintBoundary(
-            child: AnimatedScale(
-              scale: _owlPressed ? 0.88 : 1.0,
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeInOut,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  GlassContainer(
-                    key: _owlButtonKey,
-                    useOwnLayer: true,
-                    width: 52,
-                    height: 52,
-                    settings: const LiquidGlassSettings(
-                      thickness: 18,
-                      blur: 2,
-                      glassColor: Colors.transparent,
-                      chromaticAberration: 0.1,
-                      lightIntensity: 0.7,
-                      ambientStrength: 0.6,
-                      refractiveIndex: 1.2,
-                      saturation: 1.0,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFD4B8A0), // Bej
-                            Color(0xFF964040), // Kırmızı
-                            Color(0xFF2A4A6C), // Mavi
-                          ],
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.45),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF964040).withOpacity(0.35),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 6,
-                            right: 6,
-                            top: 6,
-                            height: 12,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white.withOpacity(0.4),
-                                    Colors.white.withOpacity(0.0),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Center(child: Image.asset('assets/images/owl.png', width: 52, height: 52)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Okunmamış mektup badge'i
-                  if (totalUnread > 0)
-                    const Positioned(
-                      right: 0,
-                      top: 0,
-                      child: CosmicBadge(),
-                    ),
-                ],
-              ),
-            ),
-          ),
+        _OwlButton(
+          unreadCount: totalUnread,
+          onTap: _openOwlLetterPage,
         ),
       ],
+    );
+  }
+}
+
+class _OwlButton extends StatefulWidget {
+  final int unreadCount;
+  final VoidCallback onTap;
+
+  const _OwlButton({
+    required this.unreadCount,
+    required this.onTap,
+  });
+
+  @override
+  State<_OwlButton> createState() => _OwlButtonState();
+}
+
+class _OwlButtonState extends State<_OwlButton> {
+  bool _pressed = false;
+  final GlobalKey _btnKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) setState(() => _pressed = false);
+          widget.onTap();
+        });
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: RepaintBoundary(
+        child: AnimatedScale(
+          scale: _pressed ? 0.88 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeInOut,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GlassContainer(
+                key: _btnKey,
+                useOwnLayer: true,
+                width: 52,
+                height: 52,
+                settings: const LiquidGlassSettings(
+                  thickness: 18,
+                  blur: 2,
+                  glassColor: Colors.transparent,
+                  chromaticAberration: 0.1,
+                  lightIntensity: 0.7,
+                  ambientStrength: 0.6,
+                  refractiveIndex: 1.2,
+                  saturation: 1.0,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFD4B8A0), // Bej
+                        Color(0xFF964040), // Kırmızı
+                        Color(0xFF2A4A6C), // Mavi
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.45),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF964040).withOpacity(0.35),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 6,
+                        right: 6,
+                        top: 6,
+                        height: 12,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withOpacity(0.4),
+                                Colors.white.withOpacity(0.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Image.asset(
+                          'assets/images/owl.png',
+                          width: 52,
+                          height: 52,
+                          gaplessPlayback: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Okunmamış mektup badge'i
+              if (widget.unreadCount > 0)
+                const Positioned(
+                  right: 0,
+                  top: 0,
+                  child: CosmicBadge(),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

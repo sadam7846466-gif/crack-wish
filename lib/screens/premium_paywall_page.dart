@@ -50,7 +50,6 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
     // 2. Lokal veriyi güncelle
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('is_elite', isEliteInCloud);
-    await prefs.setBool('is_premium_test_mode', isEliteInCloud); // Eski uyumluluk için
     
     if (!mounted) return;
     setState(() {

@@ -71,7 +71,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+        _isPremiumUser = prefs.getBool('is_elite') ?? false;
       });
     }
   }
@@ -88,15 +88,15 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isActive
-                ? const Color(0xFF22D3EE).withOpacity(0.12)
-                : Colors.white.withOpacity(0.05),
+                ? const Color(0xFF22D3EE).withValues(alpha: 0.12)
+                : Colors.white.withValues(alpha: 0.05),
           ),
           child: Icon(
             icon,
             size: 16,
             color: isActive
-                ? const Color(0xFF22D3EE).withOpacity(0.8)
-                : Colors.white.withOpacity(0.3),
+                ? const Color(0xFF22D3EE).withValues(alpha: 0.8)
+                : Colors.white.withValues(alpha: 0.3),
           ),
         ),
         const SizedBox(width: 12),
@@ -105,8 +105,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             text,
             style: TextStyle(
               color: isActive
-                  ? Colors.white.withOpacity(0.75)
-                  : Colors.white.withOpacity(0.4),
+                  ? Colors.white.withValues(alpha: 0.75)
+                  : Colors.white.withValues(alpha: 0.4),
               fontSize: 13,
               height: 1.3,
             ),
@@ -121,7 +121,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     if (!mounted) return;
     await showGeneralDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       barrierDismissible: true,
       barrierLabel: 'SoulStoneInfo',
       transitionDuration: const Duration(milliseconds: 300),
@@ -142,13 +142,13 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
                       color: _isPremiumUser
-                          ? const Color(0xFF22D3EE).withOpacity(0.08)
-                          : Colors.white.withOpacity(0.12),
+                          ? const Color(0xFF22D3EE).withValues(alpha: 0.08)
+                          : Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: _isPremiumUser
-                            ? const Color(0xFF22D3EE).withOpacity(0.35)
-                            : Colors.white.withOpacity(0.25),
+                            ? const Color(0xFF22D3EE).withValues(alpha: 0.35)
+                            : Colors.white.withValues(alpha: 0.25),
                         width: 0.5,
                       ),
                     ),
@@ -159,7 +159,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                           Icons.diamond_rounded,
                           color: soulStones >= 1
                               ? const Color(0xFF22D3EE)
-                              : Colors.white.withOpacity(0.3),
+                              : Colors.white.withValues(alpha: 0.3),
                           size: 48,
                         ),
                         const SizedBox(height: 12),
@@ -178,10 +178,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF22D3EE).withOpacity(0.12),
+                            color: const Color(0xFF22D3EE).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color(0xFF22D3EE).withOpacity(0.3),
+                              color: const Color(0xFF22D3EE).withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -234,7 +234,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(
                                 0xFF22D3EE,
-                              ).withOpacity(0.15),
+                              ).withValues(alpha: 0.15),
                               elevation: 0,
                               minimumSize: const Size(double.infinity, 44),
                               shape: RoundedRectangleBorder(
@@ -242,7 +242,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                 side: BorderSide(
                                   color: const Color(
                                     0xFF22D3EE,
-                                  ).withOpacity(0.4),
+                                  ).withValues(alpha: 0.4),
                                 ),
                               ),
                             ),
@@ -416,7 +416,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     final remaining = _kWesternMaxAdEntries - adCount;
     showGeneralDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       barrierDismissible: true,
       barrierLabel: 'WesternAd',
       transitionDuration: const Duration(milliseconds: 300),
@@ -434,9 +434,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 0.5),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -452,7 +452,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                         Text(
                           'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.\nKalan hak: $remaining',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.4),
                         ),
                         const SizedBox(height: 20),
                         Row(
@@ -460,12 +460,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                             Expanded(
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white.withOpacity(0.08),
+                                  backgroundColor: Colors.white.withValues(alpha: 0.08),
                                   elevation: 0,
                                   minimumSize: const Size(double.infinity, 48),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
-                                    side: BorderSide(color: const Color(0xFFFFD060).withOpacity(0.3)),
+                                    side: BorderSide(color: const Color(0xFFFFD060).withValues(alpha: 0.3)),
                                   ),
                                 ),
                                 onPressed: () {
@@ -482,10 +482,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                     }
                                   }, () {});
                                 },
-                                icon: Icon(Icons.play_circle_filled_rounded, color: const Color(0xFFFFD060).withOpacity(0.8), size: 18),
+                                icon: Icon(Icons.play_circle_filled_rounded, color: const Color(0xFFFFD060).withValues(alpha: 0.8), size: 18),
                                 label: Text(
                                   'Reklam İzle',
-                                  style: TextStyle(color: const Color(0xFFFFD060).withOpacity(0.9), fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: const Color(0xFFFFD060).withValues(alpha: 0.9), fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -493,12 +493,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                             Expanded(
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                  backgroundColor: const Color(0xFF22D3EE).withValues(alpha: 0.15),
                                   elevation: 0,
                                   minimumSize: const Size(double.infinity, 48),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
-                                    side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                    side: BorderSide(color: const Color(0xFF22D3EE).withValues(alpha: 0.4)),
                                   ),
                                 ),
                                 onPressed: () {
@@ -532,7 +532,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   void _showWesternLimitReached(BuildContext context) {
     showGeneralDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       barrierDismissible: true,
       barrierLabel: 'WesternLimit',
       transitionDuration: const Duration(milliseconds: 300),
@@ -550,14 +550,14 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 0.5),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.lock_clock_rounded, color: Colors.white.withOpacity(0.4), size: 48),
+                        Icon(Icons.lock_clock_rounded, color: Colors.white.withValues(alpha: 0.4), size: 48),
                         const SizedBox(height: 12),
                         const Text(
                           'Günlük Limit Doldu',
@@ -568,17 +568,17 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                         Text(
                           'Bugünlük Batı Astrolojisi hakkın bitti.\nYarın yeni haklar seni bekliyor!\n\nYa da Elite ile sınırsız giriş yap.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.5),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.5),
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                            backgroundColor: const Color(0xFF22D3EE).withValues(alpha: 0.15),
                             elevation: 0,
                             minimumSize: const Size(double.infinity, 48),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                              side: BorderSide(color: const Color(0xFF22D3EE).withValues(alpha: 0.4)),
                             ),
                           ),
                           onPressed: () {
@@ -643,7 +643,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     // Ücretsiz kullanıcı için Merkezi Kilit Modalı (Tarot tarzı)
     showGeneralDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       barrierDismissible: true,
       barrierLabel: 'PremiumAccess',
       transitionDuration: const Duration(milliseconds: 300),
@@ -663,15 +663,15 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
+                          color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.25), 
+                            color: Colors.white.withValues(alpha: 0.25), 
                             width: 0.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 40,
                               spreadRadius: -5,
                             ),
@@ -687,7 +687,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                         children: [
                                           Icon(
                                             Icons.diamond_rounded, 
-                                            color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), 
+                                            color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withValues(alpha: 0.3), 
                                             size: 48
                                           ),
                                           const SizedBox(height: 12),
@@ -700,9 +700,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFF22D3EE).withOpacity(0.12),
+                                              color: const Color(0xFF22D3EE).withValues(alpha: 0.12),
                                               borderRadius: BorderRadius.circular(12),
-                                              border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 1),
+                                              border: Border.all(color: const Color(0xFF22D3EE).withValues(alpha: 0.3), width: 1),
                                             ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
@@ -743,8 +743,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                 child: ElevatedButton(
                                                   style: ElevatedButton.styleFrom(
                                                     backgroundColor: hasEnough
-                                                        ? const Color(0xFF22D3EE).withOpacity(0.15)
-                                                        : Colors.white.withOpacity(0.05),
+                                                        ? const Color(0xFF22D3EE).withValues(alpha: 0.15)
+                                                        : Colors.white.withValues(alpha: 0.05),
                                                     elevation: 0,
                                                     padding: const EdgeInsets.symmetric(vertical: 0),
                                                     minimumSize: const Size(double.infinity, 48),
@@ -752,8 +752,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                       borderRadius: BorderRadius.circular(16),
                                                       side: BorderSide(
                                                         color: hasEnough
-                                                            ? const Color(0xFF22D3EE).withOpacity(0.4)
-                                                            : Colors.white.withOpacity(0.1),
+                                                            ? const Color(0xFF22D3EE).withValues(alpha: 0.4)
+                                                            : Colors.white.withValues(alpha: 0.1),
                                                       ),
                                                     ),
                                                   ),
@@ -778,7 +778,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                       style: TextStyle(
                                                         color: hasEnough
                                                             ? const Color(0xFF22D3EE)
-                                                            : Colors.white.withOpacity(0.3),
+                                                            : Colors.white.withValues(alpha: 0.3),
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
@@ -790,12 +790,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                 Expanded(
                                                   child: ElevatedButton.icon(
                                                     style: ElevatedButton.styleFrom(
-                                                      backgroundColor: const Color(0xFF22D3EE).withOpacity(0.15),
+                                                      backgroundColor: const Color(0xFF22D3EE).withValues(alpha: 0.15),
                                                       elevation: 0,
                                                       minimumSize: const Size(double.infinity, 48),
                                                       shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.circular(16),
-                                                        side: BorderSide(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+                                                        side: BorderSide(color: const Color(0xFF22D3EE).withValues(alpha: 0.4)),
                                                       ),
                                                     ),
                                                     onPressed: () {
@@ -852,7 +852,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
         // Arka plan
         Container(decoration: BoxDecoration(gradient: RadialGradient(
           center: const Alignment(0, -0.6), radius: 1.6,
-          colors: [_goldD.withOpacity(0.2), _bg], stops: const [0, 1],
+          colors: [_goldD.withValues(alpha: 0.2), _bg], stops: const [0, 1],
         ))),
 
         // Kaydırılabilir Çarklar (Yumuşak üst sınır)
@@ -864,7 +864,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.4),
+                  Colors.black.withValues(alpha: 0.4),
                   Colors.black,
                   Colors.black,
                 ],
@@ -970,10 +970,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                               width: 38,
                               height: 38,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.10),
+                                color: Colors.white.withValues(alpha: 0.10),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: const Color(0xFF22D3EE).withOpacity(0.3),
+                                  color: const Color(0xFF22D3EE).withValues(alpha: 0.3),
                                   width: 0.6,
                                 ),
                               ),
@@ -984,13 +984,13 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                   Icon(
                                     Icons.diamond_outlined, 
                                     size: 11, 
-                                    color: soulStones > 0 ? const Color(0xFF22D3EE).withOpacity(0.9) : Colors.white.withOpacity(0.3)
+                                    color: soulStones > 0 ? const Color(0xFF22D3EE).withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.3)
                                   ),
                                   const SizedBox(width: 2),
                                   Text(
                                     '$soulStones',
                                     style: TextStyle(
-                                      color: soulStones > 0 ? const Color(0xFF22D3EE).withOpacity(0.9) : Colors.white.withOpacity(0.3),
+                                      color: soulStones > 0 ? const Color(0xFF22D3EE).withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.3),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -1030,7 +1030,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            Text(label, style: TextStyle(color: _gold.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 3)),
+            Text(label, style: TextStyle(color: _gold.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 3)),
             if (isPremium)
               Positioned(
                 right: -20,
@@ -1047,7 +1047,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF22D3EE).withOpacity(0.6),
+                        color: const Color(0xFF22D3EE).withValues(alpha: 0.6),
                         blurRadius: 6,
                         spreadRadius: 1,
                       )
@@ -1065,8 +1065,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: onTap,
-              splashColor: _goldL.withOpacity(0.15),
-              highlightColor: _goldD.withOpacity(0.1),
+              splashColor: _goldL.withValues(alpha: 0.15),
+              highlightColor: _goldD.withValues(alpha: 0.1),
               child: SizedBox(width: wheelSize, height: wheelSize, child: AnimatedBuilder(
                 animation: _spin,
                 builder: (c, _) => CustomPaint(size: Size(wheelSize, wheelSize), painter: painter(_spin.value)),
@@ -1076,15 +1076,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     ]);
   }
 
-  Widget _badge() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-    decoration: BoxDecoration(color: _goldD.withOpacity(0.15), borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: _gold.withOpacity(0.2))),
-    child: Row(mainAxisSize: MainAxisSize.min, children: [
-      const Text('✨', style: TextStyle(fontSize: 12)), const SizedBox(width: 5),
-      Text('3 Kadim Gelenek', style: TextStyle(color: _goldL.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600)),
-    ]),
-  );
+
 }
 
 // BATI ZODIAC ÇARKI — Referans görselden ilham
@@ -1100,23 +1092,23 @@ class WesternWheelPainter extends CustomPainter {
     final p = Paint()..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
 
     // Dış çift halka
-    p..color = gold.withOpacity(0.3)..strokeWidth = 1.8;
+    p..color = gold.withValues(alpha: 0.3)..strokeWidth = 1.8;
     canvas.drawCircle(c, r - 2, p);
-    p..color = gold.withOpacity(0.15)..strokeWidth = 1.0;
+    p..color = gold.withValues(alpha: 0.15)..strokeWidth = 1.0;
     canvas.drawCircle(c, r - 8, p);
-    p..color = gold.withOpacity(0.22)..strokeWidth = 1.2;
+    p..color = gold.withValues(alpha: 0.22)..strokeWidth = 1.2;
     canvas.drawCircle(c, r * 0.36, p);
 
     // 12 segment bölmesi
     for (int i = 0; i < 12; i++) {
       final a = (i * 30 - 90 + rotation * 360) * math.pi / 180;
-      p..color = gold.withOpacity(0.1)..strokeWidth = 0.6;
+      p..color = gold.withValues(alpha: 0.1)..strokeWidth = 0.6;
       canvas.drawLine(c + Offset(math.cos(a) * r * 0.36, math.sin(a) * r * 0.36),
         c + Offset(math.cos(a) * (r - 8), math.sin(a) * (r - 8)), p);
     }
 
     // 12 burç sembolü — daha büyük alan
-    final sp = Paint()..color = gold.withOpacity(0.9)..style = PaintingStyle.stroke
+    final sp = Paint()..color = gold.withValues(alpha: 0.9)..style = PaintingStyle.stroke
       ..strokeWidth = 2.4..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
     for (int i = 0; i < 12; i++) {
       final a = (i * 30 - 75 + rotation * 360) * math.pi / 180;
@@ -1128,7 +1120,7 @@ class WesternWheelPainter extends CustomPainter {
 
     // Sıcak parıltı (geniş)
     canvas.drawCircle(c, r * 0.5, Paint()..shader = RadialGradient(
-      colors: [gold.withOpacity(0.08), gold.withOpacity(0.02), Colors.transparent],
+      colors: [gold.withValues(alpha: 0.08), gold.withValues(alpha: 0.02), Colors.transparent],
       stops: const [0.1, 0.5, 1.0],
     ).createShader(Rect.fromCircle(center: c, radius: r * 0.5)));
 
@@ -1142,7 +1134,7 @@ class WesternWheelPainter extends CustomPainter {
       // Opaklık dışa doğru azalıyor
       final baseOpacity = type == 0 ? 0.25 : (type == 2 ? 0.15 : 0.08);
       final width = type == 0 ? 1.3 : (type == 2 ? 0.8 : 0.4);
-      p..color = gold.withOpacity(baseOpacity)..strokeWidth = width;
+      p..color = gold.withValues(alpha: baseOpacity)..strokeWidth = width;
       canvas.drawLine(
         c + Offset(math.cos(a) * innerStart, math.sin(a) * innerStart),
         c + Offset(math.cos(a) * outerEnd, math.sin(a) * outerEnd), p);
@@ -1151,14 +1143,14 @@ class WesternWheelPainter extends CustomPainter {
     // İkinci katman — 12 ana ışın (daha kalın, daha uzun)
     for (int i = 0; i < 12; i++) {
       final a = (i * 30 + 15 + rotation * 360) * math.pi / 180;
-      p..color = gold.withOpacity(0.12)..strokeWidth = 2.0;
+      p..color = gold.withValues(alpha: 0.12)..strokeWidth = 2.0;
       canvas.drawLine(
         c + Offset(math.cos(a) * discR * 1.5, math.sin(a) * discR * 1.5),
         c + Offset(math.cos(a) * r * 0.48, math.sin(a) * r * 0.48), p);
       // Paralel ince ışınlar (kenar çizgileri)
       for (final offset in [-0.03, 0.03]) {
         final aOff = a + offset;
-        p..color = gold.withOpacity(0.06)..strokeWidth = 0.5;
+        p..color = gold.withValues(alpha: 0.06)..strokeWidth = 0.5;
         canvas.drawLine(
           c + Offset(math.cos(aOff) * discR * 2, math.sin(aOff) * discR * 2),
           c + Offset(math.cos(aOff) * r * 0.44, math.sin(aOff) * r * 0.44), p);
@@ -1166,25 +1158,25 @@ class WesternWheelPainter extends CustomPainter {
     }
 
     // Güneş diski — çift halka
-    p..color = gold.withOpacity(0.4)..strokeWidth = 2.0;
+    p..color = gold.withValues(alpha: 0.4)..strokeWidth = 2.0;
     canvas.drawCircle(c, discR, p);
-    p..color = gold.withOpacity(0.2)..strokeWidth = 0.8;
+    p..color = gold.withValues(alpha: 0.2)..strokeWidth = 0.8;
     canvas.drawCircle(c, discR * 1.6, p);
 
     // Disk iç parıltı
     canvas.drawCircle(c, discR * 1.2, Paint()..shader = RadialGradient(
-      colors: [gold.withOpacity(0.18), gold.withOpacity(0.05), Colors.transparent],
+      colors: [gold.withValues(alpha: 0.18), gold.withValues(alpha: 0.05), Colors.transparent],
     ).createShader(Rect.fromCircle(center: c, radius: discR * 1.2)));
 
     // Parlak çekirdek
-    canvas.drawCircle(c, 3, Paint()..color = gold.withOpacity(0.75)..style = PaintingStyle.fill);
-    canvas.drawCircle(c, 1.2, Paint()..color = gold.withOpacity(0.95)..style = PaintingStyle.fill);
+    canvas.drawCircle(c, 3, Paint()..color = gold.withValues(alpha: 0.75)..style = PaintingStyle.fill);
+    canvas.drawCircle(c, 1.2, Paint()..color = gold.withValues(alpha: 0.95)..style = PaintingStyle.fill);
 
     // Dış noktalar
     for (int i = 0; i < 36; i++) {
       final a = (i * 10 + rotation * 360) * math.pi / 180;
       canvas.drawCircle(c + Offset(math.cos(a) * (r - 5), math.sin(a) * (r - 5)),
-        i % 3 == 0 ? 1.5 : 0.7, Paint()..color = gold.withOpacity(i % 3 == 0 ? 0.25 : 0.08)..style = PaintingStyle.fill);
+        i % 3 == 0 ? 1.5 : 0.7, Paint()..color = gold.withValues(alpha: i % 3 == 0 ? 0.25 : 0.08)..style = PaintingStyle.fill);
     }
   }
 
@@ -1192,63 +1184,63 @@ class WesternWheelPainter extends CustomPainter {
     final path = Path();
     switch (i) {
       case 0: // ♈ Koç — V boynuz + alt çizgi
-        path..moveTo(o.dx - s * .35, o.dy - s * .55);
+        path.moveTo(o.dx - s * .35, o.dy - s * .55);
         path.cubicTo(o.dx - s * .55, o.dy - s * .15, o.dx - s * .15, o.dy + s * .1, o.dx, o.dy + s * .35);
         path.cubicTo(o.dx + s * .15, o.dy + s * .1, o.dx + s * .55, o.dy - s * .15, o.dx + s * .35, o.dy - s * .55);
-        path..moveTo(o.dx, o.dy + s * .35); path.lineTo(o.dx, o.dy + s * .65);
+        path.moveTo(o.dx, o.dy + s * .35); path.lineTo(o.dx, o.dy + s * .65);
       case 1: // ♉ Boğa — daire + hilal boynuz
         canvas.drawCircle(Offset(o.dx, o.dy + s * .2), s * .28, p);
-        path..moveTo(o.dx - s * .45, o.dy);
+        path.moveTo(o.dx - s * .45, o.dy);
         path.cubicTo(o.dx - s * .55, o.dy - s * .55, o.dx - s * .1, o.dy - s * .7, o.dx, o.dy - s * .4);
         path.cubicTo(o.dx + s * .1, o.dy - s * .7, o.dx + s * .55, o.dy - s * .55, o.dx + s * .45, o.dy);
       case 2: // ♊ İkizler — iki sütun + yay bağlantılar
-        path..moveTo(o.dx - s * .3, o.dy - s * .55); path.lineTo(o.dx - s * .3, o.dy + s * .55);
-        path..moveTo(o.dx + s * .3, o.dy - s * .55); path.lineTo(o.dx + s * .3, o.dy + s * .55);
-        path..moveTo(o.dx - s * .45, o.dy - s * .4);
+        path.moveTo(o.dx - s * .3, o.dy - s * .55); path.lineTo(o.dx - s * .3, o.dy + s * .55);
+        path.moveTo(o.dx + s * .3, o.dy - s * .55); path.lineTo(o.dx + s * .3, o.dy + s * .55);
+        path.moveTo(o.dx - s * .45, o.dy - s * .4);
         path.quadraticBezierTo(o.dx, o.dy - s * .75, o.dx + s * .45, o.dy - s * .4);
-        path..moveTo(o.dx - s * .45, o.dy + s * .4);
+        path.moveTo(o.dx - s * .45, o.dy + s * .4);
         path.quadraticBezierTo(o.dx, o.dy + s * .75, o.dx + s * .45, o.dy + s * .4);
       case 3: // ♋ Yengeç — 69 şekli
-        path..moveTo(o.dx + s * .15, o.dy - s * .15);
+        path.moveTo(o.dx + s * .15, o.dy - s * .15);
         path.cubicTo(o.dx - s * .2, o.dy - s * .15, o.dx - s * .5, o.dy - s * .55, o.dx - s * .1, o.dy - s * .5);
-        path..moveTo(o.dx + s * .15, o.dy - s * .15);
+        path.moveTo(o.dx + s * .15, o.dy - s * .15);
         path.cubicTo(o.dx + s * .5, o.dy - s * .15, o.dx + s * .5, o.dy + s * .15, o.dx + s * .15, o.dy + s * .15);
-        path..moveTo(o.dx - s * .15, o.dy + s * .15);
+        path.moveTo(o.dx - s * .15, o.dy + s * .15);
         path.cubicTo(o.dx + s * .2, o.dy + s * .15, o.dx + s * .5, o.dy + s * .55, o.dx + s * .1, o.dy + s * .5);
-        path..moveTo(o.dx - s * .15, o.dy + s * .15);
+        path.moveTo(o.dx - s * .15, o.dy + s * .15);
         path.cubicTo(o.dx - s * .5, o.dy + s * .15, o.dx - s * .5, o.dy - s * .15, o.dx - s * .15, o.dy - s * .15);
       case 4: // ♌ Aslan — daire + S kuyruk
         canvas.drawCircle(Offset(o.dx + s * .2, o.dy + s * .25), s * .2, p);
-        path..moveTo(o.dx, o.dy + s * .25);
+        path.moveTo(o.dx, o.dy + s * .25);
         path.cubicTo(o.dx - s * .4, o.dy + s * .25, o.dx - s * .5, o.dy - s * .1, o.dx - s * .2, o.dy - s * .35);
         path.cubicTo(o.dx, o.dy - s * .6, o.dx + s * .4, o.dy - s * .5, o.dx + s * .35, o.dy - s * .15);
       case 5: // ♍ Başak — m dalga + çapraz kuyruk
-        path..moveTo(o.dx - s * .45, o.dy + s * .4); path.lineTo(o.dx - s * .45, o.dy);
+        path.moveTo(o.dx - s * .45, o.dy + s * .4); path.lineTo(o.dx - s * .45, o.dy);
         path.cubicTo(o.dx - s * .45, o.dy - s * .45, o.dx - s * .15, o.dy - s * .45, o.dx - s * .15, o.dy);
         path.cubicTo(o.dx - s * .15, o.dy - s * .45, o.dx + s * .15, o.dy - s * .45, o.dx + s * .15, o.dy);
         path.cubicTo(o.dx + s * .15, o.dy - s * .45, o.dx + s * .45, o.dy - s * .45, o.dx + s * .45, o.dy);
         path.lineTo(o.dx + s * .45, o.dy + s * .2);
-        path..moveTo(o.dx + s * .2, o.dy + s * .15); path.lineTo(o.dx + s * .55, o.dy + s * .5);
-        path..moveTo(o.dx + s * .3, o.dy + s * .38); path.lineTo(o.dx + s * .55, o.dy + s * .25);
+        path.moveTo(o.dx + s * .2, o.dy + s * .15); path.lineTo(o.dx + s * .55, o.dy + s * .5);
+        path.moveTo(o.dx + s * .3, o.dy + s * .38); path.lineTo(o.dx + s * .55, o.dy + s * .25);
       case 6: // ♎ Terazi — kubbe + iki çizgi
-        path..moveTo(o.dx - s * .5, o.dy + s * .35); path.lineTo(o.dx + s * .5, o.dy + s * .35);
-        path..moveTo(o.dx - s * .5, o.dy + s * .1); path.lineTo(o.dx + s * .5, o.dy + s * .1);
-        path..moveTo(o.dx - s * .35, o.dy + s * .1);
+        path.moveTo(o.dx - s * .5, o.dy + s * .35); path.lineTo(o.dx + s * .5, o.dy + s * .35);
+        path.moveTo(o.dx - s * .5, o.dy + s * .1); path.lineTo(o.dx + s * .5, o.dy + s * .1);
+        path.moveTo(o.dx - s * .35, o.dy + s * .1);
         path.cubicTo(o.dx - s * .35, o.dy - s * .55, o.dx + s * .35, o.dy - s * .55, o.dx + s * .35, o.dy + s * .1);
       case 7: // ♏ Akrep — m dalga + ok kuyruk
-        path..moveTo(o.dx - s * .5, o.dy + s * .35); path.lineTo(o.dx - s * .5, o.dy - s * .05);
+        path.moveTo(o.dx - s * .5, o.dy + s * .35); path.lineTo(o.dx - s * .5, o.dy - s * .05);
         path.cubicTo(o.dx - s * .5, o.dy - s * .45, o.dx - s * .2, o.dy - s * .45, o.dx - s * .2, o.dy - s * .05);
         path.cubicTo(o.dx - s * .2, o.dy - s * .45, o.dx + s * .1, o.dy - s * .45, o.dx + s * .1, o.dy - s * .05);
         path.lineTo(o.dx + s * .1, o.dy + s * .25); path.lineTo(o.dx + s * .4, o.dy + s * .45);
-        path..moveTo(o.dx + s * .4, o.dy + s * .45); path.lineTo(o.dx + s * .5, o.dy + s * .25);
-        path..moveTo(o.dx + s * .4, o.dy + s * .45); path.lineTo(o.dx + s * .2, o.dy + s * .4);
+        path.moveTo(o.dx + s * .4, o.dy + s * .45); path.lineTo(o.dx + s * .5, o.dy + s * .25);
+        path.moveTo(o.dx + s * .4, o.dy + s * .45); path.lineTo(o.dx + s * .2, o.dy + s * .4);
       case 8: // ♐ Yay — çapraz ok
-        path..moveTo(o.dx - s * .45, o.dy + s * .55); path.lineTo(o.dx + s * .45, o.dy - s * .45);
+        path.moveTo(o.dx - s * .45, o.dy + s * .55); path.lineTo(o.dx + s * .45, o.dy - s * .45);
         path.lineTo(o.dx + s * .15, o.dy - s * .45);
-        path..moveTo(o.dx + s * .45, o.dy - s * .45); path.lineTo(o.dx + s * .45, o.dy - s * .15);
-        path..moveTo(o.dx - s * .15, o.dy + s * .05); path.lineTo(o.dx + s * .2, o.dy + s * .3);
+        path.moveTo(o.dx + s * .45, o.dy - s * .45); path.lineTo(o.dx + s * .45, o.dy - s * .15);
+        path.moveTo(o.dx - s * .15, o.dy + s * .05); path.lineTo(o.dx + s * .2, o.dy + s * .3);
       case 9: // ♑ Oğlak — üst kıvrım + kuyruk döngüsü
-        path..moveTo(o.dx - s * .3, o.dy - s * .5);
+        path.moveTo(o.dx - s * .3, o.dy - s * .5);
         path.cubicTo(o.dx - s * .45, o.dy - s * .65, o.dx - s * .05, o.dy - s * .7, o.dx, o.dy - s * .4);
         path.lineTo(o.dx + s * .1, o.dy + s * .1);
         path.cubicTo(o.dx + s * .45, o.dy + s * .6, o.dx + s * .05, o.dy + s * .7, o.dx - s * .15, o.dy + s * .45);
@@ -1256,15 +1248,15 @@ class WesternWheelPainter extends CustomPainter {
       case 10: // ♒ Kova — iki S dalga
         for (int j = 0; j < 2; j++) {
           final y = o.dy + (j == 0 ? -s * .15 : s * .2);
-          path..moveTo(o.dx - s * .5, y);
+          path.moveTo(o.dx - s * .5, y);
           path.cubicTo(o.dx - s * .35, y - s * .25, o.dx - s * .15, y + s * .25, o.dx, y);
           path.cubicTo(o.dx + s * .15, y - s * .25, o.dx + s * .35, y + s * .25, o.dx + s * .5, y);
         }
       case 11: // ♓ Balık — iki karşılıklı yay + çizgi
-        path..moveTo(o.dx - s * .45, o.dy); path.lineTo(o.dx + s * .45, o.dy);
-        path..moveTo(o.dx - s * .15, o.dy - s * .5);
+        path.moveTo(o.dx - s * .45, o.dy); path.lineTo(o.dx + s * .45, o.dy);
+        path.moveTo(o.dx - s * .15, o.dy - s * .5);
         path.cubicTo(o.dx - s * .55, o.dy - s * .2, o.dx - s * .55, o.dy + s * .2, o.dx - s * .15, o.dy + s * .5);
-        path..moveTo(o.dx + s * .15, o.dy - s * .5);
+        path.moveTo(o.dx + s * .15, o.dy - s * .5);
         path.cubicTo(o.dx + s * .55, o.dy - s * .2, o.dx + s * .55, o.dy + s * .2, o.dx + s * .15, o.dy + s * .5);
     }
     canvas.drawPath(path, p);
@@ -1280,7 +1272,7 @@ class ChineseWheelPainter extends CustomPainter {
   final Color gold, goldD;
   ChineseWheelPainter({required this.rotation, required this.gold, required this.goldD});
 
-  static const List<String> _names = ['FARE', 'ÖKÜZ', 'KAPLAN', 'TAVŞAN', 'EJDERHA', 'YILAN', 'AT', 'KEÇİ', 'MAYMUN', 'HOROZ', 'KÖPEK', 'DOMUZ'];
+
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1292,14 +1284,14 @@ class ChineseWheelPainter extends CustomPainter {
 
     // Merkezdeki Zarif Parlama
     canvas.drawCircle(c, r * 0.35, Paint()..shader = RadialGradient(
-      colors: [gold.withOpacity(0.08), Colors.transparent],
+      colors: [gold.withValues(alpha: 0.08), Colors.transparent],
     ).createShader(Rect.fromCircle(center: c, radius: r * 0.35)));
 
     // MERKEZ - Büyük Asya Mühür Çerçevesi (Dış çerçevelerle tam uyumlu)
     canvas.save();
     canvas.translate(c.dx, c.dy);
     
-    final frameColor = gold == Colors.white ? Colors.white.withOpacity(0.3) : const Color(0xFFC62828);
+    final frameColor = gold == Colors.white ? Colors.white.withValues(alpha: 0.3) : const Color(0xFFC62828);
     final cR = r * 0.32; // Büyük merkez çerçevenin boyutu
 
     // Kalın kızıl dış çerçeve (Köşeleri yuvarlatılmış)
@@ -1307,20 +1299,20 @@ class ChineseWheelPainter extends CustomPainter {
       Rect.fromCenter(center: Offset.zero, width: cR * 2, height: cR * 2),
       const Radius.circular(16)
     );
-    canvas.drawRRect(cRr, Paint()..color = frameColor.withOpacity(0.08)..style = PaintingStyle.fill);
-    canvas.drawRRect(cRr, Paint()..color = frameColor.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 2.5);
+    canvas.drawRRect(cRr, Paint()..color = frameColor.withValues(alpha: 0.08)..style = PaintingStyle.fill);
+    canvas.drawRRect(cRr, Paint()..color = frameColor.withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 2.5);
     
     // İnce altın iç çerçeve
     final cInnerRr = RRect.fromRectAndRadius(
       Rect.fromCenter(center: Offset.zero, width: cR * 1.70, height: cR * 1.70),
       const Radius.circular(10)
     );
-    canvas.drawRRect(cInnerRr, Paint()..color = gold.withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+    canvas.drawRRect(cInnerRr, Paint()..color = gold.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1.2);
 
     // Geleneksel Çin köşelikleri (Lattice Window Corners)
     final q = cR * 0.85;
     final wl = cR * 0.25; 
-    final cbPaint = Paint()..color = gold.withOpacity(0.5)..style = PaintingStyle.stroke..strokeWidth = 2.0;
+    final cbPaint = Paint()..color = gold.withValues(alpha: 0.5)..style = PaintingStyle.stroke..strokeWidth = 2.0;
     
     // Sol Üst
     canvas.drawPath(Path()..moveTo(-q, -q+wl)..lineTo(-q, -q)..lineTo(-q+wl, -q), cbPaint);
@@ -1337,7 +1329,7 @@ class ChineseWheelPainter extends CustomPainter {
     canvas.restore();
 
     // Dışarıdaki o kötü duran çember/halka çizgileri tamamen silindi.
-    // p..color = gold.withOpacity(0.12)..strokeWidth = 1.0;
+    // p..color = gold.withValues(alpha: 0.12)..strokeWidth = 1.0;
     // canvas.drawCircle(c, ringR, p);
 
     // 12 Hayvan ve Etraflarında Hafif Renkli Çerçeve
@@ -1350,7 +1342,7 @@ class ChineseWheelPainter extends CustomPainter {
       // Çark dönerken hayvanlar dik dursun (Ferris wheel effect)
       
       // Çok zarif ve hafif kızıl-altın karışımı Asya Mühür Çerçevesi (Rounded Rect)
-      final frameColor = gold == Colors.white ? Colors.white.withOpacity(0.3) : const Color(0xFFC62828);
+      final frameColor = gold == Colors.white ? Colors.white.withValues(alpha: 0.3) : const Color(0xFFC62828);
       final rectRadius = animalR * 1.02; // Karelerin birbirine girmemesi için boyut küçültüldü
       final rr = RRect.fromRectAndRadius(
         Rect.fromCenter(center: Offset.zero, width: rectRadius * 2, height: rectRadius * 2),
@@ -1358,15 +1350,15 @@ class ChineseWheelPainter extends CustomPainter {
       );
       
       // Çerçevenin transparan hafif dolgusu
-      canvas.drawRRect(rr, Paint()..color = frameColor.withOpacity(0.06)..style = PaintingStyle.fill);
+      canvas.drawRRect(rr, Paint()..color = frameColor.withValues(alpha: 0.06)..style = PaintingStyle.fill);
       // Çerçevenin ince çizgileleri (ikili çerçeve çok daha şık duruyor)
-      canvas.drawRRect(rr, Paint()..color = frameColor.withOpacity(0.4)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+      canvas.drawRRect(rr, Paint()..color = frameColor.withValues(alpha: 0.4)..style = PaintingStyle.stroke..strokeWidth = 1.5);
       
       final innerRr = RRect.fromRectAndRadius(
         Rect.fromCenter(center: Offset.zero, width: rectRadius * 1.7, height: rectRadius * 1.7),
         const Radius.circular(5)
       );
-      canvas.drawRRect(innerRr, Paint()..color = gold.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 0.8);
+      canvas.drawRRect(innerRr, Paint()..color = gold.withValues(alpha: 0.2)..style = PaintingStyle.stroke..strokeWidth = 0.8);
 
       // Hayvanı çiz (Artık hiçbir metin yok, tamamen saf tasarımlar)
       _drawIcon(canvas, i, animalR * 0.85, gold); // Çerçeveye tam oturması için ikonu hafif orantıladık
@@ -1381,10 +1373,9 @@ class ChineseWheelPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
-    final pFill = Paint()..style = PaintingStyle.fill;
 
     // Ana Yin-Yang dairesi (ince altın çizgi)
-    pStroke..color = gold.withOpacity(0.5)..strokeWidth = 1.5;
+    pStroke..color = gold.withValues(alpha: 0.5)..strokeWidth = 1.5;
     canvas.drawCircle(Offset.zero, r, pStroke);
 
     // Yin-Yang S-eğrisi (ortayı ikiye bölen akışkan kıvrım)
@@ -1392,7 +1383,7 @@ class ChineseWheelPainter extends CustomPainter {
       ..moveTo(0, -r)
       ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, 0)
       ..cubicTo(-r * 0.8, 0, -r * 0.8, r * 0.6, 0, r);
-    pStroke..color = gold.withOpacity(0.6)..strokeWidth = 1.8;
+    pStroke..color = gold.withValues(alpha: 0.6)..strokeWidth = 1.8;
     canvas.drawPath(sCurve, pStroke);
 
     // Yin tarafı (sol üst yarım) - hafif dolgu
@@ -1402,7 +1393,7 @@ class ChineseWheelPainter extends CustomPainter {
       ..cubicTo(-r * 0.8, r * 0.6, -r * 0.8, 0, 0, 0)
       ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, -r + 0.01);
     // Gerçek Yin-Yang: sol yarısı koyu dolguyla
-    pFill..color = gold.withOpacity(0.08);
+    canvas.drawPath(yinPath, Paint()..color = gold.withValues(alpha: 0.08)..style = PaintingStyle.fill);
     // Sağ yarıyı dolduralım (Yang = parlak)
     final yangPath = Path()
       ..moveTo(0, -r)
@@ -1410,20 +1401,20 @@ class ChineseWheelPainter extends CustomPainter {
       ..cubicTo(-r * 0.8, r * 0.6, -r * 0.8, 0, 0, 0)
       ..cubicTo(r * 0.8, -r * 0.6, r * 0.8, 0, 0, -r + 0.01);
     // Yang tarafını hafif altın dolgu
-    canvas.drawPath(yangPath, Paint()..color = gold.withOpacity(0.12)..style = PaintingStyle.fill);
+    canvas.drawPath(yangPath, Paint()..color = gold.withValues(alpha: 0.12)..style = PaintingStyle.fill);
 
     // Yin-Yang göz noktaları (büyük dairesel noktalar)
     // Üst göz (Yang gözü - karanlık tarafta parlak nokta)
-    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, Paint()..color = gold.withOpacity(0.6)..style = PaintingStyle.fill);
-    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, pStroke..color = gold.withOpacity(0.4)..strokeWidth = 1.0);
+    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, Paint()..color = gold.withValues(alpha: 0.6)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(0, -r * 0.42), r * 0.14, pStroke..color = gold.withValues(alpha: 0.4)..strokeWidth = 1.0);
     // Alt göz (Yin gözü - aydınlık tarafta koyu nokta)
-    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, Paint()..color = gold.withOpacity(0.15)..style = PaintingStyle.fill);
-    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, pStroke..color = gold.withOpacity(0.5)..strokeWidth = 1.0);
+    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, Paint()..color = gold.withValues(alpha: 0.15)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(0, r * 0.42), r * 0.14, pStroke..color = gold.withValues(alpha: 0.5)..strokeWidth = 1.0);
 
     // ── Ejderha kıvrımı (sağ üst - Yang tarafı) ──
     // Ejderha başı (küçük detaylar)
     final dragonP = Paint()
-      ..color = gold.withOpacity(0.7)
+      ..color = gold.withValues(alpha: 0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round;
@@ -1432,7 +1423,7 @@ class ChineseWheelPainter extends CustomPainter {
     canvas.drawLine(Offset(r * 0.25, -r * 0.75), Offset(r * 0.45, -r * 0.9), dragonP);
     canvas.drawLine(Offset(r * 0.15, -r * 0.72), Offset(r * 0.08, -r * 0.92), dragonP);
     // Küçük ejderha göz
-    canvas.drawCircle(Offset(r * 0.18, -r * 0.65), r * 0.04, Paint()..color = gold.withOpacity(0.8)..style = PaintingStyle.fill);
+    canvas.drawCircle(Offset(r * 0.18, -r * 0.65), r * 0.04, Paint()..color = gold.withValues(alpha: 0.8)..style = PaintingStyle.fill);
     
     // Ejderha yüzgeç/bıyık kıvrımı  
     final whisker = Path()
@@ -1443,7 +1434,7 @@ class ChineseWheelPainter extends CustomPainter {
     // ── Anka kuşu kıvrımı (sol alt - Yin tarafı) ──  
     // Anka kuşu kuyruk tüyleri
     final phoenixP = Paint()
-      ..color = gold.withOpacity(0.6)
+      ..color = gold.withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.4
       ..strokeCap = StrokeCap.round;
@@ -1469,11 +1460,11 @@ class ChineseWheelPainter extends CustomPainter {
       final a = i * math.pi / 4;
       final dotR = i % 2 == 0 ? r * 0.04 : r * 0.025;
       final dotPos = Offset(math.cos(a) * r * 0.88, math.sin(a) * r * 0.88);
-      canvas.drawCircle(dotPos, dotR, Paint()..color = gold.withOpacity(i % 2 == 0 ? 0.5 : 0.3)..style = PaintingStyle.fill);
+      canvas.drawCircle(dotPos, dotR, Paint()..color = gold.withValues(alpha: i % 2 == 0 ? 0.5 : 0.3)..style = PaintingStyle.fill);
     }
 
     // İç ince halka (merkezi çevreleyen zarif çizgi)
-    pStroke..color = gold.withOpacity(0.25)..strokeWidth = 0.6;
+    pStroke..color = gold.withValues(alpha: 0.25)..strokeWidth = 0.6;
     canvas.drawCircle(Offset.zero, r * 0.28, pStroke);
   }
 
@@ -1481,7 +1472,7 @@ class ChineseWheelPainter extends CustomPainter {
     final Rect bounds = Rect.fromCircle(center: Offset.zero, radius: s * 0.8);
     final Paint f = Paint();
     if (baseColor == Colors.white) {
-      f.color = Colors.white.withOpacity(0.9);
+      f.color = Colors.white.withValues(alpha: 0.9);
       f.style = PaintingStyle.fill;
     } else {
       f.shader = const LinearGradient(
@@ -1508,7 +1499,7 @@ class ChineseWheelPainter extends CustomPainter {
     }
     void poly(List<double> pts) {
       final p = Path()..moveTo(s * pts[0], s * pts[1]);
-      for (int j = 2; j < pts.length; j += 2) p.lineTo(s * pts[j], s * pts[j + 1]);
+      for (int j = 2; j < pts.length; j += 2) { p.lineTo(s * pts[j], s * pts[j + 1]); }
       p.close();
       canvas.drawPath(p, f);
     }
@@ -1667,12 +1658,12 @@ class MayanWheelPainter extends CustomPainter {
     // Hafif zemin izi (Eğer mini değilse, blur ve gradient korunsun)
     if (!isMini) {
       canvas.drawCircle(c, r, Paint()..shader = RadialGradient(
-        colors: [g.withOpacity(0.05), Colors.transparent],
+        colors: [g.withValues(alpha: 0.05), Colors.transparent],
       ).createShader(Rect.fromCircle(center: c, radius: r)));
     }
 
     // Daha ince ve narin çizgiler
-    final pLine = Paint()..color = g.withOpacity(0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0 * sm..strokeCap = StrokeCap.round;
+    final pLine = Paint()..color = g.withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0 * sm..strokeCap = StrokeCap.round;
 
     canvas.save();
     canvas.translate(c.dx, c.dy);
@@ -1692,11 +1683,11 @@ class MayanWheelPainter extends CustomPainter {
         
         // Klasik Maya Hiyeroglif Çerçevesi (Sadeleştirildi)
         final crRect = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset.zero, width: glyphRadius * 1.8, height: glyphRadius * 1.6), const Radius.circular(8));
-        if (!isMini) canvas.drawRRect(crRect, Paint()..color = g.withOpacity(0.03)..style = PaintingStyle.fill);
+        if (!isMini) canvas.drawRRect(crRect, Paint()..color = g.withValues(alpha: 0.03)..style = PaintingStyle.fill);
         canvas.drawRRect(crRect, pLine..strokeWidth = 0.8 * sm);
         
         // İçine GERÇEK Maya Burç piktogramlarını (Nawal) çiziyoruz
-        _drawAuthenticNawal(canvas, i, glyphRadius * 0.9, g.withOpacity(0.8), sm);
+        _drawAuthenticNawal(canvas, i, glyphRadius * 0.9, g.withValues(alpha: 0.8), sm);
 
         canvas.restore();
     }
@@ -1712,15 +1703,15 @@ class MayanWheelPainter extends CustomPainter {
         canvas.save();
         canvas.rotate(i * (math.pi * 2 / 13));
         
-        canvas.drawLine(Offset(0, -innerBoundR + 4), Offset(0, -toneR), Paint()..color=g.withOpacity(0.3)..style=PaintingStyle.stroke..strokeWidth=1.5 * sm);
+        canvas.drawLine(Offset(0, -innerBoundR + 4), Offset(0, -toneR), Paint()..color=g.withValues(alpha: 0.3)..style=PaintingStyle.stroke..strokeWidth=1.5 * sm);
 
         int num = i + 1;
         int bars = num ~/ 5;
         int dots = num % 5;
         
         double currentR = innerBoundR - 12;
-        final pBar = Paint()..color = g.withOpacity(0.7)..style = PaintingStyle.stroke..strokeWidth = 2.5 * sm..strokeCap = StrokeCap.round;
-        final pDot = Paint()..color = g.withOpacity(0.7)..style = PaintingStyle.fill;
+        final pBar = Paint()..color = g.withValues(alpha: 0.7)..style = PaintingStyle.stroke..strokeWidth = 2.5 * sm..strokeCap = StrokeCap.round;
+        final pDot = Paint()..color = g.withValues(alpha: 0.7)..style = PaintingStyle.fill;
         
         for (int b = 0; b < bars; b++) {
             final sweep = math.pi * 2 / 13 * 0.45; 
@@ -1755,17 +1746,17 @@ class MayanWheelPainter extends CustomPainter {
            ..lineTo(-r*0.06, -toneR)
            ..lineTo(r*0.06, -toneR)
            ..close();
-        if(!isMini) canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.15)..style = PaintingStyle.fill);
-        canvas.drawPath(rayP, Paint()..color = g.withOpacity(0.4)..style = PaintingStyle.stroke..strokeWidth=1.0 * sm);
+        if(!isMini) canvas.drawPath(rayP, Paint()..color = g.withValues(alpha: 0.15)..style = PaintingStyle.fill);
+        canvas.drawPath(rayP, Paint()..color = g.withValues(alpha: 0.4)..style = PaintingStyle.stroke..strokeWidth=1.0 * sm);
         canvas.restore();
     }
 
     // 7. MERKEZ: Hunab Ku
-    if (!isMini) canvas.drawCircle(Offset.zero, centerFaceR, Paint()..color = g.withOpacity(0.04)..style = PaintingStyle.fill);
+    if (!isMini) canvas.drawCircle(Offset.zero, centerFaceR, Paint()..color = g.withValues(alpha: 0.04)..style = PaintingStyle.fill);
     canvas.drawCircle(Offset.zero, centerFaceR, pLine..strokeWidth = 1.2 * sm);
     canvas.drawCircle(Offset.zero, centerFaceR - 4, pLine..strokeWidth = 0.5 * sm);
     
-    _drawTrueMayanHunabKu(canvas, centerFaceR * 0.85, g.withOpacity(0.85), sm, isMini);
+    _drawTrueMayanHunabKu(canvas, centerFaceR * 0.85, g.withValues(alpha: 0.85), sm, isMini);
 
     canvas.restore();
   }

@@ -58,6 +58,7 @@ class _CookieSectionState extends State<CookieSection>
   bool _showAdOverlay = false;
   bool _showLimitOverlay = false;
   int _ownedCount = 0;
+  bool _isOwnershipChecking = true;
 
   // Statik cache: widget rebuild olsa bile flickerlamasın
   static int _cachedCracksToday = 0;
@@ -176,11 +177,17 @@ class _CookieSectionState extends State<CookieSection>
     // Reklamı arka planda önden yükleyelim:
     AdService().loadRewardedAd();
 
+    // Senkronize animasyon: Animasyon her yüklendiğinde saniye cinsinden zamana dayalı başlar.
+    // 5 saniyelik bir döngüde (0 - 5000ms), 2*pi'ye kadar çıkar.
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    final initialPhase = ((nowMs % 5000) / 5000.0) * (2 * math.pi);
+
     // Bounded Animation: 0’dan 2*pi’ye sürekli döngü
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
       upperBound: 2 * math.pi,
+      value: initialPhase,
     );
     _animationController.repeat();
 
@@ -228,9 +235,16 @@ class _CookieSectionState extends State<CookieSection>
   Future<void> _checkOwnership() async {
     final emoji = widget.selectedCookieEmoji ?? 'spring_wreath';
     if (!_paidCookieIds.contains(emoji)) {
-      if (mounted) setState(() => _ownedCount = 0);
+      if (mounted) {
+        setState(() {
+          _ownedCount = 0;
+          _isOwnershipChecking = false;
+        });
+      }
       return;
     }
+
+    if (mounted) setState(() => _isOwnershipChecking = true);
 
     final collection = await StorageService.getCookieCollection();
     final card = collection.firstWhere((c) => c.id == emoji, orElse: () => CookieCard(id: emoji, emoji: '', name: '', rarity: ''));
@@ -244,7 +258,10 @@ class _CookieSectionState extends State<CookieSection>
     }
 
     if (mounted) {
-      setState(() => _ownedCount = count);
+      setState(() {
+        _ownedCount = count;
+        _isOwnershipChecking = false;
+      });
     }
   }
 
@@ -309,7 +326,7 @@ class _CookieSectionState extends State<CookieSection>
       );
     }
 
-    if (!isPaid || _ownedCount > 0) return cookieWidget;
+    if (!isPaid || _isOwnershipChecking || _ownedCount > 0) return cookieWidget;
 
     // Ücretli kurabiye VE sahip değil: bulanık + kilit ikonu
     return Stack(
@@ -393,7 +410,7 @@ class _CookieSectionState extends State<CookieSection>
 
   Future<void> _loadDailyCookieCredits() async {
     final prefs = await SharedPreferences.getInstance();
-    _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+    _isPremiumUser = prefs.getBool('is_elite') ?? false;
 
     // Debug: Hot restart'ta hakları sıfırla (SADECE 1 KEZ per session)
     // Production'da bu blok çalışmaz
@@ -431,7 +448,7 @@ class _CookieSectionState extends State<CookieSection>
 
     // Premium test modunu gerçek zamanlı oku
     final prefs = await SharedPreferences.getInstance();
-    _isPremiumUser = prefs.getBool('is_premium_test_mode') ?? false;
+    _isPremiumUser = prefs.getBool('is_elite') ?? false;
 
     // 2. LİMİT KONTROLÜ
     if (cracksUsed >= StorageService.kMaxDailyCookieCracks) {
