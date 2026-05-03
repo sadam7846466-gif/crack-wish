@@ -74,8 +74,8 @@ class _CookieSelectorState extends State<CookieSelector> {
   @override
   void initState() {
     super.initState();
-    // 14 Vitrin + 6 Yuva = 20 Kurabiye
-    _displayCookies = List.from(_baseShowcaseCookies)..addAll(_legacyPurchasedCookies);
+    // Başlangıçta sadece 14 Vitrin kurabiyesini göster
+    _displayCookies = List.from(_baseShowcaseCookies);
     _selectedIndex = widget.initialSelectedIndex ?? 0;
     _loadOwnedCookies();
   }
@@ -91,6 +91,13 @@ class _CookieSelectorState extends State<CookieSelector> {
             _ownedPaidCookieCounts[c.id] = c.countObtained;
           }
         }
+        // Sahip olunan eski sezon kurabiyelerini ana sayfaya (vitrine) ekle (Max 6)
+        final ownedLegacy = _legacyPurchasedCookies.where((legacy) {
+          final count = _ownedPaidCookieCounts[legacy['id']] ?? 0;
+          return count > 0;
+        }).toList();
+
+        _displayCookies = List.from(_baseShowcaseCookies)..addAll(ownedLegacy);
       });
     }
   }

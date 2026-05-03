@@ -112,6 +112,8 @@ flutter:
     - assets/images/letter_icon.png
     - assets/images/
     - assets/images/cookies/
+    - assets/images/cookies/free/may/
+    - assets/images/cookies/paid/may/
     - assets/images/ranks/
     - assets/images/avatars/
     - assets/images/tarot/

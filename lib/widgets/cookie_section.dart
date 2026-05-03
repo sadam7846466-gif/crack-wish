@@ -320,7 +320,11 @@ class _CookieSectionState extends State<CookieSection>
       );
     }
 
-    if (!isPaid || _isOwnershipChecking || _ownedCount > 0) return cookieWidget;
+    if (!isPaid) return cookieWidget;
+    
+    // Eğer ücretliyse ve kontrol bittiyse VE sahipsek net göster.
+    // Kontrol sürerken varsayılan olarak bulanık/kilitli gösterelim ki flaş atmasın.
+    if (!_isOwnershipChecking && _ownedCount > 0) return cookieWidget;
 
     // Ücretli kurabiye VE sahip değil: bulanık + kilit ikonu
     return Stack(

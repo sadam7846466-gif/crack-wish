@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'analytics_service.dart';
+import 'storage_service.dart';
+import '../models/cookie_card.dart';
 
 /// Apple/Google'ın kendi satın alma sistemi — üçüncü parti yok.
 class PurchaseService {
