@@ -192,29 +192,36 @@ class _BentoGridState extends State<BentoGrid>
                           badgeText: _hasUnreadDream ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : l10n.bentoDreamBadge,
                           badgeHidden: !_hasUnreadDream,
                           badgeColor: _hasUnreadDream ? Colors.white : null,
-                        ),
-                        Positioned(
-                          right: -26,
-                          top: 6,
-                          child: IgnorePointer(
-                            child: RepaintBoundary(
-                              child: Image.asset(
-                                'assets/images/ruyabulut.webp',
-                                width: 175,
-                                height: 102,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 10,
-                          top: 68,
-                          child: IgnorePointer(
-                            child: WindyNazar(
-                              imagePath: 'assets/images/NAZAR.webp',
-                              width: 68,
-                              height: 68,
+                          backgroundWidget: Positioned.fill(
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Positioned(
+                                  right: -26,
+                                  top: 6,
+                                  child: IgnorePointer(
+                                    child: RepaintBoundary(
+                                      child: Image.asset(
+                                        'assets/images/ruyabulut.webp',
+                                        width: 175,
+                                        height: 102,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 10,
+                                  top: 68,
+                                  child: IgnorePointer(
+                                    child: WindyNazar(
+                                      imagePath: 'assets/images/NAZAR.webp',
+                                      width: 68,
+                                      height: 68,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -248,20 +255,19 @@ class _BentoGridState extends State<BentoGrid>
                             accent: const Color(0xFFD4A373),
                             accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
                             badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : (l10n.localeName == 'tr' ? 'YENİ' : 'NEW'),
-                            badgeHidden: !_hasUnreadCoffee && false,
+                            badgeHidden: !_hasUnreadCoffee,
                             badgeColor: _hasUnreadCoffee ? Colors.white : null,
-                          ),
-                          // Özel kahve görseli
-                          Positioned(
-                            right: -15 * scale,
-                            bottom: -15 * scale,
-                            child: IgnorePointer(
-                              child: RepaintBoundary(
-                                child: Image.asset(
-                                  'assets/images/kahve_bento.webp',
-                                  width: 135 * scale,
-                                  height: 135 * scale,
-                                  fit: BoxFit.contain,
+                            backgroundWidget: Positioned(
+                              right: -15 * scale,
+                              bottom: -15 * scale,
+                              child: IgnorePointer(
+                                child: RepaintBoundary(
+                                  child: Image.asset(
+                                    'assets/images/kahve_bento.webp',
+                                    width: 135 * scale,
+                                    height: 135 * scale,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
                             ),

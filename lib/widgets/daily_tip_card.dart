@@ -25,6 +25,13 @@ class _DailyTipCardState extends State<DailyTipCard> {
   void initState() {
     super.initState();
     _loadSuggestion();
+    StorageService.dailyTasksUpdated.addListener(_loadSuggestion);
+  }
+
+  @override
+  void dispose() {
+    StorageService.dailyTasksUpdated.removeListener(_loadSuggestion);
+    super.dispose();
   }
 
   Future<void> _loadSuggestion() async {
@@ -41,8 +48,14 @@ class _DailyTipCardState extends State<DailyTipCard> {
     if (available.isEmpty) {
       next = _SuggestionType.allDone;
     } else {
-      available.shuffle();
-      next = available.first;
+      // Eğer mevcut öneri hala yapılabilecekler listesindeyse, DEĞİŞTİRME!
+      // Bu sayede kullanıcı sadece sayfayı açıp çıkarsa (görevi yapmadan) öneri değişmez.
+      if (_suggestion != null && available.contains(_suggestion)) {
+        next = _suggestion!;
+      } else {
+        available.shuffle();
+        next = available.first;
+      }
     }
 
     if (mounted) {

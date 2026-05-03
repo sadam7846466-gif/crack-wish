@@ -184,7 +184,8 @@ class StorageService {
       final totalFriends = prefs.getInt('total_friends_count') ?? 0;
       final totalLetters = prefs.getInt('total_letters_sent') ?? 0;
       final totalReferrals = prefs.getInt('total_referrals_count') ?? 0;
-      final uniqueCookies = _safeGetStringList(prefs, _keyCookieCollection).length;
+      final cookiesData = await getCookieCollection();
+      final uniqueCookies = cookiesData.where((c) => c.firstObtainedDate != null || c.countObtained > 0).length;
       final unlockedAchievements = _safeGetStringList(prefs, 'achievements_claimed');
 
       await ProfileSyncService().syncEconomyData(
@@ -366,6 +367,8 @@ class StorageService {
     final current = await getTotalDreams();
     await prefs.setInt(_keyTotalDreams, current + 1);
     
+    await setDreamDoneToday(); // Mark dream task as done for daily tip
+
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
     final isPremium = prefs.getBool('is_elite') ?? false;
     await addPendingAura('ruya', 3 * (isPremium ? 3 : 1));
@@ -382,6 +385,7 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final current = await getTotalTarots();
     await prefs.setInt(_keyTotalTarots, current + 1);
+    await setTarotDoneToday(); // Mark tarot task as done for daily tip
   }
 
   static Future<int> getTotalCoffee() async {
@@ -568,22 +572,27 @@ class StorageService {
     return prefs.getString(_keyZodiacDoneDate) == _todayKey();
   }
 
+  static final ValueNotifier<int> dailyTasksUpdated = ValueNotifier<int>(0);
+
   static Future<void> setTarotDoneToday() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyTarotDoneDate, _todayKey());
     await prefs.setBool(_keyTarotDone, true);
+    dailyTasksUpdated.value++;
   }
 
   static Future<void> setDreamDoneToday() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyDreamDoneDate, _todayKey());
     await prefs.setBool(_keyDreamDone, true);
+    dailyTasksUpdated.value++;
   }
 
   static Future<void> setZodiacDoneToday() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyZodiacDoneDate, _todayKey());
     await prefs.setBool(_keyZodiacDone, true);
+    dailyTasksUpdated.value++;
   }
 
   static Future<String?> getCurrentMood() async {
@@ -986,8 +995,10 @@ class StorageService {
       'total_friends': prefs.getInt('total_friends_count') ?? 0,
       'total_letters_sent': prefs.getInt('total_letters_sent') ?? 0,
       'total_referrals': prefs.getInt('total_referrals_count') ?? 0,
-      'unique_cookies': _safeGetStringList(prefs, _keyCookieCollection).length,
     };
+    
+    final cookiesData = await getCookieCollection();
+    stats['unique_cookies'] = cookiesData.where((c) => c.firstObtainedDate != null || c.countObtained > 0).length;
 
     for (final achievement in achievementDefinitions) {
       final id = achievement['id'] as String;
@@ -1271,16 +1282,27 @@ class StorageService {
 
   // --- Cookie Collection ---
   static List<CookieCard> _baseCookieCards() {
-    // 20 görsel kurabiye: 14 ücretsiz (common) + 6 ücretli (rare/legendary)
     const paidIds = [
-      'golden_arabesque',
-      'midnight_mosaic',
-      'pearl_lace',
-      'golden_sakura',
+      'blue_porcelain',
+      'cupid_ribbon',
+      'diamond_crust',
       'dragon_phoenix',
+      'emerald_essence',
       'gold_beasts',
+      'golden_arabesque',
+      'golden_majesty',
+      'golden_sakura',
+      'midnight_mosaic',
+      'obsidian_grace',
+      'panda_bamboo',
+      'pearl_lace',
+      'pink_blossom',
+      'platinum_veil',
+      'royal_sapphire',
+      'ruby_heart',
+      'wildflower',
     ];
-    const legendaryIds = ['dragon_phoenix', 'gold_beasts'];
+    const legendaryIds = ['dragon_phoenix', 'gold_beasts', 'diamond_crust', 'platinum_veil'];
 
     String rarityFor(String id) {
       if (legendaryIds.contains(id)) return 'legendary';
@@ -1293,7 +1315,7 @@ class StorageService {
       'lucky_clover': 'Şanslı Yonca',
       'royal_hearts': 'Kraliyet Kalpleri',
       'evil_eye': 'Nazar',
-      'pizza_party': 'Pizza Partisi',
+      'silver_lotus': 'Gümüş Nilüfer',
       'sakura_bloom': 'Sakura',
       'blue_porcelain': 'Mavi Porselen',
       'pink_blossom': 'Pembe Çiçek',
@@ -1309,6 +1331,26 @@ class StorageService {
       'golden_sakura': 'Altın Sakura',
       'dragon_phoenix': 'Ejderha & Anka',
       'gold_beasts': 'Altın Canavarlar',
+      
+      // YENİ ÜCRETSİZ (FREE) KURABİYELER
+      'celestial_dream': 'Göksel Rüya',
+      'starlight_whisper': 'Yıldız Fısıltısı',
+      'mystic_aura': 'Mistik Aura',
+      'lunar_glow': 'Ay Işıltısı',
+      'solar_flare': 'Güneş Patlaması',
+      'cosmic_dust': 'Kozmik Toz',
+      'nebula_breeze': 'Nebula Esintisi',
+      'astral_projection': 'Astral Seyahat',
+      'quantum_leap': 'Kuantum Sıçraması',
+
+      // YENİ ÜCRETLİ (PAID) KURABİYELER
+      'royal_sapphire': 'Kraliyet Safiri',
+      'diamond_crust': 'Elmas Kabuk',
+      'platinum_veil': 'Platin Peçe',
+      'golden_majesty': 'Altın İhtişam',
+      'emerald_essence': 'Zümrüt Özü',
+      'ruby_heart': 'Yakut Kalp',
+      'obsidian_grace': 'Obsidyen Zarafeti',
     };
 
     return names.entries
@@ -1327,26 +1369,49 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     final jsonStr = prefs.getString(_keyCookieCollection);
     final base = _baseCookieCards();
-    if (jsonStr == null) return base;
-    try {
-      final List decoded = jsonDecode(jsonStr) as List;
-      final stored = decoded
-          .map((e) => CookieCard.fromJson(e as Map<String, dynamic>))
-          .toList();
-      // Kullanıcının kayıtlı tüm kurabiyelerini haritaya al (Eskiler ve oyundan tamamen kaldırılanlar dahil ASLA silinmesin)
-      final Map<String, CookieCard> map = {for (final c in stored) c.id: c};
-      
-      // Oyuna sonradan kodla (güncellemeyle) eklenmiş, yeni kurabiyeleri de sıfır (kilitsiz) olarak dahil et
-      for (final c in base) {
-        if (!map.containsKey(c.id)) {
+    
+    Map<String, CookieCard> map = {for (final c in base) c.id: c};
+    
+    if (jsonStr != null) {
+      try {
+        final List decoded = jsonDecode(jsonStr) as List;
+        final stored = decoded
+            .map((e) => CookieCard.fromJson(e as Map<String, dynamic>))
+            .toList();
+        
+        for (final c in stored) {
           map[c.id] = c;
         }
+      } catch (_) {}
+    }
+    
+    // ── VERİ KURTARMA (DATA RECOVERY) ──
+    // Eğer kullanıcının koleksiyonu bir hata nedeniyle silindiyse veya boşsa
+    final totalCracked = prefs.getInt(_keyTotalCookies) ?? 0;
+    final uniqueCount = map.values.where((c) => c.firstObtainedDate != null || c.countObtained > 0).length;
+    
+    if (totalCracked > 0 && uniqueCount == 0 && map.isNotEmpty) {
+      // Toplam kırılanın %30'u kadar (en az 1, en fazla 20) rastgele kurabiyeyi kurtar
+      int cookiesToRestore = (totalCracked * 0.3).toInt().clamp(1, 20);
+      final listValues = map.values.toList();
+      listValues.shuffle();
+      
+      for (int i = 0; i < cookiesToRestore && i < listValues.length; i++) {
+        final id = listValues[i].id;
+        map[id] = map[id]!.copyWith(
+          countObtained: 1,
+          firstObtainedDate: DateTime.now().subtract(Duration(days: i)),
+        );
       }
       
-      return map.values.toList();
-    } catch (_) {
-      return base;
+      // Kurtarılan veriyi anında kaydet
+      prefs.setString(
+        _keyCookieCollection,
+        jsonEncode(map.values.map((c) => c.toJson()).toList()),
+      );
     }
+
+    return map.values.toList();
   }
 
   static Future<void> _saveCookieCollection(List<CookieCard> cards) async {
@@ -1381,6 +1446,8 @@ class StorageService {
       int newCount = c.countObtained;
       if (isPaid) {
         newCount = (c.countObtained - 1).clamp(0, 999); // Ücretli kurabiye kırılınca envanterden düşer
+      } else {
+        newCount = c.countObtained + 1; // Ücretsiz kurabiye kırıldıkça sayısı (x1, x2) profil için artar
       }
       
       return c.copyWith(

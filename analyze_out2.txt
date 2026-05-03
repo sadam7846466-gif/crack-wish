@@ -3347,10 +3347,9 @@ warning • A value for optional parameter 'isAdvanced' isn't ever given • lib
    info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/zodiac_page.dart:9441:48 • deprecated_member_use
 warning • Dead code • lib/services/cosmic_illusion_service.dart:92:35 • dead_code
    info • The constant name 'MAX_LIMIT' isn't a lowerCamelCase identifier • lib/services/daily_limit_service.dart:13:20 • constant_identifier_names
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/services/push_notification_service.dart:76:37 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/services/push_notification_service.dart:78:56 • deprecated_member_use
-  error • Undefined name 'StorageService' • lib/services/push_notification_service.dart:169:28 • undefined_identifier
-  error • Undefined name 'SharedPreferences' • lib/services/push_notification_service.dart:182:25 • undefined_identifier
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/services/push_notification_service.dart:3:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/services/push_notification_service.dart:78:37 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/services/push_notification_service.dart:80:56 • deprecated_member_use
 warning • The operand can't be 'null', so the condition is always 'false' • lib/services/referral_service.dart:97:20 • unnecessary_null_comparison
 warning • The value of the field '_bgPlayer' isn't used • lib/services/sound_service.dart:13:21 • unused_field
 warning • Dead code • lib/services/sound_service.dart:52:54 • dead_code

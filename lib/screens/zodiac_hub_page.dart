@@ -55,8 +55,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     if (mounted) {
       setState(() {
         _westernUnread = (prefs.getString(_kWesternFreeDate) ?? '') != today;
-        _asianUnread = !(prefs.getBool('zodiac_unlocked_asian_$today') ?? false);
-        _mayanUnread = !(prefs.getBool('zodiac_unlocked_mayan_$today') ?? false);
+        _asianUnread = !(prefs.getBool('asian_daily_read_$today') ?? false);
+        _mayanUnread = !(prefs.getBool('mayan_daily_read_$today') ?? false);
       });
     }
   }
@@ -360,6 +360,9 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
         },
       ),
     );
+    if (mounted) {
+      _initUnreadStatus();
+    }
   }
 
   // ── BATI ASTROLOJİSİ: 1 ücretsiz + 3 reklamlı = günde 4 giriş ──
@@ -400,12 +403,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
       await prefs.setInt(_kWesternAdCount, 0);
     }
 
-    // 2. Günlük reklam limiti doldu (3 reklam izlenmiş)
-    if (adCount >= _kWesternMaxAdEntries) {
-      if (!context.mounted) return;
-      _showWesternLimitReached(context);
-      return;
-    }
+    // 2. Sınırsız reklam hakkı - limit kaldırıldı
 
     // 3. Reklam izle paneli göster
     if (!context.mounted) return;
@@ -413,7 +411,6 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   }
 
   void _showWesternAdPanel(BuildContext context, int adCount, VoidCallback onUnlock) {
-    final remaining = _kWesternMaxAdEntries - adCount;
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -450,7 +447,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.\nKalan hak: $remaining',
+                          'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.4),
                         ),
@@ -483,9 +480,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                   }, () {});
                                 },
                                 icon: Icon(Icons.play_circle_filled_rounded, color: const Color(0xFFFFD060).withValues(alpha: 0.8), size: 18),
-                                label: Text(
-                                  'Reklam İzle',
-                                  style: TextStyle(color: const Color(0xFFFFD060).withValues(alpha: 0.9), fontWeight: FontWeight.bold),
+                                label: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Reklam İzle',
+                                    style: TextStyle(color: const Color(0xFFFFD060).withValues(alpha: 0.9), fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
@@ -506,9 +506,12 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                   Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                                 },
                                 icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
-                                label: const Text(
-                                  'Elite Al',
-                                  style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                label: const FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Elite Al',
+                                    style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
@@ -624,12 +627,6 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
       bool success = await StorageService.deductSoulStones(1);
       if (success) {
         await prefs.setBool(unlockKey, true);
-        if (mounted) {
-          setState(() {
-            if (moduleKey == 'asian') _asianUnread = false;
-            if (moduleKey == 'mayan') _mayanUnread = false;
-          });
-        }
         HapticFeedback.lightImpact(); // Başarılı, hızlı geçiş hissi.
         onUnlock();
         return;
@@ -762,10 +759,6 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                     if (success) {
                                                       await prefs.setBool(unlockKey, true);
                                                       if (context.mounted) {
-                                                        setState(() {
-                                                          if (moduleKey == 'asian') _asianUnread = false;
-                                                          if (moduleKey == 'mayan') _mayanUnread = false;
-                                                        });
                                                         Navigator.pop(dialogCtx);
                                                         onUnlock();
                                                       }

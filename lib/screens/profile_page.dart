@@ -10,6 +10,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
+import '../services/season_config.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
@@ -6356,7 +6357,9 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
 
   Future<void> _loadOwnedCookies() async {
     final collection = await StorageService.getCookieCollection();
-    final owned = collection.where((c) => c.firstObtainedDate != null).toList();
+    final owned = collection
+        .where((c) => c.firstObtainedDate != null && c.id != 'pizza_party' && c.id != 'cosmic_dust')
+        .toList();
     owned.sort((a, b) => b.countObtained.compareTo(a.countObtained));
     final seen = await StorageService.getSeenCookieIds();
     if (mounted) {
@@ -6366,6 +6369,16 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
         _loading = false;
       });
     }
+  }
+
+  String _resolveCookieImagePath(String id) {
+    try {
+      final all = SeasonConfig.getAllCookies();
+      for (final c in all) {
+        if (c['id'] == id) return c['imagePath'] as String;
+      }
+    } catch (_) {}
+    return 'assets/images/cookies/$id.webp';
   }
 
   static const _cookieMeta = <String, Map<String, String>>{
@@ -6393,11 +6406,11 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
       'rarity': 'Yaygın',
       'quote': '"Seni koruyan görünmez bir kalkan her zaman var."',
     },
-    'pizza_party': {
-      'name': 'Pizza Partisi',
-      'desc': 'Neşe ve arkadaşlığın lezzetli kutlaması.',
+    'silver_lotus': {
+      'name': 'Gümüş Nilüfer',
+      'desc': 'Sessiz zarafetin ve içsel huzurun sembolü.',
       'rarity': 'Yaygın',
-      'quote': '"Hayatın en güzel anları paylaşılanlardır."',
+      'quote': '"Huzur, içindeki parıltıda saklı."',
     },
     'sakura_bloom': {
       'name': 'Sakura Çiçeği',
@@ -6696,7 +6709,7 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
                         width: 140,
                         height: 140,
                         child: Image.asset(
-                          'assets/images/cookies/${cookie.id}.webp',
+                          _resolveCookieImagePath(cookie.id),
                           errorBuilder: (_, __, ___) => Icon(
                             Icons.bakery_dining_rounded,
                             color: rarityColor,
@@ -6884,7 +6897,7 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Image.asset(
-                            'assets/images/cookies/${cookie.id}.webp',
+                            _resolveCookieImagePath(cookie.id),
                             errorBuilder: (_, __, ___) => const Icon(
                               Icons.bakery_dining_rounded,
                               color: Color(0xFFFFD166),
@@ -7357,33 +7370,37 @@ class _SettingsListTileState extends State<_SettingsListTile> {
                     child: Icon(widget.icon, color: widget.iconColor, size: 20),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      widget.label,
-                      style: TextStyle(
-                        color: widget.isDestructive
-                            ? const Color(0xFFFF4D4D)
-                            : Colors.white.withOpacity(0.95),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
-                      ),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      color: widget.isDestructive
+                          ? const Color(0xFFFF4D4D)
+                          : Colors.white.withOpacity(0.95),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
                     ),
                   ),
+                  const SizedBox(width: 16),
                   if (widget.subtitle != null &&
                       widget.subtitle!.isNotEmpty) ...[
-                    Text(
-                      widget.subtitle!,
-                      style: TextStyle(
-                        color: widget.isDestructive
-                            ? const Color(0xFFFF4D4D).withOpacity(0.6)
-                            : Colors.white.withOpacity(0.45),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: Text(
+                        widget.subtitle!,
+                        textAlign: TextAlign.right,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: widget.isDestructive
+                              ? const Color(0xFFFF4D4D).withOpacity(0.6)
+                              : Colors.white.withOpacity(0.45),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                  ],
+                  ] else
+                    const Spacer(),
                   Icon(
                     Icons.arrow_forward_ios_rounded,
                     color: widget.isDestructive

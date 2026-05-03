@@ -12,6 +12,8 @@ import '../models/owl_models.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/analytics_service.dart';
 import 'compatibility_content.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'premium_paywall_page.dart';
 import 'cosmic_profile_page.dart';
 import 'natal_chart_page.dart';
 
@@ -27,6 +29,7 @@ class _ZodiacPageState extends State<ZodiacPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulse;
   int _selectedIndex = 0; // Varsayılan: Koç
+  bool _isElite = false;
   String? _userName;
   String? _userAvatar;
   DateTime _birthDate = DateTime(1999, 12, 20);
@@ -712,6 +715,9 @@ class _ZodiacPageState extends State<ZodiacPage>
   }
 
   Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isElite = prefs.getBool('is_elite') ?? false;
+    
     final name = await StorageService.getUserName();
     final avatar = await StorageService.getAvatar();
     final savedDate = await StorageService.getBirthDate();
@@ -720,6 +726,7 @@ class _ZodiacPageState extends State<ZodiacPage>
     final bPlace = await StorageService.getBirthPlace();
     if (mounted) {
       setState(() {
+        _isElite = isElite;
         _userName = name;
         _userAvatar = avatar ?? 'assets/images/owl.png';
         _traitBoosts = boosts;
@@ -733,6 +740,7 @@ class _ZodiacPageState extends State<ZodiacPage>
         }
       });
       AnalyticsService().logZodiacViewed(sign: 'western_${_signs[_selectedIndex]['nameEn']}');
+      StorageService.setZodiacDoneToday(); // Mark as read since daily horoscope is visible on this page
     }
   }
 
@@ -1221,15 +1229,18 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ),
                   const SizedBox(height: 14),
                   Expanded(
-                    child: friends.isEmpty
-                      ? Center(
-                          child: Text(
-                            'Henüz arkadaşın yok',
-                            style: TextStyle(color: Colors.white.withOpacity(0.5)),
-                          ),
-                        )
-                      : ListView.separated(
-                          controller: scrollController,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: friends.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'Henüz arkadaşın yok',
+                                  style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                ),
+                              )
+                            : ListView.separated(
+                                controller: scrollController,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                           itemCount: friends.length,
                           separatorBuilder: (context, i) => const SizedBox(height: 12),
@@ -1245,7 +1256,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                 Navigator.push(
                                   context,
                                   PageRouteBuilder(
-                                    pageBuilder: (_, __, ___) => _CompatibilityResultPage(
+                                    pageBuilder: (_, __, ___) => _CosmicWeavingTransitionPage(
                                       sign1: mySign,
                                       sign2: friendSign,
                                       friend: f,
@@ -1282,14 +1293,33 @@ class _ZodiacPageState extends State<ZodiacPage>
                                         color: _gold.withOpacity(0.05),
                                         border: Border.all(color: _gold.withOpacity(0.2)),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          f.user.emoji,
-                                          style: const TextStyle(
-                                            fontSize: 24,
-                                            fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
-                                          ),
-                                        ),
+                                      child: ClipOval(
+                                        child: f.user.avatarUrl != null
+                                            ? (f.user.avatarUrl!.startsWith('http')
+                                                ? Transform.scale(
+                                                    scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                                    child: Image.network(
+                                                      f.user.avatarUrl!,
+                                                      fit: BoxFit.cover,
+                                                      key: ValueKey(f.user.avatarUrl),
+                                                    ),
+                                                  )
+                                                : Transform.scale(
+                                                    scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                                    child: Image.asset(
+                                                      f.user.avatarUrl!,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ))
+                                            : Center(
+                                                child: Text(
+                                                  f.user.emoji,
+                                                  style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                                                  ),
+                                                ),
+                                              ),
                                       ),
                                     ),
                                     const SizedBox(width: 16),
@@ -1351,6 +1381,58 @@ class _ZodiacPageState extends State<ZodiacPage>
                             );
                           },
                         ),
+                      ),
+                        if (!_isElite)
+                          Positioned.fill(
+                            child: ClipRect(
+                              child: BackdropFilter(
+                                filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                child: Container(
+                                  color: Colors.black.withOpacity(0.5),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.lock_outline, color: _gold, size: 48),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Bu Özellik Elite Üyelere Özeldir',
+                                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                                        child: Text(
+                                          'Arkadaşlarınla derin astrolojik uyumunu ve viral dinamiklerini keşfetmek için Elite abonesi olmalısın.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context); // Bottom sheet'i kapat
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (_) => const PremiumPaywallPage()),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: _gold,
+                                          foregroundColor: Colors.black,
+                                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        ),
+                                        child: const Text('Elite Ayrıcalıklarını Keşfet', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -1746,6 +1828,29 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ),
                 ),
               ],
+            ),
+          ),
+
+          // ── DURUM ÇUBUĞU KORUYUCU (Status Bar Protector) ──
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).padding.top + 80, // Yumuşak geçiş için alanı genişlettik
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.9), // En üstte koyu
+                      Colors.black.withOpacity(0.0), // Aşağı doğru tamamen şeffaf
+                    ],
+                    stops: const [0.0, 1.0],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -6950,25 +7055,123 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
     _c.dispose();
     super.dispose();
   }
+  Widget _buildFastFade(Widget child) {
+    final animation = CurvedAnimation(
+      parent: _c,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeOutCubic),
+    );
+    return FadeTransition(opacity: animation, child: child);
+  }
+
+  Widget _buildAvatarSeparator(Widget child, bool isLeft) {
+    // 0.0 - 0.4 arasında tam ortadan sağa ve sola ayrılırlar
+    final animation = CurvedAnimation(
+      parent: _c,
+      curve: const Interval(0.0, 0.4, curve: Curves.easeOutCubic),
+    );
+    
+    // Avatarın boyutu 64, aralıklar vs ile merkeze olan uzaklıkları yaklaşık 67 piksel (yani kendi genişliklerinin ~1.05 katı)
+    final slide = Tween<Offset>(
+      begin: Offset(isLeft ? 1.05 : -1.05, 0.0),
+      end: Offset.zero,
+    ).animate(animation);
+    
+    return SlideTransition(
+      position: slide,
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
+  }
+
+  Widget _buildStaggered(Widget child, int index) {
+    // Profil ve başlık 0.3'te bitiyor. Staggered elemanlar 0.3'ten sonra sırayla başlasın.
+    final start = (0.2 + (index * 0.08)).clamp(0.0, 1.0);
+    final end = (start + 0.35).clamp(0.0, 1.0);
+    
+    final animation = CurvedAnimation(
+      parent: _c,
+      curve: Interval(start, end, curve: Curves.easeOutCubic),
+    );
+    
+    // Aşağıdan yukarıya daha belirgin bir süzülme (0.15)
+    final slide = Tween<Offset>(begin: const Offset(0.0, 0.15), end: Offset.zero).animate(animation);
+    
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, child) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: slide,
+          child: child,
+        ),
+      ),
+      child: child,
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // Basic calculation for demo purposes:
-    int combinedHash =
-        (widget.sign1['name'].hashCode ^ widget.sign2['name'].hashCode).abs();
-
+    // Gerçekçi Astroloji Hesaplaması (Elementlere Göre)
+    final String e1 = widget.sign1['element'] ?? 'Ateş';
+    final String e2 = widget.sign2['element'] ?? 'Ateş';
+    
+    int baseLove = 50, baseFriend = 50, baseComm = 50, baseWork = 50, baseFun = 50;
+    int vKarma = 50, vEgo = 50, vToxic = 50;
+    
+    if (e1 == e2) {
+      // Aynı Element (Ateş-Ateş, Su-Su vs): Yüksek uyum
+      baseLove = 85; baseFriend = 90; baseComm = 85; baseWork = 80; baseFun = 95;
+      vKarma = 70; 
+      vEgo = (e1 == 'Ateş' || e1 == 'Toprak') ? 95 : 40; 
+      vToxic = (e1 == 'Ateş' || e1 == 'Su') ? 50 : 25;
+    } else if ((e1 == 'Ateş' && e2 == 'Hava') || (e1 == 'Hava' && e2 == 'Ateş') ||
+               (e1 == 'Su' && e2 == 'Toprak') || (e1 == 'Toprak' && e2 == 'Su')) {
+      // Tamamlayıcı Elementler (Ruh Eşi Potansiyeli): Mükemmel Uyum
+      baseLove = 95; baseFriend = 90; baseComm = 95; baseWork = 85; baseFun = 90;
+      vKarma = (e1 == 'Su' || e2 == 'Su') ? 98 : 85; 
+      vEgo = 30; vToxic = 15;
+    } else if ((e1 == 'Ateş' && e2 == 'Su') || (e1 == 'Su' && e2 == 'Ateş') ||
+               (e1 == 'Hava' && e2 == 'Toprak') || (e1 == 'Toprak' && e2 == 'Hava')) {
+      // Zıt ve Çatışan Elementler: ASLA SAHTE YÜKSEK VERME. Gerçekçi, düşük uyum.
+      baseLove = 35; baseFriend = 40; baseComm = 30; baseWork = 45; baseFun = 50;
+      vKarma = 85; vEgo = 92; vToxic = 98; // Toksiklik zirvede!
+    } else {
+      // Nötr / Zorlayıcı (Örn: Ateş-Toprak, Hava-Su)
+      baseLove = 55; baseFriend = 60; baseComm = 50; baseWork = 65; baseFun = 55;
+      vKarma = 55; vEgo = 80; vToxic = 75;
+    }
+    
+    // Her arkadaş kombinasyonuna benzersiz ufak bir varyans (-7 ile +7 arası sapma)
+    int combinedHash = (widget.sign1['name'].hashCode ^ widget.sign2['name'].hashCode).abs();
     if (widget.friend != null) {
-      // Eğer bir arkadaş seçildiyse, sadece burçları değil kişinin eşsiz karmasını da hesaba kat (Arkadaş ID'si)
       combinedHash = (combinedHash ^ widget.friend!.user.id.hashCode).abs();
     }
-
-    final lovePct = 50 + (combinedHash % 45); // 50 to 95
-    final friendPct = 40 + ((combinedHash ~/ 10) % 55); // 40 to 95
-    final commPct = 45 + ((combinedHash ~/ 100) % 50); // 45 to 95
-    final workPct = 35 + ((combinedHash ~/ 3) % 60); // 35 to 95
-    final funPct = 40 + ((combinedHash ~/ 7) % 55); // 40 to 95
-
+    
+    int vary(int base, int mod) {
+      int variance = (combinedHash ~/ mod) % 15 - 7; // Daha kontrollü sapma
+      return (base + variance).clamp(10, 99); // Uyuşmuyorsa %10'lara kadar düşebilir
+    }
+    
+    final lovePct = vary(baseLove, 2);
+    final friendPct = vary(baseFriend, 3);
+    final commPct = vary(baseComm, 5);
+    final workPct = vary(baseWork, 7);
+    final funPct = vary(baseFun, 11);
+    
     final avg = (lovePct + friendPct + commPct + workPct + funPct) / 5.0;
+
+    // KESİN TUTARLILIK (Consistency): Ana kategori neyse viral varyasyonu da BİREBİR aynı olmalı.
+    final viralLovePct = lovePct;           // Aşk Uyumu = Aşk & Tutku
+    final viralCrimePct = funPct;           // Macera = Suç Ortaklığı
+    final viralTelePct = commPct;           // İletişim = Gizli Telepati
+    
+    // Bağımsız viral metrikler
+    final viralKarmaPct = vary(vKarma, 19);
+    final viralEgoPct = vary(vEgo, 29);
+    final viralToxicPct = vary(vToxic, 31);
 
     return SwipeBackWrapper(
       child: Scaffold(
@@ -7003,21 +7206,23 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                   const SizedBox(height: 20),
 
                         // Title
-                        ShaderMask(
-                          shaderCallback: (b) => const LinearGradient(
-                            colors: [
-                              Color(0xFFF1DEB9), // Soft warm gold
-                              Color(0xFFF5E296), // Muted center glow
-                              Color(0xFFE5CC75), // Deep gold base
-                            ],
-                          ).createShader(b),
-                          child: Text(
-                            'KOZMİK UYUM',
-                            style: GoogleFonts.cinzel(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 3,
+                        _buildFastFade(
+                          ShaderMask(
+                            shaderCallback: (b) => const LinearGradient(
+                              colors: [
+                                Color(0xFFF1DEB9), // Soft warm gold
+                                Color(0xFFF5E296), // Muted center glow
+                                Color(0xFFE5CC75), // Deep gold base
+                              ],
+                            ).createShader(b),
+                            child: Text(
+                              'KOZMİK UYUM',
+                              style: GoogleFonts.cinzel(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 3,
+                              ),
                             ),
                           ),
                         ),
@@ -7027,23 +7232,28 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildAvatar(widget.sign1, assetImageAvatar: widget.userAvatar),
+                            _buildAvatarSeparator(_buildAvatar(widget.sign1, assetImageAvatar: widget.userAvatar), true),
                             const SizedBox(width: 20),
-                            Icon(
-                              Icons.all_inclusive,
-                              color: widget.gold.withOpacity(0.5),
-                              size: 30,
+                            _buildFastFade(
+                              Icon(
+                                Icons.all_inclusive,
+                                color: widget.gold.withOpacity(0.5),
+                                size: 30,
+                              ),
                             ),
                             const SizedBox(width: 20),
-                            _buildAvatar(widget.sign2, f: widget.friend),
+                            _buildAvatarSeparator(_buildAvatar(widget.sign2, f: widget.friend), false),
                           ],
                         ),
                         const SizedBox(height: 30),
 
                         if (widget.friend != null)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-                            child: _buildDeepSynastryCard(widget.friend!),
+                          _buildStaggered(
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+                              child: _buildDeepSynastryCard(widget.friend!),
+                            ),
+                            2,
                           ),
 
                         // Percentages
@@ -7055,88 +7265,204 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              if (widget.friend == null) ...[
-                                _ExpandableCategoryCard(
-                                  title: 'AŞK UYUMU',
-                                  categoryValue: 'love',
-                                  pct: lovePct,
-                                  iconObj: Icons.favorite_border,
-                                  c: _c,
+                                _buildStaggered(
+                                  _ExpandableCategoryCard(
+                                    title: 'AŞK UYUMU',
+                                    categoryValue: 'love',
+                                    pct: lovePct,
+                                    iconObj: Icons.favorite_border,
+                                    c: _c,
+                                  ),
+                                  3,
                                 ),
                                 const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'ARKADAŞLIK',
-                                  categoryValue: 'friend',
-                                  pct: friendPct,
-                                  iconObj: Icons.people_alt_outlined,
-                                  c: _c,
+                                _buildStaggered(
+                                  _ExpandableCategoryCard(
+                                    title: 'ARKADAŞLIK',
+                                    categoryValue: 'friend',
+                                    pct: friendPct,
+                                    iconObj: Icons.people_alt_outlined,
+                                    c: _c,
+                                  ),
+                                  4,
                                 ),
                                 const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'İLETİŞİM & ZİHİN',
-                                  categoryValue: 'comm',
-                                  pct: commPct,
-                                  iconObj: Icons.chat_bubble_outline,
-                                  c: _c,
+                                _buildStaggered(
+                                  _ExpandableCategoryCard(
+                                    title: 'İLETİŞİM & ZİHİN',
+                                    categoryValue: 'comm',
+                                    pct: commPct,
+                                    iconObj: Icons.chat_bubble_outline,
+                                    c: _c,
+                                  ),
+                                  5,
                                 ),
                                 const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'ORTAK ÇALIŞMA',
-                                  categoryValue: 'work',
-                                  pct: workPct,
-                                  iconObj: Icons.work_outline,
-                                  c: _c,
+                                _buildStaggered(
+                                  _ExpandableCategoryCard(
+                                    title: 'ORTAK ÇALIŞMA',
+                                    categoryValue: 'work',
+                                    pct: workPct,
+                                    iconObj: Icons.work_outline,
+                                    c: _c,
+                                  ),
+                                  6,
                                 ),
                                 const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'MACERA & EĞLENCE',
-                                  categoryValue: 'fun',
-                                  pct: funPct,
-                                  iconObj: Icons.explore_outlined,
-                                  c: _c,
+                                _buildStaggered(
+                                  _ExpandableCategoryCard(
+                                    title: 'MACERA & EĞLENCE',
+                                    categoryValue: 'fun',
+                                    pct: funPct,
+                                    iconObj: Icons.explore_outlined,
+                                    c: _c,
+                                  ),
+                                  7,
                                 ),
-                              ] else ...[
-                                _ExpandableCategoryCard(
-                                  title: 'KARMİK BAĞ & GEÇMİŞ Y.',
-                                  categoryValue: 'karmic',
-                                  pct: lovePct, // Yeniden rastgele hashlendiği için farklı dağılımlar olacak 
-                                  iconObj: Icons.all_inclusive,
-                                  c: _c,
-                                  isAdvanced: true,
+                                
+                                if (widget.friend != null) ...[
+                                  const SizedBox(height: 40),
+                                  _buildStaggered(
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 20),
+                                      child: Text(
+                                        'VİRAL DİNAMİKLER',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.cinzel(
+                                          color: widget.gold,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 3,
+                                        ),
+                                      ),
+                                    ),
+                                    8,
+                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'AŞK & TUTKU',
+                                          pct: viralLovePct,
+                                          iconObj: Icons.local_fire_department,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'AŞK & TUTKU',
+                                            viralLovePct,
+                                            Icons.local_fire_department,
+                                            'Kozmik radarlarımız yanılmıyorsa, burada basit bir arkadaşlıktan daha fazlası gizli olabilir. Aranızdaki bu yüksek tansiyon ya büyük bir aşka dönüşecek ya da ortalığı yakıp yıkacak. Ateşle oynuyorsunuz!',
+                                          ),
+                                        ),
+                                        9,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'SUÇ ORTAKLIĞI',
+                                          pct: viralCrimePct,
+                                          iconObj: Icons.masks_outlined,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'SUÇ ORTAKLIĞI',
+                                            viralCrimePct,
+                                            Icons.masks_outlined,
+                                            'Siz ikiniz yan yana geldiğinizde dünyanın geri kalanı için tehlike çanları çalıyor. Mükemmel bir dedikodu ağı, harika planlar ve kimsenin anlamadığı gizli bakışmalar... Sizden korkulur!',
+                                          ),
+                                        ),
+                                        10,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'GİZLİ TELEPATİ',
-                                  categoryValue: 'telepathy',
-                                  pct: commPct,
-                                  iconObj: Icons.wifi_tethering,
-                                  c: _c,
-                                  isAdvanced: true,
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'KARMİK BAĞ',
+                                          pct: viralKarmaPct,
+                                          iconObj: Icons.all_inclusive,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'KARMİK BAĞ',
+                                            viralKarmaPct,
+                                            Icons.all_inclusive,
+                                            'Birbirinizi bu hayatta ilk kez görmüş olamazsınız. Ruhlarınız önceki yaşamlardan kalma bir hesabı kapatmaya (ya da devam ettirmeye) gelmiş. Bu bağ kolay kolay kopmaz.',
+                                          ),
+                                        ),
+                                        11,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'GİZLİ TELEPATİ',
+                                          pct: viralTelePct,
+                                          iconObj: Icons.wifi_tethering,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'GİZLİ TELEPATİ',
+                                            viralTelePct,
+                                            Icons.wifi_tethering,
+                                            'Aynı anda aynı şeyi söylemek, o tam arayacakken senin mesaj atman... Frekanslarınız öylesine eşleşmiş ki bazen konuşmanıza bile gerek kalmıyor.',
+                                          ),
+                                        ),
+                                        12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'KRİZ DİNAMİĞİ',
-                                  categoryValue: 'crisis',
-                                  pct: workPct,
-                                  iconObj: Icons.thunderstorm_outlined,
-                                  c: _c,
-                                  isAdvanced: true,
-                                ),
-                                const SizedBox(height: 20),
-                                _ExpandableCategoryCard(
-                                  title: 'TOKSİK ÇARPIŞMA',
-                                  categoryValue: 'toxic',
-                                  pct: funPct,
-                                  iconObj: Icons.warning_amber_rounded,
-                                  c: _c,
-                                  isAdvanced: true,
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'EGO SAVAŞI',
+                                          pct: viralEgoPct,
+                                          iconObj: Icons.bolt,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'EGO SAVAŞI',
+                                            viralEgoPct,
+                                            Icons.bolt,
+                                            'İki güçlü karakter, iki inatçı ruh! Aranızdaki bu gizli dominans savaşı bazen tatlı bir rekabete, bazen de sessiz bir inatlaşmaya dönüşebilir. Kimin dediği olacak?',
+                                          ),
+                                        ),
+                                        13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildStaggered(
+                                        _ViralGridCard(
+                                          title: 'TOKSİK ÇARPIŞMA',
+                                          pct: viralToxicPct,
+                                          iconObj: Icons.warning_amber_rounded,
+                                          gold: widget.gold,
+                                          onTap: () => _showViralDetailSheet(
+                                            'TOKSİK ÇARPIŞMA',
+                                            viralToxicPct,
+                                            Icons.warning_amber_rounded,
+                                            'Kabul edelim, bazen birbirinizi çileden çıkarabiliyorsunuz. Ufak tefek kırmızı bayraklar havada uçuşsa da, bu kaotik dinamik ilişkinizi asla sıkıcı yapmıyor!',
+                                          ),
+                                        ),
+                                        14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
 
                               const SizedBox(height: 40),
 
                               // Description based on average
-                              _buildAnalysisText(avg),
+                              _buildStaggered(_buildAnalysisText(avg), 8),
                               const SizedBox(height: 40),
                             ],
                           ),
@@ -7155,6 +7481,74 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
         ],
       ),
     ));
+  }
+
+  void _showViralDetailSheet(String title, int pct, IconData icon, String detailText) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+          decoration: BoxDecoration(
+            color: const Color(0xFF151816),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(color: widget.gold.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 30, offset: const Offset(0, -5)),
+            ],
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 32),
+                  decoration: BoxDecoration(
+                    color: widget.gold.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Icon(icon, color: widget.gold, size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: GoogleFonts.cinzel(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '%$pct',
+                  style: GoogleFonts.cinzel(
+                    color: widget.gold,
+                    fontSize: 54,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(color: widget.gold.withOpacity(0.5), blurRadius: 20)],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  detailText,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 15,
+                    height: 1.6,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildDeepSynastryCard(Friend friend) {
@@ -7254,14 +7648,47 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                 ],
               ),
               child: f != null
-                  ? Center(child: Text(f.user.emoji, style: const TextStyle(
-                      fontSize: 40,
-                      fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
-                    )))
+                  ? (f.user.avatarUrl != null
+                      ? ClipOval(
+                          child: f.user.avatarUrl!.startsWith('http')
+                              ? Transform.scale(
+                                  scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                  child: Image.network(
+                                    f.user.avatarUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Center(child: Text(f.user.emoji, style: const TextStyle(fontSize: 40))),
+                                  ),
+                                )
+                              : Transform.scale(
+                                  scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                  child: Image.asset(f.user.avatarUrl!, fit: BoxFit.cover),
+                                ),
+                        )
+                      : Center(
+                          child: Text(
+                            f.user.emoji,
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                            ),
+                          ),
+                        ))
                   : assetImageAvatar != null
-                      ? ClipOval(child: assetImageAvatar.startsWith('http')
-                          ? Image.network(assetImageAvatar, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset(s['image'] as String, fit: BoxFit.cover))
-                          : Image.asset(assetImageAvatar, fit: BoxFit.cover))
+                      ? ClipOval(
+                          child: assetImageAvatar.startsWith('http')
+                              ? Transform.scale(
+                                  scale: assetImageAvatar.contains('owl') ? 1.35 : (assetImageAvatar.contains('avatar_') ? 1.15 : 1.0),
+                                  child: Image.network(
+                                    assetImageAvatar,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Image.asset(s['image'] as String, fit: BoxFit.cover),
+                                  ),
+                                )
+                              : Transform.scale(
+                                  scale: assetImageAvatar.contains('owl') ? 1.35 : (assetImageAvatar.contains('avatar_') ? 1.15 : 1.0),
+                                  child: Image.asset(assetImageAvatar, fit: BoxFit.cover),
+                                ),
+                        )
                       : ClipOval(child: Image.asset(s['image'] as String, fit: BoxFit.cover)),
             ),
             if (hasAvatarOverride)
@@ -8251,17 +8678,23 @@ class _CosmicHarmonyAnimationState extends State<_CosmicHarmonyAnimation> with S
               child: widget.userAvatar != null
                   ? ClipOval(
                       child: widget.userAvatar!.startsWith('http')
-                          ? Image.network(
-                              widget.userAvatar!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(
-                                widget.currentSignData['image'] as String,
+                          ? Transform.scale(
+                              scale: widget.userAvatar!.contains('owl') ? 1.35 : (widget.userAvatar!.contains('avatar_') ? 1.15 : 1.0),
+                              child: Image.network(
+                                widget.userAvatar!,
                                 fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Image.asset(
+                                  widget.currentSignData['image'] as String,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             )
-                          : Image.asset(
-                              widget.userAvatar!,
-                              fit: BoxFit.cover,
+                          : Transform.scale(
+                              scale: widget.userAvatar!.contains('owl') ? 1.35 : (widget.userAvatar!.contains('avatar_') ? 1.15 : 1.0),
+                              child: Image.asset(
+                                widget.userAvatar!,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                     )
                   : ClipOval(
@@ -8505,4 +8938,530 @@ class _MiniNatalChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CosmicWeavingTransitionPage extends StatefulWidget {
+  final Map<String, dynamic> sign1;
+  final Map<String, dynamic> sign2;
+  final Friend friend;
+  final Color gold;
+  final String? userAvatar;
+
+  const _CosmicWeavingTransitionPage({
+    Key? key,
+    required this.sign1,
+    required this.sign2,
+    required this.friend,
+    required this.gold,
+    this.userAvatar,
+  }) : super(key: key);
+
+  @override
+  State<_CosmicWeavingTransitionPage> createState() => _CosmicWeavingTransitionPageState();
+}
+
+class _CosmicWeavingTransitionPageState extends State<_CosmicWeavingTransitionPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 5000));
+    _controller.forward().then((_) {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => _CompatibilityResultPage(
+            sign1: widget.sign1,
+            sign2: widget.sign2,
+            friend: widget.friend,
+            gold: widget.gold,
+            userAvatar: widget.userAvatar,
+          ),
+          transitionsBuilder: (_, a, __, child) {
+            final slide = Tween<Offset>(
+              begin: const Offset(0.0, -0.15), // Yukarıdan aşağı süzülme
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic));
+            return FadeTransition(
+              opacity: a,
+              child: SlideTransition(
+                position: slide,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 1200),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildAvatar(Map<String, dynamic> s, {Friend? f, String? assetImageAvatar, double size = 64}) {
+    final bool hasAvatarOverride = f != null || assetImageAvatar != null;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: hasAvatarOverride ? widget.gold.withOpacity(0.05) : null,
+        border: Border.all(color: widget.gold.withOpacity(0.5), width: 2),
+        boxShadow: [
+          BoxShadow(color: widget.gold.withOpacity(0.3), blurRadius: 30),
+        ],
+      ),
+      child: f != null
+          ? (f.user.avatarUrl != null
+              ? ClipOval(
+                  child: f.user.avatarUrl!.startsWith('http')
+                      ? Transform.scale(
+                          scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                          child: Image.network(
+                            f.user.avatarUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Center(child: Text(f.user.emoji, style: const TextStyle(fontSize: 40))),
+                          ),
+                        )
+                      : Transform.scale(
+                          scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                          child: Image.asset(f.user.avatarUrl!, fit: BoxFit.cover),
+                        ),
+                )
+              : Center(
+                  child: Text(
+                    f.user.emoji,
+                    style: const TextStyle(
+                      fontSize: 44,
+                      fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                    ),
+                  ),
+                ))
+          : assetImageAvatar != null
+              ? ClipOval(
+                  child: assetImageAvatar.startsWith('http')
+                      ? Transform.scale(
+                          scale: assetImageAvatar.contains('owl') ? 1.35 : (assetImageAvatar.contains('avatar_') ? 1.15 : 1.0),
+                          child: Image.network(
+                            assetImageAvatar,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset(s['image'] as String, fit: BoxFit.cover),
+                          ),
+                        )
+                      : Transform.scale(
+                          scale: assetImageAvatar.contains('owl') ? 1.35 : (assetImageAvatar.contains('avatar_') ? 1.15 : 1.0),
+                          child: Image.asset(assetImageAvatar, fit: BoxFit.cover),
+                        ),
+                )
+              : ClipOval(child: Image.asset(s['image'] as String, fit: BoxFit.cover)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F1210), // Koyu mistik arka plan
+      body: Stack(
+        children: [
+          // Çark (Astrolap) ve Arka Plan
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                return CustomPaint(
+                  painter: _CosmicAstrolabePainter(
+                    progress: _controller.value,
+                    gold: widget.gold,
+                  ),
+                );
+              },
+            ),
+          ),
+
+          
+          // Orbiting Avatars
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final w = MediaQuery.of(context).size.width;
+              final h = MediaQuery.of(context).size.height;
+              final cx = w / 2;
+              final cy = h / 2;
+              final progress = _controller.value;
+              
+              // Açılış Fade-In ve Ekrana Giriş (0.0 -> 0.15 arası)
+              final avatarEnter = CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.15, curve: Curves.easeOutCubic)).value;
+
+              // 0.85'ten sonra erimeye (fade out) başlıyorlar
+              final vanish = CurvedAnimation(parent: _controller, curve: const Interval(0.85, 0.95, curve: Curves.easeOut)).value;
+              
+              final currentOpacity = avatarEnter * (1 - vanish);
+              if (currentOpacity == 0.0) return const SizedBox();
+
+              // Dönme açısı (0.15'ten sonra yavaşça dönmeye başlıyorlar)
+              final rotateProgress = ((progress - 0.15) / 0.85).clamp(0.0, 1.0);
+              final angle = Curves.easeInOutSine.transform(rotateProgress) * math.pi * 1.0; // Daha sakin ve yavaş dönüş
+              
+              // Yörünge yarıçapı: 0.6 -> 0.85 arası merkeze şiddetli çekilme
+              final pullAnim = CurvedAnimation(parent: _controller, curve: const Interval(0.6, 0.85, curve: Curves.easeInBack)).value;
+              final targetRadius = (w * 0.42) * (1.0 - pullAnim); 
+              
+              // Avatarlar ekranın dışından (geniş yarıçaptan) merkeze süzülerek geliyor
+              final radius = targetRadius + (w * 0.6) * (1.0 - avatarEnter);
+              
+              // 1. Avatar (User) - Sol taraftan geliyor (Açı Pi)
+              final x1 = cx + math.cos(angle + math.pi) * radius - 32; 
+              final y1 = cy + math.sin(angle + math.pi) * radius - 32;
+
+              // 2. Avatar (Friend) - Sağ taraftan geliyor (Açı 0)
+              final x2 = cx + math.cos(angle) * radius - 32;
+              final y2 = cy + math.sin(angle) * radius - 32;
+
+              return Stack(
+                children: [
+                  Positioned(
+                    left: x1,
+                    top: y1,
+                    child: Opacity(
+                      opacity: currentOpacity,
+                      child: _buildAvatar(widget.sign1, assetImageAvatar: widget.userAvatar, size: 64),
+                    ),
+                  ),
+                  Positioned(
+                    left: x2,
+                    top: y2,
+                    child: Opacity(
+                      opacity: currentOpacity,
+                      child: _buildAvatar(widget.sign2, f: widget.friend, size: 64),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          
+          // Final Flash (Çark Eriyip Işık Patlamasına Dönüşüyor)
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final flashScale = CurvedAnimation(parent: _controller, curve: const Interval(0.85, 1.0, curve: Curves.easeInExpo)).value;
+              
+              if (flashScale == 0) return const SizedBox();
+              
+              return Center(
+                child: Container(
+                  width: flashScale * 1200,
+                  height: flashScale * 1200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        widget.gold.withOpacity(0.9),
+                        widget.gold.withOpacity(0.4),
+                        widget.gold.withOpacity(0.0),
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CosmicAstrolabePainter extends CustomPainter {
+  final double progress;
+  final Color gold;
+
+  _CosmicAstrolabePainter({required this.progress, required this.gold});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 0.85'ten sonra erime başlıyor
+    if (progress > 0.95) return;
+    
+    // Astrolabe 0.15'ten sonra yavaşça beliriyor
+    final fadeIn = Curves.easeIn.transform(((progress - 0.15) / 0.10).clamp(0.0, 1.0));
+    final fadeOut = Curves.easeOut.transform(((progress - 0.85) / 0.1).clamp(0.0, 1.0));
+    final globalAlpha = fadeIn * (1.0 - fadeOut);
+
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width * 0.42; // Ekranı kaplayacak büyüklükte
+
+    final rotation = progress * math.pi * 1.0; // Çok daha yavaş ve asil dönecek
+    
+    // Yavaşça yanıp sönme (glow)
+    final glow = Curves.easeInOutSine.transform((math.sin(progress * math.pi * 2) + 1) / 2);
+    
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(rotation);
+    canvas.translate(-c.dx, -c.dy);
+
+    // Dış çember
+    final pOuter = Paint()
+      ..color = gold.withOpacity((0.2 + glow * 0.2) * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    
+    canvas.drawCircle(c, r, pOuter);
+    
+    // İçteki kalın şeffaf çember
+    canvas.drawCircle(c, r * 0.85, Paint()
+      ..color = gold.withOpacity(0.05 * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 15.0);
+      
+    // İç ince çember
+    canvas.drawCircle(c, r * 0.75, Paint()
+      ..color = gold.withOpacity((0.3 + glow * 0.2) * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5);
+    
+    // Zodyak 12 Ev Çizgileri
+    final pLine = Paint()
+      ..color = gold.withOpacity(0.15 * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+      
+    for (int i = 0; i < 12; i++) {
+      final angle = i * math.pi / 6;
+      canvas.drawLine(
+        Offset(c.dx + math.cos(angle) * (r * 0.55), c.dy + math.sin(angle) * (r * 0.55)),
+        Offset(c.dx + math.cos(angle) * r, c.dy + math.sin(angle) * r),
+        pLine,
+      );
+    }
+    
+    // Etrafında dönen mistik gezegen noktaları
+    final dotPaint = Paint()..color = gold.withOpacity(0.8 * globalAlpha);
+    for(int i = 0; i < 6; i++) {
+       final dist = r * (0.6 + i * 0.06);
+       // Noktalar zıt ve farklı hızlarda dönüyor
+       final angle = progress * math.pi * (4 - i * 0.5) * (i % 2 == 0 ? 1 : -1); 
+       
+       canvas.drawCircle(
+         Offset(c.dx + math.cos(angle) * dist, c.dy + math.sin(angle) * dist),
+         3.0 + (i % 3),
+         dotPaint..color = gold.withOpacity((0.4 + 0.1 * i) * globalAlpha),
+       );
+    }
+
+    canvas.restore();
+    
+    // Ters yöne dönen iç Astrolap çarkı
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(-rotation * 0.5); // Daha yavaş ve ters yöne
+    canvas.translate(-c.dx, -c.dy);
+    
+    canvas.drawCircle(c, r * 0.5, Paint()..color = gold.withOpacity(0.03 * globalAlpha)..style = PaintingStyle.fill);
+    
+    // Zodyak Evleri Yerine (12 Adet Mini Takımyıldızı)
+    final textRadius = r * 0.38;
+    final pMiniLine = Paint()
+      ..color = gold.withOpacity(0.3 * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+    final pMiniDot = Paint()
+      ..color = gold.withOpacity(0.6 * globalAlpha)
+      ..style = PaintingStyle.fill;
+      
+    for (int i = 0; i < 12; i++) {
+      final angle = i * math.pi / 6;
+      final cxSector = c.dx + math.cos(angle) * textRadius;
+      final cySector = c.dy + math.sin(angle) * textRadius;
+      
+      // Her burç evi için aynı (fakat birbirinden farklı) minik bir takımyıldızı oluştur
+      final rng = math.Random(i * 1234); 
+      final numPoints = 3 + rng.nextInt(2); // 3 veya 4 noktalı takımyıldızları
+      
+      final List<Offset> cPoints = [];
+      for (int p = 0; p < numPoints; p++) {
+         final rDist = rng.nextDouble() * 12.0; // Merkezden maks 12px uzakta
+         final rAngle = rng.nextDouble() * math.pi * 2;
+         cPoints.add(Offset(cxSector + math.cos(rAngle) * rDist, cySector + math.sin(rAngle) * rDist));
+      }
+      
+      // Noktaları bağlayan çizgiler
+      for (int p = 0; p < cPoints.length - 1; p++) {
+         canvas.drawLine(cPoints[p], cPoints[p+1], pMiniLine);
+      }
+      // Noktalar
+      for (var pt in cPoints) {
+         canvas.drawCircle(pt, 1.5, pMiniDot);
+      }
+    }
+    
+    // Takımyıldızı Çizgileri (Merkezde)
+    final pConstLine = Paint()
+      ..color = gold.withOpacity(0.15 * globalAlpha)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+      
+    final pConstDot = Paint()
+      ..color = gold.withOpacity(0.5 * globalAlpha)
+      ..style = PaintingStyle.fill;
+      
+    final List<Offset> starPoints = [
+      Offset(c.dx - r * 0.15, c.dy - r * 0.20),
+      Offset(c.dx + r * 0.05, c.dy - r * 0.25),
+      Offset(c.dx + r * 0.20, c.dy - r * 0.05),
+      Offset(c.dx + r * 0.15, c.dy + r * 0.15),
+      Offset(c.dx - r * 0.05, c.dy + r * 0.20),
+      Offset(c.dx - r * 0.20, c.dy + r * 0.05),
+      Offset(c.dx, c.dy), // Merkez
+    ];
+    
+    // Takımyıldızı bağları
+    canvas.drawLine(starPoints[0], starPoints[1], pConstLine);
+    canvas.drawLine(starPoints[1], starPoints[2], pConstLine);
+    canvas.drawLine(starPoints[2], starPoints[3], pConstLine);
+    canvas.drawLine(starPoints[3], starPoints[4], pConstLine);
+    canvas.drawLine(starPoints[4], starPoints[5], pConstLine);
+    canvas.drawLine(starPoints[5], starPoints[0], pConstLine);
+    
+    canvas.drawLine(starPoints[0], starPoints[6], pConstLine);
+    canvas.drawLine(starPoints[2], starPoints[6], pConstLine);
+    canvas.drawLine(starPoints[4], starPoints[6], pConstLine);
+    
+    // Yıldız Noktaları
+    for (var pt in starPoints) {
+      canvas.drawCircle(pt, 2.5, pConstDot);
+    }
+    
+    canvas.restore();
+    
+    // Elektrik Çekimi (Electric Pull) Çizgileri
+    final pullAnim = Curves.easeInBack.transform(((progress - 0.6) / 0.25).clamp(0.0, 1.0));
+    if (pullAnim > 0.0 && pullAnim < 1.0) {
+       final rotateProgress = ((progress - 0.15) / 0.85).clamp(0.0, 1.0);
+       final angle = Curves.easeInOutSine.transform(rotateProgress) * math.pi * 1.0;
+       final radius = (size.width * 0.42) * (1.0 - pullAnim);
+       
+       final p1 = Offset(c.dx + math.cos(angle + math.pi) * radius, c.dy + math.sin(angle + math.pi) * radius);
+       final p2 = Offset(c.dx + math.cos(angle) * radius, c.dy + math.sin(angle) * radius);
+       
+       // Draw electric arcs
+       final paint = Paint()..color = gold.withOpacity(0.8 * globalAlpha)..style = PaintingStyle.stroke..strokeWidth = 2.0;
+       canvas.drawLine(p1, p2, paint);
+       canvas.drawLine(p1, p2, Paint()..color = gold.withOpacity(0.3 * globalAlpha)..strokeWidth = 8.0);
+       canvas.drawLine(p1, p2, Paint()..color = Colors.white.withOpacity(0.5 * globalAlpha)..strokeWidth = 1.0);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CosmicAstrolabePainter oldDelegate) => true;
+}
+
+class _ViralGridCard extends StatelessWidget {
+  final String title;
+  final int pct;
+  final IconData iconObj;
+  final Color gold;
+  final VoidCallback onTap;
+
+  const _ViralGridCard({
+    Key? key,
+    required this.title,
+    required this.pct,
+    required this.iconObj,
+    required this.gold,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 140,
+        decoration: BoxDecoration(
+          color: gold.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: gold.withOpacity(0.15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            )
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Top Right Glow Dot
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: gold,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: gold.withOpacity(0.5),
+                      blurRadius: 6,
+                      spreadRadius: 2,
+                    )
+                  ],
+                ),
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(iconObj, color: gold.withOpacity(0.8), size: 28),
+                  
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '%$pct',
+                        style: GoogleFonts.cinzel(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          shadows: [
+                            Shadow(color: gold.withOpacity(0.5), blurRadius: 15),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        title,
+                        style: GoogleFonts.inter(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

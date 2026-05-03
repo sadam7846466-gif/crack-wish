@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Supabase Edge Function üzerinden rüya yorumlama servisi
 class SupabaseDreamService {
@@ -32,6 +33,7 @@ class SupabaseDreamService {
               'dreamText': dreamText,
               'emotion': emotion,
               'locale': locale,
+              'userId': Supabase.instance.client.auth.currentUser?.id,
             }),
           )
           .timeout(const Duration(seconds: 45));

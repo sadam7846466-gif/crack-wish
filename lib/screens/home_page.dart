@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import '../services/supabase_owl_service.dart';
 import '../services/sound_service.dart';
+import '../services/season_config.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
@@ -64,9 +65,15 @@ class _HomePageState extends State<HomePage> {
     'Sürpriz iyi gelir.',
   ];
 
+  late List<String> _cookieTypes;
+
   @override
   void initState() {
     super.initState();
+    _cookieTypes = [
+      ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
+      ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
+    ];
     _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
     _showTimeSubtitle = math.Random().nextBool();
     _checkUnreadOwlLetters();
@@ -147,8 +154,22 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadSelectedCookie() async {
     final savedCookie = await StorageService.getSelectedCookie();
+    
+    final collection = await StorageService.getCookieCollection();
+    final ownedIds = collection.where((c) => c.countObtained > 0).map((c) => c.id).toSet();
+    
+    final showcaseIds = [
+      ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
+      ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
+    ];
+    final allCookies = SeasonConfig.getAllCookies().map((c) => c['id'] as String).toList();
+    final ownedButNotShown = allCookies.where((id) {
+      return ownedIds.contains(id) && !showcaseIds.contains(id);
+    }).toList();
+
     if (mounted) {
       setState(() {
+        _cookieTypes = [...showcaseIds, ...ownedButNotShown];
         _selectedCookieEmoji = savedCookie;
         _selectedCookieIndex = _getCookieIndex(savedCookie);
       });
@@ -163,8 +184,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _checkUnreadOwlLetters() async {
-    final count = await StorageService.getUnreadOwlLetterCount();
+  void _checkUnreadOwlLetters() {
+    final count = SupabaseOwlService().unreadLetterCount + SupabaseOwlService().pendingRequestCount;
     if (!mounted) return;
     
     // Eğer yeni mektup geldiyse (ve ilk açılış değilse veya sadece 0'dan arttıysa)
@@ -183,7 +204,6 @@ class _HomePageState extends State<HomePage> {
 
   void _openOwlLetterPage() {
     HapticFeedback.mediumImpact();
-    // _owlButtonKey artık _OwlButton içinde — fallback rect kullan
     Rect rect = const Rect.fromLTWH(0, 0, 52, 52);
     final box = _owlButtonKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
@@ -202,31 +222,6 @@ class _HomePageState extends State<HomePage> {
       ),
     ).then((_) => _checkUnreadOwlLetters());
   }
-  static const List<String> _cookieTypes = [
-    // 6 Ücretsiz
-    'spring_wreath',
-    'lucky_clover',
-    'royal_hearts',
-    'evil_eye',
-    'pizza_party',
-    'sakura_bloom',
-    // 8 Ücretli Vitrin
-    'golden_arabesque',
-    'midnight_mosaic',
-    'pearl_lace',
-    'golden_sakura',
-    'dragon_phoenix',
-    'gold_beasts',
-    'blue_porcelain',
-    'pink_blossom',
-    // 6 Eski/Envanter
-    'fortune_cat',
-    'wildflower',
-    'cupid_ribbon',
-    'panda_bamboo',
-    'ramadan_cute',
-    'enchanted_forest',
-  ];
 
   void _hideFortune() {
     (_cookieSectionKey.currentState as dynamic)?.hideFortune();
@@ -498,6 +493,7 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 12),
         // Baykuş butonu — tıklanınca buzlu cam mektup paneli açılır
         _OwlButton(
+          key: _owlButtonKey,
           unreadCount: totalUnread,
           onTap: _openOwlLetterPage,
         ),
@@ -511,6 +507,7 @@ class _OwlButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const _OwlButton({
+    super.key,
     required this.unreadCount,
     required this.onTap,
   });
@@ -542,9 +539,9 @@ class _OwlButtonState extends State<_OwlButton> {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              GlassContainer(
-                key: _btnKey,
-                useOwnLayer: true,
+                GlassContainer(
+                  key: widget.key, // Artık parent'taki GlobalKey'i kullanıyoruz
+                  useOwnLayer: true,
                 width: 52,
                 height: 52,
                 settings: const LiquidGlassSettings(

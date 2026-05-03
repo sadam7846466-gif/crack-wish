@@ -220,6 +220,30 @@ Return this exact JSON structure:
       summary: fix(parsed.core_conflict || ""), // summary = core_conflict (farklı içerik, duplikasyon yok)
     };
 
+    // --- SEND PUSH NOTIFICATION ---
+    try {
+      if (userId) {
+        // userId requires dynamic import if not defined, but we can extract it from the first req.json()
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        await supabase.functions.invoke('push-notification', {
+          body: {
+            table: 'dreams',
+            record: {
+              to_user: userId,
+              from_user: userId,
+              locale: locale
+            }
+          }
+        });
+        console.log("Triggered push-notification for dream user", userId);
+      }
+    } catch(e) {
+      console.error("FCM Error:", e);
+    }
+
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

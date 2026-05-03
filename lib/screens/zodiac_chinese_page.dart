@@ -136,9 +136,22 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
     );
   }
 
+  bool _hasReadDaily = false;
+
+  Future<void> _checkDailyRead() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    if (mounted) {
+      setState(() {
+        _hasReadDaily = prefs.getBool('asian_daily_read_$today') ?? false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _checkDailyRead();
     _pageController = PageController(initialPage: _activeSection);
     _profileScrollCtrl = ScrollController()..addListener(() {
       if (_profileScrollCtrl.offset > 350 && !_careerAnimated) {
@@ -457,8 +470,19 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   Widget _buildContent() {
     return PageView(
       controller: _pageController,
-      onPageChanged: (index) {
+      onPageChanged: (index) async {
         setState(() => _activeSection = index);
+        if (index == 2 && !_hasReadDaily) {
+          final prefs = await SharedPreferences.getInstance();
+          final today = DateTime.now().toIso8601String().split('T')[0];
+          await prefs.setBool('asian_daily_read_$today', true);
+          await StorageService.setZodiacDoneToday();
+          if (mounted) {
+            setState(() {
+              _hasReadDaily = true;
+            });
+          }
+        }
       },
       physics: const BouncingScrollPhysics(),
       children: [
@@ -3907,29 +3931,30 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF22D3EE).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 0.5),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 4, height: 4,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF22D3EE),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [BoxShadow(color: const Color(0xFF22D3EE).withOpacity(0.6), blurRadius: 4, spreadRadius: 1)],
+                        if (!_hasReadDaily)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF22D3EE).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.3), width: 0.5),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 4, height: 4,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF22D3EE),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [BoxShadow(color: const Color(0xFF22D3EE).withOpacity(0.6), blurRadius: 4, spreadRadius: 1)],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
-                            ],
+                                const SizedBox(width: 4),
+                                const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 4),

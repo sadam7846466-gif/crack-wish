@@ -8,6 +8,7 @@ import '../services/storage_service.dart';
 import '../data/mayan_zodiac_data.dart';
 import '../services/analytics_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ZodiacMayanPage extends StatefulWidget {
   const ZodiacMayanPage({super.key});
@@ -45,6 +46,17 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         vsync: this, duration: const Duration(milliseconds: 3000))
       ..repeat(reverse: true);
     _loadUser();
+    _checkDailyRead();
+  }
+
+  Future<void> _checkDailyRead() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    if (mounted) {
+      setState(() {
+        _hasOpenedDaily = prefs.getBool('mayan_daily_read_$today') ?? false;
+      });
+    }
   }
 
   Future<void> _loadUser() async {
@@ -631,13 +643,21 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               // Üst Kısım - Ana Enerji
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     _isDailyEnergyExpanded = !_isDailyEnergyExpanded;
-                    if (_isDailyEnergyExpanded) {
-                      _hasOpenedDaily = true;
-                    }
                   });
+                  if (_isDailyEnergyExpanded && !_hasOpenedDaily) {
+                    final prefs = await SharedPreferences.getInstance();
+                    final today = DateTime.now().toIso8601String().split('T')[0];
+                    await prefs.setBool('mayan_daily_read_$today', true);
+                    await StorageService.setZodiacDoneToday();
+                    if (mounted) {
+                      setState(() {
+                        _hasOpenedDaily = true;
+                      });
+                    }
+                  }
                 },
                 child: Stack(
                   alignment: Alignment.center,

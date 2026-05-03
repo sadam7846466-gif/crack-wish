@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:vlucky_flutter/services/storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -152,7 +154,7 @@ class PushNotificationService {
         }
         
         // 4. İzin alındıysa sabah ve akşam otomatik rutinleri kur
-        _scheduleRoutines();
+        await _scheduleRoutines();
         
         return true;
       }
@@ -163,22 +165,62 @@ class PushNotificationService {
     }
   }
 
-  /// Sabah ve Akşam yerel bildirimlerini kurar
-  void _scheduleRoutines() {
+  /// Sabah, Öğle, Akşam ve Uyku (Cosmic Engine) yerel bildirimlerini kurar
+  Future<void> _scheduleRoutines() async {
+    // KULLANICI AYARLARINI KONTROL ET (Rastgele ve sürekli bildirim atılmasını engeller)
+    final settings = await StorageService.getNotificationSettings();
+    final bool dailyRemindersEnabled = settings['dailyReminders'] ?? false;
+
+    if (!dailyRemindersEnabled) {
+      debugPrint('Kullanıcı günlük bildirimleri kapattığı için rutinler iptal edildi.');
+      await cancelNotification(1);
+      await cancelNotification(2);
+      await cancelNotification(3);
+      await cancelNotification(4);
+      return;
+    }
+
+    // Dinamik ve kişiselleştirilmiş bildirimler için kullanıcı verilerini çek
+    final prefs = await SharedPreferences.getInstance();
+    final String userName = prefs.getString('user_name') ?? "Ruh";
+    final String zodiac = prefs.getString('zodiac_sign') ?? "Yıldıztozu";
+
     _scheduleLocalNotification(
       id: 1,
-      title: 'Güneş doğdu! 🌞',
-      body: 'Dün geceki rüyanı analiz et, taze kurabiyeni kır ve gökyüzünün bugünkü mesajını öğren.',
+      title: 'Güneş doğdu $userName! 🌞',
+      body: '$zodiac burcunun bugünkü kozmik mesajı seni bekliyor. Dün geceki rüyanı analiz et ve kurabiyeni kır.',
       hour: 9,
       minute: 0,
       channelId: 'morning_routine',
       channelName: 'Sabah Kahini',
     );
     
+    // Cosmic Engine (Uyku Verisi / Akıllı Hatırlatıcı)
     _scheduleLocalNotification(
       id: 2,
+      title: 'Ruhun Fısıldıyor ✨',
+      body: 'Evrenin sana gönderdiği mesajları yorumlamak için kozmik günlüğün seni bekliyor.',
+      hour: 9,
+      minute: 30,
+      channelId: 'cosmic_engine',
+      channelName: 'Cosmic Engine',
+    );
+
+    // Öğleden Sonra Kurabiye Hatırlatıcısı
+    _scheduleLocalNotification(
+      id: 3,
+      title: 'Kozmik Çay Saati 🥠',
+      body: 'Bugünkü $zodiac şans kurabiyeni kırmayı unutma! Gizli bir başarım seni bekliyor olabilir.',
+      hour: 15,
+      minute: 0,
+      channelId: 'afternoon_routine',
+      channelName: 'Öğle Kurabiyesi',
+    );
+
+    _scheduleLocalNotification(
+      id: 4,
       title: 'Ruhsal Dinlenme Vakti ✨',
-      body: 'Günün yorgunluğunu atmak için Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
+      body: 'Günün yorgunluğunu atmak için $zodiac burcuna özel Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
       hour: 20,
       minute: 0,
       channelId: 'evening_routine',

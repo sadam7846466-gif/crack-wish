@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'dart:ui' show Color, ImageFilter;
 import '../services/storage_service.dart';
+import '../services/season_config.dart';
 
 class CookieSelector extends StatefulWidget {
   final Function(String)? onCookieSelected;
@@ -38,36 +39,13 @@ class _CookieSelectorState extends State<CookieSelector> {
     return targetIndex * _itemWidth;
   }
 
-  // Sabit Vitrin (14 Kurabiye: 6 Ücretsiz + 8 Ücretli)
-  static final List<Map<String, dynamic>> _baseShowcaseCookies = [
-    // 6 Ücretsiz
-    {'id': 'spring_wreath', 'key': 'cookieSpringWreath', 'imagePath': 'assets/images/cookies/spring_wreath.webp', 'isPaid': false, 'color': const Color(0xFF8BC34A)},
-    {'id': 'lucky_clover', 'key': 'cookieLuckyClover', 'imagePath': 'assets/images/cookies/lucky_clover.webp', 'isPaid': false, 'color': const Color(0xFF4CAF50)},
-    {'id': 'royal_hearts', 'key': 'cookieRoyalHearts', 'imagePath': 'assets/images/cookies/royal_hearts.webp', 'isPaid': false, 'color': const Color(0xFFE91E63)},
-    {'id': 'evil_eye', 'key': 'cookieEvilEye', 'imagePath': 'assets/images/cookies/evil_eye.webp', 'isPaid': false, 'color': const Color(0xFF2196F3)},
-    {'id': 'pizza_party', 'key': 'cookiePizzaParty', 'imagePath': 'assets/images/cookies/pizza_party.webp', 'isPaid': false, 'color': const Color(0xFFFF9800)},
-    {'id': 'sakura_bloom', 'key': 'cookieSakuraBloom', 'imagePath': 'assets/images/cookies/sakura_bloom.webp', 'isPaid': false, 'color': const Color(0xFFF48FB1)},
-    
-    // 8 Ücretli
-    {'id': 'golden_arabesque', 'key': 'cookieGoldenArabesque', 'imagePath': 'assets/images/cookies/golden_arabesque.webp', 'isPaid': true, 'color': const Color(0xFFFFD700)},
-    {'id': 'midnight_mosaic', 'key': 'cookieMidnightMosaic', 'imagePath': 'assets/images/cookies/midnight_mosaic.webp', 'isPaid': true, 'color': const Color(0xFF5C6BC0)},
-    {'id': 'pearl_lace', 'key': 'cookiePearlLace', 'imagePath': 'assets/images/cookies/pearl_lace.webp', 'isPaid': true, 'color': const Color(0xFFE0E0E0)},
-    {'id': 'golden_sakura', 'key': 'cookieGoldenSakura', 'imagePath': 'assets/images/cookies/golden_sakura.webp', 'isPaid': true, 'color': const Color(0xFFF8BBD0)},
-    {'id': 'dragon_phoenix', 'key': 'cookieDragonPhoenix', 'imagePath': 'assets/images/cookies/dragon_phoenix.webp', 'isPaid': true, 'color': const Color(0xFFFF5722)},
-    {'id': 'gold_beasts', 'key': 'cookieGoldBeasts', 'imagePath': 'assets/images/cookies/gold_beasts.webp', 'isPaid': true, 'color': const Color(0xFFFFAB00)},
-    {'id': 'blue_porcelain', 'key': 'cookieBluePorcelain', 'imagePath': 'assets/images/cookies/blue_porcelain.webp', 'isPaid': true, 'color': const Color(0xFF42A5F5)},
-    {'id': 'pink_blossom', 'key': 'cookiePinkBlossom', 'imagePath': 'assets/images/cookies/pink_blossom.webp', 'isPaid': true, 'color': const Color(0xFFEC407A)},
-  ];
-
-  // Eski sezonlardan satın alınan ve kullanıcının yuvalarına (max 6) yerleşen kurabiyeler
-  static final List<Map<String, dynamic>> _legacyPurchasedCookies = [
-    {'id': 'fortune_cat', 'key': 'cookieFortuneCat', 'imagePath': 'assets/images/cookies/fortune_cat.webp', 'isPaid': true, 'color': const Color(0xFFFFB74D)},
-    {'id': 'wildflower', 'key': 'cookieWildflower', 'imagePath': 'assets/images/cookies/wildflower.webp', 'isPaid': true, 'color': const Color(0xFFAB47BC)},
-    {'id': 'cupid_ribbon', 'key': 'cookieCupidRibbon', 'imagePath': 'assets/images/cookies/cupid_ribbon.webp', 'isPaid': true, 'color': const Color(0xFFEF5350)},
-    {'id': 'panda_bamboo', 'key': 'cookiePandaBamboo', 'imagePath': 'assets/images/cookies/panda_bamboo.webp', 'isPaid': true, 'color': const Color(0xFF66BB6A)},
-    {'id': 'ramadan_cute', 'key': 'cookieRamadanCute', 'imagePath': 'assets/images/cookies/ramadan_cute.webp', 'isPaid': true, 'color': const Color(0xFF7E57C2)},
-    {'id': 'enchanted_forest', 'key': 'cookieEnchantedForest', 'imagePath': 'assets/images/cookies/enchanted_forest.webp', 'isPaid': true, 'color': const Color(0xFF26A69A)},
-  ];
+  // Sabit Vitrin: 6 Haftalık Ücretsiz + 8 Haftalık Ücretli
+  List<Map<String, dynamic>> get _baseShowcaseCookies {
+    return [
+      ...SeasonConfig.getWeeklyFreeCookies(),
+      ...SeasonConfig.getWeeklyPaidCookies(),
+    ];
+  }
 
   late List<Map<String, dynamic>> _displayCookies;
 
@@ -91,13 +69,17 @@ class _CookieSelectorState extends State<CookieSelector> {
             _ownedPaidCookieCounts[c.id] = c.countObtained;
           }
         }
-        // Sahip olunan eski sezon kurabiyelerini ana sayfaya (vitrine) ekle (Max 6)
-        final ownedLegacy = _legacyPurchasedCookies.where((legacy) {
+        
+        final baseIds = _baseShowcaseCookies.map((c) => c['id']).toSet();
+        final allCookies = SeasonConfig.getAllCookies();
+
+        // Sahip olunan AMA o haftanın vitrininde OLMAYAN kurabiyeleri sona ekle
+        final ownedButNotShown = allCookies.where((legacy) {
           final count = _ownedPaidCookieCounts[legacy['id']] ?? 0;
-          return count > 0;
+          return count > 0 && !baseIds.contains(legacy['id']);
         }).toList();
 
-        _displayCookies = List.from(_baseShowcaseCookies)..addAll(ownedLegacy);
+        _displayCookies = List.from(_baseShowcaseCookies)..addAll(ownedButNotShown);
       });
     }
   }
