@@ -2606,6 +2606,7 @@ class _BentoHeroCard extends StatelessWidget {
                               ]),
                               builder: (context, snapshot) {
                                 bool hasUnclaimed = false;
+                                int totalPending = 0;
                                 if (snapshot.hasData) {
                                   // Gün içinde birden fazla toplanabileceği için 'claimed' kilidi kapatıldı. (Sadece bekleyen fona bakılır)
                                   final pendingFal = snapshot.data![1] as int;
@@ -2615,17 +2616,15 @@ class _BentoHeroCard extends StatelessWidget {
                                   final pendingOwl = snapshot.data![4] as int;
 
                                   // Nokta sadece gerçekten toplanacak Aura varsa yansın
-                                  hasUnclaimed =
-                                      pendingFal > 0 ||
-                                      pendingCookie > 0 ||
-                                      pendingDream > 0 ||
-                                      pendingOwl > 0;
+                                  totalPending = pendingFal + pendingCookie + pendingDream + pendingOwl;
+                                  hasUnclaimed = totalPending > 0;
                                 }
                                 return _GlassBadge(
                                   imagePath: 'assets/images/aura_core.png',
                                   label: "$formattedAura Aura",
                                   color: const Color(0xFFC084FC),
                                   hasNotification: hasUnclaimed,
+                                  notificationText: hasUnclaimed ? "+$totalPending" : null,
                                   onTap: () => _showStatModal(
                                     context,
                                     "Aura Puanı",
@@ -5217,6 +5216,7 @@ class _GlassBadge extends StatelessWidget {
   final String label;
   final Color color;
   final bool hasNotification;
+  final String? notificationText;
   final VoidCallback onTap;
 
   const _GlassBadge({
@@ -5225,6 +5225,7 @@ class _GlassBadge extends StatelessWidget {
     required this.label,
     required this.color,
     this.hasNotification = false,
+    this.notificationText,
     required this.onTap,
   });
 
@@ -5290,10 +5291,28 @@ class _GlassBadge extends StatelessWidget {
           ),
           // Bildirim noktası (toplanacak kaynak varsa)
           if (hasNotification)
-            const Positioned(
-              top: -2,
-              right: 0,
-              child: CosmicBadge(), // Ortak Zümrüt Yeşili rozet!
+            Positioned(
+              top: notificationText != null ? -8 : -2,
+              right: notificationText != null ? -8 : 0,
+              child: notificationText != null
+                  ? Text(
+                      notificationText!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        shadows: [
+                          Shadow(color: Color(0xFFFFD166), offset: Offset(1, 1)),
+                          Shadow(color: Color(0xFFFFB347), offset: Offset(2, 2)),
+                          Shadow(color: Color(0xFFFF9800), offset: Offset(3, 3)),
+                          Shadow(color: Color(0xFFFF6B6B), offset: Offset(4, 4)),
+                          Shadow(color: Color(0x66000000), offset: Offset(4, 8), blurRadius: 12),
+                          Shadow(color: Color(0xAAFF6B6B), blurRadius: 20),
+                        ],
+                      ),
+                    )
+                  : const CosmicBadge(), // Ortak Zümrüt Yeşili rozet!
             ),
         ],
       ),
@@ -7239,14 +7258,20 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell>
                   child: Opacity(
                     opacity: _flyFadeAnim.value,
                     child: Center(
-                      child: Text(
-                        widget.isWeekend ? "+2" : "+1",
-                        style: const TextStyle(
-                          color: Color(0xFFFFC107),
-                          fontSize: 22,
+                      child: const Text(
+                        "+4",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
                           fontWeight: FontWeight.w900,
+                          fontStyle: FontStyle.italic,
                           shadows: [
-                            Shadow(color: Color(0x88FF6B6B), blurRadius: 10),
+                            Shadow(color: Color(0xFFFFD166), offset: Offset(1, 1)),
+                            Shadow(color: Color(0xFFFFB347), offset: Offset(2, 2)),
+                            Shadow(color: Color(0xFFFF9800), offset: Offset(3, 3)),
+                            Shadow(color: Color(0xFFFF6B6B), offset: Offset(4, 4)),
+                            Shadow(color: Color(0x66000000), offset: Offset(4, 8), blurRadius: 12),
+                            Shadow(color: Color(0xAAFF6B6B), blurRadius: 20),
                           ],
                         ),
                       ),

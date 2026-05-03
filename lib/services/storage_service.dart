@@ -806,17 +806,8 @@ class StorageService {
     final claimed = prefs.getStringList(_keyClaimedAuraDays) ?? [];
     if (claimed.contains(dateKey)) return false; // Zaten toplandı
 
-    // Hafta sonu bonusu: Cumartesi ve Pazar +2, diğer günler +1
-    final parts = dateKey.split('-');
-    int auraAmount = 1;
-    if (parts.length == 3) {
-      try {
-        final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
-        if (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday) {
-          auraAmount = 2; // Hafta sonu bonusu!
-        }
-      } catch (_) {}
-    }
+    // Her gün için her zaman 4 Aura
+    int auraAmount = 4;
 
     final bonusAura = prefs.getInt('daily_bonus_aura') ?? 0;
     await prefs.setInt('daily_bonus_aura', bonusAura + auraAmount);

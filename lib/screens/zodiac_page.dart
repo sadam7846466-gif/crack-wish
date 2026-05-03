@@ -4975,8 +4975,9 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
         _reloadScores();
       },
       onJourneyCompleted: () async {
-        // Serüven tamamlandığında ekstra +2 bonus
+        // Serüven tamamlandığında ekstra +2 bonus ve +4 Aura
         await StorageService.addTraitBoost(topWeakness, 2);
+        await StorageService.addPendingAura('zodiac', 4);
         widget.onBoostUpdated?.call();
         _reloadScores();
         if (mounted) {
@@ -5013,6 +5014,7 @@ class _CosmicChallengeCard extends StatefulWidget {
 class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
   int currentDay = 1;
   bool isChallengeFinished = false;
+  bool isDoneToday = false;
   List<Map<String, dynamic>> days = [];
   int totalDays = 0;
   String currentFocusText = '';
@@ -5026,6 +5028,20 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
 
   Future<void> _initChallenges() async {
     final w = widget.topWeakness.toLowerCase();
+    final prefs = await SharedPreferences.getInstance();
+
+    final savedTotalDays = prefs.getInt('cosmic_journey_total_days_$w');
+    final savedCurrentDay = prefs.getInt('cosmic_journey_current_day_$w');
+    final savedIsFinished = prefs.getBool('cosmic_journey_finished_$w');
+    final lastDate = prefs.getString('cosmic_journey_last_date_global');
+    
+    final todayStr = DateTime.now().toIso8601String().split('T').first;
+    if (lastDate == todayStr) {
+      isDoneToday = true;
+    }
+    
+    if (savedCurrentDay != null) currentDay = savedCurrentDay;
+    if (savedIsFinished != null) isChallengeFinished = savedIsFinished;
 
     List<Map<String, dynamic>> pool = [];
 
@@ -5744,11 +5760,15 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
       }
     }
 
-    int dynamicTotal =
-        3 +
-        (DateTime.now().millisecond % 3); // 3, 4 veya 5 günlük görevler verir
-    if (dynamicTotal > pool.length)
-      dynamicTotal = pool.length; // Array'den büyük olmaması için güvenli limit
+    int dynamicTotal = savedTotalDays ?? (3 + (DateTime.now().millisecond % 3));
+    if (dynamicTotal > pool.length) {
+      dynamicTotal = pool.length;
+    }
+    
+    // Total günleri kaydet
+    if (savedTotalDays == null) {
+      prefs.setInt('cosmic_journey_total_days_$w', dynamicTotal);
+    }
 
     if (mounted) {
       setState(() {
@@ -5798,23 +5818,26 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 2 * 3.14159),
-                      duration: const Duration(seconds: 15),
-                      builder: (context, rotation, child) {
-                        return Transform.rotate(
-                          angle: rotation,
-                          child: _ProceduralBadge(
-                            seedText: widget.topWeakness,
-                            baseColor: widget.baseColor,
-                            size: 140,
-                          ),
-                        );
-                      },
+                    const Text(
+                      "+4",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 80,
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        shadows: [
+                          Shadow(color: Color(0xFFFFD166), offset: Offset(2, 2)),
+                          Shadow(color: Color(0xFFFFB347), offset: Offset(4, 4)),
+                          Shadow(color: Color(0xFFFF9800), offset: Offset(6, 6)),
+                          Shadow(color: Color(0xFFFF6B6B), offset: Offset(8, 8)),
+                          Shadow(color: Color(0x66000000), offset: Offset(8, 16), blurRadius: 16),
+                          Shadow(color: Color(0xAAFF6B6B), blurRadius: 30),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'YENİ ROZET\nKAZANILDI',
+                      'AURA\nKAZANILDI',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cinzel(
                         color: Colors.white,
@@ -5954,10 +5977,22 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _ProceduralBadge(
-              seedText: widget.topWeakness,
-              baseColor: widget.baseColor,
-              size: 80,
+            const Text(
+              "+4",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 80,
+                fontWeight: FontWeight.w900,
+                fontStyle: FontStyle.italic,
+                shadows: [
+                  Shadow(color: Color(0xFFFFD166), offset: Offset(2, 2)),
+                  Shadow(color: Color(0xFFFFB347), offset: Offset(4, 4)),
+                  Shadow(color: Color(0xFFFF9800), offset: Offset(6, 6)),
+                  Shadow(color: Color(0xFFFF6B6B), offset: Offset(8, 8)),
+                  Shadow(color: Color(0x66000000), offset: Offset(8, 16), blurRadius: 16),
+                  Shadow(color: Color(0xAAFF6B6B), blurRadius: 30),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -5992,8 +6027,8 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 const SizedBox(width: 12),
                 Text(
                   '$newScore%',
-                  style: TextStyle(
-                    color: const Color(0xFF69F0AE),
+                  style: const TextStyle(
+                    color: Color(0xFF69F0AE),
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                   ),
@@ -6018,13 +6053,14 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 border: Border.all(color: widget.baseColor.withOpacity(0.5)),
               ),
               child: Text(
-                'Kazanılan Rozet:\n"${_weaknessToPositive[widget.topWeakness] ?? widget.topWeakness} Ustası"',
+                'Kazanılan Ödül:\n+4 AURA',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: widget.baseColor,
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   height: 1.4,
+                  letterSpacing: 2.0,
                 ),
               ),
             ),
@@ -6301,19 +6337,32 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
 
           // Aksiyon Butonu
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+              if (isDoneToday) return;
+
+              final w = widget.topWeakness.toLowerCase();
+              final prefs = await SharedPreferences.getInstance();
+              final todayStr = DateTime.now().toIso8601String().split('T').first;
+
               final taskToMark = days[currentDay - 1]['task'] as String;
               StorageService.addCompletedCosmicTask(taskToMark);
 
               // Her günlük görev tamamlandığında boost kaydet
               widget.onDayCompleted?.call();
 
+              setState(() {
+                isDoneToday = true;
+              });
+              
+              prefs.setString('cosmic_journey_last_date_global', todayStr);
+
               if (currentDay >= totalDays) {
-                widget.onJourneyCompleted?.call();
+                prefs.setBool('cosmic_journey_finished_$w', true);
                 _showCosmicCelebrationDialog(context);
                 setState(() => isChallengeFinished = true);
               } else {
                 setState(() => currentDay++);
+                prefs.setInt('cosmic_journey_current_day_$w', currentDay);
               }
             },
             child: Container(
@@ -6321,8 +6370,10 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: widget.baseColor.withOpacity(0.85),
-                boxShadow: [
+                color: isDoneToday 
+                    ? Colors.white.withOpacity(0.1) 
+                    : widget.baseColor.withOpacity(0.85),
+                boxShadow: isDoneToday ? [] : [
                   BoxShadow(
                     color: widget.baseColor.withOpacity(0.2),
                     blurRadius: 20,
@@ -6335,19 +6386,23 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    currentDay >= totalDays
-                        ? Icons.auto_awesome_rounded
-                        : Icons.check_circle_outline_rounded,
-                    color: Colors.white,
+                    isDoneToday
+                        ? Icons.check_circle_rounded
+                        : (currentDay >= totalDays
+                            ? Icons.auto_awesome_rounded
+                            : Icons.check_circle_outline_rounded),
+                    color: isDoneToday ? Colors.white.withOpacity(0.3) : Colors.white,
                     size: 22,
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    currentDay >= totalDays
-                        ? 'SERÜVENİ TAMAMLA'
-                        : 'BUGÜNÜ TAMAMLADIM',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    isDoneToday
+                        ? 'BUGÜN TAMAMLANDI'
+                        : (currentDay >= totalDays
+                            ? 'SERÜVENİ TAMAMLA'
+                            : 'BUGÜNÜ TAMAMLADIM'),
+                    style: TextStyle(
+                      color: isDoneToday ? Colors.white.withOpacity(0.3) : Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
