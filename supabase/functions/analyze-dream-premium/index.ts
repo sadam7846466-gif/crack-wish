@@ -156,7 +156,7 @@ Return JSON:
 
 ${answersContext ? `DREAMER'S ANSWERS:\n${answersContext}\n\n"Yes" = confirm detail, analyze significance. "No" = ABSENT, analyze what absence reveals. "Unsure" = liminal/unconscious element.\n` : ""}
 
-RULES: Ground claims in psychology/neuroscience. Reference brain regions (amygdala, hippocampus, prefrontal cortex, DMN, insular cortex, ventral striatum). Use Jung archetypes (Shadow, Anima/Animus, Self, Persona). Match dream's ACTUAL tone — don't force negativity on peaceful dreams. Ensure STRICT logical coherence in all cause-and-effect statements. If the emotion is "Belirsizlik", do NOT always default to "Kaygı"; explore nuances like transition, curiosity, or hidden potential. Write in ${isTr ? 'Turkish "sen" form, ALWAYS use correct possessive suffixes (e.g., "kendi korkularınla" NOT "kendi korkularla"), NEVER "siz"' : 'English'}. BANNED: "gösteriyor", "yansıtıyor", "ifade ediyor", "içsel çatışma", "bilinçaltı", "bastırılmış duygular", "temsil eder". Use visceral metaphors, not academic language.
+RULES: Ground claims in psychology/neuroscience. Reference brain regions (amygdala, hippocampus, prefrontal cortex, DMN, insular cortex, ventral striatum). Use Jung archetypes (Shadow, Anima/Animus, Self, Persona). Match dream's ACTUAL tone — don't force negativity on peaceful dreams. Ensure STRICT logical coherence in all cause-and-effect statements. If the emotion is "Belirsizlik", do NOT always default to "Kaygı"; explore nuances like transition, curiosity, or hidden potential. Write in ${isTr ? 'Turkish "sen" form, ALWAYS use correct possessive suffixes. ENSURE PERFECT SUBJECT-VERB AGREEMENT. NEVER write grammatically broken sentences like "Rüyandaki yağmur, temizlik sürecinden geçiyorsun." Instead, write correctly like "Rüyanda yağan yağmur, bir temizlik sürecinden geçtiğine dair bir his barındırıyor." NEVER "siz"' : 'English'}. BANNED: "gösteriyor", "yansıtıyor", "ifade ediyor", "içsel çatışma", "bilinçaltı", "bastırılmış duygular", "temsil eder". Use visceral metaphors, not academic language.
 
 Return ONLY valid JSON:
 {
@@ -205,9 +205,9 @@ Return ONLY valid JSON:
   },
   "reflection_question": "3-4 sentence gentle psychological REFLECTION (NOT a question) about what this dream might represent in their waking life. Do NOT sound like a doctor or give a clinical diagnosis. Use a supportive, exploratory tone.",
   "reflection_responses": {
-    "absolutely": "2 sentences. Supportive self-reflection task referencing THIS dream's elements. Do NOT prescribe therapy.",
-    "maybe": "2 sentences. Gentle self-observation task using THIS dream's symbols.",
-    "not_sure": "2 sentences. Grounding mindfulness exercise anchored in THIS dream's imagery."
+    "absolutely": "2 sentences. Supportive self-reflection task referencing THIS dream's elements. (e.g. 'Rüyanda gördüğün X, Y hissini veriyor olabilir' NOT 'Rüyandaki X, Y yapıyorsun'). Do NOT prescribe therapy.",
+    "maybe": "2 sentences. Gentle self-observation task using THIS dream's symbols. Ensure grammatically correct subject-verb agreement.",
+    "not_sure": "2 sentences. Grounding mindfulness exercise anchored in THIS dream's imagery. Ensure grammatically correct subject-verb agreement."
   },
   "cosmic_closing": "2-3 line poetic closing using dream-specific imagery",
   "waking_life_deduction": {

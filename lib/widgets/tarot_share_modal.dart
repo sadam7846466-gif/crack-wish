@@ -253,105 +253,79 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 // Kart görselleri (Daha zarif etkileşim ve altın kenarlık)
                 SizedBox(
                   height: 440,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: List.generate(
-                      widget.cardAssets.length.clamp(0, 3),
+                      widget.cardAssets.length,
                       (i) {
-                        final isCenter = i == 1;
-                        final angle = i == 0 ? -0.06 : (i == 2 ? 0.06 : 0.0);
-                        final offsetY = isCenter ? -20.0 : 10.0;
+                        final count = widget.cardAssets.length;
+                        final isMany = count > 3;
+                        double cWidth = 250.0;
+                        double cHeight = 420.0;
+                        double leftOffset = 0.0;
+                        double offsetY = 0.0;
+                        double angle = 0.0;
+
+                        if (count == 7) {
+                          cWidth = 175.0;
+                          cHeight = 293.0;
+                          final spacing = 225.0;
+                          
+                          if (i < 4) { // Arka sıra (4 kart)
+                            final offsetFromCenter = i - 1.5;
+                            leftOffset = offsetFromCenter * spacing;
+                            offsetY = (offsetFromCenter * offsetFromCenter) * 10.0 - 85.0;
+                            angle = offsetFromCenter * 0.05;
+                          } else { // Ön sıra (3 kart)
+                            final localIndex = i - 4;
+                            final offsetFromCenter = localIndex - 1.0;
+                            leftOffset = offsetFromCenter * spacing;
+                            offsetY = (offsetFromCenter * offsetFromCenter) * 10.0 + 85.0;
+                            angle = offsetFromCenter * 0.05;
+                          }
+                        } else {
+                          final centerIndex = (count - 1) / 2.0;
+                          final offsetFromCenter = i - centerIndex;
+                          final spacing = isMany ? 115.0 : 270.0;
+                          cWidth = isMany ? 180.0 : 250.0;
+                          cHeight = isMany ? 302.0 : 420.0;
+                          leftOffset = offsetFromCenter * spacing;
+                          offsetY = (offsetFromCenter * offsetFromCenter) * (isMany ? 8.0 : 12.0) - (isMany ? 0 : 20);
+                          angle = offsetFromCenter * (isMany ? 0.05 : 0.06);
+                        }
                         
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Transform.translate(
-                            offset: Offset(0, offsetY),
-                            child: Transform.rotate(
-                              angle: angle,
-                              child: Container(
-                                width: 250,
-                                height: 420,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0D0A1A),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: const Color(0xFFE7D6A5).withOpacity(0.35),
-                                    width: 1.5,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFE7D6A5).withOpacity(0.12),
-                                      blurRadius: 35,
-                                      spreadRadius: -5,
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.6),
-                                      blurRadius: 25,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
+                        return Transform.translate(
+                          offset: Offset(leftOffset, offsetY),
+                          child: Transform.rotate(
+                            angle: angle,
+                            child: Container(
+                              width: cWidth,
+                              height: cHeight,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0D0A1A),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: const Color(0xFFE7D6A5).withOpacity(0.35),
+                                  width: 1.5,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      // Kart görseli
-                                      Transform.scale(
-                                        scale: 1.12,
-                                        child: Image.asset(
-                                          widget.cardAssets[i],
-                                          width: 250,
-                                          height: 420,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Container(
-                                            color: const Color(0xFF160E24),
-                                            child: Center(
-                                              child: Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 40),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // Alt kısma karanlık degrade (yazının okunması için)
-                                      Positioned(
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        height: 90,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                                Colors.transparent,
-                                                const Color(0xFF0D0A1A).withOpacity(0.7),
-                                                const Color(0xFF0D0A1A).withOpacity(0.95),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // Kart İsmi
-                                      Positioned(
-                                        bottom: 20,
-                                        left: 0,
-                                        right: 0,
-                                        child: Text(
-                                          widget.cardNames.length > i ? widget.cardNames[i] : '',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.cinzel(
-                                            color: const Color(0xFFE7D6A5),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                            letterSpacing: 2.5,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                boxShadow: [
+                                  BoxShadow(color: const Color(0xFFE7D6A5).withOpacity(0.12), blurRadius: 35, spreadRadius: -5),
+                                  BoxShadow(color: Colors.black.withOpacity(0.6), blurRadius: 25, offset: const Offset(0, 10)),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                clipBehavior: Clip.hardEdge,
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Transform.scale(
+                                      scale: 1.12,
+                                      child: Image.asset(widget.cardAssets[i], width: cWidth, height: cHeight, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(color: const Color(0xFF160E24))),
+                                    ),
+                                    Positioned(bottom: 0, left: 0, right: 0, height: count == 7 ? 50 : (isMany ? 60 : 90), child: Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, const Color(0xFF0D0A1A).withOpacity(0.7), const Color(0xFF0D0A1A).withOpacity(0.95)])))),
+                                    Positioned(bottom: count == 7 ? 12 : (isMany ? 10 : 20), left: 0, right: 0, child: Text(widget.cardNames.length > i ? widget.cardNames[i] : '', textAlign: TextAlign.center, style: GoogleFonts.cinzel(color: const Color(0xFFE7D6A5), fontSize: count == 7 ? 10 : (isMany ? 11 : 20), fontWeight: FontWeight.w600, letterSpacing: isMany ? 1.0 : 2.5, decoration: TextDecoration.none))),
+                                  ],
                                 ),
                               ),
                             ),
@@ -530,97 +504,79 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                 // Kart görselleri (kompakt)
                 SizedBox(
                   height: 320,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: List.generate(
-                      widget.cardAssets.length.clamp(0, 3),
+                      widget.cardAssets.length,
                       (i) {
-                        final isCenter = i == 1;
-                        final angle = i == 0 ? -0.05 : (i == 2 ? 0.05 : 0.0);
-                        final offsetY = isCenter ? -15.0 : 8.0;
+                        final count = widget.cardAssets.length;
+                        final isMany = count > 3;
+                        double cWidth = 190.0;
+                        double cHeight = 310.0;
+                        double leftOffset = 0.0;
+                        double offsetY = 0.0;
+                        double angle = 0.0;
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Transform.translate(
-                            offset: Offset(0, offsetY),
-                            child: Transform.rotate(
-                              angle: angle,
-                              child: Container(
-                                width: 190,
-                                height: 310,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0D0A1A),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xFFE7D6A5).withOpacity(0.30),
-                                    width: 1.2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFE7D6A5).withOpacity(0.10),
-                                      blurRadius: 25,
-                                      spreadRadius: -5,
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.5),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
+                        if (count == 7) {
+                          cWidth = 145.0;
+                          cHeight = 243.0;
+                          final spacing = 190.0;
+                          
+                          if (i < 4) { // Arka sıra
+                            final offsetFromCenter = i - 1.5;
+                            leftOffset = offsetFromCenter * spacing;
+                            offsetY = (offsetFromCenter * offsetFromCenter) * 8.0 - 70.0;
+                            angle = offsetFromCenter * 0.05;
+                          } else { // Ön sıra
+                            final localIndex = i - 4;
+                            final offsetFromCenter = localIndex - 1.0;
+                            leftOffset = offsetFromCenter * spacing;
+                            offsetY = (offsetFromCenter * offsetFromCenter) * 8.0 + 60.0;
+                            angle = offsetFromCenter * 0.05;
+                          }
+                        } else {
+                          final centerIndex = (count - 1) / 2.0;
+                          final offsetFromCenter = i - centerIndex;
+                          final spacing = isMany ? 90.0 : 206.0;
+                          cWidth = isMany ? 140.0 : 190.0;
+                          cHeight = isMany ? 235.0 : 310.0;
+                          leftOffset = offsetFromCenter * spacing;
+                          offsetY = (offsetFromCenter * offsetFromCenter) * (isMany ? 5.0 : 8.0) - (isMany ? 0 : 15);
+                          angle = offsetFromCenter * (isMany ? 0.05 : 0.05);
+                        }
+                        
+                        return Transform.translate(
+                          offset: Offset(leftOffset, offsetY),
+                          child: Transform.rotate(
+                            angle: angle,
+                            child: Container(
+                              width: cWidth,
+                              height: cHeight,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0D0A1A),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFE7D6A5).withOpacity(0.30),
+                                  width: 1.2,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      Transform.scale(
-                                        scale: 1.12,
-                                        child: Image.asset(
-                                          widget.cardAssets[i],
-                                          width: 190,
-                                          height: 310,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Container(
-                                            color: const Color(0xFF160E24),
-                                            child: Center(
-                                              child: Icon(Icons.auto_awesome, color: const Color(0xFFE7D6A5).withOpacity(0.5), size: 30),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0, left: 0, right: 0, height: 70,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                                Colors.transparent,
-                                                const Color(0xFF0D0A1A).withOpacity(0.7),
-                                                const Color(0xFF0D0A1A).withOpacity(0.95),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 14, left: 0, right: 0,
-                                        child: Text(
-                                          widget.cardNames.length > i ? widget.cardNames[i] : '',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.cinzel(
-                                            color: const Color(0xFFE7D6A5),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            letterSpacing: 2.0,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                boxShadow: [
+                                  BoxShadow(color: const Color(0xFFE7D6A5).withOpacity(0.10), blurRadius: 25, spreadRadius: -5),
+                                  BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20, offset: const Offset(0, 8)),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                clipBehavior: Clip.hardEdge,
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Transform.scale(
+                                      scale: 1.12,
+                                      child: Image.asset(widget.cardAssets[i], width: cWidth, height: cHeight, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(color: const Color(0xFF160E24))),
+                                    ),
+                                    Positioned(bottom: 0, left: 0, right: 0, height: count == 7 ? 40 : (isMany ? 50 : 70), child: Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, const Color(0xFF0D0A1A).withOpacity(0.7), const Color(0xFF0D0A1A).withOpacity(0.95)])))),
+                                    Positioned(bottom: count == 7 ? 8 : (isMany ? 8 : 14), left: 0, right: 0, child: Text(widget.cardNames.length > i ? widget.cardNames[i] : '', textAlign: TextAlign.center, style: GoogleFonts.cinzel(color: const Color(0xFFE7D6A5), fontSize: count == 7 ? 9 : (isMany ? 10 : 16), fontWeight: FontWeight.w600, letterSpacing: isMany ? 1.0 : 2.0, decoration: TextDecoration.none))),
+                                  ],
                                 ),
                               ),
                             ),

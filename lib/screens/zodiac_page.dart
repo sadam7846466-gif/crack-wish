@@ -4327,7 +4327,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
       // ── Yay ──
       'İyimserlik': 'İyimser bakış açınla zorlu süreçleri motive edici hale getir.',
       'Özgür düşünce': 'Özgür düşüncenle kalıpların dışına çıkarak yenilikler yarat.',
-      'Dürüstlük': 'Dürüstlüğünle güven inşa et ve ilişkilerini sağlam temellere ota.',
+      'Dürüstlük': 'Dürüstlüğünle güven inşa et ve ilişkilerini sağlam temellere oturt.',
       'Kültürel zenginlik': 'Farklı kültürlerden edindiğin bilgiyi çevrene aktararak zenginlik kat.',
       'Mizah anlayışı': 'Mizah gücünle ortamı aydınlat ve insanları bir araya getir.',
       'Ruhani arayış': 'Ruhani derinliğinle hayatına anlam katacak keşifler yap.',
@@ -8131,6 +8131,255 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
     return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
   }
 
+  String _getDynamicDailyHoroscope(BuildContext context) {
+    final d = DateTime.now();
+    final signName = widget.s['name'] as String;
+    final element = widget.s['element'] as String;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    
+    final seed = d.year * 10000 + d.month * 100 + d.day + signName.hashCode;
+    final rng = math.Random(seed);
+    
+    List<String> intros;
+    List<String> midparts;
+    List<String> conclusions;
+
+    if (isTr) {
+      switch (signName) {
+        case 'Koç':
+          intros = [
+            'Bugün içindeki savaşçı ruhun uyanışa geçtiği bir gün.',
+            'Mars\'ın enerjisiyle sınırlarını zorlamak için kusursuz bir an.',
+            'Bugün evren sana sadece cesurların kazandığını fısıldıyor.',
+          ];
+          midparts = [
+            'Düşünmeden attığın adımlar bile bugün seni doğru yola çıkarabilir.',
+            'Karşına çıkan engelleri yakıp geçme gücüne sahipsin.',
+            'Liderlik vasıfların her zamankinden daha belirgin, inisiyatif al.',
+          ];
+          conclusions = [
+            'Öncü olmaktan korkma, zafer senin olacak.',
+            'İçgüdülerine güven, ateşin yolunu aydınlatıyor.',
+            'Tutkundan asla taviz verme.',
+          ];
+          break;
+        case 'Boğa':
+          intros = [
+            'Bugün adımlarını daha sağlam ve bilinçli attığın bir evredesin.',
+            'Venüs\'ün zarafetiyle kalıcı değerler üretmek için mükemmel bir gün.',
+            'Huzurun ve maddi manevi istikrarın ön planda olacağı bir enerji var.',
+          ];
+          midparts = [
+            'Mantığının sesini dinlemek seni büyük bir hatadan koruyacak.',
+            'Uzun zamandır ektiğin tohumların yavaş yavaş meyvesini verdiğini göreceksin.',
+            'Kendi konfor alanından çıkmadan da büyük başarılar elde edebilirsin.',
+          ];
+          conclusions = [
+            'Sabrının karşılığını fazlasıyla alacaksın.',
+            'Kendi değerini bil ve o değere göre hareket et.',
+            'Sarsılmaz iraden en büyük kalkanındır.',
+          ];
+          break;
+        case 'İkizler':
+          intros = [
+            'Bugün zihnin her zamankinden daha berrak ve iki kat hızlı çalışıyor.',
+            'Merkür sana yeni fikirler ve ufku genişleten konuşmalar getiriyor.',
+            'Değişen rüzgarların yönüne en hızlı senin uyum sağlayacağın bir gün.',
+          ];
+          midparts = [
+            'Beklemediğin bir mesaj veya telefon tüm gününün gidişatını değiştirebilir.',
+            'Merak duygunu dizginleme, bugün öğreneceğin bir sır çok işine yarayacak.',
+            'Farklı bakış açıları arasında köprü kurmak seni bir çıkmazdan kurtaracak.',
+          ];
+          conclusions = [
+            'Zekân bugün senin en keskin silahın.',
+            'Kelimelerinle dünyaları fethedebilirsin.',
+            'İletişimde kal, evren sana şifreler gönderiyor.',
+          ];
+          break;
+        case 'Yengeç':
+          intros = [
+            'Bugün duygularının ve sezgilerinin denizinde derinlere iniyorsun.',
+            'Ay\'ın koruyucu enerjisi altında ruhsal mesajları almak için harika bir gün.',
+            'Evinin ve kalbinin güvenli limanında huzur bulacağın bir akış içindesin.',
+          ];
+          midparts = [
+            'Mantığın yerine kalbini dinlemen sana gizli bir şifa kapısı açabilir.',
+            'Geçmişten gelen duygusal bir hatırayı sevgiyle serbest bırakma şansın var.',
+            'Sevdiklerini koruma içgüdün bugün sana beklemediğin bir kapı aralayacak.',
+          ];
+          conclusions = [
+            'Sezgilerin seni asla yanıltmaz.',
+            'Gözyaşların en büyük arınmandır, hissetmekten korkma.',
+            'Sevgi enerjisi tüm etrafını sarmış durumda.',
+          ];
+          break;
+        case 'Aslan':
+          intros = [
+            'Bugün sahne senin; içindeki güneşin tüm ihtişamıyla parladığı bir gün.',
+            'Yaratıcılığının ve özgüveninin sınır tanımayacağı muazzam bir an.',
+            'Evren bugün sana krallığını/kraliçeliğini ilan etmen gerektiğini fısıldıyor.',
+          ];
+          midparts = [
+            'Girdiğin her ortamda dikkatleri üzerine çekeceğin fırsatlar karşına çıkacak.',
+            'Kalbinin sesini dinleyerek yapacağın cömert bir hamle sana katlanarak dönecek.',
+            'Gururunu bir kenara bıraktığında asıl gücünün ortaya çıktığını göreceksin.',
+          ];
+          conclusions = [
+            'Işığını dünyadan esirgeme.',
+            'Şans gezegenlerin desteğiyle tamamen senin tarafında.',
+            'İhtişamınla her kapıyı açabilirsin.',
+          ];
+          break;
+        case 'Başak':
+          intros = [
+            'Bugün detayların gücünü fark edip, kaosun içindeki düzeni kuruyorsun.',
+            'Zihinsel berraklığın sayesinde çözülmez denilen sorunları çözeceğin bir gün.',
+            'Pratik zekanın ve analitik yeteneğinin zirvede olduğu bir frekanstasın.',
+          ];
+          midparts = [
+            'Başkalarının gözden kaçırdığı o küçücük detay sana büyük bir zafer kazandıracak.',
+            'Mükemmeli ararken elindeki mevcut güzelliği kaçırmamaya çok dikkat et.',
+            'Düzenleme ve iyileştirme güdün bugün hayatının o eksik yapbozunu tamamlayacak.',
+          ];
+          conclusions = [
+            'Analitik zekân en büyük rehberin.',
+            'Hizmet ruhun evren tarafından mükafatlandırılacak.',
+            'Kusursuzluk içsel huzurunda saklı.',
+          ];
+          break;
+        case 'Terazi':
+          intros = [
+            'Bugün hayatının her alanında o kusursuz dengeyi yakalamaya hazırsın.',
+            'Venüs sana sanat, güzellik ve uyum dolu bir enerjinin kapılarını aralıyor.',
+            'Adaletin ve diplomasinin gücüyle her türlü pürüzü gidereceğin bir gün.',
+          ];
+          midparts = [
+            'Zorlu bir anlaşmazlığı tatlı dilinle ve zarafetinle kolayca çözeceksin.',
+            'Başkalarını memnun etmeye çalışırken kendi merkezinden uzaklaşmamalısın.',
+            'Estetik bir dokunuş, bugün ruhunu sandığından çok daha fazla besleyecek.',
+          ];
+          conclusions = [
+            'Uyum ve zarafet senin imzan.',
+            'Evren sana kalıcı ve adil sonuçlar vadediyor.',
+            'Kendi iç dengeni koruduğunda dışarıyı da güzelleştirirsin.',
+          ];
+          break;
+        case 'Akrep':
+          intros = [
+            'Bugün yüzeyin altına inip sırları açığa çıkaracağın çok derin bir gün.',
+            'Plüton\'un dönüştürücü enerjisiyle küllerinden yeniden doğmaya hazırlanıyorsun.',
+            'İçgüdülerinin ve tutkularının radarı bugün her zamankinden daha keskin.',
+          ];
+          midparts = [
+            'Kimsenin göremediği niyetleri sezip, oyunları kendi lehine çevireceksin.',
+            'İçindeki o yoğun şüpheyi, stratejik bir hamleye dönüştürme fırsatın var.',
+            'Karanlığın içindeki gizli aydınlığı bulma konusunda bugün rakipsizsin.',
+          ];
+          conclusions = [
+            'Tutkun ve iradenle her engeli aşarsın.',
+            'Gizemli gücün seni her zaman koruyor.',
+            'Dönüşüme direnme, güçleniyorsun.',
+          ];
+          break;
+        case 'Yay':
+          intros = [
+            'Bugün ufkunu genişletmek ve yeni maceralara atılmak için kusursuz bir an.',
+            'Jüpiter\'in iyimser enerjisi ruhunu özgürlüğe doğru kanatlandırıyor.',
+            'Öğrenme açlığının ve keşfetme arzunun seni yeni yollara sürüklediği bir gün.',
+          ];
+          midparts = [
+            'Alışılmış sınırlarının dışına çıkmak sana beklenmedik bir ilham verecek.',
+            'Mantıklı detaylara takılmak yerine büyük resme odaklanırsan hedefi vurursun.',
+            'Bugün yapacağın ani bir yolculuk veya alacağın yeni bir bilgi kaderini etkileyebilir.',
+          ];
+          conclusions = [
+            'İyimserliğin karanlığı delen en güçlü ışıktır.',
+            'Şans her zaman cesurların yanındadır.',
+            'Evrenin bilgeliği sana akıyor, açık ol.',
+          ];
+          break;
+        case 'Oğlak':
+          intros = [
+            'Bugün hedeflerine sarsılmaz bir kararlılıkla tırmandığın çok güçlü bir gün.',
+            'Satürn sana disiplin, sabır ve uzun vadeli kalıcı başarılar fısıldıyor.',
+            'Sorumluluklarını bir yük olarak değil, zirveye çıkan basamaklar olarak göreceksin.',
+          ];
+          midparts = [
+            'Duygusallığı bir kenara bırakıp stratejik düşünmen gereken kritik bir kavşaktasın.',
+            'Geçmişte döktüğün terlerin bugün somut bir ödüle dönüşme ihtimali çok yüksek.',
+            'Soğukkanlı duruşun sayesinde büyük bir krizin üstesinden tek başına geleceksin.',
+          ];
+          conclusions = [
+            'Zirve sadece senin gibi sabredenlerin hakkıdır.',
+            'Evren disiplinini ve emeğini taçlandıracak.',
+            'Asla pes etme, zaman senin en iyi müttefikin.',
+          ];
+          break;
+        case 'Kova':
+          intros = [
+            'Bugün kuralları yıkıp kendi eşsiz gerçeğini yaratacağın isyankar bir gün.',
+            'Uranüs\'ün elektrikli enerjisiyle zihninde dâhiyane fikirler şimşek gibi çakıyor.',
+            'Toplumun dayatmalarından sıyrılıp tamamen orijinal kimliğine bürünüyorsun.',
+          ];
+          midparts = [
+            'Kimsenin aklına gelmeyen o çılgın çözüm, bugün hayat kurtarıcı olacak.',
+            'Bireyselliğini korurken aynı zamanda kolektif bir iyiliğe de hizmet edeceksin.',
+            'Bugün gelen ani bir aydınlanma, sana geleceğin kapılarını sonuna kadar açabilir.',
+          ];
+          conclusions = [
+            'Senin vizyonun geleceğin ta kendisidir.',
+            'Özgünlüğünden asla taviz verme.',
+            'Sınırların dışında düşündükçe özgürleşeceksin.',
+          ];
+          break;
+        case 'Balık':
+        default:
+          intros = [
+            'Bugün bilinçaltının sana göndereceği sessiz işaretlere açık olman gereken bir gün.',
+            'Neptün\'ün sisli ve büyülü enerjisiyle hayal gücün sınır tanımıyor.',
+            'Empati yeteneğinin ve ruhsal algılarının en üst seviyeye ulaştığı ilahi bir an.',
+          ];
+          midparts = [
+            'Rüyalarının veya içsel vizyonlarının sana fısıldadığı o sese bugün kesinlikle kulak ver.',
+            'Kendi içindeki fırtınalarla savaşmak yerine o sularda süzülmeyi denemelisin.',
+            'Başkalarının acılarını kendi yükün yapmadan onlara şifa dağıtma gücüne sahipsin.',
+          ];
+          conclusions = [
+            'Evrenin merhameti ve sevgisi her daim seninle.',
+            'Sezgilerin seni ilahi gerçeğe götürecek.',
+            'Ruhsal derinliğin en büyük zenginliğindir.',
+          ];
+          break;
+      }
+    } else {
+      intros = [
+        'Today brings a strong shift in your energy.',
+        'The universe is aligning in a mysterious way for you today.',
+        'Your ruling planet is sending you a direct message today.',
+        'An unexpected wave of clarity is approaching you.',
+      ];
+      midparts = [
+        'It is time to trust your inner compass and take action.',
+        'A situation you have been overthinking will finally resolve itself.',
+        'You possess the strength to overcome the obstacle in front of you.',
+        'Release the urge to control everything and let the cosmic flow guide you.',
+      ];
+      conclusions = [
+        'Embrace the change.',
+        'Trust the process.',
+        'Your intuition is your greatest guide.',
+        'Patience will bring its ultimate reward.',
+      ];
+    }
+
+    final intro = intros[rng.nextInt(intros.length)];
+    final mid = midparts[rng.nextInt(midparts.length)];
+    final conc = conclusions[rng.nextInt(conclusions.length)];
+
+    return '$intro $mid $conc';
+  }
+
   Widget _buildIntroCard() {
     final _gold = widget.goldColor;
     return GestureDetector(
@@ -8461,7 +8710,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    s['dailyHoroscope'] as String,
+                    _getDynamicDailyHoroscope(context),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 14,

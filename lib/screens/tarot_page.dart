@@ -1941,13 +1941,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
             child: Text(
               text,
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.9),
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
+                letterSpacing: 0.3,
+                height: 1.1,
               ),
             ),
           ),

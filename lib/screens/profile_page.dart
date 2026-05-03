@@ -2154,7 +2154,7 @@ For questions: info@crackandwish.com''',
                         children: [
                           _SettingsListTile(
                             icon: Icons.email_outlined,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: lang == 'tr' ? 'E-posta' : 'Email',
                             subtitle: _getConnectedEmail(),
                             onTap: () {
@@ -2172,7 +2172,7 @@ For questions: info@crackandwish.com''',
                           ),
                           _SettingsListTile(
                             icon: Icons.language_rounded,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: l10n.language,
                             subtitle: languageValue,
                             onTap: () {
@@ -2186,7 +2186,7 @@ For questions: info@crackandwish.com''',
                           ),
                           _SettingsListTile(
                             icon: Icons.notifications_none_rounded,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: lang == 'tr'
                                 ? 'Bildirimler'
                                 : 'Notifications',
@@ -2218,19 +2218,19 @@ For questions: info@crackandwish.com''',
 
                           _SettingsListTile(
                             icon: Icons.help_outline_rounded,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: lang == 'tr' ? 'Yardım' : 'Help',
                             onTap: _openHelpCenter,
                           ),
                           _SettingsListTile(
                             icon: Icons.share_rounded,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: lang == 'tr' ? 'Paylaş' : 'Share',
                             onTap: _shareApp,
                           ),
                           _SettingsListTile(
                             icon: Icons.star_border_rounded,
-                            iconColor: Colors.white54,
+                            iconColor: Colors.white,
                             label: lang == 'tr' ? 'Değerlendir' : 'Rate',
                             onTap: _rateApp,
                           ),
@@ -2239,11 +2239,6 @@ For questions: info@crackandwish.com''',
 
                       const SizedBox(height: 24),
 
-                      // ── BÖLÜM 3: TEHLİKELİ ALAN ──
-                      _SectionLabel(
-                        lang == 'tr' ? 'Tehlikeli Alan' : 'Danger Zone',
-                      ),
-                      const SizedBox(height: 10),
                       _SettingsListGroup(
                         children: [
                           _SettingsListTile(
@@ -7377,22 +7372,16 @@ class _SettingsListTileState extends State<_SettingsListTile> {
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: widget.iconColor.withOpacity(
-                        widget.isDestructive ? 0.2 : 0.15,
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Center(
+                      child: Icon(
+                        widget.icon,
+                        color: widget.iconColor,
+                        size: 22,
                       ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: widget.iconColor.withOpacity(0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
-                    child: Icon(widget.icon, color: widget.iconColor, size: 20),
                   ),
                   const SizedBox(width: 16),
                   Text(

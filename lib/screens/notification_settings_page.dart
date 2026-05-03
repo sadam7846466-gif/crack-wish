@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
+import '../services/push_notification_service.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -42,6 +43,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   void _updateSetting(String key, bool value) {
     StorageService.setNotificationSetting(key, value);
+    if (key == 'dailyReminders') {
+      PushNotificationService().updateDailyReminders(value);
+    } else if (key != 'voices') {
+      PushNotificationService().updateTopicSubscription(key, value);
+    }
   }
 
   @override
@@ -153,13 +159,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   // — Toggle List
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                      physics: const BouncingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _NotifToggle(
                             icon: Icons.campaign_rounded,
-                            iconBgColor: const Color(0xFF5A8BFF),
                             title: 'Duyurular',
                             subtitle: 'Yeni özellikler ve güncellemeler',
                             value: _announcements,
@@ -168,10 +174,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                               _updateSetting('announcements', v);
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.record_voice_over_rounded,
-                            iconBgColor: const Color(0xFFC084FC),
                             title: 'Sesler',
                             subtitle: 'Sesli bildirim uyarıları',
                             value: _voices,
@@ -180,10 +185,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                               _updateSetting('voices', v);
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 18),
                           _NotifToggle(
-                            icon: Icons.cookie_rounded,
-                            iconBgColor: const Color(0xFFFFD166),
+                            iconAsset: 'assets/icons/splash_cookie.png',
                             title: 'Yeni Kurabiye Alarmı',
                             subtitle: 'Yeni fortune cookie geldiğinde',
                             value: _newCookieAlarm,
@@ -192,10 +196,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                               _updateSetting('newCookieAlarm', v);
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.people_rounded,
-                            iconBgColor: const Color(0xFF2DD4BF),
                             title: 'Arkadaş Alarmı',
                             subtitle: 'Baykuş ağından yeni bağlantılar',
                             value: _friendsAlarm,
@@ -204,10 +207,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                               _updateSetting('friendsAlarm', v);
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.access_alarm_rounded,
-                            iconBgColor: const Color(0xFFFF9A5C),
                             title: 'Günlük Hatırlatıcılar',
                             subtitle: 'Günlük kurabiyeni almayı unutma',
                             value: _dailyReminders,
@@ -231,16 +233,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 }
 
 class _NotifToggle extends StatelessWidget {
-  final IconData icon;
-  final Color iconBgColor;
+  final IconData? icon;
+  final String? iconAsset;
   final String title;
   final String subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
 
   const _NotifToggle({
-    required this.icon,
-    required this.iconBgColor,
+    this.icon,
+    this.iconAsset,
     required this.title,
     required this.subtitle,
     required this.value,
@@ -249,19 +251,21 @@ class _NotifToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFFEAD8D8); // Very light, frosted glass dusty rose
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOutCubic,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: value
-            ? Colors.white.withOpacity(0.08)
-            : Colors.white.withOpacity(0.03),
+            ? Colors.white.withOpacity(0.06)
+            : Colors.white.withOpacity(0.02),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: value
               ? Colors.white.withOpacity(0.12)
-              : Colors.white.withOpacity(0.06),
+              : Colors.white.withOpacity(0.04),
         ),
       ),
       child: Row(
@@ -270,15 +274,22 @@ class _NotifToggle extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: iconBgColor.withOpacity(value ? 0.2 : 0.08),
+              color: Colors.white.withOpacity(value ? 0.08 : 0.03),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
-              child: Icon(
-                icon,
-                color: value ? iconBgColor : iconBgColor.withOpacity(0.4),
-                size: 22,
-              ),
+              child: iconAsset != null
+                  ? Image.asset(
+                      iconAsset!,
+                      width: 22,
+                      height: 22,
+                      color: value ? activeColor : Colors.white.withOpacity(0.4),
+                    )
+                  : Icon(
+                      icon,
+                      color: value ? activeColor : Colors.white.withOpacity(0.4),
+                      size: 22,
+                    ),
             ),
           ),
           const SizedBox(width: 14),
@@ -292,7 +303,7 @@ class _NotifToggle extends StatelessWidget {
                     color: value
                         ? AppColors.textWhite.withOpacity(0.95)
                         : AppColors.textWhite.withOpacity(0.5),
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     fontSize: 15,
                     letterSpacing: 0.2,
                   ),
@@ -301,9 +312,9 @@ class _NotifToggle extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: AppColors.textWhite.withOpacity(0.35),
+                    color: AppColors.textWhite.withOpacity(0.4),
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -313,8 +324,9 @@ class _NotifToggle extends StatelessWidget {
           CupertinoSwitch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: iconBgColor.withOpacity(0.8),
+            activeTrackColor: activeColor.withOpacity(0.6),
             thumbColor: Colors.white,
+            trackColor: Colors.white.withOpacity(0.05),
           ),
         ],
       ),

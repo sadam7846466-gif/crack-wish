@@ -301,4 +301,26 @@ class PushNotificationService {
     }
     return scheduledDate;
   }
+
+  Future<void> updateTopicSubscription(String topic, bool subscribe) async {
+    try {
+      if (subscribe) {
+        await _fcm.subscribeToTopic(topic);
+      } else {
+        await _fcm.unsubscribeFromTopic(topic);
+      }
+      debugPrint('Topic \$topic subscription: \$subscribe');
+    } catch (e) {
+      debugPrint('Topic subscription error: \$e');
+    }
+  }
+
+  void updateDailyReminders(bool enable) {
+    if (enable) {
+      _scheduleRoutines();
+    } else {
+      cancelNotification(1);
+      cancelNotification(2);
+    }
+  }
 }

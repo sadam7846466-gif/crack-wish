@@ -85,21 +85,43 @@ class _NatalChartPageState extends State<NatalChartPage> {
             ),
           ),
         ),
-        SafeArea(child: Column(children: [
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20), onPressed: () => Navigator.pop(context)),
-              Text('Doğum Haritası', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
-              const SizedBox(width: 48),
-            ])),
-          Expanded(child: ListView(physics: const BouncingScrollPhysics(), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), children: [
-            Center(child: Text('${widget.birthTime} · ${widget.birthPlace}',
-              style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, letterSpacing: 1))),
-            const SizedBox(height: 24),
+        // ── FULL SCREEN SCROLLABLE CONTENT ──
+        Positioned.fill(
+          child: ShaderMask(
+            shaderCallback: (Rect rect) {
+              return const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.white,
+                  Colors.white,
+                  Colors.transparent,
+                ],
+                stops: [0.0, 0.15, 0.95, 1.0],
+              ).createShader(rect);
+            },
+            blendMode: BlendMode.dstIn,
+            child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 80, // Header için boşluk
+              bottom: MediaQuery.of(context).padding.bottom + 40, // Alt kısımdan boşluk
+              left: 20,
+              right: 20,
+            ),
+            children: [
+              Center(
+                child: Text(
+                  '${widget.birthTime} · ${widget.birthPlace}',
+                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11, letterSpacing: 1),
+                ),
+              ),
+              const SizedBox(height: 24),
 
-            // ── NATAL CHART WHEEL ──
-            Center(child: _buildChartWheel(w)),
-            const SizedBox(height: 32),
+              // ── NATAL CHART WHEEL ──
+              Center(child: _buildChartWheel(w)),
+              const SizedBox(height: 32),
 
             // ── PLANET TABLE ──
             _buildPlanetTable(),
@@ -236,8 +258,57 @@ class _NatalChartPageState extends State<NatalChartPage> {
               ]),
             ),
             const SizedBox(height: 32),
-          ])),
-        ])),
+          ],
+        ),
+      )), // ShaderMask ve Positioned.fill bitti
+
+
+      // ── SMOOTH GRADIENT HEADER ──
+      Positioned(
+        top: 0, left: 0, right: 0,
+        child: IgnorePointer(
+          ignoring: false,
+          child: Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 12,
+              bottom: 40,
+              left: 16,
+              right: 16,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF0F1210).withOpacity(1.0),
+                  const Color(0xFF0F1210).withOpacity(0.8),
+                  const Color(0xFF0F1210).withOpacity(0.0),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Text(
+                      'Doğum Haritası',
+                      style: GoogleFonts.cinzel(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  const SizedBox(width: 48), // Merkezi hizalama için boşluk
+                ],
+              ),
+            ),
+          ),
+        ),
       ]),
     );
   }
