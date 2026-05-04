@@ -12,6 +12,7 @@ import 'dart:math' as math;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/cosmic_engine_service.dart';
+import '../services/push_notification_service.dart';
 import 'coffee_page.dart';
 
 class CoffeeReadingPage extends StatefulWidget {
@@ -198,24 +199,82 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       // Doğrulama ana sayfada (CoffeePage) yapıldığı için direkt yoruma geçiyoruz.
       // ═══ AŞAMA 2: Fal Yorumu ═══
       final user = supabase.auth.currentUser;
-      final interpretResponse = await supabase.functions.invoke(
-        'interpret-coffee',
-        body: {'mode': 'interpret', 'images': images, 'locale': 'tr', 'userId': user?.id},
-      );
-
-      if (interpretResponse.data == null ||
-          interpretResponse.data['error'] != null) {
-        throw Exception(
-          interpretResponse.data?['error'] ?? 'AI servisinden yanıt alınamadı',
-        );
+      
+      String? recordId;
+      try {
+        final insertResponse = await supabase.from('coffee_readings').insert({
+          'user_id': user?.id,
+          'locale': 'tr',
+          'status': 'pending'
+        }).select('id').maybeSingle();
+        recordId = insertResponse?['id'];
+      } catch (dbErr) {
+        debugPrint('DB Insert failed for coffee (ignoring): $dbErr');
       }
 
-      final reading = interpretResponse.data as Map<String, dynamic>;
+      final interpretResponse = await supabase.functions.invoke(
+        'interpret-coffee',
+        body: {
+          'mode': 'interpret', 
+          'images': images, 
+          'locale': 'tr', 
+          'userId': user?.id,
+          'record_id': recordId
+        },
+      );
 
-      // Ruh taşı Ana Sayfa'da "Kaderini Keşfet" butonuna basıldığı an peşin olarak kesildiği için burada tekrar KESMİYORUZ!
+      final initialData = interpretResponse.data as Map<String, dynamic>;
+      Map<String, dynamic> reading;
+
+      final prefs = await SharedPreferences.getInstance();
+
+      if (initialData['status'] == 'processing') {
+        // AI yorumlamayı arka planda sürdürüyor. DB'den poll edeceğiz.
+        if (recordId != null) {
+          await prefs.setString('coffee_last_record_id', recordId);
+        }
+        
+        Map<String, dynamic>? finalResult;
+        // 45 saniye boyunca db yokla (15 kere 3 saniye aralıklarla)
+        for (int i = 0; i < 15; i++) {
+          if (!mounted) {
+            // Kullanıcı sayfadan çıktıysa arka planda bildirim atacak zaten
+            break;
+          }
+          await Future.delayed(const Duration(seconds: 3));
+          
+          if (recordId != null) {
+            final row = await supabase.from('coffee_readings').select().eq('id', recordId).maybeSingle();
+            if (row != null) {
+              if (row['status'] == 'completed') {
+                finalResult = row['result'] as Map<String, dynamic>;
+                break;
+              } else if (row['status'] == 'failed') {
+                throw Exception('AI falı yorumlarken bir hata ile karşılaştı.');
+              }
+            }
+          }
+        }
+        
+        if (!mounted) {
+           CoffeeReadingPage.isApiRunning = false;
+           return;
+        }
+
+        if (finalResult == null) {
+          // Timeout, but it might still finish in background
+          CoffeeReadingPage.isApiRunning = false;
+          backgroundCallback?.call(true, null);
+          return;
+        }
+        reading = finalResult;
+        await prefs.remove('coffee_last_record_id');
+      } else {
+        // Fallback: anında yanıt geldiyse
+        reading = initialData;
+      }
 
       // Sonucu kaydet (Sayfadan çıkmış olsa bile kaydedilir)
-      final prefs = await SharedPreferences.getInstance();
       final today = DateTime.now().toIso8601String().split('T')[0];
       reading['time'] = DateTime.now().toIso8601String();
       await prefs.setString('coffee_last_reading_date', today);
@@ -236,16 +295,19 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
       await StorageService.incrementTotalCoffee();
 
+      // Akıllı bildirimleri güncelle (kurabiye kırılmış mı, tarot bakılmış mı vb.)
+      PushNotificationService().refreshSmartNotifications();
+
       backgroundCallback?.call(true, null);
 
       if (!mounted) {
-        // Kullanıcı sayfada değilse (Ana sayfaya dönmüşse veya arka plana atmışsa) bildirim at
+        // Kullanıcı sayfadan çıkmış — bildirim gönder
+        CoffeeReadingPage.isApiRunning = false;
         CosmicEngineService().scheduleInstantLocalNotification(
-          title: "Kahve Falın Hazır! ☕️",
-          body: "Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨",
+          title: 'Kahve Falın Hazır! ☕️',
+          body: 'Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨',
           secondsDelay: 1,
         );
-        CoffeeReadingPage.isApiRunning = false;
         return;
       }
 

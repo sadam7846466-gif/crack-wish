@@ -1058,6 +1058,7 @@ class StorageService {
 
     // Her rütbenin Aura ödülü
     const rankRewards = {
+      'Acemi Kahin': 5,
       'Çırak Kahin': 10,
       'Kahin': 20,
       'Bilge Kahin': 30,
@@ -1905,7 +1906,7 @@ class StorageService {
       'voices': prefs.getBool('${_keyNotifPrefix}voices') ?? false,
       'newCookieAlarm': prefs.getBool('${_keyNotifPrefix}newCookieAlarm') ?? true,
       'friendsAlarm': prefs.getBool('${_keyNotifPrefix}friendsAlarm') ?? true,
-      'dailyReminders': prefs.getBool('${_keyNotifPrefix}dailyReminders') ?? false,
+      'dailyReminders': prefs.getBool('${_keyNotifPrefix}dailyReminders') ?? true,
     };
   }
 

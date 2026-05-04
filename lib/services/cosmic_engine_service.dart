@@ -110,8 +110,11 @@ class CosmicEngineService {
     final now = tz.TZDateTime.now(tz.local);
     final targetTime = now.add(Duration(seconds: secondsDelay));
     
+    // Benzersiz ID üret — aynı anda birden fazla bildirim çakışmasın
+    final uniqueId = 900 + (DateTime.now().millisecondsSinceEpoch % 100);
+    
     await _scheduleSmartNotification(
-      id: 999, // Özel İllüzyon ID'si
+      id: uniqueId,
       title: title, 
       body: body, 
       targetTime: targetTime,

@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { step = "questions", dreamText, emotion, locale, answers, userId } = await req.json();
+    const { step = "questions", dreamText, emotion, locale, answers, userId, record_id } = await req.json();
 
     if (!dreamText || dreamText.trim().length < 10) {
       return new Response(
@@ -237,102 +237,127 @@ ZERO-REDUNDANCY ENFORCEMENT (CRITICAL):
       const emotion_str = emotion || "not specified";
       const userPrompt = `Deep premium analysis. Dream: "${dreamText}" | Emotion: ${emotion_str}${answersContext ? ` | Answers:\n${answersContext}` : ""}`;
 
-      const response = await fetch(OPENAI_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.6,
-          max_tokens: 2500,
-        }),
-      });
+      // Asenkron İşleyici
+      const processPremiumDream = async () => {
+        try {
+          const response = await fetch(OPENAI_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${OPENAI_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: MODEL,
+              response_format: { type: "json_object" },
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              temperature: 0.6,
+              max_tokens: 2500,
+            }),
+          });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error("OpenAI error:", response.status, errText);
-        throw new Error(`OpenAI HTTP error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const rawContent = data.choices?.[0]?.message?.content;
-
-      if (!rawContent) {
-        throw new Error("Empty AI response");
-      }
-
-      let parsed = JSON.parse(rawContent);
-
-      // Post-processing: siz → sen fix for Turkish
-      if (isTr) {
-        const fixSen = (obj: any): any => {
-          if (typeof obj === "string") {
-            let s = obj;
-            // Cümle başındaki "Sen,", "Senin için," gibi tekrarlayan gereksiz kelimeleri temizle
-            const startPronounRegex = /^(Sen,|Senin için,|Senin için|Sen)\s+/i;
-            if (startPronounRegex.test(s)) {
-              s = s.replace(startPronounRegex, "");
-              if (s.length > 0) s = s.charAt(0).toUpperCase() + s.slice(1);
-            }
-            return s
-              .replace(/Rüyanız/g, "Rüyan").replace(/rüyanız/g, "rüyan")
-              .replace(/yaşadığınız/g, "yaşadığın").replace(/hissettiğiniz/g, "hissettiğin")
-              .replace(/olmanız/g, "olman").replace(/kalmanız/g, "kalman")
-              .replace(/beyniniz/g, "beynin").replace(/hayatınız/g, "hayatın")
-              .replace(/bilinçaltınız/g, "bilinçaltın").replace(/Bilinçaltınız/g, "Bilinçaltın")
-              .replace(/kendiniz/g, "kendin").replace(/düşünceleriniz/g, "düşüncelerin")
-              .replace(/duygularınız/g, "duyguların").replace(/ilişkileriniz/g, "ilişkilerin")
-              .replace(/sorularınız/g, "soruların").replace(/cevaplarınız/g, "cevapların")
-              .replace(/kendi korkularla/g, "kendi korkularınla")
-              .replace(/kendi içsel korkularla/g, "kendi içsel korkularınla")
-              .replace(/kendi düşüncelerle/g, "kendi düşüncelerinle")
-              .replace(/kendi duygularla/g, "kendi duygularınla")
-              .replace(/zihinsel/g, "zihinsel"); // keep as-is
+          if (!response.ok) {
+            throw new Error(`OpenAI HTTP error: ${response.status}`);
           }
-          if (Array.isArray(obj)) return obj.map(fixSen);
-          if (obj && typeof obj === "object") {
-            const result: any = {};
-            for (const [k, v] of Object.entries(obj)) {
-              result[k] = fixSen(v);
-            }
-            return result;
-          }
-          return obj;
-        };
-        parsed = fixSen(parsed);
-      }
 
-      // --- SEND PUSH NOTIFICATION ---
-      try {
-        if (userId) {
+          const data = await response.json();
+          const rawContent = data.choices?.[0]?.message?.content;
+
+          if (!rawContent) {
+            throw new Error("Empty AI response");
+          }
+
+          let parsed = JSON.parse(rawContent);
+
+          // Post-processing: siz → sen fix for Turkish
+          if (isTr) {
+            const fixSen = (obj: any): any => {
+              if (typeof obj === "string") {
+                let s = obj;
+                const startPronounRegex = /^(Sen,|Senin için,|Senin için|Sen)\s+/i;
+                if (startPronounRegex.test(s)) {
+                  s = s.replace(startPronounRegex, "");
+                  if (s.length > 0) s = s.charAt(0).toUpperCase() + s.slice(1);
+                }
+                return s
+                  .replace(/Rüyanız/g, "Rüyan").replace(/rüyanız/g, "rüyan")
+                  .replace(/yaşadığınız/g, "yaşadığın").replace(/hissettiğiniz/g, "hissettiğin")
+                  .replace(/olmanız/g, "olman").replace(/kalmanız/g, "kalman")
+                  .replace(/beyniniz/g, "beynin").replace(/hayatınız/g, "hayatın")
+                  .replace(/bilinçaltınız/g, "bilinçaltın").replace(/Bilinçaltınız/g, "Bilinçaltın")
+                  .replace(/kendiniz/g, "kendin").replace(/düşünceleriniz/g, "düşüncelerin")
+                  .replace(/duygularınız/g, "duyguların").replace(/ilişkileriniz/g, "ilişkilerin")
+                  .replace(/sorularınız/g, "soruların").replace(/cevaplarınız/g, "cevapların")
+                  .replace(/kendi korkularla/g, "kendi korkularınla")
+                  .replace(/kendi içsel korkularla/g, "kendi içsel korkularınla")
+                  .replace(/kendi düşüncelerle/g, "kendi düşüncelerinle")
+                  .replace(/kendi duygularla/g, "kendi duygularınla");
+              }
+              if (Array.isArray(obj)) return obj.map(fixSen);
+              if (obj && typeof obj === "object") {
+                const result: any = {};
+                for (const [k, v] of Object.entries(obj)) {
+                  result[k] = fixSen(v);
+                }
+                return result;
+              }
+              return obj;
+            };
+            parsed = fixSen(parsed);
+          }
+
           const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
           const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
           const supabase = createClient(supabaseUrl, supabaseKey);
 
-          await supabase.functions.invoke('push-notification', {
-            body: {
-              table: 'dreams',
-              record: {
-                to_user: userId,
-                from_user: userId,
-                locale: locale
-              }
-            }
-          });
-          console.log("Triggered push-notification for premium dream user", userId);
-        }
-      } catch(e) {
-        console.error("FCM Error:", e);
-      }
+          // 1. Veritabanını Güncelle
+          if (record_id) {
+            await supabase.from('dream_readings').update({
+              status: 'completed',
+              result: parsed,
+              is_premium: true
+            }).eq('id', record_id);
+          }
 
-      return new Response(JSON.stringify(parsed), {
+          // 2. Push Notification Gönder
+          if (userId) {
+            try {
+              await supabase.functions.invoke('push-notification', {
+                body: {
+                  table: 'dreams',
+                  record: {
+                    to_user: userId,
+                    from_user: userId,
+                    locale: locale
+                  }
+                }
+              });
+              console.log("Triggered push-notification for premium dream user", userId);
+            } catch (notifyErr) {
+              console.error("Push notification failed, but continuing:", notifyErr);
+            }
+          }
+
+          return parsed;
+        } catch (err: any) {
+          console.error("Premium processing error:", err.message);
+          if (record_id) {
+            const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+            const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+            const supabase = createClient(supabaseUrl, supabaseKey);
+            await supabase.from('dream_readings').update({
+              status: 'failed'
+            }).eq('id', record_id);
+          }
+          throw err;
+        }
+      };
+
+      const finalResult = await processPremiumDream();
+
+      return new Response(JSON.stringify(finalResult), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     } else {

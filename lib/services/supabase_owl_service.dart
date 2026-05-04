@@ -335,6 +335,21 @@ class SupabaseOwlService {
         'status': 'pending'
       });
       debugPrint("🟢 [SEND] ✅ INSERT SUCCESSFUL! from=$myId to=$targetId");
+      
+      // Bildirim tetikle
+      try {
+        await _db.functions.invoke('push-notification', body: {
+          'table': 'friend_requests',
+          'record': {
+            'from_user': myId,
+            'to_user': targetId,
+            'id': 'new_request'
+          }
+        });
+      } catch (e) {
+        debugPrint("Push notification trigger error: $e");
+      }
+      
       AnalyticsService().logFriendRequestSent();
       return true;
     } catch (e, stack) {
@@ -375,6 +390,21 @@ class SupabaseOwlService {
         'status': 'pending',
       });
       debugPrint("🟢 [SEND_BY_ID] ✅ INSERT SUCCESSFUL!");
+      
+      // Bildirim tetikle
+      try {
+        await _db.functions.invoke('push-notification', body: {
+          'table': 'friend_requests',
+          'record': {
+            'from_user': myId,
+            'to_user': targetUserId,
+            'id': 'new_request'
+          }
+        });
+      } catch (e) {
+        debugPrint("Push notification trigger error: $e");
+      }
+      
       AnalyticsService().logFriendRequestSent();
       return true;
     } catch (e, stack) {
@@ -627,6 +657,17 @@ class SupabaseOwlService {
         };
         await _db.from('owl_letters').insert(letterData);
         debugPrint("🦉 Mektup Supabase'e fırlatıldı!");
+        
+        // Bildirim tetikle
+        try {
+          await _db.functions.invoke('push-notification', body: {
+            'table': 'owl_letters',
+            'record': letterData
+          });
+        } catch (e) {
+          debugPrint("Push notification trigger error: $e");
+        }
+        
         AnalyticsService().logOwlLetterSent();
       } catch (e) {
          debugPrint("🦉 Bağlantı yok ama mektup kasada tutuluyor (CloudSync eşleyene kadar): \$e");

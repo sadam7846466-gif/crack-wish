@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'dart:async';
@@ -14,6 +15,7 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../services/storage_service.dart';
 import '../services/cosmic_engine_service.dart';
+import '../services/push_notification_service.dart';
 import '../services/ad_service.dart';
 import '../services/dream_analysis_service.dart';
 import '../services/supabase_dream_service.dart';
@@ -437,9 +439,66 @@ class _DreamPageState extends State<DreamPage>
     _emotionOrder.shuffle(math.Random());
     _currentTipIndex = math.Random().nextInt(50); // Biliyor muydun? sabit tip
     _loadPremiumStatus();
+    _syncBackgroundDreams();
     
     if (widget.openLatestDream) {
       _loadAndShowLatestDream();
+    }
+  }
+
+  Future<void> _syncBackgroundDreams() async {
+    final prefs = await SharedPreferences.getInstance();
+    final recordId = prefs.getString('dream_last_record_id');
+    if (recordId == null) return;
+
+    try {
+      final row = await Supabase.instance.client
+          .from('dream_readings')
+          .select()
+          .eq('id', recordId)
+          .maybeSingle();
+
+      if (row != null && row['status'] == 'completed') {
+        final data = row['result'] as Map<String, dynamic>;
+        final isPremium = row['is_premium'] == true;
+        
+        final dreamId = DateTime.now().millisecondsSinceEpoch.toString();
+        final now = DateTime.now().toIso8601String();
+        
+        final savedText = prefs.getString('dream_pending_text') ?? 'Rüya arka planda tamamlandı.';
+        final savedEmotion = prefs.getString('dream_pending_emotion') ?? 'Nötr';
+        final savedAnswers = prefs.getString('dream_pending_answers') ?? '[]';
+
+        if (isPremium) {
+           await StorageService.saveDream({
+            'id': dreamId,
+            'isPremium': true,
+            'title': data['title'] ?? 'Derin Analiz',
+            'text': savedText,
+            'emotion': savedEmotion,
+            'date': now,
+            'premiumAnswers': savedAnswers,
+            'premiumData': jsonEncode(data),
+            'reflectionAction': null,
+          });
+        }
+
+        await prefs.remove('dream_last_record_id');
+        await prefs.remove('dream_pending_text');
+        await prefs.remove('dream_pending_emotion');
+        await prefs.remove('dream_pending_answers');
+        await prefs.setBool('dream_last_reading_viewed', false);
+        
+        if (mounted) {
+          setState(() {
+            _hasUnreadDream = true;
+          });
+        }
+      } else if (row != null && row['status'] == 'failed') {
+        await prefs.remove('dream_last_record_id');
+      }
+    } catch (e) {
+      debugPrint("Dream background sync error: $e");
     }
   }
 
@@ -985,6 +1044,12 @@ class _DreamPageState extends State<DreamPage>
       };
     }).toList();
 
+    // Arka plan senkronizasyonu için önceden kaydet
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dream_pending_text', trimmed);
+    await prefs.setString('dream_pending_emotion', _selectedEmotion?.name ?? '');
+    await prefs.setString('dream_pending_answers', jsonEncode(finalAnswers));
+
     final deepResult = await _supabaseDreamService.analyzeDeep(
       dreamText: trimmed,
       emotion: emotionLabel,
@@ -996,7 +1061,26 @@ class _DreamPageState extends State<DreamPage>
     print('🔮🔮🔮 deepResult.title = "${deepResult.title}"');
     print('🔮🔮🔮 deepResult.errorMessage = "${deepResult.errorMessage}"');
 
-    if (!deepResult.success) {
+    if (!deepResult.success || deepResult.isProcessing) {
+      if (deepResult.isProcessing) {
+        if (mounted) {
+          setState(() {
+            _overlayContent = 'gap';
+            _isWriting = true;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_isTr ? 'Derin Analiz arka planda hazırlanıyor. Tamamlandığında bildirim alacaksınız.' : 'Deep Analysis is being prepared in the background. You will receive a notification when it is ready.'),
+              backgroundColor: AppColors.primaryPurple,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          Future.delayed(const Duration(milliseconds: 500), () {
+             if (mounted) setState(() => _showAnalysisOverlay = false);
+          });
+        }
+        return true;
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1020,6 +1104,7 @@ class _DreamPageState extends State<DreamPage>
     await StorageService.saveDream({
       'id': _currentDreamId,
       'isPremium': true,
+      'isRead': false,
       'title': deepResult.title,
       'text': trimmed, // local trimmed from _analyzeDream
       'emotion': _selectedEmotion?.name,
@@ -1031,6 +1116,7 @@ class _DreamPageState extends State<DreamPage>
       print('Oto-kayıt hatası: $e');
     });
     await StorageService.setDreamDoneToday().catchError((e) => null);
+    PushNotificationService().refreshSmartNotifications();
 
     if (!mounted) {
       final prefs = await SharedPreferences.getInstance();
@@ -1693,13 +1779,37 @@ class _DreamPageState extends State<DreamPage>
     final locale = _isTr ? 'tr' : 'en';
     final emotionLabel = _selectedEmotion!.label;
 
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dream_pending_text', trimmed);
+    await prefs.setString('dream_pending_emotion', _selectedEmotion?.name ?? '');
+    await prefs.setString('dream_pending_answers', '[]');
+
     final result = await _supabaseDreamService.interpretDream(
       dreamText: trimmed,
       emotion: emotionLabel,
       locale: locale,
     );
 
-    if (!result.success) {
+    if (!result.success || result.isProcessing) {
+      if (result.isProcessing) {
+        if (mounted) {
+          setState(() {
+            _overlayContent = 'gap';
+            _isWriting = true;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_isTr ? 'Rüyanız arka planda analiz ediliyor. Tamamlandığında bildirim alacaksınız.' : 'Your dream is being analyzed in the background. You will receive a notification when it is ready.'),
+              backgroundColor: AppColors.primaryPurple,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          Future.delayed(const Duration(milliseconds: 500), () {
+             if (mounted) setState(() => _showAnalysisOverlay = false);
+          });
+        }
+        return true;
+      }
       // API bağlantı hatası → Lokal fallback
       final dreamInput = DreamInput(
         text: _dreamController.text,
@@ -1758,6 +1868,7 @@ class _DreamPageState extends State<DreamPage>
     await _consumeDreamAllowance();
     await StorageService.setDreamDoneToday();
     await StorageService.addPendingAura('ruya', 1); // Rüya analizini başardığı için Aura ver
+    PushNotificationService().refreshSmartNotifications();
 
     if (mounted) {
       setState(() {
@@ -4236,7 +4347,8 @@ class _DreamPageState extends State<DreamPage>
                         ],
                       ),
                     ),
-                    if (index == 0 && _hasUnreadDream) ...[
+                    // Her okunmamış rüya için mavi nokta göster (Instagram/X tarzı)
+                    if (dream['isRead'] != true) ...[
                       const SizedBox(width: 8),
                       Container(
                         width: 8,
@@ -4499,13 +4611,20 @@ class _DreamPageState extends State<DreamPage>
   Future<void> _showDreamDetail(Map<String, dynamic> dream) async {
     HapticFeedback.lightImpact();
 
-    // Eğer okunmamış rüyaya tıklandıysa rozetleri temizle
+    // Bireysel rüyayı okundu olarak işaretle
+    if (dream['isRead'] != true && dream['id'] != null) {
+      dream['isRead'] = true;
+      await StorageService.saveDream(dream);
+    }
+
+    // Global unread flag'i de temizle
     if (_hasUnreadDream) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('dream_last_reading_viewed', true);
       if (mounted) {
         setState(() {
           _hasUnreadDream = false;
+          _historyKeyTracker++; // Listeyi yenile
         });
       }
     }

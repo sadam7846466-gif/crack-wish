@@ -97,6 +97,10 @@ class PushNotificationService {
       });
 
       _isInitialized = true;
+
+      // ── OTOMATİK: İzin iste + Token al + Bildirimleri planla ──
+      // App her açıldığında tüm bildirim altyapısını garanti altına al
+      await requestPermissionAndGetToken();
     } catch (e) {
       debugPrint("Bildirim servisleri başlatılamadı: $e");
     }

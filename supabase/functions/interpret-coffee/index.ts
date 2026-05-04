@@ -16,7 +16,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { mode, images, locale, userId } = await req.json();
+    const { mode, images, locale, userId, record_id } = await req.json();
     const isTr = locale === "tr";
 
     // ═══════════════════════════════════════════════════════════════
@@ -231,105 +231,122 @@ Return ONLY valid JSON, no markdown.`;
         },
       }));
 
-      const response = await fetch(OPENAI_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: "Sana 4 kahve falı fotoğrafı gönderiyorum. ÖNEMLİ: Fotoğraflar herhangi bir sırada olabilir! Önce her fotoğrafa bak ve kendin belirle hangisi fincan içi, hangisi sol kenar, hangisi sağ kenar, hangisi tabak. Tabak düz ve geniş bir yüzeydir (fincanın altlığı). Fincan içi derin ve yukarıdan çekilmiştir. Kenarlar ise fincanın yan taraflarını gösterir. Doğru eşleştirmeyi yaptıktan sonra falı bak." },
-                ...imageContents,
-              ],
+      // Asenkron işleyici
+      const processCoffee = async () => {
+        try {
+          const response = await fetch(OPENAI_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${OPENAI_API_KEY}`,
             },
-          ],
-          temperature: 0.7,
-          max_tokens: 3500,
-          response_format: { type: "json_object" },
-        }),
-      });
+            body: JSON.stringify({
+              model: "gpt-4o-mini",
+              messages: [
+                { role: "system", content: systemPrompt },
+                {
+                  role: "user",
+                  content: [
+                    { type: "text", text: "Sana 4 kahve falı fotoğrafı gönderiyorum. ÖNEMLİ: Fotoğraflar herhangi bir sırada olabilir! Önce her fotoğrafa bak ve kendin belirle hangisi fincan içi, hangisi sol kenar, hangisi sağ kenar, hangisi tabak. Tabak düz ve geniş bir yüzeydir (fincanın altlığı). Fincan içi derin ve yukarıdan çekilmiştir. Kenarlar ise fincanın yan taraflarını gösterir. Doğru eşleştirmeyi yaptıktan sonra falı bak." },
+                    ...imageContents,
+                  ],
+                },
+              ],
+              temperature: 0.7,
+              max_tokens: 3500,
+              response_format: { type: "json_object" },
+            }),
+          });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error("OpenAI interpret error:", response.status, errText);
-        return new Response(
-          JSON.stringify({ error: "AI service unavailable", detail: errText }),
-          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const data = await response.json();
-      const rawContent = data.choices?.[0]?.message?.content;
-
-      if (!rawContent) {
-        console.error("Empty AI response:", JSON.stringify(data));
-        return new Response(
-          JSON.stringify({ error: "Empty AI response" }),
-          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const parsed = JSON.parse(rawContent);
-
-      // siz → sen post-processing
-      const fix = (t: string): string => {
-        if (!t) return t;
-        if (!isTr) return t;
-        return t
-          .replace(/Fincanınız/g, 'Fincanın').replace(/fincanınız/g, 'fincanın')
-          .replace(/Falınız/g, 'Falın').replace(/falınız/g, 'falın')
-          .replace(/hayatınız/g, 'hayatın').replace(/ilişkiniz/g, 'ilişkin')
-          .replace(/Dileğiniz/g, 'Dileğin').replace(/dileğiniz/g, 'dileğin')
-          .replace(/yaşadığınız/g, 'yaşadığın').replace(/hissettiğiniz/g, 'hissettiğin')
-          .replace(/olmanız/g, 'olman').replace(/kalmanız/g, 'kalman')
-          .replace(/yapmanız/g, 'yapman').replace(/bakmanız/g, 'bakman')
-          .replace(/gösteriyorsunuz/g, 'gösteriyorsun').replace(/taşıyorsunuz/g, 'taşıyorsun');
-      };
-
-      // Deep fix all string values
-      const deepFix = (obj: any): any => {
-        if (typeof obj === 'string') return fix(obj);
-        if (Array.isArray(obj)) return obj.map(deepFix);
-        if (obj && typeof obj === 'object') {
-          const result: any = {};
-          for (const [key, val] of Object.entries(obj)) {
-            result[key] = deepFix(val);
+          if (!response.ok) {
+            console.error("OpenAI interpret error:", response.status, await response.text());
+            throw new Error("AI service unavailable");
           }
-          return result;
-        }
-        return obj;
-      };
 
-      const fixedResult = deepFix(parsed);
+          const data = await response.json();
+          const rawContent = data.choices?.[0]?.message?.content;
+          if (!rawContent) throw new Error("Empty AI response");
 
-      // --- SEND PUSH NOTIFICATION ---
-      try {
-        if (userId) {
+          const parsed = JSON.parse(rawContent);
+
+          // siz → sen post-processing
+          const fix = (t: string): string => {
+            if (!t) return t;
+            if (!isTr) return t;
+            return t
+              .replace(/Fincanınız/g, 'Fincanın').replace(/fincanınız/g, 'fincanın')
+              .replace(/Falınız/g, 'Falın').replace(/falınız/g, 'falın')
+              .replace(/hayatınız/g, 'hayatın').replace(/ilişkiniz/g, 'ilişkin')
+              .replace(/Dileğiniz/g, 'Dileğin').replace(/dileğiniz/g, 'dileğin')
+              .replace(/yaşadığınız/g, 'yaşadığın').replace(/hissettiğiniz/g, 'hissettiğin')
+              .replace(/olmanız/g, 'olman').replace(/kalmanız/g, 'kalman')
+              .replace(/yapmanız/g, 'yapman').replace(/bakmanız/g, 'bakman')
+              .replace(/gösteriyorsunuz/g, 'gösteriyorsun').replace(/taşıyorsunuz/g, 'taşıyorsun');
+          };
+
+          const deepFix = (obj: any): any => {
+            if (typeof obj === 'string') return fix(obj);
+            if (Array.isArray(obj)) return obj.map(deepFix);
+            if (obj && typeof obj === 'object') {
+              const result: any = {};
+              for (const [key, val] of Object.entries(obj)) {
+                result[key] = deepFix(val);
+              }
+              return result;
+            }
+            return obj;
+          };
+
+          const fixedResult = deepFix(parsed);
+
           const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
           const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
           const supabase = createClient(supabaseUrl, supabaseKey);
 
-          await supabase.functions.invoke('push-notification', {
-            body: {
-              table: 'coffee_reading',
-              record: {
-                to_user: userId,
-                from_user: userId, // Kendisinden geliyormuş gibi yapabiliriz
-                locale: locale
-              }
+          // 1. Veritabanını Güncelle
+          if (record_id) {
+            await supabase.from('coffee_readings').update({
+              status: 'completed',
+              result: fixedResult
+            }).eq('id', record_id);
+          }
+
+          // 2. Push Notification Gönder
+          if (userId) {
+            try {
+              await supabase.functions.invoke('push-notification', {
+                body: {
+                  table: 'coffee_reading',
+                  record: {
+                    to_user: userId,
+                    from_user: userId,
+                    locale: locale
+                  }
+                }
+              });
+              console.log("Triggered push-notification for user", userId);
+            } catch (notifyErr) {
+              console.error("Push notification failed, but continuing:", notifyErr);
             }
-          });
-          console.log("Triggered push-notification for user", userId);
+          }
+
+          return fixedResult; // Önemli: Sonucu döndür!
+        } catch (err) {
+          console.error("Processing error:", err);
+          if (record_id) {
+            const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+            const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+            const supabase = createClient(supabaseUrl, supabaseKey);
+            await supabase.from('coffee_readings').update({
+              status: 'failed'
+            }).eq('id', record_id);
+          }
+          throw err;
         }
-      } catch(e) {
-        console.error("FCM Error:", e);
-      }
+      };
+
+      // processCoffee fonksiyonunu senkron olarak bekle
+      const fixedResult = await processCoffee();
 
       return new Response(JSON.stringify(fixedResult), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

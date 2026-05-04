@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Supabase Edge Function üzerinden rüya yorumlama servisi
 class SupabaseDreamService {
@@ -25,6 +26,29 @@ class SupabaseDreamService {
     required String locale,
   }) async {
     try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+
+      String? recordId;
+      final prefs = await SharedPreferences.getInstance();
+
+      try {
+        final insertResponse = await supabase.from('dream_readings').insert({
+          'user_id': userId,
+          'locale': locale,
+          'status': 'pending',
+          'is_premium': false
+        }).select('id').maybeSingle();
+        
+        recordId = insertResponse?['id'];
+        
+        if (recordId != null) {
+          await prefs.setString('dream_last_record_id', recordId);
+        }
+      } catch (dbErr) {
+        debugPrint('DB Insert failed for dream (ignoring): $dbErr');
+      }
+
       final response = await _client
           .post(
             Uri.parse('$_supabaseUrl/functions/v1/interpret-dream'),
@@ -33,7 +57,8 @@ class SupabaseDreamService {
               'dreamText': dreamText,
               'emotion': emotion,
               'locale': locale,
-              'userId': Supabase.instance.client.auth.currentUser?.id,
+              'userId': userId,
+              'record_id': recordId
             }),
           )
           .timeout(const Duration(seconds: 45));
@@ -50,6 +75,28 @@ class SupabaseDreamService {
         return DreamInterpretationResult.error(body['error'].toString());
       }
 
+      if (body['status'] == 'processing') {
+        // Poll for completion
+        for (int i = 0; i < 20; i++) {
+          await Future.delayed(const Duration(seconds: 3));
+          if (recordId != null) {
+            final row = await supabase.from('dream_readings').select().eq('id', recordId).maybeSingle();
+            if (row != null) {
+              if (row['status'] == 'completed') {
+                await prefs.remove('dream_last_record_id');
+                final result = row['result'] as Map<String, dynamic>;
+                return DreamInterpretationResult.fromJson(result);
+              } else if (row['status'] == 'failed') {
+                await prefs.remove('dream_last_record_id');
+                return DreamInterpretationResult.error('AI rüyayı yorumlarken hata oluştu.');
+              }
+            }
+          }
+        }
+        return DreamInterpretationResult.processing(recordId ?? '');
+      }
+
+      await prefs.remove('dream_last_record_id');
       return DreamInterpretationResult.fromJson(body);
     } catch (e) {
       return DreamInterpretationResult.error('Bağlantı hatası: $e');
@@ -96,17 +143,41 @@ class SupabaseDreamService {
     required List<dynamic> answers,
   }) async {
     const maxRetries = 2; // 1 asıl + 1 retry
-    const timeout = Duration(seconds: 120); // API ~42s sürebilir, ağ yavaşlığına karşı 120s
+    const timeout = Duration(seconds: 120);
+
+    final supabase = Supabase.instance.client;
+    final userId = supabase.auth.currentUser?.id;
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        String? recordId;
+        final prefs = await SharedPreferences.getInstance();
+
+        try {
+          final insertResponse = await supabase.from('dream_readings').insert({
+            'user_id': userId,
+            'locale': locale,
+            'status': 'pending',
+            'is_premium': true
+          }).select('id').maybeSingle();
+          
+          recordId = insertResponse?['id'];
+          
+          if (recordId != null) {
+            await prefs.setString('dream_last_record_id', recordId);
+          }
+        } catch (dbErr) {
+          debugPrint('DB Insert failed for premium dream (ignoring): $dbErr');
+        }
+
         final reqBody = jsonEncode({
           'dreamText': dreamText,
           'emotion': emotion,
           'locale': locale,
           'step': 'analyze',
           'answers': answers,
-          'userId': Supabase.instance.client.auth.currentUser?.id,
+          'userId': userId,
+          'record_id': recordId
         });
         debugPrint('🔮 [PREMIUM] Attempt $attempt/$maxRetries — Request body: $reqBody');
 
@@ -120,13 +191,10 @@ class SupabaseDreamService {
 
         final rawText = utf8.decode(response.bodyBytes);
         debugPrint('🔮 [PREMIUM] Status: ${response.statusCode}');
-        debugPrint('🔮 [PREMIUM] Raw response (first 500): ${rawText.substring(0, rawText.length > 500 ? 500 : rawText.length)}');
 
         if (response.statusCode < 200 || response.statusCode >= 300) {
           debugPrint('🔮 [PREMIUM] ERROR: Status ${response.statusCode} — $rawText');
-          // Server error — retry if we have attempts left
           if (attempt < maxRetries) {
-            debugPrint('🔮 [PREMIUM] Retrying in 2s...');
             await Future.delayed(const Duration(seconds: 2));
             continue;
           }
@@ -136,31 +204,41 @@ class SupabaseDreamService {
         final body = jsonDecode(rawText) as Map<String, dynamic>;
 
         if (body.containsKey('error')) {
-          debugPrint('🔮 [PREMIUM] API Error: ${body['error']}');
           return DeepAnalysisResult.error(body['error'].toString());
         }
 
-        debugPrint('🔮 [PREMIUM] Keys: ${body.keys.toList()}');
-        debugPrint('🔮 [PREMIUM] title: ${body['title']}');
-        debugPrint('🔮 [PREMIUM] subconsciousMap null? ${body['subconscious_map'] == null}');
-        debugPrint('🔮 [PREMIUM] archetype null? ${body['archetype'] == null}');
-        debugPrint('🔮 [PREMIUM] symbols: ${body['symbols']}');
-        debugPrint('🔮 [PREMIUM] cosmicClosing: ${body['cosmic_closing']}');
+        if (body['status'] == 'processing') {
+          // Poll for completion
+          for (int i = 0; i < 20; i++) {
+            await Future.delayed(const Duration(seconds: 3));
+            if (recordId != null) {
+              final row = await supabase.from('dream_readings').select().eq('id', recordId).maybeSingle();
+              if (row != null) {
+                if (row['status'] == 'completed') {
+                  await prefs.remove('dream_last_record_id');
+                  final result = row['result'] as Map<String, dynamic>;
+                  return DeepAnalysisResult.fromJson(result);
+                } else if (row['status'] == 'failed') {
+                  await prefs.remove('dream_last_record_id');
+                  return DeepAnalysisResult.error('AI rüyayı yorumlarken hata oluştu.');
+                }
+              }
+            }
+          }
+          return DeepAnalysisResult.processing(recordId ?? '');
+        }
 
+        await prefs.remove('dream_last_record_id');
         return DeepAnalysisResult.fromJson(body);
       } catch (e, stack) {
         debugPrint('🔮 [PREMIUM] EXCEPTION (attempt $attempt): $e');
-        debugPrint('🔮 [PREMIUM] Stack: $stack');
-        // Timeout or connection error — retry if we have attempts left
         if (attempt < maxRetries) {
-          debugPrint('🔮 [PREMIUM] Retrying in 2s...');
           await Future.delayed(const Duration(seconds: 2));
           continue;
         }
         return DeepAnalysisResult.error('Bağlantı hatası: $e');
       }
     }
-    // Bu noktaya ulaşmamalı ama güvenlik için:
     return DeepAnalysisResult.error('Beklenmeyen hata');
   }
 }
@@ -179,6 +257,8 @@ class DreamInterpretationResult {
   final DreamDistribution distribution; // Sabit 4 metrik
   final String summary;        // 1 cümle özet
   final List<DreamSection> sections; // Yapılandırılmış bölümler
+  final String? recordId;
+  final bool isProcessing;
 
   DreamInterpretationResult({
     required this.success,
@@ -187,9 +267,11 @@ class DreamInterpretationResult {
     this.distribution = const DreamDistribution(),
     this.summary = '',
     this.sections = const [],
+    this.recordId,
+    this.isProcessing = false,
   });
 
-  factory DreamInterpretationResult.fromJson(Map<String, dynamic> json) {
+  factory DreamInterpretationResult.fromJson(Map<String, dynamic> json, {String? recordId}) {
     final dist = json['distribution'] as Map<String, dynamic>?;
 
     final sectionsList = (json['sections'] as List<dynamic>?)
@@ -205,6 +287,15 @@ class DreamInterpretationResult {
           : const DreamDistribution(),
       summary: json['summary']?.toString() ?? '',
       sections: sectionsList,
+      recordId: recordId,
+    );
+  }
+
+  factory DreamInterpretationResult.processing(String recordId) {
+    return DreamInterpretationResult(
+      success: true,
+      isProcessing: true,
+      recordId: recordId,
     );
   }
 
@@ -393,6 +484,8 @@ class DeepAnalysisResult {
   final List<ClarifyingInsight> clarifyingInsights;
   final WakingLifeDeduction wakingLifeDeduction;
   final Map<String, dynamic>? rawJson;
+  final String? recordId;
+  final bool isProcessing;
 
   DeepAnalysisResult({
     required this.success,
@@ -414,9 +507,11 @@ class DeepAnalysisResult {
     this.clarifyingInsights = const [],
     this.wakingLifeDeduction = const WakingLifeDeduction(),
     this.rawJson,
+    this.recordId,
+    this.isProcessing = false,
   });
 
-  factory DeepAnalysisResult.fromJson(Map<String, dynamic> json) {
+  factory DeepAnalysisResult.fromJson(Map<String, dynamic> json, {String? recordId}) {
     return DeepAnalysisResult(
       success: true,
       title: json['title']?.toString() ?? '',
@@ -463,6 +558,15 @@ class DeepAnalysisResult {
           : const WakingLifeDeduction(),
       // Cyclic (Ouroboros) hatasını önlemek için yepyeni bir clone yapıyoruz VE data kaybını kalıcı engelliyoruz.
       rawJson: Map<String, dynamic>.from(json)..remove('__rawJson__'),
+      recordId: recordId,
+    );
+  }
+
+  factory DeepAnalysisResult.processing(String recordId) {
+    return DeepAnalysisResult(
+      success: true,
+      isProcessing: true,
+      recordId: recordId,
     );
   }
 

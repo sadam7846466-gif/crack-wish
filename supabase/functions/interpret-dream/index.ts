@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { dreamText, emotion, locale, userId } = await req.json();
+    const { dreamText, emotion, locale, userId, record_id } = await req.json();
 
     if (!dreamText || dreamText.trim().length < 10) {
       return new Response(
@@ -121,129 +121,143 @@ Return this exact JSON structure:
   }
 }`;
 
-    const response = await fetch(OPENAI_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.4,
-        max_completion_tokens: 800,
-        response_format: { type: "json_object" },
-      }),
-    });
+    // Asenkron işleyici
+    const processDream = async () => {
+      try {
+        const response = await fetch(OPENAI_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: 0.4,
+            max_completion_tokens: 800,
+            response_format: { type: "json_object" },
+          }),
+        });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("OpenAI error:", response.status, errText);
-      return new Response(
-        JSON.stringify({ error: "AI service unavailable", detail: errText }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+        if (!response.ok) {
+          console.error("OpenAI error:", response.status, await response.text());
+          throw new Error("AI service unavailable");
+        }
 
-    const data = await response.json();
-    const rawContent = data.choices?.[0]?.message?.content;
+        const data = await response.json();
+        const rawContent = data.choices?.[0]?.message?.content;
+        if (!rawContent) throw new Error("Empty AI response");
 
-    if (!rawContent) {
-      console.error("Empty AI response:", JSON.stringify(data));
-      return new Response(
-        JSON.stringify({ error: "Empty AI response" }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+        const parsed = JSON.parse(rawContent);
 
-    const parsed = JSON.parse(rawContent);
+        let finalResult: any;
+        if (parsed.is_valid_dream === false) {
+          finalResult = {
+            category: isTr ? "Geçersiz Metin" : "Invalid Content",
+            distribution: { emotional_load: 0, uncertainty: 0, recent_memory_effect: 0, brain_activity: 0 },
+            sections: [
+              { emoji: "⚠️", title: isTr ? "Rüya Algılanamadı" : "No Dream Detected", content: isTr ? "Yazdıkların bir rüya anlatısı gibi görünmüyor. Lütfen gerçekten gördüğün bir rüyayı yazdığından emin ol." : "This does not look like a dream narrative." }
+            ],
+            summary: ""
+          };
+        } else {
+          // siz → sen post-processing
+          const fix = (t: string): string => {
+            if (!t) return t;
+            // Strip all emoji characters (keep → ➤ and basic punctuation)
+            let cleaned = t.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA00}-\u{1FAFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '');
+            // Clean up double spaces left by removed emojis
+            cleaned = cleaned.replace(/  +/g, ' ').trim();
+            if (!isTr) return cleaned;
+            
+            // Strip starting pronouns
+            const startPronounRegex = /^(Sen,|Senin için,|Senin için|Sen)\s+/i;
+            if (startPronounRegex.test(cleaned)) {
+              cleaned = cleaned.replace(startPronounRegex, "");
+              if (cleaned.length > 0) cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+            }
 
-    if (parsed.is_valid_dream === false) {
-      const invalidResult = {
-        category: isTr ? "Geçersiz Metin" : "Invalid Content",
-        distribution: { emotional_load: 0, uncertainty: 0, recent_memory_effect: 0, brain_activity: 0 },
-        sections: [
-          { emoji: "⚠️", title: isTr ? "Rüya Algılanamadı" : "No Dream Detected", content: isTr ? "Yazdıkların bir rüya anlatısı gibi görünmüyor (haber, arama terimi, döviz kuru, anlamsız metin vb.). Lütfen gerçekten gördüğün bir rüyayı yazdığından emin ol." : "This does not look like a dream narrative. Please make sure you are describing an actual dream." }
-        ],
-        summary: ""
-      };
-      return new Response(JSON.stringify(invalidResult), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
+            return cleaned
+              .replace(/Rüyanız/g,'Rüyan').replace(/rüyanız/g,'rüyan')
+              .replace(/yaşadığınız/g,'yaşadığın').replace(/hissettiğiniz/g,'hissettiğin')
+              .replace(/olmanız/g,'olman').replace(/kalmanız/g,'kalman')
+              .replace(/korkunuz/g,'korkun').replace(/beyniniz/g,'beynin')
+              .replace(/hayatınız/g,'hayatın').replace(/ilişkiniz/g,'ilişkin')
+              .replace(/kendi korkularla/g, "kendi korkularınla")
+              .replace(/kendi içsel korkularla/g, "kendi içsel korkularınla")
+              .replace(/kendi düşüncelerle/g, "kendi düşüncelerinle")
+              .replace(/kendi duygularla/g, "kendi duygularınla");
+          };
 
-    // siz → sen post-processing
-    const fix = (t: string): string => {
-      if (!t) return t;
-      // Strip all emoji characters (keep → ➤ and basic punctuation)
-      let cleaned = t.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA00}-\u{1FAFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '');
-      // Clean up double spaces left by removed emojis
-      cleaned = cleaned.replace(/  +/g, ' ').trim();
-      if (!isTr) return cleaned;
-      
-      // Strip starting pronouns
-      const startPronounRegex = /^(Sen,|Senin için,|Senin için|Sen)\s+/i;
-      if (startPronounRegex.test(cleaned)) {
-        cleaned = cleaned.replace(startPronounRegex, "");
-        if (cleaned.length > 0) cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-      }
+          const a = parsed.analysis || {};
+          const sections = [];
+          if (a.brain) sections.push({ emoji: "🧠", title: isTr ? "Beyin Ne Yapıyordu?" : "What Was the Brain Doing?", content: fix(a.brain) });
+          if (a.emotion) sections.push({ emoji: "❤️", title: isTr ? "Baskın Duygusal Tema" : "Dominant Emotional Theme", content: fix(a.emotion) });
+          if (a.symbol) sections.push({ emoji: "🧩", title: isTr ? "Ana Sembol" : "Main Symbol", content: fix(a.symbol) });
+          if (a.nature && !a.nature.includes("OPTIONAL")) sections.push({ emoji: "🌲", title: isTr ? "Ortam & Doğa" : "Environment", content: fix(a.nature) });
+          if (a.physical_pain && !a.physical_pain.includes("OPTIONAL")) sections.push({ emoji: "🌫", title: isTr ? "Fiziksel His" : "Physical Sensation", content: fix(a.physical_pain) });
+          if (a.recent_effect && !a.recent_effect.includes("OPTIONAL")) sections.push({ emoji: "🔁", title: isTr ? "Yakın Zaman Etkisi" : "Recent Effect", content: fix(a.recent_effect) });
+          if (a.summary) sections.push({ emoji: "🔬", title: isTr ? "Bilimsel Özet" : "Scientific Summary", content: fix(a.summary) });
+          if (a.advice) sections.push({ emoji: "💡", title: isTr ? "Kendine Not" : "Note to Self", content: fix(a.advice) });
 
-      return cleaned
-        .replace(/Rüyanız/g,'Rüyan').replace(/rüyanız/g,'rüyan')
-        .replace(/yaşadığınız/g,'yaşadığın').replace(/hissettiğiniz/g,'hissettiğin')
-        .replace(/olmanız/g,'olman').replace(/kalmanız/g,'kalman')
-        .replace(/korkunuz/g,'korkun').replace(/beyniniz/g,'beynin')
-        .replace(/hayatınız/g,'hayatın').replace(/ilişkiniz/g,'ilişkin')
-        .replace(/kendi korkularla/g, "kendi korkularınla")
-        .replace(/kendi içsel korkularla/g, "kendi içsel korkularınla")
-        .replace(/kendi düşüncelerle/g, "kendi düşüncelerinle")
-        .replace(/kendi duygularla/g, "kendi duygularınla");
-    };
+          finalResult = {
+            category: fix(parsed.core_conflict || ""),
+            distribution: parsed.distribution || { emotional_load: 25, uncertainty: 25, recent_memory_effect: 25, brain_activity: 25 },
+            sections,
+            summary: fix(parsed.core_conflict || ""),
+          };
+        }
 
-    const a = parsed.analysis || {};
-
-    // Flutter sections formatına dönüştür
-    const sections = [];
-    if (a.brain) sections.push({ emoji: "🧠", title: isTr ? "Beyin Ne Yapıyordu?" : "What Was the Brain Doing?", content: fix(a.brain) });
-    if (a.emotion) sections.push({ emoji: "❤️", title: isTr ? "Baskın Duygusal Tema" : "Dominant Emotional Theme", content: fix(a.emotion) });
-    if (a.symbol) sections.push({ emoji: "🧩", title: isTr ? "Ana Sembol" : "Main Symbol", content: fix(a.symbol) });
-    if (a.nature && !a.nature.includes("OPTIONAL")) sections.push({ emoji: "🌲", title: isTr ? "Ortam & Doğa" : "Environment", content: fix(a.nature) });
-    if (a.physical_pain && !a.physical_pain.includes("OPTIONAL")) sections.push({ emoji: "🌫", title: isTr ? "Fiziksel His" : "Physical Sensation", content: fix(a.physical_pain) });
-    if (a.recent_effect && !a.recent_effect.includes("OPTIONAL")) sections.push({ emoji: "🔁", title: isTr ? "Yakın Zaman Etkisi" : "Recent Effect", content: fix(a.recent_effect) });
-    if (a.summary) sections.push({ emoji: "🔬", title: isTr ? "Bilimsel Özet" : "Scientific Summary", content: fix(a.summary) });
-    if (a.advice) sections.push({ emoji: "💡", title: isTr ? "Kendine Not" : "Note to Self", content: fix(a.advice) });
-
-    const result = {
-      category: fix(parsed.core_conflict || ""),
-      distribution: parsed.distribution || { emotional_load: 25, uncertainty: 25, recent_memory_effect: 25, brain_activity: 25 },
-      sections,
-      summary: fix(parsed.core_conflict || ""), // summary = core_conflict (farklı içerik, duplikasyon yok)
-    };
-
-    // --- SEND PUSH NOTIFICATION ---
-    try {
-      if (userId) {
-        // userId requires dynamic import if not defined, but we can extract it from the first req.json()
         const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
         const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        await supabase.functions.invoke('push-notification', {
-          body: {
-            table: 'dreams',
-            record: {
-              to_user: userId,
-              from_user: userId,
-              locale: locale
-            }
+        // 1. Veritabanını Güncelle
+        if (record_id) {
+          await supabase.from('dream_readings').update({
+            status: 'completed',
+            result: finalResult
+          }).eq('id', record_id);
+        }
+
+        // 2. Push Notification Gönder
+        if (userId) {
+          try {
+            await supabase.functions.invoke('push-notification', {
+              body: {
+                table: 'dreams',
+                record: {
+                  to_user: userId,
+                  from_user: userId,
+                  locale: locale
+                }
+              }
+            });
+            console.log("Triggered push-notification for dream user", userId);
+          } catch (notifyErr) {
+            console.error("Push notification failed, but continuing:", notifyErr);
           }
-        });
-        console.log("Triggered push-notification for dream user", userId);
+        }
+
+        return finalResult;
+      } catch (err) {
+        console.error("Processing error:", err);
+        if (record_id) {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+          const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          await supabase.from('dream_readings').update({
+            status: 'failed'
+          }).eq('id', record_id);
+        }
+        throw err;
       }
-    } catch(e) {
-      console.error("FCM Error:", e);
-    }
+    };
+
+    const result = await processDream();
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -23,13 +23,42 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      
-      final session = Supabase.instance.client.auth.currentSession;
-      final isLoggedIn = session != null;
+    _checkSessionAndNavigate();
+  }
 
-      Navigator.of(context).pushReplacement(
+  /// Session kurtarma sigortası:
+  /// 1) Önce currentSession'ı kontrol et (hızlı yol)
+  /// 2) null ise → Supabase'in initialSession event'ini bekle (max 2sn)
+  /// 3) Timeout olursa → currentSession'ı son kez kontrol et
+  /// Bu sayede iOS'ta session restore gecikse bile kullanıcı çıkış yapmış gibi görünmez.
+  Future<void> _checkSessionAndNavigate() async {
+    // Minimum splash süresi (animasyon için)
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+
+    // Hızlı yol: Session zaten hazırsa bekletme
+    var session = Supabase.instance.client.auth.currentSession;
+    
+    // Session null ise — iOS'ta restore geç olabilir, bekle
+    if (session == null) {
+      try {
+        await Supabase.instance.client.auth.onAuthStateChange
+            .firstWhere((data) => 
+                data.event == AuthChangeEvent.initialSession ||
+                data.event == AuthChangeEvent.signedIn ||
+                data.event == AuthChangeEvent.tokenRefreshed)
+            .timeout(const Duration(seconds: 2));
+      } catch (_) {
+        // Timeout veya hata — sorun değil, devam et
+      }
+      if (!mounted) return;
+      // Son kontrol
+      session = Supabase.instance.client.auth.currentSession;
+    }
+
+    final isLoggedIn = session != null;
+
+    Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 1000), // Daha hızlı (1400ms -> 1000ms)
           pageBuilder: (_, __, ___) => isLoggedIn ? const RootShell() : const OnboardingPage(),
@@ -83,7 +112,6 @@ class _SplashScreenState extends State<SplashScreen> {
           },
         ),
       );
-    });
   }
 
   @override

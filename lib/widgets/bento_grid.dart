@@ -173,7 +173,7 @@ class _BentoGridState extends State<BentoGrid>
                           SwipeFadePageRoute(
                             page: const DreamPage(),
                           ),
-                        );
+                        ).then((_) => _checkUnreadStatuses());
                       },
                       child: Stack(
                       clipBehavior: Clip.none,

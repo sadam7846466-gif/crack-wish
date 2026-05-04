@@ -11,12 +11,22 @@ if (!admin.apps.length && Object.keys(serviceAccount).length > 0) {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   try {
     const payload = await req.json();
+    console.log("Received payload:", JSON.stringify(payload));
     const record = payload.record;
     const tableName = payload.table; // Hangi tablodan tetiklendiğini anlar
 
-    if (!record) return new Response("No record", { status: 400 });
+    if (!record) return new Response("No record", { status: 400, headers: corsHeaders });
 
     const toUserId = record.to_user;
     const fromUserId = record.from_user;
@@ -30,8 +40,9 @@ serve(async (req) => {
 
     const { data: receiverData } = await supabase.from('profiles').select('fcm_token').eq('id', toUserId).single();
     const fcmToken = receiverData?.fcm_token;
+    console.log(`Resolved fcmToken for ${toUserId}:`, fcmToken ? "YES" : "NO");
 
-    if (!fcmToken) return new Response("No FCM token", { status: 200 });
+    if (!fcmToken) return new Response("No FCM token", { status: 200, headers: corsHeaders });
 
     let title = "";
     let body = "";
@@ -62,9 +73,12 @@ serve(async (req) => {
         sound = "default";
         dataPayload = { type: "dream_reading_ready" };
     } else {
-        return new Response("Bilinmeyen tablo", { status: 200 });
+        console.log("Unknown table:", tableName);
+        return new Response("Bilinmeyen tablo", { status: 200, headers: corsHeaders });
     }
 
+    console.log("Sending Firebase message to token:", fcmToken.substring(0, 10) + "...");
+    
     // Bildirimi Firebase ile fırlat
     const response = await admin.messaging().send({
       token: fcmToken,
@@ -93,8 +107,10 @@ serve(async (req) => {
       }
     });
 
-    return new Response(JSON.stringify({ success: true, response }), { headers: { "Content-Type": "application/json" } });
+    console.log("Firebase success:", response);
+    return new Response(JSON.stringify({ success: true, response }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
+    console.error("Error in push-notification:", error);
+    return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 })

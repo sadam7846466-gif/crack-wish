@@ -1,14 +1,48 @@
 import Flutter
 import UIKit
 import Contacts
+import FirebaseMessaging
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate, MessagingDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // ⚠️ FirebaseApp.configure() burada ÇAĞIRILMAMALI!
+    // Flutter tarafındaki Firebase.initializeApp() zaten native configure yapıyor.
+    // İkisi birden olursa Supabase auth session bozulur.
+    
+    // ── iOS Push Notification (APNs) Kayıt ──
+    UNUserNotificationCenter.current().delegate = self
+    application.registerForRemoteNotifications()
+    
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  // ── APNs Token → Firebase Messaging'e ilet ──
+  // iOS cihaz APNs token'ını aldığında Firebase'e aktarır.
+  // Bu callback, registerForRemoteNotifications() sonrası sistem tarafından çağrılır
+  // ve bu noktada Flutter engine + Firebase.initializeApp() zaten tamamlanmış olur.
+  override func application(_ application: UIApplication,
+                            didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    // Firebase bu noktada Flutter tarafından configure edilmiş olacak.
+    // Delegate'i burada set etmek, race condition'ı önler.
+    Messaging.messaging().delegate = self
+    Messaging.messaging().apnsToken = deviceToken
+    super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+  }
+  
+  // ── FCM Token yenilendiğinde ──
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    print("🔔 FCM Token yenilendi: \(fcmToken ?? "nil")")
+  }
+
+  // ── Arka planda gelen sessiz bildirimler ──
+  override func application(_ application: UIApplication,
+                            didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                            fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    completionHandler(.newData)
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {

@@ -28,7 +28,7 @@ class CloudSyncService {
       Map<String, dynamic> cloudData = {};
 
       for (String key in allKeys) {
-        if (_ignoredKeys.contains(key)) continue;
+        if (_ignoredKeys.contains(key) || key.startsWith('supabase.')) continue;
         
         // Veri tipine göre çekirdekten okuma
         var value = prefs.get(key);
@@ -74,6 +74,9 @@ class CloudSyncService {
 
       for (var entry in cloudData.entries) {
         String key = entry.key;
+        
+        if (_ignoredKeys.contains(key) || key.startsWith('supabase.')) continue;
+
         dynamic value = entry.value;
 
         // Veri tiplerini tanıyarak doğrudan SharedPreferences'a yaz

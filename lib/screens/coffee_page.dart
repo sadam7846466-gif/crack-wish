@@ -157,9 +157,47 @@ class _CoffeePageState extends State<CoffeePage>
     final savedDate = prefs.getString('coffee_last_reading_date') ?? '';
     if (savedDate != today) return;
 
+    final recordId = prefs.getString('coffee_last_record_id');
+    if (recordId != null) {
+      try {
+        final row = await Supabase.instance.client
+            .from('coffee_readings')
+            .select()
+            .eq('id', recordId)
+            .maybeSingle();
+
+        if (row != null && row['status'] == 'completed') {
+          // Arka planda DB'de tamamlanmış, sonucu yerele al
+          await prefs.setString('coffee_last_reading', jsonEncode(row['result']));
+          await prefs.remove('coffee_last_record_id');
+          await prefs.setBool('coffee_last_reading_viewed', false);
+          
+          _backgroundPollTimer?.cancel();
+          _waitingForBackgroundResult = false;
+
+          final data = row['result'] as Map<String, dynamic>;
+          if (mounted) {
+            setState(() {
+              _lastReading = data;
+              _lastReadingViewed = false;
+            });
+            _loadSoulStones();
+          }
+        } else if (row != null && row['status'] == 'failed') {
+          _backgroundPollTimer?.cancel();
+          _waitingForBackgroundResult = false;
+          await prefs.remove('coffee_last_record_id');
+          await StorageService.updateSoulStones(1); // iade
+        }
+      } catch (e) {
+        debugPrint("Polling error: $e");
+      }
+      return;
+    }
+
     final raw = prefs.getString('coffee_last_reading');
     if (raw != null && (_lastReading == null || _waitingForBackgroundResult)) {
-      // Fal arka planda tamamlanmış!
+      // Fal arka planda tamamlanmış (eski yöntem kalıntısı)
       _backgroundPollTimer?.cancel();
       _waitingForBackgroundResult = false;
 

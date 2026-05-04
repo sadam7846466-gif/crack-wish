@@ -21,7 +21,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _voices = false;
   bool _newCookieAlarm = true;
   bool _friendsAlarm = true;
-  bool _dailyReminders = false;
+  bool _dailyReminders = true;
 
   @override
   void initState() {

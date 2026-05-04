@@ -11,6 +11,7 @@ import '../constants/colors.dart';
 import '../models/fortune.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
+import '../services/push_notification_service.dart';
 import 'share_modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../services/purchase_service.dart';
@@ -552,6 +553,9 @@ class _CookieSectionState extends State<CookieSection>
     // Cache güncelle
     _cachedCracksToday = newCracks;
     _cachedDailyLimitReached = limitReached;
+
+    // Akıllı bildirimleri güncelle ("kurabiye kırmadın" bildirimi iptal olur)
+    PushNotificationService().refreshSmartNotifications();
 
     setState(() {
       _currentFortune = fortune;
