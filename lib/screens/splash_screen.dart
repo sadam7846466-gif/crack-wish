@@ -38,6 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Hızlı yol: Session zaten hazırsa bekletme
     var session = Supabase.instance.client.auth.currentSession;
+    debugPrint("🔐 [SPLASH] İlk session kontrolü: ${session != null ? 'VAR' : 'YOK'}");
     
     // Session null ise — iOS'ta restore geç olabilir, bekle
     if (session == null) {
@@ -47,13 +48,26 @@ class _SplashScreenState extends State<SplashScreen> {
                 data.event == AuthChangeEvent.initialSession ||
                 data.event == AuthChangeEvent.signedIn ||
                 data.event == AuthChangeEvent.tokenRefreshed)
-            .timeout(const Duration(seconds: 2));
+            .timeout(const Duration(seconds: 4));
       } catch (_) {
         // Timeout veya hata — sorun değil, devam et
       }
       if (!mounted) return;
       // Son kontrol
       session = Supabase.instance.client.auth.currentSession;
+      debugPrint("🔐 [SPLASH] onAuthStateChange sonrası session: ${session != null ? 'VAR' : 'YOK'}");
+    }
+
+    // SON ŞANS: Session hâlâ null ise, token'ı elle yenilemeyi dene
+    if (session == null) {
+      try {
+        final response = await Supabase.instance.client.auth.refreshSession();
+        session = response.session;
+        debugPrint("🔐 [SPLASH] refreshSession sonucu: ${session != null ? 'BAŞARILI' : 'BAŞARISIZ'}");
+      } catch (e) {
+        debugPrint("🔐 [SPLASH] refreshSession hatası (normal olabilir): $e");
+      }
+      if (!mounted) return;
     }
 
     final isLoggedIn = session != null;

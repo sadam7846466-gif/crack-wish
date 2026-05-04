@@ -16,6 +16,26 @@ class CloudSyncService {
     'app_locale', // Kullanıcı yeni telefonunu İngilizce kullanmak isteyebilir
   ];
 
+  /// ⚠️ KRİTİK: Bu anahtarlar ASLA buluta yedeklenmemeli ve buluttan geri yüklenmemeli!
+  /// Supabase oturum token'ları bu prefix'lerle SharedPreferences'ta saklanır.
+  /// Bunları yedekleyip geri yüklemek, eski/geçersiz token'ın yeni token'ın üstüne
+  /// yazılmasına ve kullanıcının hesaptan atılmasına neden olur.
+  bool _shouldSkipKey(String key) {
+    if (_ignoredKeys.contains(key)) return true;
+    // Supabase auth session token'ları (sb-<ref>-auth-token)
+    if (key.startsWith('sb-')) return true;
+    // Supabase eski format veya internal anahtarlar
+    if (key.startsWith('supabase.')) return true;
+    // Flutter SDK internal anahtarları
+    if (key.startsWith('flutter.')) return true;
+    // Firebase internal anahtarları
+    if (key.startsWith('firebase_')) return true;
+    if (key.startsWith('com.google.firebase')) return true;
+    // FCM token
+    if (key.contains('fcm_token')) return true;
+    return false;
+  }
+
   /// 1. TELEFONDAN -> BULUTA (Backup)
   /// Bu fonksiyon çağrıldığında o anki tüm Rüyalar, Ruh Taşları, Ayarlar Supabase Kasasına yüklenir.
   Future<void> pushToCloud() async {
@@ -28,7 +48,7 @@ class CloudSyncService {
       Map<String, dynamic> cloudData = {};
 
       for (String key in allKeys) {
-        if (_ignoredKeys.contains(key) || key.startsWith('supabase.')) continue;
+        if (_shouldSkipKey(key)) continue;
         
         // Veri tipine göre çekirdekten okuma
         var value = prefs.get(key);
@@ -75,7 +95,7 @@ class CloudSyncService {
       for (var entry in cloudData.entries) {
         String key = entry.key;
         
-        if (_ignoredKeys.contains(key) || key.startsWith('supabase.')) continue;
+        if (_shouldSkipKey(key)) continue;
 
         dynamic value = entry.value;
 
@@ -101,3 +121,4 @@ class CloudSyncService {
     }
   }
 }
+
