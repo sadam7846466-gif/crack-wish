@@ -2828,6 +2828,29 @@ class _BentoHeroCard extends StatelessWidget {
 
     int dreamTimeFilter = 7;
 
+    bool isModalMounted = true;
+    int particleCounter = 0;
+    List<Map<String, dynamic>> flyingAuras = [];
+
+    void spawnFlyingAura(int amount, Color color, StateSetter setModalState, BuildContext ctx) {
+      final id = particleCounter++;
+      setModalState(() {
+        flyingAuras.add({
+          'id': id,
+          'amount': amount,
+          'color': color,
+          'left': 130.0 + (id % 3) * 15.0,
+        });
+      });
+      Future.delayed(const Duration(milliseconds: 700), () {
+        if (isModalMounted) {
+          setModalState(() {
+            flyingAuras.removeWhere((e) => e['id'] == id);
+          });
+        }
+      });
+    }
+
     await showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.15),
@@ -2880,13 +2903,19 @@ class _BentoHeroCard extends StatelessWidget {
             final bool canConvert = availableAura >= conversionCost;
 
             return GestureDetector(
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                isModalMounted = false;
+                Navigator.pop(context);
+              },
               child: GestureDetector(
                 onTap: () {}, // içeriğe tıklayınca modal kapanmasın
-                child: Container(
-                  width: 320,
-                  height: 320,
-                  decoration: BoxDecoration(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 320,
+                      height: 320,
+                      decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
@@ -3256,6 +3285,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFF5A8BFF), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'ruya',
                                           );
@@ -3277,6 +3307,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFFC084FC), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'fal',
                                           );
@@ -3298,6 +3329,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFFFFD700), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'zodiac',
                                           );
@@ -3319,6 +3351,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFFFFD166), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'kurabiye',
                                           );
@@ -3342,6 +3375,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFF4EE6C5), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'baykus',
                                           );
@@ -3363,6 +3397,7 @@ class _BentoHeroCard extends StatelessWidget {
                                             collectedBonus += pts;
                                             modalAuraTotal += pts;
                                           });
+                                          spawnFlyingAura(pts, const Color(0xFFD4A373), setModalState, context);
                                           StorageService.clearPendingAura(
                                             'kahve',
                                           );
@@ -5034,7 +5069,16 @@ class _BentoHeroCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
+                      ),
+                    ),
+                    // YUKARI UÇAN AURA ANİMASYONLARI
+                    ...flyingAuras.map((fa) => _FlyingAuraParticle(
+                          key: ValueKey(fa['id']),
+                          amount: fa['amount'],
+                          color: fa['color'],
+                          leftPos: fa['left'],
+                        )),
+                  ],
                 ),
               ),
             );
@@ -7565,5 +7609,67 @@ class _EmotionDonutPainter extends CustomPainter {
   bool shouldRepaint(covariant _EmotionDonutPainter oldDelegate) {
     return oldDelegate.slices.length != slices.length ||
         oldDelegate.animationValue != animationValue;
+  }
+}
+
+class _FlyingAuraParticle extends StatefulWidget {
+  final int amount;
+  final Color color;
+  final double leftPos;
+
+  const _FlyingAuraParticle({
+    Key? key,
+    required this.amount,
+    required this.color,
+    required this.leftPos,
+  }) : super(key: key);
+
+  @override
+  State<_FlyingAuraParticle> createState() => _FlyingAuraParticleState();
+}
+
+class _FlyingAuraParticleState extends State<_FlyingAuraParticle> {
+  double _opacity = 1.0;
+  double _dy = 240.0; // Alt kısımdaki butonların ortalama yüksekliği
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _dy = 60.0; // Üstteki aura sayısının olduğu hiza
+          _opacity = 0.0;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeOutCubic,
+      top: _dy,
+      left: widget.leftPos,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 600),
+        opacity: _opacity,
+        child: Text(
+          "+${widget.amount}",
+          style: TextStyle(
+            color: widget.color,
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            shadows: [
+              Shadow(
+                color: widget.color.withOpacity(0.6),
+                blurRadius: 12,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

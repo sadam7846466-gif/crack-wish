@@ -75,7 +75,8 @@ serve(async (req) => {
       data: dataPayload,
       android: {
         notification: {
-          sound: sound === "default" ? "default" : sound.replace('.mp3', '')
+          sound: sound === "default" ? "default" : sound.replace('.mp3', ''),
+          channelId: sound === "default" ? undefined : "owl_channel"
         }
       },
       apns: {

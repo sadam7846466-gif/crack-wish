@@ -66,6 +66,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   late List<String> _cookieTypes;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -80,6 +81,11 @@ class _HomePageState extends State<HomePage> {
     _loadSelectedCookie();
     _loadUserName();
     SupabaseOwlService().addListener(_onMockOwlUpdate);
+    
+    // Uygulama açılışında gelen sesleri engellemek için 3 saniyelik bir koruma kalkanı
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) _isFirstLoad = false;
+    });
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -188,12 +194,13 @@ class _HomePageState extends State<HomePage> {
     final count = SupabaseOwlService().unreadLetterCount + SupabaseOwlService().pendingRequestCount;
     if (!mounted) return;
     
-    // Eğer yeni mektup geldiyse (ve ilk açılış değilse veya sadece 0'dan arttıysa)
-    if (_unreadOwlCount > 0 && count > _unreadOwlCount) {
-      _playOwlNotificationSound();
-    } else if (_unreadOwlCount == 0 && count > 0) {
-      // Daha önceden uygulamanın içinde dolaşırken ilk mektup düştüğünde
-      _playOwlNotificationSound();
+    // Eğer yeni mektup geldiyse ve uygulama yeni açılmadıysa
+    if (!_isFirstLoad) {
+      if (_unreadOwlCount > 0 && count > _unreadOwlCount) {
+        _playOwlNotificationSound();
+      } else if (_unreadOwlCount == 0 && count > 0) {
+        _playOwlNotificationSound();
+      }
     }
 
     // Sadece değer değiştiyse rebuild et — gereksiz rebuild'leri önle

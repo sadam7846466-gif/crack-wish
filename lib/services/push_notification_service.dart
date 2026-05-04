@@ -46,6 +46,18 @@ class PushNotificationService {
         },
       );
 
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        await _localNotifications
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+            ?.createNotificationChannel(const AndroidNotificationChannel(
+              'owl_channel',
+              'Baykuş Mektupları',
+              description: 'Kozmik baykuş mesajları',
+              importance: Importance.max,
+              sound: RawResourceAndroidNotificationSound('baykuszili'),
+            ));
+      }
+
       // 2. Firebase Cloud Messaging Başlat
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -65,16 +77,19 @@ class PushNotificationService {
         if (defaultTargetPlatform == TargetPlatform.android) {
           final title = message.notification?.title ?? 'Kozmik Bildirim';
           final body = message.notification?.body ?? '';
+          final soundName = message.data['type'] == 'new_letter' ? 'baykuszili' : null;
+
           _localNotifications.show(
             id: message.hashCode,
             title: title,
             body: body,
-            notificationDetails: const NotificationDetails(
+            notificationDetails: NotificationDetails(
               android: AndroidNotificationDetails(
-                'fcm_foreground',
+                soundName != null ? 'owl_channel' : 'fcm_foreground',
                 'Bildirimler',
                 importance: Importance.high,
                 priority: Priority.high,
+                sound: soundName != null ? RawResourceAndroidNotificationSound(soundName) : null,
               ),
             ),
           );
