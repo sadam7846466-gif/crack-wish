@@ -79,9 +79,14 @@ serve(async (req) => {
         }
       },
       apns: {
+        headers: {
+          "apns-priority": "10",
+        },
         payload: {
           aps: {
-            sound: sound
+            sound: sound,
+            badge: 1,
+            "content-available": 1
           }
         }
       }

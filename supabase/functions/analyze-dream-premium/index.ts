@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -16,7 +17,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { step = "questions", dreamText, emotion, locale, answers } = await req.json();
+    const { step = "questions", dreamText, emotion, locale, answers, userId } = await req.json();
 
     if (!dreamText || dreamText.trim().length < 10) {
       return new Response(
@@ -306,6 +307,29 @@ ZERO-REDUNDANCY ENFORCEMENT (CRITICAL):
           return obj;
         };
         parsed = fixSen(parsed);
+      }
+
+      // --- SEND PUSH NOTIFICATION ---
+      try {
+        if (userId) {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+          const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+          const supabase = createClient(supabaseUrl, supabaseKey);
+
+          await supabase.functions.invoke('push-notification', {
+            body: {
+              table: 'dreams',
+              record: {
+                to_user: userId,
+                from_user: userId,
+                locale: locale
+              }
+            }
+          });
+          console.log("Triggered push-notification for premium dream user", userId);
+        }
+      } catch(e) {
+        console.error("FCM Error:", e);
       }
 
       return new Response(JSON.stringify(parsed), {

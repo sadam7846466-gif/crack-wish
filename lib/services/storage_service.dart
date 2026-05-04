@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'analytics_service.dart';
+import 'push_notification_service.dart';
 import 'profile_sync_service.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -579,6 +580,8 @@ class StorageService {
     await prefs.setString(_keyTarotDoneDate, _todayKey());
     await prefs.setBool(_keyTarotDone, true);
     dailyTasksUpdated.value++;
+    // Akıllı bildirim: Tarot yapıldı → hatırlatma iptal
+    PushNotificationService().refreshSmartNotifications();
   }
 
   static Future<void> setDreamDoneToday() async {
@@ -586,6 +589,8 @@ class StorageService {
     await prefs.setString(_keyDreamDoneDate, _todayKey());
     await prefs.setBool(_keyDreamDone, true);
     dailyTasksUpdated.value++;
+    // Akıllı bildirim: Rüya yazıldı → hatırlatma iptal
+    PushNotificationService().refreshSmartNotifications();
   }
 
   static Future<void> setZodiacDoneToday() async {
@@ -703,6 +708,8 @@ class StorageService {
     await prefs.setInt(_keyCookieCracksToday, current + 1);
     // 📊 Analytics
     AnalyticsService().logCookieCracked(cookieId: 'daily', rarity: 'unknown');
+    // Akıllı bildirim: Kurabiye kırıldı → hatırlatma iptal
+    PushNotificationService().refreshSmartNotifications();
   }
 
   // ── GÜNLÜK BAYKUŞ MEKTUBU HAKKI SİSTEMİ ──

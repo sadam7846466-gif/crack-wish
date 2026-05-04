@@ -2598,6 +2598,8 @@ class _BentoHeroCard extends StatelessWidget {
                                 StorageService.getPendingAura('kurabiye'),
                                 StorageService.getPendingAura('ruya'),
                                 StorageService.getPendingAura('baykus'),
+                                StorageService.getPendingAura('zodiac'),
+                                StorageService.getPendingAura('kahve'),
                               ]),
                               builder: (context, snapshot) {
                                 bool hasUnclaimed = false;
@@ -2611,7 +2613,9 @@ class _BentoHeroCard extends StatelessWidget {
                                   final pendingOwl = snapshot.data![4] as int;
 
                                   // Nokta sadece gerçekten toplanacak Aura varsa yansın
-                                  totalPending = pendingFal + pendingCookie + pendingDream + pendingOwl;
+                                  final pendingZodiac = snapshot.data!.length > 5 ? snapshot.data![5] as int : 0;
+                                  final pendingKahve = snapshot.data!.length > 6 ? snapshot.data![6] as int : 0;
+                                  totalPending = pendingFal + pendingCookie + pendingDream + pendingOwl + pendingZodiac + pendingKahve;
                                   hasUnclaimed = totalPending > 0;
                                 }
                                 return _GlassBadge(
@@ -2619,7 +2623,6 @@ class _BentoHeroCard extends StatelessWidget {
                                   label: "$formattedAura Aura",
                                   color: const Color(0xFFC084FC),
                                   hasNotification: hasUnclaimed,
-                                  notificationText: hasUnclaimed ? "+$totalPending" : null,
                                   onTap: () => _showStatModal(
                                     context,
                                     "Aura Puanı",
@@ -5287,24 +5290,27 @@ class _GlassBadge extends StatelessWidget {
           // Bildirim noktası (toplanacak kaynak varsa)
           if (hasNotification)
             Positioned(
-              top: notificationText != null ? -8 : -2,
-              right: notificationText != null ? -8 : 0,
+              top: notificationText != null ? -12 : -2,
+              right: notificationText != null ? 6 : 0,
               child: notificationText != null
-                  ? Text(
-                      notificationText!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                        shadows: [
-                          Shadow(color: Color(0xFFFFD166), offset: Offset(1, 1)),
-                          Shadow(color: Color(0xFFFFB347), offset: Offset(2, 2)),
-                          Shadow(color: Color(0xFFFF9800), offset: Offset(3, 3)),
-                          Shadow(color: Color(0xFFFF6B6B), offset: Offset(4, 4)),
-                          Shadow(color: Color(0x66000000), offset: Offset(4, 8), blurRadius: 12),
-                          Shadow(color: Color(0xAAFF6B6B), blurRadius: 20),
-                        ],
+                  ? Transform.rotate(
+                      angle: 0.15,
+                      child: Text(
+                        notificationText!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          fontStyle: FontStyle.italic,
+                          shadows: [
+                            Shadow(color: Color(0xFFFFD166), offset: Offset(1, 1)),
+                            Shadow(color: Color(0xFFFFB347), offset: Offset(2, 2)),
+                            Shadow(color: Color(0xFFFF9800), offset: Offset(3, 3)),
+                            Shadow(color: Color(0xFFFF6B6B), offset: Offset(4, 4)),
+                            Shadow(color: Color(0x66000000), offset: Offset(4, 8), blurRadius: 12),
+                            Shadow(color: Color(0xAAFF6B6B), blurRadius: 20),
+                          ],
+                        ),
                       ),
                     )
                   : const CosmicBadge(), // Ortak Zümrüt Yeşili rozet!
@@ -7248,25 +7254,19 @@ class _ClaimableFireCellState extends State<_ClaimableFireCell>
               if (_justClaimed && _flyController.isAnimating)
                 Positioned(
                   left: -20,
-                  right: -20, // Ortalamak için
+                  right: -20,
                   top: _flyUpAnim.value - 10,
                   child: Opacity(
                     opacity: _flyFadeAnim.value,
                     child: Center(
-                      child: const Text(
-                        "+4",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
+                      child: Text(
+                        widget.isWeekend ? "+2" : "+1",
+                        style: const TextStyle(
+                          color: Color(0xFFFFC107),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                           shadows: [
-                            Shadow(color: Color(0xFFFFD166), offset: Offset(1, 1)),
-                            Shadow(color: Color(0xFFFFB347), offset: Offset(2, 2)),
-                            Shadow(color: Color(0xFFFF9800), offset: Offset(3, 3)),
-                            Shadow(color: Color(0xFFFF6B6B), offset: Offset(4, 4)),
-                            Shadow(color: Color(0x66000000), offset: Offset(4, 8), blurRadius: 12),
-                            Shadow(color: Color(0xAAFF6B6B), blurRadius: 20),
+                            Shadow(color: Color(0x66000000), offset: Offset(1, 2), blurRadius: 4),
                           ],
                         ),
                       ),

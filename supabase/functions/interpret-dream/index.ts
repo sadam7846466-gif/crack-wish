@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -16,7 +17,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { dreamText, emotion, locale } = await req.json();
+    const { dreamText, emotion, locale, userId } = await req.json();
 
     if (!dreamText || dreamText.trim().length < 10) {
       return new Response(

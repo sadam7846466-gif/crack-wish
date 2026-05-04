@@ -72,6 +72,7 @@ class SupabaseDreamService {
               'emotion': emotion,
               'locale': locale,
               'step': 'questions',
+              'userId': Supabase.instance.client.auth.currentUser?.id,
             }),
           )
           .timeout(const Duration(seconds: 30));
@@ -105,6 +106,7 @@ class SupabaseDreamService {
           'locale': locale,
           'step': 'analyze',
           'answers': answers,
+          'userId': Supabase.instance.client.auth.currentUser?.id,
         });
         debugPrint('🔮 [PREMIUM] Attempt $attempt/$maxRetries — Request body: $reqBody');
 

@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vlucky_flutter/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -50,9 +49,9 @@ class PushNotificationService {
       // 2. Firebase Cloud Messaging Başlat
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // Apple için foreground bildirimi ayarları (Ön plandayken native banner ÇIKMASIN, custom UI kullanacağız)
+      // Apple için foreground bildirimi ayarları — native banner olarak göstersin
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: false, // native banner in-app iken gizlensin
+        alert: true,  // Ön plandayken de native banner çıksın
         badge: true,
         sound: true,
       );
@@ -61,47 +60,25 @@ class PushNotificationService {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         debugPrint('Uygulama açıkken bildirim geldi: ${message.notification?.title}');
         
-        final title = message.notification?.title ?? 'Kozmik Bildirim';
-        final body = message.notification?.body ?? '';
-
-        // Şık Custom SnackBar HER PLATFORMDA çıksın
-        scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            duration: const Duration(seconds: 4),
-            margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 20),
-            content: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black26, blurRadius: 10, spreadRadius: 1)
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 4),
-                        Text(body, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                      ],
-                    ),
-                  ),
-                ],
+        // iOS: setForegroundNotificationPresentationOptions ile native banner otomatik çıkar
+        // Android: Local notification ile göster (çünkü Android FCM ön planda otomatik göstermez)
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          final title = message.notification?.title ?? 'Kozmik Bildirim';
+          final body = message.notification?.body ?? '';
+          _localNotifications.show(
+            id: message.hashCode,
+            title: title,
+            body: body,
+            notificationDetails: const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'fcm_foreground',
+                'Bildirimler',
+                importance: Importance.high,
+                priority: Priority.high,
               ),
             ),
-          ),
-        );
+          );
+        }
       });
 
       _isInitialized = true;
@@ -153,7 +130,7 @@ class PushNotificationService {
           }
         }
         
-        // 4. İzin alındıysa sabah ve akşam otomatik rutinleri kur
+        // 4. İzin alındıysa akıllı bildirimleri kur
         await _scheduleRoutines();
         
         return true;
@@ -165,68 +142,218 @@ class PushNotificationService {
     }
   }
 
-  /// Sabah, Öğle, Akşam ve Uyku (Cosmic Engine) yerel bildirimlerini kurar
+  // ═══════════════════════════════════════════════════════════════
+  // AKILLI BİLDİRİM MOTORU — Kullanıcı davranışına göre karar verir
+  // Mesajlar her gün rotasyonla değişir. Yapılan aktivite → bildirim iptal.
+  // ═══════════════════════════════════════════════════════════════
+
   Future<void> _scheduleRoutines() async {
-    // KULLANICI AYARLARINI KONTROL ET (Rastgele ve sürekli bildirim atılmasını engeller)
     final settings = await StorageService.getNotificationSettings();
     final bool dailyRemindersEnabled = settings['dailyReminders'] ?? false;
 
     if (!dailyRemindersEnabled) {
-      debugPrint('Kullanıcı günlük bildirimleri kapattığı için rutinler iptal edildi.');
-      await cancelNotification(1);
-      await cancelNotification(2);
-      await cancelNotification(3);
-      await cancelNotification(4);
+      for (int i = 1; i <= 10; i++) { await cancelNotification(i); }
+      await cancelNotification(901);
+      await cancelNotification(902);
+      await cancelNotification(903);
+      await cancelNotification(904);
       return;
     }
 
-    // Dinamik ve kişiselleştirilmiş bildirimler için kullanıcı verilerini çek
     final prefs = await SharedPreferences.getInstance();
     final String userName = prefs.getString('user_name') ?? "Ruh";
     final String zodiac = prefs.getString('zodiac_sign') ?? "Yıldıztozu";
+    final int dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
 
-    _scheduleLocalNotification(
-      id: 1,
-      title: 'Güneş doğdu $userName! 🌞',
-      body: '$zodiac burcunun bugünkü kozmik mesajı seni bekliyor. Dün geceki rüyanı analiz et ve kurabiyeni kır.',
-      hour: 9,
-      minute: 0,
-      channelId: 'morning_routine',
-      channelName: 'Sabah Kahini',
-    );
-    
-    // Cosmic Engine (Uyku Verisi / Akıllı Hatırlatıcı)
-    _scheduleLocalNotification(
-      id: 2,
-      title: 'Ruhun Fısıldıyor ✨',
-      body: 'Evrenin sana gönderdiği mesajları yorumlamak için kozmik günlüğün seni bekliyor.',
-      hour: 9,
-      minute: 30,
-      channelId: 'cosmic_engine',
-      channelName: 'Cosmic Engine',
-    );
+    final bool cookieDone = (await StorageService.getCookieCracksToday()) > 0;
+    final bool tarotDone = await StorageService.isTarotDoneToday();
+    final bool dreamDone = await StorageService.isDreamDoneToday();
+    final int streakDays = await StorageService.getStreakDays();
 
-    // Öğleden Sonra Kurabiye Hatırlatıcısı
-    _scheduleLocalNotification(
-      id: 3,
-      title: 'Kozmik Çay Saati 🥠',
-      body: 'Bugünkü $zodiac şans kurabiyeni kırmayı unutma! Gizli bir başarım seni bekliyor olabilir.',
-      hour: 15,
-      minute: 0,
-      channelId: 'afternoon_routine',
-      channelName: 'Öğle Kurabiyesi',
-    );
+    // ── SABAH (09:00) — Her gün farklı mesaj ──
+    final morningMessages = [
+      ['Günaydın $userName! ☀️', '$zodiac burcunun bugünkü kozmik mesajı hazır.'],
+      ['Yeni bir gün, yeni bir şans ✨', '$userName, evren bugün senin için ne hazırladı?'],
+      ['Kozmik enerji yüksek! 🌟', '$zodiac burcu bugün güçlü. Fırsatları kaçırma!'],
+      ['Bugün senin günün $userName 🔮', 'Yıldızlar $zodiac burcuna gülümsüyor.'],
+      ['Evren seninle konuşmak istiyor 🌌', '$userName, bugünkü kozmik rehberliğin hazır.'],
+      ['Ruhun uyanıyor $userName 💫', '$zodiac enerjisi bugün dorukta!'],
+      ['Kozmik kahvaltı zamanı ☕', '$userName, günün mesajını almadan çıkma!'],
+    ];
+    final mo = morningMessages[dayOfYear % morningMessages.length];
+    _scheduleLocalNotification(id: 1, title: mo[0], body: mo[1], hour: 9, minute: 0, channelId: 'morning_routine', channelName: 'Sabah Kahini');
 
-    _scheduleLocalNotification(
-      id: 4,
-      title: 'Ruhsal Dinlenme Vakti ✨',
-      body: 'Günün yorgunluğunu atmak için $zodiac burcuna özel Tarot açılımın hazır. Serini kaybetmemek için gün bitmeden tıkla!',
-      hour: 20,
-      minute: 0,
-      channelId: 'evening_routine',
-      channelName: 'Akşam Tarotu',
-    );
+    // ── ÖĞLE (13:00) — Kurabiye kırılmadıysa ──
+    if (!cookieDone) {
+      final cookieMessages = [
+        ['Bugünkü kurabiyeni kırmadın 🥠', '$zodiac şans kurabiyende gizli bir mesaj var!'],
+        ['Şans kurabiyesi seni bekliyor 🍪', 'Bugünkü $zodiac mesajını kurabiyende bul!'],
+        ['Kurabiyeni kırmadan günü kapatma 🥠', 'İçindeki mesaj seni şaşırtabilir!'],
+        ['Kırmadığın kurabiye, kaçırdığın şans! ✨', '$userName, şans kurabiyeni kırmayı unuttun.'],
+      ];
+      final co = cookieMessages[dayOfYear % cookieMessages.length];
+      _scheduleLocalNotification(id: 2, title: co[0], body: co[1], hour: 13, minute: 0, channelId: 'cookie_reminder', channelName: 'Kurabiye Hatırlatıcı');
+    } else {
+      await cancelNotification(2);
+    }
+
+    // ── AKŞAM (18:00) — Tarot bakılmadıysa ──
+    if (!tarotDone) {
+      final tarotMessages = [
+        ['Akşam kartın seni bekliyor 🃏', 'Bugünün enerjisini okumak için $zodiac tarot açılımını kaçırma!'],
+        ['Kartlar fısıldıyor $userName 🔮', 'Bugün için sana bir mesaj var. Tarot kartını çek!'],
+        ['Akşam enerjisi güçlü 🌙', '$zodiac burcuna özel kart açılımın hazır.'],
+        ['Gün bitmeden kartını çek ✨', 'Evrenin sana bugün ne söylediğini merak etmiyor musun?'],
+      ];
+      final ta = tarotMessages[dayOfYear % tarotMessages.length];
+      _scheduleLocalNotification(id: 3, title: ta[0], body: ta[1], hour: 18, minute: 0, channelId: 'tarot_reminder', channelName: 'Tarot Hatırlatıcı');
+    } else {
+      await cancelNotification(3);
+    }
+
+    // ── GECE (21:00) — Rüya yazmadıysa ──
+    if (!dreamDone) {
+      final dreamMessages = [
+        ['Dün gece bir rüya gördün mü? 🌙', 'Rüya günlüğün seni bekliyor. Bilinçaltının mesajını kaçırma!'],
+        ['Rüyaların bir şey anlatıyor 💭', '$userName, rüyanı yaz ve bilinçaltını keşfet!'],
+        ['Uyumadan önce rüyanı yaz 🌌', 'Gece gördüklerin evrenin sana mesajı olabilir.'],
+        ['Rüya defterine bir not düş 📝', '$zodiac burcunun rüya enerjisi bu gece yüksek!'],
+      ];
+      final dr = dreamMessages[dayOfYear % dreamMessages.length];
+      _scheduleLocalNotification(id: 4, title: dr[0], body: dr[1], hour: 21, minute: 0, channelId: 'dream_reminder', channelName: 'Rüya Hatırlatıcı');
+    } else {
+      await cancelNotification(4);
+    }
+
+    // ── BURÇ SEZONU (10:00) — Sezon değişim günlerinde ──
+    final zodiacSeason = _getZodiacSeasonToday();
+    if (zodiacSeason != null) {
+      final isUserSeason = zodiacSeason.toLowerCase() == zodiac.toLowerCase();
+      _scheduleLocalNotification(
+        id: 5,
+        title: isUserSeason ? '♈ $zodiac sezonu başladı! 🎉' : '$zodiacSeason sezonu başladı! ✨',
+        body: isUserSeason
+            ? '$userName, bu dönem tamamen senin! Kozmik enerjin dorukta.'
+            : 'Yeni kozmik dönem! $zodiac burcunu nasıl etkiler? Gel öğren.',
+        hour: 10, minute: 0, channelId: 'zodiac_season', channelName: 'Burç Sezonu',
+      );
+    } else {
+      await cancelNotification(5);
+    }
+
+    // ── DOĞUM GÜNÜ (00:01) — Yılda 1 kez ──
+    final birthDateStr = prefs.getString('birth_date');
+    if (birthDateStr != null) {
+      final birthDate = DateTime.tryParse(birthDateStr);
+      if (birthDate != null) {
+        final now = DateTime.now();
+        if (birthDate.month == now.month && birthDate.day == now.day) {
+          _scheduleLocalNotification(
+            id: 6,
+            title: '🎂 Doğum günün kutlu olsun $userName!',
+            body: 'Kozmik Baykuş sana özel bir doğum günü mektubu bıraktı 🦉✨',
+            hour: 0, minute: 1,
+            channelId: 'birthday', channelName: 'Doğum Günü',
+          );
+        } else {
+          await cancelNotification(6);
+        }
+      }
+    }
+
+    // ── SERİ KUTLAMASI (12:00) — 7, 14, 30, 50, 100 gün ──
+    if ({7, 14, 30, 50, 100}.contains(streakDays)) {
+      _scheduleLocalNotification(
+        id: 7,
+        title: '🔥 $streakDays günlük seri! Muhteşem $userName!',
+        body: 'Kozmik kararlılığın ödülsüz kalmaz. Seni özel bir sürpriz bekliyor!',
+        hour: 12, minute: 0,
+        channelId: 'streak_celebration', channelName: 'Seri Kutlaması',
+      );
+    } else {
+      await cancelNotification(7);
+    }
+
+    // ── KOZMİK OLAYLAR (14:00) — Dolunay, Yeniay, Merkür Retrosu ──
+    final cosmicEvent = _getCosmicEventToday();
+    if (cosmicEvent != null) {
+      _scheduleLocalNotification(
+        id: 8,
+        title: cosmicEvent['title']!,
+        body: cosmicEvent['body']!
+            .replaceAll('{zodiac}', zodiac)
+            .replaceAll('{name}', userName),
+        hour: 14, minute: 0,
+        channelId: 'cosmic_events', channelName: 'Kozmik Olaylar',
+      );
+    } else {
+      await cancelNotification(8);
+    }
+
+    // ── GERİ KAZANIM (RE-ENGAGEMENT) BİLDİRİMLERİ (Katman 3) ──
+    await _scheduleReEngagementNotifications(userName, zodiac);
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // YARDIMCI MOTORLAR
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Bugün bir burç sezonu başlıyor mu?
+  String? _getZodiacSeasonToday() {
+    final now = DateTime.now();
+    final md = now.month * 100 + now.day;
+    const seasons = {
+      121: 'Kova', 219: 'Balık', 321: 'Koç', 420: 'Boğa',
+      521: 'İkizler', 621: 'Yengeç', 723: 'Aslan', 823: 'Başak',
+      923: 'Terazi', 1023: 'Akrep', 1122: 'Yay', 1222: 'Oğlak',
+    };
+    return seasons[md];
+  }
+
+  /// Bugün özel bir kozmik olay var mı? (2026 takvimi)
+  Map<String, String>? _getCosmicEventToday() {
+    final now = DateTime.now();
+    final key = '${now.month}-${now.day}';
+    const events = <String, Map<String, String>>{
+      // 2026 Dolunayları
+      '1-13': {'title': 'Dolunay Gecesi 🌕', 'body': '{zodiac} burcunda dolunay! Duygular yoğun, farkındalık yüksek.'},
+      '2-12': {'title': 'Dolunay Enerjisi 🌕', 'body': '{name}, dolunay gecesi rüyaların çok anlamlı olabilir!'},
+      '3-14': {'title': 'Dolunay Aydınlanması 🌕', 'body': 'Bu gece dolunay! {zodiac} burcunu derinlemesine etkiliyor.'},
+      '4-12': {'title': 'Dolunay Gücü 🌕', 'body': '{name}, dolunay gecesi tarot kartın çok güçlü!'},
+      '5-12': {'title': 'Dolunay Sihri 🌕', 'body': '{zodiac} burcunun dolunay enerjisi dorukta! Niyetini belirle.'},
+      '6-11': {'title': 'Dolunay Ritüeli 🌕', 'body': 'Bu gece dolunay! {name}, kozmik enerjinle bağlan.'},
+      '7-10': {'title': 'Dolunay Farkındalığı 🌕', 'body': '{zodiac} burcu dolunaydan güç alıyor!'},
+      '8-8':  {'title': 'Dolunay Dönüşümü 🌕', 'body': 'Dolunay gecesi! {name}, içsel dönüşümün başlıyor.'},
+      '9-7':  {'title': 'Dolunay Hasadı 🌕', 'body': '{zodiac} burcunda hasat zamanı. Emeklerinin karşılığı geliyor!'},
+      '10-7': {'title': 'Dolunay Dengesi 🌕', 'body': '{name}, bu dolunay denge getiriyor.'},
+      '11-5': {'title': 'Dolunay Derinliği 🌕', 'body': 'Dolunay! {zodiac} burcu için derin sezgiler.'},
+      '12-4': {'title': 'Dolunay Kapanışı 🌕', 'body': 'Yılın son dolunaylarından biri! {name}, döngüyü kapat.'},
+      // 2026 Yeniayları
+      '1-29': {'title': 'Yeniay Başlangıcı 🌑', 'body': '{name}, yeniay yeni niyetler için mükemmel!'},
+      '2-28': {'title': 'Yeniay Enerjisi 🌑', 'body': '{zodiac} burcunda yeniay. Yeni başlangıçlar seni bekliyor!'},
+      '5-27': {'title': 'Yeniay Niyeti 🌑', 'body': '{name}, yeniay gecesi bir niyet belirle. Evren dinliyor.'},
+      // 2026 Merkür Retroları
+      '3-15': {'title': 'Merkür Retrosu Başladı ☿️', 'body': '{zodiac} dikkat! İletişimde yanlış anlaşılmalar olabilir.'},
+      '4-7':  {'title': 'Merkür Retrosu Bitti ✨', 'body': 'Rahatlama zamanı {name}! İletişim yeniden akıyor.'},
+      '7-18': {'title': 'Merkür Retrosu Başladı ☿️', 'body': '{zodiac} yaz retrosuna hazır mısın? Sabırlı ol.'},
+      '8-11': {'title': 'Merkür Retrosu Bitti ✨', 'body': '{name}, retro bitti! Planlarını hayata geçir.'},
+      '11-10': {'title': 'Merkür Retrosu Başladı ☿️', 'body': 'Son retro! {zodiac} yıl sonunu sakin geçir.'},
+      '12-1': {'title': 'Merkür Retrosu Bitti ✨', 'body': '{name}, yılın son retrosu bitti. Özgürce ilerle!'},
+      // Asya (Çin) Astrolojisi (2026)
+      '2-17': {'title': 'Çin Yeni Yılı 🐉', 'body': 'Ateş Atı yılı başlıyor! Asya burcunun sana ne getireceğini öğren.'},
+      '8-22': {'title': 'Kozmik Tanabata 🎋', 'body': 'Yıldız festivali enerjisi yüksek! {name}, dileklerini evrene gönder.'},
+      '9-25': {'title': 'Güz Ortası Festivali 🥮', 'body': 'Ay enerjisi en parlak halinde. İçsel dengeyi bulma zamanı.'},
+      // Maya Takvimi Olayları
+      '4-4':  {'title': 'Tzolk\'in Portalı 🌀', 'body': 'Maya takviminde özel bir galaktik portal günü. Enerjin değişiyor!'},
+      '7-25': {'title': 'Zaman Dışı Gün ⏳', 'body': 'Maya takviminde Zaman Dışı Gün. Geçmişi bırak, yarına hazırlan.'},
+      '12-21':{'title': 'Kozmik Yenilenme ☀️', 'body': 'Güneş dönümü! Maya bilgeliğine göre ruhunu arındırma zamanı.'},
+    };
+    return events[key];
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BİLDİRİM ALTYAPISI
+  // ═══════════════════════════════════════════════════════════════
 
   Future<void> _scheduleLocalNotification({
     required int id,
@@ -244,8 +371,7 @@ class PushNotificationService {
       scheduledDate: _nextInstanceOfTime(hour, minute),
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          channelId,
-          channelName,
+          channelId, channelName,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -253,6 +379,63 @@ class PushNotificationService {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  /// App açılmadığında tetiklenecek geri kazanım bildirimleri (Katman 3)
+  /// Bu fonksiyon her app açılışında çağrılır ve gelecekteki bildirimleri öteler.
+  Future<void> _scheduleReEngagementNotifications(String userName, String zodiac) async {
+    final now = tz.TZDateTime.now(tz.local);
+
+    // Eski re-engagement'leri iptal et (böylece her giriş yaptığında ötelenir)
+    await cancelNotification(901);
+    await cancelNotification(902);
+    await cancelNotification(903);
+    await cancelNotification(904);
+
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails('re_engagement', 'Geri Kazanım', importance: Importance.high, priority: Priority.high),
+      iOS: DarwinNotificationDetails(),
+    );
+
+    // 2 Gün Sonra
+    await _localNotifications.zonedSchedule(
+      id: 901,
+      title: 'Kozmik Birikimin Var ✨',
+      body: '$userName, $zodiac burcunun 2 günlük enerjisi birikti. Gel ve topla!',
+      scheduledDate: now.add(const Duration(days: 2)),
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+
+    // 5 Gün Sonra
+    await _localNotifications.zonedSchedule(
+      id: 902,
+      title: 'Seni Özledik $userName 🦉',
+      body: 'Baykuşun sana gizli bir sürpriz mektup bıraktı. Görmek ister misin?',
+      scheduledDate: now.add(const Duration(days: 5)),
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+
+    // 14 Gün Sonra
+    await _localNotifications.zonedSchedule(
+      id: 903,
+      title: 'Önemli Bir Kozmik Dönem 🌟',
+      body: '$zodiac burcunun bu hafta çok özel bir döngüsü var. Bunu kaçırmamalısın!',
+      scheduledDate: now.add(const Duration(days: 14)),
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+
+    // 30 Gün Sonra (Son şans)
+    await _localNotifications.zonedSchedule(
+      id: 904,
+      title: 'Kozmik Enerjin Zayıflıyor... 🔥',
+      body: '$userName, şans serini yeniden başlatmak için son çağrı. Evren seni bekliyor!',
+      scheduledDate: now.add(const Duration(days: 30)),
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 
@@ -266,9 +449,7 @@ class PushNotificationService {
     required String channelName,
   }) async {
     if (!_isInitialized) return;
-    
     final scheduledDate = tz.TZDateTime.now(tz.local).add(delay);
-    
     await _localNotifications.zonedSchedule(
       id: id,
       title: title,
@@ -276,8 +457,7 @@ class PushNotificationService {
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          channelId,
-          channelName,
+          channelId, channelName,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -287,7 +467,7 @@ class PushNotificationService {
     );
   }
 
-  /// Bir bildirimi iptal eder (Örneğin fal sayfasında kaldıysa ve sonucu gördüyse)
+  /// Bir bildirimi iptal eder
   Future<void> cancelNotification(int id) async {
     if (!_isInitialized) return;
     await _localNotifications.cancel(id: id);
@@ -309,9 +489,9 @@ class PushNotificationService {
       } else {
         await _fcm.unsubscribeFromTopic(topic);
       }
-      debugPrint('Topic \$topic subscription: \$subscribe');
+      debugPrint('Topic $topic subscription: $subscribe');
     } catch (e) {
-      debugPrint('Topic subscription error: \$e');
+      debugPrint('Topic subscription error: $e');
     }
   }
 
@@ -319,8 +499,18 @@ class PushNotificationService {
     if (enable) {
       _scheduleRoutines();
     } else {
-      cancelNotification(1);
-      cancelNotification(2);
+      for (int i = 1; i <= 10; i++) { cancelNotification(i); }
+      cancelNotification(901);
+      cancelNotification(902);
+      cancelNotification(903);
+      cancelNotification(904);
     }
+  }
+
+  /// Kullanıcı bir aktivite yaptığında bildirim zamanlamalarını güncelle.
+  /// Böylece "kurabiye kırmadın" bildirimi, kurabiye kırıldığında iptal olur.
+  Future<void> refreshSmartNotifications() async {
+    if (!_isInitialized) return;
+    await _scheduleRoutines();
   }
 }
