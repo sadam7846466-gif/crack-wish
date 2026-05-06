@@ -1,9 +1,18 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
+import admin from "npm:firebase-admin@11.11.1"
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "gpt-4o-mini";
+
+// Firebase Admin — push bildirim için
+const firebaseServiceAccount = JSON.parse(Deno.env.get('FIREBASE_SERVICE_ACCOUNT') || '{}');
+if (!admin.apps.length && Object.keys(firebaseServiceAccount).length > 0) {
+  admin.initializeApp({
+    credential: admin.credential.cert(firebaseServiceAccount)
+  });
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -317,26 +326,38 @@ ZERO-REDUNDANCY ENFORCEMENT (CRITICAL):
             await supabase.from('dream_readings').update({
               status: 'completed',
               result: parsed,
-              is_premium: true
             }).eq('id', record_id);
           }
 
-          // 2. Push Notification Gönder
+          // 2. Push Notification Gönder (doğrudan Firebase Admin — inter-function call sorununu ortadan kaldırır)
           if (userId) {
             try {
-              await supabase.functions.invoke('push-notification', {
-                body: {
-                  table: 'dreams',
-                  record: {
-                    to_user: userId,
-                    from_user: userId,
-                    locale: locale
+              // FCM token'ı al
+              const { data: receiverData } = await supabase.from('profiles').select('fcm_token').eq('id', userId).single();
+              const fcmToken = receiverData?.fcm_token;
+              console.log(`FCM token for ${userId}:`, fcmToken ? 'EXISTS' : 'MISSING');
+              
+              if (fcmToken && admin.apps.length > 0) {
+                const isTr = locale === 'tr';
+                const pushTitle = isTr ? 'Rüya Yorumun Hazır! 🌙' : 'Dream Interpretation Ready! 🌙';
+                const pushBody = isTr ? 'Bilinçaltının sana verdiği mesajı okumak için tıkla ✨' : 'Click to read the message from your subconscious ✨';
+                
+                const firebaseResponse = await admin.messaging().send({
+                  token: fcmToken,
+                  notification: { title: pushTitle, body: pushBody },
+                  data: { type: 'dream_reading_ready' },
+                  android: { notification: { sound: 'default' } },
+                  apns: {
+                    headers: { 'apns-priority': '10' },
+                    payload: { aps: { sound: 'default', badge: 1, 'content-available': 1 } }
                   }
-                }
-              });
-              console.log("Triggered push-notification for premium dream user", userId);
+                });
+                console.log('✅ Firebase push sent successfully:', firebaseResponse);
+              } else {
+                console.log('⚠️ Skipped push: fcmToken=' + !!fcmToken + ', firebase=' + (admin.apps.length > 0));
+              }
             } catch (notifyErr) {
-              console.error("Push notification failed, but continuing:", notifyErr);
+              console.error('Push notification failed, but continuing:', notifyErr);
             }
           }
 
@@ -355,11 +376,24 @@ ZERO-REDUNDANCY ENFORCEMENT (CRITICAL):
         }
       };
 
-      const finalResult = await processPremiumDream();
+      // HİBRİT YAKLAŞIM:
+      // 1. EdgeRuntime.waitUntil ile sunucunun işi arka planda bitirmesini garanti altına al
+      //    (istemci bağlantıyı kesse bile sunucu çalışmaya devam eder)
+      // 2. Aynı promise'i await ederek, istemci hala bağlıysa sonucu doğrudan dön
+      const taskPromise = processPremiumDream();
+      EdgeRuntime.waitUntil(taskPromise);
 
-      return new Response(JSON.stringify(finalResult), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      try {
+        const finalResult = await taskPromise;
+        return new Response(JSON.stringify(finalResult), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (bgErr) {
+        // İstemci kopmuş olabilir, ama waitUntil sayesinde DB güncellenmiş olacak
+        return new Response(JSON.stringify({ status: "processing" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     } else {
       throw new Error("Invalid step parameter.");
     }

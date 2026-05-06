@@ -20,6 +20,7 @@ class CosmicEngineService {
     
     // Zaman dilimi ayarları (Bildirimleri doğru saatte atmak için)
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
 
     // Bildirim İzinleri (Sessizce hazırlanır)
     const DarwinInitializationSettings iosRules = DarwinInitializationSettings(

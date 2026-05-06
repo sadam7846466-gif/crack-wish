@@ -141,6 +141,7 @@ class SupabaseDreamService {
     required String emotion,
     required String locale,
     required List<dynamic> answers,
+    String? existingRecordId,
   }) async {
     const maxRetries = 2; // 1 asıl + 1 retry
     const timeout = Duration(seconds: 120);
@@ -150,24 +151,28 @@ class SupabaseDreamService {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        String? recordId;
         final prefs = await SharedPreferences.getInstance();
-
-        try {
-          final insertResponse = await supabase.from('dream_readings').insert({
-            'user_id': userId,
-            'locale': locale,
-            'status': 'pending',
-            'is_premium': true
-          }).select('id').maybeSingle();
-          
-          recordId = insertResponse?['id'];
-          
-          if (recordId != null) {
-            await prefs.setString('dream_last_record_id', recordId);
+        
+        // Eğer önceden oluşturulmuş record_id varsa onu kullan, yoksa yeni oluştur
+        String? recordId = existingRecordId;
+        
+        if (recordId == null) {
+          try {
+            final insertResponse = await supabase.from('dream_readings').insert({
+              'user_id': userId,
+              'dream_text': dreamText,
+              'locale': locale,
+              'status': 'pending',
+            }).select('id').maybeSingle();
+            
+            recordId = insertResponse?['id'];
+            
+            if (recordId != null) {
+              await prefs.setString('dream_last_record_id', recordId);
+            }
+          } catch (dbErr) {
+            debugPrint('DB Insert failed for premium dream (ignoring): $dbErr');
           }
-        } catch (dbErr) {
-          debugPrint('DB Insert failed for premium dream (ignoring): $dbErr');
         }
 
         final reqBody = jsonEncode({

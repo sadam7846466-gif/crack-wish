@@ -13,6 +13,7 @@ import '../screens/zodiac_hub_page.dart';
 import '../screens/coffee_page.dart';
 import '../widgets/fade_page_route.dart';
 import '../widgets/windy_nazar.dart';
+import '../services/app_navigator.dart';
 
 class BentoGrid extends StatefulWidget {
   const BentoGrid({super.key});
@@ -39,6 +40,9 @@ class _BentoGridState extends State<BentoGrid>
     );
     _checkUnreadStatuses();
 
+    // Recovery tamamlanınca anında yenile
+    readingReadyNotifier.addListener(_checkUnreadStatuses);
+
     // Arka planda biten işlemleri (Kahve vb.) anında ekrana yansıtmak için periyodik kontrol
     _statusTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       _checkUnreadStatuses();
@@ -61,6 +65,7 @@ class _BentoGridState extends State<BentoGrid>
 
   @override
   void dispose() {
+    readingReadyNotifier.removeListener(_checkUnreadStatuses);
     _statusTimer?.cancel();
     _tarotFloatController.dispose();
     super.dispose();

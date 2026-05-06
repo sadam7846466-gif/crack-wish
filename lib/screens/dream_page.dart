@@ -439,68 +439,14 @@ class _DreamPageState extends State<DreamPage>
     _emotionOrder.shuffle(math.Random());
     _currentTipIndex = math.Random().nextInt(50); // Biliyor muydun? sabit tip
     _loadPremiumStatus();
-    _syncBackgroundDreams();
     
+    // Background recovery is now exclusively handled by RootShell 
+    // to prevent race conditions and duplicate saves.
     if (widget.openLatestDream) {
       _loadAndShowLatestDream();
     }
   }
 
-  Future<void> _syncBackgroundDreams() async {
-    final prefs = await SharedPreferences.getInstance();
-    final recordId = prefs.getString('dream_last_record_id');
-    if (recordId == null) return;
-
-    try {
-      final row = await Supabase.instance.client
-          .from('dream_readings')
-          .select()
-          .eq('id', recordId)
-          .maybeSingle();
-
-      if (row != null && row['status'] == 'completed') {
-        final data = row['result'] as Map<String, dynamic>;
-        final isPremium = row['is_premium'] == true;
-        
-        final dreamId = DateTime.now().millisecondsSinceEpoch.toString();
-        final now = DateTime.now().toIso8601String();
-        
-        final savedText = prefs.getString('dream_pending_text') ?? 'Rüya arka planda tamamlandı.';
-        final savedEmotion = prefs.getString('dream_pending_emotion') ?? 'Nötr';
-        final savedAnswers = prefs.getString('dream_pending_answers') ?? '[]';
-
-        if (isPremium) {
-           await StorageService.saveDream({
-            'id': dreamId,
-            'isPremium': true,
-            'title': data['title'] ?? 'Derin Analiz',
-            'text': savedText,
-            'emotion': savedEmotion,
-            'date': now,
-            'premiumAnswers': savedAnswers,
-            'premiumData': jsonEncode(data),
-            'reflectionAction': null,
-          });
-        }
-
-        await prefs.remove('dream_last_record_id');
-        await prefs.remove('dream_pending_text');
-        await prefs.remove('dream_pending_emotion');
-        await prefs.remove('dream_pending_answers');
-        await prefs.setBool('dream_last_reading_viewed', false);
-        
-        if (mounted) {
-          setState(() {
-            _hasUnreadDream = true;
-          });
-        }
-      } else if (row != null && row['status'] == 'failed') {
-        await prefs.remove('dream_last_record_id');
-      }
-    } catch (e) {
-      debugPrint("Dream background sync error: $e");
-    }
-  }
 
   Future<void> _loadAndShowLatestDream() async {
     final dreams = await StorageService.getDreams();
@@ -1050,11 +996,36 @@ class _DreamPageState extends State<DreamPage>
     await prefs.setString('dream_pending_emotion', _selectedEmotion?.name ?? '');
     await prefs.setString('dream_pending_answers', jsonEncode(finalAnswers));
 
+    // Server Edge Function will automatically send an FCM push notification 
+    // when the premium analysis is actually completed. We DO NOT use local timers
+    // anymore to prevent false positive notifications if the request fails.
+
+    // ── KRİTİK: DB kaydını API'den ÖNCE oluştur ──
+    // App kapatılsa bile record_id kayıtlı kalır → recovery mekanizması çalışır
+    String? preRecordId;
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+      final insertResponse = await supabase.from('dream_readings').insert({
+        'user_id': userId,
+        'dream_text': trimmed,
+        'locale': locale,
+        'status': 'pending',
+      }).select('id').maybeSingle();
+      preRecordId = insertResponse?['id'];
+      if (preRecordId != null) {
+        await prefs.setString('dream_last_record_id', preRecordId);
+      }
+    } catch (dbErr) {
+      debugPrint('Pre-insert dream record failed: $dbErr');
+    }
+
     final deepResult = await _supabaseDreamService.analyzeDeep(
       dreamText: trimmed,
       emotion: emotionLabel,
       locale: locale,
       answers: finalAnswers,
+      existingRecordId: preRecordId,
     );
 
     print('🔮🔮🔮 deepResult.success = ${deepResult.success}');
@@ -1117,20 +1088,18 @@ class _DreamPageState extends State<DreamPage>
     });
     await StorageService.setDreamDoneToday().catchError((e) => null);
     PushNotificationService().refreshSmartNotifications();
+    // API başarıyla tamamlandı — bildirim flag'lerini ayarla
+    await prefs.setBool('dream_last_reading_viewed', false);
+    await prefs.setBool('dream_last_reading_notified', false);
 
     if (!mounted) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('dream_last_reading_viewed', false);
-      await prefs.setBool('dream_last_reading_notified', false);
-      
-      // Kullanıcı sayfadan çıkmış, bildirimi gönder
-      CosmicEngineService().scheduleInstantLocalNotification(
-        title: "Rüyan Yorumlandı 🌙",
-        body: "Bilinçaltının mesajları çözüldü. Geçmiş Rüyalarım'dan hemen oku ✨",
-        secondsDelay: 1,
-      );
+      // Kullanıcı sayfadan çıkmış — önceden planlanan bildirim (ID:950) zaten çalacak
       return true;
     }
+
+    // Kullanıcı hâlâ sayfada — sonucu görecek
+    // (Local notification scheduling was removed, FCM will still send if server finishes,
+    // but the user is already here so it doesn't matter)
 
     // Premium sonucu göster
     _deepAnalysisResult = deepResult;

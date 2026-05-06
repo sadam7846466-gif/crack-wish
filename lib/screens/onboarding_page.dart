@@ -453,20 +453,20 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Future<void> _completeFinalOnboardingProfileSave() async {
     HapticFeedback.heavyImpact();
     
-    // Sabit avatar havuzundan index'e göre URL çekimi
+    // Sabit avatar havuzundan index'e göre asset path çekimi
     final List<String> avatarPool = [
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300", 
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300", 
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300", 
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300", 
-      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300", 
-      "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300",
+      'assets/images/avatars/avatar_1.png',
+      'assets/images/avatars/avatar_2.png',
+      'assets/images/avatars/avatar_3.png',
+      'assets/images/avatars/avatar_4.png',
+      'assets/images/avatars/avatar_5.png',
+      'assets/images/avatars/avatar_6.png',
+      'assets/images/avatars/avatar_7.png',
+      'assets/images/avatars/avatar_8.png',
+      'assets/images/avatars/avatar_9.png',
+      'assets/images/avatars/avatar_10.png',
+      'assets/images/avatars/avatar_11.png',
+      'assets/images/avatars/avatar_12.png',
     ];
     final String selectedAvatarUrl = avatarPool[_selectedAvatarIndex];
     
@@ -2996,18 +2996,18 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
   late final PageController _pageCtrl;
   
   final List<String> _avatars = [
-    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300", 
-    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300", 
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300", 
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300", 
-    "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=300", 
-    "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
-    "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&q=80&w=300",
+    'assets/images/avatars/avatar_1.png',
+    'assets/images/avatars/avatar_2.png',
+    'assets/images/avatars/avatar_3.png',
+    'assets/images/avatars/avatar_4.png',
+    'assets/images/avatars/avatar_5.png',
+    'assets/images/avatars/avatar_6.png',
+    'assets/images/avatars/avatar_7.png',
+    'assets/images/avatars/avatar_8.png',
+    'assets/images/avatars/avatar_9.png',
+    'assets/images/avatars/avatar_10.png',
+    'assets/images/avatars/avatar_11.png',
+    'assets/images/avatars/avatar_12.png',
   ];
 
   @override
@@ -3068,40 +3068,24 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
                     child: Transform.scale(
                       scale: scale,
                       child: Container(
-                        height: 145, // Yuvarlak form (Tam daire)
-                        width: 145,  // Yükseklikle birebir aynı ebat!
+                        height: 145,
+                        width: 145,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle, // "burayı yuvarlak yap" emrine göre tam daire kesimi
-                          color: Colors.white.withOpacity(0.04), // Cam efektati tabanı
-                          border: Border.all(
-                            color: isFullyFocused ? Colors.white.withOpacity(0.4) : Colors.white.withOpacity(0.1),
-                            width: isFullyFocused ? 2.5 : 1.0,
-                          ),
+                          shape: BoxShape.circle,
                           boxShadow: isFullyFocused ? [BoxShadow(color: Colors.white.withOpacity(0.15), blurRadius: 40)] : [],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(1000), // Tam sarmalayan yuvarlak maske
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0), // Cam panel bulanıklığı
-                            child: Padding(
-                              padding: EdgeInsets.zero, // Cam panele tam oturmasını sağlamak için boşluk sıfırlandı
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(1000), // İç resmin mükemmel yuvarlak kalması için
-                                child: ImageFiltered(
-                                  imageFilter: ui.ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(_avatars[index]),
-                                        fit: BoxFit.cover,
-                                        colorFilter: ColorFilter.mode(
-                                          Colors.black.withOpacity(isFullyFocused ? 0.0 : 0.5), 
-                                          BlendMode.darken,
-                                        )
-                                      )
-                                    ),
-                                  ),
-                                ),
+                        child: ClipOval(
+                          child: ImageFiltered(
+                            imageFilter: ui.ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+                            child: Transform.scale(
+                              scale: 1.12, // Avatarın iç çemberini container'a tam oturt
+                              child: Image.asset(
+                                _avatars[index],
+                                fit: BoxFit.cover,
+                                width: 145,
+                                height: 145,
+                                colorBlendMode: isFullyFocused ? null : BlendMode.darken,
+                                color: isFullyFocused ? null : Colors.black.withOpacity(0.5),
                               ),
                             ),
                           ),

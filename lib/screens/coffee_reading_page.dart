@@ -212,6 +212,16 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         debugPrint('DB Insert failed for coffee (ignoring): $dbErr');
       }
 
+      // record_id'yi HEMEN kaydet — kullanıcı app'i kapatırsa recovery bulabilsin
+      final prefs = await SharedPreferences.getInstance();
+      if (recordId != null) {
+        await prefs.setString('coffee_last_record_id', recordId);
+      }
+
+      // Server Edge Function will automatically send an FCM push notification 
+      // when the analysis is actually completed. We DO NOT use local timers
+      // anymore to prevent false positive notifications if the request fails.
+
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
         body: {
@@ -226,13 +236,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       final initialData = interpretResponse.data as Map<String, dynamic>;
       Map<String, dynamic> reading;
 
-      final prefs = await SharedPreferences.getInstance();
-
       if (initialData['status'] == 'processing') {
         // AI yorumlamayı arka planda sürdürüyor. DB'den poll edeceğiz.
-        if (recordId != null) {
-          await prefs.setString('coffee_last_record_id', recordId);
-        }
         
         Map<String, dynamic>? finalResult;
         // 45 saniye boyunca db yokla (15 kere 3 saniye aralıklarla)
@@ -301,15 +306,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       backgroundCallback?.call(true, null);
 
       if (!mounted) {
-        // Kullanıcı sayfadan çıkmış — bildirim gönder
         CoffeeReadingPage.isApiRunning = false;
-        CosmicEngineService().scheduleInstantLocalNotification(
-          title: 'Kahve Falın Hazır! ☕️',
-          body: 'Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨',
-          secondsDelay: 1,
-        );
         return;
       }
+
+      // Kullanıcı hâlâ sayfada — sonucu görecek
+      // (Local notification scheduling was removed, FCM will still send if server finishes,
+      // ama push notification backend tarafında handle edildiğinden sorun yok)
 
       HapticFeedback.heavyImpact();
       setState(() {

@@ -9,11 +9,36 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:vlucky_flutter/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Arka planda mesaj gelince tetiklenir.
   await Firebase.initializeApp();
-  debugPrint("Arka plan mesajı: ${message.messageId}");
+  debugPrint("Arka plan mesajı: ${message.messageId} - type: ${message.data['type']}");
+  
+  final type = message.data['type'];
+  
+  // Rüya veya kahve falı hazır bildirimi geldiğinde, flag'leri ayarla
+  if (type == 'dream_reading_ready' || type == 'coffee_reading_ready') {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      if (type == 'dream_reading_ready') {
+        // "Hazır" flag'lerini HEMEN ayarla — app açılınca anında göstersin
+        await prefs.setBool('dream_last_reading_viewed', false);
+        await prefs.setBool('dream_last_reading_notified', false);
+        await prefs.setBool('dream_push_received', true);
+        debugPrint('🌙 Arka plan: Rüya hazır flag\'leri ayarlandı');
+      } else if (type == 'coffee_reading_ready') {
+        await prefs.setBool('coffee_last_reading_viewed', false);
+        await prefs.setBool('coffee_last_reading_notified', false);
+        await prefs.setBool('coffee_push_received', true);
+        debugPrint('☕ Arka plan: Kahve hazır flag\'leri ayarlandı');
+      }
+    } catch (e) {
+      debugPrint('Arka plan handler hatası: $e');
+    }
+  }
 }
 
 class PushNotificationService {
@@ -32,6 +57,8 @@ class PushNotificationService {
     try {
       // 1. Local Notifications (Sabah/Akşam Rutinleri için) Başlat
       tz.initializeTimeZones();
+      // Türkiye saat dilimini ayarla — yoksa UTC'de kalır ve bildirimler 3 saat geç gider!
+      tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
       const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
         requestAlertPermission: false, 
@@ -61,11 +88,11 @@ class PushNotificationService {
       // 2. Firebase Cloud Messaging Başlat
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // Apple için foreground bildirimi ayarları — native banner olarak göstersin
+      // Apple için foreground bildirimi ayarları — in-app toast ile yönetildiği için native banner KAPALI
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: true,  // Ön plandayken de native banner çıksın
+        alert: false,  // Ön plandayken native banner çıkmasın (in-app toast yeterli)
         badge: true,
-        sound: true,
+        sound: false,
       );
 
       // Ön Planda (Uygulama Açıkken) Firebase Mesajı Gelirse
@@ -271,7 +298,7 @@ class PushNotificationService {
             id: 6,
             title: '🎂 Doğum günün kutlu olsun $userName!',
             body: 'Kozmik Baykuş sana özel bir doğum günü mektubu bıraktı 🦉✨',
-            hour: 0, minute: 1,
+            hour: 10, minute: 0,
             channelId: 'birthday', channelName: 'Doğum Günü',
           );
         } else {

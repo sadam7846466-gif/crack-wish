@@ -1,5 +1,14 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
+import admin from "npm:firebase-admin@11.11.1"
+
+// Firebase Admin — push bildirim için
+const firebaseServiceAccount = JSON.parse(Deno.env.get('FIREBASE_SERVICE_ACCOUNT') || '{}');
+if (!admin.apps.length && Object.keys(firebaseServiceAccount).length > 0) {
+  admin.initializeApp({
+    credential: admin.credential.cert(firebaseServiceAccount)
+  });
+}
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -32,17 +41,14 @@ Deno.serve(async (req: Request) => {
 
       const validationPrompt = `You are evaluating 4 images for a Turkish coffee reading app.
 
-VALIDATION CHECKLIST:
-1. **Is it coffee?** Every image MUST clearly show a coffee cup, saucer, or coffee grounds. Be STRICT. If an image is just a blank wall, a face, or something completely unrelated, you MUST FAIL it.
-2. **No Identical Clones:** FAIL an image if the exact same file is uploaded twice.
-3. **Must Have a Saucer (Tabak):** Look at ALL 4 images. At least ONE of them MUST be a saucer (a flat plate, usually under the cup). If none of the 4 images is a saucer, you MUST FAIL the 4th image.
+VALIDATION RULES (be LENIENT, not strict):
+1. **Coffee Related?** Each image should be related to Turkish coffee fortune telling. Accept: coffee cups, saucers/plates with coffee residue, coffee grounds on plates, upside-down cups, etc. ONLY reject if the image is clearly NOT coffee-related (e.g. a selfie, a landscape, a random object with zero coffee connection).
+2. **No Identical Photos:** FAIL only if the EXACT same photo file appears twice (same angle, same everything). Different angles of the same cup are FINE.
+3. **Saucer/Plate Check:** At least one of the 4 images should show a saucer or plate. A saucer is the small flat plate that goes under a Turkish coffee cup — it usually has coffee residue/grounds on it. Be GENEROUS: if you see ANY flat circular dish with brown/dark residue, accept it as a saucer. Do NOT reject a valid coffee saucer just because it doesn't look like a "perfect plate".
+
+IMPORTANT: When in doubt, ACCEPT the image. It is much worse to reject a valid coffee photo than to accept a slightly unclear one. Users are frustrated when valid photos get rejected.
 
 If an image fails, provide a SHORT, friendly error message in ${isTr ? 'Turkish (use "sen" form)' : 'English'}.
-
-Examples of errors:
-- "Lütfen geçerli bir kahve fincanı veya tabağı fotoğrafı yükle."
-- "Aynı fotoğrafı iki kez yüklemişsin. Lütfen farklı bir açı çek."
-- "Tabak fotoğrafı eksik. Lütfen fincanla birlikte tabağın da fotoğrafını yükle."
 
 Return ONLY valid JSON, no markdown. Format:
 {
@@ -311,22 +317,34 @@ Return ONLY valid JSON, no markdown.`;
             }).eq('id', record_id);
           }
 
-          // 2. Push Notification Gönder
+          // 2. Push Notification Gönder (doğrudan Firebase Admin)
           if (userId) {
             try {
-              await supabase.functions.invoke('push-notification', {
-                body: {
-                  table: 'coffee_reading',
-                  record: {
-                    to_user: userId,
-                    from_user: userId,
-                    locale: locale
+              const { data: receiverData } = await supabase.from('profiles').select('fcm_token').eq('id', userId).single();
+              const fcmToken = receiverData?.fcm_token;
+              console.log(`FCM token for ${userId}:`, fcmToken ? 'EXISTS' : 'MISSING');
+              
+              if (fcmToken && admin.apps.length > 0) {
+                const isTr = locale === 'tr';
+                const pushTitle = isTr ? 'Kahve Falın Hazır! ☕️' : 'Coffee Reading Ready! ☕️';
+                const pushBody = isTr ? 'Fincanındaki sırlar çözüldü. Hemen okumaya başla ✨' : 'The secrets in your cup have been revealed ✨';
+                
+                const firebaseResponse = await admin.messaging().send({
+                  token: fcmToken,
+                  notification: { title: pushTitle, body: pushBody },
+                  data: { type: 'coffee_reading_ready' },
+                  android: { notification: { sound: 'default' } },
+                  apns: {
+                    headers: { 'apns-priority': '10' },
+                    payload: { aps: { sound: 'default', badge: 1, 'content-available': 1 } }
                   }
-                }
-              });
-              console.log("Triggered push-notification for user", userId);
+                });
+                console.log('✅ Firebase push sent successfully:', firebaseResponse);
+              } else {
+                console.log('⚠️ Skipped push: fcmToken=' + !!fcmToken + ', firebase=' + (admin.apps.length > 0));
+              }
             } catch (notifyErr) {
-              console.error("Push notification failed, but continuing:", notifyErr);
+              console.error('Push notification failed, but continuing:', notifyErr);
             }
           }
 
@@ -345,12 +363,22 @@ Return ONLY valid JSON, no markdown.`;
         }
       };
 
-      // processCoffee fonksiyonunu senkron olarak bekle
-      const fixedResult = await processCoffee();
+      // HİBRİT YAKLAŞIM:
+      // 1. EdgeRuntime.waitUntil ile sunucunun işi arka planda bitirmesini garanti altına al
+      // 2. Aynı promise'i await ederek, istemci hala bağlıysa sonucu doğrudan dön
+      const taskPromise = processCoffee();
+      EdgeRuntime.waitUntil(taskPromise);
 
-      return new Response(JSON.stringify(fixedResult), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      try {
+        const fixedResult = await taskPromise;
+        return new Response(JSON.stringify(fixedResult), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (bgErr) {
+        return new Response(JSON.stringify({ status: "processing" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     return new Response(

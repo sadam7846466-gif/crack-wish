@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../services/supabase_owl_service.dart';
@@ -17,6 +18,7 @@ import 'dart:io';
 import 'coffee_reading_page.dart';
 import 'coffee_page.dart';
 import 'dream_page.dart';
+import '../services/app_navigator.dart';
 
 /// Ortak tab shell: alt menü sabit, sayfalar IndexedStack ile korunur.
 class RootShell extends StatefulWidget {
@@ -28,7 +30,7 @@ class RootShell extends StatefulWidget {
   State<RootShell> createState() => _RootShellState();
 }
 
-class _RootShellState extends State<RootShell> {
+class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
   late int _currentIndex = widget.initialIndex.clamp(0, 1);
   final GlobalKey<ProfilePageState> _profileKey = GlobalKey<ProfilePageState>();
   Timer? _globalPollTimer;
@@ -93,6 +95,7 @@ class _RootShellState extends State<RootShell> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // SupabaseOwlService otomatik olarak auth listener'da başlatılır
     PushNotificationService().requestPermissionAndGetToken();
     
@@ -107,6 +110,10 @@ class _RootShellState extends State<RootShell> {
     
     // Cihazdaki güncel Aura ve Ruh Taşını anında veritabanına yansıt (Senkronize et)
     StorageService.syncEconomyToCloud();
+    
+    // App kapatılırken yarıda kalan rüya/kahve analizlerini sunucudan kontrol et
+    _checkPendingDreamResult();
+    _checkPendingCoffeeResult();
     
     // Global Background Polling (Ana sayfaya dönüldüğünde bildirimin gelmesi için)
     _startGlobalPolling();
@@ -226,8 +233,259 @@ class _RootShellState extends State<RootShell> {
     });
   }
 
+  /// App kapatılırken yarıda kalan rüya analizini sunucudan kontrol et.
+  /// Sunucu analizi tamamlamış olabilir — sonucu alıp yerel depolamaya kaydet.
+  /// Eğer henüz tamamlanmamışsa, 5 saniye aralıklarla 2 dakika boyunca tekrar dener.
+  Future<void> _checkPendingDreamResult() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final recordId = prefs.getString('dream_last_record_id');
+      if (recordId == null) {
+        debugPrint('🔍 dream_last_record_id yok — recovery gerek yok');
+        return;
+      }
+
+      debugPrint('🔍 Bekleyen rüya kaydı bulundu: $recordId — sunucu kontrol ediliyor...');
+
+      final supabase = Supabase.instance.client;
+      
+      // 24 deneme x 5 saniye = 2 dakika boyunca polling yap
+      for (int attempt = 0; attempt < 24; attempt++) {
+        if (!mounted) return;
+        
+        // İlk deneme hariç, her denemeden önce 5 saniye bekle
+        if (attempt > 0) {
+          await Future.delayed(const Duration(seconds: 5));
+        }
+        
+        // record_id hala var mı kontrol et (başka bir yerden temizlenmiş olabilir)
+        final currentRecordId = prefs.getString('dream_last_record_id');
+        if (currentRecordId == null) {
+          debugPrint('✅ dream_last_record_id başka bir yerden temizlenmiş — polling durduruluyor');
+          return;
+        }
+        
+        try {
+          final row = await supabase.from('dream_readings').select().eq('id', recordId).maybeSingle();
+          
+          if (row == null) {
+            await prefs.remove('dream_last_record_id');
+            return;
+          }
+
+          final status = row['status']?.toString() ?? 'unknown';
+          final hasResult = row['result'] != null;
+
+          if (status == 'completed' && hasResult) {
+            // Sunucu analizi tamamlamış! Sonucu yerel depolamaya kaydet.
+            final resultRaw = row['result'];
+            final Map<String, dynamic> result;
+            if (resultRaw is Map<String, dynamic>) {
+              result = resultRaw;
+            } else if (resultRaw is String) {
+              result = jsonDecode(resultRaw) as Map<String, dynamic>;
+            } else {
+              return;
+            }
+            
+            final isPremium = true; // DB'de is_premium sütunu yok — bu fonksiyon zaten premium path'ten çağrılıyor
+            final pendingText = prefs.getString('dream_pending_text') ?? '';
+            final pendingEmotion = prefs.getString('dream_pending_emotion') ?? '';
+            final pendingAnswers = prefs.getString('dream_pending_answers') ?? '[]';
+            
+            final dreamId = DateTime.now().millisecondsSinceEpoch.toString();
+            
+            await StorageService.saveDream({
+              'id': dreamId,
+              'isPremium': isPremium,
+              'isRead': false,
+              'title': result['title'] ?? 'Rüya Yorumu',
+              'text': pendingText,
+              'emotion': pendingEmotion,
+              'date': DateTime.now().toIso8601String(),
+              'premiumAnswers': pendingAnswers,
+              'premiumData': jsonEncode(result),
+            });
+
+            // Flag'leri ayarla (in-app toast gösterilsin)
+            await prefs.setBool('dream_last_reading_viewed', false);
+            await prefs.setBool('dream_last_reading_notified', false);
+            
+            // Bekleyen veriyi temizle
+            await prefs.remove('dream_last_record_id');
+            await prefs.remove('dream_pending_text');
+            await prefs.remove('dream_pending_emotion');
+            await prefs.remove('dream_pending_answers');
+            
+            debugPrint('✅ Bekleyen rüya analizi sunucudan alındı ve kaydedildi!');
+            
+            // Hemen toast göster — global polling'i bekleme!
+            if (mounted) {
+              HapticFeedback.heavyImpact();
+              CosmicToast.show(
+                context: context,
+                title: 'Rüyan Yorumlandı!',
+                message: 'Bilinçaltının mesajları çözüldü.',
+                icon: Icons.nights_stay_rounded,
+                iconColor: const Color(0xFF60E0FF),
+                reward: 'Göz At',
+                rewardColor: const Color(0xFF60E0FF),
+                duration: const Duration(seconds: 8),
+                onTap: () {
+                  if (!mounted) return;
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const DreamPage(openLatestDream: true),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                    ),
+                  );
+                },
+              );
+              // Bildirimi gösterildi olarak işaretle (polling tekrar göstermesin)
+              await prefs.setBool('dream_last_reading_notified', true);
+              // Bento grid'i ANINDA yenile
+              readingReadyNotifier.value++;
+            }
+            
+            return; // Başarılı — polling'den çık
+          } else if (status == 'failed') {
+            await prefs.remove('dream_last_record_id');
+            await prefs.remove('dream_pending_text');
+            await prefs.remove('dream_pending_emotion');
+            await prefs.remove('dream_pending_answers');
+            debugPrint('❌ Bekleyen rüya analizi sunucuda başarısız olmuş.');
+            return; // Başarısız — polling'den çık
+          } else {
+            debugPrint('⏳ Rüya henüz işleniyor (deneme ${attempt + 1}/24) — 5sn sonra tekrar...');
+          }
+        } catch (pollErr) {
+          debugPrint('Polling error (attempt ${attempt + 1}): $pollErr');
+        }
+      }
+      
+      debugPrint('⏰ 2 dakika doldu, rüya hala işleniyor — arka plan polling durduruluyor');
+    } catch (e) {
+      debugPrint('Pending dream check error: $e');
+    }
+  }
+
+  /// App kapatılırken yarıda kalan kahve falı sonucunu sunucudan kontrol et.
+  /// Eğer henüz tamamlanmamışsa, 5 saniye aralıklarla 2 dakika boyunca tekrar dener.
+  Future<void> _checkPendingCoffeeResult() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final recordId = prefs.getString('coffee_last_record_id');
+      if (recordId == null) return;
+
+      debugPrint('🔍 Bekleyen kahve falı kaydı bulundu: $recordId — sunucu kontrol ediliyor...');
+
+      final supabase = Supabase.instance.client;
+      
+      // 24 deneme x 5 saniye = 2 dakika boyunca polling yap
+      for (int attempt = 0; attempt < 24; attempt++) {
+        if (!mounted) return;
+        
+        if (attempt > 0) {
+          await Future.delayed(const Duration(seconds: 5));
+        }
+        
+        // record_id hala var mı kontrol et
+        final currentRecordId = prefs.getString('coffee_last_record_id');
+        if (currentRecordId == null) {
+          debugPrint('✅ coffee_last_record_id başka bir yerden temizlenmiş — polling durduruluyor');
+          return;
+        }
+        
+        try {
+          final row = await supabase.from('coffee_readings').select().eq('id', recordId).maybeSingle();
+          
+          if (row == null) {
+            await prefs.remove('coffee_last_record_id');
+            return;
+          }
+
+          if (row['status'] == 'completed' && row['result'] != null) {
+            final resultRaw = row['result'];
+            final Map<String, dynamic> result;
+            if (resultRaw is Map<String, dynamic>) {
+              result = resultRaw;
+            } else if (resultRaw is String) {
+              result = jsonDecode(resultRaw) as Map<String, dynamic>;
+            } else {
+              debugPrint('❌ Kahve sonucu beklenmeyen tipte: ${resultRaw.runtimeType}');
+              await prefs.remove('coffee_last_record_id');
+              return;
+            }
+            
+            final today = DateTime.now().toIso8601String().split('T')[0];
+            result['time'] = DateTime.now().toIso8601String();
+            await prefs.setString('coffee_last_reading_date', today);
+            await prefs.setString('coffee_last_reading', jsonEncode(result));
+            await prefs.setBool('coffee_last_reading_viewed', false);
+            await prefs.setBool('coffee_last_reading_notified', false);
+            await prefs.setBool('pending_fortune_paid', false);
+
+            await prefs.remove('coffee_last_record_id');
+            
+            debugPrint('✅ Bekleyen kahve falı sunucudan alındı ve kaydedildi!');
+            
+            // Hemen toast göster — global polling'i bekleme!
+            if (mounted) {
+              HapticFeedback.heavyImpact();
+              CosmicToast.show(
+                context: context,
+                title: 'Kahve Falın Hazır!',
+                message: 'Fincanındaki sırlar çözüldü.',
+                icon: Icons.coffee_rounded,
+                iconColor: const Color(0xFFD4A373),
+                reward: 'Göz At',
+                rewardColor: const Color(0xFFD4A373),
+                duration: const Duration(seconds: 8),
+                onTap: () {
+                  if (!mounted) return;
+                  _handleNavTap(1); // Kahve sekmesine git
+                },
+              );
+              await prefs.setBool('coffee_last_reading_notified', true);
+              // Bento grid'i ANINDA yenile
+              readingReadyNotifier.value++;
+            }
+            
+            return; // Başarılı — polling'den çık
+          } else if (row['status'] == 'failed') {
+            await prefs.remove('coffee_last_record_id');
+            debugPrint('❌ Bekleyen kahve falı sunucuda başarısız olmuş.');
+            return; // Başarısız — polling'den çık
+          } else {
+            debugPrint('⏳ Kahve falı henüz işleniyor (deneme ${attempt + 1}/24) — 5sn sonra tekrar...');
+          }
+        } catch (pollErr) {
+          debugPrint('Coffee polling error (attempt ${attempt + 1}): $pollErr');
+        }
+      }
+      
+      debugPrint('⏰ 2 dakika doldu, kahve falı hala işleniyor — polling durduruluyor');
+    } catch (e) {
+      debugPrint('Pending coffee check error: $e');
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // App arka plandan döndü — bekleyen sonuçları kontrol et
+      _checkPendingDreamResult();
+      _checkPendingCoffeeResult();
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _globalPollTimer?.cancel();
     super.dispose();
   }

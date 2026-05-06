@@ -246,12 +246,18 @@ class SupabaseOwlService {
       });
     
     // Gelen Mektuplar Bağlantısı
+    bool _isFirstLetterEmission = true;
     _letterSub = _db.from('owl_letters')
       .stream(primaryKey: ['id'])
       .eq('to_user', _db.auth.currentUser!.id)
       .listen((data) {
-         _loadInboxFromSupabase(playSound: true);
-      });
+         if (_isFirstLetterEmission) {
+           _isFirstLetterEmission = false;
+           _loadInboxFromSupabase(playSound: false); // İlk yükleme — zil çalma
+         } else {
+           _loadInboxFromSupabase(playSound: true); // Gerçek yeni mektup
+         }
+       });
 
     // Supabase Realtime fallback: 30 saniyede bir senkronize et
     _pollingTimer?.cancel();
