@@ -356,6 +356,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dailySuggestionZodiacSubtitle => 'See today\'s energy right away!';
 
   @override
+  String get dailySuggestionCoffeeHeadline => 'Did you drink coffee today?';
+
+  @override
+  String get dailySuggestionCoffeeSubtitle =>
+      'Turn your cup over, let\'s read your fortune!';
+
+  @override
   String get dailySuggestionAllDoneHeadline => 'Today\'s rituals are complete!';
 
   @override

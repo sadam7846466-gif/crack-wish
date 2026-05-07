@@ -47,6 +47,8 @@ class StorageService {
   static const String _keyTarotDoneDate = 'tarot_done_date';
   static const String _keyDreamDoneDate = 'dream_done_date';
   static const String _keyZodiacDoneDate = 'zodiac_done_date';
+  static const String _keyCoffeeDoneDate = 'coffee_done_date';
+  static const String _keyCoffeeDone = 'coffee_done';
   static const String _keyZodiacOverlayDx = 'zodiac_overlay_dx';
   static const String _keyZodiacOverlayDy = 'zodiac_overlay_dy';
   static const String _keyTarotOverlayDx = 'tarot_overlay_dx';
@@ -88,11 +90,13 @@ class StorageService {
     await prefs.setString(_keyTarotDoneDate, yesterday);
     await prefs.setString(_keyDreamDoneDate, yesterday);
     await prefs.setString(_keyZodiacDoneDate, yesterday);
+    await prefs.setString(_keyCoffeeDoneDate, yesterday);
     
-    // Cookie, Tarot, Zodiac vs. true kalmışsa false yapalım ki UI anında yenilensin
+    // Cookie, Tarot, Zodiac, Coffee vs. true kalmışsa false yapalım ki UI anında yenilensin
     await prefs.setBool(_keyTarotDone, false);
     await prefs.setBool(_keyDreamDone, false);
     await prefs.setBool(_keyZodiacDone, false);
+    await prefs.setBool(_keyCoffeeDone, false);
     
     // Reset completed tasks for the day
     await prefs.remove(_keyCompletedCosmicTasks);
@@ -399,6 +403,8 @@ class StorageService {
     final current = await getTotalCoffee();
     await prefs.setInt(_keyTotalCoffee, current + 1);
     
+    await setCoffeeDoneToday(); // Mark coffee task as done for daily tip
+
     // YENİ SİSTEM: Bekleyen Aura havuzuna (+3) ekliyoruz
     final isPremium = prefs.getBool('is_elite') ?? false;
     await addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
@@ -573,6 +579,11 @@ class StorageService {
     return prefs.getString(_keyZodiacDoneDate) == _todayKey();
   }
 
+  static Future<bool> isCoffeeDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyCoffeeDoneDate) == _todayKey();
+  }
+
   static final ValueNotifier<int> dailyTasksUpdated = ValueNotifier<int>(0);
 
   static Future<void> setTarotDoneToday() async {
@@ -597,6 +608,13 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyZodiacDoneDate, _todayKey());
     await prefs.setBool(_keyZodiacDone, true);
+    dailyTasksUpdated.value++;
+  }
+
+  static Future<void> setCoffeeDoneToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyCoffeeDoneDate, _todayKey());
+    await prefs.setBool(_keyCoffeeDone, true);
     dailyTasksUpdated.value++;
   }
 

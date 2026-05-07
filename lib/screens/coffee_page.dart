@@ -2356,7 +2356,7 @@ class _CoffeePageState extends State<CoffeePage>
                               ],
                             ),
                             child: const Icon(
-                              Icons.auto_awesome_rounded,
+                              Icons.local_cafe_rounded,
                               color: Color(0xFFD4A373),
                               size: 56,
                             ),
@@ -2469,7 +2469,7 @@ class _CoffeePageState extends State<CoffeePage>
                               ),
                               // İçeride mistik ikon
                               const Icon(
-                                Icons.auto_awesome_rounded,
+                                Icons.local_cafe_rounded,
                                 color: Color(0xFFD4A373),
                                 size: 32,
                               ),
@@ -2488,7 +2488,7 @@ class _CoffeePageState extends State<CoffeePage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Yapay zeka fincanının sırlarını\nanaliz ediyor...',
+                          'Telvelerin dili çözülüyor,\nkaderin fısıltıları dinleniyor...',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.4),
                             fontSize: 14,

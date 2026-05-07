@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
+import '../screens/coffee_page.dart';
 import '../screens/dream_page.dart';
 import '../screens/tarot_page.dart';
 import '../screens/zodiac_hub_page.dart';
@@ -38,11 +39,13 @@ class _DailyTipCardState extends State<DailyTipCard> {
     final dreamDone = await StorageService.isDreamDoneToday();
     final tarotDone = await StorageService.isTarotDoneToday();
     final zodiacDone = await StorageService.isZodiacDoneToday();
+    final coffeeDone = await StorageService.isCoffeeDoneToday();
 
     final available = <_SuggestionType>[];
     if (!dreamDone) available.add(_SuggestionType.dream);
     if (!tarotDone) available.add(_SuggestionType.tarot);
     if (!zodiacDone) available.add(_SuggestionType.zodiac);
+    if (!coffeeDone) available.add(_SuggestionType.coffee);
 
     _SuggestionType next;
     if (available.isEmpty) {
@@ -83,6 +86,12 @@ class _DailyTipCardState extends State<DailyTipCard> {
           SwipeFadePageRoute(page: const ZodiacHubPage()),
         ).then((_) => _loadSuggestion());
         break;
+      case _SuggestionType.coffee:
+        Navigator.push(
+          context,
+          SwipeFadePageRoute(page: const CoffeePage()),
+        ).then((_) => _loadSuggestion());
+        break;
       case _SuggestionType.allDone:
       case null:
         break;
@@ -97,12 +106,14 @@ class _DailyTipCardState extends State<DailyTipCard> {
       _SuggestionType.dream => l10n.dailySuggestionDreamHeadline,
       _SuggestionType.tarot => l10n.dailySuggestionTarotHeadline,
       _SuggestionType.zodiac => l10n.dailySuggestionZodiacHeadline,
+      _SuggestionType.coffee => l10n.dailySuggestionCoffeeHeadline,
       _SuggestionType.allDone => l10n.dailySuggestionAllDoneHeadline,
     };
     final subtitle = switch (suggestion) {
       _SuggestionType.dream => l10n.dailySuggestionDreamSubtitle,
       _SuggestionType.tarot => l10n.dailySuggestionTarotSubtitle,
       _SuggestionType.zodiac => l10n.dailySuggestionZodiacSubtitle,
+      _SuggestionType.coffee => l10n.dailySuggestionCoffeeSubtitle,
       _SuggestionType.allDone => l10n.dailySuggestionAllDoneSubtitle,
     };
 
@@ -110,6 +121,7 @@ class _DailyTipCardState extends State<DailyTipCard> {
       _SuggestionType.dream => Icons.nights_stay_rounded,
       _SuggestionType.tarot => Icons.style_rounded,
       _SuggestionType.zodiac => Icons.brightness_high_rounded,
+      _SuggestionType.coffee => Icons.local_cafe_rounded,
       _SuggestionType.allDone => Icons.check_circle_rounded,
     };
 
@@ -244,4 +256,4 @@ class _DailyTipCardState extends State<DailyTipCard> {
   }
 }
 
-enum _SuggestionType { dream, tarot, zodiac, allDone }
+enum _SuggestionType { dream, tarot, zodiac, coffee, allDone }

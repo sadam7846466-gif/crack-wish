@@ -350,6 +350,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dailySuggestionZodiacSubtitle => 'Günün enerjisini hemen öğren!';
 
   @override
+  String get dailySuggestionCoffeeHeadline => 'Bugün kahve içtin mi?';
+
+  @override
+  String get dailySuggestionCoffeeSubtitle =>
+      'Fincanını kapat, falına bakalım!';
+
+  @override
   String get dailySuggestionAllDoneHeadline => 'Bugünün ritüelleri tamam!';
 
   @override

@@ -741,6 +741,18 @@ abstract class AppLocalizations {
   /// **'Günün enerjisini hemen öğren!'**
   String get dailySuggestionZodiacSubtitle;
 
+  /// No description provided for @dailySuggestionCoffeeHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün kahve içtin mi?'**
+  String get dailySuggestionCoffeeHeadline;
+
+  /// No description provided for @dailySuggestionCoffeeSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanını kapat, falına bakalım!'**
+  String get dailySuggestionCoffeeSubtitle;
+
   /// No description provided for @dailySuggestionAllDoneHeadline.
   ///
   /// In tr, this message translates to:

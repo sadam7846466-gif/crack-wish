@@ -44,7 +44,7 @@ STRICT RULES:
 - Avoid generic dream explanations.
 - Avoid repetition.
 - Keep the tone intelligent, grounded, and emotionally perceptive.
-- Write in ${isTr ? 'Turkish. Use informal "sen" form, ALWAYS use correct possessive suffixes (e.g., "kendi korkularınla" NOT "kendi korkularla"), NEVER "siz".' : 'English.'}
+- Write in ${isTr ? 'Turkish. Use informal "sen" form, ALWAYS use correct possessive suffixes (e.g., "kendi korkularınla" NOT "kendi korkularla"), NEVER "siz". CRUCIAL FOR TITLES/SUMMARIES: Avoid ambiguous "-ma/-me" verbal nouns if the action happens TO the dreamer (e.g., use "Köpeğin Kovalaması" instead of "Köpeğin Peşinden Koşma").' : 'English.'}
 
 QUALITY RULES:
 - The response must feel specific to this exact dream, not dreams in general.
