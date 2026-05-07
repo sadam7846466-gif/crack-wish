@@ -1165,6 +1165,18 @@ class StorageService {
     }
 
     dreams.insert(0, dream); // en yeni en üstte
+
+    // ── 12 AYLIK DÖNEN PENCERE ──
+    // 12 aydan eski rüyaları otomatik sil (sunucu yükü sabit kalsın)
+    final cutoff = DateTime.now().subtract(const Duration(days: 365));
+    dreams.removeWhere((d) {
+      final dateStr = d['date'] as String?;
+      if (dateStr == null) return false;
+      final date = DateTime.tryParse(dateStr);
+      if (date == null) return false;
+      return date.isBefore(cutoff);
+    });
+
     await prefs.setString(_keyDreamList, jsonEncode(dreams));
     await incrementTotalDreams();
     AnalyticsService().logDreamSaved();
@@ -1181,6 +1193,32 @@ class StorageService {
       await prefs.remove('${_keyDreams}_${i}_date');
     }
     await prefs.remove('${_keyDreams}_count');
+  }
+
+  /// Rüyaları aylara göre grupla (12 aylık dönen pencere)
+  /// Dönen map: {'Mayıs 2026': [dream1, dream2], 'Nisan 2026': [dream3]}
+  static Future<Map<String, List<Map<String, dynamic>>>> getDreamsByMonth() async {
+    final dreams = await getDreams();
+    final months = <String, List<Map<String, dynamic>>>{};
+    final monthNames = ['', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 
+                         'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+    // İçinde bulunduğumuz ayı her zaman ilk sıraya ekle (boş olsa bile)
+    final now = DateTime.now();
+    final currentMonthKey = '${monthNames[now.month]} ${now.year}';
+    months[currentMonthKey] = [];
+
+    for (final dream in dreams) {
+      final dateStr = dream['date'] as String?;
+      if (dateStr == null) continue;
+      final date = DateTime.tryParse(dateStr);
+      if (date == null) continue;
+
+      final key = '${monthNames[date.month]} ${date.year}';
+      months.putIfAbsent(key, () => []);
+      months[key]!.add(dream);
+    }
+    return months;
   }
 
   static Future<bool> isTarotDone() async {

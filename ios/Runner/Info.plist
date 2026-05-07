@@ -43,10 +43,6 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Rehberinizdeki arkadaşlarınızı bulup Crack&amp;Wish evrenine ekleyebilmeniz için izin gerekiyor. Rehberiniz sunucularımızda saklanmaz.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Bu uygulama, kozmik enerjinizi ve yaşam döngülerinizi kişiselleştirmek için temel verilerinize güvenli erişim talep edebilir.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Bu uygulama, kozmik ritimlerinizle bağlantılı olarak temel sağlık verilerinizi sadece cihazınızda güncelleyebilir.</string>
 
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>

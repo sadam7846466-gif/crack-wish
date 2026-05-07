@@ -314,6 +314,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       // (Local notification scheduling was removed, FCM will still send if server finishes,
       // ama push notification backend tarafında handle edildiğinden sorun yok)
 
+      // KULLANICI SONUCU EKRANDA GÖRDÜ, BİLDİRİMİ İPTAL ET:
+      await prefs.setBool('coffee_last_reading_viewed', true);
+      await prefs.setBool('coffee_last_reading_notified', true);
+
       HapticFeedback.heavyImpact();
       setState(() {
         _readingData = reading;

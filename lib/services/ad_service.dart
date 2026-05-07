@@ -60,6 +60,8 @@ class AdService {
       return;
     }
 
+    bool earnedReward = false;
+
     try {
       _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdShowedFullScreenContent: (ad) => debugPrint('Reklam gösteriliyor.'),
@@ -68,7 +70,11 @@ class AdService {
           ad.dispose();
           _rewardedAd = null;
           loadRewardedAd(); 
-          onAdDismissed();
+          if (earnedReward) {
+            onRewardEarned();
+          } else {
+            onAdDismissed();
+          }
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           debugPrint('Reklam gösterilemedi: $error');
@@ -83,7 +89,7 @@ class AdService {
         onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
           debugPrint('Kullanıcı reklamı izledi ve ödülü kazandı: ${reward.amount} ${reward.type}');
           AnalyticsService().logAdWatched(source: 'rewarded');
-          onRewardEarned();
+          earnedReward = true;
         },
       );
     } catch (e) {

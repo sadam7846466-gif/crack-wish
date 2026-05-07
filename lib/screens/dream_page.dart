@@ -1028,9 +1028,9 @@ class _DreamPageState extends State<DreamPage>
       existingRecordId: preRecordId,
     );
 
-    print('🔮🔮🔮 deepResult.success = ${deepResult.success}');
-    print('🔮🔮🔮 deepResult.title = "${deepResult.title}"');
-    print('🔮🔮🔮 deepResult.errorMessage = "${deepResult.errorMessage}"');
+    debugPrint('🔮 deepResult.success = ${deepResult.success}');
+    debugPrint('🔮 deepResult.title = "${deepResult.title}"');
+    debugPrint('🔮 deepResult.errorMessage = "${deepResult.errorMessage}"');
 
     if (!deepResult.success || deepResult.isProcessing) {
       if (deepResult.isProcessing) {
@@ -1063,7 +1063,7 @@ class _DreamPageState extends State<DreamPage>
           ),
         );
       }
-      print('🔮🔮🔮 FALLING BACK TO STANDARD!');
+      debugPrint('🔮 FALLING BACK TO STANDARD!');
       return await _interpretDream(skipOverlaySetup: true);
     }
 
@@ -1084,7 +1084,7 @@ class _DreamPageState extends State<DreamPage>
       'premiumData': jsonEncode(deepResult.rawJson),
       'reflectionAction': _selectedReflectionAction,
     }).catchError((e) {
-      print('Oto-kayıt hatası: $e');
+      debugPrint('Oto-kayıt hatası: $e');
     });
     await StorageService.setDreamDoneToday().catchError((e) => null);
     PushNotificationService().refreshSmartNotifications();
@@ -1109,7 +1109,7 @@ class _DreamPageState extends State<DreamPage>
     _isDreamSaved = true;
 
     // Durumu hemen results'a geçecek şekilde güncelle
-    print('🔮🔮🔮 Setting _isPremiumResult = true, switching to gap then results');
+    debugPrint('🔮 Setting _isPremiumResult = true, switching to gap then results');
     setState(() {
       _overlayContent = 'gap';
       _isWriting = true;
@@ -4196,9 +4196,9 @@ class _DreamPageState extends State<DreamPage>
   }
 
   Widget _buildHistoryTab() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
       key: ValueKey(_historyKeyTracker),
-      future: StorageService.getDreams(),
+      future: StorageService.getDreamsByMonth(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -4228,152 +4228,176 @@ class _DreamPageState extends State<DreamPage>
           );
         }
 
+        final monthEntries = snapshot.data!.entries.toList();
+
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
-          itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) {
-            final dream = snapshot.data![index];
-            final title = (dream['title'] ?? '').toString().trim();
-            final dateStr = dream['date']?.toString() ?? '';
-            final formatted = _formatDate(dateStr);
-            final shortDate = _formatShortDate(dateStr);
-            final isPremium = dream['isPremium'] == true;
-            final emotionName =
-                dream['emotion']?.toString() ?? dream['mood']?.toString();
-            final emotionEnum = _resolveDreamEmotion(dream);
-            final emotionColor = _resolveEmotionAccentColor(emotionEnum);
+          itemCount: monthEntries.length,
+          itemBuilder: (context, monthIndex) {
+            final monthName = monthEntries[monthIndex].key;
+            final monthDreams = monthEntries[monthIndex].value;
+            final isCurrentMonth = monthIndex == 0; // İlk ay = bu ay
 
-            String emotionLabelValue = shortDate;
-            if (emotionName != null) {
-              final parsed = _emotionFromStored(emotionName);
-              emotionLabelValue = parsed != null
-                  ? _emotionLabel(parsed)
-                  : emotionName;
-            }
-
-            return _AnimatedBounceButton(
-              onTap: () => _showDreamDetail(dream),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.05),
-                      Colors.white.withOpacity(0.01),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.transparent),
-                      ),
-                      child: Icon(
-                        _resolveDreamIcon(title),
-                        color: Colors.white.withOpacity(0.7),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title.isNotEmpty
-                                ? title
-                                : (_isTr ? 'Gizemli Rüya' : 'Mysterious Dream'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            formatted,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.4),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Her okunmamış rüya için mavi nokta göster (Instagram/X tarzı)
-                    if (dream['isRead'] != true) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF22D3EE),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF22D3EE).withOpacity(0.5),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ] else ...[
-                      const SizedBox(width: 12),
-                    ],
-                    if (emotionName != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
+            return _MonthPanel(
+              monthName: monthName,
+              dreamCount: monthDreams.length,
+              initiallyExpanded: isCurrentMonth,
+              children: monthDreams.isEmpty
+                  ? [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         child: Text(
-                          emotionLabelValue,
+                          _isTr ? 'Bu ay henüz rüya yazmadın ✨' : 'No dreams written this month yet ✨',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
-                      )
-                    else
-                      Text(
-                        shortDate,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.3),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
                       ),
+                    ]
+                  : monthDreams.map((dream) {
+                final title = (dream['title'] ?? '').toString().trim();
+                final dateStr = dream['date']?.toString() ?? '';
+                final formatted = _formatDate(dateStr);
+                final shortDate = _formatShortDate(dateStr);
+                final emotionName =
+                    dream['emotion']?.toString() ?? dream['mood']?.toString();
+                final emotionEnum = _resolveDreamEmotion(dream);
 
-                  ],
-                ),
-              ),
+                String emotionLabelValue = shortDate;
+                if (emotionName != null) {
+                  final parsed = _emotionFromStored(emotionName);
+                  emotionLabelValue = parsed != null
+                      ? _emotionLabel(parsed)
+                      : emotionName;
+                }
+
+                return _AnimatedBounceButton(
+                  onTap: () => _showDreamDetail(dream),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.05),
+                          Colors.white.withOpacity(0.01),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.05),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.transparent),
+                          ),
+                          child: Icon(
+                            _resolveDreamIcon(title),
+                            color: Colors.white.withOpacity(0.7),
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title.isNotEmpty
+                                    ? title
+                                    : (_isTr ? 'Gizemli Rüya' : 'Mysterious Dream'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                formatted,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.4),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (dream['isRead'] != true) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF22D3EE),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF22D3EE).withOpacity(0.5),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ] else ...[
+                          const SizedBox(width: 12),
+                        ],
+                        if (emotionName != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Text(
+                              emotionLabelValue,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          )
+                        else
+                          Text(
+                            shortDate,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.3),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             );
           },
         );
@@ -9272,3 +9296,155 @@ class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
   }
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// AYLIK PANEL — Rüyaları aya göre gruplar, açılır/kapanır
+// ═══════════════════════════════════════════════════════════════
+class _MonthPanel extends StatefulWidget {
+  final String monthName;
+  final int dreamCount;
+  final bool initiallyExpanded;
+  final List<Widget> children;
+
+  const _MonthPanel({
+    required this.monthName,
+    required this.dreamCount,
+    required this.initiallyExpanded,
+    required this.children,
+  });
+
+  @override
+  State<_MonthPanel> createState() => _MonthPanelState();
+}
+
+class _MonthPanelState extends State<_MonthPanel> with SingleTickerProviderStateMixin {
+  late bool _isExpanded;
+  late AnimationController _controller;
+  late Animation<double> _iconTurns;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initiallyExpanded;
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    if (_isExpanded) _controller.value = 1.0;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: _toggle,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(_isExpanded ? 0.08 : 0.04),
+                  Colors.white.withOpacity(0.02),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: _isExpanded
+                    ? const Color(0xFF8B5CF6).withOpacity(0.3)
+                    : Colors.white.withOpacity(0.06),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.nights_stay_rounded,
+                    color: Color(0xFF8B5CF6),
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.monthName,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${widget.dreamCount}',
+                    style: const TextStyle(
+                      color: Color(0xFFD8B4FE),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                RotationTransition(
+                  turns: _iconTurns,
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white.withOpacity(0.5),
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          firstChild: Column(children: widget.children),
+          secondChild: const SizedBox.shrink(),
+          crossFadeState: _isExpanded
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          duration: const Duration(milliseconds: 300),
+          sizeCurve: Curves.easeInOut,
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}

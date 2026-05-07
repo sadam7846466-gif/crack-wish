@@ -1192,18 +1192,20 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
 
   Widget _addFriendButton() {
-    final rewardColor = _isPremiumUser ? const Color(0xFFFFD700) : const Color(0xFF6DE8B8);
-    final rewardText = _isPremiumUser ? '+1 Kurabiye' : '+3 Ruh Taşı';
+    final rewardColor = const Color(0xFF6DE8B8);
+    final rewardText = '+2 Ruh Taşı';
 
     return _BouncingNode(
-      onTap: () {
+      onTap: () async {
         HapticFeedback.mediumImpact();
-        final String username = _service.currentUser.name.replaceAll(' ', '').toLowerCase();
+        final String username = await StorageService.getUserHandle() ?? _service.currentUser.name.replaceAll(' ', '').toLowerCase();
         // Smart Deep Link ile otomatik takip
-        final String shareText = "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackandwish.com/invite?ref=$username";
+        final String shareText = "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackwish.com/invite/$username";
         
         try {
-          Share.share(shareText);
+          if (!context.mounted) return;
+          final RenderBox? box = context.findRenderObject() as RenderBox?;
+          _showInviteOptions(context, null, shareText, AppLocalizations.of(context)?.inviteShareSubject ?? "Crack Wish Daveti", box);
         } catch (e) {
           debugPrint("Share error: $e");
         }
@@ -1289,7 +1291,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _isPremiumUser ? Icons.cookie_rounded : Icons.diamond_rounded, 
+                        Icons.diamond_rounded, 
                         color: rewardColor, 
                         size: 11
                       ),
@@ -1856,45 +1858,53 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   ),
                   const SizedBox(height: 32),
                   
-                  if (rawPhone != null && rawPhone.isNotEmpty) ...[
-                    // WhatsApp Seçeneği
-                    _buildInviteOptionTile(
-                      icon: PhosphorIcons.whatsappLogo(PhosphorIconsStyle.regular),
-                      title: "WhatsApp",
-                      subtitle: "Mesaj olarak gönder",
-                      color: const Color(0xFF25D366),
-                      onTap: () async {
-                        Navigator.pop(context);
+                  // WhatsApp Seçeneği
+                  _buildInviteOptionTile(
+                    icon: PhosphorIcons.whatsappLogo(PhosphorIconsStyle.regular),
+                    title: "WhatsApp",
+                    subtitle: "Mesaj olarak gönder",
+                    color: const Color(0xFF25D366),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      Uri whatsappUri;
+                      if (rawPhone != null && rawPhone.isNotEmpty) {
                         final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                        final Uri whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
-                        if (await canLaunchUrl(whatsappUri)) {
-                          await launchUrl(whatsappUri);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    
-                    // SMS Seçeneği
-                    _buildInviteOptionTile(
-                      icon: PhosphorIcons.chatCircleText(PhosphorIconsStyle.regular), // Görseldeki gibi oval sohbet balonu
-                      title: "SMS",
-                      subtitle: "Klasik mesaj ile yolla",
-                      color: const Color(0xFF0A84FF),
-                      onTap: () async {
-                        Navigator.pop(context);
+                        whatsappUri = Uri.parse("whatsapp://send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}");
+                      } else {
+                        whatsappUri = Uri.parse("whatsapp://send?text=${Uri.encodeComponent(message)}");
+                      }
+                      if (await canLaunchUrl(whatsappUri)) {
+                        await launchUrl(whatsappUri);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  
+                  // SMS Seçeneği
+                  _buildInviteOptionTile(
+                    icon: PhosphorIcons.chatCircleText(PhosphorIconsStyle.regular), // Görseldeki gibi oval sohbet balonu
+                    title: "SMS",
+                    subtitle: "Klasik mesaj ile yolla",
+                    color: const Color(0xFF0A84FF),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      Uri smsUri;
+                      if (rawPhone != null && rawPhone.isNotEmpty) {
                         final String cleanPhone = rawPhone.replaceAll(RegExp(r'[^0-9+]'), '');
-                        final Uri smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
-                        if (await canLaunchUrl(smsUri)) {
-                          await launchUrl(smsUri);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+                        smsUri = Uri.parse("sms:$cleanPhone&body=${Uri.encodeComponent(message)}");
+                      } else {
+                        smsUri = Uri.parse("sms:?body=${Uri.encodeComponent(message)}");
+                      }
+                      if (await canLaunchUrl(smsUri)) {
+                        await launchUrl(smsUri);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
                   
                   // Paylaşım Seçeneği (Instagram, TikTok vb)
                   _buildInviteOptionTile(
