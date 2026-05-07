@@ -2007,7 +2007,9 @@ class StorageService {
   static Future<void> setSoundEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('sound_enabled', value);
-    // ---------------------------------------------------------------------------
+  }
+
+  // ---------------------------------------------------------------------------
   // ELITE ABONELİK & GÜNLÜK ÖDÜL (Adım 4)
   // ---------------------------------------------------------------------------
   
@@ -2060,5 +2062,4 @@ class StorageService {
     await prefs.setStringList(_keyPinnedCookies, safeList);
   }
 
-}
 }

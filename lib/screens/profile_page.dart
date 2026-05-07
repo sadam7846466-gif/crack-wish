@@ -28,6 +28,7 @@ import 'collection_page.dart';
 import '../services/locale_controller.dart';
 import '../services/storage_service.dart';
 import '../services/profile_sync_service.dart';
+import '../services/purchase_service.dart';
 import '../services/content_moderation_service.dart';
 import 'dart:async';
 import 'package:sensors_plus/sensors_plus.dart';
