@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'root_shell.dart';
 import 'onboarding_page.dart';
+import '../services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -71,6 +72,13 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     final isLoggedIn = session != null;
+    
+    if (isLoggedIn) {
+      // Adım 4: Elite Kullanıcılarına günlük ödül kontrolü
+      try {
+        await StorageService.checkDailyEliteReward();
+      } catch (_) {}
+    }
 
     Navigator.of(context).pushReplacement(
         PageRouteBuilder(

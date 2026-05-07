@@ -4,6 +4,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'analytics_service.dart';
 import 'storage_service.dart';
+import 'profile_sync_service.dart';
 import '../models/cookie_card.dart';
 
 /// Apple/Google'ın kendi satın alma sistemi — üçüncü parti yok.
@@ -28,6 +29,11 @@ class PurchaseService {
   static const String cookieDragonPhoenixId = 'cookie_dragon_phoenix';
   static const String cookieGoldBeastsId = 'cookie_gold_beasts';
 
+  // Ruh Taşı ID'leri
+  static const String soulStone5Id = 'soul_stone_5';
+  static const String soulStone15Id = 'soul_stone_15';
+  static const String soulStone50Id = 'soul_stone_50';
+
   static const Set<String> _allProductIds = {
     eliteWeeklyId,
     eliteMonthlyId,
@@ -38,6 +44,9 @@ class PurchaseService {
     cookieGoldenSakuraId,
     cookieDragonPhoenixId,
     cookieGoldBeastsId,
+    soulStone5Id,
+    soulStone15Id,
+    soulStone50Id,
   };
 
   // Yüklenen ürün detayları
@@ -127,6 +136,8 @@ class PurchaseService {
       await prefs.setBool('is_elite', true);
       debugPrint('✅ Elite aktif edildi!');
       AnalyticsService().logElitePurchased(plan: productId);
+      // Buluta Senkronize Et
+      ProfileSyncService().syncEliteStatus(true);
     } else if (_isCookieProduct(productId)) {
       // Kurabiye — satın alınan kurabiyeyi envantere ekle
       // Satın alınan ürün ID'si örn: "cookie_golden_arabesque". Ön ekini temizle:
@@ -134,6 +145,32 @@ class PurchaseService {
       await StorageService.incrementCookieCard(cookieId);
       debugPrint('✅ Kurabiye satın alındı: $productId');
       AnalyticsService().logCookiePurchased(cookieId: productId, price: 'store');
+      
+      // Buluta Senkronize Et (Arka planda)
+      StorageService.getCookieCollection().then((collection) {
+        final Map<String, int> inventory = {};
+        for (var c in collection) {
+          if (c.countObtained > 0) inventory[c.id] = c.countObtained;
+        }
+        ProfileSyncService().syncCookieInventoryToCloud(inventory);
+      });
+    } else if (_isSoulStoneProduct(productId)) {
+      // Ruh Taşı satın alımı
+      int amount = 0;
+      if (productId == soulStone5Id) amount = 5;
+      else if (productId == soulStone15Id) amount = 15;
+      else if (productId == soulStone50Id) amount = 50;
+
+      if (amount > 0) {
+        final currentStones = await StorageService.getSoulStones();
+        final newStones = currentStones + amount;
+        await prefs.setInt('soul_stones', newStones);
+        debugPrint('✅ $amount Ruh Taşı satın alındı!');
+        
+        // Buluta Senkronize Et (Arka planda)
+        final aura = prefs.getInt('aura_points') ?? 0;
+        ProfileSyncService().syncEconomyData(aura: aura, soulStones: newStones);
+      }
     }
 
     onPurchaseSuccess?.call(productId);
@@ -143,6 +180,8 @@ class PurchaseService {
       id == eliteWeeklyId || id == eliteMonthlyId || id == eliteYearlyId;
 
   bool _isCookieProduct(String id) => id.startsWith('cookie_');
+
+  bool _isSoulStoneProduct(String id) => id.startsWith('soul_stone_');
 
   /// Belirli bir ürünü satın al
   Future<bool> purchase(String productId) async {

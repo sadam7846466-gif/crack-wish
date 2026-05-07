@@ -224,4 +224,87 @@ class ProfileSyncService {
     }
     return null;
   }
+
+  /// Satın alınan/hediye gelen Premium Kurabiye envanterini buluta senkronize eder (jsonb formatında)
+  Future<void> syncCookieInventoryToCloud(Map<String, int> inventory) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+
+      await _supabase.from('profiles').update({
+        'cookie_inventory': inventory,
+      }).eq('id', user.id);
+      
+      debugPrint('☁️ Kurabiye Envanteri Buluta Yedeklendi: $inventory');
+    } catch (e) {
+      debugPrint('☁️ Kurabiye Envanteri Senkronizasyon Hatası: $e');
+    }
+  }
+
+  /// Buluttaki Kurabiye envanterini (jsonb) locale çekmek için
+  Future<Map<String, int>?> fetchCookieInventory() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return null;
+
+      final data = await _supabase
+          .from('profiles')
+          .select('cookie_inventory')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data != null && data['cookie_inventory'] != null) {
+        final Map<String, dynamic> rawMap = data['cookie_inventory'];
+        final Map<String, int> inventory = {};
+        rawMap.forEach((key, value) {
+          if (value is int) {
+            inventory[key] = value;
+          }
+        });
+        return inventory;
+      }
+    } catch (e) {
+      debugPrint('☁️ Kurabiye Envanteri Buluttan Çekilirken Hata: $e');
+    }
+    return null;
+  }
+
+  /// Profil Vitrini (Showcase) Kurabiyelerini buluta senkronize eder
+  Future<void> syncPinnedCookiesToCloud(List<String> cookieIds) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+
+      // Sadece ilk 3 tanesine izin ver
+      final safeList = cookieIds.take(3).toList();
+      await _supabase.from('profiles').update({
+        'pinned_cookies': safeList,
+      }).eq('id', user.id);
+      
+      debugPrint('☁️ Vitrin Buluta Yedeklendi: $safeList');
+    } catch (e) {
+      debugPrint('☁️ Vitrin Senkronizasyon Hatası: $e');
+    }
+  }
+
+  /// Buluttaki vitrin kurabiyelerini locale çeker
+  Future<List<String>?> fetchPinnedCookies() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return null;
+
+      final data = await _supabase
+          .from('profiles')
+          .select('pinned_cookies')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data != null && data['pinned_cookies'] != null) {
+        return List<String>.from(data['pinned_cookies']);
+      }
+    } catch (e) {
+      debugPrint('☁️ Vitrin Buluttan Çekilirken Hata: $e');
+    }
+    return null;
+  }
 }

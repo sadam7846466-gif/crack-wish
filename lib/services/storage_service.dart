@@ -61,6 +61,7 @@ class StorageService {
   static const String _keyMotiveStarDy = 'motive_star_dy';
   static const String _keySeenFortunes = 'seen_fortune_ids';
   static const String _keyCookieCollection = 'cookie_collection';
+  static const String _keyPinnedCookies = 'pinned_cookies';
   static const String _keyLocale = 'app_locale';
   static const String _keySelectedCookie = 'selected_cookie';
   static const String _keyInstallId = 'install_id';
@@ -2006,5 +2007,58 @@ class StorageService {
   static Future<void> setSoundEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('sound_enabled', value);
+    // ---------------------------------------------------------------------------
+  // ELITE ABONELİK & GÜNLÜK ÖDÜL (Adım 4)
+  // ---------------------------------------------------------------------------
+  
+  /// Her gece 00:00'dan sonra giriş yapan Elite abonelere bedava 5 Ruh Taşı verir.
+  /// Ayrıca Elite aboneliği biten kullanıcının yetkilerini temizler.
+  static Future<void> checkDailyEliteReward() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 1. Kullanıcı şu an Elite mi? (Bunu Supabase'den veya IAP'den güncelleyebilirsiniz)
+      final isElite = prefs.getBool('is_elite') ?? false;
+      if (!isElite) return; // Elite değilse ödül yok
+
+      // 2. Bugünün tarihini al (Sadece yıl-ay-gün olarak)
+      final now = DateTime.now();
+      final todayStr = '${now.year}-${now.month}-${now.day}';
+
+      // 3. Son ödül aldığı tarihi çek
+      final lastRewardDate = prefs.getString(_keyDailyEliteSoulDate);
+
+      // 4. Eğer bugün ödül almamışsa
+      if (lastRewardDate != todayStr) {
+        // Envantere 5 ruh taşı ekle
+        final currentStones = await getSoulStones();
+        await prefs.setInt(_keySoulStones, currentStones + 5);
+        
+        // Ödül tarihini bugüne güncelle
+        await prefs.setString(_keyDailyEliteSoulDate, todayStr);
+        
+        debugPrint('👑 ELITE ÖDÜLÜ: Günlük 5 Bedava Ruh Taşı verildi!');
+      }
+    } catch (e) {
+      debugPrint('👑 Elite ödül hatası: $e');
+    }
   }
+
+  // ---------------------------------------------------------------------------
+  // PROFİL VİTRİNİ (SHOWCASE)
+  // ---------------------------------------------------------------------------
+  
+  static Future<List<String>> getPinnedCookies() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_keyPinnedCookies) ?? [];
+  }
+
+  static Future<void> setPinnedCookies(List<String> cookieIds) async {
+    final prefs = await SharedPreferences.getInstance();
+    // En fazla 3 tane sabitlenebilir
+    final safeList = cookieIds.take(3).toList();
+    await prefs.setStringList(_keyPinnedCookies, safeList);
+  }
+
+}
 }

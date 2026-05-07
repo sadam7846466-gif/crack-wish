@@ -485,35 +485,7 @@ class _CookieSelectorItem extends StatelessWidget {
                     ),
                   ),
                 ),
-              // Stok (Bakiye) Rozeti (Legacy kurabiyelerde stok/sayı göstermeyelim, sınırsız açık görünsün)
-              if (isPaid && ownedCount > 0 && !const {'fortune_cat.webp', 'wildflower.webp', 'cupid_ribbon.webp', 'panda_bamboo.webp', 'ramadan_cute.webp', 'enchanted_forest.webp'}.any((img) => imagePath.contains(img)))
-                Positioned(
-                  right: -6,
-                  top: -6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFB74D), // Turuncu/Altın renk
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withOpacity(0.9), width: 1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFFB74D).withOpacity(0.5),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      'x$ownedCount',
-                      style: const TextStyle(
-                        color: Color(0xFF4E342E),
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
+              // Stok rozeti kaldırıldı — satın alınan kurabiye ya var ya yok, x2/x3 mantığı yok.
             ],
           ),
           ),

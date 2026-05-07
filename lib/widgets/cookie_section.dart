@@ -49,6 +49,7 @@ class _CookieSectionState extends State<CookieSection>
   late AnimationController _shakeController;
   late AnimationController _crackController;
   late AnimationController _sparkleController;
+  late AnimationController _unlockController; // Premium Büyülü Açılış
   bool _isCracking = false;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -60,6 +61,7 @@ class _CookieSectionState extends State<CookieSection>
   bool _showLimitOverlay = false;
   int _ownedCount = 0;
   bool _isOwnershipChecking = true;
+  bool _isUnlocking = false; // Kilit açılma animasyonu için
 
   // Statik cache: widget rebuild olsa bile flickerlamasın
   static int _cachedCracksToday = 0;
@@ -190,6 +192,14 @@ class _CookieSectionState extends State<CookieSection>
     _loadDailyCookieCredits();
     _checkOwnership();
     
+    // GEÇİCİ UI TESTİ: Sen "R" basıp Hot Restart yaptığında animasyonu tekrar test edebilmen için.
+    // DİKKAT: Diğer HİÇBİR veriye dokunmaz, SADECE kurabiye kilitlerini sıfırlar.
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.remove('cookie_collection');
+      // Sıfırladıktan sonra UI'ı kilitli gösterecek şekilde state'i anında güncelle:
+      setState(() => _ownedCount = 0);
+    });
+
     // Reklamı arka planda önden yükleyelim:
     AdService().loadRewardedAd();
 
@@ -234,6 +244,12 @@ class _CookieSectionState extends State<CookieSection>
     _sparkleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
+    );
+
+    // Premium Unlock animasyonu (Büyülü açılış)
+    _unlockController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
     );
   }
 
@@ -282,6 +298,7 @@ class _CookieSectionState extends State<CookieSection>
     _shakeController.dispose();
     _crackController.dispose();
     _sparkleController.dispose();
+    _unlockController.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -338,41 +355,78 @@ class _CookieSectionState extends State<CookieSection>
 
     if (!isPaid) return cookieWidget;
     
-    // Eğer ücretliyse ve kontrol bittiyse VE sahipsek net göster.
-    // Kontrol sürerken varsayılan olarak bulanık/kilitli gösterelim ki flaş atmasın.
-    if (!_isOwnershipChecking && _ownedCount > 0) return cookieWidget;
+    final bool isUnlockedNow = _isUnlocking || (!_isOwnershipChecking && _ownedCount > 0);
 
-    // Ücretli kurabiye VE sahip değil: bulanık + kilit ikonu
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ImageFiltered(
-          imageFilter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
-          child: cookieWidget,
-        ),
-        // Kilit overlay
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.black.withOpacity(0.3),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.6),
-              width: 1.5,
+    // Eğer tamamen sahipsek ve animasyon bitmişse direkt göster
+    if (isUnlockedNow && !_isUnlocking) return cookieWidget;
+
+    // Premium Kilit Açılış Animasyonu
+    return AnimatedBuilder(
+      animation: _unlockController,
+      builder: (context, child) {
+        final double t = _unlockController.value;
+        final bool isUnlockingActive = _isUnlocking;
+
+        // Kilit Animasyonu: 0.0 - 0.20 arası. 0'dan 0.15'e büyür (scale 1.3), 0.15'ten 0.20'ye yok olur.
+        double lockScale = 1.0;
+        double lockOpacity = 1.0;
+        if (isUnlockingActive) {
+          if (t < 0.15) {
+            lockScale = 1.0 + (t / 0.15 * 0.3); // 1.0 -> 1.3
+            lockOpacity = 1.0;
+          } else if (t < 0.20) {
+            lockScale = 1.3 + ((t - 0.15) / 0.05 * 0.2); // 1.3 -> 1.5
+            lockOpacity = 1.0 - ((t - 0.15) / 0.05); // 1.0 -> 0.0
+          } else {
+            lockScale = 0.0;
+            lockOpacity = 0.0;
+          }
+        }
+
+        // Blur Animasyonu: 0.20'den 0.80'e kadar (Kilit kaybolduktan sonra yavaşça açılır)
+        final double blurProgress = isUnlockingActive 
+            ? (t >= 0.20 && t <= 0.80 ? (t - 0.20) / 0.60 : (t > 0.80 ? 1.0 : 0.0)) 
+            : 0.0;
+        final double currentBlur = isUnlockingActive ? 6.0 * (1.0 - blurProgress) : 6.0;
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: currentBlur, sigmaY: currentBlur),
+              child: cookieWidget,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.white.withOpacity(0.2),
-                blurRadius: 12,
+            if (lockOpacity > 0)
+              Transform.scale(
+                scale: lockScale,
+                child: Opacity(
+                  opacity: lockOpacity,
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withOpacity(0.3),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.6), 
+                        width: 1.5
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isUnlockingActive ? const Color(0xFFFFD700).withOpacity(0.6) : Colors.white.withOpacity(0.2),
+                          blurRadius: isUnlockingActive ? 15 : 12,
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.lock_rounded, color: Colors.white, size: 22),
+                    ),
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: const Center(
-            child: Icon(Icons.lock_rounded, color: Colors.white, size: 22),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -643,20 +697,31 @@ class _CookieSectionState extends State<CookieSection>
       // Satın alındı, envantere ekle
       await StorageService.incrementCookieCard(cookieId);
       
-      // Bildirim göster
+      // Panel tamamen kapanana kadar bekle (yaklaşık 400ms)
+      await Future.delayed(const Duration(milliseconds: 400));
+      
+      if (mounted) {
+        setState(() => _isUnlocking = true);
+        _unlockController.forward(from: 0.0);
+      }
+      
+      // 0.20 saniyede tam kilit kırılma hissi (2500ms * 0.20 = 500ms)
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) HapticFeedback.heavyImpact();
+      });
+      
+      // Kilit açılma animasyonunun bitmesini bekle (2.5 saniye)
+      await Future.delayed(const Duration(milliseconds: 2500));
+
+      // Tüm animasyonlar bitince bildirimi göster
       if (mounted) {
         final isTr = Localizations.localeOf(context).languageCode == 'tr';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isTr ? 'Kurabiye başarıyla "My Cookie" koleksiyonuna eklendi!' : 'Cookie successfully added to your "My Cookie" collection!',
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: const Color(0xFFC084FC).withOpacity(0.9),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        _CookieUnlockedDialog.show(
+          context: context,
+          imagePath: imagePath ?? 'assets/images/cookies/paid/may/golden_arabesque.webp',
+          cookieId: cookieId,
         );
+        setState(() => _isUnlocking = false);
       }
       
       _checkOwnership(); // Güncel durumu yükle
@@ -1862,7 +1927,6 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
     setState(() => _isPurchasing = true);
 
     try {
-      // Kurabiye ID'sine göre ürün ID'sini belirle
       final productId = 'cookie_${widget.cookieId}';
       final success = await PurchaseService().purchase(productId);
 
@@ -2289,6 +2353,199 @@ class _CircularLimitOverlayState extends State<_CircularLimitOverlay> {
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.9)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CookieUnlockedDialog extends StatefulWidget {
+  final String imagePath;
+  final String cookieName;
+
+  const _CookieUnlockedDialog({
+    required this.imagePath,
+    required this.cookieName,
+  });
+
+  static const trNames = {
+    'spring_wreath': 'Bahar Çelengi', 'lucky_clover': 'Şanslı Yonca',
+    'royal_hearts': 'Kraliyet Kalpleri', 'evil_eye': 'Nazar',
+    'silver_lotus': 'Gümüş Nilüfer', 'sakura_bloom': 'Sakura',
+    'blue_porcelain': 'Mavi Porselen', 'pink_blossom': 'Pembe Çiçek',
+    'fortune_cat': 'Şans Kedisi', 'wildflower': 'Kır Çiçeği',
+    'cupid_ribbon': 'Aşk Kurdelesi', 'panda_bamboo': 'Panda',
+    'ramadan_cute': 'Ramazan', 'enchanted_forest': 'Büyülü Orman',
+    'golden_arabesque': 'Altın Arabesk', 'midnight_mosaic': 'Gece Mozaiği',
+    'pearl_lace': 'İnci Dantel', 'golden_sakura': 'Altın Sakura',
+    'dragon_phoenix': 'Ejderha & Anka', 'gold_beasts': 'Altın Canavarlar',
+    'celestial_dream': 'Göksel Rüya', 'starlight_whisper': 'Yıldız Fısıltısı',
+    'mystic_aura': 'Mistik Aura', 'lunar_glow': 'Ay Işıltısı',
+    'solar_flare': 'Güneş Patlaması', 'cosmic_dust': 'Kozmik Toz',
+    'nebula_breeze': 'Nebula Esintisi', 'astral_projection': 'Astral Seyahat',
+    'quantum_leap': 'Kuantum Sıçraması', 'royal_sapphire': 'Kraliyet Safiri',
+    'diamond_crust': 'Elmas Kabuk', 'platinum_veil': 'Platin Peçe',
+    'golden_majesty': 'Altın İhtişam', 'emerald_essence': 'Zümrüt Özü',
+    'ruby_heart': 'Yakut Kalp', 'obsidian_grace': 'Obsidyen Zarafeti',
+  };
+
+  static const enNames = {
+    'spring_wreath': 'Spring Wreath', 'lucky_clover': 'Lucky Clover',
+    'royal_hearts': 'Royal Hearts', 'evil_eye': 'Evil Eye',
+    'silver_lotus': 'Silver Lotus', 'sakura_bloom': 'Sakura Bloom',
+    'blue_porcelain': 'Blue Porcelain', 'pink_blossom': 'Pink Blossom',
+    'fortune_cat': 'Fortune Cat', 'wildflower': 'Wildflower',
+    'cupid_ribbon': 'Cupid Ribbon', 'panda_bamboo': 'Panda Bamboo',
+    'ramadan_cute': 'Ramadan', 'enchanted_forest': 'Enchanted Forest',
+    'golden_arabesque': 'Golden Arabesque', 'midnight_mosaic': 'Midnight Mosaic',
+    'pearl_lace': 'Pearl Lace', 'golden_sakura': 'Golden Sakura',
+    'dragon_phoenix': 'Dragon Phoenix', 'gold_beasts': 'Gold Beasts',
+    'celestial_dream': 'Celestial Dream', 'starlight_whisper': 'Starlight Whisper',
+    'mystic_aura': 'Mystic Aura', 'lunar_glow': 'Lunar Glow',
+    'solar_flare': 'Solar Flare', 'cosmic_dust': 'Cosmic Dust',
+    'nebula_breeze': 'Nebula Breeze', 'astral_projection': 'Astral Projection',
+    'quantum_leap': 'Quantum Leap', 'royal_sapphire': 'Royal Sapphire',
+    'diamond_crust': 'Diamond Crust', 'platinum_veil': 'Platinum Veil',
+    'golden_majesty': 'Golden Majesty', 'emerald_essence': 'Emerald Essence',
+    'ruby_heart': 'Ruby Heart', 'obsidian_grace': 'Obsidian Grace',
+  };
+
+  static Future<void> show({
+    required BuildContext context,
+    required String imagePath,
+    required String cookieId,
+  }) {
+    HapticFeedback.heavyImpact();
+    // Varsa ses eklenebilir SoundService().playPanelReward();
+    return showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'CookieUnlockedDismiss',
+      barrierColor: Colors.black.withOpacity(0.6),
+      transitionDuration: const Duration(milliseconds: 600),
+      pageBuilder: (context, anim1, anim2) {
+        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+        final cName = isTr ? (trNames[cookieId] ?? 'Premium Kurabiye') : (enNames[cookieId] ?? 'Premium Cookie');
+        return _CookieUnlockedDialog(
+          imagePath: imagePath,
+          cookieName: cName,
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: anim1, curve: Curves.easeOutBack)),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  State<_CookieUnlockedDialog> createState() => _CookieUnlockedDialogState();
+}
+
+class _CookieUnlockedDialogState extends State<_CookieUnlockedDialog> with SingleTickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.08).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final glowColor = const Color(0xFFFFD700);
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.of(context).pop();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Align(
+        alignment: const Alignment(0, -0.3), // Paneli biraz yukarı kaydır
+        child: Material(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(32),
+                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 0.5),
+                    boxShadow: [
+                      BoxShadow(color: glowColor.withOpacity(0.15), blurRadius: 40, spreadRadius: -5),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Parlayan Kurabiye Resmi
+                      AnimatedBuilder(
+                        animation: _pulseAnim,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: _pulseAnim.value,
+                            child: Container(
+                              width: 140,
+                              height: 140,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(color: glowColor.withOpacity(0.4), blurRadius: 40, spreadRadius: 5),
+                                ],
+                              ),
+                              child: Image.asset(widget.imagePath, fit: BoxFit.contain),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        widget.cookieName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        isTr ? 'Kurabiye başarıyla koleksiyonuna eklendi!' : 'Cookie successfully added to your collection!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

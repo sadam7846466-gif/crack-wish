@@ -3435,8 +3435,8 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "1 Taş",
-                                      "₺24.99",
+                                      "5 Taş",
+                                      "₺49.99",
                                       const Color(0xFF4EE6C5),
                                       isSelected: selectedStoreIndex == 0,
                                       onTap: () => setModalState(
@@ -3448,8 +3448,8 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "3 Taş",
-                                      "₺59.99",
+                                      "15 Taş",
+                                      "₺119.99",
                                       const Color(0xFFC084FC),
                                       isPopular: true,
                                       isSelected: selectedStoreIndex == 1,
@@ -3462,8 +3462,8 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "10 Taş",
-                                      "₺149.99",
+                                      "50 Taş",
+                                      "₺299.99",
                                       const Color(0xFFFFD700),
                                       isSelected: selectedStoreIndex == 2,
                                       onTap: () => setModalState(
@@ -3478,8 +3478,16 @@ class _BentoHeroCard extends StatelessWidget {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: selectedStoreIndex != -1
-                                      ? () {
+                                      ? () async {
                                           HapticFeedback.heavyImpact();
+                                          String pId = '';
+                                          if (selectedStoreIndex == 0) pId = PurchaseService.soulStone5Id;
+                                          else if (selectedStoreIndex == 1) pId = PurchaseService.soulStone15Id;
+                                          else if (selectedStoreIndex == 2) pId = PurchaseService.soulStone50Id;
+                                          
+                                          if (pId.isNotEmpty) {
+                                            await PurchaseService().purchase(pId);
+                                          }
                                         }
                                       : null,
                                   borderRadius: BorderRadius.circular(24),
