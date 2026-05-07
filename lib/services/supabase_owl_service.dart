@@ -144,24 +144,25 @@ class SupabaseOwlService {
          final senderIds = requests.map((r) => r['from_user']).toSet().toList();
          
          final profiles = await _db.from('profiles')
-             .select('id, full_name, handle, avatar_url')
+             .select('id, full_name, handle, avatar_url, zodiac_sign')
              .inFilter('id', senderIds.map((e) => e.toString()).toList());
              
          final Map<String, dynamic> profileMap = { for (var p in profiles) p['id'].toString(): p };
          
          for (var req in requests) {
             final senderId = req['from_user'].toString();
-            final p = profileMap[senderId];
-            if (p != null) {
-               newRequests.add(FriendRequest(
-                  id: req['id'].toString(),
-                  from: OwlUser(
-                    id: p['id'].toString(),
-                    name: p['full_name'] ?? 'Ruhsal Rehber',
-                    emoji: '🧑',
-                    owlCode: p['handle']?.toString().replaceFirst('@', '') ?? 'MYS',
-                    avatarUrl: p['avatar_url']?.toString(),
-                  ),
+             final p = profileMap[senderId];
+             if (p != null) {
+                newRequests.add(FriendRequest(
+                   id: req['id'].toString(),
+                   from: OwlUser(
+                     id: p['id'].toString(),
+                     name: p['full_name'] ?? 'Ruhsal Rehber',
+                     emoji: '🧑',
+                     owlCode: p['handle']?.toString().replaceFirst('@', '') ?? 'MYS',
+                     avatarUrl: p['avatar_url']?.toString(),
+                     zodiacSign: p['zodiac_sign']?.toString(),
+                   ),
                   to: currentUser,
                   createdAt: DateTime.tryParse(req['created_at'].toString()) ?? DateTime.now(),
                ));
@@ -190,7 +191,7 @@ class SupabaseOwlService {
       
       if (friendIds.isNotEmpty) {
         final friendProfiles = await _db.from('profiles')
-            .select('id, full_name, handle, avatar_url')
+            .select('id, full_name, handle, avatar_url, zodiac_sign')
             .inFilter('id', friendIds.map((e) => e.toString()).toList());
         
         for (var p in friendProfiles) {
@@ -205,6 +206,7 @@ class SupabaseOwlService {
               emoji: '🧑',
               owlCode: p['handle']?.toString().replaceFirst('@', '') ?? '',
               avatarUrl: p['avatar_url']?.toString(),
+              zodiacSign: p['zodiac_sign']?.toString(),
             ),
             friendsSince: DateTime.now(),
           ));

@@ -6,6 +6,7 @@ class OwlUser {
   final String emoji;
   final String owlCode; // #OWL-XXXX
   final String? avatarUrl;
+  final String? zodiacSign;
 
   const OwlUser({
     required this.id,
@@ -13,6 +14,7 @@ class OwlUser {
     required this.emoji,
     required this.owlCode,
     this.avatarUrl,
+    this.zodiacSign,
   });
 }
 

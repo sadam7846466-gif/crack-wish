@@ -1232,156 +1232,14 @@ class _ZodiacPageState extends State<ZodiacPage>
                     child: Stack(
                       children: [
                         Positioned.fill(
-                          child: friends.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'Henüz arkadaşın yok',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5)),
-                                ),
-                              )
-                            : ListView.separated(
-                                controller: scrollController,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                          itemCount: friends.length,
-                          separatorBuilder: (context, i) => const SizedBox(height: 12),
-                          itemBuilder: (context, i) {
-                            final f = friends[i];
-                            // Arkadaş için rastgele ama id'ye göre tutarlı bir burç belirle
-                            final friendSignIndex = f.user.id.hashCode.abs() % _signs.length;
-                            final friendSign = _signs[friendSignIndex];
-
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (_, __, ___) => _CosmicWeavingTransitionPage(
-                                      sign1: mySign,
-                                      sign2: friendSign,
-                                      friend: f,
-                                      gold: const Color(0xFFE5CC75),
-                                      userAvatar: _userAvatar,
-                                    ),
-                                    transitionsBuilder: (_, a, __, child) =>
-                                        FadeTransition(opacity: a, child: child),
-                                    transitionDuration: const Duration(milliseconds: 400),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.02),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: _gold.withOpacity(0.15)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: _gold.withOpacity(0.05),
-                                        border: Border.all(color: _gold.withOpacity(0.2)),
-                                      ),
-                                      child: ClipOval(
-                                        child: f.user.avatarUrl != null
-                                            ? (f.user.avatarUrl!.startsWith('http')
-                                                ? Transform.scale(
-                                                    scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                                                    child: Image.network(
-                                                      f.user.avatarUrl!,
-                                                      fit: BoxFit.cover,
-                                                      key: ValueKey(f.user.avatarUrl),
-                                                    ),
-                                                  )
-                                                : Transform.scale(
-                                                    scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                                                    child: Image.asset(
-                                                      f.user.avatarUrl!,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ))
-                                            : Center(
-                                                child: Text(
-                                                  f.user.emoji,
-                                                  style: const TextStyle(
-                                                    fontSize: 24,
-                                                    fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
-                                                  ),
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            f.user.name,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Row(
-                                            children: [
-                                              ClipOval(
-                                                child: Image.asset(
-                                                  friendSign['image'] as String,
-                                                  width: 16,
-                                                  height: 16,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                friendSign['name'] as String,
-                                                style: TextStyle(
-                                                  color: _gold.withOpacity(0.6),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: _gold.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        'SEÇ',
-                                        style: TextStyle(
-                                          color: _gold,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                          child: _FriendSelectionWidget(
+                            mySign: mySign,
+                            userAvatar: _userAvatar,
+                            scrollController: scrollController,
+                            signs: _signs,
+                            gold: _gold,
+                          ),
                         ),
-                      ),
                         if (!_isElite)
                           Positioned.fill(
                             child: ClipRect(
@@ -9766,6 +9624,233 @@ class _ViralGridCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _FriendSelectionWidget extends StatefulWidget {
+  final Map<String, dynamic> mySign;
+  final String? userAvatar;
+  final ScrollController scrollController;
+  final List<Map<String, dynamic>> signs;
+  final Color gold;
+
+  const _FriendSelectionWidget({
+    Key? key,
+    required this.mySign,
+    this.userAvatar,
+    required this.scrollController,
+    required this.signs,
+    required this.gold,
+  }) : super(key: key);
+
+  @override
+  State<_FriendSelectionWidget> createState() => _FriendSelectionWidgetState();
+}
+
+class _FriendSelectionWidgetState extends State<_FriendSelectionWidget> {
+  final _service = SupabaseOwlService();
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _service.addListener(_update);
+    _checkInit();
+  }
+
+  Future<void> _checkInit() async {
+    // Hizmet boşsa initialize etmesini bekle. Zaten yüklüyse hızlı döner.
+    await _service.initialize();
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _update() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _service.removeListener(_update);
+    super.dispose();
+  }
+
+  Map<String, dynamic> _getFriendSign(Friend f) {
+    if (f.user.zodiacSign != null && f.user.zodiacSign!.isNotEmpty) {
+      final signStr = f.user.zodiacSign!.trim().toLowerCase();
+      for (var s in widget.signs) {
+        if ((s['name'] as String).toLowerCase() == signStr || (s['nameEn'] as String).toLowerCase() == signStr) {
+          return s;
+        }
+      }
+    }
+    // Fallback: Arkadaş için rastgele ama id'ye göre tutarlı bir burç belirle
+    final friendSignIndex = f.user.id.hashCode.abs() % widget.signs.length;
+    return widget.signs[friendSignIndex];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final friends = _service.friends;
+    
+    if (_isLoading && friends.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(color: widget.gold),
+      );
+    }
+
+    if (friends.isEmpty) {
+      return Center(
+        child: Text(
+          'Henüz arkadaşın yok',
+          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      controller: widget.scrollController,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      itemCount: friends.length,
+      separatorBuilder: (context, i) => const SizedBox(height: 12),
+      itemBuilder: (context, i) {
+        final f = friends[i];
+        final friendSign = _getFriendSign(f);
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => _CosmicWeavingTransitionPage(
+                  sign1: widget.mySign,
+                  sign2: friendSign,
+                  friend: f,
+                  gold: widget.gold,
+                  userAvatar: widget.userAvatar,
+                ),
+                transitionsBuilder: (_, a, __, child) =>
+                    FadeTransition(opacity: a, child: child),
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.02),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: widget.gold.withOpacity(0.15)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.gold.withOpacity(0.05),
+                    border: Border.all(color: widget.gold.withOpacity(0.2)),
+                  ),
+                  child: ClipOval(
+                    child: f.user.avatarUrl != null
+                        ? (f.user.avatarUrl!.startsWith('http')
+                            ? Transform.scale(
+                                scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                child: Image.network(
+                                  f.user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  key: ValueKey(f.user.avatarUrl),
+                                ),
+                              )
+                            : Transform.scale(
+                                scale: f.user.avatarUrl!.contains('owl') ? 1.35 : (f.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                child: Image.asset(
+                                  f.user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                ),
+                              ))
+                        : Center(
+                            child: Text(
+                              f.user.emoji,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        f.user.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          ClipOval(
+                            child: Image.asset(
+                              friendSign['image'] as String,
+                              width: 16,
+                              height: 16,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            friendSign['name'] as String,
+                            style: TextStyle(
+                              color: widget.gold.withOpacity(0.6),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: widget.gold.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'SEÇ',
+                    style: TextStyle(
+                      color: widget.gold,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
