@@ -302,8 +302,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
+    final bool isCurrentRoute = ModalRoute.of(context)?.isCurrent == true;
+    
     return TickerMode(
-      enabled: true,
+      enabled: isCurrentRoute,
       child: Scaffold(
         extendBody: true,
         backgroundColor: Colors.transparent,

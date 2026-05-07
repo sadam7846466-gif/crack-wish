@@ -794,7 +794,19 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
           content: Scaffold(
             extendBody: true,
             backgroundColor: Colors.transparent,
-            body: IndexedStack(index: _currentIndex, children: _tabs),
+            body: IndexedStack(
+              index: _currentIndex,
+              children: [
+                TickerMode(
+                  enabled: _currentIndex == 0,
+                  child: _tabs[0],
+                ),
+                TickerMode(
+                  enabled: _currentIndex == 1,
+                  child: _tabs[1],
+                ),
+              ],
+            ),
             bottomNavigationBar: BottomNav(
               currentIndex: _currentIndex,
               onTap: _handleNavTap,
