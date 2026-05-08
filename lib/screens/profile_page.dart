@@ -3437,7 +3437,7 @@ class _BentoHeroCard extends StatelessWidget {
                                     child: _buildSoulStoreCard(
                                       context,
                                       "5 Taş",
-                                      "₺49.99",
+                                      PurchaseService().getPrice(PurchaseService.soulStone5Id) ?? "₺49.99",
                                       const Color(0xFF4EE6C5),
                                       isSelected: selectedStoreIndex == 0,
                                       onTap: () => setModalState(

@@ -299,9 +299,9 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             const SizedBox(height: 16), // from 28
 
                             // ── CAM TASARIMLI 3'LÜ PAKET DİZİLİMİ ──
-                            _buildGlassPackageRow(0, "Haftalık Uyanış", "\$2.99", "/ week"),
-                            _buildGlassPackageRow(1, "Aylık Sezgi", "\$7.99", "/ month", subText: "Save 33%"),
-                            _buildGlassPackageRow(2, "Yıllık Aydınlanma", "\$39.99", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
+                            _buildGlassPackageRow(0, "Haftalık Uyanış", PurchaseService().getPrice(PurchaseService.eliteWeeklyId) ?? "\$2.99", "/ week"),
+                            _buildGlassPackageRow(1, "Aylık Sezgi", PurchaseService().getPrice(PurchaseService.eliteMonthlyId) ?? "\$7.99", "/ month", subText: "Save 33%"),
+                            _buildGlassPackageRow(2, "Yıllık Aydınlanma", PurchaseService().getPrice(PurchaseService.eliteYearlyId) ?? "\$39.99", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
                             const SizedBox(height: 16), // from 24
                                   ],
                                 ),
