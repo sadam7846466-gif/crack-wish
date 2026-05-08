@@ -11,14 +11,13 @@ class AdService {
   RewardedAd? _rewardedAd;
   bool _isRewardedAdLoading = false;
 
-  // Yayınlanmadan önce test IDsini kullanmalıyız ki reklamlar her zaman yüklensin.
+  // GERÇEK REKLAM KİMLİKLERİ (PRODUCTION)
   String get _rewardedAdUnitId {
-    // TODO: CANLIYA (APP STORE'A) ÇIKMADAN HEMEN ÖNCE BURAYI DÜZELT!
-    // ŞU AN ZORUNLU TEST REKLAMI MODUNDA (Telefonda test için)
     if (Platform.isAndroid) {
+      // TODO: Android için henüz gerçek kimlik girilmedi, şimdilik test kimliği duruyor.
       return 'ca-app-pub-3940256099942544/5224354917'; 
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313'; 
+      return 'ca-app-pub-5096906411582452/3877609409'; // Gerçek iOS Rewarded Ad Kimliği
     }
     throw UnsupportedError("Unsupported platform");
   }
