@@ -22,12 +22,14 @@ class PurchaseService {
   static const String eliteYearlyId = 'elite_yearly';
 
   // Premium Kurabiye ID'leri
-  static const String cookieGoldenArabesqueId = 'cookie_golden_arabesque';
-  static const String cookieMidnightMosaicId = 'cookie_midnight_mosaic';
-  static const String cookiePearlLaceId = 'cookie_pearl_lace';
-  static const String cookieGoldenSakuraId = 'cookie_golden_sakura';
-  static const String cookieDragonPhoenixId = 'cookie_dragon_phoenix';
-  static const String cookieGoldBeastsId = 'cookie_gold_beasts';
+  static const List<String> allPremiumCookieIds = [
+    'cookie_blue_porcelain', 'cookie_cupid_ribbon', 'cookie_diamond_crust', 
+    'cookie_dragon_phoenix', 'cookie_emerald_essence', 'cookie_gold_beasts', 
+    'cookie_golden_arabesque', 'cookie_golden_majesty', 'cookie_golden_sakura', 
+    'cookie_midnight_mosaic', 'cookie_obsidian_grace', 'cookie_panda_bamboo', 
+    'cookie_pearl_lace', 'cookie_pink_blossom', 'cookie_platinum_veil', 
+    'cookie_royal_sapphire', 'cookie_ruby_heart', 'cookie_wildflower'
+  ];
 
   // Ruh Taşı ID'leri
   static const String soulStone5Id = 'soul_stone_5';
@@ -38,15 +40,10 @@ class PurchaseService {
     eliteWeeklyId,
     eliteMonthlyId,
     eliteYearlyId,
-    cookieGoldenArabesqueId,
-    cookieMidnightMosaicId,
-    cookiePearlLaceId,
-    cookieGoldenSakuraId,
-    cookieDragonPhoenixId,
-    cookieGoldBeastsId,
     soulStone5Id,
     soulStone15Id,
     soulStone50Id,
+    ...allPremiumCookieIds,
   };
 
   // Yüklenen ürün detayları

@@ -1855,36 +1855,24 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
 
   // Kurabiye bilgileri
   static const Map<String, Map<String, String>> _cookieInfo = {
-    'golden_arabesque': {
-      'tr': 'Altın Arabesk',
-      'en': 'Golden Arabesque',
-      'rarity': 'rare',
-    },
-    'midnight_mosaic': {
-      'tr': 'Gece Mozaiği',
-      'en': 'Midnight Mosaic',
-      'rarity': 'rare',
-    },
-    'pearl_lace': {
-      'tr': 'İnci Dantel',
-      'en': 'Pearl Lace',
-      'rarity': 'rare',
-    },
-    'golden_sakura': {
-      'tr': 'Altın Sakura',
-      'en': 'Golden Sakura',
-      'rarity': 'legendary',
-    },
-    'dragon_phoenix': {
-      'tr': 'Ejderha & Anka',
-      'en': 'Dragon & Phoenix',
-      'rarity': 'legendary',
-    },
-    'gold_beasts': {
-      'tr': 'Altın Canavarlar',
-      'en': 'Gold Beasts',
-      'rarity': 'legendary',
-    },
+    'golden_arabesque': {'tr': 'Altın Arabesk', 'en': 'Golden Arabesque', 'rarity': 'rare'},
+    'midnight_mosaic': {'tr': 'Gece Mozaiği', 'en': 'Midnight Mosaic', 'rarity': 'rare'},
+    'pearl_lace': {'tr': 'İnci Dantel', 'en': 'Pearl Lace', 'rarity': 'rare'},
+    'golden_sakura': {'tr': 'Altın Sakura', 'en': 'Golden Sakura', 'rarity': 'legendary'},
+    'dragon_phoenix': {'tr': 'Ejderha & Anka', 'en': 'Dragon & Phoenix', 'rarity': 'legendary'},
+    'gold_beasts': {'tr': 'Altın Canavarlar', 'en': 'Gold Beasts', 'rarity': 'legendary'},
+    'blue_porcelain': {'tr': 'Mavi Porselen', 'en': 'Blue Porcelain', 'rarity': 'rare'},
+    'cupid_ribbon': {'tr': 'Aşk Kurdelesi', 'en': 'Cupid Ribbon', 'rarity': 'rare'},
+    'diamond_crust': {'tr': 'Elmas Kabuk', 'en': 'Diamond Crust', 'rarity': 'legendary'},
+    'emerald_essence': {'tr': 'Zümrüt Özü', 'en': 'Emerald Essence', 'rarity': 'rare'},
+    'golden_majesty': {'tr': 'Altın İhtişam', 'en': 'Golden Majesty', 'rarity': 'legendary'},
+    'obsidian_grace': {'tr': 'Obsidyen Zarafeti', 'en': 'Obsidian Grace', 'rarity': 'legendary'},
+    'panda_bamboo': {'tr': 'Panda', 'en': 'Panda Bamboo', 'rarity': 'rare'},
+    'pink_blossom': {'tr': 'Pembe Çiçek', 'en': 'Pink Blossom', 'rarity': 'rare'},
+    'platinum_veil': {'tr': 'Platin Peçe', 'en': 'Platinum Veil', 'rarity': 'legendary'},
+    'royal_sapphire': {'tr': 'Kraliyet Safiri', 'en': 'Royal Sapphire', 'rarity': 'rare'},
+    'ruby_heart': {'tr': 'Yakut Kalp', 'en': 'Ruby Heart', 'rarity': 'rare'},
+    'wildflower': {'tr': 'Kır Çiçeği', 'en': 'Wildflower', 'rarity': 'rare'},
   };
 
   @override
