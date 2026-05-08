@@ -2136,10 +2136,15 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                 ),
                 const SizedBox(height: 10),
                 // ── Fiyat + Satın Al Butonu ──
-                _PurchaseButton(
-                  isPurchasing: _isPurchasing,
-                  label: isTr ? 'Satın Al (₺29.99)' : 'Purchase (\$0.99)',
-                  onTap: _handlePurchase,
+                Builder(
+                  builder: (context) {
+                    final priceStr = PurchaseService().getPrice('cookie_${widget.cookieId}') ?? (isTr ? '₺29.99' : '\$0.99');
+                    return _PurchaseButton(
+                      isPurchasing: _isPurchasing,
+                      label: isTr ? 'Satın Al ($priceStr)' : 'Purchase ($priceStr)',
+                      onTap: _handlePurchase,
+                    );
+                  }
                 ),
                 const SizedBox(height: 8),
                 // ── Kapat ipucu ──
