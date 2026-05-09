@@ -1,0 +1,846 @@
+=== WEEKLY (READY) ===
+{
+  "data": {
+    "type": "subscriptions",
+    "id": "6767601552",
+    "attributes": {
+      "name": "Haftal\u0131k Elite",
+      "productId": "elite_weekly",
+      "familySharable": false,
+      "state": "READY_TO_SUBMIT",
+      "subscriptionPeriod": "ONE_WEEK",
+      "reviewNote": "This auto-renewable subscription unlocks premium daily tarot, dream interpretations, and removes ads. No additional accounts needed.",
+      "groupLevel": 1
+    },
+    "relationships": {
+      "subscriptionLocalizations": {
+        "meta": {
+          "paging": {
+            "total": 8,
+            "limit": 10
+          }
+        },
+        "data": [
+          {
+            "type": "subscriptionLocalizations",
+            "id": "59d61e9e-16c0-4ba1-83f1-2375e0847b9e"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "f2634896-5a95-44b0-a922-bf0d0f891f70"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "17bf8ac7-599c-4f90-baf1-78af63bf332e"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "232b9945-eb8b-4ac6-9bc1-fee8e4506e52"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "5fe8ad8b-f627-4292-97a2-5317c92c5056"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "4dc0c09d-f46b-46d3-9951-2f05a2bd9ccb"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "dedacebf-4425-476c-8a66-c4d7babacf11"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "e3ead03e-41d6-4f12-b7ae-7d9ed940211a"
+          }
+        ],
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/subscriptionLocalizations",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/subscriptionLocalizations"
+        }
+      },
+      "appStoreReviewScreenshot": {
+        "data": {
+          "type": "subscriptionAppStoreReviewScreenshots",
+          "id": "42ba920c-6039-4f2f-b00f-063622096867"
+        },
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/appStoreReviewScreenshot",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/appStoreReviewScreenshot"
+        }
+      },
+      "introductoryOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/introductoryOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/introductoryOffers"
+        }
+      },
+      "promotionalOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/promotionalOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/promotionalOffers"
+        }
+      },
+      "offerCodes": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/offerCodes",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/offerCodes"
+        }
+      },
+      "prices": {
+        "meta": {
+          "paging": {
+            "total": 175,
+            "limit": 10
+          }
+        },
+        "data": [
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0"
+          }
+        ],
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/prices",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/prices"
+        }
+      },
+      "pricePoints": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/pricePoints",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/pricePoints"
+        }
+      },
+      "promotedPurchase": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/promotedPurchase",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/promotedPurchase"
+        }
+      },
+      "subscriptionAvailability": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/subscriptionAvailability",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/subscriptionAvailability"
+        }
+      },
+      "winBackOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/winBackOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/winBackOffers"
+        }
+      },
+      "images": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/relationships/images",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552/images"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552"
+    }
+  },
+  "included": [
+    {
+      "type": "subscriptionLocalizations",
+      "id": "59d61e9e-16c0-4ba1-83f1-2375e0847b9e",
+      "attributes": {
+        "name": "Elite Mingguan",
+        "locale": "id",
+        "description": "Premium Elite Mingguan",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/59d61e9e-16c0-4ba1-83f1-2375e0847b9e"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "f2634896-5a95-44b0-a922-bf0d0f891f70",
+      "attributes": {
+        "name": "\u30a6\u30a3\u30fc\u30af\u30ea\u30fc Elite",
+        "locale": "ja",
+        "description": "Premium \u30a6\u30a3\u30fc\u30af\u30ea\u30fc Elite",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/f2634896-5a95-44b0-a922-bf0d0f891f70"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "17bf8ac7-599c-4f90-baf1-78af63bf332e",
+      "attributes": {
+        "name": "Elite Semanal",
+        "locale": "es-MX",
+        "description": "Premium Elite Semanal",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/17bf8ac7-599c-4f90-baf1-78af63bf332e"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "232b9945-eb8b-4ac6-9bc1-fee8e4506e52",
+      "attributes": {
+        "name": "Elite H\u00e0ng tu\u1ea7n",
+        "locale": "vi",
+        "description": "Premium Elite H\u00e0ng tu\u1ea7n",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/232b9945-eb8b-4ac6-9bc1-fee8e4506e52"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "5fe8ad8b-f627-4292-97a2-5317c92c5056",
+      "attributes": {
+        "name": "\u0625\u064a\u0644\u064a\u062a \u0623\u0633\u0628\u0648\u0639\u064a",
+        "locale": "ar-SA",
+        "description": "Premium \u0625\u064a\u0644\u064a\u062a \u0623\u0633\u0628\u0648\u0639\u064a",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/5fe8ad8b-f627-4292-97a2-5317c92c5056"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "4dc0c09d-f46b-46d3-9951-2f05a2bd9ccb",
+      "attributes": {
+        "name": "\uc8fc\uac04 Elite",
+        "locale": "ko",
+        "description": "Premium \uc8fc\uac04 Elite",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/4dc0c09d-f46b-46d3-9951-2f05a2bd9ccb"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "dedacebf-4425-476c-8a66-c4d7babacf11",
+      "attributes": {
+        "name": "Elite \u0e23\u0e32\u0e22\u0e2a\u0e31\u0e1b\u0e14\u0e32\u0e2b\u0e4c",
+        "locale": "th",
+        "description": "Premium Elite \u0e23\u0e32\u0e22\u0e2a\u0e31\u0e1b\u0e14\u0e32\u0e2b\u0e4c",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/dedacebf-4425-476c-8a66-c4d7babacf11"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "e3ead03e-41d6-4f12-b7ae-7d9ed940211a",
+      "attributes": {
+        "name": "Haftal\u0131k Elite",
+        "locale": "tr",
+        "description": "Haftal\u0131k eri\u015fim ",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/e3ead03e-41d6-4f12-b7ae-7d9ed940211a"
+      }
+    },
+    {
+      "type": "subscriptionAppStoreReviewScreenshots",
+      "id": "42ba920c-6039-4f2f-b00f-063622096867",
+      "attributes": {
+        "fileSize": 665789,
+        "fileName": "SOURCE",
+        "sourceFileChecksum": "d19a3f3dabf334fe68c5361ac61b7cc3",
+        "imageAsset": {
+          "templateUrl": "https://is1-ssl.mzstatic.com/image/thumb/b9njM6BYjIbMhKyj2iEcDg/{w}x{h}bb.{f}",
+          "width": 1206,
+          "height": 2622
+        },
+        "assetToken": "22fa251d-594e-8455-eda9-a318ce9554c6",
+        "assetType": "IAP_REVIEW_SCREENSHOT",
+        "uploadOperations": [],
+        "assetDeliveryState": {
+          "errors": null,
+          "warnings": null,
+          "state": "COMPLETE"
+        }
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionAppStoreReviewScreenshots/42ba920c-6039-4f2f-b00f-063622096867"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTU1MiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601552?include=appStoreReviewScreenshot%2Cprices%2CsubscriptionLocalizations"
+  }
+}
+=== MONTHLY (MISSING) ===
+{
+  "data": {
+    "type": "subscriptions",
+    "id": "6767601502",
+    "attributes": {
+      "name": "Ayl\u0131k Elite",
+      "productId": "elite_monthly",
+      "familySharable": false,
+      "state": "MISSING_METADATA",
+      "subscriptionPeriod": "ONE_MONTH",
+      "reviewNote": "This auto-renewable subscription unlocks premium daily tarot, dream interpretations, and removes ads. No additional accounts needed.",
+      "groupLevel": 2
+    },
+    "relationships": {
+      "subscriptionLocalizations": {
+        "meta": {
+          "paging": {
+            "total": 8,
+            "limit": 10
+          }
+        },
+        "data": [
+          {
+            "type": "subscriptionLocalizations",
+            "id": "22af4cbf-db0c-412e-9023-d4cbfffb3733"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "8f3dd83e-9da4-48e2-89cf-7c6019dfe311"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "dfc6a0e8-3cc3-4a9f-bf64-ef2508f63947"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "d1e59dd4-8257-4d97-b950-6621f6fe94d9"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "b970a959-7dc7-4d16-8a75-21668b4f076d"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "fc8d48c3-97bd-44ec-87e1-74e4424b6161"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "ed5d2cb1-bf5b-48c4-a41b-e89cee2cfe1d"
+          },
+          {
+            "type": "subscriptionLocalizations",
+            "id": "c2a0f8ba-f5d7-4f65-8cfa-3e2c8eb93277"
+          }
+        ],
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/subscriptionLocalizations",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/subscriptionLocalizations"
+        }
+      },
+      "appStoreReviewScreenshot": {
+        "data": {
+          "type": "subscriptionAppStoreReviewScreenshots",
+          "id": "2392c4d4-1f1c-4c99-b701-ef6cc4f9aa06"
+        },
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/appStoreReviewScreenshot",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/appStoreReviewScreenshot"
+        }
+      },
+      "introductoryOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/introductoryOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/introductoryOffers"
+        }
+      },
+      "promotionalOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/promotionalOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/promotionalOffers"
+        }
+      },
+      "offerCodes": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/offerCodes",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/offerCodes"
+        }
+      },
+      "prices": {
+        "meta": {
+          "paging": {
+            "total": 175,
+            "limit": 10
+          }
+        },
+        "data": [
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0"
+          },
+          {
+            "type": "subscriptionPrices",
+            "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0"
+          }
+        ],
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/prices",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/prices"
+        }
+      },
+      "pricePoints": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/pricePoints",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/pricePoints"
+        }
+      },
+      "promotedPurchase": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/promotedPurchase",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/promotedPurchase"
+        }
+      },
+      "subscriptionAvailability": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/subscriptionAvailability",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/subscriptionAvailability"
+        }
+      },
+      "winBackOffers": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/winBackOffers",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/winBackOffers"
+        }
+      },
+      "images": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/relationships/images",
+          "related": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502/images"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502"
+    }
+  },
+  "included": [
+    {
+      "type": "subscriptionLocalizations",
+      "id": "22af4cbf-db0c-412e-9023-d4cbfffb3733",
+      "attributes": {
+        "name": "\u0625\u064a\u0644\u064a\u062a \u0634\u0647\u0631\u064a",
+        "locale": "ar-SA",
+        "description": "Premium \u0625\u064a\u0644\u064a\u062a \u0634\u0647\u0631\u064a",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/22af4cbf-db0c-412e-9023-d4cbfffb3733"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "8f3dd83e-9da4-48e2-89cf-7c6019dfe311",
+      "attributes": {
+        "name": "Elite H\u00e0ng th\u00e1ng",
+        "locale": "vi",
+        "description": "Premium Elite H\u00e0ng th\u00e1ng",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/8f3dd83e-9da4-48e2-89cf-7c6019dfe311"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "dfc6a0e8-3cc3-4a9f-bf64-ef2508f63947",
+      "attributes": {
+        "name": "Elite Bulanan",
+        "locale": "id",
+        "description": "Premium Elite Bulanan",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/dfc6a0e8-3cc3-4a9f-bf64-ef2508f63947"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "d1e59dd4-8257-4d97-b950-6621f6fe94d9",
+      "attributes": {
+        "name": "\u30de\u30f3\u30b9\u30ea\u30fc Elite",
+        "locale": "ja",
+        "description": "Premium \u30de\u30f3\u30b9\u30ea\u30fc Elite",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/d1e59dd4-8257-4d97-b950-6621f6fe94d9"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "b970a959-7dc7-4d16-8a75-21668b4f076d",
+      "attributes": {
+        "name": "Ayl\u0131k Elite",
+        "locale": "tr",
+        "description": "Ayl\u0131k premium eri\u015fim",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/b970a959-7dc7-4d16-8a75-21668b4f076d"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "fc8d48c3-97bd-44ec-87e1-74e4424b6161",
+      "attributes": {
+        "name": "\uc6d4\uac04 Elite",
+        "locale": "ko",
+        "description": "Premium \uc6d4\uac04 Elite",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/fc8d48c3-97bd-44ec-87e1-74e4424b6161"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "ed5d2cb1-bf5b-48c4-a41b-e89cee2cfe1d",
+      "attributes": {
+        "name": "Elite Mensual",
+        "locale": "es-MX",
+        "description": "Premium Elite Mensual",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/ed5d2cb1-bf5b-48c4-a41b-e89cee2cfe1d"
+      }
+    },
+    {
+      "type": "subscriptionLocalizations",
+      "id": "c2a0f8ba-f5d7-4f65-8cfa-3e2c8eb93277",
+      "attributes": {
+        "name": "Elite \u0e23\u0e32\u0e22\u0e40\u0e14\u0e37\u0e2d\u0e19",
+        "locale": "th",
+        "description": "Premium Elite \u0e23\u0e32\u0e22\u0e40\u0e14\u0e37\u0e2d\u0e19",
+        "state": "PREPARE_FOR_SUBMISSION"
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/c2a0f8ba-f5d7-4f65-8cfa-3e2c8eb93277"
+      }
+    },
+    {
+      "type": "subscriptionAppStoreReviewScreenshots",
+      "id": "2392c4d4-1f1c-4c99-b701-ef6cc4f9aa06",
+      "attributes": {
+        "fileSize": 662537,
+        "fileName": "SOURCE",
+        "sourceFileChecksum": "ec33c5678b34b90f69d70f8635163014",
+        "imageAsset": {
+          "templateUrl": "https://is1-ssl.mzstatic.com/image/thumb/6iPzLOjSK2hRMqYZ7SwJfA/{w}x{h}bb.{f}",
+          "width": 1206,
+          "height": 2622
+        },
+        "assetToken": "8bda4901-55a2-3627-82a3-84da97c45ff5",
+        "assetType": "IAP_REVIEW_SCREENSHOT",
+        "uploadOperations": [],
+        "assetDeliveryState": {
+          "errors": null,
+          "warnings": null,
+          "state": "COMPLETE"
+        }
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionAppStoreReviewScreenshots/2392c4d4-1f1c-4c99-b701-ef6cc4f9aa06"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRiIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBRyIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBSSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTCIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTSIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBTyIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBUiIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVCIsImQiOjAsInAiOiIwIn0"
+      }
+    },
+    {
+      "type": "subscriptionPrices",
+      "id": "eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0",
+      "attributes": {
+        "startDate": null,
+        "preserved": false
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/subscriptionPrices/eyJhIjoiNjc2NzYwMTUwMiIsImMiOiJBVSIsImQiOjAsInAiOiIwIn0"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/subscriptions/6767601502?include=appStoreReviewScreenshot%2Cprices%2CsubscriptionLocalizations"
+  }
+}
