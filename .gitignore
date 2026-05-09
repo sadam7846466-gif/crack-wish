@@ -51,3 +51,8 @@ scripts/
 .agents/
 *.py
 *.diff
+
+# App Store Connect API Keys
+*.p8
+AuthKey_*.p8
+
