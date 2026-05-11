@@ -192,13 +192,7 @@ class _CookieSectionState extends State<CookieSection>
     _loadDailyCookieCredits();
     _checkOwnership();
     
-    // GEÇİCİ UI TESTİ: Sen "R" basıp Hot Restart yaptığında animasyonu tekrar test edebilmen için.
-    // DİKKAT: Diğer HİÇBİR veriye dokunmaz, SADECE kurabiye kilitlerini sıfırlar.
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.remove('cookie_collection');
-      // Sıfırladıktan sonra UI'ı kilitli gösterecek şekilde state'i anında güncelle:
-      setState(() => _ownedCount = 0);
-    });
+
 
     // Reklamı arka planda önden yükleyelim:
     AdService().loadRewardedAd();
