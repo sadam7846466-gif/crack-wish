@@ -694,8 +694,7 @@ class _CookieSectionState extends State<CookieSection>
     );
 
     if (result == true) {
-      // Satın alındı, envantere ekle
-      await StorageService.incrementCookieCard(cookieId);
+      // Satın alındı, animasyonu başlat
       
       // Panel tamamen kapanana kadar bekle (yaklaşık 400ms)
       await Future.delayed(const Duration(milliseconds: 400));

@@ -103,16 +103,31 @@ class PurchaseService {
         case PurchaseStatus.restored:
           // Satın alma başarılı — doğrula ve kilidi aç
           await _verifyAndDeliver(purchase);
+          if (_pendingProductId == purchase.productID && _purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+             _purchaseCompleter!.complete(true);
+             _purchaseCompleter = null;
+             _pendingProductId = null;
+          }
           break;
         case PurchaseStatus.error:
           debugPrint('Satın alma hatası: ${purchase.error}');
           onPurchaseError?.call(purchase.error?.message ?? 'Bilinmeyen hata');
+          if (_pendingProductId == purchase.productID && _purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+             _purchaseCompleter!.complete(false);
+             _purchaseCompleter = null;
+             _pendingProductId = null;
+          }
           break;
         case PurchaseStatus.pending:
           debugPrint('Satın alma beklemede: ${purchase.productID}');
           break;
         case PurchaseStatus.canceled:
           debugPrint('Satın alma iptal edildi: ${purchase.productID}');
+          if (_pendingProductId == purchase.productID && _purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+             _purchaseCompleter!.complete(false);
+             _purchaseCompleter = null;
+             _pendingProductId = null;
+          }
           break;
       }
 
@@ -180,6 +195,9 @@ class PurchaseService {
 
   bool _isSoulStoneProduct(String id) => id.startsWith('soul_stone_');
 
+  Completer<bool>? _purchaseCompleter;
+  String? _pendingProductId;
+
   /// Belirli bir ürünü satın al
   Future<bool> purchase(String productId) async {
     if (!_isAvailable) {
@@ -193,18 +211,40 @@ class PurchaseService {
       return false;
     }
 
+    if (_purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+      debugPrint('Zaten devam eden bir satın alma işlemi var.');
+      return false;
+    }
+
+    _purchaseCompleter = Completer<bool>();
+    _pendingProductId = productId;
+
     try {
       final purchaseParam = PurchaseParam(productDetails: product);
 
+      bool queued = false;
       if (_isEliteProduct(purchaseParam.productDetails.id)) {
-        await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+        queued = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
       } else {
-        // Kurabiye (tüketilebilir/hediye edilebilir, stoklu ürün)
-        await _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: true);
+        // Kurabiye (tüketilebilir/hediye edilebilir, stoklu ürün) VEYA Ruh Taşı
+        queued = await _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: true);
       }
-      return true;
+      
+      if (!queued) {
+        if (!_purchaseCompleter!.isCompleted) _purchaseCompleter!.complete(false);
+        _purchaseCompleter = null;
+        _pendingProductId = null;
+        return false;
+      }
+
+      return await _purchaseCompleter!.future;
     } catch (e) {
       debugPrint('Satın alma başlatma hatası: $e');
+      if (_purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+        _purchaseCompleter!.complete(false);
+      }
+      _purchaseCompleter = null;
+      _pendingProductId = null;
       return false;
     }
   }

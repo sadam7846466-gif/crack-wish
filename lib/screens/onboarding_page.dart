@@ -599,7 +599,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       builder: (context, constraints) {
                         return SingleChildScrollView(
                           clipBehavior: Clip.none, // Avatarların sağa sola taşmasına izin verir (akıcı geçiş)
-                          physics: _currentStep == 0 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                          physics: _currentStep <= 6 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                           padding: const EdgeInsets.only(top: 140, bottom: 220), // Alt menü ile çakışmayı önlemek için bottom artırıldı
                           child: ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxHeight - 120),
@@ -2077,7 +2077,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep2() {
     return Column(
       children: [
-        const SizedBox(height: 52), // Kutuları biraz aşağı kaydırdık
+        const SizedBox(height: 100), // Kutuları dikey olarak ortaya aldık
 
         _buildOverlappingOption(
           "Haberci & Net Rüyalar", 
@@ -2220,7 +2220,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep3() {
     return Column(
       children: [
-        const SizedBox(height: 64), // Tepede sıkışan seçenekleri, ekranı dengeli kullanmak için aşağı ittik
+        const SizedBox(height: 80), // Butonları dikey ortaya yaklaştırdık
 
         _buildTimeAccordion(
           "Aklın Işığı", 
