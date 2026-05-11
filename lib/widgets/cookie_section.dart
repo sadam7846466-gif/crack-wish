@@ -1913,20 +1913,6 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
 
       if (success) {
         if (mounted) Navigator.pop(context, true);
-      } else if (mounted) {
-        HapticFeedback.heavyImpact();
-        final isTr = Localizations.localeOf(context).languageCode == 'tr';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isTr ? 'Şu anda satın alma yapılamıyor.' : 'Purchase unavailable right now.',
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.redAccent.withOpacity(0.9),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
       }
     } catch (e) {
       debugPrint('Kurabiye satın alma hatası: $e');
