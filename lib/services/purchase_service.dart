@@ -74,7 +74,14 @@ class PurchaseService {
     // Ürünleri yükle
     await _loadProducts();
 
-    // Tamamlanmamış satın almaları kontrol et
+    // Tamamlanmamış satın almaları kontrol et ve askıda kalanları temizle
+    try {
+      await _iap.restorePurchases();
+      debugPrint('Askıda kalan satın almalar restore edildi.');
+    } catch (e) {
+      debugPrint('Restore hatası: $e');
+    }
+
     debugPrint('PurchaseService Başlatıldı! ${_products.length} ürün yüklendi.');
   }
 
@@ -112,7 +119,7 @@ class PurchaseService {
         case PurchaseStatus.error:
           debugPrint('Satın alma hatası: ${purchase.error}');
           onPurchaseError?.call(purchase.error?.message ?? 'Bilinmeyen hata');
-          if (_pendingProductId == purchase.productID && _purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+          if (_purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
              _purchaseCompleter!.complete(false);
              _purchaseCompleter = null;
              _pendingProductId = null;
@@ -123,7 +130,7 @@ class PurchaseService {
           break;
         case PurchaseStatus.canceled:
           debugPrint('Satın alma iptal edildi: ${purchase.productID}');
-          if (_pendingProductId == purchase.productID && _purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
+          if (_purchaseCompleter != null && !_purchaseCompleter!.isCompleted) {
              _purchaseCompleter!.complete(false);
              _purchaseCompleter = null;
              _pendingProductId = null;

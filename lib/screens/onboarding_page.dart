@@ -728,7 +728,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                     duration: const Duration(milliseconds: 450),
                                     curve: Curves.easeOut,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 70.0), // 100 pixel çok geldiği için "bir tık" (30px) düşürülerek tam odak merkeze alındı
+                                      padding: const EdgeInsets.only(bottom: 20.0), // 100 pixel çok geldiği için "bir tık" (30px) düşürülerek tam odak merkeze alındı
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
