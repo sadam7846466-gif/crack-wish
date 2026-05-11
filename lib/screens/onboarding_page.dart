@@ -1157,16 +1157,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           HapticFeedback.selectionClick();
           onSelect(label);
         },
-        child: SizedBox(
-          width: 160,
-          height: 135,
+        child: SizedBox.expand(
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: 160,
-                height: 135,
+                width: double.infinity,
+                height: double.infinity,
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.white.withOpacity(0.12) : Colors.white.withOpacity(0.04), // Seçiliyken cam efektini güçlendirecek fon
                   borderRadius: BorderRadius.circular(22),
@@ -1891,18 +1889,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildStep1() {
-    return Column(
+    return Transform.translate(
+      offset: const Offset(0, -90),
+      child: Column(
       children: [
-        const SizedBox(height: 32),
-        Container(
-          width: double.infinity,
-          alignment: Alignment.center,
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 20, // Alt boşluğu doldurması için genişletildi
-
-            alignment: WrapAlignment.center,
-          children: [
+        const SizedBox(height: 0),
+        GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 16,
+            childAspectRatio: 1.2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
             _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
@@ -1941,8 +1940,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             }, index: 5),
           ],
         ),
-        ), // Container closed
       ],
+    ),
     );
   }
 
