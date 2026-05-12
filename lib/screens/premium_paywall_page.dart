@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:crack_wish/widgets/magical_success_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -182,15 +183,16 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                               // Supabase'e bildir
                               await ProfileSyncService().syncEliteStatus(true);
                               
-                              _showGlassMessage(
-                                "Elite Geri Yüklendi",
-                                "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
-                                Icons.check_circle_rounded,
-                                const Color(0xFF10B981),
-                                onOk: () {
-                                  Navigator.pop(context);
-                                }
-                              );
+                              MagicalSuccessDialog.show(
+                                context,
+                                title: "Elite Geri Yüklendi",
+                                subtitle: "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
+                                imagePath: '',
+                                fallbackIcon: Icons.check_circle_rounded,
+                                themeColor: const Color(0xFF10B981),
+                              ).then((_) {
+                                if (mounted) Navigator.pop(context);
+                              });
                             } else {
                               HapticFeedback.vibrate();
                               _showGlassMessage(
@@ -392,15 +394,16 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                               _activePackageIndex = _selectedPackageIndex;
                                             });
                                             
-                                            _showGlassMessage(
-                                              isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
-                                              isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
-                                              Icons.auto_awesome,
-                                              const Color(0xFFFFD700),
-                                              onOk: () {
-                                                Navigator.pop(context, true);
-                                              }
-                                            );
+                                            MagicalSuccessDialog.show(
+                                              context,
+                                              title: isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
+                                              subtitle: isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
+                                              imagePath: '',
+                                              fallbackIcon: Icons.auto_awesome,
+                                              themeColor: const Color(0xFFFFD700),
+                                            ).then((_) {
+                                              if (mounted) Navigator.pop(context, true);
+                                            });
                                           } else if (mounted) {
                                             setState(() => _isPurchasing = false);
                                             _showGlassMessage(

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:crack_wish/widgets/magical_success_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -2815,6 +2816,7 @@ class _BentoHeroCard extends StatelessWidget {
     bool showSuccess = false;
 
     int selectedStoreIndex = -1;
+    bool isPurchasingStone = false;
 
     // Anlık olarak StorageService'dan çekilecek bekleyen aura değerleri
     int pendingFal = 0;
@@ -3478,7 +3480,7 @@ class _BentoHeroCard extends StatelessWidget {
                               Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: selectedStoreIndex != -1
+                                  onTap: (selectedStoreIndex != -1 && !isPurchasingStone)
                                       ? () async {
                                           HapticFeedback.heavyImpact();
                                           String pId = '';
@@ -3487,7 +3489,34 @@ class _BentoHeroCard extends StatelessWidget {
                                           else if (selectedStoreIndex == 2) pId = PurchaseService.soulStone50Id;
                                           
                                           if (pId.isNotEmpty) {
-                                            await PurchaseService().purchase(pId);
+                                            setModalState(() => isPurchasingStone = true);
+                                            bool success = await PurchaseService().purchase(pId);
+                                            
+                                            if (!context.mounted) return;
+                                            setModalState(() => isPurchasingStone = false);
+                                            
+                                            if (success) {
+                                              HapticFeedback.heavyImpact();
+                                              int amount = 5;
+                                              if (pId == PurchaseService.soulStone15Id) amount = 15;
+                                              if (pId == PurchaseService.soulStone50Id) amount = 50;
+
+                                              setModalState(() {
+                                                modalSoulStones += amount;
+                                              });
+                                              setState(() {
+                                                soulStones += amount;
+                                              });
+
+                                              MagicalSuccessDialog.show(
+                                                context,
+                                                title: "Ruh Taşı Kazanıldı!",
+                                                subtitle: "Kozmik hazinenize $amount adet Ruh Taşı eklendi. Premium kurabiyeler açılmayı bekliyor.",
+                                                imagePath: '',
+                                                fallbackIcon: Icons.diamond_rounded,
+                                                themeColor: const Color(0xFF22D3EE),
+                                              );
+                                            }
                                           }
                                         }
                                       : null,
@@ -3515,17 +3544,19 @@ class _BentoHeroCard extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                     child: Center(
-                                      child: Text(
-                                        "Satın Al",
-                                        style: TextStyle(
-                                          color: selectedStoreIndex != -1
-                                              ? const Color(0xFFC084FC)
-                                              : Colors.white.withOpacity(0.2),
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1,
-                                        ),
-                                      ),
+                                      child: isPurchasingStone
+                                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Color(0xFFC084FC), strokeWidth: 2))
+                                          : Text(
+                                              "Satın Al",
+                                              style: TextStyle(
+                                                color: selectedStoreIndex != -1
+                                                    ? const Color(0xFFC084FC)
+                                                    : Colors.white.withOpacity(0.2),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 1,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
