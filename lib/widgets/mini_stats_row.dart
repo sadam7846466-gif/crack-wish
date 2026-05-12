@@ -1869,11 +1869,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
             children: [
               // Başlık
               Text(
-                _cookieNameLocalized(
-                  widget.selectedCookieId ?? '',
-                  isTr ? 'Kurabiyelerim' : 'My Cookies',
-                  languageCode,
-                ),
+                isTr ? 'Kurabiyelerim' : 'My Cookies',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -1884,8 +1880,8 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
               const SizedBox(height: 4),
               Text(
                 isTr
-                    ? '${_ownedCookies.length} çeşit · dokun → sabitle'
-                    : '${_ownedCookies.length} types · tap → pin',
+                    ? '${_ownedCookies.length} çeşit · basılı tut → sergile'
+                    : '${_ownedCookies.length} types · hold → display',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.45),
@@ -1914,8 +1910,8 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     isTr
-                        ? 'Henüz koleksiyonunda kurabiye yok.\nAna sayfadan kurabiye kırarak başla!'
-                        : 'No cookies in your collection yet.\nStart cracking cookies from the home page!',
+                        ? 'Henüz koleksiyonunda kurabiye yok.\nPremium kurabiye satın alarak koleksiyonunu başlat!'
+                        : 'No cookies in your collection yet.\nPurchase a premium cookie to start your collection!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
