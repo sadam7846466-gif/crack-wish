@@ -19,13 +19,15 @@ import '../services/sound_service.dart';
 import '../models/cookie_card.dart';
 
 class CookieSection extends StatefulWidget {
-  final VoidCallback? onCookieTapped;
+  final VoidCallback onCookieTapped;
+  final VoidCallback? onPurchaseSuccess;
   final String? selectedCookieEmoji;
   final bool hideLabels;
 
   const CookieSection({
     super.key,
-    this.onCookieTapped,
+    required this.onCookieTapped,
+    this.onPurchaseSuccess,
     this.selectedCookieEmoji,
     this.hideLabels = false,
   });
@@ -698,17 +700,11 @@ class _CookieSectionState extends State<CookieSection>
         _unlockController.forward(from: 0.0);
       }
       
-      // 0.20 saniyede tam kilit kırılma hissi (2500ms * 0.20 = 500ms)
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) HapticFeedback.heavyImpact();
-      });
+      // Kilit açılma animasyonunu ve sesi bekle
+      await Future.delayed(const Duration(milliseconds: 2000));
       
-      // Kilit açılma animasyonunun bitmesini bekle (2.5 saniye)
-      await Future.delayed(const Duration(milliseconds: 2500));
-
       // Tüm animasyonlar bitince bildirimi göster
       if (mounted) {
-        final isTr = Localizations.localeOf(context).languageCode == 'tr';
         _CookieUnlockedDialog.show(
           context: context,
           imagePath: imagePath ?? 'assets/images/cookies/paid/may/golden_arabesque.webp',
@@ -718,6 +714,7 @@ class _CookieSectionState extends State<CookieSection>
       }
       
       _checkOwnership(); // Güncel durumu yükle
+      widget.onPurchaseSuccess?.call();
     }
   }
 

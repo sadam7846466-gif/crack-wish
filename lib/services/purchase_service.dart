@@ -159,11 +159,11 @@ class PurchaseService {
       ProfileSyncService().syncEliteStatus(true);
     } else if (_isCookieProduct(productId)) {
       // Kurabiye — satın alınan kurabiyeyi envantere ekle
-      // Satın alınan ürün ID'si örn: "cookie_golden_arabesque". Ön ekini temizle:
-      final String cookieId = productId.replaceFirst('cookie_', '');
+      // Satın alınan ürün ID'si örn: "cookie_golden_arabesque" veya direkt "golden_arabesque". Ön ekini temizle:
+      final String cookieId = productId.startsWith('cookie_') ? productId.replaceFirst('cookie_', '') : productId;
       await StorageService.incrementCookieCard(cookieId);
-      debugPrint('✅ Kurabiye satın alındı: $productId');
-      AnalyticsService().logCookiePurchased(cookieId: productId, price: 'store');
+      debugPrint('✅ Kurabiye satın alındı: $productId (Parsed: $cookieId)');
+      AnalyticsService().logCookiePurchased(cookieId: cookieId, price: 'store');
       
       // Buluta Senkronize Et (Arka planda)
       StorageService.getCookieCollection().then((collection) {
@@ -198,7 +198,11 @@ class PurchaseService {
   bool _isEliteProduct(String id) =>
       id == eliteWeeklyId || id == eliteMonthlyId || id == eliteYearlyId;
 
-  bool _isCookieProduct(String id) => id.startsWith('cookie_');
+  bool _isCookieProduct(String id) {
+    if (id.startsWith('cookie_')) return true;
+    if (allPremiumCookieIds.contains('cookie_$id')) return true;
+    return false;
+  }
 
   bool _isSoulStoneProduct(String id) => id.startsWith('soul_stone_');
 

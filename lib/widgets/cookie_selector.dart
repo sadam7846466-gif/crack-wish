@@ -101,6 +101,10 @@ class _CookieSelectorState extends State<CookieSelector> {
   @override
   void didUpdateWidget(CookieSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
+    // Her güncellendiğinde envanteri yeniden yükle (parent rebuild olduğunda vs.)
+    _loadOwnedCookies();
+    
     if (widget.initialSelectedIndex != null &&
         widget.initialSelectedIndex != oldWidget.initialSelectedIndex &&
         widget.initialSelectedIndex! != _selectedIndex) {

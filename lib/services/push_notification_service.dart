@@ -193,6 +193,16 @@ class PushNotificationService {
   // Mesajlar her gün rotasyonla değişir. Yapılan aktivite → bildirim iptal.
   // ═══════════════════════════════════════════════════════════════
 
+  String _translateZodiac(String sign) {
+    final map = {
+      'aries': 'Koç', 'taurus': 'Boğa', 'gemini': 'İkizler',
+      'cancer': 'Yengeç', 'leo': 'Aslan', 'virgo': 'Başak',
+      'libra': 'Terazi', 'scorpio': 'Akrep', 'sagittarius': 'Yay',
+      'capricorn': 'Oğlak', 'aquarius': 'Kova', 'pisces': 'Balık'
+    };
+    return map[sign.trim().toLowerCase()] ?? sign;
+  }
+
   Future<void> _scheduleRoutines() async {
     final settings = await StorageService.getNotificationSettings();
     final bool dailyRemindersEnabled = settings['dailyReminders'] ?? false;
@@ -208,78 +218,99 @@ class PushNotificationService {
 
     final prefs = await SharedPreferences.getInstance();
     final String userName = prefs.getString('user_name') ?? "Ruh";
-    final String zodiac = prefs.getString('zodiac_sign') ?? "Yıldıztozu";
+    final String rawZodiac = prefs.getString('zodiac_sign') ?? "Yıldıztozu";
+    final String zodiac = _translateZodiac(rawZodiac);
     final int dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
+
+    // Her kullanıcıya özel "Organik Bildirim Dakikası" (0-59 arası)
+    // Böylece herkese tam saatinde gitmez, sistem saati doğal hissettirir.
+    final int userHash = userName.hashCode.abs();
+    final int minuteOffset = (userHash + dayOfYear * 7) % 60;
 
     final bool cookieDone = (await StorageService.getCookieCracksToday()) > 0;
     final bool tarotDone = await StorageService.isTarotDoneToday();
     final bool dreamDone = await StorageService.isDreamDoneToday();
     final int streakDays = await StorageService.getStreakDays();
+    final int soulStones = await StorageService.getSoulStones();
 
-    // ── SABAH (09:00) — Her gün farklı mesaj ──
+    // Mesaj seçici: Herkes o gün AYNI mesajı almasın diye kullanıcının hash'i ile kaydırıyoruz.
+    int getMsgIndex(int length) => (dayOfYear + userHash) % length;
+
+    // ── SABAH (09:XX) — Günlük Karşılama ──
     final morningMessages = [
       ['Günaydın $userName! ☀️', '$zodiac burcunun bugünkü kozmik mesajı hazır.'],
       ['Yeni bir gün, yeni bir şans ✨', '$userName, evren bugün senin için ne hazırladı?'],
       ['Kozmik enerji yüksek! 🌟', '$zodiac burcu bugün güçlü. Fırsatları kaçırma!'],
       ['Bugün senin günün $userName 🔮', 'Yıldızlar $zodiac burcuna gülümsüyor.'],
       ['Evren seninle konuşmak istiyor 🌌', '$userName, bugünkü kozmik rehberliğin hazır.'],
-      ['Ruhun uyanıyor $userName 💫', '$zodiac enerjisi bugün dorukta!'],
-      ['Kozmik kahvaltı zamanı ☕', '$userName, günün mesajını almadan çıkma!'],
     ];
-    final mo = morningMessages[dayOfYear % morningMessages.length];
-    _scheduleLocalNotification(id: 1, title: mo[0], body: mo[1], hour: 9, minute: 0, channelId: 'morning_routine', channelName: 'Sabah Kahini');
+    final mo = morningMessages[getMsgIndex(morningMessages.length)];
+    _scheduleLocalNotification(id: 1, title: mo[0], body: mo[1], hour: 9, minute: minuteOffset, channelId: 'morning_routine', channelName: 'Sabah Kahini');
 
-    // ── ÖĞLE (13:00) — Kurabiye kırılmadıysa ──
-    if (!cookieDone) {
-      final cookieMessages = [
-        ['Bugünkü kurabiyeni kırmadın 🥠', '$zodiac şans kurabiyende gizli bir mesaj var!'],
-        ['Şans kurabiyesi seni bekliyor 🍪', 'Bugünkü $zodiac mesajını kurabiyende bul!'],
-        ['Kurabiyeni kırmadan günü kapatma 🥠', 'İçindeki mesaj seni şaşırtabilir!'],
-        ['Kırmadığın kurabiye, kaçırdığın şans! ✨', '$userName, şans kurabiyeni kırmayı unuttun.'],
-      ];
-      final co = cookieMessages[dayOfYear % cookieMessages.length];
-      _scheduleLocalNotification(id: 2, title: co[0], body: co[1], hour: 13, minute: 0, channelId: 'cookie_reminder', channelName: 'Kurabiye Hatırlatıcı');
-    } else {
-      await cancelNotification(2);
-    }
-
-    // ── AKŞAM (18:00) — Tarot bakılmadıysa ──
-    if (!tarotDone) {
-      final tarotMessages = [
-        ['Akşam kartın seni bekliyor 🃏', 'Bugünün enerjisini okumak için $zodiac tarot açılımını kaçırma!'],
-        ['Kartlar fısıldıyor $userName 🔮', 'Bugün için sana bir mesaj var. Tarot kartını çek!'],
-        ['Akşam enerjisi güçlü 🌙', '$zodiac burcuna özel kart açılımın hazır.'],
-        ['Gün bitmeden kartını çek ✨', 'Evrenin sana bugün ne söylediğini merak etmiyor musun?'],
-      ];
-      final ta = tarotMessages[dayOfYear % tarotMessages.length];
-      _scheduleLocalNotification(id: 3, title: ta[0], body: ta[1], hour: 18, minute: 0, channelId: 'tarot_reminder', channelName: 'Tarot Hatırlatıcı');
-    } else {
-      await cancelNotification(3);
-    }
-
-    // ── GECE (21:00) — Rüya yazmadıysa ──
-    if (!dreamDone) {
+    // ── KUŞLUK VAKTİ (11:XX) — Rüya Hatırlatıcı (Her gün DEĞİL, 2 günde 1 hatırlatır) ──
+    if (!dreamDone && (dayOfYear + userHash) % 2 == 0) {
       final dreamMessages = [
-        ['Dün gece bir rüya gördün mü? 🌙', 'Rüya günlüğün seni bekliyor. Bilinçaltının mesajını kaçırma!'],
-        ['Rüyaların bir şey anlatıyor 💭', '$userName, rüyanı yaz ve bilinçaltını keşfet!'],
-        ['Uyumadan önce rüyanı yaz 🌌', 'Gece gördüklerin evrenin sana mesajı olabilir.'],
-        ['Rüya defterine bir not düş 📝', '$zodiac burcunun rüya enerjisi bu gece yüksek!'],
+        ['Dün gece bir rüya gördün mü? 🌙', 'Bilinçaltının mesajını unutmadan kaydet!'],
+        ['Rüyaların bir şey anlatıyor 💭', '$userName, bu sabah rüyanı yaz ve sırları keşfet!'],
+        ['Evren sana ne mesaj verdi? 🌌', 'Dün gece gördüğün rüya, geleceğine dair ipuçları taşıyor.'],
       ];
-      final dr = dreamMessages[dayOfYear % dreamMessages.length];
-      _scheduleLocalNotification(id: 4, title: dr[0], body: dr[1], hour: 21, minute: 0, channelId: 'dream_reminder', channelName: 'Rüya Hatırlatıcı');
+      final dr = dreamMessages[getMsgIndex(dreamMessages.length)];
+      _scheduleLocalNotification(id: 4, title: dr[0], body: dr[1], hour: 11, minute: minuteOffset, channelId: 'dream_reminder', channelName: 'Rüya Hatırlatıcı');
     } else {
       await cancelNotification(4);
     }
 
+    // ── ÖĞLE (14:XX) — Kurabiye Molası (Eğer kırmadıysa her gün uyarır) ──
+    if (!cookieDone) {
+      final cookieMessages = [
+        ['Kurabiyeni unutma 🥠', '$zodiac şans kurabiyende gizli bir mesaj var!'],
+        ['Şansını kır 🍪', 'Bugünkü $zodiac mesajını kurabiyende bul!'],
+        ['Sana bir mesaj var 🥠', 'İçindeki sürprizi görmek için kurabiyeni kır.'],
+      ];
+      final co = cookieMessages[getMsgIndex(cookieMessages.length)];
+      _scheduleLocalNotification(id: 2, title: co[0], body: co[1], hour: 14, minute: minuteOffset, channelId: 'cookie_reminder', channelName: 'Kurabiye Hatırlatıcı');
+    } else {
+      await cancelNotification(2);
+    }
+
+    // ── RUH TAŞI ZENGİNLİĞİ (16:XX) — (Çok Ruh Taşı varsa 4 günde 1 hatırlatır) ──
+    if (soulStones >= 50 && (dayOfYear + userHash) % 4 == 0) {
+      _scheduleLocalNotification(id: 9, title: 'Cebinde Ruh Taşları parlıyor! 💎', body: 'Biriken $soulStones Ruh Taşınla premium kurabiyeleri denemenin tam zamanı.', hour: 16, minute: minuteOffset, channelId: 'economy_reminder', channelName: 'Ekonomi Hatırlatıcı');
+    } else {
+      await cancelNotification(9);
+    }
+
+    // ── AKŞAM (19:XX) — Tarot (Her gün DEĞİL, 3 günde 1 hatırlatır) ──
+    if (!tarotDone && (dayOfYear + userHash) % 3 == 0) {
+      final tarotMessages = [
+        ['Akşam kartın hazır 🃏', 'Bugünün enerjisini okumak için $zodiac açılımını kaçırma!'],
+        ['Kartlar fısıldıyor 🔮', 'Bugün için sana bir mesaj var. Tarot kartını çek!'],
+        ['Akşam enerjisi güçlü 🌙', 'Günü kapatmadan evrenin sana ne söylediğine bak.'],
+      ];
+      final ta = tarotMessages[getMsgIndex(tarotMessages.length)];
+      _scheduleLocalNotification(id: 3, title: ta[0], body: ta[1], hour: 19, minute: minuteOffset, channelId: 'tarot_reminder', channelName: 'Tarot Hatırlatıcı');
+    } else {
+      await cancelNotification(3);
+    }
+
+    // ── STREAK KORUMA (21:XX) — (Serisi varsa ve kırmadıysa KESİN uyarır) ──
+    if (streakDays > 1 && !cookieDone) {
+      _scheduleLocalNotification(id: 10, title: '🔥 Serin bozulmak üzere!', body: '$streakDays günlük serini kaybetme. Hemen girip bir kurabiye kır.', hour: 21, minute: 30, channelId: 'streak_reminder', channelName: 'Seri Hatırlatıcı');
+    } else {
+      await cancelNotification(10);
+    }
+
     // ── BURÇ SEZONU (10:00) — Sezon değişim günlerinde ──
-    final zodiacSeason = _getZodiacSeasonToday();
-    if (zodiacSeason != null) {
-      final isUserSeason = zodiacSeason.toLowerCase() == zodiac.toLowerCase();
+    final rawZodiacSeason = _getZodiacSeasonToday();
+    if (rawZodiacSeason != null) {
+      final zodiacSeason = _translateZodiac(rawZodiacSeason);
+      final isUserSeason = rawZodiacSeason.toLowerCase() == rawZodiac.toLowerCase() || zodiacSeason.toLowerCase() == zodiac.toLowerCase();
+      
       _scheduleLocalNotification(
         id: 5,
         title: isUserSeason ? '♈ $zodiac sezonu başladı! 🎉' : '$zodiacSeason sezonu başladı! ✨',
         body: isUserSeason
-            ? '$userName, bu dönem tamamen senin! Kozmik enerjin dorukta.'
+            ? 'Güneş artık senin burcunda $userName. En şanslı dönemine girdin!'
             : 'Yeni kozmik dönem! $zodiac burcunu nasıl etkiler? Gel öğren.',
         hour: 10, minute: 0, channelId: 'zodiac_season', channelName: 'Burç Sezonu',
       );

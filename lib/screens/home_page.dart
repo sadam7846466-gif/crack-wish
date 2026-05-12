@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   int _currentNavIndex = 0;
   String _selectedCookieEmoji = 'spring_wreath'; // Default cookie ID
   int _selectedCookieIndex = 0; // Seçili cookie index'i (cookie selector için)
+  int _inventoryVersion = 0;
   final GlobalKey<State<CookieSection>> _cookieSectionKey =
       GlobalKey<State<CookieSection>>();
   final GlobalKey _owlButtonKey = GlobalKey();
@@ -261,6 +262,14 @@ class _HomePageState extends State<HomePage> {
     (_cookieSectionKey.currentState as dynamic)?.hideFortune();
   }
 
+  void _onPurchaseSuccess() {
+    if (mounted) {
+      setState(() {
+        _inventoryVersion++;
+      });
+    }
+  }
+
   // Kurabiye bazlı arka plan gradienti (tüm görseller için varsayılan)
   LinearGradient _getCookieGradient(String cookieId) {
     return const LinearGradient(
@@ -369,6 +378,7 @@ class _HomePageState extends State<HomePage> {
                                     });
                                   },
                                   onTapped: _refreshStats,
+                                  onPurchaseSuccess: _onPurchaseSuccess,
                                 ),
                               ),
                             ),
@@ -376,7 +386,7 @@ class _HomePageState extends State<HomePage> {
                               offset: const Offset(0, -60),
                               child: RepaintBoundary(
                                 child: CookieSelector(
-                                  key: const ValueKey('cookie_selector_fixed'),
+                                  key: ValueKey('cookie_selector_fixed_$_inventoryVersion'),
                                   initialSelectedIndex: _selectedCookieIndex,
                                   onCookieSelected: _onCookieSelected,
                                 ),
@@ -644,6 +654,7 @@ class _SlidingCookie extends StatefulWidget {
   final int currentIndex;
   final void Function(String emoji, int index) onCookieChanged;
   final VoidCallback onTapped;
+  final VoidCallback? onPurchaseSuccess;
 
   const _SlidingCookie({
     required this.emoji,
@@ -651,6 +662,7 @@ class _SlidingCookie extends StatefulWidget {
     required this.currentIndex,
     required this.onCookieChanged,
     required this.onTapped,
+    this.onPurchaseSuccess,
   });
 
   @override
@@ -816,6 +828,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Sonraki kurabiye - SADECE sürükleme sırasında oluştur
@@ -827,6 +840,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Çıkan kurabiye - SADECE geçiş animasyonu sırasında oluştur
@@ -838,6 +852,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: _outgoingEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Mevcut/giren kurabiye - HER ZAMAN render
@@ -848,6 +863,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                     onCookieTapped: widget.onTapped,
                     selectedCookieEmoji: widget.emoji,
                     hideLabels: true,
+                    onPurchaseSuccess: widget.onPurchaseSuccess,
                   ),
                 ),
               ],
