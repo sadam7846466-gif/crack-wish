@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'dart:ui';
-import 'package:crack_wish/widgets/magical_success_dialog.dart';
+import '../widgets/magical_success_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -3503,9 +3503,6 @@ class _BentoHeroCard extends StatelessWidget {
 
                                               setModalState(() {
                                                 modalSoulStones += amount;
-                                              });
-                                              setState(() {
-                                                soulStones += amount;
                                               });
 
                                               MagicalSuccessDialog.show(

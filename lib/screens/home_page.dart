@@ -561,7 +561,7 @@ class _OwlButtonState extends State<_OwlButton> {
             clipBehavior: Clip.none,
             children: [
                 GlassContainer(
-                  key: widget.key, // Artık parent'taki GlobalKey'i kullanıyoruz
+                  key: _btnKey,
                   useOwnLayer: true,
                 width: 52,
                 height: 52,
