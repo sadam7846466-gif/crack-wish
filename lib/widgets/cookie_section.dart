@@ -191,6 +191,17 @@ class _CookieSectionState extends State<CookieSection>
       _cracksToday = _cachedCracksToday;
       _dailyLimitReached = _cachedDailyLimitReached;
     }
+    final emoji = widget.selectedCookieEmoji ?? 'spring_wreath';
+    if (_paidCookieIds.contains(emoji)) {
+      final syncCount = StorageService.getCookieCountSync(emoji);
+      if (syncCount != null) {
+        _ownedCount = syncCount;
+        _isOwnershipChecking = false;
+      }
+    } else {
+      _isOwnershipChecking = false;
+    }
+
     _loadDailyCookieCredits();
     _checkOwnership();
     
@@ -270,6 +281,17 @@ class _CookieSectionState extends State<CookieSection>
         });
       }
       return;
+    }
+
+    final syncCount = StorageService.getCookieCountSync(emoji);
+    if (syncCount != null) {
+      if (mounted) {
+        setState(() {
+          _ownedCount = syncCount;
+          _isOwnershipChecking = false;
+        });
+      }
+      return; // Cache'ten bulundu, async bekleme (flicker yok)
     }
 
     if (mounted) setState(() => _isOwnershipChecking = true);

@@ -1431,6 +1431,10 @@ class StorageService {
         .toList();
   }
 
+  static Map<String, int>? _syncCookieCounts;
+
+  static int? getCookieCountSync(String id) => _syncCookieCounts?[id];
+
   static Future<List<CookieCard>> getCookieCollection() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonStr = prefs.getString(_keyCookieCollection);
@@ -1477,6 +1481,8 @@ class StorageService {
       );
     }
 
+    _syncCookieCounts = {for (final c in map.values) c.id: c.countObtained};
+
     return map.values.toList();
   }
 
@@ -1486,6 +1492,7 @@ class StorageService {
       _keyCookieCollection,
       jsonEncode(cards.map((c) => c.toJson()).toList()),
     );
+    _syncCookieCounts = {for (final c in cards) c.id: c.countObtained};
   }
 
   static Future<void> incrementCookieCard(String id, {bool isRewardOrGift = false}) async {
