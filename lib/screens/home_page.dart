@@ -169,8 +169,20 @@ class _HomePageState extends State<HomePage> {
       ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
       ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
     ];
-    final allCookies = SeasonConfig.getAllCookies().map((c) => c['id'] as String).toList();
-    final ownedButNotShown = allCookies.where((id) {
+    
+    // Kullanıcının sergilemeyi seçtiği kurabiyeler (max 6)
+    var displayedIds = await StorageService.getDisplayedCookies();
+    
+    // Henüz seçim yapmadıysa, sahip olduklarından ilk 6'sını göster
+    if (displayedIds.isEmpty) {
+      final allCookies = SeasonConfig.getAllCookies().map((c) => c['id'] as String).toList();
+      displayedIds = allCookies.where((id) {
+        return ownedIds.contains(id) && !showcaseIds.contains(id);
+      }).take(StorageService.maxDisplayedCookies).toList();
+    }
+    
+    // Vitrinde zaten olanları çıkar (çift gözükmesin)
+    final ownedButNotShown = displayedIds.where((id) {
       return ownedIds.contains(id) && !showcaseIds.contains(id);
     }).toList();
 

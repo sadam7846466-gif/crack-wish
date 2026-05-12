@@ -1403,29 +1403,48 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
     'evil_eye': 'assets/images/cookies/evil_eye.webp',
     'silver_lotus': 'assets/images/cookies/free/may/astral_projection.webp',
     'sakura_bloom': 'assets/images/cookies/free/may/sakura_bloom.webp',
-    'blue_porcelain': 'assets/images/cookies/blue_porcelain.webp',
-    'pink_blossom': 'assets/images/cookies/free/may/pink_blossom.webp',
+    'blue_porcelain': 'assets/images/cookies/paid/may/blue_porcelain.webp',
+    'pink_blossom': 'assets/images/cookies/paid/may/pink_blossom.webp',
     'fortune_cat': 'assets/images/cookies/free/may/fortune_cat.webp',
-    'wildflower': 'assets/images/cookies/free/may/wildflower.webp',
-    'cupid_ribbon': 'assets/images/cookies/free/may/cupid_ribbon.webp',
-    'panda_bamboo': 'assets/images/cookies/panda_bamboo.webp',
+    'wildflower': 'assets/images/cookies/paid/may/wildflower.webp',
+    'cupid_ribbon': 'assets/images/cookies/paid/may/cupid_ribbon.webp',
+    'panda_bamboo': 'assets/images/cookies/paid/may/panda_bamboo.webp',
     'ramadan_cute': 'assets/images/cookies/ramadan_cute.webp',
     'enchanted_forest': 'assets/images/cookies/enchanted_forest.webp',
     'golden_arabesque': 'assets/images/cookies/golden_arabesque.webp',
-    'midnight_mosaic': 'assets/images/cookies/midnight_mosaic.webp',
-    'pearl_lace': 'assets/images/cookies/pearl_lace.webp',
-    'golden_sakura': 'assets/images/cookies/golden_sakura.webp',
-    'dragon_phoenix': 'assets/images/cookies/dragon_phoenix.webp',
-    'gold_beasts': 'assets/images/cookies/gold_beasts.webp',
+    'midnight_mosaic': 'assets/images/cookies/paid/may/midnight_mosaic.webp',
+    'pearl_lace': 'assets/images/cookies/paid/may/pearl_lace.webp',
+    'golden_sakura': 'assets/images/cookies/paid/may/golden_sakura.webp',
+    'dragon_phoenix': 'assets/images/cookies/paid/may/dragon_phoenix.webp',
+    'gold_beasts': 'assets/images/cookies/paid/may/gold_beasts.webp',
+    'diamond_crust': 'assets/images/cookies/paid/may/diamond_crust.webp',
+    'emerald_essence': 'assets/images/cookies/paid/may/emerald_essence.webp',
+    'golden_majesty': 'assets/images/cookies/paid/may/golden_majesty.webp',
+    'obsidian_grace': 'assets/images/cookies/paid/may/obsidian_grace.webp',
+    'platinum_veil': 'assets/images/cookies/paid/may/platinum_veil.webp',
+    'royal_sapphire': 'assets/images/cookies/paid/may/royal_sapphire.webp',
+    'ruby_heart': 'assets/images/cookies/paid/may/ruby_heart.webp',
   };
 
   static const Set<String> _paidCookieIds = {
-    'golden_arabesque',
-    'midnight_mosaic',
-    'pearl_lace',
-    'golden_sakura',
+    'blue_porcelain',
+    'cupid_ribbon',
+    'diamond_crust',
     'dragon_phoenix',
+    'emerald_essence',
     'gold_beasts',
+    'golden_arabesque',
+    'golden_majesty',
+    'golden_sakura',
+    'midnight_mosaic',
+    'obsidian_grace',
+    'panda_bamboo',
+    'pearl_lace',
+    'pink_blossom',
+    'platinum_veil',
+    'royal_sapphire',
+    'ruby_heart',
+    'wildflower',
   };
 
   @override
@@ -1527,9 +1546,9 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
     _removeContextMenu();
 
     if (hit == 0) {
-      // Sabitle
+      // Sergile (ana sayfada göster/gizle)
       HapticFeedback.selectionClick();
-      widget.onCookieSelected?.call(cookieId);
+      StorageService.toggleDisplayedCookie(cookieId);
       _close();
     } else if (hit == 1) {
       // Gönder — koleksiyon panelini kapat, mektup panelini aç
@@ -1614,7 +1633,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                   builder: (context, hovered, _) {
                     return Row(
                       children: [
-                        // Sabitle
+                        // Sergile
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
@@ -1630,7 +1649,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.push_pin_rounded,
+                                  Icons.visibility_rounded,
                                   size: 13,
                                   color: Colors.white.withOpacity(
                                     hovered == 0 ? 1.0 : 0.9,
@@ -1638,7 +1657,7 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  isTr ? 'Sabitle' : 'Pin',
+                                  isTr ? 'Sergile' : 'Display',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(
                                       hovered == 0 ? 1.0 : 0.9,
@@ -1735,6 +1754,13 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
       'golden_sakura': 'Altın Sakura',
       'dragon_phoenix': 'Ejderha & Anka',
       'gold_beasts': 'Altın Canavarlar',
+      'diamond_crust': 'Elmas Kabuk',
+      'emerald_essence': 'Zümrüt Özü',
+      'golden_majesty': 'Altın İhtişam',
+      'obsidian_grace': 'Obsidyen Zarafeti',
+      'platinum_veil': 'Platin Peçe',
+      'royal_sapphire': 'Kraliyet Safiri',
+      'ruby_heart': 'Yakut Kalp',
     };
     const namesEn = {
       'spring_wreath': 'Spring Wreath',
@@ -1757,6 +1783,13 @@ class _CollectionOverlayState extends State<_CollectionOverlay>
       'golden_sakura': 'Golden Sakura',
       'dragon_phoenix': 'Dragon & Phoenix',
       'gold_beasts': 'Gold Beasts',
+      'diamond_crust': 'Diamond Crust',
+      'emerald_essence': 'Emerald Essence',
+      'golden_majesty': 'Golden Majesty',
+      'obsidian_grace': 'Obsidian Grace',
+      'platinum_veil': 'Platinum Veil',
+      'royal_sapphire': 'Royal Sapphire',
+      'ruby_heart': 'Ruby Heart',
     };
     if (languageCode == 'tr') return namesTr[id] ?? fallback;
     return namesEn[id] ?? fallback;
@@ -2159,16 +2192,17 @@ class _CookieGridItemState extends State<_CookieGridItem>
                 fontWeight: widget.isPaid ? FontWeight.w700 : FontWeight.w600,
               ),
             ),
-            Text(
-              'x${widget.count}',
-              style: TextStyle(
-                color: widget.isPaid
-                    ? const Color(0xFFFFD700).withOpacity(0.5)
-                    : Colors.white.withOpacity(0.4),
-                fontSize: 7,
-                fontWeight: FontWeight.w500,
+            if (widget.count > 1)
+              Text(
+                'x${widget.count}',
+                style: TextStyle(
+                  color: widget.isPaid
+                      ? const Color(0xFFFFD700).withOpacity(0.5)
+                      : Colors.white.withOpacity(0.4),
+                  fontSize: 7,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
           ],
         ),
       ),

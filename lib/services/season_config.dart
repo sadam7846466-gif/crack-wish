@@ -46,20 +46,42 @@ class SeasonConfig {
     {'id': 'wildflower', 'key': 'cookieWildflower', 'imagePath': 'assets/images/cookies/paid/may/wildflower.webp', 'isPaid': true, 'color': const Color(0xFFCDDC39)},
   ];
 
+  /// Garanti Rotasyon: 18 ücretsiz kurabiye, her hafta 6 tane.
+  /// 3 haftada 18'in hepsi sırayla vitrine çıkar, hiçbiri atlanmaz.
   static List<Map<String, dynamic>> getWeeklyFreeCookies() {
     final now = DateTime.now();
     final weekNumber = now.difference(DateTime(now.year, 1, 1)).inDays ~/ 7;
+    final cycleNumber = weekNumber ~/ 3; // Her 3 haftada yeni döngü
+    final cyclePosition = weekNumber % 3; // Döngü içi pozisyon (0, 1, 2)
+
     final copyList = List<Map<String, dynamic>>.from(_allFreeCookies);
-    copyList.shuffle(_FastRandom(weekNumber)); 
-    return copyList.take(6).toList();
+    copyList.shuffle(_FastRandom(cycleNumber)); // Döngü başında karıştır
+
+    // 18 / 6 = tam 3 hafta, örtüşme yok
+    final start = cyclePosition * 6;
+    return copyList.sublist(start, start + 6);
   }
 
+  /// Garanti Rotasyon: 18 ücretli kurabiye, her hafta 8 tane.
+  /// 3 haftada 18'in hepsi en az 1 kez vitrine çıkar.
   static List<Map<String, dynamic>> getWeeklyPaidCookies() {
     final now = DateTime.now();
     final weekNumber = now.difference(DateTime(now.year, 1, 1)).inDays ~/ 7;
+    final cycleNumber = weekNumber ~/ 3;
+    final cyclePosition = weekNumber % 3;
+
     final copyList = List<Map<String, dynamic>>.from(_allPaidCookies);
-    copyList.shuffle(_FastRandom(weekNumber + 100)); // Farklı seed
-    return copyList.take(8).toList();
+    copyList.shuffle(_FastRandom(cycleNumber + 100));
+
+    // 18 kurabiye, 8'er gösterim, adım 6 ile kaydırma
+    // Hafta 0: [0-7], Hafta 1: [6-13], Hafta 2: [12-17,0-1]
+    // 3 haftada 18'in hepsi en az 1 kez görünür
+    final offset = cyclePosition * 6;
+    final result = <Map<String, dynamic>>[];
+    for (int i = 0; i < 8; i++) {
+      result.add(copyList[(offset + i) % 18]);
+    }
+    return result;
   }
 
   static List<Map<String, dynamic>> getAllCookies() {

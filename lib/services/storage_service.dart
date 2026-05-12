@@ -335,6 +335,36 @@ class StorageService {
     await prefs.setString(_keySelectedCookie, cookieId);
   }
 
+  // ── Sergilenen kurabiyeler (ana sayfada max 6) ──
+  static const String _keyDisplayedCookies = 'displayed_cookies';
+  static const int maxDisplayedCookies = 6;
+
+  static Future<List<String>> getDisplayedCookies() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_keyDisplayedCookies) ?? [];
+  }
+
+  static Future<bool> toggleDisplayedCookie(String cookieId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_keyDisplayedCookies) ?? [];
+    
+    if (list.contains(cookieId)) {
+      list.remove(cookieId);
+      await prefs.setStringList(_keyDisplayedCookies, list);
+      return false; // Sergiden çıkarıldı
+    } else {
+      if (list.length >= maxDisplayedCookies) return false; // Max 6 sınırı
+      list.add(cookieId);
+      await prefs.setStringList(_keyDisplayedCookies, list);
+      return true; // Sergiye eklendi
+    }
+  }
+
+  static Future<bool> isDisplayedCookie(String cookieId) async {
+    final list = await getDisplayedCookies();
+    return list.contains(cookieId);
+  }
+
   static Future<Locale?> getAppLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_keyLocale);
@@ -1518,7 +1548,7 @@ class StorageService {
       
       int newCount = c.countObtained;
       if (isPaid) {
-        newCount = (c.countObtained - 1).clamp(0, 999); // Ücretli kurabiye kırılınca envanterden düşer
+        newCount = c.countObtained; // Ücretli kurabiye kalıcı — kırmak sayıyı düşürmez, sadece hediye göndermek düşürür
       } else {
         newCount = c.countObtained + 1; // Ücretsiz kurabiye kırıldıkça sayısı (x1, x2) profil için artar
       }
