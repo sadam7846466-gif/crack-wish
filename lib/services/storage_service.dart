@@ -1436,7 +1436,7 @@ class StorageService {
       'solar_flare': 'Güneş Patlaması',
       'cosmic_dust': 'Kozmik Toz',
       'nebula_breeze': 'Nebula Esintisi',
-      'astral_projection': 'Astral Seyahat',
+      'astral_projection': 'Fiesta Ruhu',
       'quantum_leap': 'Kuantum Sıçraması',
 
       // YENİ ÜCRETLİ (PAID) KURABİYELER

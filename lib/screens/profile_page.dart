@@ -6603,6 +6603,104 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
       'rarity': 'Efsanevi',
       'quote': '"Güç sahibi ol, ama merhametli kal."',
     },
+    // Yeni Ücretsiz Kurabiyeler
+    'celestial_dream': {
+      'name': 'Göksel Rüya',
+      'desc': 'Yıldızların arasında dans eden bir hayal.',
+      'rarity': 'Yaygın',
+      'quote': '"Rüyalar, evrenin sana fısıldadığı sırlar."',
+    },
+    'starlight_whisper': {
+      'name': 'Yıldız Fısıltısı',
+      'desc': 'Gecenin en sessiz anında duyulan kozmik bir melodi.',
+      'rarity': 'Yaygın',
+      'quote': '"Evren konuşur, dinlemesini bil."',
+    },
+    'mystic_aura': {
+      'name': 'Mistik Aura',
+      'desc': 'Görünmez enerjilerin dans ettiği büyülü bir hale.',
+      'rarity': 'Yaygın',
+      'quote': '"Auran senin sessiz gücündür."',
+    },
+    'lunar_glow': {
+      'name': 'Ay Işıltısı',
+      'desc': 'Dolunayın gümüş ışığında parlayan gizemli bir enerji.',
+      'rarity': 'Yaygın',
+      'quote': '"Ay, karanlıkta yolunu aydınlatır."',
+    },
+    'solar_flare': {
+      'name': 'Güneş Patlaması',
+      'desc': 'Güneşin kalbinden fırlayan ateşli bir parıltı.',
+      'rarity': 'Yaygın',
+      'quote': '"İçindeki ateşi söndürme, onu yönlendir."',
+    },
+    'cosmic_dust': {
+      'name': 'Kozmik Toz',
+      'desc': 'Yıldız tozlarından oluşan evrensel bir iz.',
+      'rarity': 'Yaygın',
+      'quote': '"Sen de bir yıldızın parçasısın."',
+    },
+    'nebula_breeze': {
+      'name': 'Nebula Esintisi',
+      'desc': 'Uzay bulutsusu gibi gizemli ve büyüleyici.',
+      'rarity': 'Yaygın',
+      'quote': '"Sonsuzluğun rüzgârı, ruhunu okşar."',
+    },
+    'astral_projection': {
+      'name': 'Fiesta Ruhu',
+      'desc': 'Meksika\'nın renkli festivallerinden ilham alan canlı desenler.',
+      'rarity': 'Yaygın',
+      'quote': '"Hayat bir festival, her günü kutla."',
+    },
+    'quantum_leap': {
+      'name': 'Kuantum Sıçraması',
+      'desc': 'Zaman ve mekânın sınırlarını aşan bir sıçrayış.',
+      'rarity': 'Yaygın',
+      'quote': '"Büyük değişimler, küçük bir adımla başlar."',
+    },
+    // Yeni Ücretli Kurabiyeler
+    'royal_sapphire': {
+      'name': 'Kraliyet Safiri',
+      'desc': 'Okyanusun derinliklerindeki safir parıltısı.',
+      'rarity': 'Epik',
+      'quote': '"Gerçek asalet, ruhun derinliğidir."',
+    },
+    'diamond_crust': {
+      'name': 'Elmas Kabuk',
+      'desc': 'Basınç altında şekillenen kusursuz bir güzellik.',
+      'rarity': 'Efsanevi',
+      'quote': '"Elmaslar baskı altında doğar."',
+    },
+    'platinum_veil': {
+      'name': 'Platin Peçe',
+      'desc': 'Gizemli ve soğuk bir zarafetle örtülü kadim bir peçe.',
+      'rarity': 'Efsanevi',
+      'quote': '"Görünmez olan, bazen en değerli olandır."',
+    },
+    'golden_majesty': {
+      'name': 'Altın İhtişam',
+      'desc': 'İmparatorlukların tahtlarını süsleyen altın işçiliği.',
+      'rarity': 'Epik',
+      'quote': '"İhtişam, sessiz bir güç gösterisidir."',
+    },
+    'emerald_essence': {
+      'name': 'Zümrüt Özü',
+      'desc': 'Doğanın en saf yeşilinden damıtılmış öz.',
+      'rarity': 'Epik',
+      'quote': '"Doğa, en büyük sanatçıdır."',
+    },
+    'ruby_heart': {
+      'name': 'Yakut Kalp',
+      'desc': 'Ateşle dövülmüş kırmızı bir kalp.',
+      'rarity': 'Epik',
+      'quote': '"Tutkuyla yaşa, yakut gibi parla."',
+    },
+    'obsidian_grace': {
+      'name': 'Obsidyen Zarafeti',
+      'desc': 'Volkanik camdan doğan karanlık ve zarif bir güzellik.',
+      'rarity': 'Epik',
+      'quote': '"Karanlıkta da zarafet bulunabilir."',
+    },
   };
 
   static Color _rarityColor(String rarity) {
@@ -6623,8 +6721,8 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
     final meta =
         _cookieMeta[cookie.id] ??
         {
-          'name': 'Gizemli Kurabiye',
-          'desc': 'Bu kurabiye henüz keşfedilmemiş...',
+          'name': cookie.name.isNotEmpty ? cookie.name : 'Gizemli Kurabiye',
+          'desc': 'Koleksiyonundaki özel bir kurabiye.',
           'rarity': 'Yaygın',
         };
     final rarityColor = _rarityColor(meta['rarity']!);
@@ -6740,7 +6838,8 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  if (cookie.countObtained > 1) ...[
+                                  // Sadece ücretli kurabiyeler için sayı göster
+                                  if (cookie.countObtained > 1 && cookie.rarity != 'common') ...[
                                     Container(
                                       margin: const EdgeInsets.symmetric(
                                         horizontal: 12,
