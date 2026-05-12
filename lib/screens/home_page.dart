@@ -176,8 +176,15 @@ class _HomePageState extends State<HomePage> {
     if (mounted) {
       setState(() {
         _cookieTypes = [...showcaseIds, ...ownedButNotShown];
-        _selectedCookieEmoji = savedCookie;
-        _selectedCookieIndex = _getCookieIndex(savedCookie);
+        
+        if (!_cookieTypes.contains(savedCookie) && _cookieTypes.isNotEmpty) {
+          _selectedCookieEmoji = _cookieTypes[0];
+          _selectedCookieIndex = 0;
+          StorageService.setSelectedCookie(_cookieTypes[0]);
+        } else {
+          _selectedCookieEmoji = savedCookie;
+          _selectedCookieIndex = _getCookieIndex(savedCookie);
+        }
       });
     }
   }

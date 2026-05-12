@@ -442,11 +442,11 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.",
+                          "Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the App Store after purchase.\n\nAboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9, height: 1.3),
+                          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9, height: 1.3),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -455,15 +455,15 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                 final lang = Localizations.localeOf(context).languageCode;
                                 _launchURL("https://crackwish.com/privacy.html#$lang");
                               },
-                              child: Text("Gizlilik Sözleşmesi", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
+                              child: Text("Privacy Policy", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
                             ),
-                            Text("   •   ", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9)),
+                            Text("   •   ", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
                             GestureDetector(
                               onTap: () {
                                 final lang = Localizations.localeOf(context).languageCode;
                                 _launchURL("https://crackwish.com/terms.html#$lang");
                               },
-                              child: Text("Kullanım Şartları", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 9, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
+                              child: Text("Terms of Use (EULA)", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
                             ),
                           ],
                         ),

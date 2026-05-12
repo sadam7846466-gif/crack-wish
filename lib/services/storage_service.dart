@@ -80,6 +80,7 @@ class StorageService {
   static const String _keyMatchPreference = 'match_preference';
   static const String _keyBirthPlace = 'birth_place';
   static const String _keyPhoneNumber = 'phone_number';
+  static const String _keyGender = 'user_gender';
 
   /// DEV METHOD: Sıfırla (BETA) - Günlük yenilemeyi tetiklemek için tüm tarih bazlı sınırları 'dün' olarak ayarlar
   static Future<void> resetDailies() async {
@@ -551,6 +552,15 @@ class StorageService {
   static Future<void> setBirthPlace(String place) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyBirthPlace, place);
+  }
+
+  static Future<String?> getGender() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyGender);
+  }
+  static Future<void> setGender(String gender) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyGender, gender);
   }
 
   static Future<String?> getPhoneNumber() async {

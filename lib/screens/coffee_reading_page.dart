@@ -222,6 +222,12 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       // when the analysis is actually completed. We DO NOT use local timers
       // anymore to prevent false positive notifications if the request fails.
 
+      // Profil verilerini al (AI kişiselleştirmesi için)
+      final gender = await StorageService.getGender();
+      final zodiac = await StorageService.getZodiacSign();
+      final relationship = await StorageService.getRelationshipStatus();
+      final lifeFocus = await StorageService.getLifeFocus(); // Niyet (Kalbinin Pusulası)
+
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
         body: {
@@ -229,7 +235,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           'images': images, 
           'locale': 'tr', 
           'userId': user?.id,
-          'record_id': recordId
+          'record_id': recordId,
+          'gender': gender ?? '',
+          'zodiac': zodiac ?? '',
+          'relationship': relationship ?? '',
+          'intent': lifeFocus ?? '', // AI promptuna niyet olarak eklenecek
         },
       );
 

@@ -39,6 +39,22 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   int _currentStep = 0; // 0 to 6
   int _selectedAvatarIndex = 2; // Ortadan (3. avatar) başlasın, kapak akışına uygun
+  
+  final List<String> _avatarPool = const [
+    'assets/images/avatars/avatar_1.png',
+    'assets/images/avatars/avatar_2.png',
+    'assets/images/avatars/avatar_3.png',
+    'assets/images/avatars/avatar_4.png',
+    'assets/images/avatars/avatar_5.png',
+    'assets/images/avatars/avatar_6.png',
+    'assets/images/avatars/avatar_7.png',
+    'assets/images/avatars/avatar_8.png',
+    'assets/images/avatars/avatar_9.png',
+    'assets/images/avatars/avatar_10.png',
+    'assets/images/avatars/avatar_11.png',
+    'assets/images/avatars/avatar_12.png',
+  ];
+
   bool _showLoginButtons = false;
   bool _isAuthLoading = false;
 
@@ -54,13 +70,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   DateTime? _selectedTime;
   bool _knowsTime = false;
   String? _selectedLocation;
+  String _selectedGender = ''; // Cinsiyet: 'Kadın', 'Erkek', 'Belirtmek İstemiyorum'
+  bool _shakeNamePanel = false;
+  bool _shakeGenderChips = false;
 
   // --- Step 1 Data ---
   List<String> _lifeFocus = [];
   String _relationship = "Yalnız Gökyüzü";
 
   // --- Step 2 Data ---
-  String _dreamFrequency = "Haberci & Net";
+  String _dreamFrequency = ""; // Mandatory
   int _auraColor = 0xFFC356FE; // Default Purple Aura
   final List<int> _auraColors = [
     0xFFFF3A6C, // Passion / Coral
@@ -72,7 +91,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   ];
 
   // --- Step 3 Data ---
-  String _sleepPattern = "Gece İnsanı";
+  String _sleepPattern = ""; // Mandatory
 
   // --- Step 4 Data ---
   bool _matchPreference = true;
@@ -104,10 +123,19 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   void _nextStep() async {
     HapticFeedback.lightImpact();
-    if (_currentStep == 2 && (_nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty)) {
-      HapticFeedback.heavyImpact();
-      _shakeCtrl.forward(from: 0.0);
-      return;
+    if (_currentStep == 2) {
+      final isNameMissing = _nameCtrl.text.trim().isEmpty || _usernameCtrl.text.trim().isEmpty;
+      final isGenderMissing = _selectedGender.isEmpty;
+
+      if (isNameMissing || isGenderMissing) {
+        HapticFeedback.heavyImpact();
+        setState(() {
+          _shakeNamePanel = isNameMissing;
+          _shakeGenderChips = isGenderMissing;
+        });
+        _shakeCtrl.forward(from: 0.0);
+        return;
+      }
     }
     
     // Handle benzersizlik kontrolü (Step 2'den çıkarken)
@@ -132,6 +160,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     }
     
     if (_currentStep == 3 && !_hasSelectedDate) {
+      HapticFeedback.heavyImpact();
+      _shakeCtrl.forward(from: 0.0);
+      return;
+    }
+
+    if (_currentStep == 4 && _lifeFocus.isEmpty) {
       HapticFeedback.heavyImpact();
       _shakeCtrl.forward(from: 0.0);
       return;
@@ -453,22 +487,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Future<void> _completeFinalOnboardingProfileSave() async {
     HapticFeedback.heavyImpact();
     
-    // Sabit avatar havuzundan index'e göre asset path çekimi
-    final List<String> avatarPool = [
-      'assets/images/avatars/avatar_1.png',
-      'assets/images/avatars/avatar_2.png',
-      'assets/images/avatars/avatar_3.png',
-      'assets/images/avatars/avatar_4.png',
-      'assets/images/avatars/avatar_5.png',
-      'assets/images/avatars/avatar_6.png',
-      'assets/images/avatars/avatar_7.png',
-      'assets/images/avatars/avatar_8.png',
-      'assets/images/avatars/avatar_9.png',
-      'assets/images/avatars/avatar_10.png',
-      'assets/images/avatars/avatar_11.png',
-      'assets/images/avatars/avatar_12.png',
-    ];
-    final String selectedAvatarUrl = avatarPool[_selectedAvatarIndex];
+    final String selectedAvatarUrl = _avatarPool[_selectedAvatarIndex];
     
     debugPrint('💾 Profil kaydı başlıyor...');
     debugPrint('💾 İsim: ${_nameCtrl.text.trim()}, Handle: ${_usernameCtrl.text.trim()}, Burç: ${_calculateZodiac(_selectedDate)}');
@@ -487,6 +506,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     }
     await StorageService.setLifeFocus(_lifeFocus.join(", "));
     await StorageService.setRelationshipStatus(_relationship);
+    await StorageService.setGender(_selectedGender);
     await StorageService.setDreamFrequency(_dreamFrequency);
     await StorageService.setAuraColor(_auraColor);
     await StorageService.setSleepPattern(_sleepPattern);
@@ -572,7 +592,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               ),
             ],
           ),
-          content: Scaffold(
+          content: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Scaffold(
             resizeToAvoidBottomInset: false, // KLAVYE ÇAKIŞMA ÇÖZÜMÜ: Sayfanın kendi kendine itilmesini kapatıp %100 kontrolü TweenAnimation'a veriyoruz!
             backgroundColor: Colors.transparent,
             extendBodyBehindAppBar: true,
@@ -852,6 +876,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   ),
                 ),
               ),
+            ),
             ),
             ),
           ),
@@ -1464,9 +1489,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildUnifiedInputRow(
-           customIcon: Transform.scale(
-             scale: 1.4,
-             child: Image.asset('assets/images/owl.png', width: 38, height: 38),
+           customIcon: ClipOval(
+             child: Image.asset(
+               _avatarPool[_selectedAvatarIndex],
+               width: 38,
+               height: 38,
+               fit: BoxFit.cover,
+             ),
            ),
            title: "PROFİL ADIN",
            child: TextField(
@@ -1523,6 +1552,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       ],
     );
   }
+
 
   Widget _buildStep0() {
     // Klavye kapanma tepkisini "ANINDA" almak için Focus statülerini de ekledik (Gecikme tamamen silinir)
@@ -1591,10 +1621,73 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   child: child,
                 );
               },
-              child: _buildGlassCard(
-                delay: 0,
-                shake: true,
-                child: _buildNameInputs(isDummy: false), // Gerçek text field'lar
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildGlassCard(
+                    delay: 0,
+                    shake: _shakeNamePanel,
+                    child: _buildNameInputs(isDummy: false),
+                  ),
+                  // Cinsiyet seçimi — panelin hemen altında 3 chip (shake ile birlikte titrer)
+                  AnimatedBuilder(
+                    animation: _shakeCtrl,
+                    builder: (context, child) {
+                      final dx = _shakeGenderChips ? math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value) : 0.0;
+                      return Transform.translate(offset: Offset(dx, 0), child: child);
+                    },
+                    child: AnimatedOpacity(
+                      opacity: isKeyboardOpen ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: ['Kadın', 'Erkek', 'Belirtmek İstemiyorum'].map((label) {
+                          final isSelected = _selectedGender == label;
+                          final displayLabel = label == 'Belirtmek İstemiyorum' ? 'Belirtmiyorum' : label;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: GestureDetector(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                setState(() => _selectedGender = label);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFFFBE4EB).withValues(alpha: 0.18)
+                                      : Colors.white.withValues(alpha: 0.04),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? const Color(0xFFEEDBD5)
+                                        : Colors.white.withValues(alpha: 0.12),
+                                    width: isSelected ? 1.5 : 0.5,
+                                  ),
+                                  boxShadow: isSelected
+                                      ? [BoxShadow(color: const Color(0xFFD3A29B).withValues(alpha: 0.2), blurRadius: 12)]
+                                      : [],
+                                ),
+                                child: Text(
+                                  displayLabel,
+                                  style: GoogleFonts.nunito(
+                                    color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 13,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1891,7 +1984,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildStep1() {
     return Transform.translate(
       offset: const Offset(0, -90),
-      child: Column(
+      child: AnimatedBuilder(
+        animation: _shakeCtrl,
+        builder: (context, child) {
+          final dx = math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value);
+          return Transform.translate(offset: Offset(dx, 0), child: child);
+        },
+        child: Column(
       children: [
         const SizedBox(height: 0),
         GridView.count(
@@ -1941,7 +2040,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           ],
         ),
       ],
-    ),
+      ),
+      ),
     );
   }
 
@@ -2074,7 +2174,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildStep2() {
-    return Column(
+    return AnimatedBuilder(
+      animation: _shakeCtrl,
+      builder: (context, child) {
+        final dx = math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value);
+        return Transform.translate(offset: Offset(dx, 0), child: child);
+      },
+      child: Column(
       children: [
         const SizedBox(height: 100), // Kutuları dikey olarak ortaya aldık
 
@@ -2098,6 +2204,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           (v) => setState(() => _dreamFrequency = v)
         ),
       ],
+      ),
     );
   }
 
@@ -2217,7 +2324,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildStep3() {
-    return Column(
+    return AnimatedBuilder(
+      animation: _shakeCtrl,
+      builder: (context, child) {
+        final dx = math.sin(_shakeCtrl.value * math.pi * 6) * 12 * (1 - _shakeCtrl.value);
+        return Transform.translate(offset: Offset(dx, 0), child: child);
+      },
+      child: Column(
       children: [
         const SizedBox(height: 80), // Butonları dikey ortaya yaklaştırdık
 
@@ -2244,6 +2357,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         ),
 
       ],
+      ),
     );
   }
 

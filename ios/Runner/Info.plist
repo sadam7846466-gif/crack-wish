@@ -43,10 +43,6 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Rehberinizdeki arkadaşlarınızı bulup Crack&amp;Wish evrenine ekleyebilmeniz için izin gerekiyor. Rehberiniz sunucularımızda saklanmaz.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Bu uygulama sağlık verilerinizi paylaşmaz, yalnızca kullanılan altyapı paketi gerekliliği olarak bu izin tanımlanmıştır.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Bu uygulama sağlık verilerinizi güncellemez, yalnızca kullanılan altyapı paketi gerekliliği olarak bu izin tanımlanmıştır.</string>
 
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Şans kartınızı fotoğraf galerinize kaydetmek için izin gerekiyor.</string>
