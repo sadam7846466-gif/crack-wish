@@ -2256,7 +2256,7 @@ For questions: info@crackandwish.com''',
                         ],
                       ),
 
-                      const SizedBox(height: 20),
+
 
                       // ── FOOTER & YASAL ──
                       Column(

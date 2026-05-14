@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'analytics_service.dart';
 import 'push_notification_service.dart';
 import 'profile_sync_service.dart';
+import 'cloud_sync_service.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
@@ -11,6 +13,20 @@ import '../models/cookie_card.dart';
 import '../models/owl_letter.dart';
 
 class StorageService {
+  // ── Debounced Cloud Sync ──
+  // Kullanıcı art arda işlem yaparsa her seferinde değil,
+  // son işlemden 5 saniye sonra TEK bir yedekleme yapar.
+  static Timer? _cloudSyncTimer;
+  
+  static void _scheduleCloudSync() {
+    _cloudSyncTimer?.cancel();
+    _cloudSyncTimer = Timer(const Duration(seconds: 5), () {
+      CloudSyncService().pushToCloud();
+      syncEconomyToCloud();
+      debugPrint('☁️ Otomatik bulut yedekleme tamamlandı');
+    });
+  }
+
   /// Güvenli getStringList — String olarak kaydedilmiş anahtarları da yönetir
   static List<String> _safeGetStringList(SharedPreferences prefs, String key) {
     try {
@@ -392,6 +408,8 @@ class StorageService {
     final current = await getTotalCookies();
     await prefs.setInt(_keyTotalCookies, current + 1);
     await incrementCookieCount(); // mevcut sayaç ve seriyle uyum için
+    // ☁️ Otomatik bulut yedekleme
+    _scheduleCloudSync();
   }
 
   static Future<int> getTotalDreams() async {
@@ -411,6 +429,8 @@ class StorageService {
     await addPendingAura('ruya', 3 * (isPremium ? 3 : 1));
     // 📊 Analytics
     AnalyticsService().logDreamAnalyzed();
+    // ☁️ Otomatik bulut yedekleme
+    _scheduleCloudSync();
   }
 
   static Future<int> getTotalTarots() async {
@@ -423,6 +443,8 @@ class StorageService {
     final current = await getTotalTarots();
     await prefs.setInt(_keyTotalTarots, current + 1);
     await setTarotDoneToday(); // Mark tarot task as done for daily tip
+    // ☁️ Otomatik bulut yedekleme
+    _scheduleCloudSync();
   }
 
   static Future<int> getTotalCoffee() async {
@@ -442,6 +464,8 @@ class StorageService {
     await addPendingAura('kahve', 3 * (isPremium ? 3 : 1));
     // 📊 Analytics
     AnalyticsService().logCoffeeAnalyzed();
+    // ☁️ Otomatik bulut yedekleme
+    _scheduleCloudSync();
   }
 
   static Future<int> getLongestStreak() async {

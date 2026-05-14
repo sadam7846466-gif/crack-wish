@@ -147,6 +147,21 @@ class SoundService {
     }
   }
 
+  // ── SATIN ALMA (PURCHASES) ──
+
+  /// Ruh taşı, Elite abonelik, Premium kurabiye satın alımları başarılı olduğunda
+  Future<void> playPurchaseSuccess() async {
+    if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+      Vibration.vibrate(pattern: [0, 50, 100, 80], intensities: [0, 128, 0, 255]);
+    } else {
+      Vibration.vibrate(duration: 120);
+    }
+
+    if (_isSoundEnabled) {
+      await _player.play(AssetSource('sounds/success_notification.mp3'), volume: 1.0);
+    }
+  }
+
   // ── STANDART UI TIKLAMALARI (SADECE TİTREŞİM) ──
 
   /// Standart buton geçişleri (Ses yok, sadece lüks dokunma hissi)

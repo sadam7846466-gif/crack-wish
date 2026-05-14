@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../services/sound_service.dart';
 
 class MagicalSuccessDialog extends StatefulWidget {
   final String title;
@@ -31,6 +32,8 @@ class MagicalSuccessDialog extends StatefulWidget {
     String? balanceText,
     IconData? balanceIcon,
   }) {
+    SoundService().playPurchaseSuccess();
+    
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -83,22 +86,25 @@ class _MagicalSuccessDialogState extends State<MagicalSuccessDialog> with Single
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
+    return GestureDetector(
+      onTap: () {
+        if (mounted) Navigator.pop(context);
+      },
+      child: Center(
+        child: Material(
+          color: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               width: MediaQuery.of(context).size.width * 0.85,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
               decoration: BoxDecoration(
-                color: const Color(0xFF13131A).withOpacity(0.8),
+                color: Colors.white.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: widget.themeColor.withOpacity(0.3), width: 1.5),
                 boxShadow: [
-                  BoxShadow(color: widget.themeColor.withOpacity(0.1), blurRadius: 40, spreadRadius: 10),
+                  BoxShadow(color: widget.themeColor.withOpacity(0.15), blurRadius: 40, spreadRadius: -5),
                 ],
               ),
               child: Column(
@@ -167,6 +173,7 @@ class _MagicalSuccessDialogState extends State<MagicalSuccessDialog> with Single
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),

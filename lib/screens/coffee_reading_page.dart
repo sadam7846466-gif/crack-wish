@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 import '../services/storage_service.dart';
 import 'dart:ui' as ui;
@@ -301,12 +303,29 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       await prefs.setBool('pending_fortune_paid', false);
 
       // Save image paths to restore the UI later
-      await prefs.setStringList('coffee_last_images', [
-        insidePath,
-        leftPath,
-        rightPath,
-        platePath,
-      ]);
+      // Fotoğrafları kalıcı dizine kopyala (iOS tmp/ klasörü silebilir)
+      final appDir = await getApplicationDocumentsDirectory();
+      final coffeeDir = Directory('${appDir.path}/coffee_photos');
+      if (!coffeeDir.existsSync()) coffeeDir.createSync(recursive: true);
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final savedPaths = <String>[];
+      final tempPaths = [insidePath, leftPath, rightPath, platePath];
+      final labels = ['inside', 'left', 'right', 'plate'];
+
+      for (int i = 0; i < tempPaths.length; i++) {
+        final src = tempPaths[i];
+        if (src.isNotEmpty && File(src).existsSync()) {
+          final ext = p.extension(src).isNotEmpty ? p.extension(src) : '.jpg';
+          final dest = '${coffeeDir.path}/${labels[i]}_$timestamp$ext';
+          await File(src).copy(dest);
+          savedPaths.add(dest);
+        } else {
+          savedPaths.add(src);
+        }
+      }
+
+      await prefs.setStringList('coffee_last_images', savedPaths);
 
       await StorageService.incrementTotalCoffee();
 
@@ -1486,7 +1505,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
               ),
-              overflow: TextOverflow.ellipsis,
+              overflow: TextOverflow.visible,
             ),
           ),
         ],

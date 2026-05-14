@@ -86,6 +86,14 @@ class ProfileSyncService {
     required String avatarUrl,
     String? zodiacSign,
     String? birthDate,
+    // Onboarding profil bilgileri
+    String? birthTime,
+    String? lifeFocus,
+    String? relationshipStatus,
+    String? dreamFrequency,
+    String? sleepPattern,
+    String? gender,
+    String? birthPlace,
   }) async {
     try {
       final user = _supabase.auth.currentUser;
@@ -99,6 +107,14 @@ class ProfileSyncService {
         'avatar_url': avatarUrl,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
         if (birthDate != null) 'birth_date': birthDate,
+        // Onboarding detay bilgileri
+        if (birthTime != null) 'birth_time': birthTime,
+        if (lifeFocus != null) 'life_focus': lifeFocus,
+        if (relationshipStatus != null) 'relationship_status': relationshipStatus,
+        if (dreamFrequency != null) 'dream_frequency': dreamFrequency,
+        if (sleepPattern != null) 'sleep_pattern': sleepPattern,
+        if (gender != null) 'gender': gender,
+        if (birthPlace != null) 'birth_place': birthPlace,
       };
 
       // 'profiles' tablosuna upsert işlemi (varsa günceller, yoksa yaratır)

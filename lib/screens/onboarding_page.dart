@@ -523,6 +523,15 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         userHandle: _usernameCtrl.text.trim(),
         avatarUrl: selectedAvatarUrl,
         zodiacSign: _calculateZodiac(_selectedDate),
+        birthDate: _selectedDate.toIso8601String(),
+        // Onboarding profil bilgileri
+        birthTime: (_knowsTime && _selectedTime != null) ? DateFormat('HH:mm').format(_selectedTime!) : null,
+        lifeFocus: _lifeFocus.isNotEmpty ? _lifeFocus.join(', ') : null,
+        relationshipStatus: _relationship.isNotEmpty ? _relationship : null,
+        dreamFrequency: _dreamFrequency.isNotEmpty ? _dreamFrequency : null,
+        sleepPattern: _sleepPattern.isNotEmpty ? _sleepPattern : null,
+        gender: _selectedGender.isNotEmpty ? _selectedGender : null,
+        birthPlace: _selectedLocation,
       );
       debugPrint('☁️ Supabase senkronizasyon sonucu: ${syncResult == true ? "BAŞARILI ✅" : "BAŞARISIZ ❌ $syncResult"}');
       

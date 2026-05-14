@@ -394,12 +394,17 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                               _activePackageIndex = _selectedPackageIndex;
                                             });
                                             
+                                            IconData successIcon = Icons.auto_awesome;
+                                            if (_selectedPackageIndex == 0) successIcon = Icons.bolt_rounded;
+                                            else if (_selectedPackageIndex == 1) successIcon = Icons.nights_stay_rounded;
+                                            else if (_selectedPackageIndex == 2) successIcon = Icons.workspace_premium_rounded;
+
                                             MagicalSuccessDialog.show(
                                               context,
                                               title: isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
                                               subtitle: isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
                                               imagePath: '',
-                                              fallbackIcon: Icons.auto_awesome,
+                                              fallbackIcon: successIcon,
                                               themeColor: const Color(0xFFFFD700),
                                             ).then((_) {
                                               if (mounted) Navigator.pop(context, true);
