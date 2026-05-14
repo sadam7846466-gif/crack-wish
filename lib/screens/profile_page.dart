@@ -3514,6 +3514,8 @@ class _BentoHeroCard extends StatelessWidget {
                                                 imagePath: '',
                                                 fallbackIcon: Icons.diamond_rounded,
                                                 themeColor: const Color(0xFF22D3EE),
+                                                balanceText: "Mevcut Bakiye: $modalSoulStones Ruh Taşı",
+                                                balanceIcon: Icons.diamond_outlined,
                                               );
                                             }
                                           }

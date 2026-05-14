@@ -2352,10 +2352,12 @@ class _CircularLimitOverlayState extends State<_CircularLimitOverlay> {
 class _CookieUnlockedDialog extends StatefulWidget {
   final String imagePath;
   final String cookieName;
+  final int count;
 
   const _CookieUnlockedDialog({
     required this.imagePath,
     required this.cookieName,
+    required this.count,
   });
 
   static const trNames = {
@@ -2407,18 +2409,20 @@ class _CookieUnlockedDialog extends StatefulWidget {
   }) {
     HapticFeedback.heavyImpact();
     // Varsa ses eklenebilir SoundService().playPanelReward();
+    final count = StorageService.getCookieCountSync(cookieId) ?? 1;
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'CookieUnlockedDismiss',
-      barrierColor: Colors.black.withOpacity(0.6),
-      transitionDuration: const Duration(milliseconds: 600),
+      barrierColor: Colors.black.withOpacity(0.75),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) {
         final isTr = Localizations.localeOf(context).languageCode == 'tr';
         final cName = isTr ? (trNames[cookieId] ?? 'Premium Kurabiye') : (enNames[cookieId] ?? 'Premium Cookie');
         return _CookieUnlockedDialog(
           imagePath: imagePath,
           cookieName: cName,
+          count: count,
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
@@ -2497,12 +2501,12 @@ class _CookieUnlockedDialogState extends State<_CookieUnlockedDialog> with Singl
                           return Transform.scale(
                             scale: _pulseAnim.value,
                             child: Container(
-                              width: 140,
-                              height: 140,
+                              width: 120,
+                              height: 120,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 boxShadow: [
-                                  BoxShadow(color: glowColor.withOpacity(0.4), blurRadius: 40, spreadRadius: 5),
+                                  BoxShadow(color: glowColor.withOpacity(0.4), blurRadius: 30, spreadRadius: 5),
                                 ],
                               ),
                               child: Image.asset(widget.imagePath, fit: BoxFit.contain),
@@ -2516,18 +2520,43 @@ class _CookieUnlockedDialogState extends State<_CookieUnlockedDialog> with Singl
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
                       Text(
                         isTr ? 'Kurabiye başarıyla koleksiyonuna eklendi!' : 'Cookie successfully added to your collection!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
+                          fontSize: 13,
                           height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: glowColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: glowColor.withOpacity(0.3), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(PhosphorIcons.cookie(PhosphorIconsStyle.fill), color: glowColor, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              isTr ? "Mevcut Bakiye: ${widget.count} Adet" : "Current Balance: ${widget.count}",
+                              style: TextStyle(
+                                color: glowColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

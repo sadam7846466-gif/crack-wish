@@ -7,6 +7,8 @@ class MagicalSuccessDialog extends StatefulWidget {
   final String imagePath;
   final IconData? fallbackIcon;
   final Color themeColor;
+  final String? balanceText;
+  final IconData? balanceIcon;
 
   const MagicalSuccessDialog({
     super.key,
@@ -15,6 +17,8 @@ class MagicalSuccessDialog extends StatefulWidget {
     required this.imagePath,
     this.fallbackIcon,
     required this.themeColor,
+    this.balanceText,
+    this.balanceIcon,
   });
 
   static Future<void> show(
@@ -24,13 +28,15 @@ class MagicalSuccessDialog extends StatefulWidget {
     required String imagePath,
     IconData? fallbackIcon,
     Color themeColor = const Color(0xFFC084FC),
+    String? balanceText,
+    IconData? balanceIcon,
   }) {
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withOpacity(0.7),
-      transitionDuration: const Duration(milliseconds: 600),
+      barrierColor: Colors.black.withOpacity(0.75),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) {
         return MagicalSuccessDialog(
           title: title,
@@ -38,6 +44,8 @@ class MagicalSuccessDialog extends StatefulWidget {
           imagePath: imagePath,
           fallbackIcon: fallbackIcon,
           themeColor: themeColor,
+          balanceText: balanceText,
+          balanceIcon: balanceIcon,
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
@@ -100,12 +108,12 @@ class _MagicalSuccessDialogState extends State<MagicalSuccessDialog> with Single
                     animation: _glowAnim,
                     builder: (context, child) {
                       return Container(
-                        width: 120,
-                        height: 120,
+                        width: 90,
+                        height: 90,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
-                            BoxShadow(color: widget.themeColor.withOpacity(0.4 * _glowAnim.value), blurRadius: 40 * _glowAnim.value, spreadRadius: 10 * _glowAnim.value),
+                            BoxShadow(color: widget.themeColor.withOpacity(0.4 * _glowAnim.value), blurRadius: 30 * _glowAnim.value, spreadRadius: 8 * _glowAnim.value),
                           ],
                         ),
                         child: child,
@@ -113,43 +121,72 @@ class _MagicalSuccessDialogState extends State<MagicalSuccessDialog> with Single
                     },
                     child: widget.imagePath.isNotEmpty
                         ? Image.asset(widget.imagePath, fit: BoxFit.contain)
-                        : Icon(widget.fallbackIcon ?? Icons.diamond_rounded, size: 80, color: widget.themeColor),
+                        : Icon(widget.fallbackIcon ?? Icons.diamond_rounded, size: 60, color: widget.themeColor),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   Text(
                     widget.title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Text(
                     widget.subtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, height: 1.5, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13, height: 1.5, fontWeight: FontWeight.w500),
                   ),
-                  const SizedBox(height: 32),
+                  if (widget.balanceText != null) ...[
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: widget.themeColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: widget.themeColor.withOpacity(0.3), width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.balanceIcon != null) ...[
+                            Icon(widget.balanceIcon, color: widget.themeColor, size: 18),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            widget.balanceText!,
+                            style: TextStyle(
+                              color: widget.themeColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [widget.themeColor, widget.themeColor.withOpacity(0.7)],
+                          colors: [widget.themeColor, widget.themeColor.withOpacity(0.8)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
-                          BoxShadow(color: widget.themeColor.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 4)),
+                          BoxShadow(color: widget.themeColor.withOpacity(0.25), blurRadius: 15, offset: const Offset(0, 4)),
                         ],
                       ),
                       alignment: Alignment.center,
                       child: const Text(
-                        "Muhteşem",
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        "Harika",
+                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 1),
                       ),
                     ),
                   )
