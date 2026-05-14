@@ -181,14 +181,8 @@ class PurchaseService {
       else if (productId == soulStone50Id) amount = 50;
 
       if (amount > 0) {
-        final currentStones = await StorageService.getSoulStones();
-        final newStones = currentStones + amount;
-        await prefs.setInt('soul_stones', newStones);
+        await StorageService.updateSoulStones(amount);
         debugPrint('✅ $amount Ruh Taşı satın alındı!');
-        
-        // Buluta Senkronize Et (Arka planda)
-        final aura = prefs.getInt('aura_points') ?? 0;
-        ProfileSyncService().syncEconomyData(aura: aura, soulStones: newStones);
       }
     }
 

@@ -827,7 +827,7 @@ class ProfilePageState extends State<ProfilePage> {
     // Uygulama yayınlandığında mağaza linkleriyle çalışacak profesyonel yapı
     final Uri url = Uri.parse(
       Platform.isIOS
-          ? 'https://apps.apple.com/app/idYOUR_APP_ID' // iOS App Store Linki
+          ? 'https://apps.apple.com/app/id6761079957' // iOS App Store Linki
           : 'https://play.google.com/store/apps/details?id=com.sadam.vlucky_flutter' // Google Play Linki
     );
     
@@ -2135,7 +2135,9 @@ For questions: info@crackandwish.com''',
                                     );
                                   },
                                 ),
-                              );
+                              ).then((_) {
+                                loadUserData();
+                              });
                             },
                           ),
                           _SettingsListTile(
