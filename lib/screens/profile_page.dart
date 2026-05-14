@@ -2258,6 +2258,8 @@ For questions: info@crackandwish.com''',
 
 
 
+                      const SizedBox(height: 60),
+
                       // ── FOOTER & YASAL ──
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -2533,6 +2535,31 @@ class _BentoHeroCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              if (isPremium)
+                                Positioned(
+                                  bottom: 4,
+                                  right: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF1E1E1E),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: const Color(0xFF60A5FA), width: 2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF60A5FA).withOpacity(0.5),
+                                          blurRadius: 12,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.star_rounded,
+                                      color: Color(0xFF60A5FA),
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),

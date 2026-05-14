@@ -137,101 +137,28 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
             ),
           ),
 
-          // ── TEK SAYFA DÜZENİ ──
-          SafeArea(
-            child: Column(
-              children: [
-                // ── ÜST BAR (SABİT) ──
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 24, bottom: 10), // Tepe barlarına yapışmayı engellemek için top paddding 24 eklendi
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.08),
-                            shape: BoxShape.circle,
+          // ── TAM EKRAN DÜZENİ (Sınırsız Kaydırma) ──
+          Positioned.fill(
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            left: 24, 
+                            right: 24, 
+                            top: MediaQuery.of(context).padding.top + 80,
+                            bottom: MediaQuery.of(context).padding.bottom,
                           ),
-                          child: const Icon(Icons.close_rounded, color: Colors.white70, size: 20),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          if (_isRestoring) return;
-                          HapticFeedback.lightImpact();
-                          setState(() => _isRestoring = true);
-                          
-                          try {
-                            await PurchaseService().restorePurchases();
-                            await Future.delayed(const Duration(seconds: 2));
-                            
-                            final isElite = await PurchaseService().isUserElite();
-                            
-                            if (!mounted) return;
-                            setState(() => _isRestoring = false);
-                            
-                            if (isElite) {
-                              HapticFeedback.heavyImpact();
-                              setState(() => _isAlreadyElite = true);
-                              
-                              // Supabase'e bildir
-                              await ProfileSyncService().syncEliteStatus(true);
-                              
-                              MagicalSuccessDialog.show(
-                                context,
-                                title: "Elite Geri Yüklendi",
-                                subtitle: "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
-                                imagePath: '',
-                                fallbackIcon: Icons.check_circle_rounded,
-                                themeColor: const Color(0xFF10B981),
-                              ).then((_) {
-                                if (mounted) Navigator.pop(context);
-                              });
-                            } else {
-                              HapticFeedback.vibrate();
-                              _showGlassMessage(
-                                "Aktif Abonelik Yok",
-                                "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
-                                Icons.error_outline_rounded,
-                                const Color(0xFFF87171),
-                              );
-                            }
-                          } catch (e) {
-                            debugPrint('Geri yükleme hatası: $e');
-                            if (mounted) setState(() => _isRestoring = false);
-                          }
-                        },
-                        child: _isRestoring 
-                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2))
-                          : const Text("Satın Alımları Geri Yükle", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
-                      )
-                    ],
-                  ),
-                ),
-
-                // ── MERKEZİ İÇERİK ──
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(), // Ekran küçükse veya taşma varsa kullanıcı kaydırabilsin (Taşıp butonları ezmesin)
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                            child: IntrinsicHeight(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                            // ── ICON & BAŞLIK ──
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // ── ICON & BAŞLIK ──
                             ScaleTransition(
                               scale: _pulseAnimation,
                               child: Container(
@@ -304,8 +231,170 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             _buildGlassPackageRow(0, "Haftalık Uyanış", PurchaseService().getPrice(PurchaseService.eliteWeeklyId) ?? "\$2.99", "/ week"),
                             _buildGlassPackageRow(1, "Aylık Sezgi", PurchaseService().getPrice(PurchaseService.eliteMonthlyId) ?? "\$7.99", "/ month", subText: "Save 33%"),
                             _buildGlassPackageRow(2, "Yıllık Aydınlanma", PurchaseService().getPrice(PurchaseService.eliteYearlyId) ?? "\$39.99", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
-                            const SizedBox(height: 16), // from 24
-                                  ],
+                            const SizedBox(height: 32),
+
+                            // ── ALT BUTON VE YASAL METİN (ARTIK KAYDIRILABİLİR) ──
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(26),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                                child: Builder(
+                                  builder: (context) {
+                                    final bool isCurrentPlan = _isAlreadyElite && _selectedPackageIndex == _activePackageIndex;
+                                    final bool isDowngrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex < _activePackageIndex!;
+                                    final bool isUpgrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex > _activePackageIndex!;
+                                    
+                                    final bool useGradient = !isCurrentPlan && !isDowngrade;
+                                    final bool isDisabled = _isPurchasing || isCurrentPlan;
+
+                                    return AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        gradient: useGradient 
+                                          ? const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [Color(0xFFFFD700), Color(0xFFC084FC)],
+                                            )
+                                          : null,
+                                        color: !useGradient ? Colors.white.withOpacity(0.08) : null,
+                                        borderRadius: BorderRadius.circular(26),
+                                        boxShadow: useGradient 
+                                          ? [BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))]
+                                          : null,
+                                      ),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(26),
+                                          onTap: isDisabled ? null : () async {
+                                            if (isDowngrade) {
+                                              HapticFeedback.lightImpact();
+                                              final url = Theme.of(context).platform == TargetPlatform.iOS 
+                                                ? "https://apps.apple.com/account/subscriptions" 
+                                                : "https://play.google.com/store/account/subscriptions";
+                                              _launchURL(url);
+                                              return;
+                                            }
+
+                                            HapticFeedback.heavyImpact();
+                                            setState(() => _isPurchasing = true);
+                                            
+                                            try {
+                                              final productId = _selectedPackageIndex == 0 
+                                                ? PurchaseService.eliteWeeklyId 
+                                                : (_selectedPackageIndex == 1 
+                                                  ? PurchaseService.eliteMonthlyId 
+                                                  : PurchaseService.eliteYearlyId);
+                                              
+                                              final success = await PurchaseService().purchase(productId);
+                                              
+                                              if (success && mounted) {
+                                                final prefs = await SharedPreferences.getInstance();
+                                                final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
+                                                await prefs.setString('elite_plan_type', plan);
+                                                await prefs.setInt('daily_elite_soul_stones', 5);
+                                                
+                                                await ProfileSyncService().syncEliteStatus(true);
+                                                
+                                                if (!mounted) return;
+                                                setState(() {
+                                                  _isPurchasing = false;
+                                                  _isAlreadyElite = true;
+                                                  _activePackageIndex = _selectedPackageIndex;
+                                                });
+                                                
+                                                IconData successIcon = Icons.auto_awesome;
+                                                if (_selectedPackageIndex == 0) successIcon = Icons.bolt_rounded;
+                                                else if (_selectedPackageIndex == 1) successIcon = Icons.nights_stay_rounded;
+                                                else if (_selectedPackageIndex == 2) successIcon = Icons.workspace_premium_rounded;
+
+                                                MagicalSuccessDialog.show(
+                                                  context,
+                                                  title: isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
+                                                  subtitle: isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
+                                                  imagePath: '',
+                                                  fallbackIcon: successIcon,
+                                                  themeColor: const Color(0xFFFFD700),
+                                                ).then((_) {
+                                                  if (mounted) Navigator.pop(context, true);
+                                                });
+                                              } else if (mounted) {
+                                                setState(() => _isPurchasing = false);
+                                                _showGlassMessage(
+                                                  "Bağlantı Hatası",
+                                                  "Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.",
+                                                  Icons.error_outline_rounded,
+                                                  const Color(0xFFF87171),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              debugPrint('Elite satın alma hatası: $e');
+                                              if (mounted) setState(() => _isPurchasing = false);
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 14),
+                                            child: Center(
+                                              child: _isPurchasing
+                                                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                                  : Text(
+                                                      isCurrentPlan 
+                                                        ? "Mevcut Planın" 
+                                                        : (isDowngrade ? "Mağazadan Yönet" : (isUpgrade ? "Planı Yükselt" : "Elite Sınırlarını Aç")),
+                                                      style: TextStyle(
+                                                        color: useGradient ? const Color(0xFF1A1A2E) : Colors.white.withOpacity(isCurrentPlan ? 0.3 : 0.9), 
+                                                        fontSize: 16, 
+                                                        fontWeight: FontWeight.w800, 
+                                                        letterSpacing: 0.5,
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Builder(
+                              builder: (context) {
+                                final lang = Localizations.localeOf(context).languageCode;
+                                final text = lang == 'tr' 
+                                  ? "Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz."
+                                  : "Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. You can manage and cancel your subscriptions in your App Store settings.";
+                                return Text(
+                                  text,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9, height: 1.3),
+                                );
+                              }
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    final lang = Localizations.localeOf(context).languageCode;
+                                    _launchURL("https://crackwish.com/privacy.html#$lang");
+                                  },
+                                  child: Text("Privacy Policy", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
+                                ),
+                                Text("   •   ", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
+                                GestureDetector(
+                                  onTap: () {
+                                    final lang = Localizations.localeOf(context).languageCode;
+                                    _launchURL("https://crackwish.com/terms.html#$lang");
+                                  },
+                                  child: Text("Terms of Use (EULA)", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
+                                ),
+                              ],
+                            ),
+                            ],
                                 ),
                               ),
                             ),
@@ -315,173 +404,100 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                     ),
                   ),
                 ),
-                // ── ALT BUTON VE YASAL METİN (SABİT) ──
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 16), // from 24, 8, 24, 24
-                    child: Column(
+
+                // ── ÜST BAR (SABİT) OVERLAY ──
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFF1E1E1E).withOpacity(0.9),
+                          const Color(0xFF1E1E1E).withOpacity(0.0),
+                        ],
+                        stops: const [0.4, 1.0],
+                      ),
+                    ),
+                    padding: EdgeInsets.only(
+                      left: 20, 
+                      right: 20, 
+                      top: MediaQuery.of(context).padding.top > 0 ? MediaQuery.of(context).padding.top + 10 : 20, 
+                      bottom: 20
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(26), // from 30
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                            child: Builder(
-                              builder: (context) {
-                                final bool isCurrentPlan = _isAlreadyElite && _selectedPackageIndex == _activePackageIndex;
-                                final bool isDowngrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex < _activePackageIndex!;
-                                final bool isUpgrade = _isAlreadyElite && _activePackageIndex != null && _selectedPackageIndex > _activePackageIndex!;
-                                
-                                final bool useGradient = !isCurrentPlan && !isDowngrade;
-                                final bool isDisabled = _isPurchasing || isCurrentPlan;
-
-                                return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    gradient: useGradient 
-                                      ? const LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [Color(0xFFFFD700), Color(0xFFC084FC)],
-                                        )
-                                      : null,
-                                    color: !useGradient ? Colors.white.withOpacity(0.08) : null,
-                                    borderRadius: BorderRadius.circular(26),
-                                    boxShadow: useGradient 
-                                      ? [BoxShadow(color: const Color(0xFFFFD700).withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))]
-                                      : null,
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(26),
-                                      onTap: isDisabled ? null : () async {
-                                        if (isDowngrade) {
-                                          HapticFeedback.lightImpact();
-                                          // Apple/Google store'a yönlendir
-                                          final url = Theme.of(context).platform == TargetPlatform.iOS 
-                                            ? "https://apps.apple.com/account/subscriptions" 
-                                            : "https://play.google.com/store/account/subscriptions";
-                                          _launchURL(url);
-                                          return;
-                                        }
-
-                                        HapticFeedback.heavyImpact();
-                                        setState(() => _isPurchasing = true);
-                                        
-                                        try {
-                                          final productId = _selectedPackageIndex == 0 
-                                            ? PurchaseService.eliteWeeklyId 
-                                            : (_selectedPackageIndex == 1 
-                                              ? PurchaseService.eliteMonthlyId 
-                                              : PurchaseService.eliteYearlyId);
-                                          
-                                          final success = await PurchaseService().purchase(productId);
-                                          
-                                          if (success && mounted) {
-                                            final prefs = await SharedPreferences.getInstance();
-                                            final plan = _selectedPackageIndex == 0 ? 'weekly' : (_selectedPackageIndex == 1 ? 'monthly' : 'yearly');
-                                            await prefs.setString('elite_plan_type', plan);
-                                            await prefs.setInt('daily_elite_soul_stones', 5);
-                                            
-                                            await ProfileSyncService().syncEliteStatus(true);
-                                            
-                                            if (!mounted) return;
-                                            setState(() {
-                                              _isPurchasing = false;
-                                              _isAlreadyElite = true;
-                                              _activePackageIndex = _selectedPackageIndex;
-                                            });
-                                            
-                                            IconData successIcon = Icons.auto_awesome;
-                                            if (_selectedPackageIndex == 0) successIcon = Icons.bolt_rounded;
-                                            else if (_selectedPackageIndex == 1) successIcon = Icons.nights_stay_rounded;
-                                            else if (_selectedPackageIndex == 2) successIcon = Icons.workspace_premium_rounded;
-
-                                            MagicalSuccessDialog.show(
-                                              context,
-                                              title: isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
-                                              subtitle: isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
-                                              imagePath: '',
-                                              fallbackIcon: successIcon,
-                                              themeColor: const Color(0xFFFFD700),
-                                            ).then((_) {
-                                              if (mounted) Navigator.pop(context, true);
-                                            });
-                                          } else if (mounted) {
-                                            setState(() => _isPurchasing = false);
-                                            _showGlassMessage(
-                                              "Bağlantı Hatası",
-                                              "Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.",
-                                              Icons.error_outline_rounded,
-                                              const Color(0xFFF87171),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          debugPrint('Elite satın alma hatası: $e');
-                                          if (mounted) setState(() => _isPurchasing = false);
-                                        }
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
-                                        child: Center(
-                                          child: _isPurchasing
-                                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                              : Text(
-                                                  isCurrentPlan 
-                                                    ? "Mevcut Planın" 
-                                                    : (isDowngrade ? "Mağazadan Yönet" : (isUpgrade ? "Planı Yükselt" : "Elite Sınırlarını Aç")),
-                                                  style: TextStyle(
-                                                    color: useGradient ? const Color(0xFF1A1A2E) : Colors.white.withOpacity(isCurrentPlan ? 0.3 : 0.9), 
-                                                    fontSize: 16, 
-                                                    fontWeight: FontWeight.w800, 
-                                                    letterSpacing: 0.5,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              shape: BoxShape.circle,
                             ),
+                            child: const Icon(Icons.close_rounded, color: Colors.white70, size: 20),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the App Store after purchase.\n\nAboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9, height: 1.3),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                final lang = Localizations.localeOf(context).languageCode;
-                                _launchURL("https://crackwish.com/privacy.html#$lang");
-                              },
-                              child: Text("Privacy Policy", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
-                            ),
-                            Text("   •   ", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
-                            GestureDetector(
-                              onTap: () {
-                                final lang = Localizations.localeOf(context).languageCode;
-                                _launchURL("https://crackwish.com/terms.html#$lang");
-                              },
-                              child: Text("Terms of Use (EULA)", style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10, decoration: TextDecoration.underline, decorationColor: Colors.white.withOpacity(0.5))),
-                            ),
-                          ],
-                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            if (_isRestoring) return;
+                            HapticFeedback.lightImpact();
+                            setState(() => _isRestoring = true);
+                            
+                            try {
+                              await PurchaseService().restorePurchases();
+                              await Future.delayed(const Duration(seconds: 2));
+                              
+                              final isElite = await PurchaseService().isUserElite();
+                              
+                              if (!mounted) return;
+                              setState(() => _isRestoring = false);
+                              
+                              if (isElite) {
+                                HapticFeedback.heavyImpact();
+                                setState(() => _isAlreadyElite = true);
+                                
+                                await ProfileSyncService().syncEliteStatus(true);
+                                
+                                MagicalSuccessDialog.show(
+                                  context,
+                                  title: "Elite Geri Yüklendi",
+                                  subtitle: "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
+                                  imagePath: '',
+                                  fallbackIcon: Icons.check_circle_rounded,
+                                  themeColor: const Color(0xFF10B981),
+                                ).then((_) {
+                                  if (mounted) Navigator.pop(context);
+                                });
+                              } else {
+                                HapticFeedback.vibrate();
+                                _showGlassMessage(
+                                  "Aktif Abonelik Yok",
+                                  "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
+                                  Icons.error_outline_rounded,
+                                  const Color(0xFFF87171),
+                                );
+                              }
+                            } catch (e) {
+                              debugPrint('Geri yükleme hatası: $e');
+                              if (mounted) setState(() => _isRestoring = false);
+                            }
+                          },
+                          child: _isRestoring 
+                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2))
+                            : const Text("Satın Alımları Geri Yükle", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                        )
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
         ],
       ), // Stack
       ), // GestureDetector
