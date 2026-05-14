@@ -3509,8 +3509,8 @@ class _BentoHeroCard extends StatelessWidget {
 
                                               MagicalSuccessDialog.show(
                                                 context,
-                                                title: "Ruh Taşı Kazanıldı!",
-                                                subtitle: "Kozmik hazinenize $amount adet Ruh Taşı eklendi. Premium kurabiyeler açılmayı bekliyor.",
+                                                title: "$amount Ruh Taşı Kazanıldı!",
+                                                subtitle: "Kozmik hazinenize $amount adet Ruh Taşı eklendi.",
                                                 imagePath: '',
                                                 fallbackIcon: Icons.diamond_rounded,
                                                 themeColor: const Color(0xFF22D3EE),

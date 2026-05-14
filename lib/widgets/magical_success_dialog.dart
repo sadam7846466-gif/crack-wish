@@ -164,32 +164,6 @@ class _MagicalSuccessDialogState extends State<MagicalSuccessDialog> with Single
                       ),
                     ),
                   ],
-                  const SizedBox(height: 28),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [widget.themeColor, widget.themeColor.withOpacity(0.8)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(color: widget.themeColor.withOpacity(0.25), blurRadius: 15, offset: const Offset(0, 4)),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "Harika",
-                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 1),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
