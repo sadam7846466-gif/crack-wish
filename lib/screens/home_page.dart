@@ -7,20 +7,22 @@ import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import '../constants/colors.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
-import '../services/mock_owl_service.dart';
+import '../services/supabase_owl_service.dart';
+import '../services/sound_service.dart';
+import '../services/season_config.dart';
 import '../widgets/mini_stats_row.dart';
 import '../widgets/cookie_section.dart';
 import '../widgets/cookie_selector.dart';
 import '../widgets/daily_tip_card.dart';
 import '../widgets/bento_grid.dart';
 import '../widgets/cosmic_badge.dart';
-import '../widgets/quote_banner.dart';
 import '../widgets/daily_horoscope_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/fade_page_route.dart';
 import 'profile_page.dart';
 import 'collection_page.dart';
 import 'owl_letter_page.dart';
+import '../widgets/cosmic_toast.dart';
 
 class HomePage extends StatefulWidget {
   final bool showBottomNav;
@@ -36,12 +38,13 @@ class _HomePageState extends State<HomePage> {
   int _currentNavIndex = 0;
   String _selectedCookieEmoji = 'spring_wreath'; // Default cookie ID
   int _selectedCookieIndex = 0; // Seçili cookie index'i (cookie selector için)
+  int _inventoryVersion = 0;
   final GlobalKey<State<CookieSection>> _cookieSectionKey =
       GlobalKey<State<CookieSection>>();
   final GlobalKey _owlButtonKey = GlobalKey();
   int _unreadOwlCount = 0;
-  bool _owlPressed = false;
   late String _randomSubtitle;
+  late bool _showTimeSubtitle;
   String? _userName;
   static final _mottledPainter = _MottledPainter();
 
@@ -63,14 +66,27 @@ class _HomePageState extends State<HomePage> {
     'Sürpriz iyi gelir.',
   ];
 
+  late List<String> _cookieTypes;
+  bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
+    _cookieTypes = [
+      ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
+      ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
+    ];
     _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
+    _showTimeSubtitle = math.Random().nextBool();
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
     _loadUserName();
-    MockOwlService().addListener(_onMockOwlUpdate);
+    SupabaseOwlService().addListener(_onMockOwlUpdate);
+    
+    // Uygulama açılışında gelen sesleri engellemek için 3 saniyelik bir koruma kalkanı
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) _isFirstLoad = false;
+    });
     
     // Milestones kontrolünü gecikmeli çalıştır ki UI render edilsin
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -86,12 +102,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onMockOwlUpdate() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    // Sadece unread count değiştiyse rebuild et — gereksiz zıplamayı önler
+    _checkUnreadOwlLetters();
   }
 
   @override
   void dispose() {
-    MockOwlService().removeListener(_onMockOwlUpdate);
+    SupabaseOwlService().removeListener(_onMockOwlUpdate);
     super.dispose();
   }
 
@@ -117,7 +135,7 @@ class _HomePageState extends State<HomePage> {
     HapticFeedback.heavyImpact();
     
     String rewardText = "";
-    IconData rewardIcon = Icons.auto_awesome_rounded;
+    IconData rewardIcon = Icons.auto_awesome;
     Color rewardColor = const Color(0xFFC084FC);
     
     if (threshold == 7) { rewardText = "+15 Aura"; }
@@ -127,190 +145,99 @@ class _HomePageState extends State<HomePage> {
     else if (threshold == 100) { rewardText = "+3 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
     else if (threshold == 365) { rewardText = "+5 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
 
-    showGeneralDialog(
+    CosmicToast.show(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.6),
-      barrierDismissible: true,
-      barrierLabel: 'MilestoneModal',
-      transitionDuration: const Duration(milliseconds: 400),
-      transitionBuilder: (context, anim1, anim2, child) {
-        return BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 12 * anim1.value, sigmaY: 12 * anim1.value),
-          child: FadeTransition(
-            opacity: anim1,
-            child: Transform.scale(
-              scale: 0.95 + 0.05 * Curves.easeOutCubic.transform(anim1.value),
-              child: child,
-            ),
-          ),
-        );
-      },
-      pageBuilder: (context, anim1, anim2) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 28),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(28, 36, 28, 28),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A).withOpacity(0.7),
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: rewardColor.withOpacity(0.15),
-                blurRadius: 60,
-                spreadRadius: -10,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Üst İkon
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFFF8A65).withOpacity(0.2),
-                      const Color(0xFFFF8A65).withOpacity(0.0),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  border: Border.all(
-                    color: const Color(0xFFFF8A65).withOpacity(0.4),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(Icons.local_fire_department_rounded, color: Color(0xFFFF8A65), size: 36),
-              ),
-              const SizedBox(height: 24),
-              // Başlık
-              const Text(
-                "İnanılmaz Odak!",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Açıklama
-              Text(
-                "Günlük serin tam $threshold güne ulaştı.\nEvren bu bağlılığını küçük bir hediyeyle onurlandırıyor.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 14,
-                  height: 1.5,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              // Ödül Kutusu (Minimalist tasarım)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                decoration: BoxDecoration(
-                  color: rewardColor.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: rewardColor.withOpacity(0.3), width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(rewardIcon, color: rewardColor, size: 24),
-                    const SizedBox(width: 12),
-                    Text(
-                      rewardText,
-                      style: TextStyle(
-                        color: rewardColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Topla Butonu
-              GestureDetector(
-                onTap: () async {
-                  HapticFeedback.mediumImpact();
-                  await StorageService.claimMilestone(threshold);
-                  if (mounted) Navigator.pop(context);
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.white.withOpacity(0.9),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.15),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Teşekkür Et ve Al",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      title: 'İnanılmaz Odak!',
+      message: 'Günlük serin tam $threshold güne ulaştı.',
+      reward: rewardText,
+      icon: rewardIcon,
+      iconColor: const Color(0xFFFF6B6B),
+      rewardColor: rewardColor,
     );
+    
+    // Arka planda topla
+    StorageService.claimMilestone(threshold);
   }
 
   Future<void> _loadSelectedCookie() async {
     final savedCookie = await StorageService.getSelectedCookie();
+    
+    final collection = await StorageService.getCookieCollection();
+    final ownedIds = collection.where((c) => c.countObtained > 0).map((c) => c.id).toSet();
+    
+    final showcaseIds = [
+      ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
+      ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
+    ];
+    
+    // Kullanıcının sergilemeyi seçtiği kurabiyeler (max 6)
+    var displayedIds = await StorageService.getDisplayedCookies();
+    
+    // Henüz seçim yapmadıysa, sahip olduklarından ilk 6'sını göster
+    if (displayedIds.isEmpty) {
+      final allCookies = SeasonConfig.getAllCookies().map((c) => c['id'] as String).toList();
+      displayedIds = allCookies.where((id) {
+        return ownedIds.contains(id) && !showcaseIds.contains(id);
+      }).take(StorageService.maxDisplayedCookies).toList();
+    }
+    
+    // Vitrinde zaten olanları çıkar (çift gözükmesin)
+    final ownedButNotShown = displayedIds.where((id) {
+      return ownedIds.contains(id) && !showcaseIds.contains(id);
+    }).toList();
+
     if (mounted) {
       setState(() {
-        _selectedCookieEmoji = savedCookie;
-        _selectedCookieIndex = _getCookieIndex(savedCookie);
+        _cookieTypes = [...showcaseIds, ...ownedButNotShown];
+        
+        if (!_cookieTypes.contains(savedCookie) && _cookieTypes.isNotEmpty) {
+          _selectedCookieEmoji = _cookieTypes[0];
+          _selectedCookieIndex = 0;
+          StorageService.setSelectedCookie(_cookieTypes[0]);
+        } else {
+          _selectedCookieEmoji = savedCookie;
+          _selectedCookieIndex = _getCookieIndex(savedCookie);
+        }
       });
     }
   }
 
-  Future<void> _checkUnreadOwlLetters() async {
-    final count = await StorageService.getUnreadOwlLetterCount();
+  void _playOwlNotificationSound() async {
+    try {
+      await SoundService().playOwlLetter();
+    } catch (e) {
+      debugPrint('Bildirim sesi oynatılamadı: $e');
+    }
+  }
+
+  void _checkUnreadOwlLetters() {
+    final count = SupabaseOwlService().unreadLetterCount + SupabaseOwlService().pendingRequestCount;
     if (!mounted) return;
-    setState(() => _unreadOwlCount = count);
+    
+    // Eğer yeni mektup geldiyse ve uygulama yeni açılmadıysa
+    if (!_isFirstLoad) {
+      if (_unreadOwlCount > 0 && count > _unreadOwlCount) {
+        _playOwlNotificationSound();
+      } else if (_unreadOwlCount == 0 && count > 0) {
+        _playOwlNotificationSound();
+      }
+    }
+
+    // Sadece değer değiştiyse rebuild et — gereksiz rebuild'leri önle
+    if (_unreadOwlCount != count) {
+      setState(() => _unreadOwlCount = count);
+    }
   }
 
   void _openOwlLetterPage() {
     HapticFeedback.mediumImpact();
+    Rect rect = const Rect.fromLTWH(0, 0, 52, 52);
     final box = _owlButtonKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final pos = box.localToGlobal(Offset.zero);
-    final size = box.size;
-    final rect = Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
+    if (box != null) {
+      final pos = box.localToGlobal(Offset.zero);
+      final size = box.size;
+      rect = Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
+    }
 
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -322,28 +249,6 @@ class _HomePageState extends State<HomePage> {
       ),
     ).then((_) => _checkUnreadOwlLetters());
   }
-  static const List<String> _cookieTypes = [
-    'spring_wreath',
-    'lucky_clover',
-    'royal_hearts',
-    'evil_eye',
-    'pizza_party',
-    'sakura_bloom',
-    'blue_porcelain',
-    'pink_blossom',
-    'fortune_cat',
-    'wildflower',
-    'cupid_ribbon',
-    'panda_bamboo',
-    'ramadan_cute',
-    'enchanted_forest',
-    'golden_arabesque',
-    'midnight_mosaic',
-    'pearl_lace',
-    'golden_sakura',
-    'dragon_phoenix',
-    'gold_beasts',
-  ];
 
   void _hideFortune() {
     (_cookieSectionKey.currentState as dynamic)?.hideFortune();
@@ -367,6 +272,14 @@ class _HomePageState extends State<HomePage> {
     StorageService.setSelectedCookie(emoji);
     // Açık bir şans mesajı varsa kapat
     (_cookieSectionKey.currentState as dynamic)?.hideFortune();
+  }
+
+  void _onPurchaseSuccess() {
+    if (mounted) {
+      setState(() {
+        _inventoryVersion++;
+      });
+    }
   }
 
   // Kurabiye bazlı arka plan gradienti (tüm görseller için varsayılan)
@@ -416,6 +329,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.transparent,
@@ -476,6 +390,7 @@ class _HomePageState extends State<HomePage> {
                                     });
                                   },
                                   onTapped: _refreshStats,
+                                  onPurchaseSuccess: _onPurchaseSuccess,
                                 ),
                               ),
                             ),
@@ -483,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                               offset: const Offset(0, -60),
                               child: RepaintBoundary(
                                 child: CookieSelector(
-                                  key: const ValueKey('cookie_selector_fixed'),
+                                  key: ValueKey('cookie_selector_fixed_$_inventoryVersion'),
                                   initialSelectedIndex: _selectedCookieIndex,
                                   onCookieSelected: _onCookieSelected,
                                 ),
@@ -497,7 +412,6 @@ class _HomePageState extends State<HomePage> {
                                   const DailyTipCard(),
                                   const BentoGrid(),
                                   const SizedBox(height: 16),
-                                  const QuoteBanner(),
                                   const DailyHoroscopeCard(),
                                 ],
                               ),
@@ -524,7 +438,7 @@ class _HomePageState extends State<HomePage> {
     final isTr = l10n.localeName == 'tr';
     final hour = DateTime.now().hour;
     
-    final int totalUnread = _unreadOwlCount + MockOwlService().pendingRequestCount + MockOwlService().unreadLetterCount;
+    final int totalUnread = _unreadOwlCount + SupabaseOwlService().pendingRequestCount + SupabaseOwlService().unreadLetterCount;
     
     String greeting;
     String timeSubtitle;
@@ -561,8 +475,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Yarı rastgele, yarı zamana özel bir alt başlık
-    final showTimeSubtitle = math.Random().nextBool(); // %50 ihtimalle zamana özel, %50 rastgele mottolar
-    final finalSubtitle = showTimeSubtitle ? timeSubtitle : _randomSubtitle;
+    final finalSubtitle = _showTimeSubtitle ? timeSubtitle : _randomSubtitle;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -612,101 +525,136 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(width: 12),
         // Baykuş butonu — tıklanınca buzlu cam mektup paneli açılır
-        GestureDetector(
-          onTapDown: (_) => setState(() => _owlPressed = true),
-          onTapUp: (_) {
-            Future.delayed(const Duration(milliseconds: 100), () {
-              if (mounted) setState(() => _owlPressed = false);
-              _openOwlLetterPage();
-            });
-          },
-          onTapCancel: () => setState(() => _owlPressed = false),
-          child: RepaintBoundary(
-            child: AnimatedScale(
-              scale: _owlPressed ? 0.88 : 1.0,
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeInOut,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  GlassContainer(
-                    key: _owlButtonKey,
-                    useOwnLayer: true,
-                    width: 52,
-                    height: 52,
-                    settings: const LiquidGlassSettings(
-                      thickness: 18,
-                      blur: 2,
-                      glassColor: Colors.transparent,
-                      chromaticAberration: 0.1,
-                      lightIntensity: 0.7,
-                      ambientStrength: 0.6,
-                      refractiveIndex: 1.2,
-                      saturation: 1.0,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFD4B8A0), // Bej
-                            Color(0xFF964040), // Kırmızı
-                            Color(0xFF2A4A6C), // Mavi
-                          ],
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.45),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF964040).withOpacity(0.35),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 6,
-                            right: 6,
-                            top: 6,
-                            height: 12,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white.withOpacity(0.4),
-                                    Colors.white.withOpacity(0.0),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Center(child: Image.asset('assets/images/owl.png', width: 52, height: 52)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Okunmamış mektup badge'i
-                  if (totalUnread > 0)
-                    const Positioned(
-                      right: 0,
-                      top: 0,
-                      child: CosmicBadge(),
-                    ),
-                ],
-              ),
-            ),
-          ),
+        _OwlButton(
+          key: _owlButtonKey,
+          unreadCount: totalUnread,
+          onTap: _openOwlLetterPage,
         ),
       ],
+    );
+  }
+}
+
+class _OwlButton extends StatefulWidget {
+  final int unreadCount;
+  final VoidCallback onTap;
+
+  const _OwlButton({
+    super.key,
+    required this.unreadCount,
+    required this.onTap,
+  });
+
+  @override
+  State<_OwlButton> createState() => _OwlButtonState();
+}
+
+class _OwlButtonState extends State<_OwlButton> {
+  bool _pressed = false;
+  final GlobalKey _btnKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) setState(() => _pressed = false);
+          widget.onTap();
+        });
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: RepaintBoundary(
+        child: AnimatedScale(
+          scale: _pressed ? 0.88 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeInOut,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+                GlassContainer(
+                  key: _btnKey,
+                  useOwnLayer: true,
+                width: 52,
+                height: 52,
+                settings: const LiquidGlassSettings(
+                  thickness: 18,
+                  blur: 2,
+                  glassColor: Colors.transparent,
+                  chromaticAberration: 0.1,
+                  lightIntensity: 0.7,
+                  ambientStrength: 0.6,
+                  refractiveIndex: 1.2,
+                  saturation: 1.0,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFD4B8A0), // Bej
+                        Color(0xFF964040), // Kırmızı
+                        Color(0xFF2A4A6C), // Mavi
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.45),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF964040).withOpacity(0.35),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 6,
+                        right: 6,
+                        top: 6,
+                        height: 12,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withOpacity(0.4),
+                                Colors.white.withOpacity(0.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Image.asset(
+                          'assets/images/owl.png',
+                          width: 52,
+                          height: 52,
+                          gaplessPlayback: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Okunmamış mektup badge'i
+              if (widget.unreadCount > 0)
+                const Positioned(
+                  right: 0,
+                  top: 0,
+                  child: CosmicBadge(),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -718,6 +666,7 @@ class _SlidingCookie extends StatefulWidget {
   final int currentIndex;
   final void Function(String emoji, int index) onCookieChanged;
   final VoidCallback onTapped;
+  final VoidCallback? onPurchaseSuccess;
 
   const _SlidingCookie({
     required this.emoji,
@@ -725,6 +674,7 @@ class _SlidingCookie extends StatefulWidget {
     required this.currentIndex,
     required this.onCookieChanged,
     required this.onTapped,
+    this.onPurchaseSuccess,
   });
 
   @override
@@ -890,6 +840,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Sonraki kurabiye - SADECE sürükleme sırasında oluştur
@@ -901,6 +852,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: sideEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Çıkan kurabiye - SADECE geçiş animasyonu sırasında oluştur
@@ -912,6 +864,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                       onCookieTapped: () {},
                       selectedCookieEmoji: _outgoingEmoji!,
                       hideLabels: true,
+                      onPurchaseSuccess: widget.onPurchaseSuccess,
                     ),
                   ),
                 // Mevcut/giren kurabiye - HER ZAMAN render
@@ -922,6 +875,7 @@ class _SlidingCookieState extends State<_SlidingCookie>
                     onCookieTapped: widget.onTapped,
                     selectedCookieEmoji: widget.emoji,
                     hideLabels: true,
+                    onPurchaseSuccess: widget.onPurchaseSuccess,
                   ),
                 ),
               ],
