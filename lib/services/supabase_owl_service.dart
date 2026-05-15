@@ -112,6 +112,7 @@ class SupabaseOwlService {
           name: profile['full_name'] ?? 'Ben',
           emoji: '🧑',
           owlCode: profile['handle']?.toString().toUpperCase().replaceAll('@', '') ?? '1',
+          isElite: profile['is_elite'] == true,
         );
       }
     } catch (e) {
@@ -144,7 +145,7 @@ class SupabaseOwlService {
          final senderIds = requests.map((r) => r['from_user']).toSet().toList();
          
          final profiles = await _db.from('profiles')
-             .select('id, full_name, handle, avatar_url, zodiac_sign')
+             .select('id, full_name, handle, avatar_url, zodiac_sign, is_elite')
              .inFilter('id', senderIds.map((e) => e.toString()).toList());
              
          final Map<String, dynamic> profileMap = { for (var p in profiles) p['id'].toString(): p };
@@ -162,6 +163,7 @@ class SupabaseOwlService {
                      owlCode: p['handle']?.toString().replaceFirst('@', '') ?? 'MYS',
                      avatarUrl: p['avatar_url']?.toString(),
                      zodiacSign: p['zodiac_sign']?.toString(),
+                     isElite: p['is_elite'] == true,
                    ),
                   to: currentUser,
                   createdAt: DateTime.tryParse(req['created_at'].toString()) ?? DateTime.now(),
@@ -191,7 +193,7 @@ class SupabaseOwlService {
       
       if (friendIds.isNotEmpty) {
         final friendProfiles = await _db.from('profiles')
-            .select('id, full_name, handle, avatar_url, zodiac_sign')
+            .select('id, full_name, handle, avatar_url, zodiac_sign, is_elite')
             .inFilter('id', friendIds.map((e) => e.toString()).toList());
         
         for (var p in friendProfiles) {
@@ -207,6 +209,7 @@ class SupabaseOwlService {
               owlCode: p['handle']?.toString().replaceFirst('@', '') ?? '',
               avatarUrl: p['avatar_url']?.toString(),
               zodiacSign: p['zodiac_sign']?.toString(),
+              isElite: p['is_elite'] == true,
             ),
             friendsSince: DateTime.now(),
           ));
@@ -548,7 +551,7 @@ class SupabaseOwlService {
       Map<String, dynamic> profileMap = {};
       if (userIds.isNotEmpty) {
         final profiles = await _db.from('profiles')
-            .select('id, full_name, handle, avatar_url')
+            .select('id, full_name, handle, avatar_url, is_elite')
             .inFilter('id', userIds.map((e) => e.toString()).toList());
         profileMap = { for (var p in profiles) p['id'].toString(): p };
       }
@@ -573,6 +576,7 @@ class SupabaseOwlService {
             emoji: '🧑',
             owlCode: senderProfile?['handle']?.toString().replaceFirst('@', '') ?? '',
             avatarUrl: senderProfile?['avatar_url']?.toString(),
+            isElite: senderProfile?['is_elite'] == true,
           ),
           to: currentUser,
           message: l['content'] ?? '',
@@ -602,6 +606,7 @@ class SupabaseOwlService {
             emoji: '🧑',
             owlCode: receiverProfile?['handle']?.toString().replaceFirst('@', '') ?? '',
             avatarUrl: receiverProfile?['avatar_url']?.toString(),
+            isElite: receiverProfile?['is_elite'] == true,
           ),
           message: l['content'] ?? '',
           attachedCookieId: l['attached_cookie_id']?.toString(),
@@ -792,7 +797,7 @@ class SupabaseOwlService {
       try {
         final List<dynamic> matchedProfiles = await _db
             .from('profiles')
-            .select('id, full_name, handle, avatar_url, email')
+            .select('id, full_name, handle, avatar_url, email, is_elite')
             .filter('email', 'in', emails);
 
         final matchedEmails = matchedProfiles.map((p) => p['email'].toString().toLowerCase()).toSet();

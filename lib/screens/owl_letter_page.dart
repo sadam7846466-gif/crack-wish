@@ -418,32 +418,49 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
           return Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.2),
-                  border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                ),
-                child: ClipOval(
-                  child: avatarUrl != null && avatarUrl.startsWith('http')
-                      ? Transform.scale(
-                          scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                          child: Image.network(
-                            avatarUrl,
-                            key: ValueKey(avatarUrl),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                          ),
-                        )
-                      : avatarUrl != null && avatarUrl.startsWith('assets')
+              Stack(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withOpacity(0.2),
+                      border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                    ),
+                    child: ClipOval(
+                      child: avatarUrl != null && avatarUrl.startsWith('http')
                           ? Transform.scale(
                               scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                              child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                              child: Image.network(
+                                avatarUrl,
+                                key: ValueKey(avatarUrl),
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                              ),
                             )
-                          : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
-                ),
+                          : avatarUrl != null && avatarUrl.startsWith('assets')
+                              ? Transform.scale(
+                                  scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                                  child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                                )
+                              : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 22),
+                    ),
+                  ),
+                  if (_isPremiumUser)
+                    Positioned(
+                      bottom: -2,
+                      right: -2,
+                      child: Icon(
+                        Icons.star_rounded,
+                        color: const Color(0xFF60A5FA),
+                        size: 16,
+                        shadows: [
+                          Shadow(color: const Color(0xFF60A5FA).withOpacity(0.8), blurRadius: 6),
+                        ],
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -565,32 +582,49 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.2),
-                        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
-                      ),
-                      child: ClipOval(
-                        child: avatarUrl != null && avatarUrl.startsWith('http')
-                            ? Transform.scale(
-                                scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                                child: Image.network(
-                                  avatarUrl,
-                                  key: ValueKey(avatarUrl),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
-                                ),
-                              )
-                            : avatarUrl != null && avatarUrl.startsWith('assets')
+                    Stack(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black.withOpacity(0.2),
+                            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                          ),
+                          child: ClipOval(
+                            child: avatarUrl != null && avatarUrl.startsWith('http')
                                 ? Transform.scale(
                                     scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
-                                    child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                                    child: Image.network(
+                                      avatarUrl,
+                                      key: ValueKey(avatarUrl),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
+                                    ),
                                   )
-                                : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
-                      ),
+                                : avatarUrl != null && avatarUrl.startsWith('assets')
+                                    ? Transform.scale(
+                                        scale: avatarUrl.contains('owl') ? 1.35 : (avatarUrl.contains('avatar_') ? 1.15 : 1.0),
+                                        child: Image.asset(avatarUrl, fit: BoxFit.cover),
+                                      )
+                                    : Icon(Icons.person, color: Colors.white.withOpacity(0.5), size: 20),
+                          ),
+                        ),
+                        if (u['is_elite'] == true)
+                          Positioned(
+                            bottom: -2,
+                            right: -2,
+                            child: Icon(
+                              Icons.star_rounded,
+                              color: const Color(0xFF60A5FA),
+                              size: 16,
+                              shadows: [
+                                Shadow(color: const Color(0xFF60A5FA).withOpacity(0.8), blurRadius: 6),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -2579,48 +2613,65 @@ class _ContactItem extends StatelessWidget {
         ) : null,
         child: Row(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.2) : Colors.white.withOpacity(0.05),
-                border: Border.all(color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.6) : Colors.white.withOpacity(0.1), width: 1.0),
-                boxShadow: isAppUser ? [
-                  BoxShadow(color: const Color(0xFF6B429C).withOpacity(0.3), blurRadius: 8, spreadRadius: 1)
-                ] : [],
-              ),
-              child: ClipOval(
-                child: friend?.user.avatarUrl != null 
-                    ? (friend!.user.avatarUrl!.startsWith('http') 
-                        ? Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                            child: Image.network(
-                              friend!.user.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Center(
-                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            ),
-                          )
-                        : Transform.scale(
-                            scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
-                            child: Image.asset(
-                              friend!.user.avatarUrl!,
-                              fit: BoxFit.cover,
-                              width: 44,
-                              height: 44,
-                              errorBuilder: (_, __, ___) => Center(
-                                child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                              ),
-                            ),
-                          ))
-                    : Center(
-                        child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
-                      ),
-              ),
+            Stack(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                    border: Border.all(color: isAppUser ? const Color(0xFF6B429C).withOpacity(0.6) : Colors.white.withOpacity(0.1), width: 1.0),
+                    boxShadow: isAppUser ? [
+                      BoxShadow(color: const Color(0xFF6B429C).withOpacity(0.3), blurRadius: 8, spreadRadius: 1)
+                    ] : [],
+                  ),
+                  child: ClipOval(
+                    child: friend?.user.avatarUrl != null 
+                        ? (friend!.user.avatarUrl!.startsWith('http') 
+                            ? Transform.scale(
+                                scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                child: Image.network(
+                                  friend!.user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 44,
+                                  height: 44,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                                  ),
+                                ),
+                              )
+                            : Transform.scale(
+                                scale: friend!.user.avatarUrl!.contains('owl') ? 1.35 : (friend!.user.avatarUrl!.contains('avatar_') ? 1.15 : 1.0),
+                                child: Image.asset(
+                                  friend!.user.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 44,
+                                  height: 44,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                                  ),
+                                ),
+                              ))
+                        : Center(
+                            child: Icon(Icons.person, color: isAppUser ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.5), size: 22),
+                          ),
+                  ),
+                ),
+                if (friend?.user.isElite == true)
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: Icon(
+                      Icons.star_rounded,
+                      color: const Color(0xFF60A5FA),
+                      size: 16,
+                      shadows: [
+                        Shadow(color: const Color(0xFF60A5FA).withOpacity(0.8), blurRadius: 6),
+                      ],
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 12),
             Expanded(

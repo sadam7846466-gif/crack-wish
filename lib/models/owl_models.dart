@@ -7,6 +7,7 @@ class OwlUser {
   final String owlCode; // #OWL-XXXX
   final String? avatarUrl;
   final String? zodiacSign;
+  final bool isElite;
 
   const OwlUser({
     required this.id,
@@ -15,6 +16,7 @@ class OwlUser {
     required this.owlCode,
     this.avatarUrl,
     this.zodiacSign,
+    this.isElite = false,
   });
 }
 
