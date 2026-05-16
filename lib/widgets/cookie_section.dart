@@ -2124,7 +2124,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                 // ── Fiyat + Satın Al Butonu ──
                 Builder(
                   builder: (context) {
-                    final priceStr = PurchaseService().getPrice('cookie_${widget.cookieId}') ?? (isTr ? '₺29.99' : '\$0.99');
+                    final priceStr = PurchaseService().getPrice('cookie_${widget.cookieId}') ?? '...';
                     return _PurchaseButton(
                       isPurchasing: _isPurchasing,
                       label: isTr ? 'Satın Al ($priceStr)' : 'Purchase ($priceStr)',

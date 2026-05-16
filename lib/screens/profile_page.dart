@@ -3457,7 +3457,7 @@ class _BentoHeroCard extends StatelessWidget {
                                     child: _buildSoulStoreCard(
                                       context,
                                       "5 Taş",
-                                      PurchaseService().getPrice(PurchaseService.soulStone5Id) ?? "₺49.99",
+                                      PurchaseService().getPrice(PurchaseService.soulStone5Id) ?? "...",
                                       const Color(0xFF4EE6C5),
                                       isSelected: selectedStoreIndex == 0,
                                       onTap: () => setModalState(
@@ -3470,7 +3470,7 @@ class _BentoHeroCard extends StatelessWidget {
                                     child: _buildSoulStoreCard(
                                       context,
                                       "15 Taş",
-                                      PurchaseService().getPrice(PurchaseService.soulStone15Id) ?? "₺119.99",
+                                      PurchaseService().getPrice(PurchaseService.soulStone15Id) ?? "...",
                                       const Color(0xFFC084FC),
                                       isPopular: true,
                                       isSelected: selectedStoreIndex == 1,
@@ -3484,7 +3484,7 @@ class _BentoHeroCard extends StatelessWidget {
                                     child: _buildSoulStoreCard(
                                       context,
                                       "50 Taş",
-                                      PurchaseService().getPrice(PurchaseService.soulStone50Id) ?? "₺299.99",
+                                      PurchaseService().getPrice(PurchaseService.soulStone50Id) ?? "...",
                                       const Color(0xFFFFD700),
                                       isSelected: selectedStoreIndex == 2,
                                       onTap: () => setModalState(
