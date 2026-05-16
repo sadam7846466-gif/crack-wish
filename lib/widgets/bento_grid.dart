@@ -55,10 +55,18 @@ class _BentoGridState extends State<BentoGrid>
     
     final today = DateTime.now().toIso8601String().split('T')[0];
     final lastZodiacDate = prefs.getString('last_zodiac_read_date') ?? '';
+    final lastCoffeeDate = prefs.getString('coffee_last_reading_date') ?? '';
+    final lastDreamDate = prefs.getString('dream_last_reading_date') ?? '';
+    
+    // HAZIR badge'i SADECE şu 3 koşulun hepsi karşılanırsa gösterilir:
+    // 1. Fal tarihi bugün olmalı
+    // 2. viewed = false olmalı (henüz okunmamış)
+    // 3. Gerçek fal verisi (reading data) mevcut olmalı
+    final hasCoffeeData = prefs.getString('coffee_last_reading') != null;
 
     setState(() {
-      _hasUnreadCoffee = prefs.getBool('coffee_last_reading_viewed') == false;
-      _hasUnreadDream = prefs.getBool('dream_last_reading_viewed') == false;
+      _hasUnreadCoffee = (lastCoffeeDate == today) && (prefs.getBool('coffee_last_reading_viewed') == false) && hasCoffeeData;
+      _hasUnreadDream = (lastDreamDate == today) && (prefs.getBool('dream_last_reading_viewed') == false);
       _hasUnreadZodiac = lastZodiacDate != today;
     });
   }

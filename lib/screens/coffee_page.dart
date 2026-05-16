@@ -55,12 +55,56 @@ class _CoffeePageState extends State<CoffeePage>
   Timer? _backgroundPollTimer;
   bool _waitingForBackgroundResult = false;
 
+  // Niyet Ekranı State'leri
+  int _currentIntentStep = 0; // 0: İlişki, 1: Odak, 2: Ruh Hali, 3: Hazır
+  String? _selectedRelationship;
+  String? _selectedFocus;
+  String? _selectedMood;
+
   // Giriş animasyonu için
   late AnimationController _entranceController;
+
+  // Buton titremesi için
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
+
+  // Seçenek butonları titremesi için
+  late AnimationController _optionsShakeController;
+  late Animation<double> _optionsShakeAnimation;
+
+  // Rastgele Karıştırılmış Seçenekler
+  late List<Map<String, dynamic>> _shuffledRelationshipOptions;
+  late List<Map<String, dynamic>> _shuffledFocusOptions;
+  late List<Map<String, dynamic>> _shuffledMoodOptions;
 
   @override
   void initState() {
     super.initState();
+    _shuffledRelationshipOptions = [
+      {'text': 'Yalnız Ruhum', 'icon': Icons.person_outline},
+      {'text': 'Kalbim Dolu', 'icon': Icons.favorite_border},
+      {'text': 'Nişanlıyım', 'icon': Icons.diamond_outlined},
+      {'text': 'Evliyim', 'icon': Icons.home_outlined},
+      {'text': 'Karmaşık', 'icon': Icons.all_inclusive},
+    ]..shuffle();
+
+    _shuffledFocusOptions = [
+      {'text': 'Aşk ve Uyum', 'icon': Icons.favorite_border},
+      {'text': 'Kariyer ve Maddiyat', 'icon': Icons.work_outline},
+      {'text': 'Şifa ve Huzur', 'icon': Icons.spa_outlined},
+      {'text': 'Genel Gelecek', 'icon': Icons.visibility_outlined},
+      {'text': 'Sürpriz Olsun', 'icon': Icons.auto_awesome},
+    ]..shuffle();
+
+    _shuffledMoodOptions = [
+      {'text': 'Huzurlu', 'icon': Icons.self_improvement},
+      {'text': 'Heyecanlı', 'icon': Icons.local_fire_department_outlined},
+      {'text': 'Endişeli', 'icon': Icons.water_drop_outlined},
+      {'text': 'Kararsız', 'icon': Icons.help_outline},
+      {'text': 'Enerjik', 'icon': Icons.bolt_outlined},
+      {'text': 'Hüzünlü', 'icon': Icons.cloud_outlined},
+    ]..shuffle();
+
     WidgetsBinding.instance.addObserver(this);
     _checkAndRefundPendingFortune();
     _pageCtrl = PageController(initialPage: 0);
@@ -74,51 +118,45 @@ class _CoffeePageState extends State<CoffeePage>
       duration: const Duration(milliseconds: 1400),
     );
     _entranceController.forward();
+
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
+    ]).animate(_shakeController);
+
+    _optionsShakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _optionsShakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -8.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 8.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -6.0, end: 6.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 6.0, end: -3.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
+    ]).animate(_optionsShakeController);
+
     _loadSoulStones();
     _loadPremiumStatus();
     _loadTodaysReadings();
+    _loadIntentData();
   }
 
-  // Yarım Kalan Fal İade Sistemi
+  Future<void> _loadIntentData() async {
+    // İlişki durumu artık otomatik yüklenmiyor — kullanıcı her fal için seçim yapmalı
+  }
+
+  // Yarım Kalan Fal İade Sistemi (KALDIRILDI - Artık taş iadesi yok)
   Future<void> _checkAndRefundPendingFortune() async {
-    // Eğer API şu anda arka planda harıl harıl çalışıyorsa sakın iade yapma!
-    if (CoffeeReadingPage.isApiRunning) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    final isPending = prefs.getBool('pending_fortune_paid') ?? false;
-    final pendingTime = prefs.getInt('pending_fortune_time') ?? 0;
-
-    // Eğer son fal ödemesinin üzerinden 3 dakikadan az zaman geçtiyse, API hala çalışıyor olabilir, bekle!
-    if (isPending) {
-      final now = DateTime.now().millisecondsSinceEpoch;
-      if (now - pendingTime < 3 * 60 * 1000) {
-        return; // Henüz 3 dakika dolmadı, bekle
-      }
-
-      // 3 dakikadan fazla olduysa ve hala pending ise, uygulama kesin çökmüştür, iade et.
-      await StorageService.updateSoulStones(1);
-      await prefs.setBool('pending_fortune_paid', false);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Yarım kalan falınızdan dolayı 1 Ruh Taşı iade edildi. ✨',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            backgroundColor: const Color(0xFF6D28D9), // Zarif mor
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    }
+    // İade mantığı iptal edildi. Fal iptal olursa veya uygulama çökerse taş yanar.
   }
 
   Future<void> _loadSoulStones() async {
@@ -187,7 +225,7 @@ class _CoffeePageState extends State<CoffeePage>
           _backgroundPollTimer?.cancel();
           _waitingForBackgroundResult = false;
           await prefs.remove('coffee_last_record_id');
-          await StorageService.updateSoulStones(1); // iade
+          // İptal edildi: await StorageService.updateSoulStones(1); // iade yok
         }
       } catch (e) {
         debugPrint("Polling error: $e");
@@ -224,6 +262,8 @@ class _CoffeePageState extends State<CoffeePage>
     _pageCtrl.dispose();
     _floatCtrl.dispose();
     _entranceController.dispose();
+    _shakeController.dispose();
+    _optionsShakeController.dispose();
     super.dispose();
   }
 
@@ -358,12 +398,9 @@ class _CoffeePageState extends State<CoffeePage>
         return;
       }
 
-      // Ödeme yapıldı ama fal henüz tamamlanmadı — bayrak koy.
-      // Uygulama kill edilirse bir sonraki açılışta taş iade edilir.
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('pending_fortune_paid', true);
-      await prefs.setInt('pending_fortune_time', DateTime.now().millisecondsSinceEpoch);
-
+      // Ödeme yapıldı ama fal henüz tamamlanmadı.
+      // İade sistemi kapatıldığı için pending flag koymuyoruz.
+      
       if (mounted) {
         setState(() {
           _hasPaidForScan = true; // Bilet alındı bayrağı
@@ -648,6 +685,17 @@ class _CoffeePageState extends State<CoffeePage>
   }
 
   void _goToReadingPage() async {
+    // Seçilenleri Storage'a kalıcı olarak kaydet (İlişki durumu güncellenirse kalıcı olsun)
+    if (_selectedRelationship != null) {
+      await StorageService.setRelationshipStatus(_selectedRelationship!);
+    }
+
+    final intentData = {
+      'relationship': _selectedRelationship,
+      'focus': _selectedFocus,
+      'mood': _selectedMood,
+    };
+
     final result = await Navigator.push(
       context,
       FadePageRoute(
@@ -656,6 +704,7 @@ class _CoffeePageState extends State<CoffeePage>
           leftAngle: _leftAngle!,
           rightAngle: _rightAngle!,
           plateAngle: _plateAngle!,
+          intentData: intentData,
         ),
       ),
     );
@@ -2330,60 +2379,23 @@ class _CoffeePageState extends State<CoffeePage>
       child: Column(
         children: [
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // DYNAMIC STATUS AREA (Ultra Minimalist & Aesthetic)
-                Builder(
-                  builder: (context) {
-                    if (_isValidated) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 80),
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFFD4A373,
-                                  ).withOpacity(0.1),
-                                  blurRadius: 40,
-                                  spreadRadius: 10,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.local_cafe_rounded,
-                              color: Color(0xFFD4A373),
-                              size: 56,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Kozmik Bağ Kuruldu',
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Fincanının sırları çözülmeye hazır.',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      );
-                    }
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start, // Changed from center to start to fix title position
+                children: [
+                  // DYNAMIC STATUS AREA (Ultra Minimalist & Aesthetic)
+                  Builder(
+                    builder: (context) {
+                      if (_isValidated) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: 160), // Reduced from 210 to 160 to prevent pushing too far down
+                            _buildIntentSelector(),
+                          ],
+                        );
+                      }
 
                     // Hata varsa zarif bir yazı ve şık bir buton
                     if (_invalidSlots.isNotEmpty) {
@@ -2400,7 +2412,7 @@ class _CoffeePageState extends State<CoffeePage>
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 80),
+                          const SizedBox(height: 160), // Matched to 160 to prevent pushing too far down
                           Icon(
                             Icons.error_outline_rounded,
                             color: Colors.redAccent.withOpacity(0.8),
@@ -2437,7 +2449,7 @@ class _CoffeePageState extends State<CoffeePage>
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 80),
+                        const SizedBox(height: 260), // Increased from 160 to 260 specifically for the analyzing screen to vertically center it
                         Container(
                           width: 120,
                           height: 120,
@@ -2503,57 +2515,82 @@ class _CoffeePageState extends State<CoffeePage>
               ],
             ),
           ),
+          ),
 
           // Always visible, only active on success (Same position and size as step 1-4 buttons)
           AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            opacity: _isValidated ? 1.0 : 0.3,
-            child: TapScaleButton(
-              onTap: () {
-                if (_isValidated) {
-                  HapticFeedback.heavyImpact();
-                  _goToReadingPage();
-                } else {
-                  HapticFeedback.selectionClick();
-                }
-              },
-              child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              opacity: _isValidated ? 1.0 : 0.3,
+              child: TapScaleButton(
+                onTap: () {
+                  if (_isValidated) {
+                    if (_currentIntentStep < 3) {
+                      HapticFeedback.heavyImpact();
+                      _optionsShakeController.forward(from: 0.0);
+                      return;
+                    }
+                    HapticFeedback.heavyImpact();
+                    _goToReadingPage();
+                  } else {
+                    HapticFeedback.heavyImpact();
+                    _optionsShakeController.forward(from: 0.0);
+                  }
+                },
+                child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: double.infinity,
-                height: 60,
+                height: 64, // Slightly taller
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
-                    color: _isValidated
-                        ? const Color(0xFFD4A373).withOpacity(0.5)
+                    color: _isValidated && _currentIntentStep == 3
+                        ? const Color(0xFFD4A373).withOpacity(0.8) // Brighter border
                         : Colors.white.withOpacity(0.1),
+                    width: _isValidated && _currentIntentStep == 3 ? 1.5 : 1.0,
                   ),
-                  color: _isValidated
-                      ? const Color(0xFFD4A373).withOpacity(0.1)
+                  color: _isValidated && _currentIntentStep == 3
+                      ? Colors.white.withOpacity(0.05)
                       : Colors.white.withOpacity(0.02),
+                  boxShadow: _isValidated && _currentIntentStep == 3
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFFD4A373).withOpacity(0.3),
+                            blurRadius: 30,
+                            spreadRadius: 2,
+                          )
+                        ]
+                      : [],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.visibility_rounded,
-                      color: _isValidated
+                      color: _isValidated && _currentIntentStep == 3
                           ? const Color(0xFFD4A373)
                           : Colors.white.withOpacity(0.3),
-                      size: 18,
+                      size: 20,
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Text(
                       'Sır Perdesini Arala',
-                      style: GoogleFonts.inter(
-                        color: _isValidated
+                      style: GoogleFonts.outfit(
+                        color: _isValidated && _currentIntentStep == 3
                             ? const Color(0xFFD4A373)
                             : Colors.white.withOpacity(0.3),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
                         letterSpacing: 0.5,
                       ),
                     ),
+                    if (_isValidated && _currentIntentStep == 3) ...[
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: Color(0xFFD4A373),
+                        size: 20,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -2567,23 +2604,360 @@ class _CoffeePageState extends State<CoffeePage>
 
   // ADIM 5: Yorumlama
   Widget _buildAnalyzingScreen() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 180),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(color: Color(0xFFD4A373)),
+          const SizedBox(height: 32),
+          Text(
+            'Telveler Okunuyor...',
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Geleceğin kapıları aralanıyor, bekle.',
+            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 15),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // INTENT UI METOTLARI
+  Widget _buildIntentSelector() {
+    Widget currentStepWidget;
+
+    if (_currentIntentStep == 0) {
+      currentStepWidget = _buildPremiumSelector(
+        key: const ValueKey('step_0'),
+        title: 'İlişki Durumun',
+        subtitle: 'Kozmik bağın temelini belirle.',
+        options: _shuffledRelationshipOptions,
+        selectedValue: _selectedRelationship,
+        onSelected: (val) {
+          HapticFeedback.lightImpact();
+          setState(() => _selectedRelationship = val);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) setState(() => _currentIntentStep = 1);
+          });
+        },
+      );
+    } else if (_currentIntentStep == 1) {
+      currentStepWidget = _buildPremiumSelector(
+        key: const ValueKey('step_1'),
+        title: 'Aklında Ne Var?',
+        subtitle: 'Bir niyet seç, yorumun ona göre derinleşsin.',
+        options: _shuffledFocusOptions,
+        selectedValue: _selectedFocus,
+        onSelected: (val) {
+          HapticFeedback.lightImpact();
+          setState(() => _selectedFocus = val);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) setState(() => _currentIntentStep = 2);
+          });
+        },
+      );
+    } else if (_currentIntentStep == 2) {
+      currentStepWidget = _buildPremiumSelector(
+        key: const ValueKey('step_2'),
+        title: 'Ruh Halin?',
+        subtitle: 'Fincanının enerjisini hisset.',
+        options: _shuffledMoodOptions,
+        selectedValue: _selectedMood,
+        onSelected: (val) {
+          HapticFeedback.lightImpact();
+          setState(() => _selectedMood = val);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) setState(() => _currentIntentStep = 3);
+          });
+        },
+        useGrid: true,
+      );
+    } else {
+      currentStepWidget = Padding(
+        key: const ValueKey('step_3'),
+        padding: const EdgeInsets.only(top: 120),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4A373).withOpacity(0.1),
+                    blurRadius: 40,
+                    spreadRadius: 10,
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.local_cafe_rounded,
+                color: Color(0xFFD4A373),
+                size: 48,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Kozmik Bağ Kuruldu',
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Fincanının sırları fısıldanmaya hazır...',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 14,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return FadeTransition(
+      opacity: _entranceController,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        switchInCurve: Curves.easeInOutCubic,
+        switchOutCurve: Curves.easeInOutCubic,
+        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+          return Stack(
+            alignment: Alignment.topCenter, // This prevents the shorter widget from jumping down
+            children: <Widget>[
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        child: currentStepWidget,
+      ),
+    );
+  }
+
+  Widget _buildPremiumSelector({
+    Key? key,
+    required String title,
+    required String subtitle,
+    required List<Map<String, dynamic>> options,
+    required String? selectedValue,
+    required Function(String) onSelected,
+    bool useGrid = false,
+  }) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const CircularProgressIndicator(color: Color(0xFFD4A373)),
-        const SizedBox(height: 32),
         Text(
-          'Telveler Okunuyor...',
-          style: GoogleFonts.inter(
+          title,
+          style: GoogleFonts.outfit(
             color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            fontWeight: FontWeight.w300,
+            letterSpacing: 1.0,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 6),
         Text(
-          'Geleceğin kapıları aralanıyor, bekle.',
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 15),
+          subtitle,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.5),
+            fontSize: 13,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 1,
+              width: 30,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, const Color(0xFFD4A373).withOpacity(0.5)],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.star, color: Color(0xFFD4A373), size: 8),
+            const SizedBox(width: 8),
+            Container(
+              height: 1,
+              width: 30,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [const Color(0xFFD4A373).withOpacity(0.5), Colors.transparent],
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: useGrid ? 68 : 24),
+        AnimatedBuilder(
+          animation: _optionsShakeAnimation,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(_optionsShakeAnimation.value, 0),
+              child: child,
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: useGrid ? 24 : 32),
+          child: useGrid
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    final itemWidth = (constraints.maxWidth - 12) / 2.001; // Tiny fraction less to prevent rounding overflow
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.center,
+                      children: options.map((option) {
+                        final isSelected = selectedValue == option['text'];
+                        return GestureDetector(
+                          onTap: () => onSelected(option['text']),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: itemWidth, // Exact calculated width
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected ? const Color(0xFFD4A373).withOpacity(0.8) : Colors.white.withOpacity(0.1),
+                                width: isSelected ? 1.5 : 1.0,
+                              ),
+                              color: isSelected ? const Color(0xFFD4A373).withOpacity(0.1) : Colors.transparent,
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFFD4A373).withOpacity(0.2),
+                                        blurRadius: 15,
+                                        spreadRadius: 1,
+                                      )
+                                    ]
+                                  : [],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected ? const Color(0xFFD4A373).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                                  ),
+                                  child: Icon(
+                                    option['icon'],
+                                    color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.5),
+                                    size: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    option['text'],
+                                    style: GoogleFonts.outfit(
+                                      color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
+                                      fontSize: 14,
+                                      fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                )
+              : Column(
+                  children: options.map((option) {
+                    final isSelected = selectedValue == option['text'];
+                    return GestureDetector(
+                      onTap: () => onSelected(option['text']),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: isSelected ? const Color(0xFFD4A373).withOpacity(0.8) : Colors.white.withOpacity(0.1),
+                            width: isSelected ? 1.5 : 1.0,
+                          ),
+                          color: isSelected ? const Color(0xFFD4A373).withOpacity(0.1) : Colors.transparent,
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: const Color(0xFFD4A373).withOpacity(0.2),
+                                    blurRadius: 15,
+                                    spreadRadius: 1,
+                                  )
+                                ]
+                              : [],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected ? const Color(0xFFD4A373).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                              ),
+                              child: Icon(
+                                option['icon'],
+                                color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.5),
+                                size: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                option['text'],
+                                style: GoogleFonts.outfit(
+                                  color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
+                                  fontSize: 16,
+                                  fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              const Icon(
+                                Icons.auto_awesome,
+                                color: Color(0xFFD4A373),
+                                size: 14,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
         ),
       ],
     );
@@ -2879,6 +3253,7 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation>
       ),
     );
   }
+
 }
 
 class _CameraAngleInstruction extends StatefulWidget {

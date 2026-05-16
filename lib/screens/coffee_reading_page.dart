@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/cosmic_engine_service.dart';
 import '../services/push_notification_service.dart';
 import 'coffee_page.dart';
+import '../widgets/coffee_share_modal.dart';
 
 class CoffeeReadingPage extends StatefulWidget {
   static bool isApiRunning = false; // Add static flag
@@ -25,6 +26,7 @@ class CoffeeReadingPage extends StatefulWidget {
   final File? rightAngle;
   final File? plateAngle;
   final Map<String, dynamic>? initialData;
+  final Map<String, dynamic>? intentData;
   final void Function(bool success, String? error)? onBackgroundResult;
 
   const CoffeeReadingPage({
@@ -34,6 +36,7 @@ class CoffeeReadingPage extends StatefulWidget {
     this.rightAngle,
     this.plateAngle,
     this.initialData,
+    this.intentData,
     this.onBackgroundResult,
   });
 
@@ -227,8 +230,17 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       // Profil verilerini al (AI kişiselleştirmesi için)
       final gender = await StorageService.getGender();
       final zodiac = await StorageService.getZodiacSign();
-      final relationship = await StorageService.getRelationshipStatus();
-      final lifeFocus = await StorageService.getLifeFocus(); // Niyet (Kalbinin Pusulası)
+      
+      // Popup'tan gelen yeni verileri öncelikli olarak kullan
+      final passedRelationship = widget.intentData?['relationship'];
+      final passedFocus = widget.intentData?['focus'];
+      final passedMood = widget.intentData?['mood'];
+
+      final relationship = passedRelationship ?? await StorageService.getRelationshipStatus();
+      final lifeFocus = passedFocus ?? await StorageService.getLifeFocus();
+      
+      final dobStr = await SharedPreferences.getInstance().then((prefs) => prefs.getString('birth_date'));
+      final birthTime = await StorageService.getBirthTime();
 
       final interpretResponse = await supabase.functions.invoke(
         'interpret-coffee',
@@ -240,8 +252,11 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           'record_id': recordId,
           'gender': gender ?? '',
           'zodiac': zodiac ?? '',
+          'birthDate': dobStr ?? '', // Kullanıcının girdiği doğum tarihi direkt gönderiliyor
+          'birthTime': birthTime ?? '', // Doğum saati
           'relationship': relationship ?? '',
-          'intent': lifeFocus ?? '', // AI promptuna niyet olarak eklenecek
+          'intent': lifeFocus ?? '',
+          'mood': passedMood ?? '',
         },
       );
 
@@ -1034,20 +1049,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 ),
                 const SizedBox(height: 16),
 
-                // 8. Dilek Mesajı
+                // 8. Falın Son Sözü (Dilek + Tavsiye birleşik)
                 _buildAnimatedResultChild(
                   0.7,
-                  _buildSectionCard(
-                    'Dilek Mesajı',
-                    _readingData?['wish'] ?? 'Yorum yükleniyor...',
-                    icon: Icons.auto_awesome_rounded,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 9. Falının Sana Tavsiyesi
-                _buildAnimatedResultChild(
-                  0.8,
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -1065,13 +1069,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                         Row(
                           children: [
                             const Icon(
-                              Icons.stars_rounded,
+                              Icons.auto_awesome_rounded,
                               color: Color(0xFFD4A373),
                               size: 18,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Falının Sana Tavsiyesi',
+                              'Falın Son Sözü',
                               style: GoogleFonts.outfit(
                                 color: const Color(0xFFD4A373),
                                 fontSize: 18,
@@ -1082,7 +1086,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _readingData?['advice'] ?? 'Yorum yükleniyor...',
+                          _readingData?['closing'] ?? (_readingData?['wish'] ?? 'Yorum yükleniyor...'),
                           style: GoogleFonts.inter(
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 14,
@@ -1103,6 +1107,19 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                       GestureDetector(
                         onTap: () {
                           HapticFeedback.lightImpact();
+                          final story = _readingData?['story']?.toString() ?? '';
+                          final advice = _readingData?['advice']?.toString();
+                          final symbols = (_readingData?['symbols'] as List?)?.map<Map<String, dynamic>>((s) => Map<String, dynamic>.from(s)).toList() ?? [];
+                          showDialog(
+                            context: context,
+                            barrierColor: Colors.transparent,
+                            builder: (_) => CoffeeShareModal(
+                              story: story,
+                              advice: advice,
+                              symbols: symbols,
+                              cupImage: widget.insideAngle,
+                            ),
+                          );
                         },
                         child: Container(
                           width: double.infinity,
@@ -1207,7 +1224,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    Navigator.of(context).pop();
+                    Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -1426,6 +1443,12 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       'local_cafe_rounded': Icons.local_cafe_rounded,
       'star_rounded': Icons.star_rounded,
       'nightlight_rounded': Icons.nightlight_rounded,
+      'local_fire_department_rounded': Icons.local_fire_department_rounded,
+      'anchor_rounded': Icons.anchor_rounded,
+      'psychology_rounded': Icons.psychology_rounded,
+      'sailing_rounded': Icons.sailing_rounded,
+      'shield_rounded': Icons.shield_rounded,
+      'diamond_rounded': Icons.diamond_rounded,
     };
     return iconMap[name] ?? Icons.auto_awesome;
   }
@@ -1479,9 +1502,10 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
   Widget _buildPremiumSymbolChip(IconData icon, String title, String subtitle) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFD4A373).withOpacity(0.2)),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -1493,19 +1517,22 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFFD4A373), size: 16),
-          const SizedBox(width: 8),
-          Flexible(
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, color: const Color(0xFFD4A373), size: 16),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
             child: Text(
               '$title — $subtitle',
               style: GoogleFonts.outfit(
                 color: const Color(0xFFE8D5C4),
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
+                height: 1.4,
               ),
-              overflow: TextOverflow.visible,
             ),
           ),
         ],

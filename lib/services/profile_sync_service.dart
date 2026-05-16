@@ -99,6 +99,10 @@ class ProfileSyncService {
       final user = _supabase.auth.currentUser;
       if (user == null) return false;
 
+      // ÖNEMLİ: Sadece Supabase 'profiles' tablosunda MEVCUT olan kolonlar gönderilmeli!
+      // birth_time, life_focus, relationship_status, dream_frequency, sleep_pattern,
+      // gender, birth_place kolonları henüz DB'de YOK — eklenince buraya dahil edilecek.
+      // Bu alanlar şimdilik yalnızca cihaz hafızasında (SharedPreferences) saklanıyor.
       final updateData = {
         'id': user.id, // Primary Key olarak eşleşecek
         'full_name': userName,
@@ -107,14 +111,6 @@ class ProfileSyncService {
         'avatar_url': avatarUrl,
         if (zodiacSign != null) 'zodiac_sign': zodiacSign,
         if (birthDate != null) 'birth_date': birthDate,
-        // Onboarding detay bilgileri
-        if (birthTime != null) 'birth_time': birthTime,
-        if (lifeFocus != null) 'life_focus': lifeFocus,
-        if (relationshipStatus != null) 'relationship_status': relationshipStatus,
-        if (dreamFrequency != null) 'dream_frequency': dreamFrequency,
-        if (sleepPattern != null) 'sleep_pattern': sleepPattern,
-        if (gender != null) 'gender': gender,
-        if (birthPlace != null) 'birth_place': birthPlace,
       };
 
       // 'profiles' tablosuna upsert işlemi (varsa günceller, yoksa yaratır)

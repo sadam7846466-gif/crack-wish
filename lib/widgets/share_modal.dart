@@ -34,6 +34,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
   final ScreenshotController _screenshotController = ScreenshotController();
   bool _isExporting = false;
   bool _isStoryFormat = true; // true = Hikaye (9:16), false = Gönderi (4:5)
+  bool _isSaved = false; // İndir butonu geri bildirimi
 
   late final AnimationController _entranceCtrl;
   late final Animation<double> _fadeAnim;
@@ -124,21 +125,13 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
       
       if (mounted) {
         final success = result != null && (result['isSuccess'] == true || result['isSuccess'] == 1);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(success ? Icons.check_circle : Icons.error, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Text(success ? 'Galeriye kaydedildi!' : 'Kaydetme başarısız'),
-              ],
-            ),
-            backgroundColor: success ? const Color(0xFF2D7A50) : Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        if (success) {
+          HapticFeedback.mediumImpact();
+          setState(() => _isSaved = true);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) setState(() => _isSaved = false);
+          });
+        }
       }
     } catch(e) { 
       debugPrint('Save error: $e');
@@ -802,11 +795,11 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _buildStyledButton(
-                                label: 'İndir',
-                                icon: Icons.download_rounded,
-                                bgColor: Colors.transparent,
-                                textColor: const Color(0xFFBBA090),
-                                borderColor: const Color(0xFFBBA090).withOpacity(0.5),
+                                label: _isSaved ? 'Kaydedildi ✓' : 'İndir',
+                                icon: _isSaved ? Icons.check_circle_rounded : Icons.download_rounded,
+                                bgColor: _isSaved ? const Color(0xFF2D7A50) : Colors.transparent,
+                                textColor: _isSaved ? Colors.white : const Color(0xFFBBA090),
+                                borderColor: _isSaved ? Colors.transparent : const Color(0xFFBBA090).withOpacity(0.5),
                                 onTap: _saveToGallery,
                               ),
                               const SizedBox(width: 12),

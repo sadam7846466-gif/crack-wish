@@ -36,6 +36,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
   final ScreenshotController _screenshotController = ScreenshotController();
   bool _isExporting = false;
   bool _isStoryFormat = true;
+  bool _isSaved = false;
 
   late final AnimationController _entranceCtrl;
   late final Animation<double> _fadeAnim;
@@ -122,21 +123,13 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
       
       if (mounted) {
         final success = result != null && (result['isSuccess'] == true || result['isSuccess'] == 1);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(success ? Icons.check_circle : Icons.error, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Text(success ? 'Galeriye kaydedildi!' : 'Kaydetme başarısız'),
-              ],
-            ),
-            backgroundColor: success ? const Color(0xFF2D7A50) : Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        if (success) {
+          HapticFeedback.mediumImpact();
+          setState(() => _isSaved = true);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) setState(() => _isSaved = false);
+          });
+        }
       }
     } catch(e) { 
       debugPrint('Save error: $e');
@@ -769,25 +762,33 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                       children: [
                         _TarotTapButton(
                           onTap: _isExporting ? null : _saveToGallery,
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.transparent,
+                              color: _isSaved ? const Color(0xFF2D7A50) : Colors.transparent,
                               borderRadius: BorderRadius.circular(100),
-                              border: Border.all(color: const Color(0xFFE7D6A5).withOpacity(0.4), width: 1.0),
+                              border: Border.all(color: _isSaved ? Colors.transparent : const Color(0xFFE7D6A5).withOpacity(0.4), width: 1.0),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (_isExporting)
-                                  Opacity(
-                                    opacity: 0.4,
-                                    child: Icon(Icons.download_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.7), size: 14),
-                                  )
-                                else
-                                  Icon(Icons.download_rounded, color: const Color(0xFFE7D6A5).withOpacity(0.7), size: 14),
+                                Icon(
+                                  _isSaved ? Icons.check_circle_rounded : Icons.download_rounded,
+                                  color: _isSaved ? Colors.white : const Color(0xFFE7D6A5).withOpacity(0.7),
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 6),
-                                Text('İndir', style: TextStyle(color: const Color(0xFFE7D6A5).withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
+                                Text(
+                                  _isSaved ? 'Kaydedildi ✓' : 'İndir',
+                                  style: TextStyle(
+                                    color: _isSaved ? Colors.white : const Color(0xFFE7D6A5).withOpacity(0.7),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.3,
+                                    decoration: TextDecoration.none,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
