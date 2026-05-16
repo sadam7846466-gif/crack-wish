@@ -164,10 +164,14 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
                   File? plate;
 
                   if (imagePaths != null && imagePaths.length == 4) {
-                    inside = File(imagePaths[0]);
-                    left = File(imagePaths[1]);
-                    right = File(imagePaths[2]);
-                    plate = File(imagePaths[3]);
+                    final f0 = File(imagePaths[0]);
+                    final f1 = File(imagePaths[1]);
+                    final f2 = File(imagePaths[2]);
+                    final f3 = File(imagePaths[3]);
+                    inside = f0.existsSync() ? f0 : null;
+                    left = f1.existsSync() ? f1 : null;
+                    right = f2.existsSync() ? f2 : null;
+                    plate = f3.existsSync() ? f3 : null;
                   }
                   
                   if (!mounted) return;
