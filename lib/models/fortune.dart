@@ -1,5 +1,6 @@
 import 'dart:math';
 import '../services/storage_service.dart';
+import '../data/daily_quotes.dart';
 
 class Fortune {
   final String id;
@@ -25,284 +26,37 @@ class Fortune {
   });
 
   static List<_FortuneTemplate> _templates() {
-    return [
-      _FortuneTemplate(
-        id: 'fortune_01',
-        nameTr: 'Yıldız',
-        nameEn: 'Star',
-        emoji: '🌟',
-        meaningTr:
-            'Umut ve ilham senden yana. Küçük bir adım, beklediğin kapıyı aralayacak.',
-        meaningEn:
-            'Hope and inspiration are on your side. A small step will open the door you have been waiting for.',
-        length: 'medium',
+    final List<_FortuneTemplate> list = [];
+    final emojis = ['🌟', '🌙', '☀️', '💫', '❤️', '⚡', '🎭', '👑', '⚖️', '🔮', '🍀', '🦋', '✨', '🧿'];
+    
+    // Create templates from the 1000 item pool
+    for (int i = 0; i < DailyQuotes.pool.length; i++) {
+      final q = DailyQuotes.pool[i];
+      final r = Random(i); // Deterministic generation for stable IDs and stats
+      
+      list.add(_FortuneTemplate(
+        id: 'cookie_$i',
+        nameTr: 'Kozmik Fısıltı',
+        nameEn: 'Cosmic Whisper',
+        emoji: emojis[r.nextInt(emojis.length)],
+        meaningTr: q['tr']!,
+        meaningEn: q['en']!,
+        length: q['tr']!.length > 60 ? 'medium' : 'short',
         statsTr: {
-          'Aşk': 'Yükseliş',
-          'Kariyer': 'Gelişim',
-          'Para': 'İyileşme',
-          'Sağlık': 'Mükemmel',
-        },
-        statsEn: {
-          'Love': 'Rise',
-          'Career': 'Growth',
-          'Money': 'Recovery',
-          'Health': 'Excellent',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_02',
-        nameTr: 'Ay',
-        nameEn: 'Moon',
-        emoji: '🌙',
-        meaningTr:
-            'Sezgilerin yükseliyor. Sakin kal ve iç sesi dinle; ufak bir işaret yolunu gösterecek.',
-        meaningEn:
-            'Your intuition is rising. Stay calm and listen to your inner voice; a small sign will show the way.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Dengeli',
-          'Kariyer': 'Stabil',
-          'Para': 'Dikkat',
+          'Aşk': r.nextBool() ? 'Yükseliş' : 'Dengeli',
+          'Kariyer': r.nextBool() ? 'Gelişim' : 'Stabil',
+          'Para': r.nextBool() ? 'Artış' : 'Bekleyiş',
           'Sağlık': 'İyi',
         },
         statsEn: {
-          'Love': 'Balanced',
-          'Career': 'Stable',
-          'Money': 'Caution',
+          'Love': r.nextBool() ? 'Rise' : 'Balanced',
+          'Career': r.nextBool() ? 'Growth' : 'Stable',
+          'Money': r.nextBool() ? 'Increase' : 'Wait',
           'Health': 'Good',
         },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_03',
-        nameTr: 'Güneş',
-        nameEn: 'Sun',
-        emoji: '☀️',
-        meaningTr:
-            'Başarı ve mutluluk kapıda. Emeklerinin karşılığı geliyor; paylaşmak iyi gelecek.',
-        meaningEn:
-            'Success and happiness are near. Your efforts will pay off; sharing will feel good.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Yükseliş',
-          'Kariyer': 'Yükseliş',
-          'Para': 'Artış',
-          'Sağlık': 'Mükemmel',
-        },
-        statsEn: {
-          'Love': 'Rise',
-          'Career': 'Rise',
-          'Money': 'Increase',
-          'Health': 'Excellent',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_04',
-        nameTr: 'Kader',
-        nameEn: 'Destiny',
-        emoji: '💫',
-        meaningTr:
-            'Değişim kapıda, şans senden yana. Cesur davranırsan yeni fırsatlar açılır.',
-        meaningEn:
-            'Change is near and luck is on your side. Be bold and new opportunities will open.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Olumlu',
-          'Kariyer': 'Gelişim',
-          'Para': 'İyileşme',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Positive',
-          'Career': 'Growth',
-          'Money': 'Recovery',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_05',
-        nameTr: 'Aşk',
-        nameEn: 'Love',
-        emoji: '❤️',
-        meaningTr:
-            'Aşkta önemli kararlar yaklaşıyor. Açık bir konuşma rahatlatacak.',
-        meaningEn:
-            'Important decisions in love are approaching. An honest conversation will bring relief.',
-        length: 'short',
-        statsTr: {
-          'Aşk': 'Yükseliş',
-          'Kariyer': 'Stabil',
-          'Para': 'Dengeli',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Rise',
-          'Career': 'Stable',
-          'Money': 'Balanced',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_06',
-        nameTr: 'Kule',
-        nameEn: 'Tower',
-        emoji: '⚡',
-        meaningTr:
-            'Ani değişim ve yeni başlangıç ufukta. Beklenmedik bir haber planlarını tazeler.',
-        meaningEn:
-            'Sudden change and a new beginning are on the horizon. Unexpected news will refresh your plans.',
-        length: 'short',
-        statsTr: {
-          'Aşk': 'Değişim',
-          'Kariyer': 'Dönüşüm',
-          'Para': 'Değişken',
-          'Sağlık': 'Dikkat',
-        },
-        statsEn: {
-          'Love': 'Change',
-          'Career': 'Transformation',
-          'Money': 'Volatile',
-          'Health': 'Caution',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_07',
-        nameTr: 'Büyücü',
-        nameEn: 'Magician',
-        emoji: '🎭',
-        meaningTr:
-            'Yaratıcı gücün elinde. Fikirlerini cesurca söyle, destek bulacaksın.',
-        meaningEn:
-            'Creative power is in your hands. Share your ideas boldly and you will find support.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Olumlu',
-          'Kariyer': 'Yükseliş',
-          'Para': 'Artış',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Positive',
-          'Career': 'Rise',
-          'Money': 'Increase',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_08',
-        nameTr: 'İmparatoriçe',
-        nameEn: 'Empress',
-        emoji: '👑',
-        meaningTr:
-            'Bolluk ve bereket zamanı. Küçük dokunuşlar sıcaklık getirir; şükür şansını artırır.',
-        meaningEn:
-            'It is a time of abundance. Small gestures bring warmth; gratitude increases your luck.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Yükseliş',
-          'Kariyer': 'Gelişim',
-          'Para': 'Artış',
-          'Sağlık': 'Mükemmel',
-        },
-        statsEn: {
-          'Love': 'Rise',
-          'Career': 'Growth',
-          'Money': 'Increase',
-          'Health': 'Excellent',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_09',
-        nameTr: 'Adalet',
-        nameEn: 'Justice',
-        emoji: '⚖️',
-        meaningTr:
-            'Denge ve doğrulukla ilerle. Mantıkla kalbi dengeleyince eski mesele çözülür.',
-        meaningEn:
-            'Move forward with balance and honesty. When mind and heart align, an old issue will resolve.',
-        length: 'short',
-        statsTr: {
-          'Aşk': 'Dengeli',
-          'Kariyer': 'Stabil',
-          'Para': 'Dengeli',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Balanced',
-          'Career': 'Stable',
-          'Money': 'Balanced',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_10',
-        nameTr: 'Rahibe',
-        nameEn: 'Priestess',
-        emoji: '🔮',
-        meaningTr:
-            'İç bilgelik rehber. Sessiz bir an, net bir içgörü verecek.',
-        meaningEn:
-            'Inner wisdom is your guide. A quiet moment will bring a clear insight.',
-        length: 'short',
-        statsTr: {
-          'Aşk': 'Dengeli',
-          'Kariyer': 'Gelişim',
-          'Para': 'Stabil',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Balanced',
-          'Career': 'Growth',
-          'Money': 'Stable',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_11',
-        nameTr: 'Şans',
-        nameEn: 'Luck',
-        emoji: '🍀',
-        meaningTr:
-            'Talih bugün senden yana. Küçük bir risk sürpriz kazanç getirebilir.',
-        meaningEn:
-            'Luck is on your side today. A small risk could bring a pleasant surprise.',
-        length: 'short',
-        statsTr: {
-          'Aşk': 'Olumlu',
-          'Kariyer': 'Yükseliş',
-          'Para': 'Artış',
-          'Sağlık': 'İyi',
-        },
-        statsEn: {
-          'Love': 'Positive',
-          'Career': 'Rise',
-          'Money': 'Increase',
-          'Health': 'Good',
-        },
-      ),
-      _FortuneTemplate(
-        id: 'fortune_12',
-        nameTr: 'Dönüşüm',
-        nameEn: 'Transformation',
-        emoji: '🦋',
-        meaningTr:
-            'Güzelleşerek değişiyorsun. Eski bir alışkanlığı bırakmak enerjini tazeler.',
-        meaningEn:
-            'You are changing beautifully. Letting go of an old habit will refresh your energy.',
-        length: 'medium',
-        statsTr: {
-          'Aşk': 'Gelişim',
-          'Kariyer': 'Dönüşüm',
-          'Para': 'İyileşme',
-          'Sağlık': 'Gelişim',
-        },
-        statsEn: {
-          'Love': 'Growth',
-          'Career': 'Transformation',
-          'Money': 'Recovery',
-          'Health': 'Growth',
-        },
-      ),
-    ];
+      ));
+    }
+    return list;
   }
 
   static List<Fortune> _localizedFortunes(String languageCode) {
@@ -329,14 +83,11 @@ class Fortune {
     final fortunes = _localizedFortunes(languageCode);
     final seenIds = await StorageService.getSeenFortuneIds();
 
-    // Basit deterministik karıştırma
-    final seed = DateTime.now().day;
-    fortunes.shuffle(Random(seed));
-
     final unseen = fortunes.where((f) => !seenIds.contains(f.id)).toList();
     List<Fortune> pool;
 
     if (unseen.isEmpty) {
+      // Bütün mesajları görmüş (1000 tane), listeyi sıfırla
       await StorageService.clearSeenFortunes();
       pool = fortunes;
     } else {
@@ -371,9 +122,12 @@ class Fortune {
   static Fortune getRandomFortuneInstant({
     required String languageCode,
   }) {
+    // Storage beklemiyoruz ama rastgelelik için tam listeyi kullanıyoruz.
+    // İdealde bu fonksiyon Future olmalı ama Widget build esnasında senkron çalışması gerekiyorsa 
+    // en azından 1000'lik havuzdan rastgele çekiyoruz. Gerçek Unseen logic'i Future olan getRandomFortune'da çalışır.
     final fortunes = _localizedFortunes(languageCode);
-    fortunes.shuffle(Random());
-
+    
+    // Basit rastgele
     final selected = fortunes[Random().nextInt(fortunes.length)];
 
     final luckyNumber = Random().nextInt(99) + 1;
@@ -383,7 +137,7 @@ class Fortune {
     final luckyColor = colors[Random().nextInt(colors.length)];
     final luckPercent = 50 + Random().nextInt(51);
 
-    // Storage'ı arka planda güncelle
+    // Storage'ı arka planda güncelle (aynı şeyin çıkma ihtimalini azaltır)
     StorageService.addSeenFortuneId(selected.id);
 
     return Fortune(
@@ -399,9 +153,9 @@ class Fortune {
     );
   }
 
-  // Çok uzun anlamları kısalt (daha etkili, 2 satır civarı)
+  // Çok uzun anlamları kısalt (daha etkili, 2-3 satır civarı)
   static String _shortenMeaning(String text) {
-    const int maxChars = 110; // daha kısa, ~2 satır
+    const int maxChars = 200; // Artık 1000 mesaj var ve daha uzun olabilirler
     if (text.length <= maxChars) return text;
     return '${text.substring(0, maxChars).trimRight()}...';
   }
