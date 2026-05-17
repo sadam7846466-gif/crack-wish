@@ -17,46 +17,64 @@ class NatalChartPage extends StatefulWidget {
 class _NatalChartPageState extends State<NatalChartPage> {
   static const _accent = Color(0xFFD4C5A0);
   static const _accentLight = Color(0xFFE8DCC8);
-  late final NatalChartEngine _engine;
-  late final List<Aspect> _aspects;
+  NatalChartEngine? _engine;
+  List<Aspect>? _aspects;
+  bool _isLoading = true;
   int _activeTab = 0;
   late final PageController _pageController;
 
   List<_InsightData> get _insights => [
     _InsightData('Ana Kişilik Özeti', '☉', [
-      'Güneş ${NatalChartEngine.signs[_engine.planets[0].signIndex]} · ${_engine.planets[0].house}. Ev',
-      'Ay ${NatalChartEngine.signs[_engine.planets[1].signIndex]} · ${_engine.planets[1].house}. Ev',
-      'Yükselen ${NatalChartEngine.signs[_engine.ascSignIndex]}',
-    ], _engine.getPersonalitySummary()),
+      'Güneş ${NatalChartEngine.signs[_engine!.planets[0].signIndex]} · ${_engine!.planets[0].house}. Ev',
+      'Ay ${NatalChartEngine.signs[_engine!.planets[1].signIndex]} · ${_engine!.planets[1].house}. Ev',
+      'Yükselen ${NatalChartEngine.signs[_engine!.ascSignIndex]}',
+    ], _engine!.getPersonalitySummary()),
     _InsightData('Aşk & İlişkiler', '♡', [
-      'Venüs ${NatalChartEngine.signs[_engine.planets[3].signIndex]} · ${_engine.planets[3].house}. Ev',
-      'Mars ${NatalChartEngine.signs[_engine.planets[4].signIndex]} · ${_engine.planets[4].house}. Ev',
-    ], _engine.getLoveInterpretation()),
+      'Venüs ${NatalChartEngine.signs[_engine!.planets[3].signIndex]} · ${_engine!.planets[3].house}. Ev',
+      'Mars ${NatalChartEngine.signs[_engine!.planets[4].signIndex]} · ${_engine!.planets[4].house}. Ev',
+    ], _engine!.getLoveInterpretation()),
     _InsightData('Kariyer & Para', '⬡', [
-      'MC ${NatalChartEngine.signs[_engine.mcSignIndex]}',
-      'Satürn ${NatalChartEngine.signs[_engine.planets[6].signIndex]} · ${_engine.planets[6].house}. Ev',
-    ], _engine.getCareerInterpretation()),
+      'MC ${NatalChartEngine.signs[_engine!.mcSignIndex]}',
+      'Satürn ${NatalChartEngine.signs[_engine!.planets[6].signIndex]} · ${_engine!.planets[6].house}. Ev',
+    ], _engine!.getCareerInterpretation()),
     _InsightData('Duygusal Yapı', '☽', [
-      'Ay ${NatalChartEngine.signs[_engine.planets[1].signIndex]} · ${_engine.planets[1].house}. Ev',
-    ], _engine.getEmotionalInterpretation()),
+      'Ay ${NatalChartEngine.signs[_engine!.planets[1].signIndex]} · ${_engine!.planets[1].house}. Ev',
+    ], _engine!.getEmotionalInterpretation()),
     _InsightData('Güçlü & Zayıf Yönler', '✦', [
-      'Mars ${NatalChartEngine.signs[_engine.planets[4].signIndex]}',
-      'Satürn ${NatalChartEngine.signs[_engine.planets[6].signIndex]}',
-    ], _engine.getStrengthsWeaknesses()),
+      'Mars ${NatalChartEngine.signs[_engine!.planets[4].signIndex]}',
+      'Satürn ${NatalChartEngine.signs[_engine!.planets[6].signIndex]}',
+    ], _engine!.getStrengthsWeaknesses()),
   ];
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _activeTab);
+    _initEngine();
+  }
+
+  Future<void> _initEngine() async {
     final now = DateTime.now();
     final signMonths = [3,4,5,6,7,8,9,10,11,12,1,2];
     final signDays = [30,10,21,1,11,22,2,13,23,4,14,25];
     final m = signMonths[widget.selectedIndex];
     final d = signDays[widget.selectedIndex];
     final birthDate = DateTime(now.year - 25, m, d);
-    _engine = NatalChartEngine(birthDate: birthDate, birthTime: widget.birthTime, birthPlace: widget.birthPlace);
-    _aspects = _engine.getAspects();
-    _pageController = PageController(initialPage: _activeTab);
+
+    // Use async factory with real geocoding
+    final engine = await NatalChartEngine.create(
+      birthDate: birthDate,
+      birthTime: widget.birthTime,
+      birthPlace: widget.birthPlace,
+    );
+
+    if (mounted) {
+      setState(() {
+        _engine = engine;
+        _aspects = engine.getAspects();
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -67,6 +85,31 @@ class _NatalChartPageState extends State<NatalChartPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading || _engine == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0F1210),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  color: _accent.withOpacity(0.6),
+                  strokeWidth: 2,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Yıldız haritanız hesaplanıyor...',
+                style: TextStyle(color: _accent.withOpacity(0.5), fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color(0xFF0F1210),
@@ -336,7 +379,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
         // Rows
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(children: _engine.planets.map((p) => Padding(
+          child: Column(children: _engine!.planets.map((p) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(children: [
               SizedBox(width: 22, child: Text(p.symbol, style: TextStyle(color: _accent, fontSize: 15))),
@@ -439,7 +482,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
     return SizedBox(
       width: chartSize,
       height: chartSize,
-      child: CustomPaint(painter: _NatalWheelPainter(engine: _engine, aspects: _aspects)),
+      child: CustomPaint(painter: _NatalWheelPainter(engine: _engine!, aspects: _aspects!)),
     );
   }
 }

@@ -75,6 +75,7 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_contacts: ^2.0.2
   app_links: ^6.2.0
+  swisseph: ^0.5.1
 
 dev_dependencies:
   flutter_test:
