@@ -182,15 +182,36 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   Future<void> _callCoffeeApi() async {
     // ÖNEMLİ: Eğer sayfa arka plana atılırsa (dispose olursa) widget'a erişim hata fırlatır!
     // Bu yüzden arka planda kullanılacak tüm widget referanslarını yerel değişkene alıyoruz.
-    final insidePath = widget.insideAngle?.path ?? '';
-    final leftPath = widget.leftAngle?.path ?? '';
-    final rightPath = widget.rightAngle?.path ?? '';
-    final platePath = widget.plateAngle?.path ?? '';
     final backgroundCallback = widget.onBackgroundResult;
 
     CoffeeReadingPage.isApiRunning = true;
 
     try {
+      // ═══ HEMEN: Fotoğrafları kalıcı dizine kopyala (temp dosyalar analiz sırasında silinebilir!) ═══
+      final appDir = await getApplicationDocumentsDirectory();
+      final coffeeDir = Directory('${appDir.path}/coffee_photos');
+      if (!coffeeDir.existsSync()) coffeeDir.createSync(recursive: true);
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final savedImagePaths = <String>[];
+      final sourceFiles = [widget.insideAngle, widget.leftAngle, widget.rightAngle, widget.plateAngle];
+      final labels = ['inside', 'left', 'right', 'plate'];
+
+      for (int i = 0; i < sourceFiles.length; i++) {
+        final src = sourceFiles[i];
+        if (src != null && src.existsSync()) {
+          final ext = p.extension(src.path).isNotEmpty ? p.extension(src.path) : '.jpg';
+          final dest = '${coffeeDir.path}/${labels[i]}_$timestamp$ext';
+          await src.copy(dest);
+          savedImagePaths.add(dest);
+        } else {
+          savedImagePaths.add('');
+        }
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('coffee_last_images', savedImagePaths);
+
       // Fotoğrafları base64'e çevir
       final images = await Future.wait([
         _imageToBase64(widget.insideAngle),
@@ -218,7 +239,6 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       }
 
       // record_id'yi HEMEN kaydet — kullanıcı app'i kapatırsa recovery bulabilsin
-      final prefs = await SharedPreferences.getInstance();
       if (recordId != null) {
         await prefs.setString('coffee_last_record_id', recordId);
       }
@@ -317,30 +337,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       // Fal başarıyla tamamlandı — iade bayrağını kaldır
       await prefs.setBool('pending_fortune_paid', false);
 
-      // Save image paths to restore the UI later
-      // Fotoğrafları kalıcı dizine kopyala (iOS tmp/ klasörü silebilir)
-      final appDir = await getApplicationDocumentsDirectory();
-      final coffeeDir = Directory('${appDir.path}/coffee_photos');
-      if (!coffeeDir.existsSync()) coffeeDir.createSync(recursive: true);
-
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final savedPaths = <String>[];
-      final tempPaths = [insidePath, leftPath, rightPath, platePath];
-      final labels = ['inside', 'left', 'right', 'plate'];
-
-      for (int i = 0; i < tempPaths.length; i++) {
-        final src = tempPaths[i];
-        if (src.isNotEmpty && File(src).existsSync()) {
-          final ext = p.extension(src).isNotEmpty ? p.extension(src) : '.jpg';
-          final dest = '${coffeeDir.path}/${labels[i]}_$timestamp$ext';
-          await File(src).copy(dest);
-          savedPaths.add(dest);
-        } else {
-          savedPaths.add(src);
-        }
-      }
-
-      await prefs.setStringList('coffee_last_images', savedPaths);
+      // (Fotoğraflar zaten fonksiyonun başında kalıcı dizine kopyalandı)
 
       await StorageService.incrementTotalCoffee();
 
