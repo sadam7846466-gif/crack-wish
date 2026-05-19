@@ -847,4 +847,53 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get rankCosmic => 'Kozmik Kahin';
+
+  @override
+  String get loginSubtitle =>
+      'Ruhunun rehberi ile senkronize ol.\nGeçmişini, geleceğini ve bilinçaltını hatırla.';
+
+  @override
+  String get loginAppleContinue => 'Apple ile Devam Et';
+
+  @override
+  String get loginAppleSignIn => 'Apple ile Giriş Yap';
+
+  @override
+  String get loginGoogleContinue => 'Google ile Devam Et';
+
+  @override
+  String get loginGoogleSignIn => 'Google ile Giriş Yap';
+
+  @override
+  String get loginGoogleFailed => 'Google Girişi Başarısız';
+
+  @override
+  String get loginAppleFailed => 'Apple Girişi Başarısız';
+
+  @override
+  String get loginNoAccountYet => 'Henüz evrene katılmadın mı?  ';
+
+  @override
+  String get loginHaveAccount => 'Zaten hesabın var mı?  ';
+
+  @override
+  String get loginSignUp => 'Kayıt Ol';
+
+  @override
+  String get loginSignIn => 'Giriş Yap';
+
+  @override
+  String get loginLegalPrefix => 'Devam ederek ';
+
+  @override
+  String get loginTermsOfUse => 'Kullanım Şartları';
+
+  @override
+  String get loginLegalAnd => ' ve ';
+
+  @override
+  String get loginPrivacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get loginLegalSuffix => '\'nı kabul etmiş olursunuz.';
 }

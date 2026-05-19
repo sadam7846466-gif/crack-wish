@@ -1660,6 +1660,102 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kozmik Kahin'**
   String get rankCosmic;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhunun rehberi ile senkronize ol.\nGeçmişini, geleceğini ve bilinçaltını hatırla.'**
+  String get loginSubtitle;
+
+  /// No description provided for @loginAppleContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Devam Et'**
+  String get loginAppleContinue;
+
+  /// No description provided for @loginAppleSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Giriş Yap'**
+  String get loginAppleSignIn;
+
+  /// No description provided for @loginGoogleContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile Devam Et'**
+  String get loginGoogleContinue;
+
+  /// No description provided for @loginGoogleSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile Giriş Yap'**
+  String get loginGoogleSignIn;
+
+  /// No description provided for @loginGoogleFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google Girişi Başarısız'**
+  String get loginGoogleFailed;
+
+  /// No description provided for @loginAppleFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple Girişi Başarısız'**
+  String get loginAppleFailed;
+
+  /// No description provided for @loginNoAccountYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz evrene katılmadın mı?  '**
+  String get loginNoAccountYet;
+
+  /// No description provided for @loginHaveAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zaten hesabın var mı?  '**
+  String get loginHaveAccount;
+
+  /// No description provided for @loginSignUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt Ol'**
+  String get loginSignUp;
+
+  /// No description provided for @loginSignIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş Yap'**
+  String get loginSignIn;
+
+  /// No description provided for @loginLegalPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam ederek '**
+  String get loginLegalPrefix;
+
+  /// No description provided for @loginTermsOfUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları'**
+  String get loginTermsOfUse;
+
+  /// No description provided for @loginLegalAnd.
+  ///
+  /// In tr, this message translates to:
+  /// **' ve '**
+  String get loginLegalAnd;
+
+  /// No description provided for @loginPrivacyPolicy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası'**
+  String get loginPrivacyPolicy;
+
+  /// No description provided for @loginLegalSuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **'\'nı kabul etmiş olursunuz.'**
+  String get loginLegalSuffix;
 }
 
 class _AppLocalizationsDelegate

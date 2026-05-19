@@ -375,5 +375,21 @@
   "rankSeer": "Kahin",
   "rankWise": "Bilge Kahin",
   "rankMaster": "Usta Kahin",
-  "rankCosmic": "Kozmik Kahin"
+  "rankCosmic": "Kozmik Kahin",
+  "loginSubtitle": "Ruhunun rehberi ile senkronize ol.\nGeçmişini, geleceğini ve bilinçaltını hatırla.",
+  "loginAppleContinue": "Apple ile Devam Et",
+  "loginAppleSignIn": "Apple ile Giriş Yap",
+  "loginGoogleContinue": "Google ile Devam Et",
+  "loginGoogleSignIn": "Google ile Giriş Yap",
+  "loginGoogleFailed": "Google Girişi Başarısız",
+  "loginAppleFailed": "Apple Girişi Başarısız",
+  "loginNoAccountYet": "Henüz evrene katılmadın mı?  ",
+  "loginHaveAccount": "Zaten hesabın var mı?  ",
+  "loginSignUp": "Kayıt Ol",
+  "loginSignIn": "Giriş Yap",
+  "loginLegalPrefix": "Devam ederek ",
+  "loginTermsOfUse": "Kullanım Şartları",
+  "loginLegalAnd": " ve ",
+  "loginPrivacyPolicy": "Gizlilik Politikası",
+  "loginLegalSuffix": "'nı kabul etmiş olursunuz."
 }

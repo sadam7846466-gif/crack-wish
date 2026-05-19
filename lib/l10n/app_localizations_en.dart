@@ -859,4 +859,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rankCosmic => 'Cosmic Seer';
+
+  @override
+  String get loginSubtitle =>
+      'Synchronize with your soul\'s guide.\nRemember your past, future, and subconscious.';
+
+  @override
+  String get loginAppleContinue => 'Continue with Apple';
+
+  @override
+  String get loginAppleSignIn => 'Sign in with Apple';
+
+  @override
+  String get loginGoogleContinue => 'Continue with Google';
+
+  @override
+  String get loginGoogleSignIn => 'Sign in with Google';
+
+  @override
+  String get loginGoogleFailed => 'Google Sign-In Failed';
+
+  @override
+  String get loginAppleFailed => 'Apple Sign-In Failed';
+
+  @override
+  String get loginNoAccountYet => 'Haven\'t joined the universe yet?  ';
+
+  @override
+  String get loginHaveAccount => 'Already have an account?  ';
+
+  @override
+  String get loginSignUp => 'Sign Up';
+
+  @override
+  String get loginSignIn => 'Sign In';
+
+  @override
+  String get loginLegalPrefix => 'By continuing, you agree to our ';
+
+  @override
+  String get loginTermsOfUse => 'Terms of Use';
+
+  @override
+  String get loginLegalAnd => ' and ';
+
+  @override
+  String get loginPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get loginLegalSuffix => '.';
 }

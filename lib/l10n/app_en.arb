@@ -375,5 +375,21 @@
   "rankSeer": "Seer",
   "rankWise": "Wise Seer",
   "rankMaster": "Master Seer",
-  "rankCosmic": "Cosmic Seer"
+  "rankCosmic": "Cosmic Seer",
+  "loginSubtitle": "Synchronize with your soul's guide.\nRemember your past, future, and subconscious.",
+  "loginAppleContinue": "Continue with Apple",
+  "loginAppleSignIn": "Sign in with Apple",
+  "loginGoogleContinue": "Continue with Google",
+  "loginGoogleSignIn": "Sign in with Google",
+  "loginGoogleFailed": "Google Sign-In Failed",
+  "loginAppleFailed": "Apple Sign-In Failed",
+  "loginNoAccountYet": "Haven't joined the universe yet?  ",
+  "loginHaveAccount": "Already have an account?  ",
+  "loginSignUp": "Sign Up",
+  "loginSignIn": "Sign In",
+  "loginLegalPrefix": "By continuing, you agree to our ",
+  "loginTermsOfUse": "Terms of Use",
+  "loginLegalAnd": " and ",
+  "loginPrivacyPolicy": "Privacy Policy",
+  "loginLegalSuffix": "."
 }

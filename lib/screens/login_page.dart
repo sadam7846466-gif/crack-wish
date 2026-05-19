@@ -7,6 +7,7 @@ import '../services/storage_service.dart';
 import '../screens/root_shell.dart';
 import '../screens/onboarding_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -100,7 +101,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         await _routeUser();
       }
     } catch (e) {
-      _showError('Google Girişi Başarısız: $e');
+      _showError('${AppLocalizations.of(context)?.loginGoogleFailed ?? 'Google Girişi Başarısız'}: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -114,7 +115,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         await _routeUser();
       }
     } catch (e) {
-      _showError('Apple Girişi Başarısız: $e');
+      _showError('${AppLocalizations.of(context)?.loginAppleFailed ?? 'Apple Girişi Başarısız'}: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -195,15 +196,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      "Ruhunun rehberi ile senkronize ol.\nGeçmişini, geleceğini ve bilinçaltını hatırla.",
+                    Builder(builder: (ctx) {
+                      final l10n = AppLocalizations.of(ctx);
+                      return Text(
+                      l10n?.loginSubtitle ?? "Ruhunun rehberi ile senkronize ol.\nGeçmişini, geleceğini ve bilinçaltını hatırla.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 14,
                         height: 1.5,
-                      ),
-                    ),
+                      );
+                    }),
                     
                     const Spacer(),
 
@@ -244,7 +247,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 if (Platform.isIOS || Platform.isMacOS) ...[
                                   _buildAuthButton(
                                     icon: Icons.apple,
-                                    label: _isLoginMode ? "Apple ile Giriş Yap" : "Apple ile Devam Et",
+                                    label: _isLoginMode ? (AppLocalizations.of(context)?.loginAppleSignIn ?? "Apple ile Giriş Yap") : (AppLocalizations.of(context)?.loginAppleContinue ?? "Apple ile Devam Et"),
                                     color: Colors.white,
                                     textColor: Colors.black,
                                     onTap: _handleAppleSignIn,
@@ -253,7 +256,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 ],
                                 _buildAuthButton(
                                   icon: Icons.g_mobiledata_rounded,
-                                  label: _isLoginMode ? "Google ile Giriş Yap" : "Google ile Devam Et",
+                                  label: _isLoginMode ? (AppLocalizations.of(context)?.loginGoogleSignIn ?? "Google ile Giriş Yap") : (AppLocalizations.of(context)?.loginGoogleContinue ?? "Google ile Devam Et"),
                                   color: Colors.white.withOpacity(0.1),
                                   textColor: Colors.white,
                                   onTap: _handleGoogleSignIn,
@@ -268,65 +271,68 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     const SizedBox(height: 20),
 
                     // Yasal Bilgilendirme (App Store / Play Store Şartı)
-                    Text.rich(
-                      TextSpan(
-                        text: 'By continuing, you agree to our ',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.35),
-                          fontSize: 11,
-                          height: 1.5,
+                    Builder(builder: (ctx) {
+                      final l10nLegal = AppLocalizations.of(ctx);
+                      return Text.rich(
+                        TextSpan(
+                          text: l10nLegal?.loginLegalPrefix ?? 'By continuing, you agree to our ',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.35),
+                            fontSize: 11,
+                            height: 1.5,
+                          ),
+                          children: [
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.baseline,
+                              baseline: TextBaseline.alphabetic,
+                              child: GestureDetector(
+                                onTap: () => _openUrl('https://crackwish.com/terms.html'),
+                                child: Text(
+                                  l10nLegal?.loginTermsOfUse ?? 'Terms of Use',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.55),
+                                    fontSize: 11,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white.withOpacity(0.3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TextSpan(
+                              text: l10nLegal?.loginLegalAnd ?? ' and ',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.35),
+                                fontSize: 11,
+                              ),
+                            ),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.baseline,
+                              baseline: TextBaseline.alphabetic,
+                              child: GestureDetector(
+                                onTap: () => _openUrl('https://crackwish.com/privacy.html'),
+                                child: Text(
+                                  l10nLegal?.loginPrivacyPolicy ?? 'Privacy Policy',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.55),
+                                    fontSize: 11,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white.withOpacity(0.3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TextSpan(
+                              text: l10nLegal?.loginLegalSuffix ?? '.',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.35),
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
-                        children: [
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: () => _openUrl('https://crackwish.com/terms.html'),
-                              child: Text(
-                                'Terms of Use',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.55),
-                                  fontSize: 11,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white.withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' and ',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.35),
-                              fontSize: 11,
-                            ),
-                          ),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: () => _openUrl('https://crackwish.com/privacy.html'),
-                              child: Text(
-                                'Privacy Policy',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.55),
-                                  fontSize: 11,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white.withOpacity(0.3),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '.',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.35),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                        textAlign: TextAlign.center,
+                      );
+                    }),
 
                     const SizedBox(height: 16),
 
@@ -338,14 +344,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text.rich(
                           TextSpan(
-                            text: _isLoginMode ? "Henüz evrene katılmadın mı?  " : "Zaten hesabın var mı?  ",
+                            text: _isLoginMode ? (AppLocalizations.of(context)?.loginNoAccountYet ?? "Henüz evrene katılmadın mı?  ") : (AppLocalizations.of(context)?.loginHaveAccount ?? "Zaten hesabın var mı?  "),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.5), 
                               fontSize: 13,
                             ),
                             children: [
                               TextSpan(
-                                text: _isLoginMode ? "Kayıt Ol" : "Giriş Yap",
+                                text: _isLoginMode ? (AppLocalizations.of(context)?.loginSignUp ?? "Kayıt Ol") : (AppLocalizations.of(context)?.loginSignIn ?? "Giriş Yap"),
                                 style: const TextStyle(
                                   color: Colors.white, 
                                   fontWeight: FontWeight.w600,
