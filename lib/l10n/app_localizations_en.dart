@@ -743,4 +743,120 @@ class AppLocalizationsEn extends AppLocalizations {
   String inviteRequestSent(String name) {
     return 'Request sent to $name!';
   }
+
+  @override
+  String get toastCoffeeReadyTitle => 'Your Reading is Ready!';
+
+  @override
+  String get toastCoffeeReadyMessage =>
+      'The secrets in your cup have been revealed.';
+
+  @override
+  String get toastViewButton => 'View';
+
+  @override
+  String get toastDreamReadyTitle => 'Your Dream is Interpreted!';
+
+  @override
+  String get toastDreamReadyMessage =>
+      'The messages of your subconscious have been decoded.';
+
+  @override
+  String get toastCoffeeReadyTitle2 => 'Your Coffee Reading is Ready!';
+
+  @override
+  String get dreamFallbackTitle => 'Dream Interpretation';
+
+  @override
+  String get rewardWelcomeTitle => 'Welcome to the Universe';
+
+  @override
+  String get rewardWelcomeDesc =>
+      'We left a small gift for you to start your journey.';
+
+  @override
+  String get rewardReferralFallback => 'A friend';
+
+  @override
+  String get rewardReferralReceiverTitle => 'An Unexpected Gift';
+
+  @override
+  String rewardReferralReceiverDesc(String inviter) {
+    return '$inviter invited you here and left a welcome gift for you.';
+  }
+
+  @override
+  String get rewardInviterTitle => 'Your Call Was Heard!';
+
+  @override
+  String rewardInviterDescSingle(String name) {
+    return '$name joined the universe. You\'ve been rewarded for being a guide.';
+  }
+
+  @override
+  String rewardInviterDescMultiple(String name, int count) {
+    return '$name and $count more friends joined the universe. You\'ve been rewarded for being a guide.';
+  }
+
+  @override
+  String rewardInviterDescGeneric(int count) {
+    return '$count friends joined the universe. You\'ve been rewarded for being a guide.';
+  }
+
+  @override
+  String birthdayTitleWithName(String name) {
+    return 'Happy Birthday, $name!';
+  }
+
+  @override
+  String get birthdayTitle => 'Happy Birthday!';
+
+  @override
+  String get birthdayDesc =>
+      'Today is the sacred day your soul came into this world. The universe left a special gift for you.';
+
+  @override
+  String get cookieReminderTitle => 'You Didn\'t Crack a Cookie Today';
+
+  @override
+  String get cookieReminderMessage => 'Your daily fortune message is waiting!';
+
+  @override
+  String get cookieReminderReward => '3 Left';
+
+  @override
+  String achievementRewardStones(int count) {
+    return '+$count Soul Stones';
+  }
+
+  @override
+  String achievementRewardAura(int count) {
+    return '+$count Aura';
+  }
+
+  @override
+  String get rankUpTitle => 'Cosmic Promotion!';
+
+  @override
+  String rankUpMessage(String rank) {
+    return 'Your aura power increased. New title: $rank';
+  }
+
+  @override
+  String get rankNovice => 'Novice Seer';
+
+  @override
+  String get rankApprentice => 'Apprentice Seer';
+
+  @override
+  String get rankSeer => 'Seer';
+
+  @override
+  String get rankWise => 'Wise Seer';
+
+  @override
+  String get rankMaster => 'Master Seer';
+
+  @override
+  String get rankCosmic => 'Cosmic Seer';
 }

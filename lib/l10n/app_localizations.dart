@@ -1468,6 +1468,198 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{name} kişisine istek gönderildi!'**
   String inviteRequestSent(String name);
+
+  /// No description provided for @toastCoffeeReadyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falın Hazır!'**
+  String get toastCoffeeReadyTitle;
+
+  /// No description provided for @toastCoffeeReadyMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanındaki sırlar çözüldü.'**
+  String get toastCoffeeReadyMessage;
+
+  /// No description provided for @toastViewButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Göz At'**
+  String get toastViewButton;
+
+  /// No description provided for @toastDreamReadyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyan Yorumlandı!'**
+  String get toastDreamReadyTitle;
+
+  /// No description provided for @toastDreamReadyMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinçaltının mesajları çözüldü.'**
+  String get toastDreamReadyMessage;
+
+  /// No description provided for @toastCoffeeReadyTitle2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahve Falın Hazır!'**
+  String get toastCoffeeReadyTitle2;
+
+  /// No description provided for @dreamFallbackTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüya Yorumu'**
+  String get dreamFallbackTitle;
+
+  /// No description provided for @rewardWelcomeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrene Hoş Geldin'**
+  String get rewardWelcomeTitle;
+
+  /// No description provided for @rewardWelcomeDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yolculuğuna başlaman için sana küçük bir hediye bıraktık.'**
+  String get rewardWelcomeDesc;
+
+  /// No description provided for @rewardReferralFallback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir arkadaşın'**
+  String get rewardReferralFallback;
+
+  /// No description provided for @rewardReferralReceiverTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beklenmedik Bir Hediye'**
+  String get rewardReferralReceiverTitle;
+
+  /// No description provided for @rewardReferralReceiverDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'{inviter} seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.'**
+  String rewardReferralReceiverDesc(String inviter);
+
+  /// No description provided for @rewardInviterTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çağrın Duyuldu!'**
+  String get rewardInviterTitle;
+
+  /// No description provided for @rewardInviterDescSingle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.'**
+  String rewardInviterDescSingle(String name);
+
+  /// No description provided for @rewardInviterDescMultiple.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ve {count} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.'**
+  String rewardInviterDescMultiple(String name, int count);
+
+  /// No description provided for @rewardInviterDescGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.'**
+  String rewardInviterDescGeneric(int count);
+
+  /// No description provided for @birthdayTitleWithName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}, Doğum Günün Kutlu Olsun!'**
+  String birthdayTitleWithName(String name);
+
+  /// No description provided for @birthdayTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Günün Kutlu Olsun!'**
+  String get birthdayTitle;
+
+  /// No description provided for @birthdayDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün ruhunun bu dünyaya indiği kutsal gün. Evren sana özel bir hediye bıraktı.'**
+  String get birthdayDesc;
+
+  /// No description provided for @cookieReminderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün Kurabiye Kırmadın'**
+  String get cookieReminderTitle;
+
+  /// No description provided for @cookieReminderMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük şans mesajın seni bekliyor!'**
+  String get cookieReminderMessage;
+
+  /// No description provided for @cookieReminderReward.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 Hak'**
+  String get cookieReminderReward;
+
+  /// No description provided for @achievementRewardStones.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{count} Ruh Taşı'**
+  String achievementRewardStones(int count);
+
+  /// No description provided for @achievementRewardAura.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{count} Aura'**
+  String achievementRewardAura(int count);
+
+  /// No description provided for @rankUpTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Terfi!'**
+  String get rankUpTitle;
+
+  /// No description provided for @rankUpMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aura gücün arttı. Yeni unvanın: {rank}'**
+  String rankUpMessage(String rank);
+
+  /// No description provided for @rankNovice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acemi Kahin'**
+  String get rankNovice;
+
+  /// No description provided for @rankApprentice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çırak Kahin'**
+  String get rankApprentice;
+
+  /// No description provided for @rankSeer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahin'**
+  String get rankSeer;
+
+  /// No description provided for @rankWise.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilge Kahin'**
+  String get rankWise;
+
+  /// No description provided for @rankMaster.
+  ///
+  /// In tr, this message translates to:
+  /// **'Usta Kahin'**
+  String get rankMaster;
+
+  /// No description provided for @rankCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Kahin'**
+  String get rankCosmic;
 }
 
 class _AppLocalizationsDelegate

@@ -302,5 +302,78 @@
     "placeholders": {
       "name": { "type": "String" }
     }
-  }
+  },
+  "toastCoffeeReadyTitle": "Falın Hazır!",
+  "toastCoffeeReadyMessage": "Fincanındaki sırlar çözüldü.",
+  "toastViewButton": "Göz At",
+  "toastDreamReadyTitle": "Rüyan Yorumlandı!",
+  "toastDreamReadyMessage": "Bilinçaltının mesajları çözüldü.",
+  "toastCoffeeReadyTitle2": "Kahve Falın Hazır!",
+  "dreamFallbackTitle": "Rüya Yorumu",
+  "rewardWelcomeTitle": "Evrene Hoş Geldin",
+  "rewardWelcomeDesc": "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.",
+  "rewardReferralFallback": "Bir arkadaşın",
+  "rewardReferralReceiverTitle": "Beklenmedik Bir Hediye",
+  "rewardReferralReceiverDesc": "{inviter} seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.",
+  "@rewardReferralReceiverDesc": {
+    "placeholders": {
+      "inviter": { "type": "String" }
+    }
+  },
+  "rewardInviterTitle": "Çağrın Duyuldu!",
+  "rewardInviterDescSingle": "{name} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
+  "@rewardInviterDescSingle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "rewardInviterDescMultiple": "{name} ve {count} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
+  "@rewardInviterDescMultiple": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "rewardInviterDescGeneric": "{count} arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
+  "@rewardInviterDescGeneric": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "birthdayTitleWithName": "{name}, Doğum Günün Kutlu Olsun!",
+  "@birthdayTitleWithName": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "birthdayTitle": "Doğum Günün Kutlu Olsun!",
+  "birthdayDesc": "Bugün ruhunun bu dünyaya indiği kutsal gün. Evren sana özel bir hediye bıraktı.",
+  "cookieReminderTitle": "Bugün Kurabiye Kırmadın",
+  "cookieReminderMessage": "Günlük şans mesajın seni bekliyor!",
+  "cookieReminderReward": "3 Hak",
+  "achievementRewardStones": "+{count} Ruh Taşı",
+  "@achievementRewardStones": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "achievementRewardAura": "+{count} Aura",
+  "@achievementRewardAura": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rankUpTitle": "Kozmik Terfi!",
+  "rankUpMessage": "Aura gücün arttı. Yeni unvanın: {rank}",
+  "@rankUpMessage": {
+    "placeholders": {
+      "rank": { "type": "String" }
+    }
+  },
+  "rankNovice": "Acemi Kahin",
+  "rankApprentice": "Çırak Kahin",
+  "rankSeer": "Kahin",
+  "rankWise": "Bilge Kahin",
+  "rankMaster": "Usta Kahin",
+  "rankCosmic": "Kozmik Kahin"
 }

@@ -19,6 +19,7 @@ import 'coffee_reading_page.dart';
 import 'coffee_page.dart';
 import 'dream_page.dart';
 import '../services/app_navigator.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 
 /// Ortak tab shell: alt menü sabit, sayfalar IndexedStack ile korunur.
 class RootShell extends StatefulWidget {
@@ -147,13 +148,14 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
             
             if (mounted) {
               HapticFeedback.heavyImpact();
+              final l10n = AppLocalizations.of(context);
               CosmicToast.show(
                 context: context,
-                title: 'Falın Hazır!',
-                message: 'Fincanındaki sırlar çözüldü.',
+                title: l10n?.toastCoffeeReadyTitle ?? 'Falın Hazır!',
+                message: l10n?.toastCoffeeReadyMessage ?? 'Fincanındaki sırlar çözüldü.',
                 icon: Icons.local_cafe_rounded,
                 iconColor: const Color(0xFFD4A373),
-                reward: 'Göz At',
+                reward: l10n?.toastViewButton ?? 'Göz At',
                 rewardColor: const Color(0xFFD4A373),
                 duration: const Duration(seconds: 8), // Biraz uzun tutalım
                 onTap: () async {
@@ -209,13 +211,14 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
         
         if (mounted) {
           HapticFeedback.heavyImpact();
+          final l10nDream = AppLocalizations.of(context);
           CosmicToast.show(
             context: context,
-            title: 'Rüyan Yorumlandı!',
-            message: 'Bilinçaltının mesajları çözüldü.',
+            title: l10nDream?.toastDreamReadyTitle ?? 'Rüyan Yorumlandı!',
+            message: l10nDream?.toastDreamReadyMessage ?? 'Bilinçaltının mesajları çözüldü.',
             icon: Icons.nights_stay_rounded,
             iconColor: const Color(0xFF60E0FF),
-            reward: 'Göz At',
+            reward: l10nDream?.toastViewButton ?? 'Göz At',
             rewardColor: const Color(0xFF60E0FF),
             duration: const Duration(seconds: 8),
             onTap: () {
@@ -303,7 +306,7 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
               'id': dreamId,
               'isPremium': isPremium,
               'isRead': false,
-              'title': result['title'] ?? 'Rüya Yorumu',
+              'title': result['title'] ?? (AppLocalizations.of(context)?.dreamFallbackTitle ?? 'Rüya Yorumu'),
               'text': pendingText,
               'emotion': pendingEmotion,
               'date': DateTime.now().toIso8601String(),
@@ -326,13 +329,14 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
             // Hemen toast göster — global polling'i bekleme!
             if (mounted) {
               HapticFeedback.heavyImpact();
+              final l10nPendingDream = AppLocalizations.of(context);
               CosmicToast.show(
                 context: context,
-                title: 'Rüyan Yorumlandı!',
-                message: 'Bilinçaltının mesajları çözüldü.',
+                title: l10nPendingDream?.toastDreamReadyTitle ?? 'Rüyan Yorumlandı!',
+                message: l10nPendingDream?.toastDreamReadyMessage ?? 'Bilinçaltının mesajları çözüldü.',
                 icon: Icons.nights_stay_rounded,
                 iconColor: const Color(0xFF60E0FF),
-                reward: 'Göz At',
+                reward: l10nPendingDream?.toastViewButton ?? 'Göz At',
                 rewardColor: const Color(0xFF60E0FF),
                 duration: const Duration(seconds: 8),
                 onTap: () {
@@ -440,13 +444,14 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
             // Hemen toast göster — global polling'i bekleme!
             if (mounted) {
               HapticFeedback.heavyImpact();
+              final l10nPendingCoffee = AppLocalizations.of(context);
               CosmicToast.show(
                 context: context,
-                title: 'Kahve Falın Hazır!',
-                message: 'Fincanındaki sırlar çözüldü.',
+                title: l10nPendingCoffee?.toastCoffeeReadyTitle2 ?? 'Kahve Falın Hazır!',
+                message: l10nPendingCoffee?.toastCoffeeReadyMessage ?? 'Fincanındaki sırlar çözüldü.',
                 icon: Icons.coffee_rounded,
                 iconColor: const Color(0xFFD4A373),
-                reward: 'Göz At',
+                reward: l10nPendingCoffee?.toastViewButton ?? 'Göz At',
                 rewardColor: const Color(0xFFD4A373),
                 duration: const Duration(seconds: 8),
                 onTap: () {
@@ -504,10 +509,11 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
     if (prefs.getBool('needs_welcome_dialog') == true) {
       if (!mounted) return;
       await prefs.remove('needs_welcome_dialog');
+      final l10nReward = AppLocalizations.of(context);
       await CosmicRewardDialog.show(
         context: context,
-        title: "Evrene Hoş Geldin",
-        description: "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.",
+        title: l10nReward?.rewardWelcomeTitle ?? "Evrene Hoş Geldin",
+        description: l10nReward?.rewardWelcomeDesc ?? "Yolculuğuna başlaman için sana küçük bir hediye bıraktık.",
         icon: Icons.card_giftcard,
         stoneReward: 3,
       );
@@ -517,14 +523,15 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
     // 2. Davet ile Gelen Kişiye Verilen Ödül Dialogu
     if (prefs.getBool('needs_referral_receiver_dialog') == true) {
       if (!mounted) return;
-      final inviter = prefs.getString('referral_inviter_name') ?? 'Bir arkadaşın';
+      final l10nRef = AppLocalizations.of(context);
+      final inviter = prefs.getString('referral_inviter_name') ?? (l10nRef?.rewardReferralFallback ?? 'Bir arkadaşın');
       await prefs.remove('needs_referral_receiver_dialog');
       await prefs.remove('referral_inviter_name');
       
       await CosmicRewardDialog.show(
         context: context,
-        title: "Beklenmedik Bir Hediye",
-        description: "$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.",
+        title: l10nRef?.rewardReferralReceiverTitle ?? "Beklenmedik Bir Hediye",
+        description: l10nRef?.rewardReferralReceiverDesc(inviter) ?? "$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.",
         icon: Icons.mail_outline,
         glowColor: const Color(0xFFC36E6E),
         auraReward: 50,
@@ -545,20 +552,21 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
       final totalAura = inviterRewardCount * 25;
       final totalStones = inviterRewardCount * 2;
       
+      final l10nInv = AppLocalizations.of(context);
       String descText;
       if (newNames.isNotEmpty) {
         if (inviterRewardCount == 1) {
-          descText = "${newNames.first} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+          descText = l10nInv?.rewardInviterDescSingle(newNames.first) ?? "${newNames.first} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
         } else {
-          descText = "${newNames.first} ve ${inviterRewardCount - 1} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+          descText = l10nInv?.rewardInviterDescMultiple(newNames.first, inviterRewardCount - 1) ?? "${newNames.first} ve ${inviterRewardCount - 1} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
         }
       } else {
-        descText = "$inviterRewardCount arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
+        descText = l10nInv?.rewardInviterDescGeneric(inviterRewardCount) ?? "$inviterRewardCount arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.";
       }
       
       await CosmicRewardDialog.show(
         context: context,
-        title: "Çağrın Duyuldu!",
+        title: l10nInv?.rewardInviterTitle ?? "Çağrın Duyuldu!",
         description: descText,
         icon: Icons.person_add_alt_1,
         glowColor: const Color(0xFF38BDF8),
@@ -592,12 +600,13 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
             if (!mounted) return;
             final userName = await StorageService.getUserName();
             final displayName = (userName != null && userName.isNotEmpty) ? userName : null;
+            final l10nBday = AppLocalizations.of(context);
             await CosmicRewardDialog.show(
               context: context,
               title: displayName != null
-                  ? "$displayName, Doğum Günün Kutlu Olsun!"
-                  : "Doğum Günün Kutlu Olsun!",
-              description: "Bugün ruhunun bu dünyaya indiği kutsal gün. Evren sana özel bir hediye bıraktı.",
+                  ? (l10nBday?.birthdayTitleWithName(displayName) ?? "$displayName, Doğum Günün Kutlu Olsun!")
+                  : (l10nBday?.birthdayTitle ?? "Doğum Günün Kutlu Olsun!"),
+              description: l10nBday?.birthdayDesc ?? "Bugün ruhunun bu dünyaya indiği kutsal gün. Evren sana özel bir hediye bıraktı.",
               icon: Icons.cake_rounded,
               glowColor: const Color(0xFFFF6B9D),
               auraReward: 30,
@@ -681,9 +690,9 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
     HapticFeedback.lightImpact();
     CosmicToast.show(
       context: context,
-      title: 'Bugün Kurabiye Kırmadın',
-      message: 'Günlük şans mesajın seni bekliyor!',
-      reward: '3 Hak',
+      title: AppLocalizations.of(context)?.cookieReminderTitle ?? 'Bugün Kurabiye Kırmadın',
+      message: AppLocalizations.of(context)?.cookieReminderMessage ?? 'Günlük şans mesajın seni bekliyor!',
+      reward: AppLocalizations.of(context)?.cookieReminderReward ?? '3 Hak',
       icon: Icons.cookie_rounded,
       iconColor: const Color(0xFFFBBF24),
       rewardColor: const Color(0xFFFBBF24),
@@ -700,7 +709,8 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
       HapticFeedback.heavyImpact();
       final stones = achievement['stones'] as int;
       final aura = achievement['aura'] as int;
-      final rewardText = stones > 0 ? '+$stones Ruh Taşı' : '+$aura Aura';
+      final l10nAch = AppLocalizations.of(context);
+      final rewardText = stones > 0 ? (l10nAch?.achievementRewardStones(stones) ?? '+$stones Ruh Taşı') : (l10nAch?.achievementRewardAura(aura) ?? '+$aura Aura');
       final iconData = achievement['iconData'] as IconData;
       final color = achievement['color'] as Color;
       final imagePath = achievement['imagePath'] as String?;
@@ -760,10 +770,11 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
           rankColor = const Color(0xFFFFD700);
       }
 
+      final l10nRank = AppLocalizations.of(context);
       CosmicToast.show(
         context: context,
-        title: 'Kozmik Terfi!',
-        message: 'Aura gücün arttı. Yeni unvanın: $newRank',
+        title: l10nRank?.rankUpTitle ?? 'Kozmik Terfi!',
+        message: l10nRank?.rankUpMessage(newRank) ?? 'Aura gücün arttı. Yeni unvanın: $newRank',
         reward: '+$auraReward Aura',
         icon: rankIcon,
         iconColor: rankColor,

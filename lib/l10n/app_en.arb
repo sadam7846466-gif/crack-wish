@@ -302,5 +302,78 @@
     "placeholders": {
       "name": { "type": "String" }
     }
-  }
+  },
+  "toastCoffeeReadyTitle": "Your Reading is Ready!",
+  "toastCoffeeReadyMessage": "The secrets in your cup have been revealed.",
+  "toastViewButton": "View",
+  "toastDreamReadyTitle": "Your Dream is Interpreted!",
+  "toastDreamReadyMessage": "The messages of your subconscious have been decoded.",
+  "toastCoffeeReadyTitle2": "Your Coffee Reading is Ready!",
+  "dreamFallbackTitle": "Dream Interpretation",
+  "rewardWelcomeTitle": "Welcome to the Universe",
+  "rewardWelcomeDesc": "We left a small gift for you to start your journey.",
+  "rewardReferralFallback": "A friend",
+  "rewardReferralReceiverTitle": "An Unexpected Gift",
+  "rewardReferralReceiverDesc": "{inviter} invited you here and left a welcome gift for you.",
+  "@rewardReferralReceiverDesc": {
+    "placeholders": {
+      "inviter": { "type": "String" }
+    }
+  },
+  "rewardInviterTitle": "Your Call Was Heard!",
+  "rewardInviterDescSingle": "{name} joined the universe. You've been rewarded for being a guide.",
+  "@rewardInviterDescSingle": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "rewardInviterDescMultiple": "{name} and {count} more friends joined the universe. You've been rewarded for being a guide.",
+  "@rewardInviterDescMultiple": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "rewardInviterDescGeneric": "{count} friends joined the universe. You've been rewarded for being a guide.",
+  "@rewardInviterDescGeneric": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "birthdayTitleWithName": "Happy Birthday, {name}!",
+  "@birthdayTitleWithName": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "birthdayTitle": "Happy Birthday!",
+  "birthdayDesc": "Today is the sacred day your soul came into this world. The universe left a special gift for you.",
+  "cookieReminderTitle": "You Didn't Crack a Cookie Today",
+  "cookieReminderMessage": "Your daily fortune message is waiting!",
+  "cookieReminderReward": "3 Left",
+  "achievementRewardStones": "+{count} Soul Stones",
+  "@achievementRewardStones": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "achievementRewardAura": "+{count} Aura",
+  "@achievementRewardAura": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "rankUpTitle": "Cosmic Promotion!",
+  "rankUpMessage": "Your aura power increased. New title: {rank}",
+  "@rankUpMessage": {
+    "placeholders": {
+      "rank": { "type": "String" }
+    }
+  },
+  "rankNovice": "Novice Seer",
+  "rankApprentice": "Apprentice Seer",
+  "rankSeer": "Seer",
+  "rankWise": "Wise Seer",
+  "rankMaster": "Master Seer",
+  "rankCosmic": "Cosmic Seer"
 }

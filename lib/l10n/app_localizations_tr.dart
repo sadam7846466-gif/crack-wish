@@ -733,4 +733,118 @@ class AppLocalizationsTr extends AppLocalizations {
   String inviteRequestSent(String name) {
     return '$name kişisine istek gönderildi!';
   }
+
+  @override
+  String get toastCoffeeReadyTitle => 'Falın Hazır!';
+
+  @override
+  String get toastCoffeeReadyMessage => 'Fincanındaki sırlar çözüldü.';
+
+  @override
+  String get toastViewButton => 'Göz At';
+
+  @override
+  String get toastDreamReadyTitle => 'Rüyan Yorumlandı!';
+
+  @override
+  String get toastDreamReadyMessage => 'Bilinçaltının mesajları çözüldü.';
+
+  @override
+  String get toastCoffeeReadyTitle2 => 'Kahve Falın Hazır!';
+
+  @override
+  String get dreamFallbackTitle => 'Rüya Yorumu';
+
+  @override
+  String get rewardWelcomeTitle => 'Evrene Hoş Geldin';
+
+  @override
+  String get rewardWelcomeDesc =>
+      'Yolculuğuna başlaman için sana küçük bir hediye bıraktık.';
+
+  @override
+  String get rewardReferralFallback => 'Bir arkadaşın';
+
+  @override
+  String get rewardReferralReceiverTitle => 'Beklenmedik Bir Hediye';
+
+  @override
+  String rewardReferralReceiverDesc(String inviter) {
+    return '$inviter seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.';
+  }
+
+  @override
+  String get rewardInviterTitle => 'Çağrın Duyuldu!';
+
+  @override
+  String rewardInviterDescSingle(String name) {
+    return '$name evrene katıldı. Yol gösterici olduğun için ödüllendirildin.';
+  }
+
+  @override
+  String rewardInviterDescMultiple(String name, int count) {
+    return '$name ve $count arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.';
+  }
+
+  @override
+  String rewardInviterDescGeneric(int count) {
+    return '$count arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.';
+  }
+
+  @override
+  String birthdayTitleWithName(String name) {
+    return '$name, Doğum Günün Kutlu Olsun!';
+  }
+
+  @override
+  String get birthdayTitle => 'Doğum Günün Kutlu Olsun!';
+
+  @override
+  String get birthdayDesc =>
+      'Bugün ruhunun bu dünyaya indiği kutsal gün. Evren sana özel bir hediye bıraktı.';
+
+  @override
+  String get cookieReminderTitle => 'Bugün Kurabiye Kırmadın';
+
+  @override
+  String get cookieReminderMessage => 'Günlük şans mesajın seni bekliyor!';
+
+  @override
+  String get cookieReminderReward => '3 Hak';
+
+  @override
+  String achievementRewardStones(int count) {
+    return '+$count Ruh Taşı';
+  }
+
+  @override
+  String achievementRewardAura(int count) {
+    return '+$count Aura';
+  }
+
+  @override
+  String get rankUpTitle => 'Kozmik Terfi!';
+
+  @override
+  String rankUpMessage(String rank) {
+    return 'Aura gücün arttı. Yeni unvanın: $rank';
+  }
+
+  @override
+  String get rankNovice => 'Acemi Kahin';
+
+  @override
+  String get rankApprentice => 'Çırak Kahin';
+
+  @override
+  String get rankSeer => 'Kahin';
+
+  @override
+  String get rankWise => 'Bilge Kahin';
+
+  @override
+  String get rankMaster => 'Usta Kahin';
+
+  @override
+  String get rankCosmic => 'Kozmik Kahin';
 }
