@@ -1912,6 +1912,174 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yıldızlar bu gece senin için parlıyor.'**
   String get homeTimeSubNight;
+
+  /// No description provided for @paywallSubtitleElite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik farkındalığın zaten açık.\nPlanını yükselterek aydınlanmanı güçlendir.'**
+  String get paywallSubtitleElite;
+
+  /// No description provided for @paywallSubtitleNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik farkındalığa giden kapıyı aç.\nSınırları tamamen kaldır.'**
+  String get paywallSubtitleNew;
+
+  /// No description provided for @paywallFeature1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde 5 Taze Ruh Taşı'**
+  String get paywallFeature1;
+
+  /// No description provided for @paywallFeature2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Master Analiz Modu'**
+  String get paywallFeature2;
+
+  /// No description provided for @paywallFeature3.
+  ///
+  /// In tr, this message translates to:
+  /// **'x3 Hızlı Aura Kazanımı'**
+  String get paywallFeature3;
+
+  /// No description provided for @paywallFeature4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonsuz Klinik Arşiv'**
+  String get paywallFeature4;
+
+  /// No description provided for @paywallFeature5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklamsız Kesintisiz Deneyim'**
+  String get paywallFeature5;
+
+  /// No description provided for @paywallPackageWeekly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık Uyanış'**
+  String get paywallPackageWeekly;
+
+  /// No description provided for @paywallPackageMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık Sezgi'**
+  String get paywallPackageMonthly;
+
+  /// No description provided for @paywallPackageYearly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıllık Aydınlanma'**
+  String get paywallPackageYearly;
+
+  /// No description provided for @paywallBtnCurrentPlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut Planın'**
+  String get paywallBtnCurrentPlan;
+
+  /// No description provided for @paywallBtnManage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mağazadan Yönet'**
+  String get paywallBtnManage;
+
+  /// No description provided for @paywallBtnUpgrade.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planı Yükselt'**
+  String get paywallBtnUpgrade;
+
+  /// No description provided for @paywallBtnSubscribe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Sınırlarını Aç'**
+  String get paywallBtnSubscribe;
+
+  /// No description provided for @paywallSuccessUpgradeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aydınlanma Yükseldi'**
+  String get paywallSuccessUpgradeTitle;
+
+  /// No description provided for @paywallSuccessTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aydınlanmaya Hoşgeldiniz'**
+  String get paywallSuccessTitle;
+
+  /// No description provided for @paywallSuccessUpgradeSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planınız başarıyla yükseltildi.'**
+  String get paywallSuccessUpgradeSubtitle;
+
+  /// No description provided for @paywallSuccessSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.'**
+  String get paywallSuccessSubtitle;
+
+  /// No description provided for @paywallErrorTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı Hatası'**
+  String get paywallErrorTitle;
+
+  /// No description provided for @paywallErrorMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console\'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.'**
+  String get paywallErrorMessage;
+
+  /// No description provided for @paywallRestoreSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Geri Yüklendi'**
+  String get paywallRestoreSuccess;
+
+  /// No description provided for @paywallRestoreSuccessSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.'**
+  String get paywallRestoreSuccessSubtitle;
+
+  /// No description provided for @paywallRestoreNoSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif Abonelik Yok'**
+  String get paywallRestoreNoSub;
+
+  /// No description provided for @paywallRestoreNoSubMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.'**
+  String get paywallRestoreNoSubMessage;
+
+  /// No description provided for @paywallRestore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın Alımları Geri Yükle'**
+  String get paywallRestore;
+
+  /// No description provided for @paywallCurrentPlanBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'MEVCUT PLAN'**
+  String get paywallCurrentPlanBadge;
+
+  /// No description provided for @paywallLegalTr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.'**
+  String get paywallLegalTr;
+
+  /// No description provided for @paywallOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get paywallOk;
 }
 
 class _AppLocalizationsDelegate

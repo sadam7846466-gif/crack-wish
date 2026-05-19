@@ -990,4 +990,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTimeSubNight => 'The stars shine for you tonight.';
+
+  @override
+  String get paywallSubtitleElite =>
+      'Your cosmic awareness is already open.\nStrengthen your enlightenment by upgrading your plan.';
+
+  @override
+  String get paywallSubtitleNew =>
+      'Open the door to cosmic awareness.\nRemove all limits.';
+
+  @override
+  String get paywallFeature1 => '5 Fresh Soul Stones Daily';
+
+  @override
+  String get paywallFeature2 => 'Master Analysis Mode';
+
+  @override
+  String get paywallFeature3 => 'x3 Fast Aura Gain';
+
+  @override
+  String get paywallFeature4 => 'Unlimited Clinical Archive';
+
+  @override
+  String get paywallFeature5 => 'Ad-Free Seamless Experience';
+
+  @override
+  String get paywallPackageWeekly => 'Weekly Awakening';
+
+  @override
+  String get paywallPackageMonthly => 'Monthly Intuition';
+
+  @override
+  String get paywallPackageYearly => 'Yearly Enlightenment';
+
+  @override
+  String get paywallBtnCurrentPlan => 'Current Plan';
+
+  @override
+  String get paywallBtnManage => 'Manage from Store';
+
+  @override
+  String get paywallBtnUpgrade => 'Upgrade Plan';
+
+  @override
+  String get paywallBtnSubscribe => 'Unlock Elite';
+
+  @override
+  String get paywallSuccessUpgradeTitle => 'Enlightenment Upgraded';
+
+  @override
+  String get paywallSuccessTitle => 'Welcome to Enlightenment';
+
+  @override
+  String get paywallSuccessUpgradeSubtitle =>
+      'Your plan has been successfully upgraded.';
+
+  @override
+  String get paywallSuccessSubtitle =>
+      'You are now an Elite member. Cosmic limits have been removed for you.';
+
+  @override
+  String get paywallErrorTitle => 'Connection Error';
+
+  @override
+  String get paywallErrorMessage =>
+      'Could not connect to the store or the transaction was canceled. Products may not yet be published on the App Store/Play Console. Please try again later.';
+
+  @override
+  String get paywallRestoreSuccess => 'Elite Restored';
+
+  @override
+  String get paywallRestoreSuccessSubtitle =>
+      'Welcome back to cosmic awareness. Your limits have been removed.';
+
+  @override
+  String get paywallRestoreNoSub => 'No Active Subscription';
+
+  @override
+  String get paywallRestoreNoSubMessage =>
+      'No active Crack Wish Elite membership found to restore. Please review the packages.';
+
+  @override
+  String get paywallRestore => 'Restore Purchases';
+
+  @override
+  String get paywallCurrentPlanBadge => 'CURRENT PLAN';
+
+  @override
+  String get paywallLegalTr =>
+      'Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. You can manage and cancel your subscriptions in your App Store settings.';
+
+  @override
+  String get paywallOk => 'OK';
 }

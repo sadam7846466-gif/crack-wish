@@ -979,4 +979,95 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get homeTimeSubNight => 'Yıldızlar bu gece senin için parlıyor.';
+
+  @override
+  String get paywallSubtitleElite =>
+      'Kozmik farkındalığın zaten açık.\nPlanını yükselterek aydınlanmanı güçlendir.';
+
+  @override
+  String get paywallSubtitleNew =>
+      'Kozmik farkındalığa giden kapıyı aç.\nSınırları tamamen kaldır.';
+
+  @override
+  String get paywallFeature1 => 'Günde 5 Taze Ruh Taşı';
+
+  @override
+  String get paywallFeature2 => 'Master Analiz Modu';
+
+  @override
+  String get paywallFeature3 => 'x3 Hızlı Aura Kazanımı';
+
+  @override
+  String get paywallFeature4 => 'Sonsuz Klinik Arşiv';
+
+  @override
+  String get paywallFeature5 => 'Reklamsız Kesintisiz Deneyim';
+
+  @override
+  String get paywallPackageWeekly => 'Haftalık Uyanış';
+
+  @override
+  String get paywallPackageMonthly => 'Aylık Sezgi';
+
+  @override
+  String get paywallPackageYearly => 'Yıllık Aydınlanma';
+
+  @override
+  String get paywallBtnCurrentPlan => 'Mevcut Planın';
+
+  @override
+  String get paywallBtnManage => 'Mağazadan Yönet';
+
+  @override
+  String get paywallBtnUpgrade => 'Planı Yükselt';
+
+  @override
+  String get paywallBtnSubscribe => 'Elite Sınırlarını Aç';
+
+  @override
+  String get paywallSuccessUpgradeTitle => 'Aydınlanma Yükseldi';
+
+  @override
+  String get paywallSuccessTitle => 'Aydınlanmaya Hoşgeldiniz';
+
+  @override
+  String get paywallSuccessUpgradeSubtitle => 'Planınız başarıyla yükseltildi.';
+
+  @override
+  String get paywallSuccessSubtitle =>
+      'Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.';
+
+  @override
+  String get paywallErrorTitle => 'Bağlantı Hatası';
+
+  @override
+  String get paywallErrorMessage =>
+      'Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console\'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get paywallRestoreSuccess => 'Elite Geri Yüklendi';
+
+  @override
+  String get paywallRestoreSuccessSubtitle =>
+      'Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.';
+
+  @override
+  String get paywallRestoreNoSub => 'Aktif Abonelik Yok';
+
+  @override
+  String get paywallRestoreNoSubMessage =>
+      'Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.';
+
+  @override
+  String get paywallRestore => 'Satın Alımları Geri Yükle';
+
+  @override
+  String get paywallCurrentPlanBadge => 'MEVCUT PLAN';
+
+  @override
+  String get paywallLegalTr =>
+      'Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.';
+
+  @override
+  String get paywallOk => 'Tamam';
 }

@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/purchase_service.dart';
 import '../services/analytics_service.dart';
 import '../services/profile_sync_service.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 class PremiumPaywallPage extends StatefulWidget {
   const PremiumPaywallPage({super.key});
 
@@ -189,8 +190,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             const SizedBox(height: 2),
                             Text(
                               _isAlreadyElite 
-                                ? "Kozmik farkındalığın zaten açık.\nPlanını yükselterek aydınlanmanı güçlendir."
-                                : "Kozmik farkındalığa giden kapıyı aç.\nSınırları tamamen kaldır.",
+                                ? (AppLocalizations.of(context)?.paywallSubtitleElite ?? "Kozmik farkındalığın zaten açık.\nPlanını yükselterek aydınlanmanı güçlendir.")
+                                : (AppLocalizations.of(context)?.paywallSubtitleNew ?? "Kozmik farkındalığa giden kapıyı aç.\nSınırları tamamen kaldır."),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.6),
@@ -214,11 +215,11 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                   ),
                                   child: Column(
                                     children: [
-                                      _buildCompactFeature(Icons.diamond_rounded, const Color(0xFF4EE6C5), "Günde 5 Taze Ruh Taşı"),
-                                      _buildCompactFeature(Icons.psychology_alt_rounded, const Color(0xFFC084FC), "Master Analiz Modu"),
-                                      _buildCompactFeature(Icons.auto_awesome, const Color(0xFFFFD700), "x3 Hızlı Aura Kazanımı"),
-                                      _buildCompactFeature(Icons.auto_stories_rounded, const Color(0xFF94A3B8), "Sonsuz Klinik Arşiv"),
-                                      _buildCompactFeature(Icons.block_rounded, const Color(0xFFF87171), "Reklamsız Kesintisiz Deneyim", isLast: true),
+                                      _buildCompactFeature(Icons.diamond_rounded, const Color(0xFF4EE6C5), AppLocalizations.of(context)?.paywallFeature1 ?? "Günde 5 Taze Ruh Taşı"),
+                                      _buildCompactFeature(Icons.psychology_alt_rounded, const Color(0xFFC084FC), AppLocalizations.of(context)?.paywallFeature2 ?? "Master Analiz Modu"),
+                                      _buildCompactFeature(Icons.auto_awesome, const Color(0xFFFFD700), AppLocalizations.of(context)?.paywallFeature3 ?? "x3 Hızlı Aura Kazanımı"),
+                                      _buildCompactFeature(Icons.auto_stories_rounded, const Color(0xFF94A3B8), AppLocalizations.of(context)?.paywallFeature4 ?? "Sonsuz Klinik Arşiv"),
+                                      _buildCompactFeature(Icons.block_rounded, const Color(0xFFF87171), AppLocalizations.of(context)?.paywallFeature5 ?? "Reklamsız Kesintisiz Deneyim", isLast: true),
                                     ],
                                   ),
                                 ),
@@ -228,9 +229,9 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             const SizedBox(height: 16), // from 28
 
                             // ── CAM TASARIMLI 3'LÜ PAKET DİZİLİMİ ──
-                            _buildGlassPackageRow(0, "Haftalık Uyanış", PurchaseService().getPrice(PurchaseService.eliteWeeklyId) ?? "...", "/ week"),
-                            _buildGlassPackageRow(1, "Aylık Sezgi", PurchaseService().getPrice(PurchaseService.eliteMonthlyId) ?? "...", "/ month", subText: "Save 33%"),
-                            _buildGlassPackageRow(2, "Yıllık Aydınlanma", PurchaseService().getPrice(PurchaseService.eliteYearlyId) ?? "...", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
+                            _buildGlassPackageRow(0, AppLocalizations.of(context)?.paywallPackageWeekly ?? "Haftalık Uyanış", PurchaseService().getPrice(PurchaseService.eliteWeeklyId) ?? "...", "/ week"),
+                            _buildGlassPackageRow(1, AppLocalizations.of(context)?.paywallPackageMonthly ?? "Aylık Sezgi", PurchaseService().getPrice(PurchaseService.eliteMonthlyId) ?? "...", "/ month", subText: "Save 33%"),
+                            _buildGlassPackageRow(2, AppLocalizations.of(context)?.paywallPackageYearly ?? "Yıllık Aydınlanma", PurchaseService().getPrice(PurchaseService.eliteYearlyId) ?? "...", "/ year", badge: "Popular", subText: "Just \$3.33/mo (Save 58%)"),
                             const SizedBox(height: 32),
 
                             // ── ALT BUTON VE YASAL METİN (ARTIK KAYDIRILABİLİR) ──
@@ -312,8 +313,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
 
                                                 MagicalSuccessDialog.show(
                                                   context,
-                                                  title: isUpgrade ? "Aydınlanma Yükseldi" : "Aydınlanmaya Hoşgeldiniz",
-                                                  subtitle: isUpgrade ? "Planınız başarıyla yükseltildi." : "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı.",
+                                                  title: isUpgrade ? (AppLocalizations.of(context)?.paywallSuccessUpgradeTitle ?? "Aydınlanma Yükseldi") : (AppLocalizations.of(context)?.paywallSuccessTitle ?? "Aydınlanmaya Hoşgeldiniz"),
+                                                  subtitle: isUpgrade ? (AppLocalizations.of(context)?.paywallSuccessUpgradeSubtitle ?? "Planınız başarıyla yükseltildi.") : (AppLocalizations.of(context)?.paywallSuccessSubtitle ?? "Artık bir Elite üyesisiniz. Kozmik sınırlar sizin için kaldırıldı."),
                                                   imagePath: '',
                                                   fallbackIcon: successIcon,
                                                   themeColor: const Color(0xFFFFD700),
@@ -323,8 +324,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                               } else if (mounted) {
                                                 setState(() => _isPurchasing = false);
                                                 _showGlassMessage(
-                                                  "Bağlantı Hatası",
-                                                  "Mağazaya bağlanılamadı veya işlem iptal edildi. Ürünler henüz App Store/Play Console'da yayına alınmamış olabilir. Lütfen daha sonra tekrar deneyin.",
+                                                  AppLocalizations.of(context)?.paywallErrorTitle ?? "Bağlantı Hatası",
+                                                  AppLocalizations.of(context)?.paywallErrorMessage ?? "Mağazaya bağlanılamadı veya işlem iptal edildi.",
                                                   Icons.error_outline_rounded,
                                                   const Color(0xFFF87171),
                                                 );
@@ -341,8 +342,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                                                   : Text(
                                                       isCurrentPlan 
-                                                        ? "Mevcut Planın" 
-                                                        : (isDowngrade ? "Mağazadan Yönet" : (isUpgrade ? "Planı Yükselt" : "Elite Sınırlarını Aç")),
+                                                        ? (AppLocalizations.of(context)?.paywallBtnCurrentPlan ?? "Mevcut Planın")
+                                                        : (isDowngrade ? (AppLocalizations.of(context)?.paywallBtnManage ?? "Mağazadan Yönet") : (isUpgrade ? (AppLocalizations.of(context)?.paywallBtnUpgrade ?? "Planı Yükselt") : (AppLocalizations.of(context)?.paywallBtnSubscribe ?? "Elite Sınırlarını Aç"))),
                                                       style: TextStyle(
                                                         color: useGradient ? const Color(0xFF1A1A2E) : Colors.white.withOpacity(isCurrentPlan ? 0.3 : 0.9), 
                                                         fontSize: 16, 
@@ -364,7 +365,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                               builder: (context) {
                                 final lang = Localizations.localeOf(context).languageCode;
                                 final text = lang == 'tr' 
-                                  ? "Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz."
+                                  ? (AppLocalizations.of(context)?.paywallLegalTr ?? "Aboneliğiniz otomatik olarak yenilenir.")
                                   : "Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. You can manage and cancel your subscriptions in your App Store settings.";
                                 return Text(
                                   text,
@@ -468,8 +469,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                                 
                                 MagicalSuccessDialog.show(
                                   context,
-                                  title: "Elite Geri Yüklendi",
-                                  subtitle: "Kozmik farkındalığa yeniden hoş geldiniz. Sınırlarınız kaldırıldı.",
+                                  title: AppLocalizations.of(context)?.paywallRestoreSuccess ?? "Elite Geri Yüklendi",
+                                  subtitle: AppLocalizations.of(context)?.paywallRestoreSuccessSubtitle ?? "Kozmik farkındalığa yeniden hoş geldiniz.",
                                   imagePath: '',
                                   fallbackIcon: Icons.check_circle_rounded,
                                   themeColor: const Color(0xFF10B981),
@@ -479,8 +480,8 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                               } else {
                                 HapticFeedback.vibrate();
                                 _showGlassMessage(
-                                  "Aktif Abonelik Yok",
-                                  "Geri yüklenebilecek aktif bir Crack Wish Elite üyeliği bulunamadı. Lütfen paketleri inceleyin.",
+                                  AppLocalizations.of(context)?.paywallRestoreNoSub ?? "Aktif Abonelik Yok",
+                                  AppLocalizations.of(context)?.paywallRestoreNoSubMessage ?? "Geri yüklenebilecek aktif bir üyelik bulunamadı.",
                                   Icons.error_outline_rounded,
                                   const Color(0xFFF87171),
                                 );
@@ -492,7 +493,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                           },
                           child: _isRestoring 
                             ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2))
-                            : const Text("Satın Alımları Geri Yükle", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
+                            : Text(AppLocalizations.of(context)?.paywallRestore ?? "Satın Alımları Geri Yükle", style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.3)),
                         )
                       ],
                     ),
@@ -550,7 +551,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
     final bool isSelected = _selectedPackageIndex == index;
     final bool isActivePlan = _isAlreadyElite && _activePackageIndex == index;
     final Color highlightColor = isActivePlan ? const Color(0xFF10B981) : const Color(0xFFFFD700);
-    final String? finalBadge = isActivePlan ? "MEVCUT PLAN" : badge;
+    final String? finalBadge = isActivePlan ? (AppLocalizations.of(context)?.paywallCurrentPlanBadge ?? "MEVCUT PLAN") : badge;
 
     return GestureDetector(
       onTap: isDowngrade ? null : () => _selectPackage(index),
@@ -693,7 +694,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             borderRadius: BorderRadius.circular(20),
                           ),
                           alignment: Alignment.center,
-                          child: const Text("Tamam", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                          child: Text(AppLocalizations.of(context)?.paywallOk ?? "Tamam", style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
                         ),
                       )
                     ],
