@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
   String? _userName;
   static final _mottledPainter = _MottledPainter();
 
-  static const _subtitles = [
+  static const _subtitlesFallback = [
     'Kır, Oku, Gülümse.',
     'Şansın cebinde.',
     'Günün mesajı: Sen.',
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
       ...SeasonConfig.getWeeklyFreeCookies().map((c) => c['id'] as String),
       ...SeasonConfig.getWeeklyPaidCookies().map((c) => c['id'] as String),
     ];
-    _randomSubtitle = _subtitles[math.Random().nextInt(_subtitles.length)];
+    _randomSubtitle = _subtitlesFallback[math.Random().nextInt(_subtitlesFallback.length)];
     _showTimeSubtitle = math.Random().nextBool();
     _checkUnreadOwlLetters();
     _loadSelectedCookie();
@@ -134,21 +134,22 @@ class _HomePageState extends State<HomePage> {
   void _showMilestoneCelebration(int threshold) {
     HapticFeedback.heavyImpact();
     
+    final l10nM = AppLocalizations.of(context);
     String rewardText = "";
     IconData rewardIcon = Icons.auto_awesome;
     Color rewardColor = const Color(0xFFC084FC);
     
-    if (threshold == 7) { rewardText = "+15 Aura"; }
-    else if (threshold == 14) { rewardText = "+30 Aura"; }
-    else if (threshold == 30) { rewardText = "+1 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
-    else if (threshold == 50) { rewardText = "+2 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
-    else if (threshold == 100) { rewardText = "+3 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
-    else if (threshold == 365) { rewardText = "+5 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    if (threshold == 7) { rewardText = l10nM?.achievementRewardAura(15) ?? "+15 Aura"; }
+    else if (threshold == 14) { rewardText = l10nM?.achievementRewardAura(30) ?? "+30 Aura"; }
+    else if (threshold == 30) { rewardText = l10nM?.homeMilestoneSoulStone(1) ?? "+1 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 50) { rewardText = l10nM?.homeMilestoneSoulStone(2) ?? "+2 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 100) { rewardText = l10nM?.homeMilestoneSoulStone(3) ?? "+3 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
+    else if (threshold == 365) { rewardText = l10nM?.homeMilestoneSoulStone(5) ?? "+5 Ruh Taşı"; rewardIcon = Icons.diamond_rounded; rewardColor = const Color(0xFF60A5FA); }
 
     CosmicToast.show(
       context: context,
-      title: 'İnanılmaz Odak!',
-      message: 'Günlük serin tam $threshold güne ulaştı.',
+      title: l10nM?.homeMilestoneTitle ?? 'İnanılmaz Odak!',
+      message: l10nM?.homeMilestoneMessage(threshold) ?? 'Günlük serin tam $threshold güne ulaştı.',
       reward: rewardText,
       icon: rewardIcon,
       iconColor: const Color(0xFFFF6B6B),
@@ -435,7 +436,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHeader(AppLocalizations l10n) {
-    final isTr = l10n.localeName == 'tr';
     final hour = DateTime.now().hour;
     
     final int totalUnread = _unreadOwlCount + SupabaseOwlService().pendingRequestCount + SupabaseOwlService().unreadLetterCount;
@@ -446,25 +446,25 @@ class _HomePageState extends State<HomePage> {
     Color timeColor;
     
     if (hour >= 5 && hour < 12) {
-      greeting = isTr ? 'Günaydın' : 'Good Morning';
-      timeSubtitle = isTr ? 'Kahvenin yanına taze bir mesaj geldi.' : 'Fresh message with your coffee.';
-      timeIcon = Icons.wb_twilight_rounded; // Gündoğumu
-      timeColor = const Color(0xFFFFB74D); // Soft Orange
+      greeting = l10n.homeGreetingMorning;
+      timeSubtitle = l10n.homeTimeSubMorning;
+      timeIcon = Icons.wb_twilight_rounded;
+      timeColor = const Color(0xFFFFB74D);
     } else if (hour >= 12 && hour < 18) {
-      greeting = isTr ? 'İyi Günler' : 'Good Afternoon';
-      timeSubtitle = isTr ? 'Günün koşturmacasına sihirli bir mola.' : 'A magical break in your day.';
-      timeIcon = Icons.wb_sunny_rounded; // Dolu, tok bir güneş
-      timeColor = const Color(0xFFFFD54F); // Soft Amber
+      greeting = l10n.homeGreetingAfternoon;
+      timeSubtitle = l10n.homeTimeSubAfternoon;
+      timeIcon = Icons.wb_sunny_rounded;
+      timeColor = const Color(0xFFFFD54F);
     } else if (hour >= 18 && hour < 22) {
-      greeting = isTr ? 'İyi Akşamlar' : 'Good Evening';
-      timeSubtitle = isTr ? 'Günün yorgunluğunu atacak tatlı bir kehanet.' : 'A sweet prophecy to unwind.';
-      timeIcon = Icons.nights_stay_rounded; // Ay ve bulut (İhtişamlı)
-      timeColor = const Color(0xFF9FA8DA); // Soft Indigo
+      greeting = l10n.homeGreetingEvening;
+      timeSubtitle = l10n.homeTimeSubEvening;
+      timeIcon = Icons.nights_stay_rounded;
+      timeColor = const Color(0xFF9FA8DA);
     } else {
-      greeting = isTr ? 'İyi Geceler' : 'Good Night';
-      timeSubtitle = isTr ? 'Yıldızlar bu gece senin için parlıyor.' : 'The stars shine for you tonight.';
-      timeIcon = Icons.bedtime_rounded; // Tok ve net bir Hilal Ay
-      timeColor = const Color(0xFF90CAF9); // Soft Blue
+      greeting = l10n.homeGreetingNight;
+      timeSubtitle = l10n.homeTimeSubNight;
+      timeIcon = Icons.bedtime_rounded;
+      timeColor = const Color(0xFF90CAF9);
     }
 
     // Eğer isim çok uzunsa ve ekrana sığmıyorsa sadece ilk ismi alalım
@@ -474,8 +474,18 @@ class _HomePageState extends State<HomePage> {
       greeting = '$greeting, $displayName';
     }
 
+    // Lokalize edilmiş alt başlıklar
+    final localizedSubtitles = [
+      l10n.homeSubtitle1, l10n.homeSubtitle2, l10n.homeSubtitle3,
+      l10n.homeSubtitle4, l10n.homeSubtitle5, l10n.homeSubtitle6,
+      l10n.homeSubtitle7, l10n.homeSubtitle8, l10n.homeSubtitle9,
+      l10n.homeSubtitle10, l10n.homeSubtitle11, l10n.homeSubtitle12,
+      l10n.homeSubtitle13, l10n.homeSubtitle14, l10n.homeSubtitle15,
+    ];
+    final randomSub = localizedSubtitles[math.Random(DateTime.now().day).nextInt(localizedSubtitles.length)];
+
     // Yarı rastgele, yarı zamana özel bir alt başlık
-    final finalSubtitle = _showTimeSubtitle ? timeSubtitle : _randomSubtitle;
+    final finalSubtitle = _showTimeSubtitle ? timeSubtitle : randomSub;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

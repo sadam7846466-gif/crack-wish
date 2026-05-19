@@ -1756,6 +1756,162 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'\'nı kabul etmiş olursunuz.'**
   String get loginLegalSuffix;
+
+  /// No description provided for @homeSubtitle1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kır, Oku, Gülümse.'**
+  String get homeSubtitle1;
+
+  /// No description provided for @homeSubtitle2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şansın cebinde.'**
+  String get homeSubtitle2;
+
+  /// No description provided for @homeSubtitle3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün mesajı: Sen.'**
+  String get homeSubtitle3;
+
+  /// No description provided for @homeSubtitle4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir kırık, bir sürpriz.'**
+  String get homeSubtitle4;
+
+  /// No description provided for @homeSubtitle5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Küçük bir kurabiye, büyük bir his.'**
+  String get homeSubtitle5;
+
+  /// No description provided for @homeSubtitle6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kader değil, tatlı bir ipucu.'**
+  String get homeSubtitle6;
+
+  /// No description provided for @homeSubtitle7.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün ne diyor şansın?'**
+  String get homeSubtitle7;
+
+  /// No description provided for @homeSubtitle8.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aç, keşfet, devam et.'**
+  String get homeSubtitle8;
+
+  /// No description provided for @homeSubtitle9.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şans bir tık uzağında.'**
+  String get homeSubtitle9;
+
+  /// No description provided for @homeSubtitle10.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her kırışta yeni bir başlangıç.'**
+  String get homeSubtitle10;
+
+  /// No description provided for @homeSubtitle11.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesajını bul.'**
+  String get homeSubtitle11;
+
+  /// No description provided for @homeSubtitle12.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rastgele değil… tam sana göre.'**
+  String get homeSubtitle12;
+
+  /// No description provided for @homeSubtitle13.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şansını kır, gününü yakala.'**
+  String get homeSubtitle13;
+
+  /// No description provided for @homeSubtitle14.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gülümseten minik kehanetler.'**
+  String get homeSubtitle14;
+
+  /// No description provided for @homeSubtitle15.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürpriz iyi gelir.'**
+  String get homeSubtitle15;
+
+  /// No description provided for @homeMilestoneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnanılmaz Odak!'**
+  String get homeMilestoneTitle;
+
+  /// No description provided for @homeMilestoneMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük serin tam {count} güne ulaştı.'**
+  String homeMilestoneMessage(int count);
+
+  /// No description provided for @homeMilestoneSoulStone.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{count} Ruh Taşı'**
+  String homeMilestoneSoulStone(int count);
+
+  /// No description provided for @homeGreetingMorning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günaydın'**
+  String get homeGreetingMorning;
+
+  /// No description provided for @homeGreetingAfternoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'İyi Günler'**
+  String get homeGreetingAfternoon;
+
+  /// No description provided for @homeGreetingEvening.
+  ///
+  /// In tr, this message translates to:
+  /// **'İyi Akşamlar'**
+  String get homeGreetingEvening;
+
+  /// No description provided for @homeGreetingNight.
+  ///
+  /// In tr, this message translates to:
+  /// **'İyi Geceler'**
+  String get homeGreetingNight;
+
+  /// No description provided for @homeTimeSubMorning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahvenin yanına taze bir mesaj geldi.'**
+  String get homeTimeSubMorning;
+
+  /// No description provided for @homeTimeSubAfternoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün koşturmacasına sihirli bir mola.'**
+  String get homeTimeSubAfternoon;
+
+  /// No description provided for @homeTimeSubEvening.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün yorgunluğunu atacak tatlı bir kehanet.'**
+  String get homeTimeSubEvening;
+
+  /// No description provided for @homeTimeSubNight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldızlar bu gece senin için parlıyor.'**
+  String get homeTimeSubNight;
 }
 
 class _AppLocalizationsDelegate

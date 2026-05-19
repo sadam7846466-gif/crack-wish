@@ -896,4 +896,87 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loginLegalSuffix => '\'nı kabul etmiş olursunuz.';
+
+  @override
+  String get homeSubtitle1 => 'Kır, Oku, Gülümse.';
+
+  @override
+  String get homeSubtitle2 => 'Şansın cebinde.';
+
+  @override
+  String get homeSubtitle3 => 'Günün mesajı: Sen.';
+
+  @override
+  String get homeSubtitle4 => 'Bir kırık, bir sürpriz.';
+
+  @override
+  String get homeSubtitle5 => 'Küçük bir kurabiye, büyük bir his.';
+
+  @override
+  String get homeSubtitle6 => 'Kader değil, tatlı bir ipucu.';
+
+  @override
+  String get homeSubtitle7 => 'Bugün ne diyor şansın?';
+
+  @override
+  String get homeSubtitle8 => 'Aç, keşfet, devam et.';
+
+  @override
+  String get homeSubtitle9 => 'Şans bir tık uzağında.';
+
+  @override
+  String get homeSubtitle10 => 'Her kırışta yeni bir başlangıç.';
+
+  @override
+  String get homeSubtitle11 => 'Mesajını bul.';
+
+  @override
+  String get homeSubtitle12 => 'Rastgele değil… tam sana göre.';
+
+  @override
+  String get homeSubtitle13 => 'Şansını kır, gününü yakala.';
+
+  @override
+  String get homeSubtitle14 => 'Gülümseten minik kehanetler.';
+
+  @override
+  String get homeSubtitle15 => 'Sürpriz iyi gelir.';
+
+  @override
+  String get homeMilestoneTitle => 'İnanılmaz Odak!';
+
+  @override
+  String homeMilestoneMessage(int count) {
+    return 'Günlük serin tam $count güne ulaştı.';
+  }
+
+  @override
+  String homeMilestoneSoulStone(int count) {
+    return '+$count Ruh Taşı';
+  }
+
+  @override
+  String get homeGreetingMorning => 'Günaydın';
+
+  @override
+  String get homeGreetingAfternoon => 'İyi Günler';
+
+  @override
+  String get homeGreetingEvening => 'İyi Akşamlar';
+
+  @override
+  String get homeGreetingNight => 'İyi Geceler';
+
+  @override
+  String get homeTimeSubMorning => 'Kahvenin yanına taze bir mesaj geldi.';
+
+  @override
+  String get homeTimeSubAfternoon => 'Günün koşturmacasına sihirli bir mola.';
+
+  @override
+  String get homeTimeSubEvening =>
+      'Günün yorgunluğunu atacak tatlı bir kehanet.';
+
+  @override
+  String get homeTimeSubNight => 'Yıldızlar bu gece senin için parlıyor.';
 }

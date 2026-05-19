@@ -391,5 +391,41 @@
   "loginTermsOfUse": "Kullanım Şartları",
   "loginLegalAnd": " ve ",
   "loginPrivacyPolicy": "Gizlilik Politikası",
-  "loginLegalSuffix": "'nı kabul etmiş olursunuz."
+  "loginLegalSuffix": "'nı kabul etmiş olursunuz.",
+  "homeSubtitle1": "Kır, Oku, Gülümse.",
+  "homeSubtitle2": "Şansın cebinde.",
+  "homeSubtitle3": "Günün mesajı: Sen.",
+  "homeSubtitle4": "Bir kırık, bir sürpriz.",
+  "homeSubtitle5": "Küçük bir kurabiye, büyük bir his.",
+  "homeSubtitle6": "Kader değil, tatlı bir ipucu.",
+  "homeSubtitle7": "Bugün ne diyor şansın?",
+  "homeSubtitle8": "Aç, keşfet, devam et.",
+  "homeSubtitle9": "Şans bir tık uzağında.",
+  "homeSubtitle10": "Her kırışta yeni bir başlangıç.",
+  "homeSubtitle11": "Mesajını bul.",
+  "homeSubtitle12": "Rastgele değil… tam sana göre.",
+  "homeSubtitle13": "Şansını kır, gününü yakala.",
+  "homeSubtitle14": "Gülümseten minik kehanetler.",
+  "homeSubtitle15": "Sürpriz iyi gelir.",
+  "homeMilestoneTitle": "İnanılmaz Odak!",
+  "homeMilestoneMessage": "Günlük serin tam {count} güne ulaştı.",
+  "@homeMilestoneMessage": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeMilestoneSoulStone": "+{count} Ruh Taşı",
+  "@homeMilestoneSoulStone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeGreetingMorning": "Günaydın",
+  "homeGreetingAfternoon": "İyi Günler",
+  "homeGreetingEvening": "İyi Akşamlar",
+  "homeGreetingNight": "İyi Geceler",
+  "homeTimeSubMorning": "Kahvenin yanına taze bir mesaj geldi.",
+  "homeTimeSubAfternoon": "Günün koşturmacasına sihirli bir mola.",
+  "homeTimeSubEvening": "Günün yorgunluğunu atacak tatlı bir kehanet.",
+  "homeTimeSubNight": "Yıldızlar bu gece senin için parlıyor."
 }

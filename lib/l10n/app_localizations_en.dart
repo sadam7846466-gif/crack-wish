@@ -908,4 +908,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginLegalSuffix => '.';
+
+  @override
+  String get homeSubtitle1 => 'Crack, Read, Smile.';
+
+  @override
+  String get homeSubtitle2 => 'Luck in your pocket.';
+
+  @override
+  String get homeSubtitle3 => 'Today\'s message: You.';
+
+  @override
+  String get homeSubtitle4 => 'One crack, one surprise.';
+
+  @override
+  String get homeSubtitle5 => 'A small cookie, a big feeling.';
+
+  @override
+  String get homeSubtitle6 => 'Not fate, just a sweet hint.';
+
+  @override
+  String get homeSubtitle7 => 'What does your luck say today?';
+
+  @override
+  String get homeSubtitle8 => 'Open, discover, move on.';
+
+  @override
+  String get homeSubtitle9 => 'Luck is one tap away.';
+
+  @override
+  String get homeSubtitle10 => 'A new beginning with every crack.';
+
+  @override
+  String get homeSubtitle11 => 'Find your message.';
+
+  @override
+  String get homeSubtitle12 => 'Not random… just for you.';
+
+  @override
+  String get homeSubtitle13 => 'Crack your luck, seize your day.';
+
+  @override
+  String get homeSubtitle14 => 'Tiny prophecies that make you smile.';
+
+  @override
+  String get homeSubtitle15 => 'Surprises do you good.';
+
+  @override
+  String get homeMilestoneTitle => 'Incredible Focus!';
+
+  @override
+  String homeMilestoneMessage(int count) {
+    return 'Your daily streak reached $count days.';
+  }
+
+  @override
+  String homeMilestoneSoulStone(int count) {
+    return '+$count Soul Stones';
+  }
+
+  @override
+  String get homeGreetingMorning => 'Good Morning';
+
+  @override
+  String get homeGreetingAfternoon => 'Good Afternoon';
+
+  @override
+  String get homeGreetingEvening => 'Good Evening';
+
+  @override
+  String get homeGreetingNight => 'Good Night';
+
+  @override
+  String get homeTimeSubMorning => 'Fresh message with your coffee.';
+
+  @override
+  String get homeTimeSubAfternoon => 'A magical break in your day.';
+
+  @override
+  String get homeTimeSubEvening => 'A sweet prophecy to unwind.';
+
+  @override
+  String get homeTimeSubNight => 'The stars shine for you tonight.';
 }

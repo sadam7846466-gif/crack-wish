@@ -391,5 +391,41 @@
   "loginTermsOfUse": "Terms of Use",
   "loginLegalAnd": " and ",
   "loginPrivacyPolicy": "Privacy Policy",
-  "loginLegalSuffix": "."
+  "loginLegalSuffix": ".",
+  "homeSubtitle1": "Crack, Read, Smile.",
+  "homeSubtitle2": "Luck in your pocket.",
+  "homeSubtitle3": "Today's message: You.",
+  "homeSubtitle4": "One crack, one surprise.",
+  "homeSubtitle5": "A small cookie, a big feeling.",
+  "homeSubtitle6": "Not fate, just a sweet hint.",
+  "homeSubtitle7": "What does your luck say today?",
+  "homeSubtitle8": "Open, discover, move on.",
+  "homeSubtitle9": "Luck is one tap away.",
+  "homeSubtitle10": "A new beginning with every crack.",
+  "homeSubtitle11": "Find your message.",
+  "homeSubtitle12": "Not random… just for you.",
+  "homeSubtitle13": "Crack your luck, seize your day.",
+  "homeSubtitle14": "Tiny prophecies that make you smile.",
+  "homeSubtitle15": "Surprises do you good.",
+  "homeMilestoneTitle": "Incredible Focus!",
+  "homeMilestoneMessage": "Your daily streak reached {count} days.",
+  "@homeMilestoneMessage": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeMilestoneSoulStone": "+{count} Soul Stones",
+  "@homeMilestoneSoulStone": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeGreetingMorning": "Good Morning",
+  "homeGreetingAfternoon": "Good Afternoon",
+  "homeGreetingEvening": "Good Evening",
+  "homeGreetingNight": "Good Night",
+  "homeTimeSubMorning": "Fresh message with your coffee.",
+  "homeTimeSubAfternoon": "A magical break in your day.",
+  "homeTimeSubEvening": "A sweet prophecy to unwind.",
+  "homeTimeSubNight": "The stars shine for you tonight."
 }
