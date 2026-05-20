@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'natal_chart_engine.dart';
 
 class NatalChartPage extends StatefulWidget {
@@ -23,28 +24,37 @@ class _NatalChartPageState extends State<NatalChartPage> {
   int _activeTab = 0;
   late final PageController _pageController;
 
-  List<_InsightData> get _insights => [
-    _InsightData('Ana Kişilik Özeti', '☉', [
-      'Güneş ${NatalChartEngine.signs[_engine!.planets[0].signIndex]} · ${_engine!.planets[0].house}. Ev',
-      'Ay ${NatalChartEngine.signs[_engine!.planets[1].signIndex]} · ${_engine!.planets[1].house}. Ev',
-      'Yükselen ${NatalChartEngine.signs[_engine!.ascSignIndex]}',
-    ], _engine!.getPersonalitySummary()),
-    _InsightData('Aşk & İlişkiler', '♡', [
-      'Venüs ${NatalChartEngine.signs[_engine!.planets[3].signIndex]} · ${_engine!.planets[3].house}. Ev',
-      'Mars ${NatalChartEngine.signs[_engine!.planets[4].signIndex]} · ${_engine!.planets[4].house}. Ev',
-    ], _engine!.getLoveInterpretation()),
-    _InsightData('Kariyer & Para', '⬡', [
-      'MC ${NatalChartEngine.signs[_engine!.mcSignIndex]}',
-      'Satürn ${NatalChartEngine.signs[_engine!.planets[6].signIndex]} · ${_engine!.planets[6].house}. Ev',
-    ], _engine!.getCareerInterpretation()),
-    _InsightData('Duygusal Yapı', '☽', [
-      'Ay ${NatalChartEngine.signs[_engine!.planets[1].signIndex]} · ${_engine!.planets[1].house}. Ev',
-    ], _engine!.getEmotionalInterpretation()),
-    _InsightData('Güçlü & Zayıf Yönler', '✦', [
-      'Mars ${NatalChartEngine.signs[_engine!.planets[4].signIndex]}',
-      'Satürn ${NatalChartEngine.signs[_engine!.planets[6].signIndex]}',
-    ], _engine!.getStrengthsWeaknesses()),
-  ];
+  List<_InsightData> get _insights {
+    final l10n = AppLocalizations.of(context)!;
+    final lang = Localizations.localeOf(context).languageCode;
+    final isTr = lang == 'tr';
+
+    String signLabel(int idx) => isTr ? NatalChartEngine.signs[idx] : NatalChartEngine.signsEn[idx];
+    String houseLabel(int house) => l10n.natalChartHouse(house.toString());
+
+    return [
+      _InsightData(l10n.natalChartTabPersonality, '☉', [
+        '${isTr ? "Güneş" : "Sun"} ${signLabel(_engine!.planets[0].signIndex)} · ${houseLabel(_engine!.planets[0].house)}',
+        '${isTr ? "Ay" : "Moon"} ${signLabel(_engine!.planets[1].signIndex)} · ${houseLabel(_engine!.planets[1].house)}',
+        '${isTr ? "Yükselen" : "Ascendant"} ${signLabel(_engine!.ascSignIndex)}',
+      ], _engine!.getPersonalitySummary(lang)),
+      _InsightData(l10n.natalChartTabLove, '♡', [
+        '${isTr ? "Venüs" : "Venus"} ${signLabel(_engine!.planets[3].signIndex)} · ${houseLabel(_engine!.planets[3].house)}',
+        '${isTr ? "Mars" : "Mars"} ${signLabel(_engine!.planets[4].signIndex)} · ${houseLabel(_engine!.planets[4].house)}',
+      ], _engine!.getLoveInterpretation(lang)),
+      _InsightData(l10n.natalChartTabCareer, '⬡', [
+        'MC ${signLabel(_engine!.mcSignIndex)}',
+        '${isTr ? "Satürn" : "Saturn"} ${signLabel(_engine!.planets[6].signIndex)} · ${houseLabel(_engine!.planets[6].house)}',
+      ], _engine!.getCareerInterpretation(lang)),
+      _InsightData(l10n.natalChartTabEmotional, '☽', [
+        '${isTr ? "Ay" : "Moon"} ${signLabel(_engine!.planets[1].signIndex)} · ${houseLabel(_engine!.planets[1].house)}',
+      ], _engine!.getEmotionalInterpretation(lang)),
+      _InsightData(l10n.natalChartTabStrengths, '✦', [
+        'Mars ${signLabel(_engine!.planets[4].signIndex)}',
+        'Satürn ${signLabel(_engine!.planets[6].signIndex)}',
+      ], _engine!.getStrengthsWeaknesses(lang)),
+    ];
+  }
 
   @override
   void initState() {
@@ -102,7 +112,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Yıldız haritanız hesaplanıyor...',
+                AppLocalizations.of(context)!.natalChartCalculating,
                 style: TextStyle(color: _accent.withOpacity(0.5), fontSize: 13),
               ),
             ],
@@ -280,7 +290,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Icon(Icons.chevron_left_rounded, color: Colors.white.withOpacity(0.15), size: 14),
                       const SizedBox(width: 4),
-                      Text('Kaydırarak İncele', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9, letterSpacing: 1)),
+                      Text(AppLocalizations.of(context)!.natalChartSwipeHint, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9, letterSpacing: 1)),
                       const SizedBox(width: 4),
                       Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.15), size: 14),
                     ]),
@@ -338,7 +348,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     Text(
-                      'Doğum Haritası',
+                      AppLocalizations.of(context)!.natalChartTitle,
                       style: GoogleFonts.cinzel(
                         color: Colors.white,
                         fontSize: 18,
@@ -357,6 +367,10 @@ class _NatalChartPageState extends State<NatalChartPage> {
   }
 
   Widget _buildPlanetTable() {
+    final l10n = AppLocalizations.of(context)!;
+    final lang = Localizations.localeOf(context).languageCode;
+    final isTr = lang == 'tr';
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.03),
@@ -373,35 +387,40 @@ class _NatalChartPageState extends State<NatalChartPage> {
           child: Row(children: [
             Container(width: 3, height: 14, decoration: BoxDecoration(color: _accent.withOpacity(0.5), borderRadius: BorderRadius.circular(2))),
             const SizedBox(width: 10),
-            Text('GEZEGEN POZİSYONLARI', style: TextStyle(color: _accent.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2)),
+            Text(l10n.natalChartPlanetPositions, style: TextStyle(color: _accent.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2)),
           ]),
         ),
         // Rows
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(children: _engine!.planets.map((p) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Row(children: [
-              SizedBox(width: 22, child: Text(p.symbol, style: TextStyle(color: _accent, fontSize: 15))),
-              const SizedBox(width: 10),
-              Expanded(child: Text(p.name, style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12, fontWeight: FontWeight.w500))),
-              Text(NatalChartEngine.signs[p.signIndex], style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
-              const SizedBox(width: 6),
-              Text('${p.degree.toInt() % 30}°', style: TextStyle(color: _accent.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w600)),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(color: _accent.withOpacity(0.06), borderRadius: BorderRadius.circular(6)),
-                child: Text('${p.house}. Ev', style: TextStyle(color: _accent.withOpacity(0.45), fontSize: 9, fontWeight: FontWeight.w600)),
-              ),
-            ]),
-          )).toList()),
+          child: Column(children: _engine!.planets.map((p) {
+            final pName = isTr ? p.name : NatalChartEngine.planetNamesEn[p.index];
+            final signName = isTr ? NatalChartEngine.signs[p.signIndex] : NatalChartEngine.signsEn[p.signIndex];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(children: [
+                SizedBox(width: 22, child: Text(p.symbol, style: TextStyle(color: _accent, fontSize: 15))),
+                const SizedBox(width: 10),
+                Expanded(child: Text(pName, style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12, fontWeight: FontWeight.w500))),
+                Text(signName, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+                const SizedBox(width: 6),
+                Text('${p.degree.toInt() % 30}°', style: TextStyle(color: _accent.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.w600)),
+                const SizedBox(width: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(color: _accent.withOpacity(0.06), borderRadius: BorderRadius.circular(6)),
+                  child: Text(l10n.natalChartHouse(p.house.toString()), style: TextStyle(color: _accent.withOpacity(0.45), fontSize: 9, fontWeight: FontWeight.w600)),
+                ),
+              ]),
+            );
+          }).toList()),
         ),
       ]),
     );
   }
 
   Widget _buildAngularPointsInfo() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -416,17 +435,17 @@ class _NatalChartPageState extends State<NatalChartPage> {
             children: [
               Icon(Icons.auto_awesome_rounded, color: _accent.withOpacity(0.8), size: 14),
               const SizedBox(width: 8),
-              Text('KÖŞE NOKTALARI', style: TextStyle(color: _accent.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
+              Text(l10n.natalChartAngularPoints, style: TextStyle(color: _accent.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
             ],
           ),
           const SizedBox(height: 16),
-          _buildPointInfo('ASC (Yükselen)', 'Dış dünyaya gösterdiğiniz maske, imajınız ve ilk izleniminiz.'),
+          _buildPointInfo(l10n.natalChartAsc, l10n.natalChartAscDesc),
           const SizedBox(height: 10),
-          _buildPointInfo('MC (Tepe)', 'Kariyeriniz, toplum önündeki imajınız ve hayat hedefleriniz.'),
+          _buildPointInfo(l10n.natalChartMc, l10n.natalChartMcDesc),
           const SizedBox(height: 10),
-          _buildPointInfo('DC (Alçalan)', 'İlişkiler, evlilik ve ortaklıklarda aradığınız temel özellikler.'),
+          _buildPointInfo(l10n.natalChartDc, l10n.natalChartDcDesc),
           const SizedBox(height: 10),
-          _buildPointInfo('IC (Dip)', 'Kökleriniz, aileniz, geçmişiniz ve iç dünyanızdaki temel güvenceniz.'),
+          _buildPointInfo(l10n.natalChartIc, l10n.natalChartIcDesc),
         ],
       ),
     );

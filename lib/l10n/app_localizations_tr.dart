@@ -1730,6 +1730,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sharePost => 'Gönderi';
 
   @override
+  String get shareCookieText =>
+      'Günün kurabiyesinden bana bu çıktı! 🥠✨\n#CrackWish';
+
+  @override
   String get shareCoffeeTitle => 'Kahve Falı';
 
   @override
@@ -2810,4 +2814,71 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get onboardingFinalTagline =>
       'Kozmik haritanı güvenceye almak için tıkla.';
+
+  @override
+  String get tarotShareText =>
+      'Kartlar bana böyle konuştu! 🔮✨\n#CrackWish #Tarot';
+
+  @override
+  String get natalChartTitle => 'Doğum Haritası';
+
+  @override
+  String get natalChartCalculating => 'Yıldız haritanız hesaplanıyor...';
+
+  @override
+  String get natalChartSwipeHint => 'Kaydırarak İncele';
+
+  @override
+  String get natalChartPlanetPositions => 'GEZEGEN POZİSYONLARI';
+
+  @override
+  String get natalChartAngularPoints => 'KÖŞE NOKTALARI';
+
+  @override
+  String get natalChartAsc => 'ASC (Yükselen)';
+
+  @override
+  String get natalChartAscDesc =>
+      'Dış dünyaya gösterdiğiniz maske, imajınız ve ilk izleniminiz.';
+
+  @override
+  String get natalChartMc => 'MC (Tepe)';
+
+  @override
+  String get natalChartMcDesc =>
+      'Kariyeriniz, toplum önündeki imajınız ve hayat hedefleriniz.';
+
+  @override
+  String get natalChartDc => 'DC (Alçalan)';
+
+  @override
+  String get natalChartDcDesc =>
+      'İlişkiler, evlilik ve ortaklıklarda aradığınız temel özellikler.';
+
+  @override
+  String get natalChartIc => 'IC (Dip)';
+
+  @override
+  String get natalChartIcDesc =>
+      'Kökleriniz, aileniz, geçmişiniz ve iç dünyanızdaki temel güvenceniz.';
+
+  @override
+  String get natalChartTabPersonality => 'Ana Kişilik Özeti';
+
+  @override
+  String get natalChartTabLove => 'Aşk & İlişkiler';
+
+  @override
+  String get natalChartTabCareer => 'Kariyer & Para';
+
+  @override
+  String get natalChartTabEmotional => 'Duygusal Yapı';
+
+  @override
+  String get natalChartTabStrengths => 'Güçlü & Zayıf Yönler';
+
+  @override
+  String natalChartHouse(String house) {
+    return '$house. Ev';
+  }
 }

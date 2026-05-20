@@ -712,6 +712,7 @@
   "shareShare": "Share",
   "shareStory": "Story",
   "sharePost": "Post",
+  "shareCookieText": "This is what I got from the fortune cookie today! 🥠✨\n#CrackWish",
   "shareCoffeeTitle": "Coffee Reading",
   "cookieLockedTitle": "This special cookie is locked",
   "cookieComingSoon": "Coming Soon ✨",
@@ -1188,5 +1189,32 @@
   "onboardingFeatureDream": "Subconscious Dream Analysis",
   "onboardingFeatureZodiac": "Mystic Chinese & Mayan Compatibilities",
   "onboardingWelcomeTagline": "Today my hopes are greater than my dreams.",
-  "onboardingFinalTagline": "Click to secure your cosmic chart."
+  "onboardingFinalTagline": "Click to secure your cosmic chart.",
+  "tarotShareText": "The cards spoke to me like this! 🔮✨\n#CrackWish #Tarot",
+  "natalChartTitle": "Birth Chart",
+  "natalChartCalculating": "Calculating your birth chart...",
+  "natalChartSwipeHint": "Swipe to Inspect",
+  "natalChartPlanetPositions": "PLANET POSITIONS",
+  "natalChartAngularPoints": "ANGULAR POINTS",
+  "natalChartAsc": "ASC (Ascendant)",
+  "natalChartAscDesc": "The mask you show to the outer world, your image, and your first impression.",
+  "natalChartMc": "MC (Midheaven)",
+  "natalChartMcDesc": "Your career, your public image, and your life goals.",
+  "natalChartDc": "DC (Descendant)",
+  "natalChartDcDesc": "The core traits you look for in relationships, marriage, and partnerships.",
+  "natalChartIc": "IC (Imum Coeli)",
+  "natalChartIcDesc": "Your roots, your family, your past, and your core security in your inner world.",
+  "natalChartTabPersonality": "Main Personality Summary",
+  "natalChartTabLove": "Love & Relationships",
+  "natalChartTabCareer": "Career & Money",
+  "natalChartTabEmotional": "Emotional Structure",
+  "natalChartTabStrengths": "Strengths & Weaknesses",
+  "natalChartHouse": "House {house}",
+  "@natalChartHouse": {
+    "placeholders": {
+      "house": {
+        "type": "String"
+      }
+    }
+  }
 }

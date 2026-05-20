@@ -15,6 +15,7 @@ class NatalChartEngine {
 
   // Signs
   static const signs = ['Koç','Boğa','İkizler','Yengeç','Aslan','Başak','Terazi','Akrep','Yay','Oğlak','Kova','Balık'];
+  static const signsEn = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
   static const signImages = [
     'assets/images/zodiac_signs/aries.png','assets/images/zodiac_signs/taurus.png',
     'assets/images/zodiac_signs/gemini.png','assets/images/zodiac_signs/cancer.png',
@@ -26,6 +27,7 @@ class NatalChartEngine {
 
   // Planet data
   static const planetNames = ['Güneş','Ay','Merkür','Venüs','Mars','Jüpiter','Satürn','Uranüs','Neptün','Plüton'];
+  static const planetNamesEn = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto'];
   static const planetSymbols = ['☉','☽','☿','♀','♂','♃','♄','♅','♆','♇'];
 
   // Swiss Ephemeris planet IDs
@@ -365,33 +367,70 @@ class NatalChartEngine {
 
   // ── YORUM MOTORU ──
 
-  String getPersonalitySummary() {
-    final sun = planets[0]; final moon = planets[1]; final asc = signs[ascSignIndex];
-    return '${signs[sun.signIndex]} enerjisiyle parlıyorsun, ${signs[moon.signIndex]} Ay\'ın duygusal derinlik katıyor. $asc yükseleni dış dünyadaki izlenimini şekillendiriyor.';
+  String getPersonalitySummary(String lang) {
+    final sun = planets[0]; final moon = planets[1];
+    final isTr = lang == 'tr';
+    final sunSign = isTr ? signs[sun.signIndex] : signsEn[sun.signIndex];
+    final moonSign = isTr ? signs[moon.signIndex] : signsEn[moon.signIndex];
+    final asc = isTr ? signs[ascSignIndex] : signsEn[ascSignIndex];
+    if (isTr) {
+      return '$sunSign enerjisiyle parlıyorsun, $moonSign Ay\'ın duygusal derinlik katıyor. $asc yükseleni dış dünyadaki izlenimini şekillendiriyor.';
+    } else {
+      return 'You shine with the energy of $sunSign, your $moonSign Moon adds emotional depth. The $asc ascendant shapes your impression in the outer world.';
+    }
   }
 
-  String getLoveInterpretation() {
+  String getLoveInterpretation(String lang) {
     final venus = planets[3]; final mars = planets[4];
-    return '${signs[venus.signIndex]} Venüs\'ün sevgi dilini, ${signs[mars.signIndex]} Mars\'ın tutku tarzını belirliyor. ${_venusHouseInterpretation(venus.house)}';
+    final isTr = lang == 'tr';
+    final venusSign = isTr ? signs[venus.signIndex] : signsEn[venus.signIndex];
+    final marsSign = isTr ? signs[mars.signIndex] : signsEn[mars.signIndex];
+    if (isTr) {
+      return '$venusSign Venüs\'ün sevgi dilini, $marsSign Mars\'ın tutku tarzını belirliyor. ${_venusHouseInterpretation(venus.house, lang)}';
+    } else {
+      return '$venusSign Venus determines your love language, $marsSign Mars shapes your passion style. ${_venusHouseInterpretation(venus.house, lang)}';
+    }
   }
 
-  String getCareerInterpretation() {
-    final mc = signs[mcSignIndex]; final saturn = planets[6];
-    return 'MC $mc burcunda — kariyer yönünü bu çiziyor. ${signs[saturn.signIndex]} Satürn disiplin alanını belirliyor. ${_careerHouseInterpretation(planets[0].house)}';
+  String getCareerInterpretation(String lang) {
+    final mc = mcSignIndex; final saturn = planets[6];
+    final isTr = lang == 'tr';
+    final mcSign = isTr ? signs[mc] : signsEn[mc];
+    final saturnSign = isTr ? signs[saturn.signIndex] : signsEn[saturn.signIndex];
+    if (isTr) {
+      return 'MC $mcSign burcunda — kariyer yönünü bu çiziyor. $saturnSign Satürn disiplin alanını belirliyor. ${_careerHouseInterpretation(planets[0].house, lang)}';
+    } else {
+      return 'MC in $mcSign sign — this draws your career path. $saturnSign Saturn determines your discipline area. ${_careerHouseInterpretation(planets[0].house, lang)}';
+    }
   }
 
-  String getEmotionalInterpretation() {
+  String getEmotionalInterpretation(String lang) {
     final moon = planets[1];
-    return '${signs[moon.signIndex]} Ay\'ın iç dünyanı yönetiyor. ${_moonHouseInterpretation(moon.house)}';
+    final isTr = lang == 'tr';
+    final moonSign = isTr ? signs[moon.signIndex] : signsEn[moon.signIndex];
+    if (isTr) {
+      return '$moonSign Ay\'ın iç dünyanı yönetiyor. ${_moonHouseInterpretation(moon.house, lang)}';
+    } else {
+      return 'Your $moonSign Moon rules your inner world. ${_moonHouseInterpretation(moon.house, lang)}';
+    }
   }
 
-  String getStrengthsWeaknesses() {
+  String getStrengthsWeaknesses(String lang) {
     final sun = planets[0]; final saturn = planets[6]; final mars = planets[4];
-    return '${signs[sun.signIndex]} kararlılığı, ${signs[mars.signIndex]} savaşçı ruhu. ${signs[saturn.signIndex]} Satürn\'ün getirdiği sınırlar denge noktandır.';
+    final isTr = lang == 'tr';
+    final sunSign = isTr ? signs[sun.signIndex] : signsEn[sun.signIndex];
+    final saturnSign = isTr ? signs[saturn.signIndex] : signsEn[saturn.signIndex];
+    final marsSign = isTr ? signs[mars.signIndex] : signsEn[mars.signIndex];
+    if (isTr) {
+      return '$sunSign kararlılığı, $marsSign savaşçı ruhu. $saturnSign Satürn\'ün getirdiği sınırlar denge noktandır.';
+    } else {
+      return '$sunSign determination, $marsSign warrior spirit. The boundaries brought by $saturnSign Saturn are your balance points.';
+    }
   }
 
-  String _venusHouseInterpretation(int house) {
-    const m = {
+  String _venusHouseInterpretation(int house, String lang) {
+    final isTr = lang == 'tr';
+    const trMap = {
       1:'Çekiciliğin doğal ve göz alıcı.', 2:'Aşkta güvenlik ve konfor arıyorsun.',
       3:'Entelektüel bağ seni cezbediyor.', 4:'Yuva kurmak aşkın temel taşı.',
       5:'Romantizm ve tutku hayatının merkezinde.', 6:'Sevgiyi günlük ilgide buluyorsun.',
@@ -399,11 +438,20 @@ class NatalChartEngine {
       9:'Maceracı ve özgür bir aşk anlayışın var.', 10:'Statü ve saygınlık aşkta önemli.',
       11:'Arkadaşlık temelli ilişkiler tercih ediyorsun.', 12:'Gizli ve ruhsal derin bağlar kuruyorsun.',
     };
-    return m[house] ?? '';
+    const enMap = {
+      1: 'Your charm is natural and eye-catching.', 2: 'You look for safety and comfort in love.',
+      3: 'Intellectual connection attracts you.', 4: 'Building a home is the foundation of your love.',
+      5: 'Romance and passion are at the center of your life.', 6: 'You find love in daily care.',
+      7: 'You look for lasting partnerships and deep bonds.', 8: 'You experience intense and transformative love.',
+      9: 'You have an adventurous and free understanding of love.', 10: 'Status and respect are important in love.',
+      11: 'You prefer friendship-based relationships.', 12: 'You form secret and spiritually deep bonds.',
+    };
+    return (isTr ? trMap[house] : enMap[house]) ?? '';
   }
 
-  String _careerHouseInterpretation(int house) {
-    const m = {
+  String _careerHouseInterpretation(int house, String lang) {
+    final isTr = lang == 'tr';
+    const trMap = {
       1:'Kişisel marka ve liderlik öne çıkıyor.', 2:'Finansal güvenlik kariyer motivasyonun.',
       3:'İletişim ve medya alanları parlıyor.', 4:'Ev ve aile odaklı işler uygun.',
       5:'Yaratıcı sektörler ve sanat alanları ideal.', 6:'Hizmet ve sağlık sektörleri güçlü.',
@@ -411,11 +459,20 @@ class NatalChartEngine {
       9:'Eğitim ve uluslararası alanlar uygun.', 10:'Yöneticilik ve kamu alanları doğal yeteneklerin.',
       11:'Teknoloji ve sosyal girişimler ideal.', 12:'Ruhsal ve sanatsal alanlar çekiyor.',
     };
-    return m[house] ?? '';
+    const enMap = {
+      1: 'Personal brand and leadership stand out.', 2: 'Financial security is your career motivation.',
+      3: 'Communication and media fields shine.', 4: 'Home and family-oriented jobs are suitable.',
+      5: 'Creative sectors and art fields are ideal.', 6: 'Service and health sectors are strong.',
+      7: 'Partnership and consulting fields are bright.', 8: 'Finance and research fields stand out.',
+      9: 'Education and international fields are suitable.', 10: 'Management and public fields are your natural talents.',
+      11: 'Technology and social enterprises are ideal.', 12: 'Spiritual and artistic fields attract you.',
+    };
+    return (isTr ? trMap[house] : enMap[house]) ?? '';
   }
 
-  String _moonHouseInterpretation(int house) {
-    const m = {
+  String _moonHouseInterpretation(int house, String lang) {
+    final isTr = lang == 'tr';
+    const trMap = {
       1:'Duygularını açıkça gösteriyorsun.', 2:'Duygusal güvenlik maddi istikrarla bağlantılı.',
       3:'Duygularını kelimelerle ifade ediyorsun.', 4:'Aile ve yuva duygusal merkezin.',
       5:'Duygularını yaratıcılıkla dışa vuruyorsun.', 6:'Duygusal dengen rutinlerle sağlanıyor.',
@@ -423,7 +480,15 @@ class NatalChartEngine {
       9:'Keşif ve öğrenme seni duygusal olarak besliyor.', 10:'Başarı duygusal tatminin kaynağı.',
       11:'Topluluk duygusu seni güçlendiriyor.', 12:'İç dünyanda derin bir duygusal okyanus var.',
     };
-    return m[house] ?? '';
+    const enMap = {
+      1: 'You display your emotions openly.', 2: 'Emotional security is linked to financial stability.',
+      3: 'You express your feelings in words.', 4: 'Family and home are your emotional center.',
+      5: 'You express your emotions through creativity.', 6: 'Your emotional balance is maintained by routines.',
+      7: 'You find emotional fulfillment in relationships.', 8: 'You experience deep and intense emotional situations.',
+      9: 'Exploration and learning nourish you emotionally.', 10: 'Success is the source of your emotional satisfaction.',
+      11: 'Sense of community empowers you.', 12: 'There is a deep emotional ocean in your inner world.',
+    };
+    return (isTr ? trMap[house] : enMap[house]) ?? '';
   }
 }
 

@@ -33,18 +33,18 @@ class _MotivationPageState extends State<MotivationPage>
   static const double _autoSpeed = 0.0002;
 
   static const List<Map<String, dynamic>> characters = [
-    {'emoji': '\u{1F60A}', 'label': 'Mutlu', 'color': Color(0xFFFFD700)},
-    {'emoji': '\u{26A1}', 'label': 'Enerjik', 'color': Color(0xFFFF6B00)},
-    {'emoji': '\u{1F60C}', 'label': 'Sakin', 'color': Color(0xFF7EC8E3)},
-    {'emoji': '\u{1F3AF}', 'label': 'Odak', 'color': Color(0xFF4A90D9)},
-    {'emoji': '\u{1F495}', 'label': 'Romantik', 'color': Color(0xFFFF69B4)},
-    {'emoji': '\u{1F634}', 'label': 'Yorgun', 'color': Color(0xFF6B5B95)},
-    {'emoji': '\u{1F630}', 'label': 'Stresli', 'color': Color(0xFFCC4444)},
-    {'emoji': '\u{1F631}', 'label': 'Panik', 'color': Color(0xFFFF2222)},
-    {'emoji': '\u{1F525}', 'label': 'Motivasyon', 'color': Color(0xFFFF8C00)},
-    {'emoji': '\u{1F914}', 'label': 'Merakl\u{0131}', 'color': Color(0xFF50C878)},
-    {'emoji': '\u{1F622}', 'label': '\u{00DC}zg\u{00FC}n', 'color': Color(0xFF5577AA)},
-    {'emoji': '\u{1F60E}', 'label': 'Rahat', 'color': Color(0xFF88CC88)},
+    {'emoji': '\u{1F60A}', 'label': 'Mutlu', 'labelEn': 'Happy', 'color': Color(0xFFFFD700)},
+    {'emoji': '\u{26A1}', 'label': 'Enerjik', 'labelEn': 'Energetic', 'color': Color(0xFFFF6B00)},
+    {'emoji': '\u{1F60C}', 'label': 'Sakin', 'labelEn': 'Calm', 'color': Color(0xFF7EC8E3)},
+    {'emoji': '\u{1F3AF}', 'label': 'Odak', 'labelEn': 'Focused', 'color': Color(0xFF4A90D9)},
+    {'emoji': '\u{1F495}', 'label': 'Romantik', 'labelEn': 'Romantic', 'color': Color(0xFFFF69B4)},
+    {'emoji': '\u{1F634}', 'label': 'Yorgun', 'labelEn': 'Tired', 'color': Color(0xFF6B5B95)},
+    {'emoji': '\u{1F630}', 'label': 'Stresli', 'labelEn': 'Stressed', 'color': Color(0xFFCC4444)},
+    {'emoji': '\u{1F631}', 'label': 'Panik', 'labelEn': 'Panicked', 'color': Color(0xFFFF2222)},
+    {'emoji': '\u{1F525}', 'label': 'Motivasyon', 'labelEn': 'Motivated', 'color': Color(0xFFFF8C00)},
+    {'emoji': '\u{1F914}', 'label': 'Meraklı', 'labelEn': 'Curious', 'color': Color(0xFF50C878)},
+    {'emoji': '\u{1F622}', 'label': 'Üzgün', 'labelEn': 'Sad', 'color': Color(0xFF5577AA)},
+    {'emoji': '\u{1F60E}', 'label': 'Rahat', 'labelEn': 'Relaxed', 'color': Color(0xFF88CC88)},
   ];
 
   @override
@@ -152,6 +152,7 @@ class _MotivationPageState extends State<MotivationPage>
   }
   @override
   Widget build(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final screenWidth = MediaQuery.of(context).size.width;
     final swipeProgress = (_swipeOffset / screenWidth).clamp(0.0, 1.0);
     final scale = 1.0 - (swipeProgress * 0.08);
@@ -285,7 +286,7 @@ class _MotivationPageState extends State<MotivationPage>
                               child: _GlassFrame(
                                 size: frameSize,
                                 emoji: characters[i]['emoji'] as String,
-                                label: characters[i]['label'] as String,
+                                label: isTr ? (characters[i]['label'] as String) : (characters[i]['labelEn'] as String),
                               ),
                             ),
                           );
@@ -352,7 +353,7 @@ class _MotivationPageState extends State<MotivationPage>
                             child: _GlassFrame(
                               size: frameSize,
                               emoji: characters[i]['emoji'] as String,
-                              label: characters[i]['label'] as String,
+                              label: isTr ? (characters[i]['label'] as String) : (characters[i]['labelEn'] as String),
                             ),
                           ),
                         );

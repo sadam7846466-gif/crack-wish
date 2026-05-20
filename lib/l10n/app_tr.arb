@@ -712,6 +712,7 @@
   "shareShare": "Paylaş",
   "shareStory": "Hikaye",
   "sharePost": "Gönderi",
+  "shareCookieText": "Günün kurabiyesinden bana bu çıktı! 🥠✨\n#CrackWish",
   "shareCoffeeTitle": "Kahve Falı",
   "cookieLockedTitle": "Bu özel kurabiye kilitli",
   "cookieComingSoon": "Yakında Satışa Çıkacak ✨",
@@ -1188,5 +1189,32 @@
   "onboardingFeatureDream": "Bilinçaltı Rüya Analizleri",
   "onboardingFeatureZodiac": "Mistik Çin & Maya Uyumları",
   "onboardingWelcomeTagline": "Bugün umutlarım hayallerimden daha büyük.",
-  "onboardingFinalTagline": "Kozmik haritanı güvenceye almak için tıkla."
+  "onboardingFinalTagline": "Kozmik haritanı güvenceye almak için tıkla.",
+  "tarotShareText": "Kartlar bana böyle konuştu! 🔮✨\n#CrackWish #Tarot",
+  "natalChartTitle": "Doğum Haritası",
+  "natalChartCalculating": "Yıldız haritanız hesaplanıyor...",
+  "natalChartSwipeHint": "Kaydırarak İncele",
+  "natalChartPlanetPositions": "GEZEGEN POZİSYONLARI",
+  "natalChartAngularPoints": "KÖŞE NOKTALARI",
+  "natalChartAsc": "ASC (Yükselen)",
+  "natalChartAscDesc": "Dış dünyaya gösterdiğiniz maske, imajınız ve ilk izleniminiz.",
+  "natalChartMc": "MC (Tepe)",
+  "natalChartMcDesc": "Kariyeriniz, toplum önündeki imajınız ve hayat hedefleriniz.",
+  "natalChartDc": "DC (Alçalan)",
+  "natalChartDcDesc": "İlişkiler, evlilik ve ortaklıklarda aradığınız temel özellikler.",
+  "natalChartIc": "IC (Dip)",
+  "natalChartIcDesc": "Kökleriniz, aileniz, geçmişiniz ve iç dünyanızdaki temel güvenceniz.",
+  "natalChartTabPersonality": "Ana Kişilik Özeti",
+  "natalChartTabLove": "Aşk & İlişkiler",
+  "natalChartTabCareer": "Kariyer & Para",
+  "natalChartTabEmotional": "Duygusal Yapı",
+  "natalChartTabStrengths": "Güçlü & Zayıf Yönler",
+  "natalChartHouse": "{house}. Ev",
+  "@natalChartHouse": {
+    "placeholders": {
+      "house": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -3311,6 +3311,12 @@ abstract class AppLocalizations {
   /// **'Gönderi'**
   String get sharePost;
 
+  /// No description provided for @shareCookieText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün kurabiyesinden bana bu çıktı! 🥠✨\n#CrackWish'**
+  String get shareCookieText;
+
   /// No description provided for @shareCoffeeTitle.
   ///
   /// In tr, this message translates to:
@@ -5296,6 +5302,126 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kozmik haritanı güvenceye almak için tıkla.'**
   String get onboardingFinalTagline;
+
+  /// No description provided for @tarotShareText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kartlar bana böyle konuştu! 🔮✨\n#CrackWish #Tarot'**
+  String get tarotShareText;
+
+  /// No description provided for @natalChartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Haritası'**
+  String get natalChartTitle;
+
+  /// No description provided for @natalChartCalculating.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldız haritanız hesaplanıyor...'**
+  String get natalChartCalculating;
+
+  /// No description provided for @natalChartSwipeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydırarak İncele'**
+  String get natalChartSwipeHint;
+
+  /// No description provided for @natalChartPlanetPositions.
+  ///
+  /// In tr, this message translates to:
+  /// **'GEZEGEN POZİSYONLARI'**
+  String get natalChartPlanetPositions;
+
+  /// No description provided for @natalChartAngularPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'KÖŞE NOKTALARI'**
+  String get natalChartAngularPoints;
+
+  /// No description provided for @natalChartAsc.
+  ///
+  /// In tr, this message translates to:
+  /// **'ASC (Yükselen)'**
+  String get natalChartAsc;
+
+  /// No description provided for @natalChartAscDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dış dünyaya gösterdiğiniz maske, imajınız ve ilk izleniminiz.'**
+  String get natalChartAscDesc;
+
+  /// No description provided for @natalChartMc.
+  ///
+  /// In tr, this message translates to:
+  /// **'MC (Tepe)'**
+  String get natalChartMc;
+
+  /// No description provided for @natalChartMcDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kariyeriniz, toplum önündeki imajınız ve hayat hedefleriniz.'**
+  String get natalChartMcDesc;
+
+  /// No description provided for @natalChartDc.
+  ///
+  /// In tr, this message translates to:
+  /// **'DC (Alçalan)'**
+  String get natalChartDc;
+
+  /// No description provided for @natalChartDcDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlişkiler, evlilik ve ortaklıklarda aradığınız temel özellikler.'**
+  String get natalChartDcDesc;
+
+  /// No description provided for @natalChartIc.
+  ///
+  /// In tr, this message translates to:
+  /// **'IC (Dip)'**
+  String get natalChartIc;
+
+  /// No description provided for @natalChartIcDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kökleriniz, aileniz, geçmişiniz ve iç dünyanızdaki temel güvenceniz.'**
+  String get natalChartIcDesc;
+
+  /// No description provided for @natalChartTabPersonality.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana Kişilik Özeti'**
+  String get natalChartTabPersonality;
+
+  /// No description provided for @natalChartTabLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşk & İlişkiler'**
+  String get natalChartTabLove;
+
+  /// No description provided for @natalChartTabCareer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kariyer & Para'**
+  String get natalChartTabCareer;
+
+  /// No description provided for @natalChartTabEmotional.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duygusal Yapı'**
+  String get natalChartTabEmotional;
+
+  /// No description provided for @natalChartTabStrengths.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güçlü & Zayıf Yönler'**
+  String get natalChartTabStrengths;
+
+  /// No description provided for @natalChartHouse.
+  ///
+  /// In tr, this message translates to:
+  /// **'{house}. Ev'**
+  String natalChartHouse(String house);
 }
 
 class _AppLocalizationsDelegate

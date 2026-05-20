@@ -154,9 +154,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
       final renderBox = context.findRenderObject() as RenderBox?;
       final rect = renderBox != null ? renderBox.localToGlobal(Offset.zero) & renderBox.size : Rect.zero;
 
-      final shareText = widget.lang == 'tr'
-          ? "Kartlar bana böyle konuştu! 🔮✨\n#CrackWish #Tarot"
-          : "The cards spoke to me like this! 🔮✨\n#CrackWish #Tarot";
+      final shareText = AppLocalizations.of(context)!.tarotShareText;
 
       await Share.shareXFiles(
         [XFile(file.path)], 

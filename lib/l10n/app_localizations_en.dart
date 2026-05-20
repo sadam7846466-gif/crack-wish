@@ -1750,6 +1750,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sharePost => 'Post';
 
   @override
+  String get shareCookieText =>
+      'This is what I got from the fortune cookie today! 🥠✨\n#CrackWish';
+
+  @override
   String get shareCoffeeTitle => 'Coffee Reading';
 
   @override
@@ -2830,4 +2834,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingFinalTagline => 'Click to secure your cosmic chart.';
+
+  @override
+  String get tarotShareText =>
+      'The cards spoke to me like this! 🔮✨\n#CrackWish #Tarot';
+
+  @override
+  String get natalChartTitle => 'Birth Chart';
+
+  @override
+  String get natalChartCalculating => 'Calculating your birth chart...';
+
+  @override
+  String get natalChartSwipeHint => 'Swipe to Inspect';
+
+  @override
+  String get natalChartPlanetPositions => 'PLANET POSITIONS';
+
+  @override
+  String get natalChartAngularPoints => 'ANGULAR POINTS';
+
+  @override
+  String get natalChartAsc => 'ASC (Ascendant)';
+
+  @override
+  String get natalChartAscDesc =>
+      'The mask you show to the outer world, your image, and your first impression.';
+
+  @override
+  String get natalChartMc => 'MC (Midheaven)';
+
+  @override
+  String get natalChartMcDesc =>
+      'Your career, your public image, and your life goals.';
+
+  @override
+  String get natalChartDc => 'DC (Descendant)';
+
+  @override
+  String get natalChartDcDesc =>
+      'The core traits you look for in relationships, marriage, and partnerships.';
+
+  @override
+  String get natalChartIc => 'IC (Imum Coeli)';
+
+  @override
+  String get natalChartIcDesc =>
+      'Your roots, your family, your past, and your core security in your inner world.';
+
+  @override
+  String get natalChartTabPersonality => 'Main Personality Summary';
+
+  @override
+  String get natalChartTabLove => 'Love & Relationships';
+
+  @override
+  String get natalChartTabCareer => 'Career & Money';
+
+  @override
+  String get natalChartTabEmotional => 'Emotional Structure';
+
+  @override
+  String get natalChartTabStrengths => 'Strengths & Weaknesses';
+
+  @override
+  String natalChartHouse(String house) {
+    return 'House $house';
+  }
 }

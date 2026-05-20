@@ -24,6 +24,9 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/analytics_service.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/zodiac_translations.dart';
+import '../utils/chinese_zodiac_translations.dart';
+import '../utils/mayan_zodiac_translations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -910,9 +913,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildLegalDisclaimer() {
+    final l10nLegal = AppLocalizations.of(context);
     return Text.rich(
       TextSpan(
-        text: 'By continuing, you agree to our ',
+        text: l10nLegal?.loginLegalPrefix ?? 'By continuing, you agree to our ',
         style: GoogleFonts.nunito(
           color: Colors.white.withOpacity(0.3),
           fontSize: 11,
@@ -925,7 +929,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             child: GestureDetector(
               onTap: () => _openUrl('https://crackwish.com/terms.html'),
               child: Text(
-                'Terms of Use',
+                l10nLegal?.loginTermsOfUse ?? 'Terms of Use',
                 style: GoogleFonts.nunito(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 11,
@@ -936,7 +940,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             ),
           ),
           TextSpan(
-            text: ' and ',
+            text: l10nLegal?.loginLegalAnd ?? ' and ',
             style: GoogleFonts.nunito(
               color: Colors.white.withOpacity(0.3),
               fontSize: 11,
@@ -948,7 +952,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             child: GestureDetector(
               onTap: () => _openUrl('https://crackwish.com/privacy.html'),
               child: Text(
-                'Privacy Policy',
+                l10nLegal?.loginPrivacyPolicy ?? 'Privacy Policy',
                 style: GoogleFonts.nunito(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 11,
@@ -959,7 +963,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             ),
           ),
           TextSpan(
-            text: '.',
+            text: l10nLegal?.loginLegalSuffix ?? '.',
             style: GoogleFonts.nunito(
               color: Colors.white.withOpacity(0.3),
               fontSize: 11,
@@ -1009,33 +1013,34 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildDynamicHeader() {
+    final l10n = AppLocalizations.of(context)!;
     String title = "";
     String subtitle = "";
     
     switch (_currentStep) {
       case 1:
-        title = "Seni Neler Bekliyor?";
-        subtitle = "Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?";
+        title = l10n.onboardingFeatureStepTitle;
+        subtitle = l10n.onboardingFeatureStepSub;
         break;
       case 2:
-        title = "Seni Tanıyalım";
-        subtitle = "Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle.";
+        title = l10n.onboardingNameStepTitle;
+        subtitle = l10n.onboardingNameStepSub;
         break;
       case 3:
-        title = "Kozmik Koordinat";
-        subtitle = "Astrolojik haritanın temeli için doğduğun anı seç.";
+        title = l10n.onboardingDateStepTitle;
+        subtitle = l10n.onboardingDateStepSub;
         break;
       case 4:
-        title = "Kalbinin Pusulası";
-        subtitle = "Niyetini belirle, yolunu çizelim.";
+        title = l10n.onboardingFocusStepTitle;
+        subtitle = l10n.onboardingFocusStepSub;
         break;
       case 5:
-        title = "Bilinçaltının Sesi";
-        subtitle = "Rüyaların sana nasıl ulaşıyor?";
+        title = l10n.onboardingDreamStepTitle;
+        subtitle = l10n.onboardingDreamStepSub;
         break;
       case 6:
-        title = "İçsel Pusulan";
-        subtitle = "Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?";
+        title = l10n.onboardingSleepStepTitle;
+        subtitle = l10n.onboardingSleepStepSub;
         break;
       default:
         return const SizedBox.shrink();
@@ -1187,6 +1192,23 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildGridOption(IconData icon, String label, List<String> currentVals, Function(String) onSelect, {int index = 0}) {
     final isSelected = currentVals.contains(label);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    String displayLabel = label;
+    if (!isTr) {
+      if (label.contains("Ruhsal")) {
+        displayLabel = "Spiritual\nEnlightenment";
+      } else if (label.contains("Kariyer")) {
+        displayLabel = "Career &\nPersonal Power";
+      } else if (label.contains("Aşk")) {
+        displayLabel = "Love &\nCosmic Harmony";
+      } else if (label.contains("Şifa")) {
+        displayLabel = "Healing &\nInner Peace";
+      } else if (label.contains("Maddi")) {
+        displayLabel = "Material\nAbundance";
+      } else if (label.contains("Evrenin")) {
+        displayLabel = "Universe's\nSurprises";
+      }
+    }
     
     return StaggeredFade(
       delay: Duration(milliseconds: 150 + (index * 50)),
@@ -1236,7 +1258,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            label,
+                            displayLabel,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(
                               color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
@@ -1350,6 +1372,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   // ==========================================
   Widget _buildWelcomeStep({bool isFinal = false}) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -1398,10 +1421,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           
           // Kullanıcının Özel Beklenti Mottosu
           Text(
-            isFinal ? "Kozmik haritanı güvenceye almak için tıkla." : "Bugün umutlarım hayallerimden daha büyük.",
+            isFinal ? l10n.onboardingFinalTagline : l10n.onboardingWelcomeTagline,
             textAlign: TextAlign.center,
             style: GoogleFonts.nunito(
-              color: Colors.white.withOpacity(0.85), // Premium puslu hissiyat
+              color: Colors.white.withValues(alpha: 0.85), // Premium puslu hissiyat
               fontSize: 16,
               fontWeight: FontWeight.w400,
               letterSpacing: 0.5,
@@ -1462,33 +1485,34 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   Widget _buildFeaturesStep() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
         children: [
           const SizedBox(height: 64), // Yazı ve ikonlar arası boşluk biraz artırılarak aşağı alındı
           
           StaggeredFade(
             delay: const Duration(milliseconds: 50),
-            child: _buildFeatureItem(icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill), text: "Sana Özel Astroloji Haritası"),
+            child: _buildFeatureItem(icon: PhosphorIcons.sparkle(PhosphorIconsStyle.fill), text: l10n.onboardingFeatureAstrology),
           ),
           StaggeredFade(
             delay: const Duration(milliseconds: 100),
             child: _buildFeatureItem(
               icon: PhosphorIcons.cards(PhosphorIconsStyle.fill), 
-              text: "Yol Gösterici Tarot Serüveni",
+              text: l10n.onboardingFeatureTarot,
               angle: math.pi / 2, // Yatay kartları gerçek dikey (vertical) tarot destesi formuna çevirir
             ),
           ),
           StaggeredFade(
             delay: const Duration(milliseconds: 150),
-            child: _buildFeatureItem(icon: PhosphorIcons.coffee(PhosphorIconsStyle.fill), text: "Telvelerde Gizlenen Kadim Kahve Falı Sırları"),
+            child: _buildFeatureItem(icon: PhosphorIcons.coffee(PhosphorIconsStyle.fill), text: l10n.onboardingFeatureCoffee),
           ),
           StaggeredFade(
             delay: const Duration(milliseconds: 200),
-            child: _buildFeatureItem(icon: PhosphorIcons.moonStars(PhosphorIconsStyle.fill), text: "Bilinçaltı Rüya Analizleri"),
+            child: _buildFeatureItem(icon: PhosphorIcons.moonStars(PhosphorIconsStyle.fill), text: l10n.onboardingFeatureDream),
           ),
           StaggeredFade(
             delay: const Duration(milliseconds: 250),
-            child: _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: "Mistik Çin & Maya Uyumları"),
+            child: _buildFeatureItem(icon: PhosphorIcons.infinity(PhosphorIconsStyle.bold), text: l10n.onboardingFeatureZodiac),
           ),
         ],
       );
@@ -1498,6 +1522,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   // ==========================================
   // PROFİL INPUTLARI (İSİM VE KULLANICI ADI)
   Widget _buildNameInputs({bool isDummy = false}) {
+    final l10n = AppLocalizations.of(context)!;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1510,7 +1536,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                fit: BoxFit.cover,
              ),
            ),
-           title: "PROFİL ADIN",
+           title: l10n.profileCosmicName.toUpperCase(),
            child: TextField(
                controller: isDummy ? null : _nameCtrl,
                focusNode: isDummy ? null : _nameFocus,
@@ -1521,7 +1547,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  border: InputBorder.none,
                  isDense: true,
                  contentPadding: EdgeInsets.zero,
-                 hintText: "Örn: Yıldız Tozu \uD83C\uDF19",
+                 hintText: isTr ? "Örn: Yıldız Tozu \uD83C\uDF19" : "e.g. Stardust \uD83C\uDF19",
                  hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
                ),
            ),
@@ -1530,7 +1556,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         // 2. Kullanıcı Adı (Benzersiz, Aramalarda Bulunmak İçin)
         _buildUnifiedInputRow(
            icon: PhosphorIcons.at(PhosphorIconsStyle.fill),
-           title: "KULLANICI ADI",
+           title: l10n.accountUsername.toUpperCase(),
            child: TextField(
                controller: isDummy ? null : _usernameCtrl,
                focusNode: isDummy ? null : _usernameFocus,
@@ -1544,7 +1570,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  border: InputBorder.none,
                  isDense: true,
                  contentPadding: EdgeInsets.zero,
-                 hintText: "@kozmikyolcu",
+                 hintText: isTr ? "@kozmikyolcu" : "@cosmictraveler",
                  hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.2), fontSize: 16),
                  suffixIcon: _isCheckingHandle
                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white38))
@@ -1568,6 +1594,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
 
   Widget _buildStep0() {
+    final l10n = AppLocalizations.of(context)!;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     // Klavye kapanma tepkisini "ANINDA" almak için Focus statülerini de ekledik (Gecikme tamamen silinir)
     final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 40 || _nameFocus.hasFocus || _usernameFocus.hasFocus;
 
@@ -1658,7 +1686,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: ['Kadın', 'Erkek', 'Belirtmek İstemiyorum'].map((label) {
                           final isSelected = _selectedGender == label;
-                          final displayLabel = label == 'Belirtmek İstemiyorum' ? 'Belirtmiyorum' : label;
+                          String displayLabel = label;
+                          if (label == 'Kadın') {
+                            displayLabel = l10n.onboardingGenderFemale;
+                          } else if (label == 'Erkek') {
+                            displayLabel = l10n.onboardingGenderMale;
+                          } else if (label == 'Belirtmek İstemiyorum') {
+                            displayLabel = isTr ? 'Belirtmiyorum' : 'Prefer not to say';
+                          }
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 5),
                             child: GestureDetector(
@@ -1716,7 +1751,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     final day = d.day;
     final signs = ['Oğlak', 'Kova', 'Balık', 'Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak'];
     const cutoffs = [20, 19, 20, 20, 21, 21, 23, 23, 23, 23, 22, 22];
-    return day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+    final name = day < cutoffs[month - 1] ? signs[month - 1] : signs[month];
+    return ZodiacTranslations.translate(context, name);
   }
 
   int _getWesternZodiacIndex(DateTime d) {
@@ -1729,7 +1765,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   String _getChineseZodiac(DateTime d) {
     final animals = ['Fare', 'Öküz', 'Kaplan', 'Tavşan', 'Ejderha', 'Yılan', 'At', 'Keçi', 'Maymun', 'Horoz', 'Köpek', 'Domuz'];
-    return animals[(d.year - 4) % 12];
+    final name = animals[(d.year - 4) % 12];
+    return ChineseZodiacTranslations.translate(context, name);
   }
 
   int _getChineseZodiacIndex(DateTime d) {
@@ -1740,7 +1777,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     // Gerçek Maya İsimleri ve Türkçe Anlamı bir arada gösterimi (örn. OC \n (KÖPEK))
     final idx = MayanZodiacData.nahualIndex(d);
     final nahual = MayanZodiacData.nahuales[idx];
-    return "${nahual['name']}\n(${nahual['meaning']})".toUpperCase();
+    final meaningTranslated = MayanZodiacTranslations.translate(context, nahual['meaning'] ?? "");
+    return "${nahual['name']}\n($meaningTranslated)".toUpperCase();
   }
 
   int _getMayanZodiacIndex(DateTime d) {
@@ -2060,6 +2098,17 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildOverlappingOption(String label, String currentVal, IconData icon, Function(String) onSelect) {
     final isSelected = label == currentVal;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    String displayLabel = label;
+    if (!isTr) {
+      if (label == "Haberci & Net Rüyalar") {
+        displayLabel = "Messenger & Vivid Dreams";
+      } else if (label == "Sürprizli & Kaotik Olaylar") {
+        displayLabel = "Vivid & Chaotic Journeys";
+      } else if (label == "Bulutlar Kadar Sakin") {
+        displayLabel = "Calm as the Clouds";
+      }
+    }
 
     return GestureDetector(
       onTap: () {
@@ -2091,7 +2140,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                 children: [
                   Expanded(
                     child: Text(
-                      label,
+                      displayLabel,
                       style: GoogleFonts.nunito(
                         color: isSelected ? Colors.white : Colors.white.withOpacity(0.75),
                         fontSize: 16,
@@ -2224,6 +2273,21 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildTimeAccordion(String title, String desc, IconData icon, String val, List<Color> gradientColors) {
     final isSelected = _sleepPattern == val;
     final isInitial = _sleepPattern.isEmpty;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    String displayTitle = title;
+    String displayDesc = desc;
+    if (!isTr) {
+      if (title == "Aklın Işığı") {
+        displayTitle = "Light of the Mind";
+        displayDesc = "I analyze events, weigh them with logic, and plan concrete steps.";
+      } else if (title == "Kalbin Fısıltısı") {
+        displayTitle = "Whisper of the Heart";
+        displayDesc = "I listen to my inner voice, and always trust my feelings over logic.";
+      } else if (title == "Evrenin Akışı") {
+        displayTitle = "Flow of the Universe";
+        displayDesc = "I believe everything happens for a reason, and follow the universe's signs.";
+      }
+    }
 
     return GestureDetector(
       onTap: () {
@@ -2295,7 +2359,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                             const SizedBox(width: 16),
                             Expanded(
                               child: Text(
-                                title,
+                                displayTitle,
                                 style: GoogleFonts.nunito(
                                   color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
                                   fontSize: isSelected ? 18 : 16,
@@ -2315,7 +2379,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                           child: Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: Text(
-                              desc,
+                              displayDesc,
                               style: GoogleFonts.nunito(
                                 color: Colors.white,
                                 fontSize: 13,
@@ -2344,40 +2408,38 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         return Transform.translate(offset: Offset(dx, 0), child: child);
       },
       child: Column(
-      children: [
-        const SizedBox(height: 80), // Butonları dikey ortaya yaklaştırdık
+        children: [
+          const SizedBox(height: 80), // Butonları dikey ortaya yaklaştırdık
 
-        _buildTimeAccordion(
-          "Aklın Işığı", 
-          "Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.", 
-          PhosphorIcons.sun(PhosphorIconsStyle.fill), 
-          "Aklın Işığı (Mantık)", 
-          [const Color(0xFFECA37F), const Color(0xFFD3A29B)]
-        ),
-        _buildTimeAccordion(
-          "Kalbin Fısıltısı", 
-          "İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.", 
-          PhosphorIcons.moon(PhosphorIconsStyle.fill), 
-          "Kalbin Fısıltısı (Sezgi)", 
-          [const Color(0xFF384358), const Color(0xFF161821)]
-        ),
-        _buildTimeAccordion(
-          "Evrenin Akışı", 
-          "Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.", 
-          PhosphorIcons.spiral(PhosphorIconsStyle.fill), 
-          "Evrenin Akışı (Kader)", 
-          [const Color(0xFF6B4B7C), const Color(0xFF392D46)]
-        ),
-
-      ],
+          _buildTimeAccordion(
+            "Aklın Işığı", 
+            "Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.", 
+            PhosphorIcons.sun(PhosphorIconsStyle.fill), 
+            "Aklın Işığı (Mantık)", 
+            [const Color(0xFFECA37F), const Color(0xFFD3A29B)]
+          ),
+          _buildTimeAccordion(
+            "Kalbin Fısıltısı", 
+            "İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.", 
+            PhosphorIcons.moon(PhosphorIconsStyle.fill), 
+            "Kalbin Fısıltısı (Sezgi)", 
+            [const Color(0xFF384358), const Color(0xFF161821)]
+          ),
+          _buildTimeAccordion(
+            "Evrenin Akışı", 
+            "Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.", 
+            PhosphorIcons.spiral(PhosphorIconsStyle.fill), 
+            "Evrenin Akışı (Kader)", 
+            [const Color(0xFF6B4B7C), const Color(0xFF392D46)]
+          ),
+        ],
       ),
     );
   }
-
-  // ==========================================
-  // UTILS
-  // ==========================================
   void _showLocationPicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final languageCode = Localizations.localeOf(context).languageCode;
     String tempLocation = "";
     bool isSearching = false;
     Timer? _debounce;
@@ -2411,7 +2473,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                setModalState(() => isSearching = true);
                
                try {
-                  final uri = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=8&accept-language=tr');
+                  final uri = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=8&accept-language=$languageCode');
                   final res = await http.get(uri, headers: {'User-Agent': 'vlucky_cosmic_app_1.0'});
                   
                   if (res.statusCode == 200) {
@@ -2426,12 +2488,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                            if (!results.contains(fullName)) results.add(fullName);
                         }
                      }
-                     if (results.isEmpty) results.add("$query (Özel Konum)");
+                     if (results.isEmpty) results.add("$query ${isTr ? '(Özel Konum)' : '(Custom Location)'}");
                      
                      setModalState(() {
                         searchResults = results;
                         isSearching = false;
-                     });
+                      });
                   } else {
                      setModalState(() => isSearching = false);
                   }
@@ -2467,11 +2529,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               children: [
                                 const SizedBox(width: 50),
                                 Expanded(
-                                  child: Text('Tam Konumu Ara', textAlign: TextAlign.center, style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                  child: Text(l10n.cosmicSearchLocation, textAlign: TextAlign.center, style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
                                 CupertinoButton(
                                   padding: EdgeInsets.zero,
-                                  child: Text('Bitti', style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                                  child: Text(isTr ? 'Bitti' : 'Done', style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
                                   onPressed: () {
                                     if (tempLocation.trim().isNotEmpty && searchResults.isNotEmpty) {
                                       setState(() => _selectedLocation = searchResults.first);
@@ -2493,7 +2555,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               style: GoogleFonts.nunito(color: Colors.white, fontSize: 14),
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
-                                hintText: "Köy, ilçe veya şehir yaz...",
+                                hintText: l10n.cosmicSearchHint,
                                 hintStyle: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3)),
                                 prefixIcon: const Icon(Icons.search, color: Colors.white54),
                                 suffixIcon: isSearching ? const Padding(padding: EdgeInsets.all(12), child: CupertinoActivityIndicator(radius: 10)) : null,
@@ -2528,7 +2590,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                   child: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
                                 ),
                                 title: Text('"${tempLocation.trim()}"', style: GoogleFonts.nunito(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                                subtitle: Text('Serbest metin olarak ekle', style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                                subtitle: Text(l10n.cosmicAddFreeText, style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3), fontSize: 11)),
                                 onTap: () {
                                   HapticFeedback.selectionClick();
                                   setState(() => _selectedLocation = tempLocation.trim());

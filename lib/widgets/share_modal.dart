@@ -159,7 +159,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
 
       await Share.shareXFiles(
         [XFile(file.path)], 
-        text: "Günün kurabiyesinden bana bu çıktı! 🥠✨\n#CrackWish", 
+        text: AppLocalizations.of(context)?.shareCookieText ?? "Günün kurabiyesinden bana bu çıktı! 🥠✨\n#CrackWish", 
         sharePositionOrigin: rect,
       );
     } catch(e) { 
