@@ -2765,4 +2765,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zodiacSpiritPortrait => 'Spiritual Portrait';
+
+  @override
+  String get onboardingFeatureStepTitle => 'What Awaits You?';
+
+  @override
+  String get onboardingFeatureStepSub =>
+      'Are you ready to listen to the whispers of the universe and discover your destiny?';
+
+  @override
+  String get onboardingNameStepTitle => 'Let\'s Get to Know You';
+
+  @override
+  String get onboardingNameStepSub =>
+      'Create your profile and determine your cosmic identity so that your soulmates can find you.';
+
+  @override
+  String get onboardingDateStepTitle => 'Cosmic Coordinate';
+
+  @override
+  String get onboardingDateStepSub =>
+      'Choose the moment you were born for the basis of your astrological chart.';
+
+  @override
+  String get onboardingFocusStepTitle => 'Heart\'s Compass';
+
+  @override
+  String get onboardingFocusStepSub =>
+      'Set your intention, let\'s map your path.';
+
+  @override
+  String get onboardingDreamStepTitle => 'Voice of Subconscious';
+
+  @override
+  String get onboardingDreamStepSub => 'How do your dreams reach you?';
+
+  @override
+  String get onboardingSleepStepTitle => 'Your Inner Compass';
+
+  @override
+  String get onboardingSleepStepSub =>
+      'How do you find your way during destiny\'s turning points in your life?';
+
+  @override
+  String get onboardingFeatureAstrology => 'Personalized Astrology Chart';
+
+  @override
+  String get onboardingFeatureTarot => 'Guiding Tarot Journey';
+
+  @override
+  String get onboardingFeatureCoffee =>
+      'Ancient Secrets of Coffee Fortune-Telling';
+
+  @override
+  String get onboardingFeatureDream => 'Subconscious Dream Analysis';
+
+  @override
+  String get onboardingFeatureZodiac =>
+      'Mystic Chinese & Mayan Compatibilities';
+
+  @override
+  String get onboardingWelcomeTagline =>
+      'Today my hopes are greater than my dreams.';
+
+  @override
+  String get onboardingFinalTagline => 'Click to secure your cosmic chart.';
 }

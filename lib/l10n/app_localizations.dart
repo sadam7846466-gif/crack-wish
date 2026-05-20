@@ -5182,6 +5182,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Ruhsal Portre'**
   String get zodiacSpiritPortrait;
+
+  /// No description provided for @onboardingFeatureStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni Neler Bekliyor?'**
+  String get onboardingFeatureStepTitle;
+
+  /// No description provided for @onboardingFeatureStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?'**
+  String get onboardingFeatureStepSub;
+
+  /// No description provided for @onboardingNameStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni Tanıyalım'**
+  String get onboardingNameStepTitle;
+
+  /// No description provided for @onboardingNameStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle.'**
+  String get onboardingNameStepSub;
+
+  /// No description provided for @onboardingDateStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Koordinat'**
+  String get onboardingDateStepTitle;
+
+  /// No description provided for @onboardingDateStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Astrolojik haritanın temeli için doğduğun anı seç.'**
+  String get onboardingDateStepSub;
+
+  /// No description provided for @onboardingFocusStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbinin Pusulası'**
+  String get onboardingFocusStepTitle;
+
+  /// No description provided for @onboardingFocusStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyetini belirle, yolunu çizelim.'**
+  String get onboardingFocusStepSub;
+
+  /// No description provided for @onboardingDreamStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinçaltının Sesi'**
+  String get onboardingDreamStepTitle;
+
+  /// No description provided for @onboardingDreamStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyaların sana nasıl ulaşıyor?'**
+  String get onboardingDreamStepSub;
+
+  /// No description provided for @onboardingSleepStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İçsel Pusulan'**
+  String get onboardingSleepStepTitle;
+
+  /// No description provided for @onboardingSleepStepSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?'**
+  String get onboardingSleepStepSub;
+
+  /// No description provided for @onboardingFeatureAstrology.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sana Özel Astroloji Haritası'**
+  String get onboardingFeatureAstrology;
+
+  /// No description provided for @onboardingFeatureTarot.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yol Gösterici Tarot Serüveni'**
+  String get onboardingFeatureTarot;
+
+  /// No description provided for @onboardingFeatureCoffee.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerde Gizlenen Kadim Kahve Falı Sırları'**
+  String get onboardingFeatureCoffee;
+
+  /// No description provided for @onboardingFeatureDream.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinçaltı Rüya Analizleri'**
+  String get onboardingFeatureDream;
+
+  /// No description provided for @onboardingFeatureZodiac.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mistik Çin & Maya Uyumları'**
+  String get onboardingFeatureZodiac;
+
+  /// No description provided for @onboardingWelcomeTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün umutlarım hayallerimden daha büyük.'**
+  String get onboardingWelcomeTagline;
+
+  /// No description provided for @onboardingFinalTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik haritanı güvenceye almak için tıkla.'**
+  String get onboardingFinalTagline;
 }
 
 class _AppLocalizationsDelegate

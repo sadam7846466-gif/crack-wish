@@ -2746,4 +2746,68 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get zodiacSpiritPortrait => 'Ruhsal Portre';
+
+  @override
+  String get onboardingFeatureStepTitle => 'Seni Neler Bekliyor?';
+
+  @override
+  String get onboardingFeatureStepSub =>
+      'Evrenin fısıltılarına kulak verip kaderini keşfetmeye hazır mısın?';
+
+  @override
+  String get onboardingNameStepTitle => 'Seni Tanıyalım';
+
+  @override
+  String get onboardingNameStepSub =>
+      'Ruh eşlerinin seni bulabilmesi için profilini oluştur ve kozmik kimliğini belirle.';
+
+  @override
+  String get onboardingDateStepTitle => 'Kozmik Koordinat';
+
+  @override
+  String get onboardingDateStepSub =>
+      'Astrolojik haritanın temeli için doğduğun anı seç.';
+
+  @override
+  String get onboardingFocusStepTitle => 'Kalbinin Pusulası';
+
+  @override
+  String get onboardingFocusStepSub => 'Niyetini belirle, yolunu çizelim.';
+
+  @override
+  String get onboardingDreamStepTitle => 'Bilinçaltının Sesi';
+
+  @override
+  String get onboardingDreamStepSub => 'Rüyaların sana nasıl ulaşıyor?';
+
+  @override
+  String get onboardingSleepStepTitle => 'İçsel Pusulan';
+
+  @override
+  String get onboardingSleepStepSub =>
+      'Hayatındaki kadersel dönüm noktalarında yolunu nasıl bulursun?';
+
+  @override
+  String get onboardingFeatureAstrology => 'Sana Özel Astroloji Haritası';
+
+  @override
+  String get onboardingFeatureTarot => 'Yol Gösterici Tarot Serüveni';
+
+  @override
+  String get onboardingFeatureCoffee =>
+      'Telvelerde Gizlenen Kadim Kahve Falı Sırları';
+
+  @override
+  String get onboardingFeatureDream => 'Bilinçaltı Rüya Analizleri';
+
+  @override
+  String get onboardingFeatureZodiac => 'Mistik Çin & Maya Uyumları';
+
+  @override
+  String get onboardingWelcomeTagline =>
+      'Bugün umutlarım hayallerimden daha büyük.';
+
+  @override
+  String get onboardingFinalTagline =>
+      'Kozmik haritanı güvenceye almak için tıkla.';
 }
