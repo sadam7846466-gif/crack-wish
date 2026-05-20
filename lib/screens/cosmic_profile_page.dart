@@ -11,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'splash_screen.dart';
 
 class CosmicProfilePage extends StatefulWidget {
@@ -250,7 +251,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
   }
 
   String getAscendant(DateTime? d, String? time) {
-    if (d == null || time == null || time.isEmpty) return Localizations.localeOf(context).languageCode == 'tr' ? 'Saat Gerekli' : 'Requires Time';
+    if (d == null || time == null || time.isEmpty) return AppLocalizations.of(context)!.cosmicRequiresTime;
     final lang = Localizations.localeOf(context).languageCode;
     final signsTr = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
     final signsEn = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
@@ -273,6 +274,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
   }
 
   Widget _buildTopLiveSummary(String lang) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 8, bottom: 20, left: 16, right: 16),
@@ -288,25 +290,25 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _buildSummaryNode(
-                lang == 'tr' ? 'BATI' : 'WESTERN',
+                l10n.cosmicWestern,
                 getWesternZodiac(currentBirthDate),
                 const Color(0xFFC084FC),
                 Icons.flare_outlined,
               ),
               _buildSummaryNode(
-                lang == 'tr' ? 'ASYA' : 'ASIAN',
+                l10n.cosmicAsian,
                 getChineseZodiac(currentBirthDate),
                 const Color(0xFFFF6B6B),
                 Icons.brightness_medium_outlined,
               ),
               _buildSummaryNode(
-                lang == 'tr' ? 'MAYA' : 'MAYAN',
+                l10n.cosmicMayan,
                 getMayanZodiac(currentBirthDate),
                 const Color(0xFF2DD4BF),
                 Icons.filter_vintage_outlined,
               ),
               _buildSummaryNode(
-                lang == 'tr' ? 'YÜKSELEN' : 'RISING',
+                l10n.cosmicRising,
                 getAscendant(currentBirthDate, currentBirthTime),
                 const Color(0xFF60A5FA),
                 Icons.north_east_rounded,
@@ -399,7 +401,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
               children: [
                 Expanded(
                   child: Text(
-                    value.isEmpty ? 'Seç' : value,
+                    value.isEmpty ? AppLocalizations.of(context)!.cosmicSelect : value,
                     style: TextStyle(
                       color: hasError ? Colors.redAccent.withOpacity(0.8) : (value.isEmpty ? Colors.white.withOpacity(0.2) : Colors.white),
                       fontSize: 13,
@@ -446,6 +448,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
   @override
   Widget build(BuildContext context) {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     
     return TickerMode(
@@ -516,7 +519,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                         onPressed: () => Navigator.pop(context),
                       ),
                       Text(
-                        lang == 'tr' ? 'Kozmik Harita' : 'Cosmic Chart',
+                        l10n.cosmicChart,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -543,7 +546,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang == 'tr' ? 'DÜNYAYA İNİŞ TARİHİ' : 'ARRIVAL DATE',
+                        l10n.cosmicArrivalDate,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.3),
                           fontSize: 11,
@@ -617,7 +620,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            lang == 'tr' ? 'DOĞUM SAATİ' : 'BIRTH TIME',
+                            l10n.cosmicBirthTime,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.3),
                               fontSize: 11,
@@ -639,7 +642,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                                   border: Border.all(color: Colors.white.withOpacity(0.2)),
                                 ),
                                 child: Text(
-                                  lang == 'tr' ? 'Saat Bilinmiyor' : 'Time Unknown',
+                                  l10n.cosmicTimeUnknown,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.85), 
                                     fontSize: 10, 
@@ -714,7 +717,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang == 'tr' ? 'DOĞUM YERİ KOORDİNATLARI' : 'BIRTH PLACE COORDINATES',
+                        l10n.cosmicBirthPlace,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.3),
                           fontSize: 11,
@@ -729,12 +732,12 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                           Expanded(
                             flex: 4,
                             child: _buildLocationSelector(
-                              lang == 'tr' ? 'Ülke' : 'Country',
+                              l10n.cosmicCountry,
                               selectedCountry?.name ?? '',
                               () async {
                                 if (_daysUntilUnlock > 0) return;
                                 final countries = await csc.getAllCountries();
-                                _showSearchModal(lang == 'tr' ? 'Ülke Seç' : 'Select Country', countries, (item) {
+                                _showSearchModal(l10n.cosmicSelectCountry, countries, (item) {
                                   setState(() {
                                     selectedCountry = item;
                                     _locationController.clear();
@@ -757,7 +760,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                           Expanded(
                             flex: 6,
                             child: _buildLocationSelector(
-                              lang == 'tr' ? 'Şehir & İlçe & Köy' : 'City & District & Village',
+                              l10n.cosmicCityDistrict,
                               _locationController.text,
                               () {
                                 if (_daysUntilUnlock > 0) return;
@@ -913,7 +916,7 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                lang == 'tr' ? 'Lütfen önce doğum tarihinizi seçin.' : 'Please select your birth date first.',
+                                l10n.cosmicSelectDateFirst,
                                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                               ),
                               backgroundColor: Colors.redAccent.withOpacity(0.9),
@@ -967,8 +970,8 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
                         ? const CupertinoActivityIndicator(color: Colors.black)
                         : Text(
                             _daysUntilUnlock > 0 
-                                ? (lang == 'tr' ? '$_daysUntilUnlock Gün Sonra Değiştirilebilir' : 'Locked for $_daysUntilUnlock Days')
-                                : (lang == 'tr' ? 'Kaydet' : 'Save'),
+                                ? l10n.cosmicLockedDays(_daysUntilUnlock)
+                                : l10n.cosmicSave,
                             style: TextStyle(
                               fontWeight: _daysUntilUnlock > 0 ? FontWeight.w500 : FontWeight.w700,
                               fontSize: _daysUntilUnlock > 0 ? 14 : 16,
@@ -1057,7 +1060,7 @@ class _SearchModalState extends State<_SearchModal> {
               style: const TextStyle(color: Colors.white, fontSize: 14),
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                hintText: 'Ara...',
+                hintText: AppLocalizations.of(context)!.cosmicSearchHintShort,
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
                 prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.3)),
                 filled: true,
@@ -1086,7 +1089,7 @@ class _SearchModalState extends State<_SearchModal> {
                   style: const TextStyle(color: Color(0xFF2DD4BF), fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  Localizations.localeOf(context).languageCode == 'tr' ? 'Bunu ekle' : 'Add this',
+                  AppLocalizations.of(context)!.cosmicAddThis,
                   style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11),
                 ),
                 onTap: () {
@@ -1250,7 +1253,7 @@ class _LiveLocationSearchModalState extends State<_LiveLocationSearchModal> {
           const SizedBox(height: 12),
           Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 20),
-          Text(lang == 'tr' ? 'Tam Konumu Ara' : 'Search Exact Location', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(AppLocalizations.of(context)!.cosmicSearchLocation, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1259,7 +1262,7 @@ class _LiveLocationSearchModalState extends State<_LiveLocationSearchModal> {
               autofocus: true,
               style: const TextStyle(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
-                hintText: lang == 'tr' ? 'Köy, ilçe veya şehir yaz...' : 'Enter village, district, etc...',
+                hintText: AppLocalizations.of(context)!.cosmicSearchHint,
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
                 prefixIcon: const Icon(Icons.search, color: Colors.white54),
                 suffixIcon: _isLoading 
@@ -1291,7 +1294,7 @@ class _LiveLocationSearchModalState extends State<_LiveLocationSearchModal> {
                   child: const Icon(Icons.add_rounded, color: Color(0xFF2DD4BF), size: 18),
                 ),
                 title: Text('"${_controller.text.trim()}"', style: const TextStyle(color: Color(0xFF2DD4BF), fontSize: 14, fontWeight: FontWeight.w600)),
-                subtitle: Text(lang == 'tr' ? 'Serbest metin olarak ekle' : 'Add as free text', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                subtitle: Text(AppLocalizations.of(context)!.cosmicAddFreeText, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
                 onTap: () {
                   HapticFeedback.selectionClick();
                   Navigator.pop(context);

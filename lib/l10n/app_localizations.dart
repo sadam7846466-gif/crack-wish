@@ -1038,13 +1038,13 @@ abstract class AppLocalizations {
   /// No description provided for @dreamYes.
   ///
   /// In tr, this message translates to:
-  /// **'Evet'**
+  /// **'EVET'**
   String get dreamYes;
 
   /// No description provided for @dreamNo.
   ///
   /// In tr, this message translates to:
-  /// **'Hayır'**
+  /// **'HAYIR'**
   String get dreamNo;
 
   /// No description provided for @dreamGeneral.
@@ -1316,7 +1316,7 @@ abstract class AppLocalizations {
   /// No description provided for @dreamMetricUncertainty.
   ///
   /// In tr, this message translates to:
-  /// **'Belirsizlik'**
+  /// **'Anlatısal\nBelirsizlik'**
   String get dreamMetricUncertainty;
 
   /// No description provided for @dreamMetricRecentPast.
@@ -2080,6 +2080,3108 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tamam'**
   String get paywallOk;
+
+  /// No description provided for @coffeeLoading1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanın derinliklerine iniliyor...'**
+  String get coffeeLoading1;
+
+  /// No description provided for @coffeeLoading2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerdeki semboller evrensel enerjiyle eşleşiyor...'**
+  String get coffeeLoading2;
+
+  /// No description provided for @coffeeLoading3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kader çizgilerin haritalanıyor...'**
+  String get coffeeLoading3;
+
+  /// No description provided for @coffeeLoading4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sırlar açığa çıkıyor...'**
+  String get coffeeLoading4;
+
+  /// No description provided for @coffeeAiError.
+  ///
+  /// In tr, this message translates to:
+  /// **'AI falı yorumlarken bir hata ile karşılaştı.'**
+  String get coffeeAiError;
+
+  /// No description provided for @coffeeGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir sorun oluştu. Lütfen tekrar dene.'**
+  String get coffeeGenericError;
+
+  /// No description provided for @coffeeNotifReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falın hazır olunca bildirim alacaksın'**
+  String get coffeeNotifReady;
+
+  /// No description provided for @coffeeCheckHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'  butonundan görebilirsin'**
+  String get coffeeCheckHistory;
+
+  /// No description provided for @coffeeWaitOrExplore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burada bekle ya da uygulamayı keşfet'**
+  String get coffeeWaitOrExplore;
+
+  /// No description provided for @coffeeGoHome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana Sayfaya Dön'**
+  String get coffeeGoHome;
+
+  /// No description provided for @coffeeSections.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanın Bölümleri'**
+  String get coffeeSections;
+
+  /// No description provided for @coffeeSectionInside.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincan İçi'**
+  String get coffeeSectionInside;
+
+  /// No description provided for @coffeeSectionInsideDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'İç dünyan, düşüncelerin, duygusal halin.'**
+  String get coffeeSectionInsideDesc;
+
+  /// No description provided for @coffeeSectionEdge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincan Kenarı'**
+  String get coffeeSectionEdge;
+
+  /// No description provided for @coffeeSectionEdgeDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakın gelecek, haber, mesaj, görüşme.'**
+  String get coffeeSectionEdgeDesc;
+
+  /// No description provided for @coffeeSectionBottom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincan Dibi'**
+  String get coffeeSectionBottom;
+
+  /// No description provided for @coffeeSectionBottomDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmişten kalan konu, yük, kapanmamış mesele.'**
+  String get coffeeSectionBottomDesc;
+
+  /// No description provided for @coffeeSectionSaucer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tabak'**
+  String get coffeeSectionSaucer;
+
+  /// No description provided for @coffeeSectionSaucerDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dilek, sonuç, kısmet, son enerji.'**
+  String get coffeeSectionSaucerDesc;
+
+  /// No description provided for @coffeeLoadingComment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yorum yükleniyor...'**
+  String get coffeeLoadingComment;
+
+  /// No description provided for @coffeeStoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerin Anlattığı Hikaye'**
+  String get coffeeStoryTitle;
+
+  /// No description provided for @coffeeSymbolsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falında Görülen Semboller'**
+  String get coffeeSymbolsTitle;
+
+  /// No description provided for @coffeeLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşk & İlişkiler'**
+  String get coffeeLove;
+
+  /// No description provided for @coffeeCareer.
+  ///
+  /// In tr, this message translates to:
+  /// **'İş & Para'**
+  String get coffeeCareer;
+
+  /// No description provided for @coffeeFamily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aile & Yakın Çevre'**
+  String get coffeeFamily;
+
+  /// No description provided for @coffeeNearFuture.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakın Gelecek'**
+  String get coffeeNearFuture;
+
+  /// No description provided for @coffeeClosing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falın Son Sözü'**
+  String get coffeeClosing;
+
+  /// No description provided for @coffeeShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falımı Paylaş'**
+  String get coffeeShare;
+
+  /// No description provided for @coffeeRetryValidation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri Dön & Yeniden Çek'**
+  String get coffeeRetryValidation;
+
+  /// No description provided for @coffeeRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get coffeeRetry;
+
+  /// No description provided for @coffeeCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal Et'**
+  String get coffeeCancel;
+
+  /// No description provided for @coffeeSymbolLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sembol'**
+  String get coffeeSymbolLabel;
+
+  /// No description provided for @coffeeSymbolLoading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yükleniyor...'**
+  String get coffeeSymbolLoading;
+
+  /// No description provided for @coffeeTimelineSoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok Yakında'**
+  String get coffeeTimelineSoon;
+
+  /// No description provided for @coffeeImageError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu görselde net bir kahve telvesi seçilemiyor.'**
+  String get coffeeImageError;
+
+  /// No description provided for @coffeeCosmicTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Kahve Yorumu'**
+  String get coffeeCosmicTitle;
+
+  /// No description provided for @coffeePremiumOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sadece Premium Özeldir'**
+  String get coffeePremiumOnly;
+
+  /// No description provided for @coffeePremiumDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahve Falı özelliği uygulamanın elit üyelerine aittir. Premium\'a geç ve Ruh Taşlarınla geleceğin sırlarını arala.'**
+  String get coffeePremiumDesc;
+
+  /// No description provided for @coffeePremiumSimBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium Ol (Simülasyon)'**
+  String get coffeePremiumSimBtn;
+
+  /// No description provided for @coffeePhotoSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf Kaynağı'**
+  String get coffeePhotoSource;
+
+  /// No description provided for @coffeeCamera.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kamera'**
+  String get coffeeCamera;
+
+  /// No description provided for @coffeeGallery.
+  ///
+  /// In tr, this message translates to:
+  /// **'Galeri'**
+  String get coffeeGallery;
+
+  /// No description provided for @coffeeStepCupInside.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincan İçi'**
+  String get coffeeStepCupInside;
+
+  /// No description provided for @coffeeStepCupInsideDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.'**
+  String get coffeeStepCupInsideDesc;
+
+  /// No description provided for @coffeeStepLeftProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sol Profil'**
+  String get coffeeStepLeftProfile;
+
+  /// No description provided for @coffeeStepLeftProfileDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.'**
+  String get coffeeStepLeftProfileDesc;
+
+  /// No description provided for @coffeeStepRightProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağ Profil'**
+  String get coffeeStepRightProfile;
+
+  /// No description provided for @coffeeStepRightProfileDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.'**
+  String get coffeeStepRightProfileDesc;
+
+  /// No description provided for @coffeeStepSaucerSecret.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tabağın Sırrı'**
+  String get coffeeStepSaucerSecret;
+
+  /// No description provided for @coffeeStepSaucerDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.'**
+  String get coffeeStepSaucerDesc;
+
+  /// No description provided for @coffeeStepSaucerBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tabak Fotoğrafı Çek'**
+  String get coffeeStepSaucerBtn;
+
+  /// No description provided for @coffeeHeaderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'KAHVE FALI'**
+  String get coffeeHeaderTitle;
+
+  /// No description provided for @coffeeLastReading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son Falın'**
+  String get coffeeLastReading;
+
+  /// No description provided for @coffeeLastReadingTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat {time} • Gece 00:00\'da silinir'**
+  String coffeeLastReadingTime(String time);
+
+  /// No description provided for @coffeeNoReadingYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz fal baktırmadın.\nBir fincan kahve demle,\ntelvelerin sana fısıldamasını bekle.'**
+  String get coffeeNoReadingYet;
+
+  /// No description provided for @coffeeSoulStones.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Taşların'**
+  String get coffeeSoulStones;
+
+  /// No description provided for @coffeeSoulStoneEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Taşın bitti'**
+  String get coffeeSoulStoneEmpty;
+
+  /// No description provided for @coffeeSoulStoneRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahve falı yorumlaması için gerekli'**
+  String get coffeeSoulStoneRequired;
+
+  /// No description provided for @coffeeSoulStoneCost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her yorum 1 Ruh Taşı harcar'**
+  String get coffeeSoulStoneCost;
+
+  /// No description provided for @coffeeSoulStoneEliteActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir'**
+  String get coffeeSoulStoneEliteActive;
+
+  /// No description provided for @coffeeSoulStoneElitePromo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ile her gece 5 Ruh Taşı kazan'**
+  String get coffeeSoulStoneElitePromo;
+
+  /// No description provided for @coffeeEliteSubscribe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Abone Ol'**
+  String get coffeeEliteSubscribe;
+
+  /// No description provided for @coffeeRitualLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'RİTÜEL'**
+  String get coffeeRitualLabel;
+
+  /// No description provided for @coffeeRitualTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanın Sırları'**
+  String get coffeeRitualTitle;
+
+  /// No description provided for @coffeeRitualDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telveler sadece onlara doğru bakanlara konuşur. Gerçek bir okuma için ritüeli takip et.'**
+  String get coffeeRitualDesc;
+
+  /// No description provided for @coffeeRitualStep1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Niyetini Belirle'**
+  String get coffeeRitualStep1Title;
+
+  /// No description provided for @coffeeRitualStep1Desc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yudumlarken zihninden bir soru veya dilek geçir.'**
+  String get coffeeRitualStep1Desc;
+
+  /// No description provided for @coffeeRitualStep2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aynı Yerden İç'**
+  String get coffeeRitualStep2Title;
+
+  /// No description provided for @coffeeRitualStep2Desc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şekillerin bozulmaması için hep aynı taraftan yudumla.'**
+  String get coffeeRitualStep2Desc;
+
+  /// No description provided for @coffeeRitualStep3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ters Çevir'**
+  String get coffeeRitualStep3Title;
+
+  /// No description provided for @coffeeRitualStep3Desc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanı kapat, soğumasını bekle ve yavaşça aç.'**
+  String get coffeeRitualStep3Desc;
+
+  /// No description provided for @coffeeRitualListenTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerin Fısıltısını Dinle'**
+  String get coffeeRitualListenTitle;
+
+  /// No description provided for @coffeeStepLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adım {index}: {title}'**
+  String coffeeStepLabel(String index, String title);
+
+  /// No description provided for @coffeeDiscoverFate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaderini Keşfet'**
+  String get coffeeDiscoverFate;
+
+  /// No description provided for @coffeeNextStep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki Adım'**
+  String get coffeeNextStep;
+
+  /// No description provided for @coffeeValidationError.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.'**
+  String get coffeeValidationError;
+
+  /// No description provided for @coffeeCosmicMismatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Uyumsuzluk'**
+  String get coffeeCosmicMismatch;
+
+  /// No description provided for @coffeeCosmicCheck.
+  ///
+  /// In tr, this message translates to:
+  /// **'KOZMİK BAĞ KONTROLÜ'**
+  String get coffeeCosmicCheck;
+
+  /// No description provided for @coffeeCosmicCheckDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerin dili çözülüyor,\nkaderin fısıltıları dinleniyor...'**
+  String get coffeeCosmicCheckDesc;
+
+  /// No description provided for @coffeeRevealSecrets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sır Perdesini Arala'**
+  String get coffeeRevealSecrets;
+
+  /// No description provided for @coffeeReadingInProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telveler Okunuyor...'**
+  String get coffeeReadingInProgress;
+
+  /// No description provided for @coffeeReadingWait.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geleceğin kapıları aralanıyor, bekle.'**
+  String get coffeeReadingWait;
+
+  /// No description provided for @coffeeRelationTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlişki Durumun'**
+  String get coffeeRelationTitle;
+
+  /// No description provided for @coffeeRelationSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik bağın temelini belirle.'**
+  String get coffeeRelationSubtitle;
+
+  /// No description provided for @coffeeFocusTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aklında Ne Var?'**
+  String get coffeeFocusTitle;
+
+  /// No description provided for @coffeeFocusSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir niyet seç, yorumun ona göre derinleşsin.'**
+  String get coffeeFocusSubtitle;
+
+  /// No description provided for @coffeeMoodTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Halin?'**
+  String get coffeeMoodTitle;
+
+  /// No description provided for @coffeeMoodSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanının enerjisini hisset.'**
+  String get coffeeMoodSubtitle;
+
+  /// No description provided for @coffeeCosmicBondFormed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Bağ Kuruldu'**
+  String get coffeeCosmicBondFormed;
+
+  /// No description provided for @coffeeSecretsReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fincanının sırları fısıldanmaya hazır...'**
+  String get coffeeSecretsReady;
+
+  /// No description provided for @coffeeNewReading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Fal Bak'**
+  String get coffeeNewReading;
+
+  /// No description provided for @coffeeAiPermission.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yapay zeka kahve analizi izni'**
+  String get coffeeAiPermission;
+
+  /// No description provided for @coffeeStoneCostInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her analiz 1 Ruh Taşı harcar'**
+  String get coffeeStoneCostInfo;
+
+  /// No description provided for @coffeeEliteRefillActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir'**
+  String get coffeeEliteRefillActive;
+
+  /// No description provided for @coffeeEliteRefillPromo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ile her gece 5 Ruh Taşı kazan'**
+  String get coffeeEliteRefillPromo;
+
+  /// No description provided for @coffeeEliteGetBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Al'**
+  String get coffeeEliteGetBtn;
+
+  /// No description provided for @coffeeResultOnHome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonucu ana sayfadaki  '**
+  String get coffeeResultOnHome;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hadi Başlayalım'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam Et'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingFinish.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yolculuğa Başla'**
+  String get onboardingFinish;
+
+  /// No description provided for @onboardingNameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Bir İsim'**
+  String get onboardingNameHint;
+
+  /// No description provided for @onboardingNamePlaceholder.
+  ///
+  /// In tr, this message translates to:
+  /// **'isim_soyisim'**
+  String get onboardingNamePlaceholder;
+
+  /// No description provided for @onboardingHandleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Bir Lakap'**
+  String get onboardingHandleHint;
+
+  /// No description provided for @onboardingHandlePlaceholder.
+  ///
+  /// In tr, this message translates to:
+  /// **'galaksi_gezgin'**
+  String get onboardingHandlePlaceholder;
+
+  /// No description provided for @onboardingGenderTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cinsiyet'**
+  String get onboardingGenderTitle;
+
+  /// No description provided for @onboardingGenderFemale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kadın'**
+  String get onboardingGenderFemale;
+
+  /// No description provided for @onboardingGenderMale.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erkek'**
+  String get onboardingGenderMale;
+
+  /// No description provided for @onboardingGenderOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Belirtmek İstemiyorum'**
+  String get onboardingGenderOther;
+
+  /// No description provided for @onboardingStep1Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sana ne demeliyiz?'**
+  String get onboardingStep1Title;
+
+  /// No description provided for @onboardingStep1Sub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evren seni hangi isimle ve titreşimle tanısın?'**
+  String get onboardingStep1Sub;
+
+  /// No description provided for @onboardingAvatarSelect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görünümünü Seç'**
+  String get onboardingAvatarSelect;
+
+  /// No description provided for @onboardingStep2Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhunun bedene girdiği an...'**
+  String get onboardingStep2Title;
+
+  /// No description provided for @onboardingStep2Sub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Astrolojik doğum haritanı ve sana özel ritüelleri hesaplayabilmemiz için temel bilgilerine ihtiyacımız var.'**
+  String get onboardingStep2Sub;
+
+  /// No description provided for @onboardingBirthDateLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Tarihin'**
+  String get onboardingBirthDateLabel;
+
+  /// No description provided for @onboardingBirthTimeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Saatin'**
+  String get onboardingBirthTimeLabel;
+
+  /// No description provided for @onboardingBirthLocationLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğduğu Şehir'**
+  String get onboardingBirthLocationLabel;
+
+  /// No description provided for @onboardingTimeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam saati biliyorsan detaylı analiz için gir'**
+  String get onboardingTimeHint;
+
+  /// No description provided for @onboardingLocationHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şehir seçerek hesaplamayı netleştir'**
+  String get onboardingLocationHint;
+
+  /// No description provided for @onboardingUnknownTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam saati bilmiyorum'**
+  String get onboardingUnknownTime;
+
+  /// No description provided for @onboardingPrivacyNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnızca sana özel haritanı çizmek içindir.'**
+  String get onboardingPrivacyNote;
+
+  /// No description provided for @onboardingStep3Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak noktan neresi?'**
+  String get onboardingStep3Title;
+
+  /// No description provided for @onboardingStep3Sub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu sıralar hayatında en çok hangi enerjiyi büyütmek veya şifalandırmak istiyorsun?'**
+  String get onboardingStep3Sub;
+
+  /// No description provided for @onboardingFocusLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odak (Çoklu Seçim)'**
+  String get onboardingFocusLabel;
+
+  /// No description provided for @onboardingFocusCareer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kariyer & Para'**
+  String get onboardingFocusCareer;
+
+  /// No description provided for @onboardingFocusLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşk & İlişkiler'**
+  String get onboardingFocusLove;
+
+  /// No description provided for @onboardingFocusPeace.
+  ///
+  /// In tr, this message translates to:
+  /// **'İçsel Huzur'**
+  String get onboardingFocusPeace;
+
+  /// No description provided for @onboardingFocusLuck.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şans & Fırsatlar'**
+  String get onboardingFocusLuck;
+
+  /// No description provided for @onboardingRelLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu anki ilişki durumun:'**
+  String get onboardingRelLabel;
+
+  /// No description provided for @onboardingRelSingle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnız Gökyüzü'**
+  String get onboardingRelSingle;
+
+  /// No description provided for @onboardingRelComplicated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biri Var...'**
+  String get onboardingRelComplicated;
+
+  /// No description provided for @onboardingRelTalking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karmaşık'**
+  String get onboardingRelTalking;
+
+  /// No description provided for @onboardingRelRelationship.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mutlu Bir Bağ'**
+  String get onboardingRelRelationship;
+
+  /// No description provided for @onboardingStep4Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geceleri evrenle bağın...'**
+  String get onboardingStep4Title;
+
+  /// No description provided for @onboardingStep4Sub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinçaltın mesajları nasıl alıyor? Renklerin ve rüyaların bize ipucu verecek.'**
+  String get onboardingStep4Sub;
+
+  /// No description provided for @onboardingDreamLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne sıklıkla rüya hatırlarsın?'**
+  String get onboardingDreamLabel;
+
+  /// No description provided for @onboardingDreamOften.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sık Sık ve Çok Net'**
+  String get onboardingDreamOften;
+
+  /// No description provided for @onboardingDreamSometimes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bazen Hatırlarım'**
+  String get onboardingDreamSometimes;
+
+  /// No description provided for @onboardingDreamRarely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nadir'**
+  String get onboardingDreamRarely;
+
+  /// No description provided for @onboardingDreamNever.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hiç Rüya Görmem'**
+  String get onboardingDreamNever;
+
+  /// No description provided for @onboardingAuraLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhunun Aurası (Bugün nasıl hissediyorsun?)'**
+  String get onboardingAuraLabel;
+
+  /// No description provided for @onboardingStep5Title.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zamanla olan dansın...'**
+  String get onboardingStep5Title;
+
+  /// No description provided for @onboardingStep5Sub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün hangi saatlerinde enerjin en yüksek? Bildirimlerini buna göre ayarlayacağız.'**
+  String get onboardingStep5Sub;
+
+  /// No description provided for @onboardingSleepLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku Düzenin'**
+  String get onboardingSleepLabel;
+
+  /// No description provided for @onboardingSleepMorning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sabah İnsanı'**
+  String get onboardingSleepMorning;
+
+  /// No description provided for @onboardingSleepNight.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gece Kuşu'**
+  String get onboardingSleepNight;
+
+  /// No description provided for @onboardingSleepIrregular.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzensiz'**
+  String get onboardingSleepIrregular;
+
+  /// No description provided for @onboardingSleepLittle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok Az Uyurum'**
+  String get onboardingSleepLittle;
+
+  /// No description provided for @onboardingMatchLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşleşme ve Kozmik Bağ'**
+  String get onboardingMatchLabel;
+
+  /// No description provided for @onboardingMatchDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sinerji uyumlu profillerle bağ kurmaya ve özel kozmik eşleşmelere açık olmak istiyorum.'**
+  String get onboardingMatchDesc;
+
+  /// No description provided for @onboardingFinalTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her şey hazır...'**
+  String get onboardingFinalTitle;
+
+  /// No description provided for @onboardingFinalSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldızların senin için ne planladığını öğrenmek üzeresin. Hesabını oluştur ve kozmik evrene giriş yap.'**
+  String get onboardingFinalSub;
+
+  /// No description provided for @onboardingAppleCreate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Hesabını Oluştur'**
+  String get onboardingAppleCreate;
+
+  /// No description provided for @onboardingGoogleCreate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile Hesabını Oluştur'**
+  String get onboardingGoogleCreate;
+
+  /// No description provided for @onboardingErrorIncomplete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hoş geldin! Profilini tamamlamak için birkaç adım kaldı.'**
+  String get onboardingErrorIncomplete;
+
+  /// No description provided for @onboardingErrorFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş başarısız oldu. Lütfen tekrar deneyin.'**
+  String get onboardingErrorFailed;
+
+  /// No description provided for @onboardingErrorAlreadyExists.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu {provider} hesabı ile zaten bir kozmik profilin var! Lütfen ilk sayfadaki \'Giriş Yap\' seçeneğini kullan.'**
+  String onboardingErrorAlreadyExists(String provider);
+
+  /// No description provided for @onboardingErrorDBRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt işlemi veritabanında reddedildi:\n{error}\nLütfen destek ile iletişime geçin.'**
+  String onboardingErrorDBRejected(String error);
+
+  /// No description provided for @onboardingErrorHandleTaken.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcı adı zaten alınmış'**
+  String get onboardingErrorHandleTaken;
+
+  /// No description provided for @notifTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler'**
+  String get notifTitle;
+
+  /// No description provided for @notifSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi bildirimleri almak istediğini seç'**
+  String get notifSubtitle;
+
+  /// No description provided for @notifAnnouncements.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duyurular'**
+  String get notifAnnouncements;
+
+  /// No description provided for @notifAnnouncementsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni özellikler ve güncellemeler'**
+  String get notifAnnouncementsDesc;
+
+  /// No description provided for @notifSounds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sesler'**
+  String get notifSounds;
+
+  /// No description provided for @notifSoundsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sesli bildirim uyarıları'**
+  String get notifSoundsDesc;
+
+  /// No description provided for @notifCookieAlarm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Kurabiye Alarmı'**
+  String get notifCookieAlarm;
+
+  /// No description provided for @notifCookieAlarmDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni fortune cookie geldiğinde'**
+  String get notifCookieAlarmDesc;
+
+  /// No description provided for @notifFriendAlarm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş Alarmı'**
+  String get notifFriendAlarm;
+
+  /// No description provided for @notifFriendAlarmDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Baykuş ağından yeni bağlantılar'**
+  String get notifFriendAlarmDesc;
+
+  /// No description provided for @notifDailyReminder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Hatırlatıcılar'**
+  String get notifDailyReminder;
+
+  /// No description provided for @notifDailyReminderDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük kurabiyeni almayı unutma'**
+  String get notifDailyReminderDesc;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap Detayları'**
+  String get accountTitle;
+
+  /// No description provided for @accountSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kişisel bilgilerin ve hesap yönetimin'**
+  String get accountSubtitle;
+
+  /// No description provided for @accountUsername.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı Adı'**
+  String get accountUsername;
+
+  /// No description provided for @accountLinkedEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlı E-posta'**
+  String get accountLinkedEmail;
+
+  /// No description provided for @accountSignInMethod.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş Yöntemi'**
+  String get accountSignInMethod;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı Sil'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.'**
+  String get accountDeleteDesc;
+
+  /// No description provided for @accountDeleteCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get accountDeleteCancel;
+
+  /// No description provided for @accountDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı Sil'**
+  String get accountDeleteConfirm;
+
+  /// No description provided for @accountDeletePermanent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı Kalıcı Olarak Sil'**
+  String get accountDeletePermanent;
+
+  /// No description provided for @welcomeTagline.
+  ///
+  /// In tr, this message translates to:
+  /// **'The magic is within you.'**
+  String get welcomeTagline;
+
+  /// No description provided for @welcomeAppleContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Devam Et'**
+  String get welcomeAppleContinue;
+
+  /// No description provided for @welcomeGoogleContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile Devam Et'**
+  String get welcomeGoogleContinue;
+
+  /// No description provided for @moodGuideTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mod Rehberi'**
+  String get moodGuideTitle;
+
+  /// No description provided for @moodAwarenessTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duygusal Farkındalık'**
+  String get moodAwarenessTitle;
+
+  /// No description provided for @moodAwarenessDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh halini seçmek hislerini somutlaştırır; bu, içsel dengeni bulmanın ve öz-farkındalığın ilk adımıdır.'**
+  String get moodAwarenessDesc;
+
+  /// No description provided for @moodCosmicTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Frekans'**
+  String get moodCosmicTitle;
+
+  /// No description provided for @moodCosmicDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mod tekerinden seçtiğin her duygunun bir frekansı vardır. Ekranın aurası doğrudan senin hislerinle uyumlanır.'**
+  String get moodCosmicDesc;
+
+  /// No description provided for @moodHowToTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl Kullanmalı?'**
+  String get moodHowToTitle;
+
+  /// No description provided for @moodHowToDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sadece çarkı çevirip o anki ruh halini en iyi yansıtan ifadeyi seç. Duygunu yargılama, sadece hisset ve kabul et.'**
+  String get moodHowToDesc;
+
+  /// No description provided for @moodQuestionAlt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün modun nasıl?'**
+  String get moodQuestionAlt;
+
+  /// No description provided for @moodSpinHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çarkı çevir, ruh halini seç ✨'**
+  String get moodSpinHint;
+
+  /// No description provided for @bentoCoffeeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahve Falı'**
+  String get bentoCoffeeTitle;
+
+  /// No description provided for @bentoCoffeeDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telvelerin dili'**
+  String get bentoCoffeeDesc;
+
+  /// No description provided for @bentoUnexplored.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu alan henüz keşfedilmeyi bekliyor...'**
+  String get bentoUnexplored;
+
+  /// No description provided for @bentoSealed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mühürlü'**
+  String get bentoSealed;
+
+  /// No description provided for @horoscopeDailyEnergy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün Enerjisi'**
+  String get horoscopeDailyEnergy;
+
+  /// No description provided for @horoscopeWestern.
+  ///
+  /// In tr, this message translates to:
+  /// **'Batı Astrolojisi'**
+  String get horoscopeWestern;
+
+  /// No description provided for @horoscopeAsian.
+  ///
+  /// In tr, this message translates to:
+  /// **'Asya Bilgeliği'**
+  String get horoscopeAsian;
+
+  /// No description provided for @horoscopeMayan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maya Ruhu'**
+  String get horoscopeMayan;
+
+  /// No description provided for @shareSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedildi ✓'**
+  String get shareSaved;
+
+  /// No description provided for @shareDownload.
+  ///
+  /// In tr, this message translates to:
+  /// **'İndir'**
+  String get shareDownload;
+
+  /// No description provided for @shareShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get shareShare;
+
+  /// No description provided for @shareStory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hikaye'**
+  String get shareStory;
+
+  /// No description provided for @sharePost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderi'**
+  String get sharePost;
+
+  /// No description provided for @shareCoffeeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahve Falı'**
+  String get shareCoffeeTitle;
+
+  /// No description provided for @cookieLockedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu özel kurabiye kilitli'**
+  String get cookieLockedTitle;
+
+  /// No description provided for @cookieComingSoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakında Satışa Çıkacak ✨'**
+  String get cookieComingSoon;
+
+  /// No description provided for @dreamWaitOrReturn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burada bekleyebilir veya ana sayfaya dönebilirsin. Yorumun hazır olduğunda sana bildirim göndereceğiz ve \"Rüyalarım\" sekmesinden okuyabileceksin.'**
+  String get dreamWaitOrReturn;
+
+  /// No description provided for @dreamReturnHome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ana Sayfaya Dön'**
+  String get dreamReturnHome;
+
+  /// No description provided for @profileEditProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilini Düzenle'**
+  String get profileEditProfile;
+
+  /// No description provided for @profileEditSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad, burç ve kişisel bilgilerini düzenle'**
+  String get profileEditSubtitle;
+
+  /// No description provided for @profileSearchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burç, şehir veya doğum tarihi ara...'**
+  String get profileSearchHint;
+
+  /// No description provided for @profileStoreUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mağaza bağlantısı şu an kurulamıyor.'**
+  String get profileStoreUnavailable;
+
+  /// No description provided for @profileMailNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mail uygulaması bulunamadı. support@crackandwish.com adresine yazabilirsiniz.'**
+  String get profileMailNotFound;
+
+  /// No description provided for @profileRitualCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ritüel Kodun'**
+  String get profileRitualCode;
+
+  /// No description provided for @profileRitualDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kod senin kişisel ritüel kimliğin. Arkadaşlarınla paylaşarak onları Baykuş Ağı\'na davet edebilirsin.'**
+  String get profileRitualDesc;
+
+  /// No description provided for @profileRitualCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ritüel Kodun Kopyalandı ✨'**
+  String get profileRitualCopied;
+
+  /// No description provided for @profileRitualInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarınla paylaş, birlikte keşfedin!'**
+  String get profileRitualInfo;
+
+  /// No description provided for @profileShareCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu Paylaş'**
+  String get profileShareCode;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı Sil'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.'**
+  String get profileDeleteDesc;
+
+  /// No description provided for @profileDeleteCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get profileDeleteCancel;
+
+  /// No description provided for @profileDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabı Sil'**
+  String get profileDeleteConfirm;
+
+  /// No description provided for @profileSignOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış Yap'**
+  String get profileSignOut;
+
+  /// No description provided for @profileSignOutDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabından güvenli çıkış yap.\nVerilerin korunur.'**
+  String get profileSignOutDesc;
+
+  /// No description provided for @profileSignOutCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get profileSignOutCancel;
+
+  /// No description provided for @profileSignOutConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış Yap'**
+  String get profileSignOutConfirm;
+
+  /// No description provided for @profilePrivacyPolicy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası'**
+  String get profilePrivacyPolicy;
+
+  /// No description provided for @profileTermsOfUse.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Koşulları'**
+  String get profileTermsOfUse;
+
+  /// No description provided for @profileGetElite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite\'e Geç'**
+  String get profileGetElite;
+
+  /// No description provided for @profileGetEliteSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farkındalığa giden kapı'**
+  String get profileGetEliteSubtitle;
+
+  /// No description provided for @profileCosmicProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Profilim'**
+  String get profileCosmicProfile;
+
+  /// No description provided for @profileCosmicSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harita, Saat ve Konum Bilgileri'**
+  String get profileCosmicSubtitle;
+
+  /// No description provided for @profileSectionAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap'**
+  String get profileSectionAccount;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta'**
+  String get profileEmail;
+
+  /// No description provided for @profileNotificationSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim Tercihleri'**
+  String get profileNotificationSettings;
+
+  /// No description provided for @profileRestorePurchases.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın Alımları Geri Yükle'**
+  String get profileRestorePurchases;
+
+  /// No description provided for @profileRestoreSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın alımların başarıyla geri yüklendi!'**
+  String get profileRestoreSuccess;
+
+  /// No description provided for @profileRestoreFail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri yüklenecek satın alım bulunamadı.'**
+  String get profileRestoreFail;
+
+  /// No description provided for @profileHelp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yardım'**
+  String get profileHelp;
+
+  /// No description provided for @profileShare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Paylaş'**
+  String get profileShare;
+
+  /// No description provided for @profileRate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değerlendir'**
+  String get profileRate;
+
+  /// No description provided for @profileVersion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürüm'**
+  String get profileVersion;
+
+  /// No description provided for @profileCosmicName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Adın'**
+  String get profileCosmicName;
+
+  /// No description provided for @profileSealProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mührü Onayla'**
+  String get profileSealProfile;
+
+  /// No description provided for @profileChooseAvatar.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sihirli avatarını seç.'**
+  String get profileChooseAvatar;
+
+  /// No description provided for @profileStrengthenBonds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlarını Güçlendir'**
+  String get profileStrengthenBonds;
+
+  /// No description provided for @profileStrengthenBondsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik evreni arkadaşlarınla büyüt.'**
+  String get profileStrengthenBondsDesc;
+
+  /// No description provided for @profileEarnSoulStones.
+  ///
+  /// In tr, this message translates to:
+  /// **'+2 Ruh Taşı Kazan'**
+  String get profileEarnSoulStones;
+
+  /// No description provided for @profileCodeCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod kopyalandı!'**
+  String get profileCodeCopied;
+
+  /// No description provided for @profileNotifications.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler'**
+  String get profileNotifications;
+
+  /// No description provided for @profileSupportExperience.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek & Deneyim'**
+  String get profileSupportExperience;
+
+  /// No description provided for @profileSeerNovice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Acemi Kahin'**
+  String get profileSeerNovice;
+
+  /// No description provided for @profileSeerApprentice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çırak Kahin'**
+  String get profileSeerApprentice;
+
+  /// No description provided for @profileSeer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kahin'**
+  String get profileSeer;
+
+  /// No description provided for @profileSeerWise.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilge Kahin'**
+  String get profileSeerWise;
+
+  /// No description provided for @profileSeerMaster.
+  ///
+  /// In tr, this message translates to:
+  /// **'Usta Kahin'**
+  String get profileSeerMaster;
+
+  /// No description provided for @profileSeerCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Kahin'**
+  String get profileSeerCosmic;
+
+  /// No description provided for @profileUploadFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.'**
+  String get profileUploadFailed;
+
+  /// No description provided for @profileCropTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Kesim'**
+  String get profileCropTitle;
+
+  /// No description provided for @profileCropCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get profileCropCancel;
+
+  /// No description provided for @profileCropDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get profileCropDone;
+
+  /// No description provided for @moderationAdultContent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu görselin enerjisi Kozmik evrenimizle uyumlu değil (Uygunsuz İçerik).'**
+  String get moderationAdultContent;
+
+  /// No description provided for @moderationViolence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen zihni yormayan, auranı yansıtan daha sakin bir avatar seç (Rahatsız Edici İçerik).'**
+  String get moderationViolence;
+
+  /// No description provided for @moderationTooLarge.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görselin kozmik ağı yoracak kadar büyük. Lütfen 5MB altı bir fotoğraf seç.'**
+  String get moderationTooLarge;
+
+  /// No description provided for @moderationInvalidFormat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafın sihirli parşömenimiz tarafından okunamadı, format bozuk.'**
+  String get moderationInvalidFormat;
+
+  /// No description provided for @moderationUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinmeyen bir kozmik dalgalanma oluştu.'**
+  String get moderationUnknown;
+
+  /// No description provided for @profileShareInvite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Crack&Wish evrenine katıl! ✨\nRitüel Kodum: {code}\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com'**
+  String profileShareInvite(String code);
+
+  /// No description provided for @profileShareApp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Crack&Wish ile şansını keşfet! •✨\nKurabiye kır, tarot aç, rüya yorumla.\n\nhttps://crackandwish.com'**
+  String get profileShareApp;
+
+  /// No description provided for @profileEliteYouAre.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Büyücüsün'**
+  String get profileEliteYouAre;
+
+  /// No description provided for @profileGoElite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite\'e Geç'**
+  String get profileGoElite;
+
+  /// No description provided for @profileEliteMystical.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mistik kapıları incele'**
+  String get profileEliteMystical;
+
+  /// No description provided for @profileEliteDoor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Farkındalığa giden kapı'**
+  String get profileEliteDoor;
+
+  /// No description provided for @profileMyCosmicProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Profilim'**
+  String get profileMyCosmicProfile;
+
+  /// No description provided for @profileCosmicDetails.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harita, Saat ve Konum Bilgileri'**
+  String get profileCosmicDetails;
+
+  /// No description provided for @profileRestorePurchasesBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın Alımları Geri Yükle'**
+  String get profileRestorePurchasesBtn;
+
+  /// No description provided for @profileRestoreSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki satın alımlarını geri yükle'**
+  String get profileRestoreSubtitle;
+
+  /// No description provided for @profileInviteFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarını Davet Et'**
+  String get profileInviteFriends;
+
+  /// No description provided for @profileInviteFriendsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik bağlar kur, birlikte kazan'**
+  String get profileInviteFriendsDesc;
+
+  /// No description provided for @cosmicChart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Harita'**
+  String get cosmicChart;
+
+  /// No description provided for @cosmicWestern.
+  ///
+  /// In tr, this message translates to:
+  /// **'BATI'**
+  String get cosmicWestern;
+
+  /// No description provided for @cosmicAsian.
+  ///
+  /// In tr, this message translates to:
+  /// **'ASYA'**
+  String get cosmicAsian;
+
+  /// No description provided for @cosmicMayan.
+  ///
+  /// In tr, this message translates to:
+  /// **'MAYA'**
+  String get cosmicMayan;
+
+  /// No description provided for @cosmicRising.
+  ///
+  /// In tr, this message translates to:
+  /// **'YÜKSELEN'**
+  String get cosmicRising;
+
+  /// No description provided for @cosmicArrivalDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'DÜNYAYA İNİŞ TARİHİ'**
+  String get cosmicArrivalDate;
+
+  /// No description provided for @cosmicBirthTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'DOĞUM SAATİ'**
+  String get cosmicBirthTime;
+
+  /// No description provided for @cosmicTimeUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat Bilinmiyor'**
+  String get cosmicTimeUnknown;
+
+  /// No description provided for @cosmicBirthPlace.
+  ///
+  /// In tr, this message translates to:
+  /// **'DOĞUM YERİ KOORDİNATLARI'**
+  String get cosmicBirthPlace;
+
+  /// No description provided for @cosmicCountry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ülke'**
+  String get cosmicCountry;
+
+  /// No description provided for @cosmicSelectCountry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ülke Seç'**
+  String get cosmicSelectCountry;
+
+  /// No description provided for @cosmicCityDistrict.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şehir & İlçe & Köy'**
+  String get cosmicCityDistrict;
+
+  /// No description provided for @cosmicSelectDateFirst.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen önce doğum tarihinizi seçin.'**
+  String get cosmicSelectDateFirst;
+
+  /// No description provided for @cosmicLockedDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} Gün Sonra Değiştirilebilir'**
+  String cosmicLockedDays(int days);
+
+  /// No description provided for @cosmicSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get cosmicSave;
+
+  /// No description provided for @cosmicSearchLocation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam Konumu Ara'**
+  String get cosmicSearchLocation;
+
+  /// No description provided for @cosmicSearchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Köy, ilçe veya şehir yaz...'**
+  String get cosmicSearchHint;
+
+  /// No description provided for @cosmicAddFreeText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Serbest metin olarak ekle'**
+  String get cosmicAddFreeText;
+
+  /// No description provided for @cosmicRequiresTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Saat Gerekli'**
+  String get cosmicRequiresTime;
+
+  /// No description provided for @badgeReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'HAZIR'**
+  String get badgeReady;
+
+  /// No description provided for @badgeNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'YENİ'**
+  String get badgeNew;
+
+  /// No description provided for @paywallLegal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.'**
+  String get paywallLegal;
+
+  /// No description provided for @cosmicSelect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seç'**
+  String get cosmicSelect;
+
+  /// No description provided for @coffeeRelSingle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yalnız Ruhum'**
+  String get coffeeRelSingle;
+
+  /// No description provided for @coffeeRelInLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbim Dolu'**
+  String get coffeeRelInLove;
+
+  /// No description provided for @coffeeRelEngaged.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nişanlıyım'**
+  String get coffeeRelEngaged;
+
+  /// No description provided for @coffeeRelMarried.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evliyim'**
+  String get coffeeRelMarried;
+
+  /// No description provided for @coffeeRelComplicated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karmaşık'**
+  String get coffeeRelComplicated;
+
+  /// No description provided for @coffeeFocusLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşk ve Uyum'**
+  String get coffeeFocusLove;
+
+  /// No description provided for @coffeeFocusCareer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kariyer ve Maddiyat'**
+  String get coffeeFocusCareer;
+
+  /// No description provided for @coffeeFocusHealing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifa ve Huzur'**
+  String get coffeeFocusHealing;
+
+  /// No description provided for @coffeeFocusGeneral.
+  ///
+  /// In tr, this message translates to:
+  /// **'Genel Gelecek'**
+  String get coffeeFocusGeneral;
+
+  /// No description provided for @coffeeFocusSurprise.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürpriz Olsun'**
+  String get coffeeFocusSurprise;
+
+  /// No description provided for @coffeeMoodPeaceful.
+  ///
+  /// In tr, this message translates to:
+  /// **'Huzurlu'**
+  String get coffeeMoodPeaceful;
+
+  /// No description provided for @coffeeMoodExcited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Heyecanlı'**
+  String get coffeeMoodExcited;
+
+  /// No description provided for @coffeeMoodAnxious.
+  ///
+  /// In tr, this message translates to:
+  /// **'Endişeli'**
+  String get coffeeMoodAnxious;
+
+  /// No description provided for @coffeeMoodIndecisive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kararsız'**
+  String get coffeeMoodIndecisive;
+
+  /// No description provided for @coffeeMoodEnergetic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Enerjik'**
+  String get coffeeMoodEnergetic;
+
+  /// No description provided for @coffeeMoodMelancholic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hüzünlü'**
+  String get coffeeMoodMelancholic;
+
+  /// No description provided for @coffeeAllPhotosRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen tüm fotoğrafları çekin!'**
+  String get coffeeAllPhotosRequired;
+
+  /// No description provided for @coffeeNotEnoughStones.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeterli Ruh Taşın yok!'**
+  String get coffeeNotEnoughStones;
+
+  /// No description provided for @coffeeSoulStoneCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Ruh Taşın var'**
+  String coffeeSoulStoneCount(int count);
+
+  /// No description provided for @coffeeUseSoulStone.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 Ruh Taşı Kullan'**
+  String get coffeeUseSoulStone;
+
+  /// No description provided for @languageSettingsSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama dilini belirle'**
+  String get languageSettingsSubtitle;
+
+  /// No description provided for @cosmicSearchHintShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ara...'**
+  String get cosmicSearchHintShort;
+
+  /// No description provided for @cosmicAddThis.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bunu ekle'**
+  String get cosmicAddThis;
+
+  /// No description provided for @horoscopeWesternText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldızlar kariyerin için hizalanıyor. Hızlı ve kararlı adımlar atmalısın.'**
+  String get horoscopeWesternText;
+
+  /// No description provided for @horoscopeAsianText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Su elementi devrede. Sezgilerin çok güçlü, bugün sadece kalbini dinle.'**
+  String get horoscopeAsianText;
+
+  /// No description provided for @horoscopeMayanText.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ton 4 aktif. Hayatında düzen kurmak ve plan yapmak için mükemmel bir gün.'**
+  String get horoscopeMayanText;
+
+  /// No description provided for @horoscopeExplore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Keşfet'**
+  String get horoscopeExplore;
+
+  /// No description provided for @cookieDayCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gün Tamamlandı'**
+  String get cookieDayCompleted;
+
+  /// No description provided for @cookieSeeYouTomorrow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yarın yeni şanslarla tekrar buluşalım.'**
+  String get cookieSeeYouTomorrow;
+
+  /// No description provided for @cookieRarityLegendary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Efsanevi'**
+  String get cookieRarityLegendary;
+
+  /// No description provided for @cookieRarityRare.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nadir'**
+  String get cookieRarityRare;
+
+  /// No description provided for @cookiePremiumCollection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium Koleksiyon'**
+  String get cookiePremiumCollection;
+
+  /// No description provided for @cookiePurchaseBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın Al ({price})'**
+  String cookiePurchaseBtn(String price);
+
+  /// No description provided for @cookieTapOutsideToClose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapatmak için dışına dokun'**
+  String get cookieTapOutsideToClose;
+
+  /// No description provided for @cookieAddedToCollection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurabiye başarıyla koleksiyonuna eklendi!'**
+  String get cookieAddedToCollection;
+
+  /// No description provided for @cookiePremiumFallback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium Kurabiye'**
+  String get cookiePremiumFallback;
+
+  /// No description provided for @dreamSoulStoneRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Taşı Gerekli'**
+  String get dreamSoulStoneRequired;
+
+  /// No description provided for @dreamSoulStoneRequiredDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin analiz için Ruh Taşı gereklidir.\n\nRuh Taşlarını Aura puanlarını dönüştürerek veya Elite abonelik ile kazanabilirsin.'**
+  String get dreamSoulStoneRequiredDesc;
+
+  /// No description provided for @dreamGetElite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Abone Ol'**
+  String get dreamGetElite;
+
+  /// No description provided for @dreamClinicalGateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Klinik Analiz Kapısı'**
+  String get dreamClinicalGateTitle;
+
+  /// No description provided for @dreamClinicalGateDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut Ruh Taşın: {soulStones}\n\nBu klinik seviye derin psikolojik analiz için 1 Ruh Taşı harcanır.'**
+  String dreamClinicalGateDesc(int soulStones);
+
+  /// No description provided for @dreamUseOneStone.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 Ruh Taşı Kullan'**
+  String get dreamUseOneStone;
+
+  /// No description provided for @dreamDeepAnalysisBgPreparing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin Analiz arka planda hazırlanıyor. Tamamlandığında bildirim alacaksınız.'**
+  String get dreamDeepAnalysisBgPreparing;
+
+  /// No description provided for @dreamYourSoulStones.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Taşların'**
+  String get dreamYourSoulStones;
+
+  /// No description provided for @dreamSoulStonesRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Ruh Taşın var'**
+  String dreamSoulStonesRemaining(int count);
+
+  /// No description provided for @dreamSoulStonesEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruh Taşın bitti'**
+  String get dreamSoulStonesEmpty;
+
+  /// No description provided for @dreamRequiredForDeep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin Analiz için gerekli'**
+  String get dreamRequiredForDeep;
+
+  /// No description provided for @dreamEachAnalysisCost.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her analiz 1 Ruh Taşı harcar'**
+  String get dreamEachAnalysisCost;
+
+  /// No description provided for @dreamEliteRefillActive.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir'**
+  String get dreamEliteRefillActive;
+
+  /// No description provided for @dreamEliteRefillPromo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ile her gece 5 Ruh Taşı kazan'**
+  String get dreamEliteRefillPromo;
+
+  /// No description provided for @dreamWatchAd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam İzle'**
+  String get dreamWatchAd;
+
+  /// No description provided for @dreamBgAnalyzing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanız arka planda analiz ediliyor. Tamamlandığında bildirim alacaksınız.'**
+  String get dreamBgAnalyzing;
+
+  /// No description provided for @dreamDeepAnalysis.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin Analiz'**
+  String get dreamDeepAnalysis;
+
+  /// No description provided for @dreamDiscoverSecrets.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sırlarını keşfet'**
+  String get dreamDiscoverSecrets;
+
+  /// No description provided for @dreamDidYouKnow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Biliyor muydun?'**
+  String get dreamDidYouKnow;
+
+  /// No description provided for @dreamNeuroPsychAnalysis.
+  ///
+  /// In tr, this message translates to:
+  /// **'NÖRO-PSİKOLOJİK ANALİZ'**
+  String get dreamNeuroPsychAnalysis;
+
+  /// No description provided for @dreamYourDream.
+  ///
+  /// In tr, this message translates to:
+  /// **'RÜYANIZ'**
+  String get dreamYourDream;
+
+  /// No description provided for @dreamEmotionalProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duygusal Profil'**
+  String get dreamEmotionalProfile;
+
+  /// No description provided for @dreamEmotionalProfileSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüya sırasındaki psikolojik katmanlarınız'**
+  String get dreamEmotionalProfileSub;
+
+  /// No description provided for @dreamShadowSelf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gölge Benlik'**
+  String get dreamShadowSelf;
+
+  /// No description provided for @dreamShadowSelfSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bastırdığınız ve yüzleşmekten kaçındığınız yönler'**
+  String get dreamShadowSelfSub;
+
+  /// No description provided for @dreamRecurringPatterns.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalıplar ve Davranışlar'**
+  String get dreamRecurringPatterns;
+
+  /// No description provided for @dreamRecurringPatternsSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayatınızda sürekli tekrar eden psikolojik döngüler'**
+  String get dreamRecurringPatternsSub;
+
+  /// No description provided for @dreamSuggestedRitual.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önerilen Ritüel: {title}'**
+  String dreamSuggestedRitual(String title);
+
+  /// No description provided for @dreamSuggestedRitualSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu rüyanın etkisini yönetmek için size özel eylem'**
+  String get dreamSuggestedRitualSub;
+
+  /// No description provided for @dreamScienceNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilimsel Not:'**
+  String get dreamScienceNote;
+
+  /// No description provided for @dreamWriteNewDream.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Bir Rüya Yaz'**
+  String get dreamWriteNewDream;
+
+  /// No description provided for @dreamNoMonthDreams.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay henüz rüya yazmadın ✨'**
+  String get dreamNoMonthDreams;
+
+  /// No description provided for @dreamMysteriousDream.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizemli Rüya'**
+  String get dreamMysteriousDream;
+
+  /// No description provided for @dreamStandardAnalysis.
+  ///
+  /// In tr, this message translates to:
+  /// **'STANDART ANALİZ'**
+  String get dreamStandardAnalysis;
+
+  /// No description provided for @dreamGeneralAnalysis.
+  ///
+  /// In tr, this message translates to:
+  /// **'Genel Analiz'**
+  String get dreamGeneralAnalysis;
+
+  /// No description provided for @dreamPsychological.
+  ///
+  /// In tr, this message translates to:
+  /// **'Psikolojik Örüntü'**
+  String get dreamPsychological;
+
+  /// No description provided for @dreamSpiritual2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhsal / Sembolik'**
+  String get dreamSpiritual2;
+
+  /// No description provided for @dreamAdvice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Öneri & Adım'**
+  String get dreamAdvice;
+
+  /// No description provided for @dreamDeepenedInsights.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derinleştirilmiş Analiz'**
+  String get dreamDeepenedInsights;
+
+  /// No description provided for @dreamEliteCreditsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Okuma Hakların'**
+  String get dreamEliteCreditsTitle;
+
+  /// No description provided for @dreamReadingCreditsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Okuma Hakların'**
+  String get dreamReadingCreditsTitle;
+
+  /// No description provided for @dreamCreditsRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} okuma hakkın var'**
+  String dreamCreditsRemaining(int count);
+
+  /// No description provided for @dreamDailyLimitReached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünlük hakkın bitti'**
+  String get dreamDailyLimitReached;
+
+  /// No description provided for @dreamZeroCredits.
+  ///
+  /// In tr, this message translates to:
+  /// **'0 okuma hakkın var'**
+  String get dreamZeroCredits;
+
+  /// No description provided for @dreamDailyPremiumReads.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük {count} Rüya Yorumu hakkı'**
+  String dreamDailyPremiumReads(int count);
+
+  /// No description provided for @dreamNoAdsRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam izleme zorunluluğu yok'**
+  String get dreamNoAdsRequired;
+
+  /// No description provided for @dreamCreditsResetNightly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haklar her gece sıfırlanır'**
+  String get dreamCreditsResetNightly;
+
+  /// No description provided for @dreamOneFreeDaily.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün 1 ücretsiz yorum'**
+  String get dreamOneFreeDaily;
+
+  /// No description provided for @dreamWatchAdsForCredits.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam ile ek {maxAds} hak ({watched}/{maxAds})'**
+  String dreamWatchAdsForCredits(int maxAds, int watched);
+
+  /// No description provided for @dreamUnconsciousFrequencies.
+  ///
+  /// In tr, this message translates to:
+  /// **'BİLİNÇDIŞI FREKANSLAR'**
+  String get dreamUnconsciousFrequencies;
+
+  /// No description provided for @dreamOrbEmotion.
+  ///
+  /// In tr, this message translates to:
+  /// **'DUYGU YÜKÜ'**
+  String get dreamOrbEmotion;
+
+  /// No description provided for @dreamOrbEntropy.
+  ///
+  /// In tr, this message translates to:
+  /// **'BELİRSİZLİK'**
+  String get dreamOrbEntropy;
+
+  /// No description provided for @dreamOrbActivity.
+  ///
+  /// In tr, this message translates to:
+  /// **'BEYİN AKT.'**
+  String get dreamOrbActivity;
+
+  /// No description provided for @dreamOrbResidue.
+  ///
+  /// In tr, this message translates to:
+  /// **'YAKIN GEÇMİŞ'**
+  String get dreamOrbResidue;
+
+  /// No description provided for @dreamHighConfidence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüksek Güven'**
+  String get dreamHighConfidence;
+
+  /// No description provided for @dreamModerateConfidence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Orta Güven'**
+  String get dreamModerateConfidence;
+
+  /// No description provided for @dreamLowConfidence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düşük Güven'**
+  String get dreamLowConfidence;
+
+  /// No description provided for @dreamCoreThematicPattern.
+  ///
+  /// In tr, this message translates to:
+  /// **'ANA TEMATİK ÖRÜNTÜ'**
+  String get dreamCoreThematicPattern;
+
+  /// No description provided for @dreamMetricEmotionalLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duygusal\nYoğunluk'**
+  String get dreamMetricEmotionalLoad;
+
+  /// No description provided for @dreamMetricEmotionalLoadDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.'**
+  String get dreamMetricEmotionalLoadDesc;
+
+  /// No description provided for @dreamMetricUncertaintyDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.'**
+  String get dreamMetricUncertaintyDesc;
+
+  /// No description provided for @dreamMetricRecentMemory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yakın\nGeçmiş'**
+  String get dreamMetricRecentMemory;
+
+  /// No description provided for @dreamMetricRecentMemoryDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.'**
+  String get dreamMetricRecentMemoryDesc;
+
+  /// No description provided for @dreamMetricAgency.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ajans /\nKontrol'**
+  String get dreamMetricAgency;
+
+  /// No description provided for @dreamMetricAgencyDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.'**
+  String get dreamMetricAgencyDesc;
+
+  /// No description provided for @dreamSeverityHigh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüksek'**
+  String get dreamSeverityHigh;
+
+  /// No description provided for @dreamSeverityNormal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Normal'**
+  String get dreamSeverityNormal;
+
+  /// No description provided for @dreamSeverityLow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düşük'**
+  String get dreamSeverityLow;
+
+  /// No description provided for @dreamCognitiveDistribution.
+  ///
+  /// In tr, this message translates to:
+  /// **'BİLİŞSEL DAĞILIM'**
+  String get dreamCognitiveDistribution;
+
+  /// No description provided for @dreamTapToExpand.
+  ///
+  /// In tr, this message translates to:
+  /// **'GENİŞLETMEK İÇİN DOKUN'**
+  String get dreamTapToExpand;
+
+  /// No description provided for @dreamNeurologicalBasis.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nörolojik Taban'**
+  String get dreamNeurologicalBasis;
+
+  /// No description provided for @dreamEvidenceBase.
+  ///
+  /// In tr, this message translates to:
+  /// **'BU SONUCA NEDEN VARDIK?'**
+  String get dreamEvidenceBase;
+
+  /// No description provided for @dreamRootCause.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanın Gerçek Sebebi'**
+  String get dreamRootCause;
+
+  /// No description provided for @dreamAbsolutely.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kesinlikle'**
+  String get dreamAbsolutely;
+
+  /// No description provided for @dreamMaybe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Olabilir'**
+  String get dreamMaybe;
+
+  /// No description provided for @dreamNotSure.
+  ///
+  /// In tr, this message translates to:
+  /// **'Emin Değilim'**
+  String get dreamNotSure;
+
+  /// No description provided for @dreamDreamEssence.
+  ///
+  /// In tr, this message translates to:
+  /// **'RÜYANIN ÖZÜ'**
+  String get dreamDreamEssence;
+
+  /// No description provided for @dreamClarifyingResponses.
+  ///
+  /// In tr, this message translates to:
+  /// **'ANALİZİ NETLEŞTİREN YANITLAR'**
+  String get dreamClarifyingResponses;
+
+  /// No description provided for @dreamCosmicRhythmSynced.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Ritmin Bağlandı'**
+  String get dreamCosmicRhythmSynced;
+
+  /// No description provided for @dreamCosmicRhythmSyncedDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku döngünüze göre özel rüya bildirimleri alacaksınız.'**
+  String get dreamCosmicRhythmSyncedDesc;
+
+  /// No description provided for @dreamSyncSleepData.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyku Verini Senkronize Et'**
+  String get dreamSyncSleepData;
+
+  /// No description provided for @dreamSyncSleepDataDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tam uyandığın anı tespit edip en derin rüyanı sormasına izin ver.'**
+  String get dreamSyncSleepDataDesc;
+
+  /// No description provided for @dreamAwarenessFallback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.'**
+  String get dreamAwarenessFallback;
+
+  /// No description provided for @dreamExtractingEssence.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rüyanın özü derleniyor...'**
+  String get dreamExtractingEssence;
+
+  /// No description provided for @dreamNoReasoning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu metrik için özel bir açıklama üretilmemiş.'**
+  String get dreamNoReasoning;
+
+  /// No description provided for @dreamNotAnalyzable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.'**
+  String get dreamNotAnalyzable;
+
+  /// No description provided for @owlTabFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarım'**
+  String get owlTabFriends;
+
+  /// No description provided for @owlTabConnections.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantılar'**
+  String get owlTabConnections;
+
+  /// No description provided for @owlTabInbox.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelen Mektup'**
+  String get owlTabInbox;
+
+  /// No description provided for @owlSearchCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik evrende ara...'**
+  String get owlSearchCosmic;
+
+  /// No description provided for @owlSearchFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş ara...'**
+  String get owlSearchFriends;
+
+  /// No description provided for @owlPhoneContacts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefon Rehberin'**
+  String get owlPhoneContacts;
+
+  /// No description provided for @owlNoOneFoundCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik evrende kimse bulunamadı.'**
+  String get owlNoOneFoundCosmic;
+
+  /// No description provided for @owlFoundInCosmic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Evrende Bulunanlar'**
+  String get owlFoundInCosmic;
+
+  /// No description provided for @owlUnknownProfile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinmeyen Profil'**
+  String get owlUnknownProfile;
+
+  /// No description provided for @owlFriendRequestSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} kişisine arkadaşlık isteği gönderildi!'**
+  String owlFriendRequestSent(String name);
+
+  /// No description provided for @owlRequestSentStatus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderildi'**
+  String get owlRequestSentStatus;
+
+  /// No description provided for @owlSendRequestAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstek Gönder'**
+  String get owlSendRequestAction;
+
+  /// No description provided for @owlConnectContacts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rehberini Bağla'**
+  String get owlConnectContacts;
+
+  /// No description provided for @owlConnectContactsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.'**
+  String get owlConnectContactsDesc;
+
+  /// No description provided for @owlNoContactsFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Crack&Wish Evreninde\nKimseyi Bulamadık'**
+  String get owlNoContactsFound;
+
+  /// No description provided for @owlNoContactsFoundDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onları davet ederek kozmik enerjiyi başlatabilirsin!'**
+  String get owlNoContactsFoundDesc;
+
+  /// No description provided for @owlUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilinmeyen'**
+  String get owlUnknown;
+
+  /// No description provided for @owlAppUserLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Crack&Wish Kullanıcısı'**
+  String get owlAppUserLabel;
+
+  /// No description provided for @owlInContactsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rehberinde ekli'**
+  String get owlInContactsLabel;
+
+  /// No description provided for @owlNoFriendsYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz arkadaşın yok'**
+  String get owlNoFriendsYet;
+
+  /// No description provided for @owlNoResultsFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuç bulunamadı'**
+  String get owlNoResultsFound;
+
+  /// No description provided for @owlFriendRequests.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlık İstekleri'**
+  String get owlFriendRequests;
+
+  /// No description provided for @owlFriendsHeader.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşların'**
+  String get owlFriendsHeader;
+
+  /// No description provided for @owlAcceptAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kabul'**
+  String get owlAcceptAction;
+
+  /// No description provided for @owlRejectAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Red'**
+  String get owlRejectAction;
+
+  /// No description provided for @owlInviteReward.
+  ///
+  /// In tr, this message translates to:
+  /// **'+2 Ruh Taşı'**
+  String get owlInviteReward;
+
+  /// No description provided for @owlInviteShareMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karanlığı birlikte aydınlatalım! ✨\nCrack Wish\'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackwish.com/invite/{username}'**
+  String owlInviteShareMessage(String username);
+
+  /// No description provided for @owlInviteFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş Davet Et'**
+  String get owlInviteFriends;
+
+  /// No description provided for @owlInviteFriendsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik evreni yansıt'**
+  String get owlInviteFriendsDesc;
+
+  /// No description provided for @owlNoLettersYet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz mektup yok'**
+  String get owlNoLettersYet;
+
+  /// No description provided for @owlLetterSentNotification.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} mektup gönderdi...'**
+  String owlLetterSentNotification(String name);
+
+  /// No description provided for @owlOnItsWay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Baykuş yolda 🕊️'**
+  String get owlOnItsWay;
+
+  /// No description provided for @owlLetterCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} adet mektup'**
+  String owlLetterCount(int count);
+
+  /// No description provided for @owlUnreadCountBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Yeni'**
+  String owlUnreadCountBadge(int count);
+
+  /// No description provided for @owlIUnderstand.
+  ///
+  /// In tr, this message translates to:
+  /// **'Anladım'**
+  String get owlIUnderstand;
+
+  /// No description provided for @owlInviteHowTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl Davet Etmek İstersin?'**
+  String get owlInviteHowTitle;
+
+  /// No description provided for @owlInviteHowSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?'**
+  String get owlInviteHowSubtitle;
+
+  /// No description provided for @owlInviteSendAsMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesaj olarak gönder'**
+  String get owlInviteSendAsMessage;
+
+  /// No description provided for @owlInviteSMSSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Klasik mesaj ile yolla'**
+  String get owlInviteSMSSubtitle;
+
+  /// No description provided for @owlInviteOtherApps.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer Uygulamalar'**
+  String get owlInviteOtherApps;
+
+  /// No description provided for @owlInviteOtherAppsSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Instagram, TikTok, X vb.'**
+  String get owlInviteOtherAppsSubtitle;
+
+  /// No description provided for @owlWhatsAppNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'WhatsApp bulunamadı'**
+  String get owlWhatsAppNotFound;
+
+  /// No description provided for @owlSMSNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'SMS uygulaması bulunamadı'**
+  String get owlSMSNotFound;
+
+  /// No description provided for @owlDisconnectAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağı Kes'**
+  String get owlDisconnectAction;
+
+  /// No description provided for @owlDisconnectConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile arandaki sihirli bağı koparmak istediğine emin misin?'**
+  String owlDisconnectConfirm(String name);
+
+  /// No description provided for @owlDisconnectConfirmButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, Kopar'**
+  String get owlDisconnectConfirmButton;
+
+  /// No description provided for @owlCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get owlCancel;
+
+  /// No description provided for @owlSendMagic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönder (Tılsımlı)'**
+  String get owlSendMagic;
+
+  /// No description provided for @owlSend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönder'**
+  String get owlSend;
+
+  /// No description provided for @owlCookieAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurabiye Eklendi'**
+  String get owlCookieAdded;
+
+  /// No description provided for @owlAddCookie.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurabiye Ekle'**
+  String get owlAddCookie;
+
+  /// No description provided for @owlNoCookiesInCollection.
+  ///
+  /// In tr, this message translates to:
+  /// **'Koleksiyonunda kurabiye yok'**
+  String get owlNoCookiesInCollection;
+
+  /// No description provided for @owlWriteLetterHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mektubunu yaz...'**
+  String get owlWriteLetterHint;
+
+  /// No description provided for @owlSendCookie.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurabiye At'**
+  String get owlSendCookie;
+
+  /// No description provided for @zodiacMeasureHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'KOZMİK UYUMUNU ÖLÇ'**
+  String get zodiacMeasureHarmony;
+
+  /// No description provided for @zodiacDiscoverEnergy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldızların rehberliğinde ikili enerjini keşfet'**
+  String get zodiacDiscoverEnergy;
+
+  /// No description provided for @zodiacChooseFriend.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARKADAŞ SEÇ'**
+  String get zodiacChooseFriend;
+
+  /// No description provided for @zodiacPros.
+  ///
+  /// In tr, this message translates to:
+  /// **'Avantajlar'**
+  String get zodiacPros;
+
+  /// No description provided for @zodiacCons.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zorluklar'**
+  String get zodiacCons;
+
+  /// No description provided for @zodiacAdvice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tavsiye'**
+  String get zodiacAdvice;
+
+  /// No description provided for @zodiacDailyWhisperSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün fısıltısını hisset ve\nruhsal portrenin sırlarını çöz.'**
+  String get zodiacDailyWhisperSubtitle;
+
+  /// No description provided for @zodiacDailyWhisperHeadline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün mesajı & ruhsal portre'**
+  String get zodiacDailyWhisperHeadline;
+
+  /// No description provided for @zodiacOpenGuide.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rehberi Arala'**
+  String get zodiacOpenGuide;
+
+  /// No description provided for @zodiacNoFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz arkadaşın yok'**
+  String get zodiacNoFriends;
+
+  /// No description provided for @zodiacSelect.
+  ///
+  /// In tr, this message translates to:
+  /// **'SEÇ'**
+  String get zodiacSelect;
+
+  /// No description provided for @zodiacQuestCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Serüven Tamamlandı'**
+  String get zodiacQuestCompleted;
+
+  /// No description provided for @zodiacQuestCompletedSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrenin ritmiyle tamamen uyumlandın.'**
+  String get zodiacQuestCompletedSubtitle;
+
+  /// No description provided for @zodiacRewardAura.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kazanılan Ödül:\n+4 AURA'**
+  String get zodiacRewardAura;
+
+  /// No description provided for @zodiacStartNewQuest.
+  ///
+  /// In tr, this message translates to:
+  /// **'YENİ SERÜVENE BAŞLA'**
+  String get zodiacStartNewQuest;
+
+  /// No description provided for @zodiacDailyQuestTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} GÜNLÜK SERÜVEN'**
+  String zodiacDailyQuestTitle(int days);
+
+  /// No description provided for @zodiacDailyQuestDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"{weakness}\" Zaafını Yık'**
+  String zodiacDailyQuestDesc(String weakness);
+
+  /// No description provided for @zodiacQuestDayProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'GÜN {current} / {total}'**
+  String zodiacQuestDayProgress(int current, int total);
+
+  /// No description provided for @zodiacQuestTodayDiscovery.
+  ///
+  /// In tr, this message translates to:
+  /// **'GÜNÜN KEŞFİ'**
+  String get zodiacQuestTodayDiscovery;
+
+  /// No description provided for @zodiacQuestCompletedToday.
+  ///
+  /// In tr, this message translates to:
+  /// **'BUGÜN TAMAMLANDI'**
+  String get zodiacQuestCompletedToday;
+
+  /// No description provided for @zodiacQuestCompleteNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'SERÜVENİ TAMAMLA'**
+  String get zodiacQuestCompleteNow;
+
+  /// No description provided for @zodiacQuestMarkCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'BUGÜNÜ TAMAMLADIM'**
+  String get zodiacQuestMarkCompleted;
+
+  /// No description provided for @zodiacLoveHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'AŞK UYUMU'**
+  String get zodiacLoveHarmony;
+
+  /// No description provided for @zodiacFriendshipHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'ARKADAŞLIK'**
+  String get zodiacFriendshipHarmony;
+
+  /// No description provided for @zodiacCommunicationHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'İLETİŞİM & ZİHİN'**
+  String get zodiacCommunicationHarmony;
+
+  /// No description provided for @zodiacWorkHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'ORTAK ÇALIŞMA'**
+  String get zodiacWorkHarmony;
+
+  /// No description provided for @zodiacAdventureHarmony.
+  ///
+  /// In tr, this message translates to:
+  /// **'MACERA & EĞLENCE'**
+  String get zodiacAdventureHarmony;
+
+  /// No description provided for @zodiacViralDynamics.
+  ///
+  /// In tr, this message translates to:
+  /// **'VİRAL DİNAMİKLER'**
+  String get zodiacViralDynamics;
+
+  /// No description provided for @zodiacDeepSynastryMap.
+  ///
+  /// In tr, this message translates to:
+  /// **'DERİN SİNASTRİ HARİTASI'**
+  String get zodiacDeepSynastryMap;
+
+  /// No description provided for @zodiacSynastrySubtitle1.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} ile arandaki uyum sadece Güneş burçlarıyla sınırlandırılmadı.'**
+  String zodiacSynastrySubtitle1(String name);
+
+  /// No description provided for @zodiacSynastrySubtitle2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik algoritma, gizlilik esasına dayanarak her iki tarafın da astrolojik doğum haritalarını, Ay ve Yükselen evrelerini perde arkasında çaprazlayarak bu analizi tamamen size özel hale getirdi.'**
+  String get zodiacSynastrySubtitle2;
+
+  /// No description provided for @zodiacDailyWhisperTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günün Fısıltısı'**
+  String get zodiacDailyWhisperTitle;
+
+  /// No description provided for @zodiacChooseSign.
+  ///
+  /// In tr, this message translates to:
+  /// **'BURÇ SEÇ'**
+  String get zodiacChooseSign;
+
+  /// No description provided for @zodiacCosmicGuide.
+  ///
+  /// In tr, this message translates to:
+  /// **'KOZMİK REHBERİN'**
+  String get zodiacCosmicGuide;
+
+  /// No description provided for @zodiacNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'YENİ'**
+  String get zodiacNew;
+
+  /// No description provided for @zodiacCosmicHarmonyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'KOZMİK UYUM'**
+  String get zodiacCosmicHarmonyTitle;
+
+  /// No description provided for @zodiacAwesome.
+  ///
+  /// In tr, this message translates to:
+  /// **'HARİKA'**
+  String get zodiacAwesome;
+
+  /// No description provided for @zodiacSpiritPortrait.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhsal Portre'**
+  String get zodiacSpiritPortrait;
 }
 
 class _AppLocalizationsDelegate

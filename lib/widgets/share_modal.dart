@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -741,8 +742,8 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                _buildFormatTab('Hikaye', Icons.auto_stories_rounded, _isStoryFormat),
-                                _buildFormatTab('Gönderi', Icons.grid_on_rounded, !_isStoryFormat),
+                                _buildFormatTab(AppLocalizations.of(context)!.shareStory, Icons.auto_stories_rounded, _isStoryFormat, true),
+                                _buildFormatTab(AppLocalizations.of(context)!.sharePost, Icons.grid_on_rounded, !_isStoryFormat, false),
                               ],
                             ),
                           ),
@@ -795,7 +796,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _buildStyledButton(
-                                label: _isSaved ? 'Kaydedildi ✓' : 'İndir',
+                                label: _isSaved ? AppLocalizations.of(context)!.shareSaved : AppLocalizations.of(context)!.shareDownload,
                                 icon: _isSaved ? Icons.check_circle_rounded : Icons.download_rounded,
                                 bgColor: _isSaved ? const Color(0xFF2D7A50) : Colors.transparent,
                                 textColor: _isSaved ? Colors.white : const Color(0xFFBBA090),
@@ -804,7 +805,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                               ),
                               const SizedBox(width: 12),
                               _buildStyledButton(
-                                label: 'Paylaş',
+                                label: AppLocalizations.of(context)!.shareShare,
                                 icon: Icons.ios_share_rounded,
                                 bgColor: const Color(0xFF3A3530),
                                 textColor: Colors.white.withOpacity(0.9),
@@ -826,9 +827,9 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildFormatTab(String label, IconData icon, bool isSelected) {
+  Widget _buildFormatTab(String label, IconData icon, bool isSelected, bool isStory) {
     return _TapButton(
-      onTap: () => setState(() => _isStoryFormat = label == 'Hikaye'),
+      onTap: () => setState(() => _isStoryFormat = isStory),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

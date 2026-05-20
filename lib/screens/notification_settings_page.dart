@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import '../constants/colors.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../services/storage_service.dart';
 import '../services/push_notification_service.dart';
@@ -130,8 +131,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       children: [
                         GlassBackButton(),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Bildirimler',
+                        Text(
+                          AppLocalizations.of(context)!.notifTitle,
                           style: TextStyle(
                             color: AppColors.textWhite,
                             fontSize: 22,
@@ -146,7 +147,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      'Hangi bildirimleri almak istediğini seç',
+                      AppLocalizations.of(context)!.notifSubtitle,
                       style: TextStyle(
                         color: AppColors.textWhite.withOpacity(0.5),
                         fontSize: 14,
@@ -166,8 +167,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         children: [
                           _NotifToggle(
                             icon: Icons.campaign_rounded,
-                            title: 'Duyurular',
-                            subtitle: 'Yeni özellikler ve güncellemeler',
+                            title: AppLocalizations.of(context)!.notifAnnouncements,
+                            subtitle: AppLocalizations.of(context)!.notifAnnouncementsDesc,
                             value: _announcements,
                             onChanged: (v) {
                               setState(() => _announcements = v);
@@ -177,8 +178,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.record_voice_over_rounded,
-                            title: 'Sesler',
-                            subtitle: 'Sesli bildirim uyarıları',
+                            title: AppLocalizations.of(context)!.notifSounds,
+                            subtitle: AppLocalizations.of(context)!.notifSoundsDesc,
                             value: _voices,
                             onChanged: (v) {
                               setState(() => _voices = v);
@@ -188,8 +189,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           const SizedBox(height: 18),
                           _NotifToggle(
                             iconAsset: 'assets/icons/splash_cookie.png',
-                            title: 'Yeni Kurabiye Alarmı',
-                            subtitle: 'Yeni fortune cookie geldiğinde',
+                            title: AppLocalizations.of(context)!.notifCookieAlarm,
+                            subtitle: AppLocalizations.of(context)!.notifCookieAlarmDesc,
                             value: _newCookieAlarm,
                             onChanged: (v) {
                               setState(() => _newCookieAlarm = v);
@@ -199,8 +200,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.people_rounded,
-                            title: 'Arkadaş Alarmı',
-                            subtitle: 'Baykuş ağından yeni bağlantılar',
+                            title: AppLocalizations.of(context)!.notifFriendAlarm,
+                            subtitle: AppLocalizations.of(context)!.notifFriendAlarmDesc,
                             value: _friendsAlarm,
                             onChanged: (v) {
                               setState(() => _friendsAlarm = v);
@@ -210,8 +211,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           const SizedBox(height: 18),
                           _NotifToggle(
                             icon: Icons.access_alarm_rounded,
-                            title: 'Günlük Hatırlatıcılar',
-                            subtitle: 'Günlük kurabiyeni almayı unutma',
+                            title: AppLocalizations.of(context)!.notifDailyReminder,
+                            subtitle: AppLocalizations.of(context)!.notifDailyReminderDesc,
                             value: _dailyReminders,
                             onChanged: (v) {
                               setState(() => _dailyReminders = v);

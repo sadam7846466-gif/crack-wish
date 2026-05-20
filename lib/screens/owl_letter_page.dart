@@ -133,6 +133,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final screen = MediaQuery.of(context).size;
     final br = widget.buttonRect;
 
@@ -253,7 +254,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                             children: [
                                               Expanded(
                                                 child: _AnimatedMenuItem(
-                                                  label: 'Arkadaşlarım',
+                                                  label: l10n.owlTabFriends,
                                                   isSelected: _selectedTab == 0,
                                                   hasBadge: _service.pendingRequestCount > 0,
                                                   onTap: () {
@@ -267,7 +268,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: _AnimatedMenuItem(
-                                                  label: 'Bağlantılar',
+                                                  label: l10n.owlTabConnections,
                                                   isSelected: _selectedTab == 1,
                                                   onTap: () {
                                                     if (_selectedTab != 1) {
@@ -280,7 +281,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: _AnimatedMenuItem(
-                                                  label: 'Gelen Mektup',
+                                                  label: l10n.owlTabInbox,
                                                   isSelected: _selectedTab == 2,
                                                   hasBadge: _service.unreadLetterCount > 0,
                                                   onTap: () {
@@ -354,7 +355,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
               style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
               decoration: InputDecoration(
-                hintText: _selectedTab == 1 ? 'Kozmik evrende ara...' : 'Arkadaş ara...',
+                hintText: _selectedTab == 1 ? l10n.owlSearchCosmic : l10n.owlSearchFriends,
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 12),
                 border: InputBorder.none,
                 isDense: true,
@@ -517,7 +518,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Telefon Rehberin', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+                child: Text(l10n.owlPhoneContacts, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(height: 12),
               if (!_isContactsSynced)
@@ -532,6 +533,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildGlobalSearchList() {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: Supabase.instance.client
           .from('profiles')
@@ -559,7 +561,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               children: [
                 Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.2), size: 32),
                 const SizedBox(height: 8),
-                Text('Kozmik evrende kimse bulunamadı.', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
+                Text(l10n.owlNoOneFoundCosmic, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
               ],
             ),
           );
@@ -570,10 +572,10 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Text('Kozmik Evrende Bulunanlar', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
+              child: Text(l10n.owlFoundInCosmic, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w600)),
             ),
             ...results.map((u) {
-              final String name = u['full_name']?.toString() ?? 'Bilinmeyen Profil';
+              final String name = u['full_name']?.toString() ?? l10n.owlUnknownProfile;
               final String username = u['handle']?.toString() ?? '';
               final String userId = u['id']?.toString() ?? '';
               final String? avatarUrl = u['avatar_url']?.toString();
@@ -684,7 +686,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  '$name kişisine arkadaşlık isteği gönderildi!',
+                                  l10n.owlFriendRequestSent(name),
                                   style: const TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: const Color(0xFF16151A),
@@ -715,7 +717,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                                   const SizedBox(width: 4),
                                 ],
                                 Text(
-                                  isSent ? 'Gönderildi' : 'İstek Gönder',
+                                  isSent ? l10n.owlRequestSentStatus : l10n.owlSendRequestAction,
                                   style: TextStyle(
                                     color: isSent ? Colors.white.withOpacity(0.4) : const Color(0xFF6DE8B8),
                                     fontSize: 11,
@@ -771,6 +773,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildSyncContactsButton() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () async {
         setState(() => _isSyncingContacts = true);
@@ -811,13 +814,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                 child: const Icon(Icons.sync_rounded, color: Color(0xFF6DE8B8), size: 32),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Rehberini Bağla',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
+              Text(
+                l10n.owlConnectContacts,
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
               Text(
-                'Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.',
+                l10n.owlConnectContactsDesc,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
               ),
@@ -829,6 +832,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildSyncedContactList() {
+    final l10n = AppLocalizations.of(context)!;
     if (_syncedContacts.isEmpty) {
       return Container(
         width: double.infinity,
@@ -843,13 +847,13 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             Icon(Icons.search_off_rounded, color: Colors.white.withOpacity(0.3), size: 32),
             const SizedBox(height: 12),
             Text(
-              'Crack&Wish Evreninde\nKimseyi Bulamadık',
+              l10n.owlNoContactsFound,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
-              'Onları davet ederek kozmik enerjiyi başlatabilirsin!',
+              l10n.owlNoContactsFoundDesc,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
@@ -860,7 +864,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
     return Column(
       children: _syncedContacts.map((contact) {
-        final String name = contact["name"] ?? "Bilinmeyen";
+        final String name = contact["name"] ?? l10n.owlUnknown;
         final bool isAppUser = contact["isAppUser"] == true;
 
         return Padding(
@@ -894,7 +898,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isAppUser ? 'Crack&Wish Kullanıcısı' : 'Rehberinde ekli',
+                      isAppUser ? l10n.owlAppUserLabel : l10n.owlInContactsLabel,
                       style: TextStyle(
                         color: isAppUser ? const Color(0xFF6DE8B8) : Colors.white.withOpacity(0.4),
                         fontSize: 11,
@@ -1028,6 +1032,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildContactsList(Rect br) {
+    final l10n = AppLocalizations.of(context)!;
     final friends = _service.searchFriends(_searchQuery);
     final requests = _service.incomingRequests;
 
@@ -1037,7 +1042,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _searchQuery.isEmpty ? 'Henüz arkadaşın yok' : 'Sonuç bulunamadı',
+              _searchQuery.isEmpty ? l10n.owlNoFriendsYet : l10n.owlNoResultsFound,
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
           ],
@@ -1060,7 +1065,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Text(
-                'Arkadaşlık İstekleri',
+                l10n.owlFriendRequests,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 10,
@@ -1074,7 +1079,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  'Arkadaşların',
+                  l10n.owlFriendsHeader,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.5),
                     fontSize: 10,
@@ -1116,6 +1121,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildRequestItem(FriendRequest req) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Padding(
@@ -1189,7 +1195,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         color: const Color(0xFF4A7A6A).withOpacity(0.15),
                         border: Border.all(color: const Color(0xFF6DE8B8).withOpacity(0.35), width: 1.0),
                       ),
-                      child: const Text('Kabul', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                      child: Text(l10n.owlAcceptAction, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
                     ),
                   ),
                 ),
@@ -1211,7 +1217,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                         color: const Color(0xFF9A4A4A).withOpacity(0.15), // Pastel kırmızımsı mat zemin
                         border: Border.all(color: const Color(0xFFE86D6D).withOpacity(0.35), width: 1.0), // Parlak pastel kırmızı çerçeve
                       ),
-                      child: const Text('Red', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                      child: Text(l10n.owlRejectAction, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
                     ),
                   ),
                 ),
@@ -1226,20 +1232,21 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
 
   Widget _addFriendButton() {
+    final l10n = AppLocalizations.of(context)!;
     final rewardColor = const Color(0xFF6DE8B8);
-    final rewardText = '+2 Ruh Taşı';
+    final rewardText = l10n.owlInviteReward;
 
     return _BouncingNode(
       onTap: () async {
         HapticFeedback.mediumImpact();
         final String username = await StorageService.getUserHandle() ?? _service.currentUser.name.replaceAll(' ', '').toLowerCase();
         // Smart Deep Link ile otomatik takip
-        final String shareText = "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackwish.com/invite/$username";
+        final String shareText = l10n.owlInviteShareMessage(username);
         
         try {
           if (!context.mounted) return;
           final RenderBox? box = context.findRenderObject() as RenderBox?;
-          _showInviteOptions(context, null, shareText, AppLocalizations.of(context)?.inviteShareSubject ?? "Crack Wish Daveti", box);
+          _showInviteOptions(context, null, shareText, l10n.inviteShareSubject, box);
         } catch (e) {
           debugPrint("Share error: $e");
         }
@@ -1289,9 +1296,9 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Arkadaş Davet Et',
-                        style: TextStyle(
+                      Text(
+                        l10n.owlInviteFriends,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -1300,7 +1307,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Kozmik evreni yansıt',
+                        l10n.owlInviteFriendsDesc,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 11,
@@ -1350,6 +1357,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
   }
 
   Widget _buildInbox(Rect br) {
+    final l10n = AppLocalizations.of(context)!;
     final letters = _searchQuery.isEmpty 
         ? _service.inbox 
         : _service.inbox.where((l) => l.from.name.toLowerCase().contains(_searchQuery)).toList();
@@ -1366,7 +1374,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
             Icon(Icons.mail_outline_rounded, color: Colors.white.withOpacity(0.3), size: 28),
             const SizedBox(height: 8),
             Text(
-              'Henüz mektup yok',
+              l10n.owlNoLettersYet,
               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
             ),
           ],
@@ -1379,7 +1387,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Sonuç bulunamadı', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
+            Text(l10n.owlNoResultsFound, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
           ],
         ),
       );
@@ -1411,11 +1419,11 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${l.from.name} mektup gönderdi...',
+                        l10n.owlLetterSentNotification(l.from.name),
                         style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontStyle: FontStyle.italic),
                       ),
                     ),
-                    Text('Baykuş yolda 🕊️', style: TextStyle(color: Colors.amber.withOpacity(0.5), fontSize: 8)),
+                    Text(l10n.owlOnItsWay, style: TextStyle(color: Colors.amber.withOpacity(0.5), fontSize: 8)),
                   ],
                 ),
               )),
@@ -1505,7 +1513,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${senderLetters.length} adet mektup',
+                              l10n.owlLetterCount(senderLetters.length),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.4),
                                 fontSize: 11,
@@ -1523,7 +1531,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                             border: Border.all(color: const Color(0xFF6DAEE8).withOpacity(0.35)),
                           ),
                           child: Text(
-                            '$unreadCount Yeni',
+                            l10n.owlUnreadCountBadge(unreadCount),
                             style: const TextStyle(color: Color(0xFF6DAEE8), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -1831,7 +1839,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+            child: Text(AppLocalizations.of(context)!.owlIUnderstand, style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -1869,7 +1877,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                     ),
                   ),
                   Text(
-                    "Nasıl Davet Etmek İstersin?",
+                    AppLocalizations.of(context)!.owlInviteHowTitle,
                     style: GoogleFonts.manrope(
                       textStyle: const TextStyle(
                         color: Colors.white,
@@ -1880,7 +1888,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
+                    AppLocalizations.of(context)!.owlInviteHowSubtitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.manrope(
                       textStyle: TextStyle(
@@ -1896,7 +1904,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   _buildInviteOptionTile(
                     icon: PhosphorIcons.whatsappLogo(PhosphorIconsStyle.regular),
                     title: "WhatsApp",
-                    subtitle: "Mesaj olarak gönder",
+                    subtitle: AppLocalizations.of(context)!.owlInviteSendAsMessage,
                     color: const Color(0xFF25D366),
                     onTap: () async {
                       Navigator.pop(context);
@@ -1910,7 +1918,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       if (await canLaunchUrl(whatsappUri)) {
                         await launchUrl(whatsappUri);
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("WhatsApp bulunamadı")));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.owlWhatsAppNotFound)));
                       }
                     },
                   ),
@@ -1920,7 +1928,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   _buildInviteOptionTile(
                     icon: PhosphorIcons.chatCircleText(PhosphorIconsStyle.regular), // Görseldeki gibi oval sohbet balonu
                     title: "SMS",
-                    subtitle: "Klasik mesaj ile yolla",
+                    subtitle: AppLocalizations.of(context)!.owlInviteSMSSubtitle,
                     color: const Color(0xFF0A84FF),
                     onTap: () async {
                       Navigator.pop(context);
@@ -1934,7 +1942,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                       if (await canLaunchUrl(smsUri)) {
                         await launchUrl(smsUri);
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("SMS uygulaması bulunamadı")));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.owlSMSNotFound)));
                       }
                     },
                   ),
@@ -1943,8 +1951,8 @@ class _OwlLetterPageState extends State<OwlLetterPage>
                   // Paylaşım Seçeneği (Instagram, TikTok vb)
                   _buildInviteOptionTile(
                     icon: PhosphorIcons.shareNetwork(PhosphorIconsStyle.regular),
-                    title: "Diğer Uygulamalar",
-                    subtitle: "Instagram, TikTok, X vb.",
+                    title: AppLocalizations.of(context)!.owlInviteOtherApps,
+                    subtitle: AppLocalizations.of(context)!.owlInviteOtherAppsSubtitle,
                     color: const Color(0xFFAB68FF),
                     onTap: () async {
                       Navigator.pop(context);
@@ -2192,6 +2200,7 @@ class _ReceivedLetterViewState extends State<_ReceivedLetterView>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final hasCookie = widget.cookieId != null;
     final imgPath = hasCookie ? _cookieImageMap[widget.cookieId] : null;
@@ -2589,6 +2598,7 @@ class _ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     Widget content = GestureDetector(
       onTap: () {
         if (isAppUser) {
@@ -2755,7 +2765,7 @@ class _ContactItem extends StatelessWidget {
                             ),
                           )
                         : Text(
-                            'Davet Et',
+                            l10n.inviteSendButton,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 11,
@@ -2802,7 +2812,7 @@ class _ContactItem extends StatelessWidget {
                                 _buildIconButton(
                                   context,
                                   Icons.card_giftcard_rounded, 
-                                  'Kurabiye At', 
+                                  l10n.owlSendCookie, 
                                   Colors.orangeAccent,
                                   () {
                                     HapticFeedback.mediumImpact();
@@ -2812,7 +2822,7 @@ class _ContactItem extends StatelessWidget {
                                 _buildIconButton(
                                   context,
                                   Icons.person_remove_rounded, 
-                                  'Bağı Kes', 
+                                  l10n.owlDisconnectAction, 
                                   Colors.redAccent.withOpacity(0.8),
                                   () async {
                                     HapticFeedback.heavyImpact();
@@ -2883,9 +2893,9 @@ class _ContactItem extends StatelessWidget {
                                                           ),
                                                         ),
                                                         const SizedBox(height: 16),
-                                                        const Text('Bağı Kes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 0.5)),
+                                                        Text(l10n.owlDisconnectAction, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 0.5)),
                                                         const SizedBox(height: 8),
-                                                        Text('${friend?.user.name} ile arandaki sihirli bağı koparmak istediğine emin misin?', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4)),
+                                                        Text(l10n.owlDisconnectConfirm(friend?.user.name ?? ''), textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4)),
                                                         const SizedBox(height: 24),
                                                         Row(
                                                           children: [
@@ -2899,7 +2909,7 @@ class _ContactItem extends StatelessWidget {
                                                                     borderRadius: BorderRadius.circular(12),
                                                                   ),
                                                                   alignment: Alignment.center,
-                                                                  child: Text('İptal', style: TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600, fontSize: 14)),
+                                                                  child: Text(l10n.owlCancel, style: TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600, fontSize: 14)),
                                                                 ),
                                                               ),
                                                             ),
@@ -2915,7 +2925,7 @@ class _ContactItem extends StatelessWidget {
                                                                     borderRadius: BorderRadius.circular(12),
                                                                   ),
                                                                   alignment: Alignment.center,
-                                                                  child: const Text('Evet, Kopar', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700, fontSize: 14)),
+                                                                  child: Text(l10n.owlDisconnectConfirmButton, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700, fontSize: 14)),
                                                                 ),
                                                               ),
                                                             ),
@@ -2963,7 +2973,7 @@ class _ContactItem extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Anladım', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+            child: Text(AppLocalizations.of(context)!.owlIUnderstand, style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -3895,6 +3905,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return AnimatedBuilder(
@@ -4059,7 +4070,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                                 letterSpacing: 0.1,
                                               ),
                                               decoration: InputDecoration(
-                                                hintText: 'Mektubunu yaz...',
+                                                hintText: l10n.owlWriteLetterHint,
                                                 hintStyle: GoogleFonts.kalam(
                                                   color: const Color(0xFFB0A484),
                                                   fontSize: 14,
@@ -4263,7 +4274,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                               Icon(Icons.send_rounded, color: _hasText ? const Color(0xFFFF8A3D) : Colors.white.withOpacity(0.3), size: 12),
                               const SizedBox(width: 6),
                               Text(
-                                _selectedCookieId != null ? 'Gönder (Tılsımlı)' : 'Gönder',
+                                _selectedCookieId != null ? l10n.owlSendMagic : l10n.owlSend,
                                 style: TextStyle(
                                   color: _hasText
                                       ? const Color(0xFFFF8A3D)
@@ -4319,7 +4330,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    _selectedCookieId != null ? 'Kurabiye Eklendi' : 'Kurabiye Ekle',
+                                    _selectedCookieId != null ? l10n.owlCookieAdded : l10n.owlAddCookie,
                                     style: TextStyle(
                                       color: _selectedCookieId != null
                                           ? Colors.white
@@ -4358,7 +4369,7 @@ class _LetterPaperState extends State<_LetterPaper> with TickerProviderStateMixi
                         child: _ownedCookies.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Koleksiyonunda kurabiye yok',
+                                  l10n.owlNoCookiesInCollection,
                                   style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10),
                                 ),
                               )

@@ -275,7 +275,7 @@ class _CookieSelectorState extends State<CookieSelector> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Bu özel kurabiye kilitli',
+                      AppLocalizations.of(context)!.cookieLockedTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
@@ -301,7 +301,7 @@ class _CookieSelectorState extends State<CookieSelector> {
                       ),
                       child: Center(
                         child: Text(
-                          'Yakında Satışa Çıkacak ✨',
+                          AppLocalizations.of(context)!.cookieComingSoon,
                           style: TextStyle(
                             color: Colors.amber[200],
                             fontSize: 11,

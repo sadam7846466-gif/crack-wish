@@ -16,6 +16,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'premium_paywall_page.dart';
 import 'cosmic_profile_page.dart';
 import 'natal_chart_page.dart';
+import '../utils/zodiac_translations.dart';
+import '../l10n/app_localizations.dart';
+
+
+String _getLocalizedSignName(BuildContext context, Map<String, dynamic> sign) {
+  final isTr = Localizations.localeOf(context).languageCode == 'tr';
+  return isTr ? (sign['name'] as String) : (sign['nameEn'] as String);
+}
+
+String _getLocalizedSignDates(BuildContext context, String dates) {
+  final isTr = Localizations.localeOf(context).languageCode == 'tr';
+  if (isTr) return dates;
+  const Map<String, String> _dateTranslations = {
+    '21 Mart - 19 Nisan': 'March 21 - April 19',
+    '20 Nisan - 20 Mayıs': 'April 20 - May 20',
+    '21 Mayıs - 20 Haziran': 'May 21 - June 20',
+    '21 Haziran - 22 Temmuz': 'June 21 - July 22',
+    '23 Temmuz - 22 Ağustos': 'July 23 - August 22',
+    '23 Ağustos - 22 Eylül': 'August 23 - September 22',
+    '23 Eylül - 22 Ekim': 'September 23 - October 22',
+    '23 Ekim - 21 Kasım': 'October 23 - November 21',
+    '22 Kasım - 21 Aralık': 'November 22 - December 21',
+    '22 Aralık - 19 Ocak': 'December 22 - January 19',
+    '20 Ocak - 18 Şubat': 'January 20 - February 18',
+    '19 Şubat - 20 Mart': 'February 19 - March 20',
+  };
+  return _dateTranslations[dates] ?? dates;
+}
 
 /// Batı Zodyak Sayfası — "Ben nasıl biriyim?"
 /// Psikolojik yorum, kişilik analizi, hayat alanları, uyum
@@ -1625,8 +1653,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                                     element: s['element'] as String,
                                     color: _gold,
                                   ),
-                                  'Element',
-                                  s['element'] as String,
+                                  ZodiacTranslations.translate(context, 'Element'),
+                                  ZodiacTranslations.translate(context, s['element'] as String),
                                 ),
                               ),
                               Expanded(
@@ -1635,8 +1663,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                                     planet: s['planet'] as String,
                                     color: _gold,
                                   ),
-                                  'Gezegen',
-                                  s['planet'] as String,
+                                  ZodiacTranslations.translate(context, 'Gezegen'),
+                                  ZodiacTranslations.translate(context, s['planet'] as String),
                                 ),
                               ),
                               Expanded(
@@ -1645,8 +1673,8 @@ class _ZodiacPageState extends State<ZodiacPage>
                                     quality: s['quality'] as String,
                                     color: _gold,
                                   ),
-                                  'Ruh Hali',
-                                  s['quality'] as String,
+                                  ZodiacTranslations.translate(context, 'Ruh Hali'),
+                                  ZodiacTranslations.translate(context, s['quality'] as String),
                                 ),
                               ),
                             ],
@@ -2135,7 +2163,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ],
                 ).createShader(b),
                 child: Text(
-                  'KOZMİK UYUMUNU ÖLÇ',
+                  AppLocalizations.of(context)!.zodiacMeasureHarmony,
                   style: GoogleFonts.cinzel(
                     color: Colors.white,
                     fontSize: 13,
@@ -2148,7 +2176,7 @@ class _ZodiacPageState extends State<ZodiacPage>
           ),
           const SizedBox(height: 6),
           Text(
-            'Yıldızların rehberliğinde ikili enerjini keşfet',
+            AppLocalizations.of(context)!.zodiacDiscoverEnergy,
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 11,
@@ -2191,7 +2219,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                   Icon(Icons.person_add_alt_1_rounded, color: _gold.withOpacity(0.9), size: 16),
                   const SizedBox(width: 8),
                   Text(
-                    'ARKADAŞ SEÇ',
+                    AppLocalizations.of(context)!.zodiacChooseFriend,
                     style: TextStyle(
                       color: _gold,
                       fontSize: 12,
@@ -4473,7 +4501,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         // ═══════════════════════════
                         // | SÜPER GÜÇLERİN
                         // ═══════════════════════════
-                        _sectionHeader('SÜPER GÜÇLERİN', _warmGold),
+                        _sectionHeader(ZodiacTranslations.translate(context, 'SÜPER GÜÇLERİN'), _warmGold),
                         const SizedBox(height: 12),
 
                         // Zigzag layout — güçlü yanlar
@@ -4540,7 +4568,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         // ═══════════════════════════
                         // | BÜYÜME ALANLARIN
                         // ═══════════════════════════
-                        _sectionHeader('BÜYÜME ALANLARIN', _coolBlue),
+                        _sectionHeader(ZodiacTranslations.translate(context, 'BÜYÜME ALANLARIN'), _coolBlue),
                         const SizedBox(height: 12),
 
                         // Zigzag layout — zayıf yanlar
@@ -4564,12 +4592,12 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                         // ═══════════════════════════
                         // | SANA MEYDAN OKUYORUM (GÖREVLER)
                         // ═══════════════════════════
-                        _sectionHeader('SANA MEYDAN OKUYORUM !', _warmGold),
+                        _sectionHeader(ZodiacTranslations.translate(context, 'SANA MEYDAN OKUYORUM !'), _warmGold),
                         const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.only(left: 11),
                           child: Text(
-                            'Kişisel farkındalığını artırmak için dönüşüm odaklı bir serüven',
+                            ZodiacTranslations.translate(context, 'Kişisel farkındalığını artırmak için dönüşüm odaklı bir serüven'),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.6),
                               fontSize: 13,
@@ -4731,7 +4759,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                trait,
+                                ZodiacTranslations.translate(context, trait),
                                 textAlign: TextAlign.left,
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -4748,7 +4776,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                       barWidget,
                       const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       Text(
-                        hint,
+                        ZodiacTranslations.translate(context, hint),
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.55),
@@ -4782,7 +4810,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                             pctWidget,
                             Expanded(
                               child: Text(
-                                trait,
+                                ZodiacTranslations.translate(context, trait),
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -4798,7 +4826,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                       barWidget,
                       const SizedBox(height: 5), // Barlar azıcık rahatlatıldı
                       Text(
-                        hint,
+                        ZodiacTranslations.translate(context, hint),
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.55),
@@ -5695,7 +5723,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'AURA\nKAZANILDI',
+                      ZodiacTranslations.translate(context, 'AURA\nKAZANILDI'),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cinzel(
                         color: Colors.white,
@@ -5706,18 +5734,28 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      '"${_weaknessToPositive[widget.topWeakness] ?? widget.topWeakness} Ustası"',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cinzel(
-                        color: widget.baseColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+                        final val = ZodiacTranslations.translate(
+                          context,
+                          _weaknessToPositive[widget.topWeakness] ?? widget.topWeakness,
+                        );
+                        final title = isTr ? '$val Ustası' : 'Master of $val';
+                        return Text(
+                          '"$title"',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.cinzel(
+                            color: widget.baseColor,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Evrenin ritmiyle tamamen uyumlandın.',
+                      AppLocalizations.of(context)!.zodiacQuestCompletedSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: widget.baseColor.withOpacity(0.9),
@@ -5742,9 +5780,9 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                             ],
                           ),
                         ),
-                        child: const Text(
-                          'HARİKA',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.zodiacAwesome,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -6063,7 +6101,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Odak: $currentFocusText',
+                    '${ZodiacTranslations.translate(context, 'Odak')}: ${ZodiacTranslations.translate(context, currentFocusText)}',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.85),
                       fontSize: 13,
@@ -6082,7 +6120,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'GÜN $currentDay / $totalDays',
+                AppLocalizations.of(context)!.zodiacQuestDayProgress(currentDay, totalDays),
                 style: GoogleFonts.cinzel(
                   color: widget.baseColor,
                   fontSize: 18,
@@ -6167,7 +6205,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    'GÜNÜN KEŞFİ',
+                    AppLocalizations.of(context)!.zodiacQuestTodayDiscovery,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 10,
@@ -6178,7 +6216,7 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  currentTask['task'] as String,
+                  ZodiacTranslations.translate(context, currentTask['task'] as String),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
@@ -6255,10 +6293,10 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                   const SizedBox(width: 10),
                   Text(
                     isDoneToday
-                        ? 'BUGÜN TAMAMLANDI'
+                        ? AppLocalizations.of(context)!.zodiacQuestCompletedToday
                         : (currentDay >= totalDays
-                            ? 'SERÜVENİ TAMAMLA'
-                            : 'BUGÜNÜ TAMAMLADIM'),
+                            ? AppLocalizations.of(context)!.zodiacQuestCompleteNow
+                            : AppLocalizations.of(context)!.zodiacQuestMarkCompleted),
                     style: TextStyle(
                       color: isDoneToday ? Colors.white.withOpacity(0.3) : Colors.white,
                       fontSize: 13,
@@ -7489,7 +7527,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
               Icon(Icons.auto_awesome, color: widget.gold.withOpacity(0.7), size: 14),
               const SizedBox(width: 8),
               Text(
-                'DERİN SİNASTRİ HARİTASI',
+                AppLocalizations.of(context)!.zodiacDeepSynastryMap,
                 style: GoogleFonts.cinzel(
                   color: widget.gold.withOpacity(0.9),
                   fontSize: 12,
@@ -7503,8 +7541,8 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           ),
           const SizedBox(height: 16),
           Text(
-            '${friend.user.name} ile arandaki uyum sadece Güneş burçlarıyla sınırlandırılmadı.',
-            style: TextStyle(
+            AppLocalizations.of(context)!.zodiacSynastrySubtitle1(friend.user.name),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -7514,7 +7552,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
           ),
           const SizedBox(height: 12),
           Text(
-            'Kozmik algoritma, gizlilik esasına dayanarak her iki tarafın da astrolojik doğum haritalarını, Ay ve Yükselen evrelerini perde arkasında çaprazlayarak bu analizi tamamen size özel hale getirdi.',
+            AppLocalizations.of(context)!.zodiacSynastrySubtitle2,
             style: TextStyle(
               color: Colors.white.withOpacity(0.55),
               fontSize: 11,
@@ -8289,7 +8327,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
             ),
             const SizedBox(height: 24),
             Text(
-              'KOZMİK REHBERİN',
+              AppLocalizations.of(context)!.zodiacCosmicGuide,
               style: GoogleFonts.cinzel(
                 color: _gold,
                 fontSize: 16,
@@ -8359,9 +8397,9 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
-                        'YENİ',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.zodiacNew,
+                        style: const TextStyle(
                           color: Color(0xFF22D3EE),
                           fontSize: 8,
                           fontWeight: FontWeight.w800,
@@ -8375,7 +8413,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
             ),
             const SizedBox(height: 16),
             Text(
-              'Bugünün fısıltısını hisset ve\nruhsal portrenin sırlarını çöz.',
+              AppLocalizations.of(context)!.zodiacDailyWhisperSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),
@@ -8391,8 +8429,8 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: _gold.withOpacity(0.4)),
               ),
-              child: const Text(
-                'Rehberi Arala',
+              child: Text(
+                AppLocalizations.of(context)!.zodiacOpenGuide,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -8475,7 +8513,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                           ],
                         ).createShader(b),
                         child: Text(
-                          'KOZMİK REHBERİN',
+                          AppLocalizations.of(context)!.zodiacCosmicGuide,
                           style: GoogleFonts.cinzel(
                             color: Colors.white,
                             fontSize: 13,
@@ -8486,7 +8524,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Bugünün mesajı & ruhsal portre',
+                        AppLocalizations.of(context)!.zodiacDailyWhisperHeadline,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.3),
                           fontSize: 11,
@@ -8533,7 +8571,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'Günün Fısıltısı',
+                        AppLocalizations.of(context)!.zodiacDailyWhisperTitle,
                         style: GoogleFonts.cinzel(
                           color: _gold.withOpacity(0.8),
                           fontSize: 12,
@@ -8651,7 +8689,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Ruhsal Portre',
+                      AppLocalizations.of(context)!.zodiacSpiritPortrait,
                       style: GoogleFonts.cinzel(
                         color: _gold.withOpacity(0.8),
                         fontSize: 12,
@@ -8663,7 +8701,7 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  s['description'] as String,
+                  ZodiacTranslations.translate(context, s['description'] as String),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
                     fontSize: 14,
@@ -9706,7 +9744,7 @@ class _FriendSelectionWidgetState extends State<_FriendSelectionWidget> {
     if (friends.isEmpty) {
       return Center(
         child: Text(
-          'Henüz arkadaşın yok',
+          AppLocalizations.of(context)!.zodiacNoFriends,
           style: TextStyle(color: Colors.white.withOpacity(0.5)),
         ),
       );
@@ -9819,7 +9857,7 @@ class _FriendSelectionWidgetState extends State<_FriendSelectionWidget> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            friendSign['name'] as String,
+                            _getLocalizedSignName(context, friendSign),
                             style: TextStyle(
                               color: widget.gold.withOpacity(0.6),
                               fontSize: 11,
@@ -9838,7 +9876,7 @@ class _FriendSelectionWidgetState extends State<_FriendSelectionWidget> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'SEÇ',
+                    AppLocalizations.of(context)!.zodiacSelect,
                     style: TextStyle(
                       color: widget.gold,
                       fontSize: 10,

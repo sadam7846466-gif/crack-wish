@@ -363,10 +363,7 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                             const SizedBox(height: 16),
                             Builder(
                               builder: (context) {
-                                final lang = Localizations.localeOf(context).languageCode;
-                                final text = lang == 'tr' 
-                                  ? (AppLocalizations.of(context)?.paywallLegalTr ?? "Aboneliğiniz otomatik olarak yenilenir.")
-                                  : "Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. You can manage and cancel your subscriptions in your App Store settings.";
+                                final text = AppLocalizations.of(context)?.paywallLegal ?? "Aboneliğiniz otomatik olarak yenilenir.";
                                 return Text(
                                   text,
                                   textAlign: TextAlign.center,
@@ -603,13 +600,13 @@ class _PremiumPaywallPageState extends State<PremiumPaywallPage> with TickerProv
                         children: [
                           Row(
                             children: [
-                              Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                              Flexible(child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
                               if (finalBadge != null) ...[
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                   decoration: BoxDecoration(color: highlightColor, borderRadius: BorderRadius.circular(6)),
-                                  child: Text(finalBadge.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w900)),
+                                  child: Text(finalBadge.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w900)),
                                 ),
                               ]
                             ],

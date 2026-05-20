@@ -23,6 +23,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/analytics_service.dart';
+import '../l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -32,6 +33,8 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStateMixin {
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   late final AnimationController _stepCtrl;
   late final AnimationController _shakeCtrl;
   late final Animation<double> _fadeAnim;
@@ -76,7 +79,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   // --- Step 1 Data ---
   List<String> _lifeFocus = [];
-  String _relationship = "Yalnız Gökyüzü";
+  String _relationship = "";
 
   // --- Step 2 Data ---
   String _dreamFrequency = ""; // Mandatory
@@ -153,7 +156,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       
       if (!isAvailable) {
         HapticFeedback.heavyImpact();
-        setState(() => _handleError = 'Bu kullanıcı adı zaten alınmış');
+        setState(() => _handleError = AppLocalizations.of(context)!.onboardingErrorHandleTaken);
         _shakeCtrl.forward(from: 0.0);
         return;
       }
@@ -319,7 +322,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       // Profil yok ama hesap var → Onboarding'e yönlendir (profil tamamlasın)
       // Oturumu KAPATMA! Auth hesabı zaten oluştu, sadece profil eksik.
       if (!mounted) return;
-      _showGlassError('Hoş geldin! Profilini tamamlamak için birkaç adım kaldı.');
+      _showGlassError(AppLocalizations.of(context)!.onboardingErrorIncomplete);
       setState(() {
         _showLoginButtons = false;
         _currentStep = 1; // Onboarding adımlarına yönlendir
@@ -329,7 +332,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     }
     
     if (!mounted) return;
-    _showGlassError('Giriş başarısız oldu. Lütfen tekrar deneyin.');
+    _showGlassError(AppLocalizations.of(context)!.onboardingErrorFailed);
     setState(() {
       _showLoginButtons = false;
     });
@@ -414,7 +417,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         debugPrint('🚫 [$provider] ZATEN KAYITLI! Oturum kapatılıyor...');
         await supabase.auth.signOut();
         if (mounted) {
-          _showGlassError('Bu $provider hesabı ile zaten bir kozmik profilin var! Lütfen ilk sayfadaki "Giriş Yap" seçeneğini kullan.');
+          _showGlassError(AppLocalizations.of(context)!.onboardingErrorAlreadyExists(provider));
         }
         return true;
       }
@@ -559,7 +562,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     
     // EĞER BULUT KAYDI BAŞARISIZ OLDUYSA İŞLEMİ DURDUR
     if (syncResult != true && Supabase.instance.client.auth.currentUser != null) {
-       _showGlassError('Kayıt işlemi veritabanında reddedildi:\n$syncResult\nLütfen destek ile iletişime geçin.');
+       _showGlassError(AppLocalizations.of(context)!.onboardingErrorDBRejected(syncResult.toString()));
        // Sisteme çöp oturum kalmasın diye iptal edelim
        await Supabase.instance.client.auth.signOut();
        return;
@@ -571,6 +574,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ValueListenableBuilder<AppThemeData>(
       valueListenable: AppThemeController.notifier,
       builder: (context, palette, _) {
@@ -677,7 +681,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                             Icon(PhosphorIcons.lockKey(PhosphorIconsStyle.fill), color: Colors.white.withOpacity(0.15), size: 14),
                             const SizedBox(width: 8),
                             Text(
-                              "Yalnızca sana özel haritanı çizmek içindir.",
+                              l10n.onboardingPrivacyNote,
                               style: GoogleFonts.nunito(color: Colors.white.withOpacity(0.3), fontSize: 12),
                             ),
                           ],
@@ -712,7 +716,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       const SizedBox(height: 4), // Roma rakamları butonlara doğru aşağıya yaklaştıırıldı
                       if (_currentStep != 0 && _currentStep < 7) ...[
                         _buildNextButton(
-                          title: _currentStep == 6 ? "Yolculuğa Başla" : "Devam Et",
+                          title: _currentStep == 6 ? l10n.onboardingFinish : l10n.onboardingContinue,
                           icon: _currentStep == 6 ? PhosphorIcons.sparkle(PhosphorIconsStyle.fill) : PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
                           onTap: _nextStep,
                           glowColor: const Color(0xFFC36E6E),
@@ -736,7 +740,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 24.0), // "Hadi Başlayalım" butonunu alt yazıdan hafifçe koparıp havaya kaldırır
                                     child: _buildNextButton(
-                                      title: "Hadi Başlayalım",
+                                      title: l10n.onboardingStart,
                                       icon: PhosphorIcons.arrowRight(PhosphorIconsStyle.bold),
                                       onTap: _nextStep,
                                       glowColor: const Color(0xFFC36E6E),
@@ -775,7 +779,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                     else ...[
                                       _buildAuthButton(
                                         icon: Icons.apple,
-                                        label: "Apple ile Giriş Yap",
+                                        label: l10n.loginAppleSignIn,
                                         color: Colors.white,
                                         textColor: Colors.black,
                                         onTap: _handleAppleSignIn,
@@ -783,7 +787,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                       const SizedBox(height: 12),
                                       _buildAuthButton(
                                         icon: Icons.g_mobiledata_rounded,
-                                        label: "Google ile Giriş Yap",
+                                        label: l10n.loginGoogleSignIn,
                                         color: Colors.white.withOpacity(0.1),
                                         textColor: Colors.white,
                                         onTap: _handleGoogleSignIn,
@@ -818,14 +822,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 child: Text.rich(
                                   key: ValueKey(_showLoginButtons),
                                   TextSpan(
-                                    text: _showLoginButtons ? "Henüz evrene katılmadın mı?  " : "Zaten evrene katıldın mı?  ",
+                                    text: _showLoginButtons ? l10n.loginNoAccountYet : l10n.loginHaveAccount,
                                     style: GoogleFonts.nunito(
                                       color: Colors.white.withOpacity(0.5),
                                       fontSize: 13,
                                     ),
                                     children: [
                                       TextSpan(
-                                        text: _showLoginButtons ? "Kayıt Ol" : "Giriş Yap",
+                                        text: _showLoginButtons ? l10n.loginSignUp : l10n.loginSignIn,
                                         style: GoogleFonts.nunito(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w700,
@@ -855,7 +859,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                               else ...[
                                 _buildAuthButton(
                                   icon: Icons.apple,
-                                  label: "Apple ile Hesabını Oluştur",
+                                  label: l10n.onboardingAppleCreate,
                                   color: Colors.white,
                                   textColor: Colors.black,
                                   onTap: _handleFinalAppleSignIn,
@@ -863,7 +867,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                 const SizedBox(height: 12),
                                 _buildAuthButton(
                                   icon: Icons.g_mobiledata_rounded,
-                                  label: "Google ile Hesabını Oluştur",
+                                  label: l10n.onboardingGoogleCreate,
                                   color: Colors.white.withOpacity(0.1),
                                   textColor: Colors.white,
                                   onTap: _handleFinalGoogleSignIn,
@@ -1871,7 +1875,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : "Tam saati biliyorsan detaylı analiz için gir", style: GoogleFonts.nunito(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedTime != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                     Text(_selectedTime != null ? DateFormat('HH:mm').format(_selectedTime!) : l10n.onboardingTimeHint, style: GoogleFonts.nunito(color: _selectedTime != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedTime != null ? 15 : 12, fontWeight: FontWeight.w400)),
                    ],
                  ),
                  onTap: () {
@@ -1896,7 +1900,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     Text(_selectedLocation ?? "Şehir seçerek hesaplamayı netleştir", style: GoogleFonts.nunito(color: _selectedLocation != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedLocation != null ? 15 : 12, fontWeight: FontWeight.w400)),
+                     Text(_selectedLocation ?? l10n.onboardingLocationHint, style: GoogleFonts.nunito(color: _selectedLocation != null ? Colors.white : Colors.white.withOpacity(0.25), fontSize: _selectedLocation != null ? 15 : 12, fontWeight: FontWeight.w400)),
                    ],
                  ),
                  onTap: () {
@@ -2785,6 +2789,7 @@ class _StaggeredFadeState extends State<StaggeredFade> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 700),
       curve: Curves.easeOutCubic,
@@ -2819,6 +2824,7 @@ class _LoopingFloatState extends State<LoopingFloat> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SlideTransition(position: _anim, child: widget.child);
   }
 }
@@ -2841,6 +2847,7 @@ class _CinematicAuroraWindState extends State<CinematicAuroraWind> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, _) {
@@ -2907,6 +2914,7 @@ class _LoopingPulseState extends State<LoopingPulse> with SingleTickerProviderSt
   void dispose() { _ctrl.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ScaleTransition(scale: _scale, child: widget.child);
   }
 }
@@ -2946,6 +2954,7 @@ class _LoopingHourglassState extends State<LoopingHourglass> with SingleTickerPr
   void dispose() { _ctrl.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, child) {
@@ -2993,6 +3002,7 @@ class _AnimatedCurvedLineState extends State<_AnimatedCurvedLine> with SingleTic
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, _) {
@@ -3147,6 +3157,7 @@ class _AvatarCoverFlowState extends State<_AvatarCoverFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 160, // Kusursuz yuvarlaklar için genel yükseklik daraltıldı
       child: Stack(

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../widgets/fade_page_route.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../l10n/app_localizations.dart';
 
 class CoffeePage extends StatefulWidget {
   const CoffeePage({super.key});
@@ -81,28 +82,28 @@ class _CoffeePageState extends State<CoffeePage>
   void initState() {
     super.initState();
     _shuffledRelationshipOptions = [
-      {'text': 'Yalnız Ruhum', 'icon': Icons.person_outline},
-      {'text': 'Kalbim Dolu', 'icon': Icons.favorite_border},
-      {'text': 'Nişanlıyım', 'icon': Icons.diamond_outlined},
-      {'text': 'Evliyim', 'icon': Icons.home_outlined},
-      {'text': 'Karmaşık', 'icon': Icons.all_inclusive},
+      {'key': 'single', 'icon': Icons.person_outline},
+      {'key': 'in_love', 'icon': Icons.favorite_border},
+      {'key': 'engaged', 'icon': Icons.diamond_outlined},
+      {'key': 'married', 'icon': Icons.home_outlined},
+      {'key': 'complicated', 'icon': Icons.all_inclusive},
     ]..shuffle();
 
     _shuffledFocusOptions = [
-      {'text': 'Aşk ve Uyum', 'icon': Icons.favorite_border},
-      {'text': 'Kariyer ve Maddiyat', 'icon': Icons.work_outline},
-      {'text': 'Şifa ve Huzur', 'icon': Icons.spa_outlined},
-      {'text': 'Genel Gelecek', 'icon': Icons.visibility_outlined},
-      {'text': 'Sürpriz Olsun', 'icon': Icons.auto_awesome},
+      {'key': 'love', 'icon': Icons.favorite_border},
+      {'key': 'career', 'icon': Icons.work_outline},
+      {'key': 'healing', 'icon': Icons.spa_outlined},
+      {'key': 'general', 'icon': Icons.visibility_outlined},
+      {'key': 'surprise', 'icon': Icons.auto_awesome},
     ]..shuffle();
 
     _shuffledMoodOptions = [
-      {'text': 'Huzurlu', 'icon': Icons.self_improvement},
-      {'text': 'Heyecanlı', 'icon': Icons.local_fire_department_outlined},
-      {'text': 'Endişeli', 'icon': Icons.water_drop_outlined},
-      {'text': 'Kararsız', 'icon': Icons.help_outline},
-      {'text': 'Enerjik', 'icon': Icons.bolt_outlined},
-      {'text': 'Hüzünlü', 'icon': Icons.cloud_outlined},
+      {'key': 'peaceful', 'icon': Icons.self_improvement},
+      {'key': 'excited', 'icon': Icons.local_fire_department_outlined},
+      {'key': 'anxious', 'icon': Icons.water_drop_outlined},
+      {'key': 'indecisive', 'icon': Icons.help_outline},
+      {'key': 'energetic', 'icon': Icons.bolt_outlined},
+      {'key': 'melancholic', 'icon': Icons.cloud_outlined},
     ]..shuffle();
 
     WidgetsBinding.instance.addObserver(this);
@@ -278,7 +279,7 @@ class _CoffeePageState extends State<CoffeePage>
     else if (_plateAngle == null)
       nextStep = 4;
 
-    // Tüm fotoğraflar yüklendiyse ama henüz 'Kaderini Keşfet' (ödeme) butonuna basılmadıysa,
+    // Tüm fotoğraflar yüklendiyse ama henüz AppLocalizations.of(context)!.coffeeDiscoverFate (ödeme) butonuna basılmadıysa,
     // tarama ekranına (5. adım) SIZMASINI engelle. Kronolojik olarak bir sonraki fotoğrafa geçir.
     if (nextStep == 5 && !_hasPaidForScan) {
       nextStep = _currentStep + 1;
@@ -333,7 +334,7 @@ class _CoffeePageState extends State<CoffeePage>
             invalidSlots.add(i);
             invalidMessages[i] =
                 results[i]['error'] ??
-                'Bu görselde net bir kahve telvesi seçilemiyor.';
+                AppLocalizations.of(context)!.coffeeImageError;
           }
         }
         if (mounted) {
@@ -369,7 +370,7 @@ class _CoffeePageState extends State<CoffeePage>
         _insideAngle == null ||
         _plateAngle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen tüm fotoğrafları çekin!')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.coffeeAllPhotosRequired)),
       );
       return;
     }
@@ -392,7 +393,7 @@ class _CoffeePageState extends State<CoffeePage>
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Yeterli Ruh Taşın yok!')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.coffeeNotEnoughStones)),
           );
         }
         return;
@@ -484,8 +485,8 @@ class _CoffeePageState extends State<CoffeePage>
                                   size: 48,
                                 ),
                                 const SizedBox(height: 12),
-                                const Text(
-                                  'Kozmik Kahve Yorumu',
+                                Text(
+                                  AppLocalizations.of(context)!.coffeeCosmicTitle,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
@@ -521,7 +522,7 @@ class _CoffeePageState extends State<CoffeePage>
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        "$soulStones Ruh Taşın var",
+                                        AppLocalizations.of(context)!.coffeeSoulStoneCount(soulStones),
                                         style: const TextStyle(
                                           color: Color(0xFF22D3EE),
                                           fontSize: 13,
@@ -534,21 +535,21 @@ class _CoffeePageState extends State<CoffeePage>
                                 const SizedBox(height: 16),
                                 _premiumInfoRow(
                                   Icons.local_cafe_rounded,
-                                  "Yapay zeka kahve analizi izni",
+                                  AppLocalizations.of(context)!.coffeeAiPermission,
                                   true,
                                 ),
                                 const SizedBox(height: 10),
                                 _premiumInfoRow(
                                   Icons.diamond_outlined,
-                                  "Her analiz 1 Ruh Taşı harcar",
+                                  AppLocalizations.of(context)!.coffeeStoneCostInfo,
                                   hasEnough,
                                 ),
                                 const SizedBox(height: 10),
                                 _premiumInfoRow(
                                   Icons.workspace_premium,
                                   isPremiumUser
-                                      ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
-                                      : "Elite ile her gece 5 Ruh Taşı kazan",
+                                      ? AppLocalizations.of(context)!.coffeeEliteRefillActive
+                                      : AppLocalizations.of(context)!.coffeeEliteRefillPromo,
                                   isPremiumUser,
                                 ),
                                 const SizedBox(height: 20),
@@ -593,7 +594,7 @@ class _CoffeePageState extends State<CoffeePage>
                                         child: FittedBox(
                                           fit: BoxFit.scaleDown,
                                           child: Text(
-                                            "1 Ruh Taşı Kullan",
+                                            AppLocalizations.of(context)!.coffeeUseSoulStone,
                                             style: TextStyle(
                                               color: hasEnough
                                                   ? const Color(0xFF22D3EE)
@@ -644,10 +645,10 @@ class _CoffeePageState extends State<CoffeePage>
                                             color: Color(0xFF22D3EE),
                                             size: 18,
                                           ),
-                                          label: const FittedBox(
+                                          label: FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: Text(
-                                              "Elite Al",
+                                              AppLocalizations.of(context)!.coffeeEliteGetBtn,
                                               style: TextStyle(
                                                 color: Color(0xFF22D3EE),
                                                 fontWeight: FontWeight.bold,
@@ -769,7 +770,7 @@ class _CoffeePageState extends State<CoffeePage>
               ),
               const SizedBox(height: 16),
               Text(
-                'Sadece Premium Özeldir',
+                AppLocalizations.of(context)!.coffeePremiumOnly,
                 style: GoogleFonts.inter(
                   color: Colors.white,
                   fontSize: 22,
@@ -779,7 +780,7 @@ class _CoffeePageState extends State<CoffeePage>
               ),
               const SizedBox(height: 12),
               Text(
-                'Kahve Falı özelliği uygulamanın elit üyelerine aittir. Premium\'a geç ve Ruh Taşlarınla geleceğin sırlarını arala.',
+                AppLocalizations.of(context)!.coffeePremiumDesc,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.6),
                   fontSize: 14,
@@ -802,7 +803,7 @@ class _CoffeePageState extends State<CoffeePage>
                   ),
                   child: Center(
                     child: Text(
-                      'Premium Ol (Simülasyon)',
+                      AppLocalizations.of(context)!.coffeePremiumSimBtn,
                       style: GoogleFonts.inter(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -837,7 +838,7 @@ class _CoffeePageState extends State<CoffeePage>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Fotoğraf Kaynağı',
+                AppLocalizations.of(context)!.coffeePhotoSource,
                 style: GoogleFonts.inter(
                   color: Colors.white,
                   fontSize: 18,
@@ -877,7 +878,7 @@ class _CoffeePageState extends State<CoffeePage>
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Kamera',
+                              AppLocalizations.of(context)!.coffeeCamera,
                               style: GoogleFonts.inter(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
@@ -919,7 +920,7 @@ class _CoffeePageState extends State<CoffeePage>
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Galeri',
+                              AppLocalizations.of(context)!.coffeeGallery,
                               style: GoogleFonts.inter(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
@@ -1023,32 +1024,32 @@ class _CoffeePageState extends State<CoffeePage>
                             _buildIntroScreen(),
                             _buildUploadStep(
                               stepIndex: 1,
-                              title: 'Fincan İçi',
+                              title: AppLocalizations.of(context)!.coffeeStepCupInside,
                               desc:
-                                  'Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.',
+                                  AppLocalizations.of(context)!.coffeeStepCupInsideDesc,
                               icon: Icons.keyboard_arrow_down_rounded,
                             ),
                             _buildUploadStep(
                               stepIndex: 2,
-                              title: 'Sol Profil',
+                              title: AppLocalizations.of(context)!.coffeeStepLeftProfile,
                               desc:
-                                  'Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.',
+                                  AppLocalizations.of(context)!.coffeeStepLeftProfileDesc,
                               icon: Icons.screen_rotation_rounded,
                             ),
                             _buildUploadStep(
                               stepIndex: 3,
-                              title: 'Sağ Profil',
+                              title: AppLocalizations.of(context)!.coffeeStepRightProfile,
                               desc:
-                                  'Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.',
+                                  AppLocalizations.of(context)!.coffeeStepRightProfileDesc,
                               icon: Icons.screen_rotation_alt_rounded,
                             ),
                             _buildUploadStep(
                               stepIndex: 4,
-                              title: 'Tabağın Sırrı',
+                              title: AppLocalizations.of(context)!.coffeeStepSaucerSecret,
                               desc:
-                                  'Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.',
+                                  AppLocalizations.of(context)!.coffeeStepSaucerDesc,
                               icon: Icons.blur_circular_rounded,
-                              buttonText: 'Tabak Fotoğrafı Çek',
+                              buttonText: AppLocalizations.of(context)!.coffeeStepSaucerBtn,
                             ),
                             _buildFinalReadyScreen(),
                             _buildAnalyzingScreen(),
@@ -1309,7 +1310,7 @@ class _CoffeePageState extends State<CoffeePage>
           // Tam ortada başlık
           Center(
             child: Text(
-              'KAHVE FALI',
+              AppLocalizations.of(context)!.coffeeHeaderTitle,
               style: GoogleFonts.inter(
                 color: const Color(0xFFE8D5C4),
                 fontSize: 14,
@@ -1611,7 +1612,7 @@ class _CoffeePageState extends State<CoffeePage>
                 '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
           } catch (_) {}
         }
-        final summary = _lastReading?['story'] ?? 'Yorum bulunamadı.';
+        final summary = _lastReading?['story'] ?? AppLocalizations.of(context)!.coffeeLoadingComment;
 
         return Center(
           child: SizedBox(
@@ -1643,7 +1644,7 @@ class _CoffeePageState extends State<CoffeePage>
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Son Falın',
+                            AppLocalizations.of(context)!.coffeeLastReading,
                             style: GoogleFonts.outfit(
                               color: Colors.white,
                               fontSize: 20,
@@ -1654,7 +1655,7 @@ class _CoffeePageState extends State<CoffeePage>
                         if (hasReading && timeStr.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
-                            'Saat $timeStr • Gece 00:00\'da silinir',
+                            AppLocalizations.of(context)!.coffeeLastReadingTime(timeStr),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.4),
                               fontSize: 11,
@@ -1689,7 +1690,7 @@ class _CoffeePageState extends State<CoffeePage>
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Henüz fal baktırmadın.\nBir fincan kahve demle,\ntelvelerin sana fısıldamasını bekle.',
+                            AppLocalizations.of(context)!.coffeeNoReadingYet,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.3),
@@ -1778,8 +1779,8 @@ class _CoffeePageState extends State<CoffeePage>
                           size: 48,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Ruh Taşların',
+                        Text(
+                          AppLocalizations.of(context)!.coffeeSoulStones,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -1811,8 +1812,8 @@ class _CoffeePageState extends State<CoffeePage>
                               const SizedBox(width: 6),
                               Text(
                                 soulStones > 0
-                                    ? '$soulStones Ruh Taşın var'
-                                    : 'Ruh Taşın bitti',
+                                    ? AppLocalizations.of(context)!.coffeeSoulStoneCount(soulStones)
+                                    : AppLocalizations.of(context)!.coffeeSoulStoneEmpty,
                                 style: const TextStyle(
                                   color: Color(0xFF22D3EE),
                                   fontSize: 13,
@@ -1825,21 +1826,21 @@ class _CoffeePageState extends State<CoffeePage>
                         const SizedBox(height: 16),
                         _premiumInfoRow(
                           Icons.local_cafe_rounded,
-                          'Kahve falı yorumlaması için gerekli',
+                          AppLocalizations.of(context)!.coffeeSoulStoneRequired,
                           true,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.diamond_outlined,
-                          'Her yorum 1 Ruh Taşı harcar',
+                          AppLocalizations.of(context)!.coffeeSoulStoneCost,
                           soulStones >= 1,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.workspace_premium,
                           _isPremium
-                              ? 'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir'
-                              : 'Elite ile her gece 5 Ruh Taşı kazan',
+                              ? AppLocalizations.of(context)!.coffeeSoulStoneEliteActive
+                              : AppLocalizations.of(context)!.coffeeSoulStoneElitePromo,
                           _isPremium,
                         ),
                         if (!_isPremium) ...[
@@ -1869,8 +1870,8 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                               );
                             },
-                            child: const Text(
-                              'Elite Abone Ol',
+                            child: Text(
+                              AppLocalizations.of(context)!.coffeeEliteSubscribe,
                               style: TextStyle(
                                 color: Color(0xFF22D3EE),
                                 fontWeight: FontWeight.bold,
@@ -2000,7 +2001,7 @@ class _CoffeePageState extends State<CoffeePage>
                     _buildAnimatedChild(
                       0.15,
                       Text(
-                        'RİTÜEL',
+                        AppLocalizations.of(context)!.coffeeRitualLabel,
                         style: GoogleFonts.inter(
                           color: const Color(0xFFD4A373),
                           fontSize: 12,
@@ -2013,7 +2014,7 @@ class _CoffeePageState extends State<CoffeePage>
                     _buildAnimatedChild(
                       0.3,
                       Text(
-                        'Fincanın Sırları',
+                        AppLocalizations.of(context)!.coffeeRitualTitle,
                         style: GoogleFonts.outfit(
                           color: Colors.white,
                           fontSize: 32,
@@ -2027,7 +2028,7 @@ class _CoffeePageState extends State<CoffeePage>
                     _buildAnimatedChild(
                       0.45,
                       Text(
-                        'Telveler sadece onlara doğru bakanlara konuşur. Gerçek bir okuma için ritüeli takip et.',
+                        AppLocalizations.of(context)!.coffeeRitualDesc,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.6),
                           fontSize: 14,
@@ -2045,8 +2046,8 @@ class _CoffeePageState extends State<CoffeePage>
                       0.55,
                       _buildRitualRow(
                         Icons.self_improvement_rounded,
-                        'Niyetini Belirle',
-                        'Yudumlarken zihninden bir soru veya dilek geçir.',
+                        AppLocalizations.of(context)!.coffeeRitualStep1Title,
+                        AppLocalizations.of(context)!.coffeeRitualStep1Desc,
                       ),
                     ),
                     _buildAnimatedChild(0.6, _buildDivider()),
@@ -2054,8 +2055,8 @@ class _CoffeePageState extends State<CoffeePage>
                       0.65,
                       _buildRitualRow(
                         Icons.local_cafe_rounded,
-                        'Aynı Yerden İç',
-                        'Şekillerin bozulmaması için hep aynı taraftan yudumla.',
+                        AppLocalizations.of(context)!.coffeeRitualStep2Title,
+                        AppLocalizations.of(context)!.coffeeRitualStep2Desc,
                       ),
                     ),
                     _buildAnimatedChild(0.7, _buildDivider()),
@@ -2063,8 +2064,8 @@ class _CoffeePageState extends State<CoffeePage>
                       0.75,
                       _buildRitualRow(
                         Icons.flip_camera_android_rounded,
-                        'Ters Çevir',
-                        'Fincanı kapat, soğumasını bekle ve yavaşça aç.',
+                        AppLocalizations.of(context)!.coffeeRitualStep3Title,
+                        AppLocalizations.of(context)!.coffeeRitualStep3Desc,
                       ),
                     ),
 
@@ -2094,7 +2095,7 @@ class _CoffeePageState extends State<CoffeePage>
                           ),
                           child: Center(
                             child: Text(
-                              'Telvelerin Fısıltısını Dinle',
+                              AppLocalizations.of(context)!.coffeeRitualListenTitle,
                               style: GoogleFonts.inter(
                                 color: const Color(0xFFD4A373),
                                 fontSize: 15,
@@ -2201,7 +2202,7 @@ class _CoffeePageState extends State<CoffeePage>
                       child: Column(
                         children: [
                           Text(
-                            'Adım $stepIndex: $title',
+                            AppLocalizations.of(context)!.coffeeStepLabel(stepIndex.toString(), title),
                             style: GoogleFonts.inter(
                               color: Colors.white,
                               fontSize: 24,
@@ -2266,7 +2267,7 @@ class _CoffeePageState extends State<CoffeePage>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Kaderini Keşfet',
+                                    AppLocalizations.of(context)!.coffeeDiscoverFate,
                                     style: GoogleFonts.inter(
                                       color: const Color(0xFF161311),
                                       fontSize: 15,
@@ -2348,7 +2349,7 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  hasImage ? 'Sonraki Adım' : buttonText,
+                                  hasImage ? AppLocalizations.of(context)!.coffeeNextStep : buttonText,
                                   style: GoogleFonts.inter(
                                     color: hasImage
                                         ? const Color(0xFF161311)
@@ -2411,7 +2412,7 @@ class _CoffeePageState extends State<CoffeePage>
                       }
                       final dynamicErrorMessage = uniqueErrors.isNotEmpty
                           ? uniqueErrors.join('\n\n')
-                          : 'İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.';
+                          : AppLocalizations.of(context)!.coffeeValidationError;
 
                       return Column(
                         mainAxisSize: MainAxisSize.min,
@@ -2424,7 +2425,7 @@ class _CoffeePageState extends State<CoffeePage>
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            'Kozmik Uyumsuzluk',
+                            AppLocalizations.of(context)!.coffeeCosmicMismatch,
                             style: GoogleFonts.outfit(
                               color: Colors.white,
                               fontSize: 24,
@@ -2494,7 +2495,7 @@ class _CoffeePageState extends State<CoffeePage>
                         ),
                         const SizedBox(height: 48),
                         Text(
-                          'KOZMİK BAĞ KONTROLÜ',
+                          AppLocalizations.of(context)!.coffeeCosmicCheck,
                           style: GoogleFonts.inter(
                             color: const Color(0xFFD4A373),
                             fontSize: 12,
@@ -2504,7 +2505,7 @@ class _CoffeePageState extends State<CoffeePage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Telvelerin dili çözülüyor,\nkaderin fısıltıları dinleniyor...',
+                          AppLocalizations.of(context)!.coffeeCosmicCheckDesc,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.4),
                             fontSize: 14,
@@ -2577,7 +2578,7 @@ class _CoffeePageState extends State<CoffeePage>
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Sır Perdesini Arala',
+                      AppLocalizations.of(context)!.coffeeRevealSecrets,
                       style: GoogleFonts.outfit(
                         color: _isValidated && _currentIntentStep == 3
                             ? const Color(0xFFD4A373)
@@ -2616,7 +2617,7 @@ class _CoffeePageState extends State<CoffeePage>
           const CircularProgressIndicator(color: Color(0xFFD4A373)),
           const SizedBox(height: 32),
           Text(
-            'Telveler Okunuyor...',
+            AppLocalizations.of(context)!.coffeeReadingInProgress,
             style: GoogleFonts.inter(
               color: Colors.white,
               fontSize: 22,
@@ -2625,7 +2626,7 @@ class _CoffeePageState extends State<CoffeePage>
           ),
           const SizedBox(height: 16),
           Text(
-            'Geleceğin kapıları aralanıyor, bekle.',
+            AppLocalizations.of(context)!.coffeeReadingWait,
             style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 15),
           ),
         ],
@@ -2640,8 +2641,8 @@ class _CoffeePageState extends State<CoffeePage>
     if (_currentIntentStep == 0) {
       currentStepWidget = _buildPremiumSelector(
         key: const ValueKey('step_0'),
-        title: 'İlişki Durumun',
-        subtitle: 'Kozmik bağın temelini belirle.',
+        title: AppLocalizations.of(context)!.coffeeRelationTitle,
+        subtitle: AppLocalizations.of(context)!.coffeeRelationSubtitle,
         options: _shuffledRelationshipOptions,
         selectedValue: _selectedRelationship,
         onSelected: (val) {
@@ -2655,8 +2656,8 @@ class _CoffeePageState extends State<CoffeePage>
     } else if (_currentIntentStep == 1) {
       currentStepWidget = _buildPremiumSelector(
         key: const ValueKey('step_1'),
-        title: 'Aklında Ne Var?',
-        subtitle: 'Bir niyet seç, yorumun ona göre derinleşsin.',
+        title: AppLocalizations.of(context)!.coffeeFocusTitle,
+        subtitle: AppLocalizations.of(context)!.coffeeFocusSubtitle,
         options: _shuffledFocusOptions,
         selectedValue: _selectedFocus,
         onSelected: (val) {
@@ -2670,8 +2671,8 @@ class _CoffeePageState extends State<CoffeePage>
     } else if (_currentIntentStep == 2) {
       currentStepWidget = _buildPremiumSelector(
         key: const ValueKey('step_2'),
-        title: 'Ruh Halin?',
-        subtitle: 'Fincanının enerjisini hisset.',
+        title: AppLocalizations.of(context)!.coffeeMoodTitle,
+        subtitle: AppLocalizations.of(context)!.coffeeMoodSubtitle,
         options: _shuffledMoodOptions,
         selectedValue: _selectedMood,
         onSelected: (val) {
@@ -2710,7 +2711,7 @@ class _CoffeePageState extends State<CoffeePage>
             ),
             const SizedBox(height: 16),
             Text(
-              'Kozmik Bağ Kuruldu',
+              AppLocalizations.of(context)!.coffeeCosmicBondFormed,
               style: GoogleFonts.outfit(
                 color: Colors.white,
                 fontSize: 24,
@@ -2720,7 +2721,7 @@ class _CoffeePageState extends State<CoffeePage>
             ),
             const SizedBox(height: 8),
             Text(
-              'Fincanının sırları fısıldanmaya hazır...',
+              AppLocalizations.of(context)!.coffeeSecretsReady,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.5),
                 fontSize: 14,
@@ -2757,6 +2758,29 @@ class _CoffeePageState extends State<CoffeePage>
         child: currentStepWidget,
       ),
     );
+  }
+
+  String _intentLabel(String key) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'single': return l10n.coffeeRelSingle;
+      case 'in_love': return l10n.coffeeRelInLove;
+      case 'engaged': return l10n.coffeeRelEngaged;
+      case 'married': return l10n.coffeeRelMarried;
+      case 'complicated': return l10n.coffeeRelComplicated;
+      case 'love': return l10n.coffeeFocusLove;
+      case 'career': return l10n.coffeeFocusCareer;
+      case 'healing': return l10n.coffeeFocusHealing;
+      case 'general': return l10n.coffeeFocusGeneral;
+      case 'surprise': return l10n.coffeeFocusSurprise;
+      case 'peaceful': return l10n.coffeeMoodPeaceful;
+      case 'excited': return l10n.coffeeMoodExcited;
+      case 'anxious': return l10n.coffeeMoodAnxious;
+      case 'indecisive': return l10n.coffeeMoodIndecisive;
+      case 'energetic': return l10n.coffeeMoodEnergetic;
+      case 'melancholic': return l10n.coffeeMoodMelancholic;
+      default: return key;
+    }
   }
 
   Widget _buildPremiumSelector({
@@ -2837,9 +2861,9 @@ class _CoffeePageState extends State<CoffeePage>
                       runSpacing: 12,
                       alignment: WrapAlignment.center,
                       children: options.map((option) {
-                        final isSelected = selectedValue == option['text'];
+                        final isSelected = selectedValue == option['key'];
                         return GestureDetector(
-                          onTap: () => onSelected(option['text']),
+                          onTap: () => onSelected(option['key']),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             width: itemWidth, // Exact calculated width
@@ -2879,7 +2903,7 @@ class _CoffeePageState extends State<CoffeePage>
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    option['text'],
+                                    _intentLabel(option['key']),
                                     style: GoogleFonts.outfit(
                                       color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
                                       fontSize: 14,
@@ -2899,9 +2923,9 @@ class _CoffeePageState extends State<CoffeePage>
                 )
               : Column(
                   children: options.map((option) {
-                    final isSelected = selectedValue == option['text'];
+                    final isSelected = selectedValue == option['key'];
                     return GestureDetector(
-                      onTap: () => onSelected(option['text']),
+                      onTap: () => onSelected(option['key']),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.only(bottom: 10),
@@ -2940,7 +2964,7 @@ class _CoffeePageState extends State<CoffeePage>
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                option['text'],
+                                _intentLabel(option['key']),
                                 style: GoogleFonts.outfit(
                                   color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
                                   fontSize: 16,

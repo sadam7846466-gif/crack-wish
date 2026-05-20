@@ -419,13 +419,7 @@ class _DreamPageState extends State<DreamPage>
     'Dreams are the brain\'s simulation of possible scenarios.',
     'As stress decreases, nightmares become less frequent.',
   ];
-  static const String _notAnalyzableMessageTr =
-      'Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.';
-  static const String _notAnalyzableMessageEn =
-      'Are you sure this was a dream?\nPlease describe a real scene you experienced while sleeping.';
-
-  String get _notAnalyzableMessage =>
-      _trEn(_notAnalyzableMessageTr, _notAnalyzableMessageEn);
+  String get _notAnalyzableMessage => AppLocalizations.of(context)!.dreamNotAnalyzable;
 
   @override
   void initState() {
@@ -647,9 +641,7 @@ class _DreamPageState extends State<DreamPage>
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              _isTr
-                                  ? 'Ruh Taşı Gerekli'
-                                  : 'Soul Stone Required',
+                              _l10n.dreamSoulStoneRequired,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -658,9 +650,7 @@ class _DreamPageState extends State<DreamPage>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              _isTr
-                                  ? 'Derin analiz için Ruh Taşı gereklidir.\n\nRuh Taşlarını Aura puanlarını dönüştürerek veya Elite abonelik ile kazanabilirsin.'
-                                  : 'Soul Stones are required for deep analysis.\n\nYou can earn Soul Stones by converting Aura points or with Elite subscription.',
+                              _l10n.dreamSoulStoneRequiredDesc,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Colors.white70,
@@ -700,7 +690,7 @@ class _DreamPageState extends State<DreamPage>
                                   );
                                 },
                                 child: Text(
-                                  _isTr ? 'Elite Abone Ol' : 'Get Elite',
+                                  _l10n.dreamGetElite,
                                   style: const TextStyle(
                                     color: Color(0xFF22D3EE),
                                     fontWeight: FontWeight.bold,
@@ -768,9 +758,7 @@ class _DreamPageState extends State<DreamPage>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            _isTr
-                                ? 'Klinik Analiz Kapısı'
-                                : 'Clinical Analysis Gate',
+                            _l10n.dreamClinicalGateTitle,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -779,9 +767,7 @@ class _DreamPageState extends State<DreamPage>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            _isTr
-                                ? 'Mevcut Ruh Taşın: $soulStones\n\nBu klinik seviye derin psikolojik analiz için 1 Ruh Taşı harcanır.'
-                                : 'Current Soul Stones: $soulStones\n\nThis clinical-level deep psychoanalysis costs 1 Soul Stone.',
+                            _l10n.dreamClinicalGateDesc(soulStones),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.white70,
@@ -815,9 +801,7 @@ class _DreamPageState extends State<DreamPage>
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      _isTr
-                                          ? '1 Ruh Taşı Kullan'
-                                          : 'Use 1 Stone',
+                                      _l10n.dreamUseOneStone,
                                       style: const TextStyle(
                                         color: Color(0xFF22D3EE),
                                         fontWeight: FontWeight.bold,
@@ -859,7 +843,7 @@ class _DreamPageState extends State<DreamPage>
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      _isTr ? 'Elite Abone Ol' : 'Get Elite',
+                                      _l10n.dreamGetElite,
                                       style: const TextStyle(
                                         color: Color(0xFF22D3EE),
                                         fontWeight: FontWeight.bold,
@@ -1041,7 +1025,7 @@ class _DreamPageState extends State<DreamPage>
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isTr ? 'Derin Analiz arka planda hazırlanıyor. Tamamlandığında bildirim alacaksınız.' : 'Deep Analysis is being prepared in the background. You will receive a notification when it is ready.'),
+              content: Text(_l10n.dreamDeepAnalysisBgPreparing),
               backgroundColor: AppColors.primaryPurple,
               duration: const Duration(seconds: 4),
             ),
@@ -1241,7 +1225,7 @@ class _DreamPageState extends State<DreamPage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isTr ? "Ruh Taşların" : "Your Soul Stones",
+                          _l10n.dreamYourSoulStones,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -1273,12 +1257,8 @@ class _DreamPageState extends State<DreamPage>
                               const SizedBox(width: 6),
                               Text(
                                 soulStones > 0
-                                    ? (_isTr
-                                          ? "$soulStones Ruh Taşın var"
-                                          : "$soulStones Soul Stones remaining")
-                                    : (_isTr
-                                          ? "Ruh Taşın bitti"
-                                          : "Out of Soul Stones"),
+                                    ? _l10n.dreamSoulStonesRemaining(soulStones)
+                                    : _l10n.dreamSoulStonesEmpty,
                                 style: const TextStyle(
                                   color: Color(0xFF22D3EE),
                                   fontSize: 13,
@@ -1291,29 +1271,21 @@ class _DreamPageState extends State<DreamPage>
                         const SizedBox(height: 16),
                         _premiumInfoRow(
                           Icons.auto_awesome,
-                          _isTr
-                              ? "Derin Analiz için gerekli"
-                              : "Required for Deep Analysis",
+                          _l10n.dreamRequiredForDeep,
                           true,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.diamond_outlined,
-                          _isTr
-                              ? "Her analiz 1 Ruh Taşı harcar"
-                              : "Each analysis costs 1 Soul Stone",
+                          _l10n.dreamEachAnalysisCost,
                           soulStones >= 1,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.workspace_premium,
                           _isPremiumUser
-                              ? (_isTr
-                                    ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
-                                    : "Elite refils 5 Soul Stones nightly")
-                              : (_isTr
-                                    ? "Elite ile her gece 5 Ruh Taşı kazan"
-                                    : "Get 5 daily Soul Stones with Elite"),
+                              ? _l10n.dreamEliteRefillActive
+                              : _l10n.dreamEliteRefillPromo,
                           _isPremiumUser,
                         ),
 
@@ -1345,7 +1317,7 @@ class _DreamPageState extends State<DreamPage>
                               );
                             },
                             child: Text(
-                              _isTr ? "Elite Abone Ol" : "Get Elite",
+                              _l10n.dreamGetElite,
                               style: const TextStyle(
                                 color: Color(0xFF22D3EE),
                                 fontWeight: FontWeight.bold,
@@ -1478,13 +1450,9 @@ class _DreamPageState extends State<DreamPage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isTr
-                              ? (_isPremiumUser
-                                    ? "Elite Okuma Hakların"
-                                    : "Okuma Hakların")
-                              : (_isPremiumUser
-                                    ? "Elite Credits"
-                                    : "Your Reading Credits"),
+                          _isPremiumUser
+                              ? _l10n.dreamEliteCreditsTitle
+                              : _l10n.dreamReadingCreditsTitle,
                           style: TextStyle(
                             color: _isPremiumUser
                                 ? AppColors.primaryPurple
@@ -1523,12 +1491,8 @@ class _DreamPageState extends State<DreamPage>
                                     const SizedBox(width: 6),
                                     Text(
                                       creditCount > 0
-                                          ? (_isTr
-                                                ? "$creditCount okuma hakkın var"
-                                                : "$creditCount credits remaining")
-                                          : (_isTr
-                                                ? "Bugünlük hakkın bitti"
-                                                : "Daily limit reached"),
+                                          ? _l10n.dreamCreditsRemaining(creditCount)
+                                          : _l10n.dreamDailyLimitReached,
                                       style: TextStyle(
                                         color: AppColors.primaryPurple,
                                         fontSize: 13,
@@ -1540,16 +1504,10 @@ class _DreamPageState extends State<DreamPage>
                               )
                             : Text(
                                 creditCount > 0
-                                    ? (_isTr
-                                          ? "$creditCount okuma hakkın var"
-                                          : "$creditCount credits remaining")
+                                    ? _l10n.dreamCreditsRemaining(creditCount)
                                     : (_dreamDailyAdWatchCount < _kMaxDailyAds
-                                          ? (_isTr
-                                                ? "0 okuma hakkın var"
-                                                : "0 credits remaining")
-                                          : (_isTr
-                                                ? "Bugünlük hakkın bitti"
-                                                : "Daily limit reached")),
+                                          ? _l10n.dreamZeroCredits
+                                          : _l10n.dreamDailyLimitReached),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.5),
                                   fontSize: 13,
@@ -1560,49 +1518,37 @@ class _DreamPageState extends State<DreamPage>
                         if (_isPremiumUser) ...[
                           _dreamCreditInfoRow(
                             Icons.star_border,
-                            _isTr
-                                ? "Günlük $_kMaxPremiumReads Rüya Yorumu hakkı"
-                                : "$_kMaxPremiumReads daily Dream interpretations",
+                            _l10n.dreamDailyPremiumReads(_kMaxPremiumReads),
                             true,
                           ),
                           const SizedBox(height: 10),
                           _dreamCreditInfoRow(
                             Icons.not_interested,
-                            _isTr
-                                ? "Reklam izleme zorunluluğu yok"
-                                : "No need to watch ads",
+                            _l10n.dreamNoAdsRequired,
                             true,
                           ),
                           const SizedBox(height: 10),
                           _dreamCreditInfoRow(
                             Icons.refresh,
-                            _isTr
-                                ? "Haklar her gece sıfırlanır"
-                                : "Credits reset every night",
+                            _l10n.dreamCreditsResetNightly,
                             false,
                           ),
                         ] else ...[
                           _dreamCreditInfoRow(
                             Icons.nights_stay_outlined,
-                            _isTr
-                                ? "Her gün 1 ücretsiz yorum"
-                                : "1 free interpretation every day",
+                            _l10n.dreamOneFreeDaily,
                             !_dreamDailyFreeUsed,
                           ),
                           const SizedBox(height: 10),
                           _dreamCreditInfoRow(
                             Icons.play_circle_outline,
-                            _isTr
-                                ? "Reklam ile ek $_kMaxDailyAds hak (${math.min(_dreamDailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)"
-                                : "Watch ads for $_kMaxDailyAds extra credits (${math.min(_dreamDailyAdWatchCount, _kMaxDailyAds)}/$_kMaxDailyAds)",
+                            _l10n.dreamWatchAdsForCredits(_kMaxDailyAds, math.min(_dreamDailyAdWatchCount, _kMaxDailyAds)),
                             _dreamDailyAdWatchCount < _kMaxDailyAds,
                           ),
                           const SizedBox(height: 10),
                           _dreamCreditInfoRow(
                             Icons.refresh,
-                            _isTr
-                                ? "Haklar her gece sıfırlanır"
-                                : "Credits reset every night",
+                            _l10n.dreamCreditsResetNightly,
                             false,
                           ),
                         ],
@@ -1636,7 +1582,7 @@ class _DreamPageState extends State<DreamPage>
                                     }
                                   : null,
                               child: Text(
-                                _isTr ? "Reklam İzle" : "Watch Ad",
+                                _l10n.dreamWatchAd,
                                 style: TextStyle(
                                   color: _dreamDailyAdWatchCount < _kMaxDailyAds
                                       ? AppColors.primaryPurple
@@ -1768,7 +1714,7 @@ class _DreamPageState extends State<DreamPage>
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isTr ? 'Rüyanız arka planda analiz ediliyor. Tamamlandığında bildirim alacaksınız.' : 'Your dream is being analyzed in the background. You will receive a notification when it is ready.'),
+              content: Text(_l10n.dreamBgAnalyzing),
               backgroundColor: AppColors.primaryPurple,
               duration: const Duration(seconds: 4),
             ),
@@ -2674,10 +2620,8 @@ class _DreamPageState extends State<DreamPage>
                           // Sağ: Premium Yorum
                           Expanded(
                             child: buildActionButton(
-                              title: _isTr ? 'Derin Analiz' : 'Deep Analysis',
-                              subtitle: _isTr
-                                  ? 'Sırlarını keşfet'
-                                  : 'Discover secrets',
+                              title: _l10n.dreamDeepAnalysis,
+                              subtitle: _l10n.dreamDiscoverSecrets,
                               activeGradients: premiumActiveColors,
                               halfGradients: premiumHalfColors,
                               customGlowColor: const Color(0xFF22D3EE), // Vibrant Diamond Cyan Glow
@@ -3062,7 +3006,7 @@ class _DreamPageState extends State<DreamPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isTr ? 'Biliyor muydun?' : 'Did you know?',
+                  _l10n.dreamDidYouKnow,
                   style: TextStyle(
                     color: const Color(0xFFB8A8FF),
                     fontSize: 12,
@@ -3346,9 +3290,7 @@ class _DreamPageState extends State<DreamPage>
                     child: Column(
                       children: [
                         Text(
-                          isTr
-                              ? 'NÖRO-PSİKOLOJİK ANALİZ'
-                              : 'NEURO-PSYCH ANALYSIS',
+                          _l10n.dreamNeuroPsychAnalysis,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 14,
@@ -3401,7 +3343,7 @@ class _DreamPageState extends State<DreamPage>
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                isTr ? 'RÜYANIZ' : 'YOUR DREAM',
+                                _l10n.dreamYourDream,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.5),
                                   fontSize: 10,
@@ -3512,20 +3454,16 @@ class _DreamPageState extends State<DreamPage>
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _ClinicalAccordion(
-                    title: isTr ? 'Duygusal Profil' : 'Emotional Profile',
-                    subtitle: isTr
-                        ? 'Rüya sırasındaki psikolojik katmanlarınız'
-                        : 'Psychological layers during the dream',
+                    title: _l10n.dreamEmotionalProfile,
+                    subtitle: _l10n.dreamEmotionalProfileSub,
                     icon: Icons.waves,
                     content: _deepAnalysisResult!.emotionalLayers.synthesis,
                   ),
                   if (_deepAnalysisResult!.shadowSelf.revealed.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _ClinicalAccordion(
-                      title: isTr ? 'Gölge Benlik' : 'Shadow Self',
-                      subtitle: isTr
-                          ? 'Bastırdığınız ve yüzleşmekten kaçındığınız yönler'
-                          : 'Suppressed and unexamined aspects of the subconscious',
+                      title: _l10n.dreamShadowSelf,
+                      subtitle: _l10n.dreamShadowSelfSub,
                       icon: Icons.person_off_outlined,
                       content:
                           '${_deepAnalysisResult!.shadowSelf.revealed} ${_deepAnalysisResult!.shadowSelf.answerInsight}'.trim(),
@@ -3537,12 +3475,8 @@ class _DreamPageState extends State<DreamPage>
                       .isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _ClinicalAccordion(
-                      title: isTr
-                          ? 'Kalıplar ve Davranışlar'
-                          : 'Recurring Patterns',
-                      subtitle: isTr
-                          ? 'Hayatınızda sürekli tekrar eden psikolojik döngüler'
-                          : 'Recurring loops and psychological blockages',
+                      title: _l10n.dreamRecurringPatterns,
+                      subtitle: _l10n.dreamRecurringPatternsSub,
                       icon: Icons.replay,
                       content:
                           _deepAnalysisResult!.recurringPattern.description,
@@ -3551,15 +3485,11 @@ class _DreamPageState extends State<DreamPage>
                   if (_deepAnalysisResult!.ritual.action.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _ClinicalAccordion(
-                      title: isTr
-                          ? 'Önerilen Ritüel: ${_deepAnalysisResult!.ritual.title}'
-                          : 'Suggested Ritual: ${_deepAnalysisResult!.ritual.title}',
-                      subtitle: isTr
-                          ? 'Bu rüyanın etkisini yönetmek için size özel eylem'
-                          : 'A specialized action to manage this dream\'s impact',
+                      title: _l10n.dreamSuggestedRitual(_deepAnalysisResult!.ritual.title),
+                      subtitle: _l10n.dreamSuggestedRitualSub,
                       icon: Icons.self_improvement,
                       content:
-                          '${_deepAnalysisResult!.ritual.action}\n\n${isTr ? "Bilimsel Not:" : "Science Note:"} ${_deepAnalysisResult!.ritual.scienceNote}',
+                          '${_deepAnalysisResult!.ritual.action}\n\n${_l10n.dreamScienceNote} ${_deepAnalysisResult!.ritual.scienceNote}',
                     ),
                   ],
                 ]),
@@ -3655,7 +3585,7 @@ class _DreamPageState extends State<DreamPage>
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            isTr ? 'Yeni Bir Rüya Yaz' : 'Write a New Dream',
+                            _l10n.dreamWriteNewDream,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.7),
                               fontSize: 14,
@@ -4249,7 +4179,7 @@ class _DreamPageState extends State<DreamPage>
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         child: Text(
-                          _isTr ? 'Bu ay henüz rüya yazmadın ✨' : 'No dreams written this month yet ✨',
+                          _l10n.dreamNoMonthDreams,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.4),
@@ -4318,7 +4248,7 @@ class _DreamPageState extends State<DreamPage>
                               Text(
                                 title.isNotEmpty
                                     ? title
-                                    : (_isTr ? 'Gizemli Rüya' : 'Mysterious Dream'),
+                                    : _l10n.dreamMysteriousDream,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -4757,9 +4687,7 @@ class _DreamPageState extends State<DreamPage>
                                 ),
                                 const SizedBox(height: 24),
                                 Text(
-                                  _isTr
-                                      ? 'STANDART ANALİZ'
-                                      : 'STANDARD ANALYSIS',
+                                  _l10n.dreamStandardAnalysis,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.9),
                                     fontSize: 14,
@@ -4793,7 +4721,7 @@ class _DreamPageState extends State<DreamPage>
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      _isTr ? 'RÜYANIZ' : 'YOUR DREAM',
+                                      _l10n.dreamYourDream,
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.5),
                                         fontSize: 10,
@@ -4895,33 +4823,31 @@ class _DreamPageState extends State<DreamPage>
                             ),
                           if (general != null && general.isNotEmpty)
                             _detailBlock(
-                              _isTr ? 'Genel Analiz' : 'General Analysis',
+                              _l10n.dreamGeneralAnalysis,
                               general,
                               icon: Icons.insights,
                             ),
                           if (psychology != null && psychology.isNotEmpty)
                             _detailBlock(
-                              _isTr ? 'Psikolojik Örüntü' : 'Psychological',
+                              _l10n.dreamPsychological,
                               psychology,
                               icon: Icons.psychology,
                             ),
                           if (spiritual != null && spiritual.isNotEmpty)
                             _detailBlock(
-                              _isTr ? 'Ruhsal / Sembolik' : 'Spiritual',
+                              _l10n.dreamSpiritual2,
                               spiritual,
                               icon: Icons.nights_stay,
                             ),
                           if (advice != null && advice.isNotEmpty)
                             _detailBlock(
-                              _isTr ? 'Öneri & Adım' : 'Advice',
+                              _l10n.dreamAdvice,
                               advice,
                               icon: Icons.wb_incandescent_outlined,
                             ),
                           if (enrichedText != null && enrichedText!.isNotEmpty)
                             _detailBlock(
-                              _isTr
-                                  ? 'Derinleştirilmiş Analiz'
-                                  : 'Deepened Insights',
+                              _l10n.dreamDeepenedInsights,
                               enrichedText!,
                               icon: Icons.auto_awesome,
                             ),
@@ -5805,9 +5731,7 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
                             if (widget.showHomeButton) ...[
                               const SizedBox(height: 24),
                               Text(
-                                AppLocalizations.of(context)?.localeName == 'tr' 
-                                  ? 'Burada bekleyebilir veya ana sayfaya dönebilirsin. Yorumun hazır olduğunda sana bildirim göndereceğiz ve "Rüyalarım" sekmesinden okuyabileceksin.'
-                                  : 'You can wait here or return to home page. We will notify you when it\'s ready, and you can read it from the "My Dreams" section.',
+                                AppLocalizations.of(context)!.dreamWaitOrReturn,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.55),
@@ -5834,7 +5758,7 @@ class _AnalysisDialogState extends State<_AnalysisDialog> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      AppLocalizations.of(context)?.localeName == 'tr' ? 'Ana Sayfaya Dön' : 'Return to Home Page',
+                                      AppLocalizations.of(context)!.dreamReturnHome,
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.8),
                                         fontSize: 14,
@@ -7551,6 +7475,7 @@ class _PremiumCosmicMetrics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -7568,7 +7493,7 @@ class _PremiumCosmicMetrics extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            isTr ? 'BİLİNÇDIŞI FREKANSLAR' : 'UNCONSCIOUS FREQUENCIES',
+            l10n.dreamUnconsciousFrequencies,
             style: const TextStyle(
               color: Color(0xFF9FA8DA),
               fontSize: 12,
@@ -7581,12 +7506,12 @@ class _PremiumCosmicMetrics extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildOrb(
-                isTr ? 'DUYGU YÜKÜ' : 'EMOTION',
+                l10n.dreamOrbEmotion,
                 distribution.emotionalLoad,
                 const Color(0xFFE040FB),
               ),
               _buildOrb(
-                isTr ? 'BELİRSİZLİK' : 'ENTROPY',
+                l10n.dreamOrbEntropy,
                 distribution.uncertainty,
                 const Color(0xFF26C6DA),
               ),
@@ -7597,12 +7522,12 @@ class _PremiumCosmicMetrics extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildOrb(
-                isTr ? 'BEYİN AKT.' : 'ACTIVITY',
+                l10n.dreamOrbActivity,
                 distribution.brainActivity,
                 const Color(0xFFFFCA28),
               ),
               _buildOrb(
-                isTr ? 'YAKIN GEÇMİŞ' : 'RESIDUE',
+                l10n.dreamOrbResidue,
                 distribution.recentMemoryEffect,
                 const Color(0xFF66BB6A),
               ),
@@ -7679,10 +7604,11 @@ class _ClinicalMainThemeCard extends StatelessWidget {
     required this.uncertainty,
   });
 
-  String get _confidenceText {
-    if (uncertainty < 30) return isTr ? 'Yüksek Güven' : 'High Confidence';
-    if (uncertainty < 70) return isTr ? 'Orta Güven' : 'Moderate Confidence';
-    return isTr ? 'Düşük Güven' : 'Low Confidence';
+  String _confidenceText(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (uncertainty < 30) return l10n.dreamHighConfidence;
+    if (uncertainty < 70) return l10n.dreamModerateConfidence;
+    return l10n.dreamLowConfidence;
   }
 
   Color get _confidenceColor {
@@ -7711,7 +7637,7 @@ class _ClinicalMainThemeCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isTr ? 'ANA TEMATİK ÖRÜNTÜ' : 'CORE THEMATIC PATTERN',
+                    AppLocalizations.of(context)!.dreamCoreThematicPattern,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.4),
                       fontSize: 10,
@@ -7794,58 +7720,52 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
     super.dispose();
   }
 
-  List<Map<String, dynamic>> get _metrics => [
+  List<Map<String, dynamic>> _metrics(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
     {
       'percentage': widget.distribution.emotionalLoad / 100.0,
-      'title': widget.isTr ? 'Duygusal\nYoğunluk' : 'Emotional\nLoad',
+      'title': l10n.dreamMetricEmotionalLoad,
       'color': const Color(
         0xFFDCA4FF,
-      ), // Yumu\u015fat\u0131lm\u0131\u015f lila/pembe
+      ), // Yumuşatılmış lila/pembe
       'reasoning': widget.distribution.emotionalLoadReasoning,
-      'description': widget.isTr
-          ? 'Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.'
-          : 'How intensely your brain\'s emotional center was activated during this dream.',
+      'description': l10n.dreamMetricEmotionalLoadDesc,
     },
     {
       'percentage': widget.distribution.uncertainty / 100.0,
-      'title': widget.isTr
-          ? 'Anlatısal\nBelirsizlik'
-          : 'Narrative\nUncertainty',
-      'color': const Color(0xFF9BA6FF), // Yumu\u015fat\u0131lm\u0131\u015f mavi
+      'title': l10n.dreamMetricUncertainty,
+      'color': const Color(0xFF9BA6FF), // Yumuşatılmış mavi
       'reasoning': widget.distribution.uncertaintyReasoning,
-      'description': widget.isTr
-          ? 'Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.'
-          : 'How illogical or inconsistent your dream narrative was.',
+      'description': l10n.dreamMetricUncertaintyDesc,
     },
     {
       'percentage': widget.distribution.recentMemoryEffect / 100.0,
-      'title': widget.isTr ? 'Yakın\nGeçmiş' : 'Recent\nConnection',
+      'title': l10n.dreamMetricRecentMemory,
       'color': const Color(
         0xFF8ADABD,
-      ), // Yumu\u015fat\u0131lm\u0131\u015f mint ye\u015fili
+      ), // Yumuşatılmış mint yeşili
       'reasoning': widget.distribution.recentMemoryReasoning,
-      'description': widget.isTr
-          ? 'Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.'
-          : 'How much of your dream was influenced by recent real-life events.',
+      'description': l10n.dreamMetricRecentMemoryDesc,
     },
     {
       'percentage': widget.distribution.brainActivity / 100.0,
-      'title': widget.isTr ? 'Ajans /\nKontrol' : 'Agency /\nControl',
+      'title': l10n.dreamMetricAgency,
       'color': const Color(
         0xFF86D2E1,
-      ), // Yumu\u015fat\u0131lm\u0131\u015f cam g\u00f6be\u011fi
+      ), // Yumuşatılmış cam göbeği
       'reasoning': widget.distribution.brainActivityReasoning,
-      'description': widget.isTr
-          ? 'Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.'
-          : 'How much control you had over events in your dream.',
+      'description': l10n.dreamMetricAgencyDesc,
     },
   ];
+  }
 
   String _severityLabel(double pct) {
+    final l10n = AppLocalizations.of(context)!;
     final p = (pct * 100).toInt();
-    if (p >= 70) return widget.isTr ? 'Yüksek' : 'High';
-    if (p >= 35) return widget.isTr ? 'Normal' : 'Normal';
-    return widget.isTr ? 'Düşük' : 'Low';
+    if (p >= 70) return l10n.dreamSeverityHigh;
+    if (p >= 35) return l10n.dreamSeverityNormal;
+    return l10n.dreamSeverityLow;
   }
 
   Color _severityColor(double pct) {
@@ -7857,8 +7777,9 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
 
   @override
   Widget build(BuildContext context) {
+    final metrics = _metrics(context);
     final selectedMetric = _selectedIndex != null
-        ? _metrics[_selectedIndex!]
+        ? metrics[_selectedIndex!]
         : null;
 
     return ClipRRect(
@@ -7887,7 +7808,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        widget.isTr ? 'BİLİŞSEL DAĞILIM' : 'COGNITIVE DISTRIBUTION',
+                        AppLocalizations.of(context)!.dreamCognitiveDistribution,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.5),
                           fontSize: 10,
@@ -7902,7 +7823,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
                       Icon(Icons.touch_app_rounded, color: Colors.white.withOpacity(0.4), size: 12),
                       const SizedBox(width: 4),
                       Text(
-                        widget.isTr ? 'GENİŞLETMEK İÇİN DOKUN' : 'TAP TO EXPAND',
+                        AppLocalizations.of(context)!.dreamTapToExpand,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.4),
                           fontSize: 8,
@@ -7920,10 +7841,10 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
                 builder: (context, _) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(_metrics.length * 2 - 1, (i) {
+                    children: List.generate(metrics.length * 2 - 1, (i) {
                       if (i.isOdd) return const SizedBox(width: 8);
                       final index = i ~/ 2;
-                      final m = _metrics[index];
+                      final m = metrics[index];
                       final isSelected = _selectedIndex == index;
                       final pct = m['percentage'] as double;
                       final animPct = pct * _ringAnim.value;
@@ -8107,9 +8028,7 @@ class _ClinicalMetricsPanelState extends State<_ClinicalMetricsPanel>
                                       (selectedMetric['reasoning'] as String)
                                               .isNotEmpty
                                           ? selectedMetric['reasoning']
-                                          : (widget.isTr
-                                                ? 'Bu metrik için özel bir açıklama üretilmemiş.'
-                                                : 'No reasoning generated.'),
+                                          : AppLocalizations.of(context)!.dreamNoReasoning,
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.9),
                                         fontSize: 12.5,
@@ -8211,7 +8130,7 @@ class _ClinicalEvidenceSection extends StatelessWidget {
     if (analysis.brainScience.mechanism.isNotEmpty) {
       evidenceItems.add({
         'icon': Icons.psychology,
-        'title': isTr ? 'Nörolojik Taban' : 'Neurological Basis',
+        'title': AppLocalizations.of(context)!.dreamNeurologicalBasis,
         'text': analysis.brainScience.mechanism,
         'color': const Color(0xFFD500F9), // Purple neon
       });
@@ -8269,7 +8188,7 @@ class _ClinicalEvidenceSection extends StatelessWidget {
               Icon(Icons.hub, color: Colors.white.withOpacity(0.5), size: 16),
               const SizedBox(width: 8),
               Text(
-                isTr ? 'BU SONUCA NEDEN VARDIK?' : 'EVIDENCE BASE',
+                AppLocalizations.of(context)!.dreamEvidenceBase,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 10,
@@ -8508,13 +8427,16 @@ class _ClinicalReflectionQuestionState
   @override
   void initState() {
     super.initState();
-    if (widget.initialSelectedAction != null) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_fullText.isEmpty && widget.initialSelectedAction != null) {
       _selectedAction = widget.initialSelectedAction;
       _fullText =
           widget.reflectionResponses[_selectedAction!] ??
-          (widget.isTr
-              ? 'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.'
-              : 'This awareness is the start of a new path. It is time to face it.');
+          AppLocalizations.of(context)!.dreamAwarenessFallback;
       _displayedText = _fullText;
     }
   }
@@ -8540,9 +8462,7 @@ class _ClinicalReflectionQuestionState
       _isAnalyzing = false;
       _fullText =
           widget.reflectionResponses[actionKey] ??
-          (widget.isTr
-              ? 'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.'
-              : 'This awareness is the start of a new path. It is time to face it.');
+          (AppLocalizations.of(context)!.dreamAwarenessFallback);
     });
 
     // Yazı daktilo (typewriter) efekti
@@ -8578,7 +8498,7 @@ class _ClinicalReflectionQuestionState
           Icon(Icons.my_location, color: const Color(0xFFB39DDB), size: 28),
           const SizedBox(height: 16),
           Text(
-            widget.isTr ? 'Rüyanın Gerçek Sebebi' : 'Root Cause',
+            AppLocalizations.of(context)!.dreamRootCause,
             style: const TextStyle(
               color: Color(0xFFB39DDB),
               fontSize: 11,
@@ -8602,21 +8522,21 @@ class _ClinicalReflectionQuestionState
             children: [
               Expanded(
                 child: _buildReflectionBtn(
-                  widget.isTr ? 'Kesinlikle' : 'Absolutely',
+                  AppLocalizations.of(context)!.dreamAbsolutely,
                   'absolutely',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _buildReflectionBtn(
-                  widget.isTr ? 'Olabilir' : 'Maybe',
+                  AppLocalizations.of(context)!.dreamMaybe,
                   'maybe',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _buildReflectionBtn(
-                  widget.isTr ? 'Emin Değilim' : 'Not Sure',
+                  AppLocalizations.of(context)!.dreamNotSure,
                   'not_sure',
                 ),
               ),
@@ -8715,9 +8635,7 @@ class _ClinicalReflectionQuestionState
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      widget.isTr
-                          ? 'Rüyanın özü derleniyor...'
-                          : 'Extracting dream essence...',
+                      AppLocalizations.of(context)!.dreamExtractingEssence,
                       style: const TextStyle(
                         color: Color(0xFFB39DDB),
                         fontSize: 11,
@@ -8738,7 +8656,7 @@ class _ClinicalReflectionQuestionState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          widget.isTr ? 'RÜYANIN ÖZÜ' : 'DREAM ESSENCE',
+                          AppLocalizations.of(context)!.dreamDreamEssence,
                           style: const TextStyle(
                             color: Color(0xFFB39DDB),
                             fontSize: 10,
@@ -8808,7 +8726,7 @@ class _ClinicalAnswersSection extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isTr ? 'ANALİZİ NETLEŞTİREN YANITLAR' : 'CLARIFYING RESPONSES',
+                AppLocalizations.of(context)!.dreamClarifyingResponses,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 10,
@@ -8829,9 +8747,10 @@ class _ClinicalAnswersSection extends StatelessWidget {
                 final qa = entry.value;
                 final bool isYes = qa['answer'] == 'yes';
                 final bool isNo = qa['answer'] == 'no';
+                final l10n = AppLocalizations.of(context)!;
                 final String ansText = isYes
-                    ? (isTr ? 'EVET' : 'YES')
-                    : (isNo ? (isTr ? 'HAYIR' : 'NO') : (isTr ? '?' : '?'));
+                    ? l10n.dreamYes
+                    : (isNo ? l10n.dreamNo : '?');
                 final Color ansColor = isYes
                     ? const Color(0xFF69F0AE)
                     : (isNo
@@ -9180,7 +9099,7 @@ class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.isTr ? "Kozmik Ritmin Bağlandı" : "Cosmic Rhythm Synced",
+                    AppLocalizations.of(context)!.dreamCosmicRhythmSynced,
                     style: const TextStyle(
                       color: Colors.greenAccent,
                       fontSize: 16,
@@ -9190,9 +9109,7 @@ class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    widget.isTr 
-                      ? "Uyku döngünüze göre özel rüya bildirimleri alacaksınız." 
-                      : "You will receive custom dream prompts based on your sleep cycle.",
+                    AppLocalizations.of(context)!.dreamCosmicRhythmSyncedDesc,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 13,
@@ -9261,7 +9178,7 @@ class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.isTr ? "Uyku Verini Senkronize Et" : "Sync Sleep Data",
+                    AppLocalizations.of(context)!.dreamSyncSleepData,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -9271,9 +9188,7 @@ class _CosmicSyncButtonState extends State<_CosmicSyncButton> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    widget.isTr 
-                      ? "Tam uyandığın anı tespit edip en derin rüyanı sormasına izin ver." 
-                      : "Allow it to detect when you wake up to ask about your deepest dream.",
+                    AppLocalizations.of(context)!.dreamSyncSleepDataDesc,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 13,

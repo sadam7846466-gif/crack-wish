@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import '../l10n/app_localizations.dart';
 
 enum ModerationResult {
   approved,
@@ -74,18 +75,19 @@ class ContentModerationService {
   }
 
   /// Uyarıcı Mesaj Döner
-  String getErrorMessage(ModerationResult result) {
+  String getErrorMessage(BuildContext context, ModerationResult result) {
+    final l10n = AppLocalizations.of(context)!;
     switch (result) {
       case ModerationResult.rejectedAdultContent:
-        return 'Bu görselin enerjisi Kozmik evrenimizle uyumlu değil (Uygunsuz İçerik).';
+        return l10n.moderationAdultContent;
       case ModerationResult.rejectedViolence:
-        return 'Lütfen zihni yormayan, auranı yansıtan daha sakin bir avatar seç (Rahatsız Edici İçerik).';
+        return l10n.moderationViolence;
       case ModerationResult.rejectedTooLarge:
-        return 'Görselin kozmik ağı yoracak kadar büyük. Lütfen 5MB altı bir fotoğraf seç.';
+        return l10n.moderationTooLarge;
       case ModerationResult.rejectedInvalidFormat:
-        return 'Fotoğrafın sihirli parşömenimiz tarafından okunamadı, format bozuk.';
+        return l10n.moderationInvalidFormat;
       default:
-        return 'Bilinmeyen bir kozmik dalgalanma oluştu.';
+        return l10n.moderationUnknown;
     }
   }
 }

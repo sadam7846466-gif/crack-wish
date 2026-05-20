@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/guidance_booklet.dart';
 import '../widgets/swipe_back_wrapper.dart';
+import '../l10n/app_localizations.dart';
 
 class MotivationPage extends StatefulWidget {
   const MotivationPage({super.key});
@@ -227,8 +228,8 @@ class _MotivationPageState extends State<MotivationPage>
             child: AnimatedOpacity(
               opacity: _selectedIndex == null ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 400),
-              child: const Text(
-                'Bugün modun nasıl?',
+              child: Text(
+                AppLocalizations.of(context)!.moodQuestion,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -371,7 +372,7 @@ class _MotivationPageState extends State<MotivationPage>
               opacity: _selectedIndex == null ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 400),
               child: Text(
-                'Çarkı çevir, ruh halini seç ✨',
+                AppLocalizations.of(context)!.moodSpinHint,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.5),

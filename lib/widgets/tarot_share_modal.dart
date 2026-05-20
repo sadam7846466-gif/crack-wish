@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -701,8 +702,8 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildFormatTab('Hikaye', Icons.auto_stories_rounded, _isStoryFormat),
-                          _buildFormatTab('Gönderi', Icons.grid_on_rounded, !_isStoryFormat),
+                          _buildFormatTab(AppLocalizations.of(context)!.shareStory, Icons.auto_stories_rounded, _isStoryFormat, true),
+                          _buildFormatTab(AppLocalizations.of(context)!.sharePost, Icons.grid_on_rounded, !_isStoryFormat, false),
                         ],
                       ),
                     ),
@@ -780,7 +781,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  _isSaved ? 'Kaydedildi ✓' : 'İndir',
+                                  _isSaved ? AppLocalizations.of(context)!.shareSaved : AppLocalizations.of(context)!.shareDownload,
                                   style: TextStyle(
                                     color: _isSaved ? Colors.white : const Color(0xFFE7D6A5).withOpacity(0.7),
                                     fontSize: 13,
@@ -813,7 +814,7 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
                                 else
                                   Icon(Icons.ios_share_rounded, color: Colors.white.withOpacity(0.85), size: 14),
                                 const SizedBox(width: 6),
-                                Text('Paylaş', style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
+                                Text(AppLocalizations.of(context)!.shareShare, style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
                               ],
                             ),
                           ),
@@ -832,9 +833,9 @@ class _TarotShareModalState extends State<TarotShareModal> with TickerProviderSt
     );
   }
 
-  Widget _buildFormatTab(String label, IconData icon, bool isSelected) {
+  Widget _buildFormatTab(String label, IconData icon, bool isSelected, bool isStory) {
     return _TarotTapButton(
-      onTap: () => setState(() => _isStoryFormat = label == 'Hikaye'),
+      onTap: () => setState(() => _isStoryFormat = isStory),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

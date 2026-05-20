@@ -76,6 +76,7 @@ dependencies:
   flutter_contacts: ^2.0.2
   app_links: ^6.2.0
   swisseph: ^0.5.1
+  circle_flags: ^5.0.1
 
 dev_dependencies:
   flutter_test:

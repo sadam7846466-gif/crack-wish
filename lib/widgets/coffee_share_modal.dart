@@ -9,6 +9,7 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 
 class CoffeeShareModal extends StatefulWidget {
   final String story;
@@ -174,7 +175,7 @@ class _CoffeeShareModalState extends State<CoffeeShareModal> with TickerProvider
                 child: Column(children: [
                   Icon(Icons.auto_awesome, color: gold.withOpacity(0.5), size: 20),
                   const SizedBox(height: 10),
-                  Text('Kahve Falı', style: GoogleFonts.playfairDisplay(
+                  Text(AppLocalizations.of(context)!.shareCoffeeTitle, style: GoogleFonts.playfairDisplay(
                     color: gold, fontSize: fs * 0.55, fontWeight: FontWeight.w600,
                     letterSpacing: 6.0, decoration: TextDecoration.none,
                   )),
@@ -316,8 +317,8 @@ class _CoffeeShareModalState extends State<CoffeeShareModal> with TickerProvider
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(100)),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      _tab('Hikaye', Icons.auto_stories_rounded, _isStoryFormat),
-                      _tab('Gönderi', Icons.grid_on_rounded, !_isStoryFormat),
+                      _tab(AppLocalizations.of(context)!.shareStory, Icons.auto_stories_rounded, _isStoryFormat, true),
+                      _tab(AppLocalizations.of(context)!.sharePost, Icons.grid_on_rounded, !_isStoryFormat, false),
                     ]),
                   ),
                   const SizedBox(height: 16),
@@ -340,11 +341,11 @@ class _CoffeeShareModalState extends State<CoffeeShareModal> with TickerProvider
                   const SizedBox(height: 24),
                   // Butonlar
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    _btn(_isSaved ? 'Kaydedildi ✓' : 'İndir', _isSaved ? Icons.check_circle_rounded : Icons.download_rounded,
+                    _btn(_isSaved ? AppLocalizations.of(context)!.shareSaved : AppLocalizations.of(context)!.shareDownload, _isSaved ? Icons.check_circle_rounded : Icons.download_rounded,
                       _isSaved ? const Color(0xFF2D7A50) : Colors.transparent, _isSaved ? Colors.white : const Color(0xFFD4A373),
                       _isSaved ? Colors.transparent : const Color(0xFFD4A373).withOpacity(0.5), _saveToGallery),
                     const SizedBox(width: 12),
-                    _btn('Paylaş', Icons.ios_share_rounded, const Color(0xFF3A3020), const Color(0xFFE8D5C4), Colors.transparent, _shareContent),
+                    _btn(AppLocalizations.of(context)!.shareShare, Icons.ios_share_rounded, const Color(0xFF3A3020), const Color(0xFFE8D5C4), Colors.transparent, _shareContent),
                   ]),
                 ])),
               ]),
@@ -355,8 +356,8 @@ class _CoffeeShareModalState extends State<CoffeeShareModal> with TickerProvider
     ));
   }
 
-  Widget _tab(String label, IconData icon, bool sel) => GestureDetector(
-    onTap: () { HapticFeedback.lightImpact(); setState(() { _isStoryFormat = label == 'Hikaye'; _cachedStoryImage = null; _cachedPostImage = null; }); },
+  Widget _tab(String label, IconData icon, bool sel, bool isStory) => GestureDetector(
+    onTap: () { HapticFeedback.lightImpact(); setState(() { _isStoryFormat = isStory; _cachedStoryImage = null; _cachedPostImage = null; }); },
     child: AnimatedContainer(duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(color: sel ? Colors.white.withOpacity(0.15) : Colors.transparent, borderRadius: BorderRadius.circular(100)),

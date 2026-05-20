@@ -153,8 +153,7 @@
   "discoverFeaturedTag": "ÖNE ÇIKAN",
   "discoverFeaturedTitle": "3 Kartlı Tarot Falı",
   "discoverFeaturedSubtitle": "Geçmiş, şimdi ve geleceğini keşfet",
-  "ctaStart": "Başla"
-  ,
+  "ctaStart": "Başla",
   "homeGreeting": "Merhaba! 👋",
   "homeFeeling": "Bugün nasıl hissediyorsun?",
   "quoteOfDayText": "Bugün yapabileceğin en küçük adım, yarının en büyük zaferine götürür.",
@@ -162,8 +161,7 @@
   "dailyHoroscopeTitle": "Koç Burcu",
   "dailyHoroscopeSubtitle": "Bugünkü Yorum",
   "dailyHoroscopeBody": "Bu hafta aşk konusunda şanslısın! Kariyer fırsatları kapında, gözlerini aç. Enerjin yüksek, bunu değerlendir.",
-  "aries": "Koç"
-  ,
+  "aries": "Koç",
   "bentoTarotTitle": "Tarot",
   "bentoTarotDesc": "Geleceğini gör",
   "bentoTarotBadge": "POPÜLER",
@@ -175,10 +173,8 @@
   "bentoMotivationBadge": "GÜNLÜK",
   "bentoZodiacTitle": "Burç",
   "bentoZodiacDesc": "Yıldızların mesajı",
-  "bentoZodiacBadge": "GÜNLÜK"
-  ,
-  "moodQuestion": "Bugün nasılsın?"
-  ,
+  "bentoZodiacBadge": "GÜNLÜK",
+  "moodQuestion": "Bugün nasılsın?",
   "dreamTitle": "Rüyanı Anlat",
   "dreamTabNew": "Yeni Rüya",
   "dreamTabHistory": "Rüyalarım",
@@ -199,8 +195,8 @@
   "dreamClarifyEscape": "Rüyada hareket/kaçış hissi var mıydı?",
   "dreamClarifyAnxious": "Rüyada tedirginlik veya tehdit hissi var mıydı?",
   "dreamUnsure": "Emin değilim",
-  "dreamYes": "Evet",
-  "dreamNo": "Hayır",
+  "dreamYes": "EVET",
+  "dreamNo": "HAYIR",
   "dreamGeneral": "Genel Rüya",
   "dreamShareText": "Rüya Başlığı: {title}\nTarih: {date}\n\nRüya: {text}\n\nGenel: {general}\nPsikolojik: {psychology}\nSpiritüel: {spiritual}\nTavsiye: {advice}\n\n#VLucky #Rüya",
   "@dreamShareText": {
@@ -214,8 +210,7 @@
       "spiritual": {},
       "advice": {}
     }
-  }
-  ,
+  },
   "scientificTitle": "Bilimsel Rüya Analizi",
   "scientificDreamPromptTitle": "Rüyanı Anlat",
   "scientificDreamHint": "Rüyanı hatırladığın kadar yaz...",
@@ -227,8 +222,7 @@
   "scientificResultsTitle": "Rüyanın Yorumu",
   "scientificRecentPastTitle": "Yakın Geçmiş Etkileri",
   "scientificSaved": "Rüya kaydedildi",
-  "scientificSaveButton": "Rüyayı Kaydet"
-  ,
+  "scientificSaveButton": "Rüyayı Kaydet",
   "cookieSpringWreath": "Bahar Çelengi",
   "cookieLuckyClover": "Şanslı Yonca",
   "cookieRoyalHearts": "Kraliyet Kalpleri",
@@ -255,14 +249,12 @@
   "emotionHappy": "Mutlu",
   "emotionSad": "Üzgün",
   "emotionConfusion": "Belirsiz",
-  "emotionSurprise": "Şaşkın"
-  ,
+  "emotionSurprise": "Şaşkın",
   "dreamMoodQuestion": "Uyandığında nasıl hissettin?",
   "dreamMetricEmotional": "Duygusal Yük",
-  "dreamMetricUncertainty": "Belirsizlik",
+  "dreamMetricUncertainty": "Anlatısal\nBelirsizlik",
   "dreamMetricRecentPast": "Yakın Geçmiş",
-  "dreamMetricBrain": "Beyin Akt."
-  ,
+  "dreamMetricBrain": "Beyin Akt.",
   "tarotShuffleHint": "Karıştırmak için dairesel sürükle",
   "tarotEnergyDepletedTitle": "Enerji Tükendi",
   "tarotEnergyDepletedBody": "Günlük kozmik enerjin tükendi.\nGerçeği görmek için enerjini yenile.",
@@ -289,8 +281,12 @@
   "inviteShareMessage": "Mistik bir yolculuğa hazır mısın? Crack&Wish evreninde seni bekliyorum! ✨\n\nDavet kodum: {handle}\nHemen İndir: {link}",
   "@inviteShareMessage": {
     "placeholders": {
-      "handle": { "type": "String" },
-      "link": { "type": "String" }
+      "handle": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
     }
   },
   "inviteShareSubject": "Crack&Wish Daveti",
@@ -300,7 +296,9 @@
   "inviteRequestSent": "{name} kişisine istek gönderildi!",
   "@inviteRequestSent": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "toastCoffeeReadyTitle": "Falın Hazır!",
@@ -317,33 +315,45 @@
   "rewardReferralReceiverDesc": "{inviter} seni buraya davet ettiği için sana bir karşılama hediyesi bıraktı.",
   "@rewardReferralReceiverDesc": {
     "placeholders": {
-      "inviter": { "type": "String" }
+      "inviter": {
+        "type": "String"
+      }
     }
   },
   "rewardInviterTitle": "Çağrın Duyuldu!",
   "rewardInviterDescSingle": "{name} evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
   "@rewardInviterDescSingle": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rewardInviterDescMultiple": "{name} ve {count} arkadaşın daha evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
   "@rewardInviterDescMultiple": {
     "placeholders": {
-      "name": { "type": "String" },
-      "count": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rewardInviterDescGeneric": "{count} arkadaşın evrene katıldı. Yol gösterici olduğun için ödüllendirildin.",
   "@rewardInviterDescGeneric": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "birthdayTitleWithName": "{name}, Doğum Günün Kutlu Olsun!",
   "@birthdayTitleWithName": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "birthdayTitle": "Doğum Günün Kutlu Olsun!",
@@ -354,20 +364,26 @@
   "achievementRewardStones": "+{count} Ruh Taşı",
   "@achievementRewardStones": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "achievementRewardAura": "+{count} Aura",
   "@achievementRewardAura": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "rankUpTitle": "Kozmik Terfi!",
   "rankUpMessage": "Aura gücün arttı. Yeni unvanın: {rank}",
   "@rankUpMessage": {
     "placeholders": {
-      "rank": { "type": "String" }
+      "rank": {
+        "type": "String"
+      }
     }
   },
   "rankNovice": "Acemi Kahin",
@@ -411,13 +427,17 @@
   "homeMilestoneMessage": "Günlük serin tam {count} güne ulaştı.",
   "@homeMilestoneMessage": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "homeMilestoneSoulStone": "+{count} Ruh Taşı",
   "@homeMilestoneSoulStone": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "homeGreetingMorning": "Günaydın",
@@ -455,5 +475,699 @@
   "paywallRestore": "Satın Alımları Geri Yükle",
   "paywallCurrentPlanBadge": "MEVCUT PLAN",
   "paywallLegalTr": "Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.",
-  "paywallOk": "Tamam"
+  "paywallOk": "Tamam",
+  "coffeeLoading1": "Fincanın derinliklerine iniliyor...",
+  "coffeeLoading2": "Telvelerdeki semboller evrensel enerjiyle eşleşiyor...",
+  "coffeeLoading3": "Kader çizgilerin haritalanıyor...",
+  "coffeeLoading4": "Sırlar açığa çıkıyor...",
+  "coffeeAiError": "AI falı yorumlarken bir hata ile karşılaştı.",
+  "coffeeGenericError": "Bir sorun oluştu. Lütfen tekrar dene.",
+  "coffeeNotifReady": "Falın hazır olunca bildirim alacaksın",
+  "coffeeCheckHistory": "  butonundan görebilirsin",
+  "coffeeWaitOrExplore": "Burada bekle ya da uygulamayı keşfet",
+  "coffeeGoHome": "Ana Sayfaya Dön",
+  "coffeeSections": "Fincanın Bölümleri",
+  "coffeeSectionInside": "Fincan İçi",
+  "coffeeSectionInsideDesc": "İç dünyan, düşüncelerin, duygusal halin.",
+  "coffeeSectionEdge": "Fincan Kenarı",
+  "coffeeSectionEdgeDesc": "Yakın gelecek, haber, mesaj, görüşme.",
+  "coffeeSectionBottom": "Fincan Dibi",
+  "coffeeSectionBottomDesc": "Geçmişten kalan konu, yük, kapanmamış mesele.",
+  "coffeeSectionSaucer": "Tabak",
+  "coffeeSectionSaucerDesc": "Dilek, sonuç, kısmet, son enerji.",
+  "coffeeLoadingComment": "Yorum yükleniyor...",
+  "coffeeStoryTitle": "Telvelerin Anlattığı Hikaye",
+  "coffeeSymbolsTitle": "Falında Görülen Semboller",
+  "coffeeLove": "Aşk & İlişkiler",
+  "coffeeCareer": "İş & Para",
+  "coffeeFamily": "Aile & Yakın Çevre",
+  "coffeeNearFuture": "Yakın Gelecek",
+  "coffeeClosing": "Falın Son Sözü",
+  "coffeeShare": "Falımı Paylaş",
+  "coffeeRetryValidation": "Geri Dön & Yeniden Çek",
+  "coffeeRetry": "Tekrar Dene",
+  "coffeeCancel": "İptal Et",
+  "coffeeSymbolLabel": "Sembol",
+  "coffeeSymbolLoading": "Yükleniyor...",
+  "coffeeTimelineSoon": "Çok Yakında",
+  "coffeeImageError": "Bu görselde net bir kahve telvesi seçilemiyor.",
+  "coffeeCosmicTitle": "Kozmik Kahve Yorumu",
+  "coffeePremiumOnly": "Sadece Premium Özeldir",
+  "coffeePremiumDesc": "Kahve Falı özelliği uygulamanın elit üyelerine aittir. Premium'a geç ve Ruh Taşlarınla geleceğin sırlarını arala.",
+  "coffeePremiumSimBtn": "Premium Ol (Simülasyon)",
+  "coffeePhotoSource": "Fotoğraf Kaynağı",
+  "coffeeCamera": "Kamera",
+  "coffeeGallery": "Galeri",
+  "coffeeStepCupInside": "Fincan İçi",
+  "coffeeStepCupInsideDesc": "Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.",
+  "coffeeStepLeftProfile": "Sol Profil",
+  "coffeeStepLeftProfileDesc": "Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.",
+  "coffeeStepRightProfile": "Sağ Profil",
+  "coffeeStepRightProfileDesc": "Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.",
+  "coffeeStepSaucerSecret": "Tabağın Sırrı",
+  "coffeeStepSaucerDesc": "Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.",
+  "coffeeStepSaucerBtn": "Tabak Fotoğrafı Çek",
+  "coffeeHeaderTitle": "KAHVE FALI",
+  "coffeeLastReading": "Son Falın",
+  "coffeeLastReadingTime": "Saat {time} • Gece 00:00'da silinir",
+  "@coffeeLastReadingTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "coffeeNoReadingYet": "Henüz fal baktırmadın.\nBir fincan kahve demle,\ntelvelerin sana fısıldamasını bekle.",
+  "coffeeSoulStones": "Ruh Taşların",
+  "coffeeSoulStoneEmpty": "Ruh Taşın bitti",
+  "coffeeSoulStoneRequired": "Kahve falı yorumlaması için gerekli",
+  "coffeeSoulStoneCost": "Her yorum 1 Ruh Taşı harcar",
+  "coffeeSoulStoneEliteActive": "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir",
+  "coffeeSoulStoneElitePromo": "Elite ile her gece 5 Ruh Taşı kazan",
+  "coffeeEliteSubscribe": "Elite Abone Ol",
+  "coffeeRitualLabel": "RİTÜEL",
+  "coffeeRitualTitle": "Fincanın Sırları",
+  "coffeeRitualDesc": "Telveler sadece onlara doğru bakanlara konuşur. Gerçek bir okuma için ritüeli takip et.",
+  "coffeeRitualStep1Title": "Niyetini Belirle",
+  "coffeeRitualStep1Desc": "Yudumlarken zihninden bir soru veya dilek geçir.",
+  "coffeeRitualStep2Title": "Aynı Yerden İç",
+  "coffeeRitualStep2Desc": "Şekillerin bozulmaması için hep aynı taraftan yudumla.",
+  "coffeeRitualStep3Title": "Ters Çevir",
+  "coffeeRitualStep3Desc": "Fincanı kapat, soğumasını bekle ve yavaşça aç.",
+  "coffeeRitualListenTitle": "Telvelerin Fısıltısını Dinle",
+  "coffeeStepLabel": "Adım {index}: {title}",
+  "@coffeeStepLabel": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "coffeeDiscoverFate": "Kaderini Keşfet",
+  "coffeeNextStep": "Sonraki Adım",
+  "coffeeValidationError": "İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.",
+  "coffeeCosmicMismatch": "Kozmik Uyumsuzluk",
+  "coffeeCosmicCheck": "KOZMİK BAĞ KONTROLÜ",
+  "coffeeCosmicCheckDesc": "Telvelerin dili çözülüyor,\nkaderin fısıltıları dinleniyor...",
+  "coffeeRevealSecrets": "Sır Perdesini Arala",
+  "coffeeReadingInProgress": "Telveler Okunuyor...",
+  "coffeeReadingWait": "Geleceğin kapıları aralanıyor, bekle.",
+  "coffeeRelationTitle": "İlişki Durumun",
+  "coffeeRelationSubtitle": "Kozmik bağın temelini belirle.",
+  "coffeeFocusTitle": "Aklında Ne Var?",
+  "coffeeFocusSubtitle": "Bir niyet seç, yorumun ona göre derinleşsin.",
+  "coffeeMoodTitle": "Ruh Halin?",
+  "coffeeMoodSubtitle": "Fincanının enerjisini hisset.",
+  "coffeeCosmicBondFormed": "Kozmik Bağ Kuruldu",
+  "coffeeSecretsReady": "Fincanının sırları fısıldanmaya hazır...",
+  "coffeeNewReading": "Yeni Fal Bak",
+  "coffeeAiPermission": "Yapay zeka kahve analizi izni",
+  "coffeeStoneCostInfo": "Her analiz 1 Ruh Taşı harcar",
+  "coffeeEliteRefillActive": "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir",
+  "coffeeEliteRefillPromo": "Elite ile her gece 5 Ruh Taşı kazan",
+  "coffeeEliteGetBtn": "Elite Al",
+  "coffeeResultOnHome": "Sonucu ana sayfadaki  ",
+  "onboardingStart": "Hadi Başlayalım",
+  "onboardingContinue": "Devam Et",
+  "onboardingFinish": "Yolculuğa Başla",
+  "onboardingNameHint": "Kozmik Bir İsim",
+  "onboardingNamePlaceholder": "isim_soyisim",
+  "onboardingHandleHint": "Kozmik Bir Lakap",
+  "onboardingHandlePlaceholder": "galaksi_gezgin",
+  "onboardingGenderTitle": "Cinsiyet",
+  "onboardingGenderFemale": "Kadın",
+  "onboardingGenderMale": "Erkek",
+  "onboardingGenderOther": "Belirtmek İstemiyorum",
+  "onboardingStep1Title": "Sana ne demeliyiz?",
+  "onboardingStep1Sub": "Evren seni hangi isimle ve titreşimle tanısın?",
+  "onboardingAvatarSelect": "Görünümünü Seç",
+  "onboardingStep2Title": "Ruhunun bedene girdiği an...",
+  "onboardingStep2Sub": "Astrolojik doğum haritanı ve sana özel ritüelleri hesaplayabilmemiz için temel bilgilerine ihtiyacımız var.",
+  "onboardingBirthDateLabel": "Doğum Tarihin",
+  "onboardingBirthTimeLabel": "Doğum Saatin",
+  "onboardingBirthLocationLabel": "Doğduğu Şehir",
+  "onboardingTimeHint": "Tam saati biliyorsan detaylı analiz için gir",
+  "onboardingLocationHint": "Şehir seçerek hesaplamayı netleştir",
+  "onboardingUnknownTime": "Tam saati bilmiyorum",
+  "onboardingPrivacyNote": "Yalnızca sana özel haritanı çizmek içindir.",
+  "onboardingStep3Title": "Odak noktan neresi?",
+  "onboardingStep3Sub": "Şu sıralar hayatında en çok hangi enerjiyi büyütmek veya şifalandırmak istiyorsun?",
+  "onboardingFocusLabel": "Odak (Çoklu Seçim)",
+  "onboardingFocusCareer": "Kariyer & Para",
+  "onboardingFocusLove": "Aşk & İlişkiler",
+  "onboardingFocusPeace": "İçsel Huzur",
+  "onboardingFocusLuck": "Şans & Fırsatlar",
+  "onboardingRelLabel": "Şu anki ilişki durumun:",
+  "onboardingRelSingle": "Yalnız Gökyüzü",
+  "onboardingRelComplicated": "Biri Var...",
+  "onboardingRelTalking": "Karmaşık",
+  "onboardingRelRelationship": "Mutlu Bir Bağ",
+  "onboardingStep4Title": "Geceleri evrenle bağın...",
+  "onboardingStep4Sub": "Bilinçaltın mesajları nasıl alıyor? Renklerin ve rüyaların bize ipucu verecek.",
+  "onboardingDreamLabel": "Ne sıklıkla rüya hatırlarsın?",
+  "onboardingDreamOften": "Sık Sık ve Çok Net",
+  "onboardingDreamSometimes": "Bazen Hatırlarım",
+  "onboardingDreamRarely": "Nadir",
+  "onboardingDreamNever": "Hiç Rüya Görmem",
+  "onboardingAuraLabel": "Ruhunun Aurası (Bugün nasıl hissediyorsun?)",
+  "onboardingStep5Title": "Zamanla olan dansın...",
+  "onboardingStep5Sub": "Günün hangi saatlerinde enerjin en yüksek? Bildirimlerini buna göre ayarlayacağız.",
+  "onboardingSleepLabel": "Uyku Düzenin",
+  "onboardingSleepMorning": "Sabah İnsanı",
+  "onboardingSleepNight": "Gece Kuşu",
+  "onboardingSleepIrregular": "Düzensiz",
+  "onboardingSleepLittle": "Çok Az Uyurum",
+  "onboardingMatchLabel": "Eşleşme ve Kozmik Bağ",
+  "onboardingMatchDesc": "Sinerji uyumlu profillerle bağ kurmaya ve özel kozmik eşleşmelere açık olmak istiyorum.",
+  "onboardingFinalTitle": "Her şey hazır...",
+  "onboardingFinalSub": "Yıldızların senin için ne planladığını öğrenmek üzeresin. Hesabını oluştur ve kozmik evrene giriş yap.",
+  "onboardingAppleCreate": "Apple ile Hesabını Oluştur",
+  "onboardingGoogleCreate": "Google ile Hesabını Oluştur",
+  "onboardingErrorIncomplete": "Hoş geldin! Profilini tamamlamak için birkaç adım kaldı.",
+  "onboardingErrorFailed": "Giriş başarısız oldu. Lütfen tekrar deneyin.",
+  "onboardingErrorAlreadyExists": "Bu {provider} hesabı ile zaten bir kozmik profilin var! Lütfen ilk sayfadaki 'Giriş Yap' seçeneğini kullan.",
+  "@onboardingErrorAlreadyExists": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingErrorDBRejected": "Kayıt işlemi veritabanında reddedildi:\n{error}\nLütfen destek ile iletişime geçin.",
+  "@onboardingErrorDBRejected": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingErrorHandleTaken": "Bu kullanıcı adı zaten alınmış",
+  "notifTitle": "Bildirimler",
+  "notifSubtitle": "Hangi bildirimleri almak istediğini seç",
+  "notifAnnouncements": "Duyurular",
+  "notifAnnouncementsDesc": "Yeni özellikler ve güncellemeler",
+  "notifSounds": "Sesler",
+  "notifSoundsDesc": "Sesli bildirim uyarıları",
+  "notifCookieAlarm": "Yeni Kurabiye Alarmı",
+  "notifCookieAlarmDesc": "Yeni fortune cookie geldiğinde",
+  "notifFriendAlarm": "Arkadaş Alarmı",
+  "notifFriendAlarmDesc": "Baykuş ağından yeni bağlantılar",
+  "notifDailyReminder": "Günlük Hatırlatıcılar",
+  "notifDailyReminderDesc": "Günlük kurabiyeni almayı unutma",
+  "accountTitle": "Hesap Detayları",
+  "accountSubtitle": "Kişisel bilgilerin ve hesap yönetimin",
+  "accountUsername": "Kullanıcı Adı",
+  "accountLinkedEmail": "Bağlı E-posta",
+  "accountSignInMethod": "Giriş Yöntemi",
+  "accountDeleteTitle": "Hesabı Sil",
+  "accountDeleteDesc": "Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.",
+  "accountDeleteCancel": "Vazgeç",
+  "accountDeleteConfirm": "Hesabı Sil",
+  "accountDeletePermanent": "Hesabı Kalıcı Olarak Sil",
+  "welcomeTagline": "The magic is within you.",
+  "welcomeAppleContinue": "Apple ile Devam Et",
+  "welcomeGoogleContinue": "Google ile Devam Et",
+  "moodGuideTitle": "Mod Rehberi",
+  "moodAwarenessTitle": "Duygusal Farkındalık",
+  "moodAwarenessDesc": "Ruh halini seçmek hislerini somutlaştırır; bu, içsel dengeni bulmanın ve öz-farkındalığın ilk adımıdır.",
+  "moodCosmicTitle": "Kozmik Frekans",
+  "moodCosmicDesc": "Mod tekerinden seçtiğin her duygunun bir frekansı vardır. Ekranın aurası doğrudan senin hislerinle uyumlanır.",
+  "moodHowToTitle": "Nasıl Kullanmalı?",
+  "moodHowToDesc": "Sadece çarkı çevirip o anki ruh halini en iyi yansıtan ifadeyi seç. Duygunu yargılama, sadece hisset ve kabul et.",
+  "moodQuestionAlt": "Bugün modun nasıl?",
+  "moodSpinHint": "Çarkı çevir, ruh halini seç ✨",
+  "bentoCoffeeTitle": "Kahve Falı",
+  "bentoCoffeeDesc": "Telvelerin dili",
+  "bentoUnexplored": "Bu alan henüz keşfedilmeyi bekliyor...",
+  "bentoSealed": "Mühürlü",
+  "horoscopeDailyEnergy": "Günün Enerjisi",
+  "horoscopeWestern": "Batı Astrolojisi",
+  "horoscopeAsian": "Asya Bilgeliği",
+  "horoscopeMayan": "Maya Ruhu",
+  "shareSaved": "Kaydedildi ✓",
+  "shareDownload": "İndir",
+  "shareShare": "Paylaş",
+  "shareStory": "Hikaye",
+  "sharePost": "Gönderi",
+  "shareCoffeeTitle": "Kahve Falı",
+  "cookieLockedTitle": "Bu özel kurabiye kilitli",
+  "cookieComingSoon": "Yakında Satışa Çıkacak ✨",
+  "dreamWaitOrReturn": "Burada bekleyebilir veya ana sayfaya dönebilirsin. Yorumun hazır olduğunda sana bildirim göndereceğiz ve \"Rüyalarım\" sekmesinden okuyabileceksin.",
+  "dreamReturnHome": "Ana Sayfaya Dön",
+  "profileEditProfile": "Profilini Düzenle",
+  "profileEditSubtitle": "Ad, burç ve kişisel bilgilerini düzenle",
+  "profileSearchHint": "Burç, şehir veya doğum tarihi ara...",
+  "profileStoreUnavailable": "Mağaza bağlantısı şu an kurulamıyor.",
+  "profileMailNotFound": "Mail uygulaması bulunamadı. support@crackandwish.com adresine yazabilirsiniz.",
+  "profileRitualCode": "Ritüel Kodun",
+  "profileRitualDesc": "Bu kod senin kişisel ritüel kimliğin. Arkadaşlarınla paylaşarak onları Baykuş Ağı'na davet edebilirsin.",
+  "profileRitualCopied": "Ritüel Kodun Kopyalandı ✨",
+  "profileRitualInfo": "Arkadaşlarınla paylaş, birlikte keşfedin!",
+  "profileShareCode": "Kodu Paylaş",
+  "profileDeleteAccount": "Hesabı Sil",
+  "profileDeleteDesc": "Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.",
+  "profileDeleteCancel": "Vazgeç",
+  "profileDeleteConfirm": "Hesabı Sil",
+  "profileSignOut": "Çıkış Yap",
+  "profileSignOutDesc": "Hesabından güvenli çıkış yap.\nVerilerin korunur.",
+  "profileSignOutCancel": "Vazgeç",
+  "profileSignOutConfirm": "Çıkış Yap",
+  "profilePrivacyPolicy": "Gizlilik Politikası",
+  "profileTermsOfUse": "Kullanım Koşulları",
+  "profileGetElite": "Elite'e Geç",
+  "profileGetEliteSubtitle": "Farkındalığa giden kapı",
+  "profileCosmicProfile": "Kozmik Profilim",
+  "profileCosmicSubtitle": "Harita, Saat ve Konum Bilgileri",
+  "profileSectionAccount": "Hesap",
+  "profileEmail": "E-posta",
+  "profileNotificationSettings": "Bildirim Tercihleri",
+  "profileRestorePurchases": "Satın Alımları Geri Yükle",
+  "profileRestoreSuccess": "Satın alımların başarıyla geri yüklendi!",
+  "profileRestoreFail": "Geri yüklenecek satın alım bulunamadı.",
+  "profileHelp": "Yardım",
+  "profileShare": "Paylaş",
+  "profileRate": "Değerlendir",
+  "profileVersion": "Sürüm",
+  "profileCosmicName": "Kozmik Adın",
+  "profileSealProfile": "Mührü Onayla",
+  "profileChooseAvatar": "Sihirli avatarını seç.",
+  "profileStrengthenBonds": "Bağlarını Güçlendir",
+  "profileStrengthenBondsDesc": "Kozmik evreni arkadaşlarınla büyüt.",
+  "profileEarnSoulStones": "+2 Ruh Taşı Kazan",
+  "profileCodeCopied": "Kod kopyalandı!",
+  "profileNotifications": "Bildirimler",
+  "profileSupportExperience": "Destek & Deneyim",
+  "profileSeerNovice": "Acemi Kahin",
+  "profileSeerApprentice": "Çırak Kahin",
+  "profileSeer": "Kahin",
+  "profileSeerWise": "Bilge Kahin",
+  "profileSeerMaster": "Usta Kahin",
+  "profileSeerCosmic": "Kozmik Kahin",
+  "profileUploadFailed": "Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.",
+  "profileCropTitle": "Kozmik Kesim",
+  "profileCropCancel": "İptal",
+  "profileCropDone": "Tamam",
+  "moderationAdultContent": "Bu görselin enerjisi Kozmik evrenimizle uyumlu değil (Uygunsuz İçerik).",
+  "moderationViolence": "Lütfen zihni yormayan, auranı yansıtan daha sakin bir avatar seç (Rahatsız Edici İçerik).",
+  "moderationTooLarge": "Görselin kozmik ağı yoracak kadar büyük. Lütfen 5MB altı bir fotoğraf seç.",
+  "moderationInvalidFormat": "Fotoğrafın sihirli parşömenimiz tarafından okunamadı, format bozuk.",
+  "moderationUnknown": "Bilinmeyen bir kozmik dalgalanma oluştu.",
+  "profileShareInvite": "Crack&Wish evrenine katıl! ✨\nRitüel Kodum: {code}\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com",
+  "@profileShareInvite": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "profileShareApp": "Crack&Wish ile şansını keşfet! •✨\nKurabiye kır, tarot aç, rüya yorumla.\n\nhttps://crackandwish.com",
+  "profileEliteYouAre": "Elite Büyücüsün",
+  "profileGoElite": "Elite'e Geç",
+  "profileEliteMystical": "Mistik kapıları incele",
+  "profileEliteDoor": "Farkındalığa giden kapı",
+  "profileMyCosmicProfile": "Kozmik Profilim",
+  "profileCosmicDetails": "Harita, Saat ve Konum Bilgileri",
+  "profileRestorePurchasesBtn": "Satın Alımları Geri Yükle",
+  "profileRestoreSubtitle": "Önceki satın alımlarını geri yükle",
+  "profileInviteFriends": "Arkadaşlarını Davet Et",
+  "profileInviteFriendsDesc": "Kozmik bağlar kur, birlikte kazan",
+  "cosmicChart": "Kozmik Harita",
+  "cosmicWestern": "BATI",
+  "cosmicAsian": "ASYA",
+  "cosmicMayan": "MAYA",
+  "cosmicRising": "YÜKSELEN",
+  "cosmicArrivalDate": "DÜNYAYA İNİŞ TARİHİ",
+  "cosmicBirthTime": "DOĞUM SAATİ",
+  "cosmicTimeUnknown": "Saat Bilinmiyor",
+  "cosmicBirthPlace": "DOĞUM YERİ KOORDİNATLARI",
+  "cosmicCountry": "Ülke",
+  "cosmicSelectCountry": "Ülke Seç",
+  "cosmicCityDistrict": "Şehir & İlçe & Köy",
+  "cosmicSelectDateFirst": "Lütfen önce doğum tarihinizi seçin.",
+  "cosmicLockedDays": "{days} Gün Sonra Değiştirilebilir",
+  "@cosmicLockedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "cosmicSave": "Kaydet",
+  "cosmicSearchLocation": "Tam Konumu Ara",
+  "cosmicSearchHint": "Köy, ilçe veya şehir yaz...",
+  "cosmicAddFreeText": "Serbest metin olarak ekle",
+  "cosmicRequiresTime": "Saat Gerekli",
+  "badgeReady": "HAZIR",
+  "badgeNew": "YENİ",
+  "paywallLegal": "Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.",
+  "cosmicSelect": "Seç",
+  "coffeeRelSingle": "Yalnız Ruhum",
+  "coffeeRelInLove": "Kalbim Dolu",
+  "coffeeRelEngaged": "Nişanlıyım",
+  "coffeeRelMarried": "Evliyim",
+  "coffeeRelComplicated": "Karmaşık",
+  "coffeeFocusLove": "Aşk ve Uyum",
+  "coffeeFocusCareer": "Kariyer ve Maddiyat",
+  "coffeeFocusHealing": "Şifa ve Huzur",
+  "coffeeFocusGeneral": "Genel Gelecek",
+  "coffeeFocusSurprise": "Sürpriz Olsun",
+  "coffeeMoodPeaceful": "Huzurlu",
+  "coffeeMoodExcited": "Heyecanlı",
+  "coffeeMoodAnxious": "Endişeli",
+  "coffeeMoodIndecisive": "Kararsız",
+  "coffeeMoodEnergetic": "Enerjik",
+  "coffeeMoodMelancholic": "Hüzünlü",
+  "coffeeAllPhotosRequired": "Lütfen tüm fotoğrafları çekin!",
+  "coffeeNotEnoughStones": "Yeterli Ruh Taşın yok!",
+  "coffeeSoulStoneCount": "{count} Ruh Taşın var",
+  "@coffeeSoulStoneCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coffeeUseSoulStone": "1 Ruh Taşı Kullan",
+  "languageSettingsSubtitle": "Uygulama dilini belirle",
+  "cosmicSearchHintShort": "Ara...",
+  "cosmicAddThis": "Bunu ekle",
+  "horoscopeWesternText": "Yıldızlar kariyerin için hizalanıyor. Hızlı ve kararlı adımlar atmalısın.",
+  "horoscopeAsianText": "Su elementi devrede. Sezgilerin çok güçlü, bugün sadece kalbini dinle.",
+  "horoscopeMayanText": "Ton 4 aktif. Hayatında düzen kurmak ve plan yapmak için mükemmel bir gün.",
+  "horoscopeExplore": "Keşfet",
+  "cookieDayCompleted": "Gün Tamamlandı",
+  "cookieSeeYouTomorrow": "Yarın yeni şanslarla tekrar buluşalım.",
+  "cookieRarityLegendary": "Efsanevi",
+  "cookieRarityRare": "Nadir",
+  "cookiePremiumCollection": "Premium Koleksiyon",
+  "cookiePurchaseBtn": "Satın Al ({price})",
+  "@cookiePurchaseBtn": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "cookieTapOutsideToClose": "Kapatmak için dışına dokun",
+  "cookieAddedToCollection": "Kurabiye başarıyla koleksiyonuna eklendi!",
+  "cookiePremiumFallback": "Premium Kurabiye",
+  "dreamSoulStoneRequired": "Ruh Taşı Gerekli",
+  "dreamSoulStoneRequiredDesc": "Derin analiz için Ruh Taşı gereklidir.\n\nRuh Taşlarını Aura puanlarını dönüştürerek veya Elite abonelik ile kazanabilirsin.",
+  "dreamGetElite": "Elite Abone Ol",
+  "dreamClinicalGateTitle": "Klinik Analiz Kapısı",
+  "dreamClinicalGateDesc": "Mevcut Ruh Taşın: {soulStones}\n\nBu klinik seviye derin psikolojik analiz için 1 Ruh Taşı harcanır.",
+  "@dreamClinicalGateDesc": {
+    "placeholders": {
+      "soulStones": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamUseOneStone": "1 Ruh Taşı Kullan",
+  "dreamDeepAnalysisBgPreparing": "Derin Analiz arka planda hazırlanıyor. Tamamlandığında bildirim alacaksınız.",
+  "dreamYourSoulStones": "Ruh Taşların",
+  "dreamSoulStonesRemaining": "{count} Ruh Taşın var",
+  "@dreamSoulStonesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamSoulStonesEmpty": "Ruh Taşın bitti",
+  "dreamRequiredForDeep": "Derin Analiz için gerekli",
+  "dreamEachAnalysisCost": "Her analiz 1 Ruh Taşı harcar",
+  "dreamEliteRefillActive": "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir",
+  "dreamEliteRefillPromo": "Elite ile her gece 5 Ruh Taşı kazan",
+  "dreamWatchAd": "Reklam İzle",
+  "dreamBgAnalyzing": "Rüyanız arka planda analiz ediliyor. Tamamlandığında bildirim alacaksınız.",
+  "dreamDeepAnalysis": "Derin Analiz",
+  "dreamDiscoverSecrets": "Sırlarını keşfet",
+  "dreamDidYouKnow": "Biliyor muydun?",
+  "dreamNeuroPsychAnalysis": "NÖRO-PSİKOLOJİK ANALİZ",
+  "dreamYourDream": "RÜYANIZ",
+  "dreamEmotionalProfile": "Duygusal Profil",
+  "dreamEmotionalProfileSub": "Rüya sırasındaki psikolojik katmanlarınız",
+  "dreamShadowSelf": "Gölge Benlik",
+  "dreamShadowSelfSub": "Bastırdığınız ve yüzleşmekten kaçındığınız yönler",
+  "dreamRecurringPatterns": "Kalıplar ve Davranışlar",
+  "dreamRecurringPatternsSub": "Hayatınızda sürekli tekrar eden psikolojik döngüler",
+  "dreamSuggestedRitual": "Önerilen Ritüel: {title}",
+  "@dreamSuggestedRitual": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dreamSuggestedRitualSub": "Bu rüyanın etkisini yönetmek için size özel eylem",
+  "dreamScienceNote": "Bilimsel Not:",
+  "dreamWriteNewDream": "Yeni Bir Rüya Yaz",
+  "dreamNoMonthDreams": "Bu ay henüz rüya yazmadın ✨",
+  "dreamMysteriousDream": "Gizemli Rüya",
+  "dreamStandardAnalysis": "STANDART ANALİZ",
+  "dreamGeneralAnalysis": "Genel Analiz",
+  "dreamPsychological": "Psikolojik Örüntü",
+  "dreamSpiritual2": "Ruhsal / Sembolik",
+  "dreamAdvice": "Öneri & Adım",
+  "dreamDeepenedInsights": "Derinleştirilmiş Analiz",
+  "dreamEliteCreditsTitle": "Elite Okuma Hakların",
+  "dreamReadingCreditsTitle": "Okuma Hakların",
+  "dreamCreditsRemaining": "{count} okuma hakkın var",
+  "@dreamCreditsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamDailyLimitReached": "Bugünlük hakkın bitti",
+  "dreamZeroCredits": "0 okuma hakkın var",
+  "dreamDailyPremiumReads": "Günlük {count} Rüya Yorumu hakkı",
+  "@dreamDailyPremiumReads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamNoAdsRequired": "Reklam izleme zorunluluğu yok",
+  "dreamCreditsResetNightly": "Haklar her gece sıfırlanır",
+  "dreamOneFreeDaily": "Her gün 1 ücretsiz yorum",
+  "dreamWatchAdsForCredits": "Reklam ile ek {maxAds} hak ({watched}/{maxAds})",
+  "@dreamWatchAdsForCredits": {
+    "placeholders": {
+      "maxAds": {
+        "type": "int"
+      },
+      "watched": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamUnconsciousFrequencies": "BİLİNÇDIŞI FREKANSLAR",
+  "dreamOrbEmotion": "DUYGU YÜKÜ",
+  "dreamOrbEntropy": "BELİRSİZLİK",
+  "dreamOrbActivity": "BEYİN AKT.",
+  "dreamOrbResidue": "YAKIN GEÇMİŞ",
+  "dreamHighConfidence": "Yüksek Güven",
+  "dreamModerateConfidence": "Orta Güven",
+  "dreamLowConfidence": "Düşük Güven",
+  "dreamCoreThematicPattern": "ANA TEMATİK ÖRÜNTÜ",
+  "dreamMetricEmotionalLoad": "Duygusal\nYoğunluk",
+  "dreamMetricEmotionalLoadDesc": "Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.",
+  "dreamMetricUncertaintyDesc": "Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.",
+  "dreamMetricRecentMemory": "Yakın\nGeçmiş",
+  "dreamMetricRecentMemoryDesc": "Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.",
+  "dreamMetricAgency": "Ajans /\nKontrol",
+  "dreamMetricAgencyDesc": "Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.",
+  "dreamSeverityHigh": "Yüksek",
+  "dreamSeverityNormal": "Normal",
+  "dreamSeverityLow": "Düşük",
+  "dreamCognitiveDistribution": "BİLİŞSEL DAĞILIM",
+  "dreamTapToExpand": "GENİŞLETMEK İÇİN DOKUN",
+  "dreamNeurologicalBasis": "Nörolojik Taban",
+  "dreamEvidenceBase": "BU SONUCA NEDEN VARDIK?",
+  "dreamRootCause": "Rüyanın Gerçek Sebebi",
+  "dreamAbsolutely": "Kesinlikle",
+  "dreamMaybe": "Olabilir",
+  "dreamNotSure": "Emin Değilim",
+  "dreamDreamEssence": "RÜYANIN ÖZÜ",
+  "dreamClarifyingResponses": "ANALİZİ NETLEŞTİREN YANITLAR",
+  "dreamCosmicRhythmSynced": "Kozmik Ritmin Bağlandı",
+  "dreamCosmicRhythmSyncedDesc": "Uyku döngünüze göre özel rüya bildirimleri alacaksınız.",
+  "dreamSyncSleepData": "Uyku Verini Senkronize Et",
+  "dreamSyncSleepDataDesc": "Tam uyandığın anı tespit edip en derin rüyanı sormasına izin ver.",
+  "dreamAwarenessFallback": "Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.",
+  "dreamExtractingEssence": "Rüyanın özü derleniyor...",
+  "dreamNoReasoning": "Bu metrik için özel bir açıklama üretilmemiş.",
+  "dreamNotAnalyzable": "Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.",
+  "owlTabFriends": "Arkadaşlarım",
+  "owlTabConnections": "Bağlantılar",
+  "owlTabInbox": "Gelen Mektup",
+  "owlSearchCosmic": "Kozmik evrende ara...",
+  "owlSearchFriends": "Arkadaş ara...",
+  "owlPhoneContacts": "Telefon Rehberin",
+  "owlNoOneFoundCosmic": "Kozmik evrende kimse bulunamadı.",
+  "owlFoundInCosmic": "Kozmik Evrende Bulunanlar",
+  "owlUnknownProfile": "Bilinmeyen Profil",
+  "owlFriendRequestSent": "{name} kişisine arkadaşlık isteği gönderildi!",
+  "@owlFriendRequestSent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlRequestSentStatus": "Gönderildi",
+  "owlSendRequestAction": "İstek Gönder",
+  "owlConnectContacts": "Rehberini Bağla",
+  "owlConnectContactsDesc": "Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.",
+  "owlNoContactsFound": "Crack&Wish Evreninde\nKimseyi Bulamadık",
+  "owlNoContactsFoundDesc": "Onları davet ederek kozmik enerjiyi başlatabilirsin!",
+  "owlUnknown": "Bilinmeyen",
+  "owlAppUserLabel": "Crack&Wish Kullanıcısı",
+  "owlInContactsLabel": "Rehberinde ekli",
+  "owlNoFriendsYet": "Henüz arkadaşın yok",
+  "owlNoResultsFound": "Sonuç bulunamadı",
+  "owlFriendRequests": "Arkadaşlık İstekleri",
+  "owlFriendsHeader": "Arkadaşların",
+  "owlAcceptAction": "Kabul",
+  "owlRejectAction": "Red",
+  "owlInviteReward": "+2 Ruh Taşı",
+  "owlInviteShareMessage": "Karanlığı birlikte aydınlatalım! ✨\nCrack Wish'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackwish.com/invite/{username}",
+  "@owlInviteShareMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "owlInviteFriends": "Arkadaş Davet Et",
+  "owlInviteFriendsDesc": "Kozmik evreni yansıt",
+  "owlNoLettersYet": "Henüz mektup yok",
+  "owlLetterSentNotification": "{name} mektup gönderdi...",
+  "@owlLetterSentNotification": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlOnItsWay": "Baykuş yolda 🕊️",
+  "owlLetterCount": "{count} adet mektup",
+  "@owlLetterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "owlUnreadCountBadge": "{count} Yeni",
+  "@owlUnreadCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "owlIUnderstand": "Anladım",
+  "owlInviteHowTitle": "Nasıl Davet Etmek İstersin?",
+  "owlInviteHowSubtitle": "Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?",
+  "owlInviteSendAsMessage": "Mesaj olarak gönder",
+  "owlInviteSMSSubtitle": "Klasik mesaj ile yolla",
+  "owlInviteOtherApps": "Diğer Uygulamalar",
+  "owlInviteOtherAppsSubtitle": "Instagram, TikTok, X vb.",
+  "owlWhatsAppNotFound": "WhatsApp bulunamadı",
+  "owlSMSNotFound": "SMS uygulaması bulunamadı",
+  "owlDisconnectAction": "Bağı Kes",
+  "owlDisconnectConfirm": "{name} ile arandaki sihirli bağı koparmak istediğine emin misin?",
+  "@owlDisconnectConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlDisconnectConfirmButton": "Evet, Kopar",
+  "owlCancel": "İptal",
+  "owlSendMagic": "Gönder (Tılsımlı)",
+  "owlSend": "Gönder",
+  "owlCookieAdded": "Kurabiye Eklendi",
+  "owlAddCookie": "Kurabiye Ekle",
+  "owlNoCookiesInCollection": "Koleksiyonunda kurabiye yok",
+  "owlWriteLetterHint": "Mektubunu yaz...",
+  "owlSendCookie": "Kurabiye At",
+  "zodiacMeasureHarmony": "KOZMİK UYUMUNU ÖLÇ",
+  "zodiacDiscoverEnergy": "Yıldızların rehberliğinde ikili enerjini keşfet",
+  "zodiacChooseFriend": "ARKADAŞ SEÇ",
+  "zodiacPros": "Avantajlar",
+  "zodiacCons": "Zorluklar",
+  "zodiacAdvice": "Tavsiye",
+  "zodiacDailyWhisperSubtitle": "Bugünün fısıltısını hisset ve\nruhsal portrenin sırlarını çöz.",
+  "zodiacDailyWhisperHeadline": "Bugünün mesajı & ruhsal portre",
+  "zodiacOpenGuide": "Rehberi Arala",
+  "zodiacNoFriends": "Henüz arkadaşın yok",
+  "zodiacSelect": "SEÇ",
+  "zodiacQuestCompleted": "Serüven Tamamlandı",
+  "zodiacQuestCompletedSubtitle": "Evrenin ritmiyle tamamen uyumlandın.",
+  "zodiacRewardAura": "Kazanılan Ödül:\n+4 AURA",
+  "zodiacStartNewQuest": "YENİ SERÜVENE BAŞLA",
+  "zodiacDailyQuestTitle": "{days} GÜNLÜK SERÜVEN",
+  "@zodiacDailyQuestTitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "zodiacDailyQuestDesc": "\"{weakness}\" Zaafını Yık",
+  "@zodiacDailyQuestDesc": {
+    "placeholders": {
+      "weakness": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacQuestDayProgress": "GÜN {current} / {total}",
+  "@zodiacQuestDayProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "zodiacQuestTodayDiscovery": "GÜNÜN KEŞFİ",
+  "zodiacQuestCompletedToday": "BUGÜN TAMAMLANDI",
+  "zodiacQuestCompleteNow": "SERÜVENİ TAMAMLA",
+  "zodiacQuestMarkCompleted": "BUGÜNÜ TAMAMLADIM",
+  "zodiacLoveHarmony": "AŞK UYUMU",
+  "zodiacFriendshipHarmony": "ARKADAŞLIK",
+  "zodiacCommunicationHarmony": "İLETİŞİM & ZİHİN",
+  "zodiacWorkHarmony": "ORTAK ÇALIŞMA",
+  "zodiacAdventureHarmony": "MACERA & EĞLENCE",
+  "zodiacViralDynamics": "VİRAL DİNAMİKLER",
+  "zodiacDeepSynastryMap": "DERİN SİNASTRİ HARİTASI",
+  "zodiacSynastrySubtitle1": "{name} ile arandaki uyum sadece Güneş burçlarıyla sınırlandırılmadı.",
+  "@zodiacSynastrySubtitle1": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacSynastrySubtitle2": "Kozmik algoritma, gizlilik esasına dayanarak her iki tarafın da astrolojik doğum haritalarını, Ay ve Yükselen evrelerini perde arkasında çaprazlayarak bu analizi tamamen size özel hale getirdi.",
+  "zodiacDailyWhisperTitle": "Günün Fısıltısı",
+  "zodiacChooseSign": "BURÇ SEÇ",
+  "zodiacCosmicGuide": "KOZMİK REHBERİN",
+  "zodiacNew": "YENİ",
+  "zodiacCosmicHarmonyTitle": "KOZMİK UYUM",
+  "zodiacAwesome": "HARİKA",
+  "zodiacSpiritPortrait": "Ruhsal Portre"
 }

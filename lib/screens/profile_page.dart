@@ -139,88 +139,51 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Kullanıcı seviyesi hesapla (Aura bazlı) ──
   // Emoji yerine Material Icon kullanıyoruz — her cihazda çalışır.
   ({IconData icon, Color color, String title}) _getUserLevel(String lang) {
-    // YENİ SİSTEM: Aura doğrudan eklentiler yerine, sadece toplanan (_bonusAura) havuzundan okunur.
+    final l10n = AppLocalizations.of(context)!;
     final int aura = _bonusAura;
 
-    if (lang == 'tr') {
-      if (aura < 51)
-        return (
-          icon: Icons.eco_rounded,
-          color: const Color(0xFF4ADE80),
-          title: 'Acemi Kahin',
-        );
-      if (aura < 151)
-        return (
-          icon: Icons.local_fire_department_rounded,
-          color: const Color(0xFFFBBF24),
-          title: 'Çırak Kahin',
-        );
-      if (aura < 301)
-        return (
-          icon: Icons.auto_awesome_rounded,
-          color: const Color(0xFFA78BFA),
-          title: 'Kahin',
-        );
-      if (aura < 601)
-        return (
-          icon: Icons.visibility_rounded,
-          color: const Color(0xFF38BDF8),
-          title: 'Bilge Kahin',
-        );
-      if (aura < 1001)
-        return (
-          icon: Icons.bolt_rounded,
-          color: const Color(0xFFF97316),
-          title: 'Usta Kahin',
-        );
+    if (aura < 51)
       return (
-        icon: Icons.workspace_premium_rounded,
-        color: const Color(0xFFFFD700),
-        title: 'Kozmik Kahin',
+        icon: Icons.eco_rounded,
+        color: const Color(0xFF4ADE80),
+        title: l10n.profileSeerNovice,
       );
-    } else {
-      if (aura < 51)
-        return (
-          icon: Icons.eco_rounded,
-          color: const Color(0xFF4ADE80),
-          title: 'Novice Seer',
-        );
-      if (aura < 151)
-        return (
-          icon: Icons.local_fire_department_rounded,
-          color: const Color(0xFFFBBF24),
-          title: 'Apprentice Seer',
-        );
-      if (aura < 301)
-        return (
-          icon: Icons.auto_awesome_rounded,
-          color: const Color(0xFFA78BFA),
-          title: 'Seer',
-        );
-      if (aura < 601)
-        return (
-          icon: Icons.visibility_rounded,
-          color: const Color(0xFF38BDF8),
-          title: 'Wise Seer',
-        );
-      if (aura < 1001)
-        return (
-          icon: Icons.bolt_rounded,
-          color: const Color(0xFFF97316),
-          title: 'Master Seer',
-        );
+    if (aura < 151)
       return (
-        icon: Icons.workspace_premium_rounded,
-        color: const Color(0xFFFFD700),
-        title: 'Cosmic Seer',
+        icon: Icons.local_fire_department_rounded,
+        color: const Color(0xFFFBBF24),
+        title: l10n.profileSeerApprentice,
       );
-    }
+    if (aura < 301)
+      return (
+        icon: Icons.auto_awesome_rounded,
+        color: const Color(0xFFA78BFA),
+        title: l10n.profileSeer,
+      );
+    if (aura < 601)
+      return (
+        icon: Icons.visibility_rounded,
+        color: const Color(0xFF38BDF8),
+        title: l10n.profileSeerWise,
+      );
+    if (aura < 1001)
+      return (
+        icon: Icons.bolt_rounded,
+        color: const Color(0xFFF97316),
+        title: l10n.profileSeerMaster,
+      );
+    return (
+      icon: Icons.workspace_premium_rounded,
+      color: const Color(0xFFFFD700),
+      title: l10n.profileSeerCosmic,
+    );
   }
 
   // ── İsim & Profil Düzenleme ──
   void _editProfile() {
     final nameController = TextEditingController(text: _userName);
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     String selectedAvatar = _userAvatar;
 
     final avatars = [
@@ -290,7 +253,7 @@ class ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 28),
                           Text(
-                            lang == 'tr' ? 'Profilini Düzenle' : 'Edit Profile',
+                            l10n.profileEditProfile,
                             style: const TextStyle(
                               color: AppColors.textWhite,
                               fontSize: 24,
@@ -300,9 +263,7 @@ class ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            lang == 'tr'
-                                ? 'Sihirli avatarını seç.'
-                                : 'Choose your magical avatar.',
+                            l10n.profileChooseAvatar,
                             style: TextStyle(
                               color: AppColors.textWhite.withOpacity(0.5),
                               fontSize: 15,
@@ -345,7 +306,7 @@ class ProfilePageState extends State<ProfilePage> {
                                                 uiSettings: [
                                                   AndroidUiSettings(
                                                     toolbarTitle:
-                                                        'Kozmik Kesim',
+                                                        l10n.profileCropTitle,
                                                     toolbarColor:
                                                         AppColors.bgDark1,
                                                     toolbarWidgetColor:
@@ -357,9 +318,9 @@ class ProfilePageState extends State<ProfilePage> {
                                                     lockAspectRatio: true,
                                                   ),
                                                   IOSUiSettings(
-                                                    title: 'Kozmik Kesim',
-                                                    cancelButtonTitle: 'İptal',
-                                                    doneButtonTitle: 'Tamam',
+                                                    title: l10n.profileCropTitle,
+                                                    cancelButtonTitle: l10n.profileCropCancel,
+                                                    doneButtonTitle: l10n.profileCropDone,
                                                     cropStyle: CropStyle.circle,
                                                     aspectRatioLockEnabled:
                                                         true,
@@ -549,9 +510,7 @@ class ProfilePageState extends State<ProfilePage> {
                               ),
                               cursorColor: AppColors.primaryOrange,
                               decoration: InputDecoration(
-                                hintText: lang == 'tr'
-                                    ? 'Kozmik Adın'
-                                    : 'Cosmic Name',
+                                hintText: l10n.profileCosmicName,
                                 hintStyle: TextStyle(
                                   color: Colors.white.withOpacity(0.2),
                                 ),
@@ -639,6 +598,7 @@ class ProfilePageState extends State<ProfilePage> {
                                         final errorMessage =
                                             ContentModerationService()
                                                 .getErrorMessage(
+                                                  context,
                                                   moderationResult,
                                                 );
                                         setModalState(() => _isSaving = false);
@@ -693,9 +653,9 @@ class ProfilePageState extends State<ProfilePage> {
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               content: Text(
-                                                'Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.',
+                                                l10n.profileUploadFailed,
                                               ),
                                               backgroundColor: Colors.redAccent,
                                             ),
@@ -775,9 +735,7 @@ class ProfilePageState extends State<ProfilePage> {
                                         ),
                                       )
                                     : Text(
-                                        lang == 'tr'
-                                            ? 'Mührü Onayla'
-                                            : 'Seal Profile',
+                                        l10n.profileSealProfile,
                                         style: const TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.w800,
@@ -806,9 +764,8 @@ class ProfilePageState extends State<ProfilePage> {
   void _shareApp() {
     HapticFeedback.lightImpact();
     final lang = Localizations.localeOf(context).languageCode;
-    final text = lang == 'tr'
-        ? 'Crack&Wish ile şansını keşfet! •✨\nKurabiye kır, tarot aç, rüya yorumla.\n\nhttps://crackandwish.com'
-        : 'Discover your fortune with Crack&Wish! •✨\nCrack cookies, read tarot, interpret dreams.\n\nhttps://crackandwish.com';
+    final l10n = AppLocalizations.of(context)!;
+    final text = l10n.profileShareApp;
     final box = context.findRenderObject() as RenderBox?;
     if (box != null) {
       Share.share(
@@ -823,6 +780,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Uygulamayı değerlendir ──
   void _rateApp() async {
     HapticFeedback.lightImpact();
+    final l10n = AppLocalizations.of(context)!;
     
     // Uygulama yayınlandığında mağaza linkleriyle çalışacak profesyonel yapı
     final Uri url = Uri.parse(
@@ -841,7 +799,7 @@ class ProfilePageState extends State<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              lang == 'tr' ? 'Mağaza bağlantısı şu an kurulamıyor.' : 'Store link is unavailable.',
+              l10n.profileStoreUnavailable,
               style: const TextStyle(color: Colors.white, fontSize: 13),
             ),
             backgroundColor: const Color(0xFF1A1A2E),
@@ -870,6 +828,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Yardım merkezi ──
   void _openHelpCenter() async {
     HapticFeedback.lightImpact();
+    final l10n = AppLocalizations.of(context)!;
     // Destek ekibine doğrudan mail atan ciddi yapı
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
@@ -889,7 +848,7 @@ class ProfilePageState extends State<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              lang == 'tr' ? 'Mail uygulaması bulunamadı. support@crackandwish.com adresine yazabilirsiniz.' : 'No mail app found. You can write to support@crackandwish.com',
+              l10n.profileMailNotFound,
               style: const TextStyle(color: Colors.white, fontSize: 13),
             ),
             backgroundColor: const Color(0xFF1A1A2E),
@@ -906,6 +865,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Davet Et & Kazan Sistemi Modalı ──
   void _showInviteModal() {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     HapticFeedback.heavyImpact();
 
     // Geçici sahte kod üretimi (ileride Supabase'den gerçek kod çekilecek)
@@ -972,9 +932,7 @@ class ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang == 'tr'
-                                ? 'Bağlarını Güçlendir'
-                                : 'Strengthen Bonds',
+                            l10n.profileStrengthenBonds,
                             style: const TextStyle(
                               color: AppColors.textWhite,
                               fontSize: 22,
@@ -984,9 +942,7 @@ class ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            lang == 'tr'
-                                ? 'Kozmik evreni arkadaşlarınla büyüt.'
-                                : 'Expand the cosmic universe with friends.',
+                            l10n.profileStrengthenBondsDesc,
                             style: TextStyle(
                               color: AppColors.textWhite.withOpacity(0.5),
                               fontSize: 14,
@@ -1018,7 +974,7 @@ class ProfilePageState extends State<ProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            lang == 'tr' ? 'Ritüel Kodun' : 'Ritual Code',
+                            l10n.profileRitualCode,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.7),
                               fontSize: 13,
@@ -1034,9 +990,7 @@ class ProfilePageState extends State<ProfilePage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                lang == 'tr'
-                                    ? '+2 Ruh Taşı Kazan'
-                                    : 'Earn +2 Soul Stones',
+                                l10n.profileEarnSoulStones,
                                 style: const TextStyle(
                                   color: Color(0xFF60A5FA),
                                   fontSize: 12,
@@ -1081,9 +1035,7 @@ class ProfilePageState extends State<ProfilePage> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      lang == 'tr'
-                                          ? 'Kod kopyalandı!'
-                                          : 'Code copied!',
+                                      l10n.profileCodeCopied,
                                       style: const TextStyle(
                                         color: Colors.white,
                                       ),
@@ -1120,9 +1072,7 @@ class ProfilePageState extends State<ProfilePage> {
                         onTap: () {
                           HapticFeedback.lightImpact();
                           Share.share(
-                            lang == 'tr'
-                                ? 'Crack&Wish evrenine katıl! ✨\nRitüel Kodum: $inviteCode\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com'
-                                : 'Join the Crack&Wish universe! ✨\nMy Ritual Code: $inviteCode\n\nEnter this code to earn +1 Soul Stone, +50 Aura, and a surprise Premium Cookie!\nhttps://crackandwish.com',
+                            l10n.profileShareInvite(inviteCode),
                           );
                         },
                         child: Container(
@@ -1145,7 +1095,7 @@ class ProfilePageState extends State<ProfilePage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  lang == 'tr' ? 'Kodu Paylaş' : 'Share Code',
+                                  l10n.profileShareCode,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
@@ -1210,6 +1160,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Hesap silme ──
   void _deleteAccount() {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     HapticFeedback.heavyImpact();
     showModalBottomSheet(
       context: context,
@@ -1261,7 +1212,7 @@ class ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    lang == 'tr' ? 'Hesabı Sil' : 'Delete Account',
+                    l10n.profileDeleteAccount,
                     style: const TextStyle(
                       color: AppColors.textWhite,
                       fontSize: 18,
@@ -1272,9 +1223,7 @@ class ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 40,
                     child: Text(
-                      lang == 'tr'
-                          ? 'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.'
-                          : 'All your data will be deleted.\nThis action cannot be undone.',
+                      l10n.profileDeleteDesc,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textWhite.withOpacity(0.5),
@@ -1300,7 +1249,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Vazgeç' : 'Cancel',
+                                l10n.profileDeleteCancel,
                                 style: const TextStyle(
                                   color: AppColors.textWhite,
                                   fontSize: 15,
@@ -1352,7 +1301,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Hesabı Sil' : 'Delete',
+                                l10n.profileDeleteConfirm,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -1377,6 +1326,7 @@ class ProfilePageState extends State<ProfilePage> {
   // ── Çıkış yap ──
   void _signOut() {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -1428,7 +1378,7 @@ class ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                    l10n.profileSignOut,
                     style: const TextStyle(
                       color: AppColors.textWhite,
                       fontSize: 18,
@@ -1439,9 +1389,7 @@ class ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 40,
                     child: Text(
-                      lang == 'tr'
-                          ? 'Hesap oturumundan çıkış yapmak\nüzere olduğundan emin misin?'
-                          : 'Are you sure you want to sign out\nof your active account session?',
+                      l10n.profileSignOutDesc,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textWhite.withOpacity(0.5),
@@ -1467,7 +1415,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Vazgeç' : 'Cancel',
+                                l10n.profileSignOutCancel,
                                 style: const TextStyle(
                                   color: AppColors.textWhite,
                                   fontSize: 15,
@@ -1516,7 +1464,7 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                                l10n.profileSignOutConfirm,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -1552,10 +1500,11 @@ class ProfilePageState extends State<ProfilePage> {
 
   void _openPrivacyPolicy() {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     _launchURL("https://crackwish.com/privacy.html#$lang");
     return;
     _showLegalSheet(
-      title: lang == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
+      title: l10n.profilePrivacyPolicy,
       content: lang == 'tr'
           ? '''Crack&Wish Gizlilik Politikası
 Son güncelleme: 23 Nisan 2026
@@ -1721,10 +1670,11 @@ For questions: info@crackandwish.com''',
   // ── Kullanım Koşulları ──
   void _openTermsOfService() {
     final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     _launchURL("https://crackwish.com/terms.html#$lang");
     return;
     _showLegalSheet(
-      title: lang == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use',
+      title: l10n.profileTermsOfUse,
       content: lang == 'tr'
           ? '''Crack&Wish Kullanım Koşulları
 Son güncelleme: 23 Nisan 2026
@@ -2117,8 +2067,8 @@ For questions: info@crackandwish.com''',
                           _SettingsListTile(
                             icon: Icons.workspace_premium_rounded,
                             iconColor: const Color(0xFFFFD166),
-                            label: lang == 'tr' ? 'Elite\'e Geç' : 'Get Elite',
-                            subtitle: lang == 'tr' ? 'Farkındalığa giden kapı' : 'Doorway to awareness',
+                            label: l10n.profileGetElite,
+                            subtitle: l10n.profileGetEliteSubtitle,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -2143,8 +2093,8 @@ For questions: info@crackandwish.com''',
                           _SettingsListTile(
                             icon: Icons.auto_graph_rounded,
                             iconColor: const Color(0xFFC084FC),
-                            label: lang == 'tr' ? 'Kozmik Profilim' : 'Cosmic Profile',
-                            subtitle: lang == 'tr' ? 'Harita, Saat ve Konum Bilgileri' : 'Chart, Time and Location',
+                            label: l10n.profileCosmicProfile,
+                            subtitle: l10n.profileCosmicSubtitle,
                             onTap: _openCosmicChart,
                           ),
                         ],
@@ -2152,14 +2102,14 @@ For questions: info@crackandwish.com''',
                       const SizedBox(height: 16),
 
                       // ── BÖLÜM 1: HESAP ──
-                      _SectionLabel(lang == 'tr' ? 'Hesap' : 'Account'),
+                      _SectionLabel(l10n.profileSectionAccount),
                       const SizedBox(height: 10),
                       _SettingsListGroup(
                         children: [
                           _SettingsListTile(
                             icon: Icons.email_outlined,
                             iconColor: Colors.white,
-                            label: lang == 'tr' ? 'E-posta' : 'Email',
+                            label: l10n.profileEmail,
                             subtitle: _getConnectedEmail(),
                             onTap: () {
                               Navigator.push(
@@ -2191,9 +2141,7 @@ For questions: info@crackandwish.com''',
                           _SettingsListTile(
                             icon: Icons.notifications_none_rounded,
                             iconColor: Colors.white,
-                            label: lang == 'tr'
-                                ? 'Bildirimler'
-                                : 'Notifications',
+                            label: l10n.profileNotifications,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -2212,9 +2160,7 @@ For questions: info@crackandwish.com''',
 
                       // ── BÖLÜM 2: DESTEK & DENEYİM ──
                       _SectionLabel(
-                        lang == 'tr'
-                            ? 'Destek & Deneyim'
-                            : 'Support & Experience',
+                        l10n.profileSupportExperience,
                       ),
                       const SizedBox(height: 10),
                       _SettingsListGroup(
@@ -2223,19 +2169,19 @@ For questions: info@crackandwish.com''',
                           _SettingsListTile(
                             icon: Icons.help_outline_rounded,
                             iconColor: Colors.white,
-                            label: lang == 'tr' ? 'Yardım' : 'Help',
+                            label: l10n.profileHelp,
                             onTap: _openHelpCenter,
                           ),
                           _SettingsListTile(
                             icon: Icons.share_rounded,
                             iconColor: Colors.white,
-                            label: lang == 'tr' ? 'Paylaş' : 'Share',
+                            label: l10n.profileShare,
                             onTap: _shareApp,
                           ),
                           _SettingsListTile(
                             icon: Icons.star_border_rounded,
                             iconColor: Colors.white,
-                            label: lang == 'tr' ? 'Değerlendir' : 'Rate',
+                            label: l10n.profileRate,
                             onTap: _rateApp,
                           ),
                         ],
@@ -2248,7 +2194,7 @@ For questions: info@crackandwish.com''',
                           _SettingsListTile(
                             icon: Icons.logout_rounded,
                             iconColor: const Color(0xFFFCA5A5), // Soft red
-                            label: lang == 'tr' ? 'Çıkış Yap' : 'Sign Out',
+                            label: l10n.profileSignOut,
                             isDestructive: true,
                             onTap: _signOut,
                           ),
@@ -2268,9 +2214,7 @@ For questions: info@crackandwish.com''',
                               GestureDetector(
                                 onTap: _openPrivacyPolicy,
                                 child: Text(
-                                  lang == 'tr'
-                                      ? 'Gizlilik Politikası'
-                                      : 'Privacy Policy',
+                                  l10n.profilePrivacyPolicy,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.35),
                                     fontSize: 12,
@@ -2292,9 +2236,7 @@ For questions: info@crackandwish.com''',
                               GestureDetector(
                                 onTap: _openTermsOfService,
                                 child: Text(
-                                  lang == 'tr'
-                                      ? 'Kullanım Koşulları'
-                                      : 'Terms of Use',
+                                  l10n.profileTermsOfUse,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.35),
                                     fontSize: 12,
@@ -5873,12 +5815,8 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                       children: [
                         Text(
                           widget.isPremium
-                              ? (widget.lang == 'tr'
-                                    ? 'Elite Büyücüsün'
-                                    : 'You are Elite')
-                              : (widget.lang == 'tr'
-                                    ? 'Elite\'e Geç'
-                                    : 'Go Elite'),
+                              ? AppLocalizations.of(context)!.profileEliteYouAre
+                              : AppLocalizations.of(context)!.profileGoElite,
                           style: TextStyle(
                             color: widget.isPremium
                                 ? const Color(0xFFE0F2FE)
@@ -5889,12 +5827,8 @@ class _BentoPremiumBannerState extends State<_BentoPremiumBanner> {
                         ),
                         Text(
                           widget.isPremium
-                              ? (widget.lang == 'tr'
-                                    ? 'Mistik kapıları incele'
-                                    : 'View mystical gates')
-                              : (widget.lang == 'tr'
-                                    ? 'Farkındalığa giden kapı'
-                                    : 'Door to awareness'),
+                              ? AppLocalizations.of(context)!.profileEliteMystical
+                              : AppLocalizations.of(context)!.profileEliteDoor,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.55),
                             fontSize: 10,
@@ -6017,9 +5951,7 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.lang == 'tr'
-                              ? 'Kozmik Profilim'
-                              : 'My Cosmic Profile',
+                          AppLocalizations.of(context)!.profileMyCosmicProfile,
                           style: const TextStyle(
                             color: Color(0xFFF3E8FF),
                             fontSize: 16,
@@ -6029,9 +5961,7 @@ class _BentoCosmicBannerState extends State<_BentoCosmicBanner> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          widget.lang == 'tr'
-                              ? 'Harita, Saat ve Konum Bilgileri'
-                              : 'Chart, Time, and Place Details',
+                          AppLocalizations.of(context)!.profileCosmicDetails,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 12,
@@ -6131,9 +6061,7 @@ class _BentoInviteBannerState extends State<_BentoInviteBanner> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.lang == 'tr'
-                              ? 'Arkadaşlarını Davet Et'
-                              : 'Invite Friends',
+                          AppLocalizations.of(context)!.profileInviteFriends,
                           style: const TextStyle(
                             color: Color(0xFFE879F9),
                             fontSize: 15,
@@ -6143,9 +6071,7 @@ class _BentoInviteBannerState extends State<_BentoInviteBanner> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          widget.lang == 'tr'
-                              ? 'Kozmik bağlar kur, birlikte kazan'
-                              : 'Build cosmic bonds, earn together',
+                          AppLocalizations.of(context)!.profileInviteFriendsDesc,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.45),
                             fontSize: 11,

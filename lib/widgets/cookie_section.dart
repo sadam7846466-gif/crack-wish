@@ -982,7 +982,7 @@ class _CookieSectionState extends State<CookieSection>
               const SizedBox(height: 10),
               Text(
                 _dailyLimitReached
-                    ? (Localizations.localeOf(context).languageCode == 'tr' ? 'Gün Tamamlandı' : 'Day Completed')
+                    ? l10n.cookieDayCompleted
                     : l10n.dailyCookieTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -994,9 +994,7 @@ class _CookieSectionState extends State<CookieSection>
               const SizedBox(height: 8),
               if (_dailyLimitReached)
                 Text(
-                  Localizations.localeOf(context).languageCode == 'tr' 
-                      ? 'Yarın yeni şanslarla tekrar buluşalım.' 
-                      : 'See you tomorrow with new cookies.',
+                  l10n.cookieSeeYouTomorrow,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textWhite.withOpacity(0.4),
@@ -1994,13 +1992,14 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
   }
 
   Widget _buildGlassPanel() {
+    final l10n = AppLocalizations.of(context)!;
     final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final info = _cookieInfo[widget.cookieId] ?? _cookieInfo['golden_arabesque']!;
     final cookieName = isTr ? info['tr']! : info['en']!;
     final isLegendary = info['rarity'] == 'legendary';
     final rarityLabel = isLegendary
-        ? (isTr ? 'Efsanevi' : 'Legendary')
-        : (isTr ? 'Nadir' : 'Rare');
+        ? l10n.cookieRarityLegendary
+        : l10n.cookieRarityRare;
     final rarityColor = isLegendary
         ? const Color(0xFFE8A0FF) // Mor-lila
         : const Color(0xFF7DD4FF); // Açık mavi
@@ -2112,7 +2111,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isTr ? 'Premium Koleksiyon' : 'Premium Collection',
+                  l10n.cookiePremiumCollection,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.45),
                     fontSize: 11,
@@ -2127,7 +2126,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                     final priceStr = PurchaseService().getPrice('cookie_${widget.cookieId}') ?? '...';
                     return _PurchaseButton(
                       isPurchasing: _isPurchasing,
-                      label: isTr ? 'Satın Al ($priceStr)' : 'Purchase ($priceStr)',
+                      label: l10n.cookiePurchaseBtn(priceStr),
                       onTap: _handlePurchase,
                     );
                   }
@@ -2135,7 +2134,7 @@ class _PremiumCookieOverlayState extends State<_PremiumCookieOverlay>
                 const SizedBox(height: 8),
                 // ── Kapat ipucu ──
                 Text(
-                  isTr ? 'Kapatmak için dışına dokun' : 'Tap outside to close',
+                  l10n.cookieTapOutsideToClose,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.25),
                     fontSize: 10,
@@ -2416,7 +2415,7 @@ class CookieUnlockedDialog extends StatefulWidget {
       transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) {
         final isTr = Localizations.localeOf(context).languageCode == 'tr';
-        final cName = isTr ? (trNames[cookieId] ?? 'Premium Kurabiye') : (enNames[cookieId] ?? 'Premium Cookie');
+        final cName = isTr ? (trNames[cookieId] ?? AppLocalizations.of(context)!.cookiePremiumFallback) : (enNames[cookieId] ?? AppLocalizations.of(context)!.cookiePremiumFallback);
         return CookieUnlockedDialog(
           imagePath: imagePath,
           cookieName: cName,
@@ -2457,7 +2456,6 @@ class CookieUnlockedDialogState extends State<CookieUnlockedDialog> with SingleT
 
   @override
   Widget build(BuildContext context) {
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final glowColor = const Color(0xFFFFD700);
 
     return GestureDetector(
@@ -2523,7 +2521,7 @@ class CookieUnlockedDialogState extends State<CookieUnlockedDialog> with SingleT
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        isTr ? 'Kurabiye başarıyla koleksiyonuna eklendi!' : 'Cookie successfully added to your collection!',
+                        AppLocalizations.of(context)!.cookieAddedToCollection,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/glass_back_button.dart';
 import '../widgets/fade_page_route.dart';
 import '../constants/colors.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import 'onboarding_page.dart';
 
@@ -21,7 +22,7 @@ class AccountDetailsPage extends StatefulWidget {
 class _AccountDetailsPageState extends State<AccountDetailsPage> {
 
   void _deleteAccount() {
-    final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     HapticFeedback.heavyImpact();
     showModalBottomSheet(
       context: context,
@@ -73,7 +74,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    lang == 'tr' ? 'Hesabı Sil' : 'Delete Account',
+                    l10n.accountDeleteTitle,
                     style: const TextStyle(
                       color: AppColors.textWhite,
                       fontSize: 18,
@@ -84,9 +85,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                   SizedBox(
                     height: 40,
                     child: Text(
-                      lang == 'tr'
-                          ? 'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.'
-                          : 'All your data will be deleted.\nThis action cannot be undone.',
+                      l10n.accountDeleteDesc,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textWhite.withOpacity(0.5),
@@ -112,7 +111,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Vazgeç' : 'Cancel',
+                                l10n.accountDeleteCancel,
                                 style: const TextStyle(
                                   color: AppColors.textWhite,
                                   fontSize: 15,
@@ -162,7 +161,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                             ),
                             child: Center(
                               child: Text(
-                                lang == 'tr' ? 'Hesabı Sil' : 'Delete',
+                                l10n.accountDeleteConfirm,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -187,7 +186,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final palette = AppThemeController.current;
-    final lang = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     final user = Supabase.instance.client.auth.currentUser;
     final String fullEmail = user?.email ?? '';
     final String provider = user?.appMetadata['provider'] ?? 'E-posta';
@@ -253,7 +252,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                         const GlassBackButton(),
                         const SizedBox(width: 10),
                         Text(
-                          lang == 'tr' ? 'Hesap Detayları' : 'Account Details',
+                          l10n.accountTitle,
                           style: const TextStyle(
                             color: AppColors.textWhite,
                             fontSize: 22,
@@ -268,7 +267,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      lang == 'tr' ? 'Kişisel bilgilerin ve hesap yönetimin' : 'Personal info and account management',
+                      l10n.accountSubtitle,
                       style: TextStyle(
                         color: AppColors.textWhite.withOpacity(0.5),
                         fontSize: 14,
@@ -285,19 +284,19 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                         children: [
                           _AccountDetailCard(
                             icon: Icons.person_rounded,
-                            title: lang == 'tr' ? 'Kullanıcı Adı' : 'Username',
+                            title: l10n.accountUsername,
                             value: widget.userName,
                           ),
                           const SizedBox(height: 12),
                           _AccountDetailCard(
                             icon: Icons.email_rounded,
-                            title: lang == 'tr' ? 'Bağlı E-posta' : 'Linked Email',
+                            title: l10n.accountLinkedEmail,
                             value: fullEmail.isEmpty ? '-' : fullEmail,
                           ),
                           const SizedBox(height: 12),
                           _AccountDetailCard(
                             icon: Icons.security_rounded,
-                            title: lang == 'tr' ? 'Giriş Yöntemi' : 'Sign-in Method',
+                            title: l10n.accountSignInMethod,
                             value: provider.toUpperCase(),
                           ),
                           
@@ -322,7 +321,7 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                                   const Icon(Icons.delete_forever_rounded, color: Color(0xFFFF2D55), size: 22),
                                   const SizedBox(width: 8),
                                   Text(
-                                    lang == 'tr' ? 'Hesabı Kalıcı Olarak Sil' : 'Delete Account Permanently',
+                                    l10n.accountDeletePermanent,
                                     style: const TextStyle(
                                       color: Color(0xFFFF2D55),
                                       fontSize: 15,

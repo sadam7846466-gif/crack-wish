@@ -202,7 +202,7 @@ class _BentoGridState extends State<BentoGrid>
                           desc: l10n.bentoDreamDesc,
                           accent: const Color(0xFF60E0FF), // Parlak neon mavi
                           accentSoft: const Color(0xFF2080C0), // Doygun derin mavi
-                          badgeText: _hasUnreadDream ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : l10n.bentoDreamBadge,
+                          badgeText: _hasUnreadDream ? l10n.badgeReady : l10n.bentoDreamBadge,
                           badgeHidden: !_hasUnreadDream,
                           badgeColor: _hasUnreadDream ? Colors.white : null,
                           backgroundWidget: Positioned.fill(
@@ -263,11 +263,11 @@ class _BentoGridState extends State<BentoGrid>
                               size: 16,
                               color: AppColors.textWhite,
                             ),
-                            title: l10n.localeName == 'tr' ? 'Kahve Falı' : 'Coffee Reading',
-                            desc: l10n.localeName == 'tr' ? 'Telvelerin dili' : 'Whispers of grounds',
+                            title: l10n.bentoCoffeeTitle,
+                            desc: l10n.bentoCoffeeDesc,
                             accent: const Color(0xFFD4A373),
                             accentSoft: const Color(0xFF8B5A2B), // Koyu kahve
-                            badgeText: _hasUnreadCoffee ? (l10n.localeName == 'tr' ? 'HAZIR' : 'READY') : (l10n.localeName == 'tr' ? 'YENİ' : 'NEW'),
+                            badgeText: _hasUnreadCoffee ? l10n.badgeReady : l10n.badgeNew,
                             badgeHidden: !_hasUnreadCoffee,
                             badgeColor: _hasUnreadCoffee ? Colors.white : null,
                             backgroundWidget: Positioned(
@@ -313,7 +313,7 @@ class _BentoGridState extends State<BentoGrid>
                           desc: l10n.bentoZodiacDesc,
                           accent: const Color(0xFFFFD060), // Parlak altın sarısı
                           accentSoft: const Color(0xFFB07020), // Doygun koyu altın
-                          badgeText: _hasUnreadZodiac ? (l10n.localeName == 'tr' ? 'YENİ' : 'NEW') : l10n.bentoZodiacBadge,
+                          badgeText: _hasUnreadZodiac ? l10n.badgeNew : l10n.bentoZodiacBadge,
                           badgeHidden: !_hasUnreadZodiac,
                           badgeColor: _hasUnreadZodiac ? Colors.white : null,
                           backgroundWidget: Positioned(
@@ -360,7 +360,7 @@ class _MoodCard extends StatelessWidget {
                 const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  l10n.localeName == 'tr' ? 'Bu alan henüz keşfedilmeyi bekliyor...' : 'This realm is waiting to be explored...',
+                  l10n.bentoUnexplored,
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ],
@@ -442,7 +442,7 @@ class _MoodCard extends StatelessWidget {
                       Icon(Icons.lock_rounded, color: Colors.white.withOpacity(0.5), size: 13),
                       const SizedBox(width: 6),
                       Text(
-                        l10n.localeName == 'tr' ? 'Mühürlü' : 'Sealed',
+                        l10n.bentoSealed,
                         style: GoogleFonts.inter(
                           color: Colors.white.withOpacity(0.6),
                           fontSize: 12,

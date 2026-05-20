@@ -57,45 +57,26 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isTr = l10n.localeName == 'tr';
 
     // Konsept başlığı
-    final String title = isTr ? 'Günün Enerjisi' : 'Today\'s Energy';
+    final String title = l10n.horoscopeDailyEnergy;
 
     // Özlü günlük yorumlar
-    final List<Map<String, dynamic>> insights = isTr 
-        ? [
+    final List<Map<String, dynamic>> insights = [
             {
-              'title': 'Batı Astrolojisi',
+              'title': l10n.horoscopeWestern,
               'icon': Icons.flare_outlined,
-              'text': 'Yıldızlar kariyerin için hizalanıyor. Hızlı ve kararlı adımlar atmalısın.',
+              'text': l10n.horoscopeWesternText,
             },
             {
-              'title': 'Asya Bilgeliği',
+              'title': l10n.horoscopeAsian,
               'icon': Icons.brightness_medium_outlined,
-              'text': 'Su elementi devrede. Sezgilerin çok güçlü, bugün sadece kalbini dinle.',
+              'text': l10n.horoscopeAsianText,
             },
             {
-              'title': 'Maya Ruhu',
+              'title': l10n.horoscopeMayan,
               'icon': Icons.filter_vintage_outlined,
-              'text': 'Ton 4 aktif. Hayatında düzen kurmak ve plan yapmak için mükemmel bir gün.',
-            },
-          ]
-        : [
-            {
-              'title': 'Western Ast.',
-              'icon': Icons.flare_outlined,
-              'text': 'Stars align for your career. Take swift and decisive steps.',
-            },
-            {
-              'title': 'Asian Wisdom',
-              'icon': Icons.brightness_medium_outlined,
-              'text': 'Water element is active. Your intuition is strong, just listen to your heart.',
-            },
-            {
-              'title': 'Mayan Spirit',
-              'icon': Icons.filter_vintage_outlined,
-              'text': 'Tone 4 is active. A perfect day to establish order and plan your life.',
+              'text': l10n.horoscopeMayanText,
             },
           ];
 
@@ -198,7 +179,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> with SingleTick
                           ),
                           child: Row(
                             children: [
-                              Text(isTr ? 'Keşfet' : 'Explore', style: const TextStyle(color: AppColors.primaryOrange, fontSize: 11, fontWeight: FontWeight.w700)),
+                              Text(l10n.horoscopeExplore, style: const TextStyle(color: AppColors.primaryOrange, fontSize: 11, fontWeight: FontWeight.w700)),
                               const SizedBox(width: 4),
                               const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primaryOrange, size: 10),
                             ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'root_shell.dart';
 import '../services/storage_service.dart';
@@ -177,8 +178,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                                       ),
                                     ),
                                     const SizedBox(height: 12),
-                                    const Text(
-                                      'The magic is within you.',
+                                    Text(
+                                      AppLocalizations.of(context)!.welcomeTagline,
                                       style: TextStyle(
                                         color: Color(0xFFE5B0B0),
                                         fontSize: 16,
@@ -222,8 +223,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                                     children: [
                                       Icon(Icons.apple, color: Colors.black, size: 28),
                                       const SizedBox(width: 12),
-                                      const Text(
-                                        'Apple ile Devam Et',
+                                      Text(
+                                        AppLocalizations.of(context)!.welcomeAppleContinue,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 17,
@@ -254,8 +255,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                                         children: [
                                           Icon(PhosphorIcons.googleLogo(PhosphorIconsStyle.fill), color: Colors.white, size: 24),
                                           const SizedBox(width: 12),
-                                          const Text(
-                                            'Google ile Devam Et',
+                                          Text(
+                                            AppLocalizations.of(context)!.welcomeGoogleContinue,
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 17,
@@ -269,7 +270,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                               ),
                               const SizedBox(height: 32),
                               Text(
-                                "Devam ederek Kullanım Koşulları ve Gizlilik Politikası'nı\nkabul etmiş sayılırsınız.",
+                                "${AppLocalizations.of(context)!.loginLegalPrefix}${AppLocalizations.of(context)!.loginTermsOfUse}${AppLocalizations.of(context)!.loginLegalAnd}${AppLocalizations.of(context)!.loginPrivacyPolicy}${AppLocalizations.of(context)!.loginLegalSuffix}",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.35),

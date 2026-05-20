@@ -512,10 +512,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dreamUnsure => 'Not sure';
 
   @override
-  String get dreamYes => 'Yes';
+  String get dreamYes => 'YES';
 
   @override
-  String get dreamNo => 'No';
+  String get dreamNo => 'NO';
 
   @override
   String get dreamGeneral => 'General Dream';
@@ -659,7 +659,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dreamMetricEmotional => 'Emotional Load';
 
   @override
-  String get dreamMetricUncertainty => 'Uncertainty';
+  String get dreamMetricUncertainty => 'Narrative\nUncertainty';
 
   @override
   String get dreamMetricRecentPast => 'Recent Past';
@@ -1082,4 +1082,1687 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paywallOk => 'OK';
+
+  @override
+  String get coffeeLoading1 => 'Diving into the depths of the cup...';
+
+  @override
+  String get coffeeLoading2 =>
+      'Symbols in the grounds are aligning with universal energy...';
+
+  @override
+  String get coffeeLoading3 => 'Your fate lines are being mapped...';
+
+  @override
+  String get coffeeLoading4 => 'Secrets are being revealed...';
+
+  @override
+  String get coffeeAiError =>
+      'AI encountered an error while interpreting the reading.';
+
+  @override
+  String get coffeeGenericError => 'Something went wrong. Please try again.';
+
+  @override
+  String get coffeeNotifReady =>
+      'You\'ll be notified when your reading is ready';
+
+  @override
+  String get coffeeCheckHistory => '  button to view it';
+
+  @override
+  String get coffeeWaitOrExplore => 'Wait here or explore the app';
+
+  @override
+  String get coffeeGoHome => 'Go to Home';
+
+  @override
+  String get coffeeSections => 'Cup Sections';
+
+  @override
+  String get coffeeSectionInside => 'Inside the Cup';
+
+  @override
+  String get coffeeSectionInsideDesc =>
+      'Your inner world, thoughts, emotional state.';
+
+  @override
+  String get coffeeSectionEdge => 'Cup Edge';
+
+  @override
+  String get coffeeSectionEdgeDesc =>
+      'Near future, news, messages, encounters.';
+
+  @override
+  String get coffeeSectionBottom => 'Cup Bottom';
+
+  @override
+  String get coffeeSectionBottomDesc =>
+      'Lingering past issues, burdens, unresolved matters.';
+
+  @override
+  String get coffeeSectionSaucer => 'Saucer';
+
+  @override
+  String get coffeeSectionSaucerDesc => 'Wish, outcome, fate, final energy.';
+
+  @override
+  String get coffeeLoadingComment => 'Loading interpretation...';
+
+  @override
+  String get coffeeStoryTitle => 'The Story Told by the Grounds';
+
+  @override
+  String get coffeeSymbolsTitle => 'Symbols Seen in Your Reading';
+
+  @override
+  String get coffeeLove => 'Love & Relationships';
+
+  @override
+  String get coffeeCareer => 'Career & Finance';
+
+  @override
+  String get coffeeFamily => 'Family & Close Circle';
+
+  @override
+  String get coffeeNearFuture => 'Near Future';
+
+  @override
+  String get coffeeClosing => 'Final Words of Your Reading';
+
+  @override
+  String get coffeeShare => 'Share My Reading';
+
+  @override
+  String get coffeeRetryValidation => 'Go Back & Retake';
+
+  @override
+  String get coffeeRetry => 'Try Again';
+
+  @override
+  String get coffeeCancel => 'Cancel';
+
+  @override
+  String get coffeeSymbolLabel => 'Symbol';
+
+  @override
+  String get coffeeSymbolLoading => 'Loading...';
+
+  @override
+  String get coffeeTimelineSoon => 'Very Soon';
+
+  @override
+  String get coffeeImageError =>
+      'Unable to detect clear coffee grounds in this image.';
+
+  @override
+  String get coffeeCosmicTitle => 'Cosmic Coffee Reading';
+
+  @override
+  String get coffeePremiumOnly => 'Premium Feature Only';
+
+  @override
+  String get coffeePremiumDesc =>
+      'Coffee Reading is exclusive to elite members. Upgrade to Premium and uncover the secrets of your future with your Soul Stones.';
+
+  @override
+  String get coffeePremiumSimBtn => 'Go Premium (Simulation)';
+
+  @override
+  String get coffeePhotoSource => 'Photo Source';
+
+  @override
+  String get coffeeCamera => 'Camera';
+
+  @override
+  String get coffeeGallery => 'Gallery';
+
+  @override
+  String get coffeeStepCupInside => 'Inside the Cup';
+
+  @override
+  String get coffeeStepCupInsideDesc =>
+      'Position the camera directly above the cup and capture the coffee grounds inside.';
+
+  @override
+  String get coffeeStepLeftProfile => 'Left Profile';
+
+  @override
+  String get coffeeStepLeftProfileDesc =>
+      'Hold the cup by its handle and take a clear photo of just the left side.';
+
+  @override
+  String get coffeeStepRightProfile => 'Right Profile';
+
+  @override
+  String get coffeeStepRightProfileDesc =>
+      'Now capture the right rear side of the cup from a well-lit angle.';
+
+  @override
+  String get coffeeStepSaucerSecret => 'Saucer\'s Secret';
+
+  @override
+  String get coffeeStepSaucerDesc =>
+      'Finally, capture the saucer\'s wide surface with the grounds clearly visible.';
+
+  @override
+  String get coffeeStepSaucerBtn => 'Take Saucer Photo';
+
+  @override
+  String get coffeeHeaderTitle => 'COFFEE READING';
+
+  @override
+  String get coffeeLastReading => 'Your Last Reading';
+
+  @override
+  String coffeeLastReadingTime(String time) {
+    return 'At $time • Expires at midnight';
+  }
+
+  @override
+  String get coffeeNoReadingYet =>
+      'You haven\'t had a reading yet.\nBrew a cup of coffee,\nand let the grounds whisper to you.';
+
+  @override
+  String get coffeeSoulStones => 'Your Soul Stones';
+
+  @override
+  String get coffeeSoulStoneEmpty => 'No Soul Stones left';
+
+  @override
+  String get coffeeSoulStoneRequired => 'Required for coffee reading analysis';
+
+  @override
+  String get coffeeSoulStoneCost => 'Each reading costs 1 Soul Stone';
+
+  @override
+  String get coffeeSoulStoneEliteActive =>
+      'Elite perk: 5 Soul Stones refresh every night';
+
+  @override
+  String get coffeeSoulStoneElitePromo =>
+      'Go Elite to earn 5 Soul Stones nightly';
+
+  @override
+  String get coffeeEliteSubscribe => 'Subscribe to Elite';
+
+  @override
+  String get coffeeRitualLabel => 'RITUAL';
+
+  @override
+  String get coffeeRitualTitle => 'Secrets of the Cup';
+
+  @override
+  String get coffeeRitualDesc =>
+      'The grounds only speak to those who look closely. Follow the ritual for a true reading.';
+
+  @override
+  String get coffeeRitualStep1Title => 'Set Your Intention';
+
+  @override
+  String get coffeeRitualStep1Desc =>
+      'As you sip, let a question or wish flow through your mind.';
+
+  @override
+  String get coffeeRitualStep2Title => 'Sip from One Side';
+
+  @override
+  String get coffeeRitualStep2Desc =>
+      'Always drink from the same side to preserve the patterns.';
+
+  @override
+  String get coffeeRitualStep3Title => 'Flip It Over';
+
+  @override
+  String get coffeeRitualStep3Desc =>
+      'Turn the cup upside down, let it cool, and gently open it.';
+
+  @override
+  String get coffeeRitualListenTitle => 'Listen to the Grounds\' Whisper';
+
+  @override
+  String coffeeStepLabel(String index, String title) {
+    return 'Step $index: $title';
+  }
+
+  @override
+  String get coffeeDiscoverFate => 'Discover Your Fate';
+
+  @override
+  String get coffeeNextStep => 'Next Step';
+
+  @override
+  String get coffeeValidationError =>
+      'The grounds in the marked photos\ncould not be clearly identified.';
+
+  @override
+  String get coffeeCosmicMismatch => 'Cosmic Mismatch';
+
+  @override
+  String get coffeeCosmicCheck => 'COSMIC BOND CHECK';
+
+  @override
+  String get coffeeCosmicCheckDesc =>
+      'Decoding the language of the grounds,\nlistening to fate\'s whispers...';
+
+  @override
+  String get coffeeRevealSecrets => 'Lift the Veil of Secrets';
+
+  @override
+  String get coffeeReadingInProgress => 'Reading the Grounds...';
+
+  @override
+  String get coffeeReadingWait =>
+      'The doors of the future are opening, hold on.';
+
+  @override
+  String get coffeeRelationTitle => 'Your Relationship Status';
+
+  @override
+  String get coffeeRelationSubtitle =>
+      'Set the foundation of your cosmic bond.';
+
+  @override
+  String get coffeeFocusTitle => 'What\'s on Your Mind?';
+
+  @override
+  String get coffeeFocusSubtitle =>
+      'Choose an intention to deepen your reading.';
+
+  @override
+  String get coffeeMoodTitle => 'Your Mood?';
+
+  @override
+  String get coffeeMoodSubtitle => 'Feel the energy of your cup.';
+
+  @override
+  String get coffeeCosmicBondFormed => 'Cosmic Bond Formed';
+
+  @override
+  String get coffeeSecretsReady =>
+      'The secrets of your cup are ready to be whispered...';
+
+  @override
+  String get coffeeNewReading => 'New Reading';
+
+  @override
+  String get coffeeAiPermission => 'AI coffee analysis permission';
+
+  @override
+  String get coffeeStoneCostInfo => 'Each analysis costs 1 Soul Stone';
+
+  @override
+  String get coffeeEliteRefillActive =>
+      'Elite perk: 5 Soul Stones refresh every night';
+
+  @override
+  String get coffeeEliteRefillPromo => 'Go Elite to earn 5 Soul Stones nightly';
+
+  @override
+  String get coffeeEliteGetBtn => 'Get Elite';
+
+  @override
+  String get coffeeResultOnHome => 'View the result on the home page  ';
+
+  @override
+  String get onboardingStart => 'Let\'s Begin';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingFinish => 'Start Journey';
+
+  @override
+  String get onboardingNameHint => 'A Cosmic Name';
+
+  @override
+  String get onboardingNamePlaceholder => 'first_last';
+
+  @override
+  String get onboardingHandleHint => 'A Cosmic Handle';
+
+  @override
+  String get onboardingHandlePlaceholder => 'galaxy_traveler';
+
+  @override
+  String get onboardingGenderTitle => 'Gender';
+
+  @override
+  String get onboardingGenderFemale => 'Female';
+
+  @override
+  String get onboardingGenderMale => 'Male';
+
+  @override
+  String get onboardingGenderOther => 'Prefer not to say';
+
+  @override
+  String get onboardingStep1Title => 'What should we call you?';
+
+  @override
+  String get onboardingStep1Sub =>
+      'By what name and vibration should the universe know you?';
+
+  @override
+  String get onboardingAvatarSelect => 'Select Your Avatar';
+
+  @override
+  String get onboardingStep2Title => 'The moment your soul entered...';
+
+  @override
+  String get onboardingStep2Sub =>
+      'We need your basic details to calculate your astrological birth chart and personalized rituals.';
+
+  @override
+  String get onboardingBirthDateLabel => 'Birth Date';
+
+  @override
+  String get onboardingBirthTimeLabel => 'Birth Time';
+
+  @override
+  String get onboardingBirthLocationLabel => 'Birth City';
+
+  @override
+  String get onboardingTimeHint =>
+      'If you know the exact time, enter for detailed analysis';
+
+  @override
+  String get onboardingLocationHint =>
+      'Refine the calculation by selecting a city';
+
+  @override
+  String get onboardingUnknownTime => 'I don\'t know the exact time';
+
+  @override
+  String get onboardingPrivacyNote =>
+      'Used exclusively to draw your personalized chart.';
+
+  @override
+  String get onboardingStep3Title => 'What is your focus?';
+
+  @override
+  String get onboardingStep3Sub =>
+      'Which energy do you most want to grow or heal in your life right now?';
+
+  @override
+  String get onboardingFocusLabel => 'Focus (Multiple Choice)';
+
+  @override
+  String get onboardingFocusCareer => 'Career & Money';
+
+  @override
+  String get onboardingFocusLove => 'Love & Relationships';
+
+  @override
+  String get onboardingFocusPeace => 'Inner Peace';
+
+  @override
+  String get onboardingFocusLuck => 'Luck & Opportunities';
+
+  @override
+  String get onboardingRelLabel => 'Current relationship status:';
+
+  @override
+  String get onboardingRelSingle => 'Lonely Sky';
+
+  @override
+  String get onboardingRelComplicated => 'There\'s Someone...';
+
+  @override
+  String get onboardingRelTalking => 'Complicated';
+
+  @override
+  String get onboardingRelRelationship => 'Happy Bond';
+
+  @override
+  String get onboardingStep4Title =>
+      'Your connection to the universe at night...';
+
+  @override
+  String get onboardingStep4Sub =>
+      'How does your subconscious receive messages? Colors and dreams will give us clues.';
+
+  @override
+  String get onboardingDreamLabel => 'How often do you remember your dreams?';
+
+  @override
+  String get onboardingDreamOften => 'Often and Clearly';
+
+  @override
+  String get onboardingDreamSometimes => 'Sometimes';
+
+  @override
+  String get onboardingDreamRarely => 'Rarely';
+
+  @override
+  String get onboardingDreamNever => 'Never';
+
+  @override
+  String get onboardingAuraLabel =>
+      'Your Soul\'s Aura (How do you feel today?)';
+
+  @override
+  String get onboardingStep5Title => 'Your dance with time...';
+
+  @override
+  String get onboardingStep5Sub =>
+      'When is your energy highest? We will adjust your notifications accordingly.';
+
+  @override
+  String get onboardingSleepLabel => 'Your Sleep Pattern';
+
+  @override
+  String get onboardingSleepMorning => 'Morning Person';
+
+  @override
+  String get onboardingSleepNight => 'Night Owl';
+
+  @override
+  String get onboardingSleepIrregular => 'Irregular';
+
+  @override
+  String get onboardingSleepLittle => 'I Sleep Very Little';
+
+  @override
+  String get onboardingMatchLabel => 'Matching & Cosmic Connection';
+
+  @override
+  String get onboardingMatchDesc =>
+      'I want to be open to connecting with synergistic profiles and special cosmic matches.';
+
+  @override
+  String get onboardingFinalTitle => 'Everything is ready...';
+
+  @override
+  String get onboardingFinalSub =>
+      'You are about to find out what the stars have planned for you. Create your account and enter the cosmic universe.';
+
+  @override
+  String get onboardingAppleCreate => 'Create Account with Apple';
+
+  @override
+  String get onboardingGoogleCreate => 'Create Account with Google';
+
+  @override
+  String get onboardingErrorIncomplete =>
+      'Welcome! Just a few steps left to complete your profile.';
+
+  @override
+  String get onboardingErrorFailed => 'Login failed. Please try again.';
+
+  @override
+  String onboardingErrorAlreadyExists(String provider) {
+    return 'You already have a cosmic profile with this $provider account! Please use the \'Sign In\' option on the first page.';
+  }
+
+  @override
+  String onboardingErrorDBRejected(String error) {
+    return 'Registration rejected by the database:\n$error\nPlease contact support.';
+  }
+
+  @override
+  String get onboardingErrorHandleTaken => 'This username is already taken';
+
+  @override
+  String get notifTitle => 'Notifications';
+
+  @override
+  String get notifSubtitle => 'Choose which notifications you want to receive';
+
+  @override
+  String get notifAnnouncements => 'Announcements';
+
+  @override
+  String get notifAnnouncementsDesc => 'New features and updates';
+
+  @override
+  String get notifSounds => 'Sounds';
+
+  @override
+  String get notifSoundsDesc => 'Sound notification alerts';
+
+  @override
+  String get notifCookieAlarm => 'New Cookie Alarm';
+
+  @override
+  String get notifCookieAlarmDesc => 'When a new fortune cookie arrives';
+
+  @override
+  String get notifFriendAlarm => 'Friend Alarm';
+
+  @override
+  String get notifFriendAlarmDesc => 'New connections from the Owl Network';
+
+  @override
+  String get notifDailyReminder => 'Daily Reminders';
+
+  @override
+  String get notifDailyReminderDesc => 'Don\'t forget your daily cookie';
+
+  @override
+  String get accountTitle => 'Account Details';
+
+  @override
+  String get accountSubtitle => 'Personal info and account management';
+
+  @override
+  String get accountUsername => 'Username';
+
+  @override
+  String get accountLinkedEmail => 'Linked Email';
+
+  @override
+  String get accountSignInMethod => 'Sign-in Method';
+
+  @override
+  String get accountDeleteTitle => 'Delete Account';
+
+  @override
+  String get accountDeleteDesc =>
+      'All your data will be permanently deleted.\nThis action cannot be undone.';
+
+  @override
+  String get accountDeleteCancel => 'Cancel';
+
+  @override
+  String get accountDeleteConfirm => 'Delete';
+
+  @override
+  String get accountDeletePermanent => 'Delete Account Permanently';
+
+  @override
+  String get welcomeTagline => 'The magic is within you.';
+
+  @override
+  String get welcomeAppleContinue => 'Continue with Apple';
+
+  @override
+  String get welcomeGoogleContinue => 'Continue with Google';
+
+  @override
+  String get moodGuideTitle => 'Mood Guide';
+
+  @override
+  String get moodAwarenessTitle => 'Emotional Awareness';
+
+  @override
+  String get moodAwarenessDesc =>
+      'Choosing your mood makes your feelings concrete; this is the first step to finding inner balance and self-awareness.';
+
+  @override
+  String get moodCosmicTitle => 'Cosmic Frequency';
+
+  @override
+  String get moodCosmicDesc =>
+      'Every emotion you pick on the wheel carries a frequency. The screen\'s aura aligns directly with your feelings.';
+
+  @override
+  String get moodHowToTitle => 'How to Use?';
+
+  @override
+  String get moodHowToDesc =>
+      'Simply spin the wheel and pick the expression that best reflects your mood. Do not judge your feeling, just feel and accept it.';
+
+  @override
+  String get moodQuestionAlt => 'How\'s your mood today?';
+
+  @override
+  String get moodSpinHint => 'Spin the wheel, pick your mood ✨';
+
+  @override
+  String get bentoCoffeeTitle => 'Coffee Reading';
+
+  @override
+  String get bentoCoffeeDesc => 'Whispers of grounds';
+
+  @override
+  String get bentoUnexplored => 'This realm is waiting to be explored...';
+
+  @override
+  String get bentoSealed => 'Sealed';
+
+  @override
+  String get horoscopeDailyEnergy => 'Today\'s Energy';
+
+  @override
+  String get horoscopeWestern => 'Western Ast.';
+
+  @override
+  String get horoscopeAsian => 'Asian Wisdom';
+
+  @override
+  String get horoscopeMayan => 'Mayan Spirit';
+
+  @override
+  String get shareSaved => 'Saved ✓';
+
+  @override
+  String get shareDownload => 'Download';
+
+  @override
+  String get shareShare => 'Share';
+
+  @override
+  String get shareStory => 'Story';
+
+  @override
+  String get sharePost => 'Post';
+
+  @override
+  String get shareCoffeeTitle => 'Coffee Reading';
+
+  @override
+  String get cookieLockedTitle => 'This special cookie is locked';
+
+  @override
+  String get cookieComingSoon => 'Coming Soon ✨';
+
+  @override
+  String get dreamWaitOrReturn =>
+      'You can wait here or return to home page. We will notify you when it\'s ready, and you can read it from the \"My Dreams\" section.';
+
+  @override
+  String get dreamReturnHome => 'Return to Home Page';
+
+  @override
+  String get profileEditProfile => 'Edit Profile';
+
+  @override
+  String get profileEditSubtitle => 'Edit name, zodiac and personal info';
+
+  @override
+  String get profileSearchHint => 'Search zodiac, city or birth date...';
+
+  @override
+  String get profileStoreUnavailable => 'Store link is unavailable.';
+
+  @override
+  String get profileMailNotFound =>
+      'No mail app found. You can write to support@crackandwish.com';
+
+  @override
+  String get profileRitualCode => 'Ritual Code';
+
+  @override
+  String get profileRitualDesc =>
+      'This code is your personal ritual identity. Share it with friends to invite them to the Owl Network.';
+
+  @override
+  String get profileRitualCopied => 'Ritual Code Copied ✨';
+
+  @override
+  String get profileRitualInfo => 'Share with friends, explore together!';
+
+  @override
+  String get profileShareCode => 'Share Code';
+
+  @override
+  String get profileDeleteAccount => 'Delete Account';
+
+  @override
+  String get profileDeleteDesc =>
+      'All your data will be permanently deleted.\nThis action cannot be undone.';
+
+  @override
+  String get profileDeleteCancel => 'Cancel';
+
+  @override
+  String get profileDeleteConfirm => 'Delete Account';
+
+  @override
+  String get profileSignOut => 'Sign Out';
+
+  @override
+  String get profileSignOutDesc =>
+      'Sign out from your account safely.\nYour data will be preserved.';
+
+  @override
+  String get profileSignOutCancel => 'Cancel';
+
+  @override
+  String get profileSignOutConfirm => 'Sign Out';
+
+  @override
+  String get profilePrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get profileTermsOfUse => 'Terms of Use';
+
+  @override
+  String get profileGetElite => 'Get Elite';
+
+  @override
+  String get profileGetEliteSubtitle => 'Doorway to awareness';
+
+  @override
+  String get profileCosmicProfile => 'Cosmic Profile';
+
+  @override
+  String get profileCosmicSubtitle => 'Chart, Time and Location';
+
+  @override
+  String get profileSectionAccount => 'Account';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profileNotificationSettings => 'Notification Settings';
+
+  @override
+  String get profileRestorePurchases => 'Restore Purchases';
+
+  @override
+  String get profileRestoreSuccess => 'Purchases restored successfully!';
+
+  @override
+  String get profileRestoreFail => 'No purchases found to restore.';
+
+  @override
+  String get profileHelp => 'Help';
+
+  @override
+  String get profileShare => 'Share';
+
+  @override
+  String get profileRate => 'Rate';
+
+  @override
+  String get profileVersion => 'Version';
+
+  @override
+  String get profileCosmicName => 'Cosmic Name';
+
+  @override
+  String get profileSealProfile => 'Seal Profile';
+
+  @override
+  String get profileChooseAvatar => 'Choose your magical avatar.';
+
+  @override
+  String get profileStrengthenBonds => 'Strengthen Bonds';
+
+  @override
+  String get profileStrengthenBondsDesc =>
+      'Expand the cosmic universe with friends.';
+
+  @override
+  String get profileEarnSoulStones => 'Earn +2 Soul Stones';
+
+  @override
+  String get profileCodeCopied => 'Code copied!';
+
+  @override
+  String get profileNotifications => 'Notifications';
+
+  @override
+  String get profileSupportExperience => 'Support & Experience';
+
+  @override
+  String get profileSeerNovice => 'Novice Seer';
+
+  @override
+  String get profileSeerApprentice => 'Apprentice Seer';
+
+  @override
+  String get profileSeer => 'Seer';
+
+  @override
+  String get profileSeerWise => 'Wise Seer';
+
+  @override
+  String get profileSeerMaster => 'Master Seer';
+
+  @override
+  String get profileSeerCosmic => 'Cosmic Seer';
+
+  @override
+  String get profileUploadFailed =>
+      'Photo upload failed! Please check your connection.';
+
+  @override
+  String get profileCropTitle => 'Cosmic Crop';
+
+  @override
+  String get profileCropCancel => 'Cancel';
+
+  @override
+  String get profileCropDone => 'Done';
+
+  @override
+  String get moderationAdultContent =>
+      'The energy of this image is not compatible with our Cosmic universe (Inappropriate Content).';
+
+  @override
+  String get moderationViolence =>
+      'Please choose a calmer avatar that reflects your aura and does not weary the mind (Disturbing Content).';
+
+  @override
+  String get moderationTooLarge =>
+      'The image is large enough to strain the cosmic network. Please select a photo under 5MB.';
+
+  @override
+  String get moderationInvalidFormat =>
+      'Your photo could not be read by our magical scroll, format is corrupted.';
+
+  @override
+  String get moderationUnknown => 'An unknown cosmic fluctuation occurred.';
+
+  @override
+  String profileShareInvite(String code) {
+    return 'Join the Crack&Wish universe! ✨\nMy Ritual Code: $code\n\nEnter this code to earn +1 Soul Stone, +50 Aura, and a surprise Premium Cookie!\nhttps://crackandwish.com';
+  }
+
+  @override
+  String get profileShareApp =>
+      'Discover your fortune with Crack&Wish! •✨\nCrack cookies, read tarot, interpret dreams.\n\nhttps://crackandwish.com';
+
+  @override
+  String get profileEliteYouAre => 'You are Elite';
+
+  @override
+  String get profileGoElite => 'Go Elite';
+
+  @override
+  String get profileEliteMystical => 'View mystical gates';
+
+  @override
+  String get profileEliteDoor => 'Door to awareness';
+
+  @override
+  String get profileMyCosmicProfile => 'My Cosmic Profile';
+
+  @override
+  String get profileCosmicDetails => 'Chart, Time, and Place Details';
+
+  @override
+  String get profileRestorePurchasesBtn => 'Restore Purchases';
+
+  @override
+  String get profileRestoreSubtitle => 'Restore your previous purchases';
+
+  @override
+  String get profileInviteFriends => 'Invite Friends';
+
+  @override
+  String get profileInviteFriendsDesc => 'Build cosmic bonds, earn together';
+
+  @override
+  String get cosmicChart => 'Cosmic Chart';
+
+  @override
+  String get cosmicWestern => 'WESTERN';
+
+  @override
+  String get cosmicAsian => 'ASIAN';
+
+  @override
+  String get cosmicMayan => 'MAYAN';
+
+  @override
+  String get cosmicRising => 'RISING';
+
+  @override
+  String get cosmicArrivalDate => 'ARRIVAL DATE';
+
+  @override
+  String get cosmicBirthTime => 'BIRTH TIME';
+
+  @override
+  String get cosmicTimeUnknown => 'Time Unknown';
+
+  @override
+  String get cosmicBirthPlace => 'BIRTH PLACE COORDINATES';
+
+  @override
+  String get cosmicCountry => 'Country';
+
+  @override
+  String get cosmicSelectCountry => 'Select Country';
+
+  @override
+  String get cosmicCityDistrict => 'City & District & Village';
+
+  @override
+  String get cosmicSelectDateFirst => 'Please select your birth date first.';
+
+  @override
+  String cosmicLockedDays(int days) {
+    return 'Locked for $days Days';
+  }
+
+  @override
+  String get cosmicSave => 'Save';
+
+  @override
+  String get cosmicSearchLocation => 'Search Exact Location';
+
+  @override
+  String get cosmicSearchHint => 'Enter village, district, etc...';
+
+  @override
+  String get cosmicAddFreeText => 'Add as free text';
+
+  @override
+  String get cosmicRequiresTime => 'Requires Time';
+
+  @override
+  String get badgeReady => 'READY';
+
+  @override
+  String get badgeNew => 'NEW';
+
+  @override
+  String get paywallLegal =>
+      'Crack Wish Elite is an auto-renewing subscription. Payment will be charged to your account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. You can manage and cancel your subscriptions in your App Store settings.';
+
+  @override
+  String get cosmicSelect => 'Select';
+
+  @override
+  String get coffeeRelSingle => 'Single Soul';
+
+  @override
+  String get coffeeRelInLove => 'Heart is Full';
+
+  @override
+  String get coffeeRelEngaged => 'Engaged';
+
+  @override
+  String get coffeeRelMarried => 'Married';
+
+  @override
+  String get coffeeRelComplicated => 'Complicated';
+
+  @override
+  String get coffeeFocusLove => 'Love & Harmony';
+
+  @override
+  String get coffeeFocusCareer => 'Career & Finances';
+
+  @override
+  String get coffeeFocusHealing => 'Healing & Peace';
+
+  @override
+  String get coffeeFocusGeneral => 'General Future';
+
+  @override
+  String get coffeeFocusSurprise => 'Surprise Me';
+
+  @override
+  String get coffeeMoodPeaceful => 'Peaceful';
+
+  @override
+  String get coffeeMoodExcited => 'Excited';
+
+  @override
+  String get coffeeMoodAnxious => 'Anxious';
+
+  @override
+  String get coffeeMoodIndecisive => 'Indecisive';
+
+  @override
+  String get coffeeMoodEnergetic => 'Energetic';
+
+  @override
+  String get coffeeMoodMelancholic => 'Melancholic';
+
+  @override
+  String get coffeeAllPhotosRequired => 'Please take all photos!';
+
+  @override
+  String get coffeeNotEnoughStones => 'Not enough Soul Stones!';
+
+  @override
+  String coffeeSoulStoneCount(int count) {
+    return '$count Soul Stones available';
+  }
+
+  @override
+  String get coffeeUseSoulStone => 'Use 1 Soul Stone';
+
+  @override
+  String get languageSettingsSubtitle => 'Choose app language';
+
+  @override
+  String get cosmicSearchHintShort => 'Search...';
+
+  @override
+  String get cosmicAddThis => 'Add this';
+
+  @override
+  String get horoscopeWesternText =>
+      'Stars align for your career. Take swift and decisive steps.';
+
+  @override
+  String get horoscopeAsianText =>
+      'Water element is active. Your intuition is strong, just listen to your heart.';
+
+  @override
+  String get horoscopeMayanText =>
+      'Tone 4 is active. A perfect day to establish order and plan your life.';
+
+  @override
+  String get horoscopeExplore => 'Explore';
+
+  @override
+  String get cookieDayCompleted => 'Day Completed';
+
+  @override
+  String get cookieSeeYouTomorrow => 'See you tomorrow with new cookies.';
+
+  @override
+  String get cookieRarityLegendary => 'Legendary';
+
+  @override
+  String get cookieRarityRare => 'Rare';
+
+  @override
+  String get cookiePremiumCollection => 'Premium Collection';
+
+  @override
+  String cookiePurchaseBtn(String price) {
+    return 'Purchase ($price)';
+  }
+
+  @override
+  String get cookieTapOutsideToClose => 'Tap outside to close';
+
+  @override
+  String get cookieAddedToCollection =>
+      'Cookie successfully added to your collection!';
+
+  @override
+  String get cookiePremiumFallback => 'Premium Cookie';
+
+  @override
+  String get dreamSoulStoneRequired => 'Soul Stone Required';
+
+  @override
+  String get dreamSoulStoneRequiredDesc =>
+      'Soul Stones are required for deep analysis.\n\nYou can earn Soul Stones by converting Aura points or with Elite subscription.';
+
+  @override
+  String get dreamGetElite => 'Get Elite';
+
+  @override
+  String get dreamClinicalGateTitle => 'Clinical Analysis Gate';
+
+  @override
+  String dreamClinicalGateDesc(int soulStones) {
+    return 'Current Soul Stones: $soulStones\n\nThis clinical-level deep psychoanalysis costs 1 Soul Stone.';
+  }
+
+  @override
+  String get dreamUseOneStone => 'Use 1 Stone';
+
+  @override
+  String get dreamDeepAnalysisBgPreparing =>
+      'Deep Analysis is being prepared in the background. You will receive a notification when it is ready.';
+
+  @override
+  String get dreamYourSoulStones => 'Your Soul Stones';
+
+  @override
+  String dreamSoulStonesRemaining(int count) {
+    return '$count Soul Stones remaining';
+  }
+
+  @override
+  String get dreamSoulStonesEmpty => 'Out of Soul Stones';
+
+  @override
+  String get dreamRequiredForDeep => 'Required for Deep Analysis';
+
+  @override
+  String get dreamEachAnalysisCost => 'Each analysis costs 1 Soul Stone';
+
+  @override
+  String get dreamEliteRefillActive => 'Elite refills 5 Soul Stones nightly';
+
+  @override
+  String get dreamEliteRefillPromo => 'Get 5 daily Soul Stones with Elite';
+
+  @override
+  String get dreamWatchAd => 'Watch Ad';
+
+  @override
+  String get dreamBgAnalyzing =>
+      'Your dream is being analyzed in the background. You will receive a notification when it is ready.';
+
+  @override
+  String get dreamDeepAnalysis => 'Deep Analysis';
+
+  @override
+  String get dreamDiscoverSecrets => 'Discover secrets';
+
+  @override
+  String get dreamDidYouKnow => 'Did you know?';
+
+  @override
+  String get dreamNeuroPsychAnalysis => 'NEURO-PSYCH ANALYSIS';
+
+  @override
+  String get dreamYourDream => 'YOUR DREAM';
+
+  @override
+  String get dreamEmotionalProfile => 'Emotional Profile';
+
+  @override
+  String get dreamEmotionalProfileSub =>
+      'Psychological layers during the dream';
+
+  @override
+  String get dreamShadowSelf => 'Shadow Self';
+
+  @override
+  String get dreamShadowSelfSub =>
+      'Suppressed and unexamined aspects of the subconscious';
+
+  @override
+  String get dreamRecurringPatterns => 'Recurring Patterns';
+
+  @override
+  String get dreamRecurringPatternsSub =>
+      'Recurring loops and psychological blockages';
+
+  @override
+  String dreamSuggestedRitual(String title) {
+    return 'Suggested Ritual: $title';
+  }
+
+  @override
+  String get dreamSuggestedRitualSub =>
+      'A specialized action to manage this dream\'s impact';
+
+  @override
+  String get dreamScienceNote => 'Science Note:';
+
+  @override
+  String get dreamWriteNewDream => 'Write a New Dream';
+
+  @override
+  String get dreamNoMonthDreams => 'No dreams written this month yet ✨';
+
+  @override
+  String get dreamMysteriousDream => 'Mysterious Dream';
+
+  @override
+  String get dreamStandardAnalysis => 'STANDARD ANALYSIS';
+
+  @override
+  String get dreamGeneralAnalysis => 'General Analysis';
+
+  @override
+  String get dreamPsychological => 'Psychological';
+
+  @override
+  String get dreamSpiritual2 => 'Spiritual';
+
+  @override
+  String get dreamAdvice => 'Advice';
+
+  @override
+  String get dreamDeepenedInsights => 'Deepened Insights';
+
+  @override
+  String get dreamEliteCreditsTitle => 'Elite Credits';
+
+  @override
+  String get dreamReadingCreditsTitle => 'Your Reading Credits';
+
+  @override
+  String dreamCreditsRemaining(int count) {
+    return '$count credits remaining';
+  }
+
+  @override
+  String get dreamDailyLimitReached => 'Daily limit reached';
+
+  @override
+  String get dreamZeroCredits => '0 credits remaining';
+
+  @override
+  String dreamDailyPremiumReads(int count) {
+    return '$count daily Dream interpretations';
+  }
+
+  @override
+  String get dreamNoAdsRequired => 'No need to watch ads';
+
+  @override
+  String get dreamCreditsResetNightly => 'Credits reset every night';
+
+  @override
+  String get dreamOneFreeDaily => '1 free interpretation every day';
+
+  @override
+  String dreamWatchAdsForCredits(int maxAds, int watched) {
+    return 'Watch ads for $maxAds extra credits ($watched/$maxAds)';
+  }
+
+  @override
+  String get dreamUnconsciousFrequencies => 'UNCONSCIOUS FREQUENCIES';
+
+  @override
+  String get dreamOrbEmotion => 'EMOTION';
+
+  @override
+  String get dreamOrbEntropy => 'ENTROPY';
+
+  @override
+  String get dreamOrbActivity => 'ACTIVITY';
+
+  @override
+  String get dreamOrbResidue => 'RESIDUE';
+
+  @override
+  String get dreamHighConfidence => 'High Confidence';
+
+  @override
+  String get dreamModerateConfidence => 'Moderate Confidence';
+
+  @override
+  String get dreamLowConfidence => 'Low Confidence';
+
+  @override
+  String get dreamCoreThematicPattern => 'CORE THEMATIC PATTERN';
+
+  @override
+  String get dreamMetricEmotionalLoad => 'Emotional\nLoad';
+
+  @override
+  String get dreamMetricEmotionalLoadDesc =>
+      'How intensely your brain\'s emotional center was activated during this dream.';
+
+  @override
+  String get dreamMetricUncertaintyDesc =>
+      'How illogical or inconsistent your dream narrative was.';
+
+  @override
+  String get dreamMetricRecentMemory => 'Recent\nConnection';
+
+  @override
+  String get dreamMetricRecentMemoryDesc =>
+      'How much of your dream was influenced by recent real-life events.';
+
+  @override
+  String get dreamMetricAgency => 'Agency /\nControl';
+
+  @override
+  String get dreamMetricAgencyDesc =>
+      'How much control you had over events in your dream.';
+
+  @override
+  String get dreamSeverityHigh => 'High';
+
+  @override
+  String get dreamSeverityNormal => 'Normal';
+
+  @override
+  String get dreamSeverityLow => 'Low';
+
+  @override
+  String get dreamCognitiveDistribution => 'COGNITIVE DISTRIBUTION';
+
+  @override
+  String get dreamTapToExpand => 'TAP TO EXPAND';
+
+  @override
+  String get dreamNeurologicalBasis => 'Neurological Basis';
+
+  @override
+  String get dreamEvidenceBase => 'EVIDENCE BASE';
+
+  @override
+  String get dreamRootCause => 'Root Cause';
+
+  @override
+  String get dreamAbsolutely => 'Absolutely';
+
+  @override
+  String get dreamMaybe => 'Maybe';
+
+  @override
+  String get dreamNotSure => 'Not Sure';
+
+  @override
+  String get dreamDreamEssence => 'DREAM ESSENCE';
+
+  @override
+  String get dreamClarifyingResponses => 'CLARIFYING RESPONSES';
+
+  @override
+  String get dreamCosmicRhythmSynced => 'Cosmic Rhythm Synced';
+
+  @override
+  String get dreamCosmicRhythmSyncedDesc =>
+      'You will receive custom dream prompts based on your sleep cycle.';
+
+  @override
+  String get dreamSyncSleepData => 'Sync Sleep Data';
+
+  @override
+  String get dreamSyncSleepDataDesc =>
+      'Allow it to detect when you wake up to ask about your deepest dream.';
+
+  @override
+  String get dreamAwarenessFallback =>
+      'This awareness is the start of a new path. It is time to face it.';
+
+  @override
+  String get dreamExtractingEssence => 'Extracting dream essence...';
+
+  @override
+  String get dreamNoReasoning => 'No reasoning generated.';
+
+  @override
+  String get dreamNotAnalyzable =>
+      'Are you sure this was a dream?\nPlease describe a real scene you experienced while sleeping.';
+
+  @override
+  String get owlTabFriends => 'My Friends';
+
+  @override
+  String get owlTabConnections => 'Connections';
+
+  @override
+  String get owlTabInbox => 'Inbox';
+
+  @override
+  String get owlSearchCosmic => 'Search cosmic universe...';
+
+  @override
+  String get owlSearchFriends => 'Search friends...';
+
+  @override
+  String get owlPhoneContacts => 'Phone Contacts';
+
+  @override
+  String get owlNoOneFoundCosmic => 'No one found in the cosmic universe.';
+
+  @override
+  String get owlFoundInCosmic => 'Found in Cosmic Universe';
+
+  @override
+  String get owlUnknownProfile => 'Unknown Profile';
+
+  @override
+  String owlFriendRequestSent(String name) {
+    return 'Friend request sent to $name!';
+  }
+
+  @override
+  String get owlRequestSentStatus => 'Sent';
+
+  @override
+  String get owlSendRequestAction => 'Send Request';
+
+  @override
+  String get owlConnectContacts => 'Connect Contacts';
+
+  @override
+  String get owlConnectContactsDesc =>
+      'Find your friends instantly.\nYour contacts are NEVER stored on servers.';
+
+  @override
+  String get owlNoContactsFound =>
+      'We Couldn\'t Find Anyone\nin the Crack&Wish Universe';
+
+  @override
+  String get owlNoContactsFoundDesc =>
+      'You can start the cosmic energy by inviting them!';
+
+  @override
+  String get owlUnknown => 'Unknown';
+
+  @override
+  String get owlAppUserLabel => 'Crack&Wish User';
+
+  @override
+  String get owlInContactsLabel => 'In your contacts';
+
+  @override
+  String get owlNoFriendsYet => 'No friends yet';
+
+  @override
+  String get owlNoResultsFound => 'No results found';
+
+  @override
+  String get owlFriendRequests => 'Friend Requests';
+
+  @override
+  String get owlFriendsHeader => 'Your Friends';
+
+  @override
+  String get owlAcceptAction => 'Accept';
+
+  @override
+  String get owlRejectAction => 'Reject';
+
+  @override
+  String get owlInviteReward => '+2 Soul Stones';
+
+  @override
+  String owlInviteShareMessage(String username) {
+    return 'Let\'s light up the darkness together! ✨\nJoin Crack Wish through my invitation link below, connect automatically, and win Start Rewards!\n\nMy Invitation Link:\nhttps://crackwish.com/invite/$username';
+  }
+
+  @override
+  String get owlInviteFriends => 'Invite Friends';
+
+  @override
+  String get owlInviteFriendsDesc => 'Reflect the cosmic universe';
+
+  @override
+  String get owlNoLettersYet => 'No letters yet';
+
+  @override
+  String owlLetterSentNotification(String name) {
+    return '$name sent a letter...';
+  }
+
+  @override
+  String get owlOnItsWay => 'Owl is on its way 🕊️';
+
+  @override
+  String owlLetterCount(int count) {
+    return '$count letters';
+  }
+
+  @override
+  String owlUnreadCountBadge(int count) {
+    return '$count New';
+  }
+
+  @override
+  String get owlIUnderstand => 'I Understand';
+
+  @override
+  String get owlInviteHowTitle => 'How Would You Like to Invite?';
+
+  @override
+  String get owlInviteHowSubtitle =>
+      'How do you want to send your cosmic key to this person?';
+
+  @override
+  String get owlInviteSendAsMessage => 'Send as message';
+
+  @override
+  String get owlInviteSMSSubtitle => 'Send via classic message';
+
+  @override
+  String get owlInviteOtherApps => 'Other Apps';
+
+  @override
+  String get owlInviteOtherAppsSubtitle => 'Instagram, TikTok, X, etc.';
+
+  @override
+  String get owlWhatsAppNotFound => 'WhatsApp not found';
+
+  @override
+  String get owlSMSNotFound => 'SMS app not found';
+
+  @override
+  String get owlDisconnectAction => 'Disconnect';
+
+  @override
+  String owlDisconnectConfirm(String name) {
+    return 'Are you sure you want to break the magical bond with $name?';
+  }
+
+  @override
+  String get owlDisconnectConfirmButton => 'Yes, Disconnect';
+
+  @override
+  String get owlCancel => 'Cancel';
+
+  @override
+  String get owlSendMagic => 'Send (Charmed)';
+
+  @override
+  String get owlSend => 'Send';
+
+  @override
+  String get owlCookieAdded => 'Cookie Added';
+
+  @override
+  String get owlAddCookie => 'Add Cookie';
+
+  @override
+  String get owlNoCookiesInCollection => 'No cookies in your collection';
+
+  @override
+  String get owlWriteLetterHint => 'Write your letter...';
+
+  @override
+  String get owlSendCookie => 'Send Cookie';
+
+  @override
+  String get zodiacMeasureHarmony => 'MEASURE COSMIC HARMONY';
+
+  @override
+  String get zodiacDiscoverEnergy =>
+      'Discover your dual energy guided by the stars';
+
+  @override
+  String get zodiacChooseFriend => 'CHOOSE FRIEND';
+
+  @override
+  String get zodiacPros => 'Advantages';
+
+  @override
+  String get zodiacCons => 'Challenges';
+
+  @override
+  String get zodiacAdvice => 'Advice';
+
+  @override
+  String get zodiacDailyWhisperSubtitle =>
+      'Feel today\'s whisper and\nunravel the secrets of your spiritual portrait.';
+
+  @override
+  String get zodiacDailyWhisperHeadline =>
+      'Today\'s message & spiritual portrait';
+
+  @override
+  String get zodiacOpenGuide => 'Open the Guide';
+
+  @override
+  String get zodiacNoFriends => 'No friends yet';
+
+  @override
+  String get zodiacSelect => 'SELECT';
+
+  @override
+  String get zodiacQuestCompleted => 'Quest Completed';
+
+  @override
+  String get zodiacQuestCompletedSubtitle =>
+      'You are fully aligned with the rhythm of the universe.';
+
+  @override
+  String get zodiacRewardAura => 'Reward Earned:\n+4 AURA';
+
+  @override
+  String get zodiacStartNewQuest => 'START NEW QUEST';
+
+  @override
+  String zodiacDailyQuestTitle(int days) {
+    return '$days-DAY QUEST';
+  }
+
+  @override
+  String zodiacDailyQuestDesc(String weakness) {
+    return 'Break Your Weakness: \"$weakness\"';
+  }
+
+  @override
+  String zodiacQuestDayProgress(int current, int total) {
+    return 'DAY $current / $total';
+  }
+
+  @override
+  String get zodiacQuestTodayDiscovery => 'TODAY\'S DISCOVERY';
+
+  @override
+  String get zodiacQuestCompletedToday => 'COMPLETED TODAY';
+
+  @override
+  String get zodiacQuestCompleteNow => 'COMPLETE QUEST NOW';
+
+  @override
+  String get zodiacQuestMarkCompleted => 'I COMPLETED TODAY';
+
+  @override
+  String get zodiacLoveHarmony => 'LOVE HARMONY';
+
+  @override
+  String get zodiacFriendshipHarmony => 'FRIENDSHIP';
+
+  @override
+  String get zodiacCommunicationHarmony => 'COMMUNICATION & MIND';
+
+  @override
+  String get zodiacWorkHarmony => 'COLLABORATION';
+
+  @override
+  String get zodiacAdventureHarmony => 'ADVENTURE & FUN';
+
+  @override
+  String get zodiacViralDynamics => 'VIRAL DYNAMICS';
+
+  @override
+  String get zodiacDeepSynastryMap => 'DEEP SYNASTRY MAP';
+
+  @override
+  String zodiacSynastrySubtitle1(String name) {
+    return 'The harmony between you and $name is not limited to Sun signs.';
+  }
+
+  @override
+  String get zodiacSynastrySubtitle2 =>
+      'Based on privacy, the cosmic algorithm cross-references astrological birth charts, Moon, and Rising phases behind the scenes, making this analysis completely unique to you.';
+
+  @override
+  String get zodiacDailyWhisperTitle => 'Today\'s Whisper';
+
+  @override
+  String get zodiacChooseSign => 'CHOOSE SIGN';
+
+  @override
+  String get zodiacCosmicGuide => 'YOUR COSMIC GUIDE';
+
+  @override
+  String get zodiacNew => 'NEW';
+
+  @override
+  String get zodiacCosmicHarmonyTitle => 'COSMIC HARMONY';
+
+  @override
+  String get zodiacAwesome => 'AWESOME';
+
+  @override
+  String get zodiacSpiritPortrait => 'Spiritual Portrait';
 }

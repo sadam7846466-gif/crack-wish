@@ -205,7 +205,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 14,
                         height: 1.5,
-                      );
+                      ),
+                    );
                     }),
                     
                     const Spacer(),

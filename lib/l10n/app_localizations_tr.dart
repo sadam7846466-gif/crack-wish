@@ -502,10 +502,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dreamUnsure => 'Emin değilim';
 
   @override
-  String get dreamYes => 'Evet';
+  String get dreamYes => 'EVET';
 
   @override
-  String get dreamNo => 'Hayır';
+  String get dreamNo => 'HAYIR';
 
   @override
   String get dreamGeneral => 'Genel Rüya';
@@ -649,7 +649,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dreamMetricEmotional => 'Duygusal Yük';
 
   @override
-  String get dreamMetricUncertainty => 'Belirsizlik';
+  String get dreamMetricUncertainty => 'Anlatısal\nBelirsizlik';
 
   @override
   String get dreamMetricRecentPast => 'Yakın Geçmiş';
@@ -1070,4 +1070,1680 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get paywallOk => 'Tamam';
+
+  @override
+  String get coffeeLoading1 => 'Fincanın derinliklerine iniliyor...';
+
+  @override
+  String get coffeeLoading2 =>
+      'Telvelerdeki semboller evrensel enerjiyle eşleşiyor...';
+
+  @override
+  String get coffeeLoading3 => 'Kader çizgilerin haritalanıyor...';
+
+  @override
+  String get coffeeLoading4 => 'Sırlar açığa çıkıyor...';
+
+  @override
+  String get coffeeAiError => 'AI falı yorumlarken bir hata ile karşılaştı.';
+
+  @override
+  String get coffeeGenericError => 'Bir sorun oluştu. Lütfen tekrar dene.';
+
+  @override
+  String get coffeeNotifReady => 'Falın hazır olunca bildirim alacaksın';
+
+  @override
+  String get coffeeCheckHistory => '  butonundan görebilirsin';
+
+  @override
+  String get coffeeWaitOrExplore => 'Burada bekle ya da uygulamayı keşfet';
+
+  @override
+  String get coffeeGoHome => 'Ana Sayfaya Dön';
+
+  @override
+  String get coffeeSections => 'Fincanın Bölümleri';
+
+  @override
+  String get coffeeSectionInside => 'Fincan İçi';
+
+  @override
+  String get coffeeSectionInsideDesc =>
+      'İç dünyan, düşüncelerin, duygusal halin.';
+
+  @override
+  String get coffeeSectionEdge => 'Fincan Kenarı';
+
+  @override
+  String get coffeeSectionEdgeDesc => 'Yakın gelecek, haber, mesaj, görüşme.';
+
+  @override
+  String get coffeeSectionBottom => 'Fincan Dibi';
+
+  @override
+  String get coffeeSectionBottomDesc =>
+      'Geçmişten kalan konu, yük, kapanmamış mesele.';
+
+  @override
+  String get coffeeSectionSaucer => 'Tabak';
+
+  @override
+  String get coffeeSectionSaucerDesc => 'Dilek, sonuç, kısmet, son enerji.';
+
+  @override
+  String get coffeeLoadingComment => 'Yorum yükleniyor...';
+
+  @override
+  String get coffeeStoryTitle => 'Telvelerin Anlattığı Hikaye';
+
+  @override
+  String get coffeeSymbolsTitle => 'Falında Görülen Semboller';
+
+  @override
+  String get coffeeLove => 'Aşk & İlişkiler';
+
+  @override
+  String get coffeeCareer => 'İş & Para';
+
+  @override
+  String get coffeeFamily => 'Aile & Yakın Çevre';
+
+  @override
+  String get coffeeNearFuture => 'Yakın Gelecek';
+
+  @override
+  String get coffeeClosing => 'Falın Son Sözü';
+
+  @override
+  String get coffeeShare => 'Falımı Paylaş';
+
+  @override
+  String get coffeeRetryValidation => 'Geri Dön & Yeniden Çek';
+
+  @override
+  String get coffeeRetry => 'Tekrar Dene';
+
+  @override
+  String get coffeeCancel => 'İptal Et';
+
+  @override
+  String get coffeeSymbolLabel => 'Sembol';
+
+  @override
+  String get coffeeSymbolLoading => 'Yükleniyor...';
+
+  @override
+  String get coffeeTimelineSoon => 'Çok Yakında';
+
+  @override
+  String get coffeeImageError =>
+      'Bu görselde net bir kahve telvesi seçilemiyor.';
+
+  @override
+  String get coffeeCosmicTitle => 'Kozmik Kahve Yorumu';
+
+  @override
+  String get coffeePremiumOnly => 'Sadece Premium Özeldir';
+
+  @override
+  String get coffeePremiumDesc =>
+      'Kahve Falı özelliği uygulamanın elit üyelerine aittir. Premium\'a geç ve Ruh Taşlarınla geleceğin sırlarını arala.';
+
+  @override
+  String get coffeePremiumSimBtn => 'Premium Ol (Simülasyon)';
+
+  @override
+  String get coffeePhotoSource => 'Fotoğraf Kaynağı';
+
+  @override
+  String get coffeeCamera => 'Kamera';
+
+  @override
+  String get coffeeGallery => 'Galeri';
+
+  @override
+  String get coffeeStepCupInside => 'Fincan İçi';
+
+  @override
+  String get coffeeStepCupInsideDesc =>
+      'Kamerayı fincanın tam üstüne getirin ve içindeki telveleri odaklayarak çekin.';
+
+  @override
+  String get coffeeStepLeftProfile => 'Sol Profil';
+
+  @override
+  String get coffeeStepLeftProfileDesc =>
+      'Fincanı kulbundan tutup sadece sol yüzünün fotoğrafını net bir şekilde çekin.';
+
+  @override
+  String get coffeeStepRightProfile => 'Sağ Profil';
+
+  @override
+  String get coffeeStepRightProfileDesc =>
+      'Şimdi fincanın sağ arka yüzünü, ışığın vurduğu açıdan çekin.';
+
+  @override
+  String get coffeeStepSaucerSecret => 'Tabağın Sırrı';
+
+  @override
+  String get coffeeStepSaucerDesc =>
+      'Son olarak tabağın geniş yüzeyini, içindeki telveler net görünecek şekilde çekin.';
+
+  @override
+  String get coffeeStepSaucerBtn => 'Tabak Fotoğrafı Çek';
+
+  @override
+  String get coffeeHeaderTitle => 'KAHVE FALI';
+
+  @override
+  String get coffeeLastReading => 'Son Falın';
+
+  @override
+  String coffeeLastReadingTime(String time) {
+    return 'Saat $time • Gece 00:00\'da silinir';
+  }
+
+  @override
+  String get coffeeNoReadingYet =>
+      'Henüz fal baktırmadın.\nBir fincan kahve demle,\ntelvelerin sana fısıldamasını bekle.';
+
+  @override
+  String get coffeeSoulStones => 'Ruh Taşların';
+
+  @override
+  String get coffeeSoulStoneEmpty => 'Ruh Taşın bitti';
+
+  @override
+  String get coffeeSoulStoneRequired => 'Kahve falı yorumlaması için gerekli';
+
+  @override
+  String get coffeeSoulStoneCost => 'Her yorum 1 Ruh Taşı harcar';
+
+  @override
+  String get coffeeSoulStoneEliteActive =>
+      'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir';
+
+  @override
+  String get coffeeSoulStoneElitePromo => 'Elite ile her gece 5 Ruh Taşı kazan';
+
+  @override
+  String get coffeeEliteSubscribe => 'Elite Abone Ol';
+
+  @override
+  String get coffeeRitualLabel => 'RİTÜEL';
+
+  @override
+  String get coffeeRitualTitle => 'Fincanın Sırları';
+
+  @override
+  String get coffeeRitualDesc =>
+      'Telveler sadece onlara doğru bakanlara konuşur. Gerçek bir okuma için ritüeli takip et.';
+
+  @override
+  String get coffeeRitualStep1Title => 'Niyetini Belirle';
+
+  @override
+  String get coffeeRitualStep1Desc =>
+      'Yudumlarken zihninden bir soru veya dilek geçir.';
+
+  @override
+  String get coffeeRitualStep2Title => 'Aynı Yerden İç';
+
+  @override
+  String get coffeeRitualStep2Desc =>
+      'Şekillerin bozulmaması için hep aynı taraftan yudumla.';
+
+  @override
+  String get coffeeRitualStep3Title => 'Ters Çevir';
+
+  @override
+  String get coffeeRitualStep3Desc =>
+      'Fincanı kapat, soğumasını bekle ve yavaşça aç.';
+
+  @override
+  String get coffeeRitualListenTitle => 'Telvelerin Fısıltısını Dinle';
+
+  @override
+  String coffeeStepLabel(String index, String title) {
+    return 'Adım $index: $title';
+  }
+
+  @override
+  String get coffeeDiscoverFate => 'Kaderini Keşfet';
+
+  @override
+  String get coffeeNextStep => 'Sonraki Adım';
+
+  @override
+  String get coffeeValidationError =>
+      'İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.';
+
+  @override
+  String get coffeeCosmicMismatch => 'Kozmik Uyumsuzluk';
+
+  @override
+  String get coffeeCosmicCheck => 'KOZMİK BAĞ KONTROLÜ';
+
+  @override
+  String get coffeeCosmicCheckDesc =>
+      'Telvelerin dili çözülüyor,\nkaderin fısıltıları dinleniyor...';
+
+  @override
+  String get coffeeRevealSecrets => 'Sır Perdesini Arala';
+
+  @override
+  String get coffeeReadingInProgress => 'Telveler Okunuyor...';
+
+  @override
+  String get coffeeReadingWait => 'Geleceğin kapıları aralanıyor, bekle.';
+
+  @override
+  String get coffeeRelationTitle => 'İlişki Durumun';
+
+  @override
+  String get coffeeRelationSubtitle => 'Kozmik bağın temelini belirle.';
+
+  @override
+  String get coffeeFocusTitle => 'Aklında Ne Var?';
+
+  @override
+  String get coffeeFocusSubtitle =>
+      'Bir niyet seç, yorumun ona göre derinleşsin.';
+
+  @override
+  String get coffeeMoodTitle => 'Ruh Halin?';
+
+  @override
+  String get coffeeMoodSubtitle => 'Fincanının enerjisini hisset.';
+
+  @override
+  String get coffeeCosmicBondFormed => 'Kozmik Bağ Kuruldu';
+
+  @override
+  String get coffeeSecretsReady => 'Fincanının sırları fısıldanmaya hazır...';
+
+  @override
+  String get coffeeNewReading => 'Yeni Fal Bak';
+
+  @override
+  String get coffeeAiPermission => 'Yapay zeka kahve analizi izni';
+
+  @override
+  String get coffeeStoneCostInfo => 'Her analiz 1 Ruh Taşı harcar';
+
+  @override
+  String get coffeeEliteRefillActive =>
+      'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir';
+
+  @override
+  String get coffeeEliteRefillPromo => 'Elite ile her gece 5 Ruh Taşı kazan';
+
+  @override
+  String get coffeeEliteGetBtn => 'Elite Al';
+
+  @override
+  String get coffeeResultOnHome => 'Sonucu ana sayfadaki  ';
+
+  @override
+  String get onboardingStart => 'Hadi Başlayalım';
+
+  @override
+  String get onboardingContinue => 'Devam Et';
+
+  @override
+  String get onboardingFinish => 'Yolculuğa Başla';
+
+  @override
+  String get onboardingNameHint => 'Kozmik Bir İsim';
+
+  @override
+  String get onboardingNamePlaceholder => 'isim_soyisim';
+
+  @override
+  String get onboardingHandleHint => 'Kozmik Bir Lakap';
+
+  @override
+  String get onboardingHandlePlaceholder => 'galaksi_gezgin';
+
+  @override
+  String get onboardingGenderTitle => 'Cinsiyet';
+
+  @override
+  String get onboardingGenderFemale => 'Kadın';
+
+  @override
+  String get onboardingGenderMale => 'Erkek';
+
+  @override
+  String get onboardingGenderOther => 'Belirtmek İstemiyorum';
+
+  @override
+  String get onboardingStep1Title => 'Sana ne demeliyiz?';
+
+  @override
+  String get onboardingStep1Sub =>
+      'Evren seni hangi isimle ve titreşimle tanısın?';
+
+  @override
+  String get onboardingAvatarSelect => 'Görünümünü Seç';
+
+  @override
+  String get onboardingStep2Title => 'Ruhunun bedene girdiği an...';
+
+  @override
+  String get onboardingStep2Sub =>
+      'Astrolojik doğum haritanı ve sana özel ritüelleri hesaplayabilmemiz için temel bilgilerine ihtiyacımız var.';
+
+  @override
+  String get onboardingBirthDateLabel => 'Doğum Tarihin';
+
+  @override
+  String get onboardingBirthTimeLabel => 'Doğum Saatin';
+
+  @override
+  String get onboardingBirthLocationLabel => 'Doğduğu Şehir';
+
+  @override
+  String get onboardingTimeHint =>
+      'Tam saati biliyorsan detaylı analiz için gir';
+
+  @override
+  String get onboardingLocationHint => 'Şehir seçerek hesaplamayı netleştir';
+
+  @override
+  String get onboardingUnknownTime => 'Tam saati bilmiyorum';
+
+  @override
+  String get onboardingPrivacyNote =>
+      'Yalnızca sana özel haritanı çizmek içindir.';
+
+  @override
+  String get onboardingStep3Title => 'Odak noktan neresi?';
+
+  @override
+  String get onboardingStep3Sub =>
+      'Şu sıralar hayatında en çok hangi enerjiyi büyütmek veya şifalandırmak istiyorsun?';
+
+  @override
+  String get onboardingFocusLabel => 'Odak (Çoklu Seçim)';
+
+  @override
+  String get onboardingFocusCareer => 'Kariyer & Para';
+
+  @override
+  String get onboardingFocusLove => 'Aşk & İlişkiler';
+
+  @override
+  String get onboardingFocusPeace => 'İçsel Huzur';
+
+  @override
+  String get onboardingFocusLuck => 'Şans & Fırsatlar';
+
+  @override
+  String get onboardingRelLabel => 'Şu anki ilişki durumun:';
+
+  @override
+  String get onboardingRelSingle => 'Yalnız Gökyüzü';
+
+  @override
+  String get onboardingRelComplicated => 'Biri Var...';
+
+  @override
+  String get onboardingRelTalking => 'Karmaşık';
+
+  @override
+  String get onboardingRelRelationship => 'Mutlu Bir Bağ';
+
+  @override
+  String get onboardingStep4Title => 'Geceleri evrenle bağın...';
+
+  @override
+  String get onboardingStep4Sub =>
+      'Bilinçaltın mesajları nasıl alıyor? Renklerin ve rüyaların bize ipucu verecek.';
+
+  @override
+  String get onboardingDreamLabel => 'Ne sıklıkla rüya hatırlarsın?';
+
+  @override
+  String get onboardingDreamOften => 'Sık Sık ve Çok Net';
+
+  @override
+  String get onboardingDreamSometimes => 'Bazen Hatırlarım';
+
+  @override
+  String get onboardingDreamRarely => 'Nadir';
+
+  @override
+  String get onboardingDreamNever => 'Hiç Rüya Görmem';
+
+  @override
+  String get onboardingAuraLabel =>
+      'Ruhunun Aurası (Bugün nasıl hissediyorsun?)';
+
+  @override
+  String get onboardingStep5Title => 'Zamanla olan dansın...';
+
+  @override
+  String get onboardingStep5Sub =>
+      'Günün hangi saatlerinde enerjin en yüksek? Bildirimlerini buna göre ayarlayacağız.';
+
+  @override
+  String get onboardingSleepLabel => 'Uyku Düzenin';
+
+  @override
+  String get onboardingSleepMorning => 'Sabah İnsanı';
+
+  @override
+  String get onboardingSleepNight => 'Gece Kuşu';
+
+  @override
+  String get onboardingSleepIrregular => 'Düzensiz';
+
+  @override
+  String get onboardingSleepLittle => 'Çok Az Uyurum';
+
+  @override
+  String get onboardingMatchLabel => 'Eşleşme ve Kozmik Bağ';
+
+  @override
+  String get onboardingMatchDesc =>
+      'Sinerji uyumlu profillerle bağ kurmaya ve özel kozmik eşleşmelere açık olmak istiyorum.';
+
+  @override
+  String get onboardingFinalTitle => 'Her şey hazır...';
+
+  @override
+  String get onboardingFinalSub =>
+      'Yıldızların senin için ne planladığını öğrenmek üzeresin. Hesabını oluştur ve kozmik evrene giriş yap.';
+
+  @override
+  String get onboardingAppleCreate => 'Apple ile Hesabını Oluştur';
+
+  @override
+  String get onboardingGoogleCreate => 'Google ile Hesabını Oluştur';
+
+  @override
+  String get onboardingErrorIncomplete =>
+      'Hoş geldin! Profilini tamamlamak için birkaç adım kaldı.';
+
+  @override
+  String get onboardingErrorFailed =>
+      'Giriş başarısız oldu. Lütfen tekrar deneyin.';
+
+  @override
+  String onboardingErrorAlreadyExists(String provider) {
+    return 'Bu $provider hesabı ile zaten bir kozmik profilin var! Lütfen ilk sayfadaki \'Giriş Yap\' seçeneğini kullan.';
+  }
+
+  @override
+  String onboardingErrorDBRejected(String error) {
+    return 'Kayıt işlemi veritabanında reddedildi:\n$error\nLütfen destek ile iletişime geçin.';
+  }
+
+  @override
+  String get onboardingErrorHandleTaken => 'Bu kullanıcı adı zaten alınmış';
+
+  @override
+  String get notifTitle => 'Bildirimler';
+
+  @override
+  String get notifSubtitle => 'Hangi bildirimleri almak istediğini seç';
+
+  @override
+  String get notifAnnouncements => 'Duyurular';
+
+  @override
+  String get notifAnnouncementsDesc => 'Yeni özellikler ve güncellemeler';
+
+  @override
+  String get notifSounds => 'Sesler';
+
+  @override
+  String get notifSoundsDesc => 'Sesli bildirim uyarıları';
+
+  @override
+  String get notifCookieAlarm => 'Yeni Kurabiye Alarmı';
+
+  @override
+  String get notifCookieAlarmDesc => 'Yeni fortune cookie geldiğinde';
+
+  @override
+  String get notifFriendAlarm => 'Arkadaş Alarmı';
+
+  @override
+  String get notifFriendAlarmDesc => 'Baykuş ağından yeni bağlantılar';
+
+  @override
+  String get notifDailyReminder => 'Günlük Hatırlatıcılar';
+
+  @override
+  String get notifDailyReminderDesc => 'Günlük kurabiyeni almayı unutma';
+
+  @override
+  String get accountTitle => 'Hesap Detayları';
+
+  @override
+  String get accountSubtitle => 'Kişisel bilgilerin ve hesap yönetimin';
+
+  @override
+  String get accountUsername => 'Kullanıcı Adı';
+
+  @override
+  String get accountLinkedEmail => 'Bağlı E-posta';
+
+  @override
+  String get accountSignInMethod => 'Giriş Yöntemi';
+
+  @override
+  String get accountDeleteTitle => 'Hesabı Sil';
+
+  @override
+  String get accountDeleteDesc =>
+      'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.';
+
+  @override
+  String get accountDeleteCancel => 'Vazgeç';
+
+  @override
+  String get accountDeleteConfirm => 'Hesabı Sil';
+
+  @override
+  String get accountDeletePermanent => 'Hesabı Kalıcı Olarak Sil';
+
+  @override
+  String get welcomeTagline => 'The magic is within you.';
+
+  @override
+  String get welcomeAppleContinue => 'Apple ile Devam Et';
+
+  @override
+  String get welcomeGoogleContinue => 'Google ile Devam Et';
+
+  @override
+  String get moodGuideTitle => 'Mod Rehberi';
+
+  @override
+  String get moodAwarenessTitle => 'Duygusal Farkındalık';
+
+  @override
+  String get moodAwarenessDesc =>
+      'Ruh halini seçmek hislerini somutlaştırır; bu, içsel dengeni bulmanın ve öz-farkındalığın ilk adımıdır.';
+
+  @override
+  String get moodCosmicTitle => 'Kozmik Frekans';
+
+  @override
+  String get moodCosmicDesc =>
+      'Mod tekerinden seçtiğin her duygunun bir frekansı vardır. Ekranın aurası doğrudan senin hislerinle uyumlanır.';
+
+  @override
+  String get moodHowToTitle => 'Nasıl Kullanmalı?';
+
+  @override
+  String get moodHowToDesc =>
+      'Sadece çarkı çevirip o anki ruh halini en iyi yansıtan ifadeyi seç. Duygunu yargılama, sadece hisset ve kabul et.';
+
+  @override
+  String get moodQuestionAlt => 'Bugün modun nasıl?';
+
+  @override
+  String get moodSpinHint => 'Çarkı çevir, ruh halini seç ✨';
+
+  @override
+  String get bentoCoffeeTitle => 'Kahve Falı';
+
+  @override
+  String get bentoCoffeeDesc => 'Telvelerin dili';
+
+  @override
+  String get bentoUnexplored => 'Bu alan henüz keşfedilmeyi bekliyor...';
+
+  @override
+  String get bentoSealed => 'Mühürlü';
+
+  @override
+  String get horoscopeDailyEnergy => 'Günün Enerjisi';
+
+  @override
+  String get horoscopeWestern => 'Batı Astrolojisi';
+
+  @override
+  String get horoscopeAsian => 'Asya Bilgeliği';
+
+  @override
+  String get horoscopeMayan => 'Maya Ruhu';
+
+  @override
+  String get shareSaved => 'Kaydedildi ✓';
+
+  @override
+  String get shareDownload => 'İndir';
+
+  @override
+  String get shareShare => 'Paylaş';
+
+  @override
+  String get shareStory => 'Hikaye';
+
+  @override
+  String get sharePost => 'Gönderi';
+
+  @override
+  String get shareCoffeeTitle => 'Kahve Falı';
+
+  @override
+  String get cookieLockedTitle => 'Bu özel kurabiye kilitli';
+
+  @override
+  String get cookieComingSoon => 'Yakında Satışa Çıkacak ✨';
+
+  @override
+  String get dreamWaitOrReturn =>
+      'Burada bekleyebilir veya ana sayfaya dönebilirsin. Yorumun hazır olduğunda sana bildirim göndereceğiz ve \"Rüyalarım\" sekmesinden okuyabileceksin.';
+
+  @override
+  String get dreamReturnHome => 'Ana Sayfaya Dön';
+
+  @override
+  String get profileEditProfile => 'Profilini Düzenle';
+
+  @override
+  String get profileEditSubtitle => 'Ad, burç ve kişisel bilgilerini düzenle';
+
+  @override
+  String get profileSearchHint => 'Burç, şehir veya doğum tarihi ara...';
+
+  @override
+  String get profileStoreUnavailable => 'Mağaza bağlantısı şu an kurulamıyor.';
+
+  @override
+  String get profileMailNotFound =>
+      'Mail uygulaması bulunamadı. support@crackandwish.com adresine yazabilirsiniz.';
+
+  @override
+  String get profileRitualCode => 'Ritüel Kodun';
+
+  @override
+  String get profileRitualDesc =>
+      'Bu kod senin kişisel ritüel kimliğin. Arkadaşlarınla paylaşarak onları Baykuş Ağı\'na davet edebilirsin.';
+
+  @override
+  String get profileRitualCopied => 'Ritüel Kodun Kopyalandı ✨';
+
+  @override
+  String get profileRitualInfo => 'Arkadaşlarınla paylaş, birlikte keşfedin!';
+
+  @override
+  String get profileShareCode => 'Kodu Paylaş';
+
+  @override
+  String get profileDeleteAccount => 'Hesabı Sil';
+
+  @override
+  String get profileDeleteDesc =>
+      'Tüm verilerin kalıcı olarak silinecek.\nBu işlem geri alınamaz.';
+
+  @override
+  String get profileDeleteCancel => 'Vazgeç';
+
+  @override
+  String get profileDeleteConfirm => 'Hesabı Sil';
+
+  @override
+  String get profileSignOut => 'Çıkış Yap';
+
+  @override
+  String get profileSignOutDesc =>
+      'Hesabından güvenli çıkış yap.\nVerilerin korunur.';
+
+  @override
+  String get profileSignOutCancel => 'Vazgeç';
+
+  @override
+  String get profileSignOutConfirm => 'Çıkış Yap';
+
+  @override
+  String get profilePrivacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get profileTermsOfUse => 'Kullanım Koşulları';
+
+  @override
+  String get profileGetElite => 'Elite\'e Geç';
+
+  @override
+  String get profileGetEliteSubtitle => 'Farkındalığa giden kapı';
+
+  @override
+  String get profileCosmicProfile => 'Kozmik Profilim';
+
+  @override
+  String get profileCosmicSubtitle => 'Harita, Saat ve Konum Bilgileri';
+
+  @override
+  String get profileSectionAccount => 'Hesap';
+
+  @override
+  String get profileEmail => 'E-posta';
+
+  @override
+  String get profileNotificationSettings => 'Bildirim Tercihleri';
+
+  @override
+  String get profileRestorePurchases => 'Satın Alımları Geri Yükle';
+
+  @override
+  String get profileRestoreSuccess =>
+      'Satın alımların başarıyla geri yüklendi!';
+
+  @override
+  String get profileRestoreFail => 'Geri yüklenecek satın alım bulunamadı.';
+
+  @override
+  String get profileHelp => 'Yardım';
+
+  @override
+  String get profileShare => 'Paylaş';
+
+  @override
+  String get profileRate => 'Değerlendir';
+
+  @override
+  String get profileVersion => 'Sürüm';
+
+  @override
+  String get profileCosmicName => 'Kozmik Adın';
+
+  @override
+  String get profileSealProfile => 'Mührü Onayla';
+
+  @override
+  String get profileChooseAvatar => 'Sihirli avatarını seç.';
+
+  @override
+  String get profileStrengthenBonds => 'Bağlarını Güçlendir';
+
+  @override
+  String get profileStrengthenBondsDesc =>
+      'Kozmik evreni arkadaşlarınla büyüt.';
+
+  @override
+  String get profileEarnSoulStones => '+2 Ruh Taşı Kazan';
+
+  @override
+  String get profileCodeCopied => 'Kod kopyalandı!';
+
+  @override
+  String get profileNotifications => 'Bildirimler';
+
+  @override
+  String get profileSupportExperience => 'Destek & Deneyim';
+
+  @override
+  String get profileSeerNovice => 'Acemi Kahin';
+
+  @override
+  String get profileSeerApprentice => 'Çırak Kahin';
+
+  @override
+  String get profileSeer => 'Kahin';
+
+  @override
+  String get profileSeerWise => 'Bilge Kahin';
+
+  @override
+  String get profileSeerMaster => 'Usta Kahin';
+
+  @override
+  String get profileSeerCosmic => 'Kozmik Kahin';
+
+  @override
+  String get profileUploadFailed =>
+      'Fotoğraf buluta yüklenemedi! Lütfen bağlantını kontrol et.';
+
+  @override
+  String get profileCropTitle => 'Kozmik Kesim';
+
+  @override
+  String get profileCropCancel => 'İptal';
+
+  @override
+  String get profileCropDone => 'Tamam';
+
+  @override
+  String get moderationAdultContent =>
+      'Bu görselin enerjisi Kozmik evrenimizle uyumlu değil (Uygunsuz İçerik).';
+
+  @override
+  String get moderationViolence =>
+      'Lütfen zihni yormayan, auranı yansıtan daha sakin bir avatar seç (Rahatsız Edici İçerik).';
+
+  @override
+  String get moderationTooLarge =>
+      'Görselin kozmik ağı yoracak kadar büyük. Lütfen 5MB altı bir fotoğraf seç.';
+
+  @override
+  String get moderationInvalidFormat =>
+      'Fotoğrafın sihirli parşömenimiz tarafından okunamadı, format bozuk.';
+
+  @override
+  String get moderationUnknown => 'Bilinmeyen bir kozmik dalgalanma oluştu.';
+
+  @override
+  String profileShareInvite(String code) {
+    return 'Crack&Wish evrenine katıl! ✨\nRitüel Kodum: $code\n\nBu kodu girerek +1 Ruh Taşı, +50 Aura ve sürpriz bir Premium Kurabiye kazanabilirsin!\nhttps://crackandwish.com';
+  }
+
+  @override
+  String get profileShareApp =>
+      'Crack&Wish ile şansını keşfet! •✨\nKurabiye kır, tarot aç, rüya yorumla.\n\nhttps://crackandwish.com';
+
+  @override
+  String get profileEliteYouAre => 'Elite Büyücüsün';
+
+  @override
+  String get profileGoElite => 'Elite\'e Geç';
+
+  @override
+  String get profileEliteMystical => 'Mistik kapıları incele';
+
+  @override
+  String get profileEliteDoor => 'Farkındalığa giden kapı';
+
+  @override
+  String get profileMyCosmicProfile => 'Kozmik Profilim';
+
+  @override
+  String get profileCosmicDetails => 'Harita, Saat ve Konum Bilgileri';
+
+  @override
+  String get profileRestorePurchasesBtn => 'Satın Alımları Geri Yükle';
+
+  @override
+  String get profileRestoreSubtitle => 'Önceki satın alımlarını geri yükle';
+
+  @override
+  String get profileInviteFriends => 'Arkadaşlarını Davet Et';
+
+  @override
+  String get profileInviteFriendsDesc => 'Kozmik bağlar kur, birlikte kazan';
+
+  @override
+  String get cosmicChart => 'Kozmik Harita';
+
+  @override
+  String get cosmicWestern => 'BATI';
+
+  @override
+  String get cosmicAsian => 'ASYA';
+
+  @override
+  String get cosmicMayan => 'MAYA';
+
+  @override
+  String get cosmicRising => 'YÜKSELEN';
+
+  @override
+  String get cosmicArrivalDate => 'DÜNYAYA İNİŞ TARİHİ';
+
+  @override
+  String get cosmicBirthTime => 'DOĞUM SAATİ';
+
+  @override
+  String get cosmicTimeUnknown => 'Saat Bilinmiyor';
+
+  @override
+  String get cosmicBirthPlace => 'DOĞUM YERİ KOORDİNATLARI';
+
+  @override
+  String get cosmicCountry => 'Ülke';
+
+  @override
+  String get cosmicSelectCountry => 'Ülke Seç';
+
+  @override
+  String get cosmicCityDistrict => 'Şehir & İlçe & Köy';
+
+  @override
+  String get cosmicSelectDateFirst => 'Lütfen önce doğum tarihinizi seçin.';
+
+  @override
+  String cosmicLockedDays(int days) {
+    return '$days Gün Sonra Değiştirilebilir';
+  }
+
+  @override
+  String get cosmicSave => 'Kaydet';
+
+  @override
+  String get cosmicSearchLocation => 'Tam Konumu Ara';
+
+  @override
+  String get cosmicSearchHint => 'Köy, ilçe veya şehir yaz...';
+
+  @override
+  String get cosmicAddFreeText => 'Serbest metin olarak ekle';
+
+  @override
+  String get cosmicRequiresTime => 'Saat Gerekli';
+
+  @override
+  String get badgeReady => 'HAZIR';
+
+  @override
+  String get badgeNew => 'YENİ';
+
+  @override
+  String get paywallLegal =>
+      'Aboneliğiniz, mevcut dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir. Ödeme, satın alma onayında Apple ID / Google Play hesabınızdan tahsil edilir. Aboneliğinizi mağaza hesap ayarlarınızdan dilediğiniz zaman yönetebilirsiniz.';
+
+  @override
+  String get cosmicSelect => 'Seç';
+
+  @override
+  String get coffeeRelSingle => 'Yalnız Ruhum';
+
+  @override
+  String get coffeeRelInLove => 'Kalbim Dolu';
+
+  @override
+  String get coffeeRelEngaged => 'Nişanlıyım';
+
+  @override
+  String get coffeeRelMarried => 'Evliyim';
+
+  @override
+  String get coffeeRelComplicated => 'Karmaşık';
+
+  @override
+  String get coffeeFocusLove => 'Aşk ve Uyum';
+
+  @override
+  String get coffeeFocusCareer => 'Kariyer ve Maddiyat';
+
+  @override
+  String get coffeeFocusHealing => 'Şifa ve Huzur';
+
+  @override
+  String get coffeeFocusGeneral => 'Genel Gelecek';
+
+  @override
+  String get coffeeFocusSurprise => 'Sürpriz Olsun';
+
+  @override
+  String get coffeeMoodPeaceful => 'Huzurlu';
+
+  @override
+  String get coffeeMoodExcited => 'Heyecanlı';
+
+  @override
+  String get coffeeMoodAnxious => 'Endişeli';
+
+  @override
+  String get coffeeMoodIndecisive => 'Kararsız';
+
+  @override
+  String get coffeeMoodEnergetic => 'Enerjik';
+
+  @override
+  String get coffeeMoodMelancholic => 'Hüzünlü';
+
+  @override
+  String get coffeeAllPhotosRequired => 'Lütfen tüm fotoğrafları çekin!';
+
+  @override
+  String get coffeeNotEnoughStones => 'Yeterli Ruh Taşın yok!';
+
+  @override
+  String coffeeSoulStoneCount(int count) {
+    return '$count Ruh Taşın var';
+  }
+
+  @override
+  String get coffeeUseSoulStone => '1 Ruh Taşı Kullan';
+
+  @override
+  String get languageSettingsSubtitle => 'Uygulama dilini belirle';
+
+  @override
+  String get cosmicSearchHintShort => 'Ara...';
+
+  @override
+  String get cosmicAddThis => 'Bunu ekle';
+
+  @override
+  String get horoscopeWesternText =>
+      'Yıldızlar kariyerin için hizalanıyor. Hızlı ve kararlı adımlar atmalısın.';
+
+  @override
+  String get horoscopeAsianText =>
+      'Su elementi devrede. Sezgilerin çok güçlü, bugün sadece kalbini dinle.';
+
+  @override
+  String get horoscopeMayanText =>
+      'Ton 4 aktif. Hayatında düzen kurmak ve plan yapmak için mükemmel bir gün.';
+
+  @override
+  String get horoscopeExplore => 'Keşfet';
+
+  @override
+  String get cookieDayCompleted => 'Gün Tamamlandı';
+
+  @override
+  String get cookieSeeYouTomorrow => 'Yarın yeni şanslarla tekrar buluşalım.';
+
+  @override
+  String get cookieRarityLegendary => 'Efsanevi';
+
+  @override
+  String get cookieRarityRare => 'Nadir';
+
+  @override
+  String get cookiePremiumCollection => 'Premium Koleksiyon';
+
+  @override
+  String cookiePurchaseBtn(String price) {
+    return 'Satın Al ($price)';
+  }
+
+  @override
+  String get cookieTapOutsideToClose => 'Kapatmak için dışına dokun';
+
+  @override
+  String get cookieAddedToCollection =>
+      'Kurabiye başarıyla koleksiyonuna eklendi!';
+
+  @override
+  String get cookiePremiumFallback => 'Premium Kurabiye';
+
+  @override
+  String get dreamSoulStoneRequired => 'Ruh Taşı Gerekli';
+
+  @override
+  String get dreamSoulStoneRequiredDesc =>
+      'Derin analiz için Ruh Taşı gereklidir.\n\nRuh Taşlarını Aura puanlarını dönüştürerek veya Elite abonelik ile kazanabilirsin.';
+
+  @override
+  String get dreamGetElite => 'Elite Abone Ol';
+
+  @override
+  String get dreamClinicalGateTitle => 'Klinik Analiz Kapısı';
+
+  @override
+  String dreamClinicalGateDesc(int soulStones) {
+    return 'Mevcut Ruh Taşın: $soulStones\n\nBu klinik seviye derin psikolojik analiz için 1 Ruh Taşı harcanır.';
+  }
+
+  @override
+  String get dreamUseOneStone => '1 Ruh Taşı Kullan';
+
+  @override
+  String get dreamDeepAnalysisBgPreparing =>
+      'Derin Analiz arka planda hazırlanıyor. Tamamlandığında bildirim alacaksınız.';
+
+  @override
+  String get dreamYourSoulStones => 'Ruh Taşların';
+
+  @override
+  String dreamSoulStonesRemaining(int count) {
+    return '$count Ruh Taşın var';
+  }
+
+  @override
+  String get dreamSoulStonesEmpty => 'Ruh Taşın bitti';
+
+  @override
+  String get dreamRequiredForDeep => 'Derin Analiz için gerekli';
+
+  @override
+  String get dreamEachAnalysisCost => 'Her analiz 1 Ruh Taşı harcar';
+
+  @override
+  String get dreamEliteRefillActive =>
+      'Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir';
+
+  @override
+  String get dreamEliteRefillPromo => 'Elite ile her gece 5 Ruh Taşı kazan';
+
+  @override
+  String get dreamWatchAd => 'Reklam İzle';
+
+  @override
+  String get dreamBgAnalyzing =>
+      'Rüyanız arka planda analiz ediliyor. Tamamlandığında bildirim alacaksınız.';
+
+  @override
+  String get dreamDeepAnalysis => 'Derin Analiz';
+
+  @override
+  String get dreamDiscoverSecrets => 'Sırlarını keşfet';
+
+  @override
+  String get dreamDidYouKnow => 'Biliyor muydun?';
+
+  @override
+  String get dreamNeuroPsychAnalysis => 'NÖRO-PSİKOLOJİK ANALİZ';
+
+  @override
+  String get dreamYourDream => 'RÜYANIZ';
+
+  @override
+  String get dreamEmotionalProfile => 'Duygusal Profil';
+
+  @override
+  String get dreamEmotionalProfileSub =>
+      'Rüya sırasındaki psikolojik katmanlarınız';
+
+  @override
+  String get dreamShadowSelf => 'Gölge Benlik';
+
+  @override
+  String get dreamShadowSelfSub =>
+      'Bastırdığınız ve yüzleşmekten kaçındığınız yönler';
+
+  @override
+  String get dreamRecurringPatterns => 'Kalıplar ve Davranışlar';
+
+  @override
+  String get dreamRecurringPatternsSub =>
+      'Hayatınızda sürekli tekrar eden psikolojik döngüler';
+
+  @override
+  String dreamSuggestedRitual(String title) {
+    return 'Önerilen Ritüel: $title';
+  }
+
+  @override
+  String get dreamSuggestedRitualSub =>
+      'Bu rüyanın etkisini yönetmek için size özel eylem';
+
+  @override
+  String get dreamScienceNote => 'Bilimsel Not:';
+
+  @override
+  String get dreamWriteNewDream => 'Yeni Bir Rüya Yaz';
+
+  @override
+  String get dreamNoMonthDreams => 'Bu ay henüz rüya yazmadın ✨';
+
+  @override
+  String get dreamMysteriousDream => 'Gizemli Rüya';
+
+  @override
+  String get dreamStandardAnalysis => 'STANDART ANALİZ';
+
+  @override
+  String get dreamGeneralAnalysis => 'Genel Analiz';
+
+  @override
+  String get dreamPsychological => 'Psikolojik Örüntü';
+
+  @override
+  String get dreamSpiritual2 => 'Ruhsal / Sembolik';
+
+  @override
+  String get dreamAdvice => 'Öneri & Adım';
+
+  @override
+  String get dreamDeepenedInsights => 'Derinleştirilmiş Analiz';
+
+  @override
+  String get dreamEliteCreditsTitle => 'Elite Okuma Hakların';
+
+  @override
+  String get dreamReadingCreditsTitle => 'Okuma Hakların';
+
+  @override
+  String dreamCreditsRemaining(int count) {
+    return '$count okuma hakkın var';
+  }
+
+  @override
+  String get dreamDailyLimitReached => 'Bugünlük hakkın bitti';
+
+  @override
+  String get dreamZeroCredits => '0 okuma hakkın var';
+
+  @override
+  String dreamDailyPremiumReads(int count) {
+    return 'Günlük $count Rüya Yorumu hakkı';
+  }
+
+  @override
+  String get dreamNoAdsRequired => 'Reklam izleme zorunluluğu yok';
+
+  @override
+  String get dreamCreditsResetNightly => 'Haklar her gece sıfırlanır';
+
+  @override
+  String get dreamOneFreeDaily => 'Her gün 1 ücretsiz yorum';
+
+  @override
+  String dreamWatchAdsForCredits(int maxAds, int watched) {
+    return 'Reklam ile ek $maxAds hak ($watched/$maxAds)';
+  }
+
+  @override
+  String get dreamUnconsciousFrequencies => 'BİLİNÇDIŞI FREKANSLAR';
+
+  @override
+  String get dreamOrbEmotion => 'DUYGU YÜKÜ';
+
+  @override
+  String get dreamOrbEntropy => 'BELİRSİZLİK';
+
+  @override
+  String get dreamOrbActivity => 'BEYİN AKT.';
+
+  @override
+  String get dreamOrbResidue => 'YAKIN GEÇMİŞ';
+
+  @override
+  String get dreamHighConfidence => 'Yüksek Güven';
+
+  @override
+  String get dreamModerateConfidence => 'Orta Güven';
+
+  @override
+  String get dreamLowConfidence => 'Düşük Güven';
+
+  @override
+  String get dreamCoreThematicPattern => 'ANA TEMATİK ÖRÜNTÜ';
+
+  @override
+  String get dreamMetricEmotionalLoad => 'Duygusal\nYoğunluk';
+
+  @override
+  String get dreamMetricEmotionalLoadDesc =>
+      'Rüyan sırasında beyninin duygusal merkezi (amigdala) ne kadar yoğun çalıştı. Yüksekse rüyanda güçlü duygular (huzur, mutluluk, korku, heyecan) yaşandı.';
+
+  @override
+  String get dreamMetricUncertaintyDesc =>
+      'Rüyanda ne kadar mantıksız veya tutarsız olay yaşandı. Yüksekse mekanlar aniden değişti, olaylar mantığa aykırıydı.';
+
+  @override
+  String get dreamMetricRecentMemory => 'Yakın\nGeçmiş';
+
+  @override
+  String get dreamMetricRecentMemoryDesc =>
+      'Rüyanın ne kadarı son günlerde yaşadığın gerçek olaylardan etkilenmiş. Yüksekse beynin günlük anıları rüyada işliyor.';
+
+  @override
+  String get dreamMetricAgency => 'Ajans /\nKontrol';
+
+  @override
+  String get dreamMetricAgencyDesc =>
+      'Rüyanda olayları ne kadar kontrol edebildin. Düşükse sadece izledin, yüksekse kararlar aldın ve müdahale ettin.';
+
+  @override
+  String get dreamSeverityHigh => 'Yüksek';
+
+  @override
+  String get dreamSeverityNormal => 'Normal';
+
+  @override
+  String get dreamSeverityLow => 'Düşük';
+
+  @override
+  String get dreamCognitiveDistribution => 'BİLİŞSEL DAĞILIM';
+
+  @override
+  String get dreamTapToExpand => 'GENİŞLETMEK İÇİN DOKUN';
+
+  @override
+  String get dreamNeurologicalBasis => 'Nörolojik Taban';
+
+  @override
+  String get dreamEvidenceBase => 'BU SONUCA NEDEN VARDIK?';
+
+  @override
+  String get dreamRootCause => 'Rüyanın Gerçek Sebebi';
+
+  @override
+  String get dreamAbsolutely => 'Kesinlikle';
+
+  @override
+  String get dreamMaybe => 'Olabilir';
+
+  @override
+  String get dreamNotSure => 'Emin Değilim';
+
+  @override
+  String get dreamDreamEssence => 'RÜYANIN ÖZÜ';
+
+  @override
+  String get dreamClarifyingResponses => 'ANALİZİ NETLEŞTİREN YANITLAR';
+
+  @override
+  String get dreamCosmicRhythmSynced => 'Kozmik Ritmin Bağlandı';
+
+  @override
+  String get dreamCosmicRhythmSyncedDesc =>
+      'Uyku döngünüze göre özel rüya bildirimleri alacaksınız.';
+
+  @override
+  String get dreamSyncSleepData => 'Uyku Verini Senkronize Et';
+
+  @override
+  String get dreamSyncSleepDataDesc =>
+      'Tam uyandığın anı tespit edip en derin rüyanı sormasına izin ver.';
+
+  @override
+  String get dreamAwarenessFallback =>
+      'Bu farkındalık yeni bir yolun başlangıcıdır. Şimdi yüzleşme zamanı.';
+
+  @override
+  String get dreamExtractingEssence => 'Rüyanın özü derleniyor...';
+
+  @override
+  String get dreamNoReasoning =>
+      'Bu metrik için özel bir açıklama üretilmemiş.';
+
+  @override
+  String get dreamNotAnalyzable =>
+      'Bunun bir rüyaya ait olduğuna emin misin?\nLütfen uykudayken zihninde canlanan gerçek bir sahneyi anlat.';
+
+  @override
+  String get owlTabFriends => 'Arkadaşlarım';
+
+  @override
+  String get owlTabConnections => 'Bağlantılar';
+
+  @override
+  String get owlTabInbox => 'Gelen Mektup';
+
+  @override
+  String get owlSearchCosmic => 'Kozmik evrende ara...';
+
+  @override
+  String get owlSearchFriends => 'Arkadaş ara...';
+
+  @override
+  String get owlPhoneContacts => 'Telefon Rehberin';
+
+  @override
+  String get owlNoOneFoundCosmic => 'Kozmik evrende kimse bulunamadı.';
+
+  @override
+  String get owlFoundInCosmic => 'Kozmik Evrende Bulunanlar';
+
+  @override
+  String get owlUnknownProfile => 'Bilinmeyen Profil';
+
+  @override
+  String owlFriendRequestSent(String name) {
+    return '$name kişisine arkadaşlık isteği gönderildi!';
+  }
+
+  @override
+  String get owlRequestSentStatus => 'Gönderildi';
+
+  @override
+  String get owlSendRequestAction => 'İstek Gönder';
+
+  @override
+  String get owlConnectContacts => 'Rehberini Bağla';
+
+  @override
+  String get owlConnectContactsDesc =>
+      'Arkadaşlarını anında bul.\nRehberin ASLA sunucularda saklanmaz.';
+
+  @override
+  String get owlNoContactsFound => 'Crack&Wish Evreninde\nKimseyi Bulamadık';
+
+  @override
+  String get owlNoContactsFoundDesc =>
+      'Onları davet ederek kozmik enerjiyi başlatabilirsin!';
+
+  @override
+  String get owlUnknown => 'Bilinmeyen';
+
+  @override
+  String get owlAppUserLabel => 'Crack&Wish Kullanıcısı';
+
+  @override
+  String get owlInContactsLabel => 'Rehberinde ekli';
+
+  @override
+  String get owlNoFriendsYet => 'Henüz arkadaşın yok';
+
+  @override
+  String get owlNoResultsFound => 'Sonuç bulunamadı';
+
+  @override
+  String get owlFriendRequests => 'Arkadaşlık İstekleri';
+
+  @override
+  String get owlFriendsHeader => 'Arkadaşların';
+
+  @override
+  String get owlAcceptAction => 'Kabul';
+
+  @override
+  String get owlRejectAction => 'Red';
+
+  @override
+  String get owlInviteReward => '+2 Ruh Taşı';
+
+  @override
+  String owlInviteShareMessage(String username) {
+    return 'Karanlığı birlikte aydınlatalım! ✨\nCrack Wish\'e aşağıdaki davet bağlantımdan katıl, otomatik olarak birbirimize bağlanıp Başlangıç Ödülleri kazanalım!\n\nDavet Bağlantım:\nhttps://crackwish.com/invite/$username';
+  }
+
+  @override
+  String get owlInviteFriends => 'Arkadaş Davet Et';
+
+  @override
+  String get owlInviteFriendsDesc => 'Kozmik evreni yansıt';
+
+  @override
+  String get owlNoLettersYet => 'Henüz mektup yok';
+
+  @override
+  String owlLetterSentNotification(String name) {
+    return '$name mektup gönderdi...';
+  }
+
+  @override
+  String get owlOnItsWay => 'Baykuş yolda 🕊️';
+
+  @override
+  String owlLetterCount(int count) {
+    return '$count adet mektup';
+  }
+
+  @override
+  String owlUnreadCountBadge(int count) {
+    return '$count Yeni';
+  }
+
+  @override
+  String get owlIUnderstand => 'Anladım';
+
+  @override
+  String get owlInviteHowTitle => 'Nasıl Davet Etmek İstersin?';
+
+  @override
+  String get owlInviteHowSubtitle =>
+      'Bu kişiye kozmik anahtarını nasıl göndermek istiyorsun?';
+
+  @override
+  String get owlInviteSendAsMessage => 'Mesaj olarak gönder';
+
+  @override
+  String get owlInviteSMSSubtitle => 'Klasik mesaj ile yolla';
+
+  @override
+  String get owlInviteOtherApps => 'Diğer Uygulamalar';
+
+  @override
+  String get owlInviteOtherAppsSubtitle => 'Instagram, TikTok, X vb.';
+
+  @override
+  String get owlWhatsAppNotFound => 'WhatsApp bulunamadı';
+
+  @override
+  String get owlSMSNotFound => 'SMS uygulaması bulunamadı';
+
+  @override
+  String get owlDisconnectAction => 'Bağı Kes';
+
+  @override
+  String owlDisconnectConfirm(String name) {
+    return '$name ile arandaki sihirli bağı koparmak istediğine emin misin?';
+  }
+
+  @override
+  String get owlDisconnectConfirmButton => 'Evet, Kopar';
+
+  @override
+  String get owlCancel => 'İptal';
+
+  @override
+  String get owlSendMagic => 'Gönder (Tılsımlı)';
+
+  @override
+  String get owlSend => 'Gönder';
+
+  @override
+  String get owlCookieAdded => 'Kurabiye Eklendi';
+
+  @override
+  String get owlAddCookie => 'Kurabiye Ekle';
+
+  @override
+  String get owlNoCookiesInCollection => 'Koleksiyonunda kurabiye yok';
+
+  @override
+  String get owlWriteLetterHint => 'Mektubunu yaz...';
+
+  @override
+  String get owlSendCookie => 'Kurabiye At';
+
+  @override
+  String get zodiacMeasureHarmony => 'KOZMİK UYUMUNU ÖLÇ';
+
+  @override
+  String get zodiacDiscoverEnergy =>
+      'Yıldızların rehberliğinde ikili enerjini keşfet';
+
+  @override
+  String get zodiacChooseFriend => 'ARKADAŞ SEÇ';
+
+  @override
+  String get zodiacPros => 'Avantajlar';
+
+  @override
+  String get zodiacCons => 'Zorluklar';
+
+  @override
+  String get zodiacAdvice => 'Tavsiye';
+
+  @override
+  String get zodiacDailyWhisperSubtitle =>
+      'Bugünün fısıltısını hisset ve\nruhsal portrenin sırlarını çöz.';
+
+  @override
+  String get zodiacDailyWhisperHeadline => 'Bugünün mesajı & ruhsal portre';
+
+  @override
+  String get zodiacOpenGuide => 'Rehberi Arala';
+
+  @override
+  String get zodiacNoFriends => 'Henüz arkadaşın yok';
+
+  @override
+  String get zodiacSelect => 'SEÇ';
+
+  @override
+  String get zodiacQuestCompleted => 'Serüven Tamamlandı';
+
+  @override
+  String get zodiacQuestCompletedSubtitle =>
+      'Evrenin ritmiyle tamamen uyumlandın.';
+
+  @override
+  String get zodiacRewardAura => 'Kazanılan Ödül:\n+4 AURA';
+
+  @override
+  String get zodiacStartNewQuest => 'YENİ SERÜVENE BAŞLA';
+
+  @override
+  String zodiacDailyQuestTitle(int days) {
+    return '$days GÜNLÜK SERÜVEN';
+  }
+
+  @override
+  String zodiacDailyQuestDesc(String weakness) {
+    return '\"$weakness\" Zaafını Yık';
+  }
+
+  @override
+  String zodiacQuestDayProgress(int current, int total) {
+    return 'GÜN $current / $total';
+  }
+
+  @override
+  String get zodiacQuestTodayDiscovery => 'GÜNÜN KEŞFİ';
+
+  @override
+  String get zodiacQuestCompletedToday => 'BUGÜN TAMAMLANDI';
+
+  @override
+  String get zodiacQuestCompleteNow => 'SERÜVENİ TAMAMLA';
+
+  @override
+  String get zodiacQuestMarkCompleted => 'BUGÜNÜ TAMAMLADIM';
+
+  @override
+  String get zodiacLoveHarmony => 'AŞK UYUMU';
+
+  @override
+  String get zodiacFriendshipHarmony => 'ARKADAŞLIK';
+
+  @override
+  String get zodiacCommunicationHarmony => 'İLETİŞİM & ZİHİN';
+
+  @override
+  String get zodiacWorkHarmony => 'ORTAK ÇALIŞMA';
+
+  @override
+  String get zodiacAdventureHarmony => 'MACERA & EĞLENCE';
+
+  @override
+  String get zodiacViralDynamics => 'VİRAL DİNAMİKLER';
+
+  @override
+  String get zodiacDeepSynastryMap => 'DERİN SİNASTRİ HARİTASI';
+
+  @override
+  String zodiacSynastrySubtitle1(String name) {
+    return '$name ile arandaki uyum sadece Güneş burçlarıyla sınırlandırılmadı.';
+  }
+
+  @override
+  String get zodiacSynastrySubtitle2 =>
+      'Kozmik algoritma, gizlilik esasına dayanarak her iki tarafın da astrolojik doğum haritalarını, Ay ve Yükselen evrelerini perde arkasında çaprazlayarak bu analizi tamamen size özel hale getirdi.';
+
+  @override
+  String get zodiacDailyWhisperTitle => 'Günün Fısıltısı';
+
+  @override
+  String get zodiacChooseSign => 'BURÇ SEÇ';
+
+  @override
+  String get zodiacCosmicGuide => 'KOZMİK REHBERİN';
+
+  @override
+  String get zodiacNew => 'YENİ';
+
+  @override
+  String get zodiacCosmicHarmonyTitle => 'KOZMİK UYUM';
+
+  @override
+  String get zodiacAwesome => 'HARİKA';
+
+  @override
+  String get zodiacSpiritPortrait => 'Ruhsal Portre';
 }

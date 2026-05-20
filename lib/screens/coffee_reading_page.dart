@@ -15,6 +15,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/cosmic_engine_service.dart';
 import '../services/push_notification_service.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'coffee_page.dart';
 import '../widgets/coffee_share_modal.dart';
 
@@ -68,7 +69,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
   // Sonuç ekranı giriş animasyonu
   late AnimationController _resultEntranceController;
 
-  final List<String> _loadingTexts = [
+  List<String> _loadingTexts = [
     "Fincanın derinliklerine iniliyor...",
     "Telvelerdeki semboller evrensel enerjiyle eşleşiyor...",
     "Ruh rehberleri dinleniyor...",
@@ -302,7 +303,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 finalResult = row['result'] as Map<String, dynamic>;
                 break;
               } else if (row['status'] == 'failed') {
-                throw Exception('AI falı yorumlarken bir hata ile karşılaştı.');
+                throw Exception(AppLocalizations.of(context)?.coffeeAiError ?? 'AI falı yorumlarken bir hata ile karşılaştı.');
               }
             }
           }
@@ -387,7 +388,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           _isLoading = false;
           _hasError = true;
           _isValidationError = false;
-          _errorMessage = 'Bir sorun oluştu. Lütfen tekrar dene.';
+          _errorMessage = AppLocalizations.of(context)?.coffeeGenericError ?? 'Bir sorun oluştu. Lütfen tekrar dene.';
         });
       }
       CoffeeReadingPage.isApiRunning = false;
@@ -577,7 +578,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 children: [
                   _buildLoadingInfoRow(
                     Icons.notifications_active_outlined,
-                    'Falın hazır olunca bildirim alacaksın',
+                    AppLocalizations.of(context)?.coffeeNotifReady ?? 'Falın hazır olunca bildirim alacaksın',
                   ),
                   const SizedBox(height: 18),
                   _buildLoadingInfoRow(
@@ -590,7 +591,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                           height: 1.4,
                         ),
                         children: [
-                          const TextSpan(text: 'Sonucu ana sayfadaki  '),
+                          TextSpan(text: AppLocalizations.of(context)!.coffeeResultOnHome),
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
                             child: Icon(
@@ -599,7 +600,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                               color: Colors.white.withOpacity(0.65),
                             ),
                           ),
-                          const TextSpan(text: '  butonundan görebilirsin'),
+                          TextSpan(text: AppLocalizations.of(context)?.coffeeCheckHistory ?? '  butonundan görebilirsin'),
                         ],
                       ),
                     ),
@@ -607,7 +608,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                   const SizedBox(height: 18),
                   _buildLoadingInfoRow(
                     Icons.explore_outlined,
-                    'Burada bekle ya da uygulamayı keşfet',
+                     AppLocalizations.of(context)?.coffeeWaitOrExplore ?? 'Burada bekle ya da uygulamayı keşfet',
                   ),
                 ],
               ),
@@ -634,7 +635,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                   ),
                   child: Center(
                     child: Text(
-                      'Ana Sayfaya Dön',
+                      AppLocalizations.of(context)?.coffeeGoHome ?? 'Ana Sayfaya Dön',
                       style: GoogleFonts.inter(
                         color: const Color(0xFFD4A373).withOpacity(0.8),
                         fontSize: 16,
@@ -755,20 +756,20 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                       children: [
                         _buildPremiumHeader(
                           Icons.local_cafe_rounded,
-                          'Fincanın Bölümleri',
+                          AppLocalizations.of(context)?.coffeeSections ?? 'Fincanın Bölümleri',
                         ),
                         const SizedBox(height: 20),
                         _ExpandablePhotoItem(
                           file: _getImageForSection('cup_inside'),
                           title:
                               _readingData?['cup_inside']?['title'] ??
-                              'Fincan İçi',
+                              AppLocalizations.of(context)?.coffeeSectionInside ?? 'Fincan İçi',
                           shortDesc:
                               _readingData?['cup_inside']?['short'] ??
-                              'İç dünyan, düşüncelerin, duygusal halin.',
+                              AppLocalizations.of(context)?.coffeeSectionInsideDesc ?? 'İç dünyan, düşüncelerin, duygusal halin.',
                           detailedDesc:
                               _readingData?['cup_inside']?['detailed'] ??
-                              'Yorum yükleniyor...',
+                              AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment,
                           icon: Icons.local_cafe_rounded,
                           isExpanded: _expandedPhotoIndex == 0,
                           onTap: () {
@@ -783,13 +784,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                           file: _getImageForSection('cup_side'),
                           title:
                               _readingData?['cup_side']?['title'] ??
-                              'Fincan Kenarı',
+                              AppLocalizations.of(context)?.coffeeSectionEdge ?? 'Fincan Kenarı',
                           shortDesc:
                               _readingData?['cup_side']?['short'] ??
-                              'Yakın gelecek, haber, mesaj, görüşme.',
+                              AppLocalizations.of(context)?.coffeeSectionEdgeDesc ?? 'Yakın gelecek, haber, mesaj, görüşme.',
                           detailedDesc:
                               _readingData?['cup_side']?['detailed'] ??
-                              'Yorum yükleniyor...',
+                              AppLocalizations.of(context)!.coffeeLoadingComment,
                           icon: Icons.blur_circular_rounded,
                           isExpanded: _expandedPhotoIndex == 1,
                           onTap: () {
@@ -804,13 +805,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                           file: _getImageForSection('cup_bottom'),
                           title:
                               _readingData?['cup_bottom']?['title'] ??
-                              'Fincan Dibi',
+                              AppLocalizations.of(context)?.coffeeSectionBottom ?? 'Fincan Dibi',
                           shortDesc:
                               _readingData?['cup_bottom']?['short'] ??
-                              'Geçmişten kalan konu, yük, kapanmamış mesele.',
+                              AppLocalizations.of(context)?.coffeeSectionBottomDesc ?? 'Geçmişten kalan konu, yük, kapanmamış mesele.',
                           detailedDesc:
                               _readingData?['cup_bottom']?['detailed'] ??
-                              'Yorum yükleniyor...',
+                              AppLocalizations.of(context)!.coffeeLoadingComment,
                           icon: Icons.fingerprint_rounded,
                           isExpanded: _expandedPhotoIndex == 2,
                           onTap: () {
@@ -823,13 +824,13 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                         ),
                         _ExpandablePhotoItem(
                           file: _getImageForSection('saucer'),
-                          title: _readingData?['saucer']?['title'] ?? 'Tabak',
+                          title: _readingData?['saucer']?['title'] ?? (AppLocalizations.of(context)?.coffeeSectionSaucer ?? 'Tabak'),
                           shortDesc:
                               _readingData?['saucer']?['short'] ??
-                              'Dilek, sonuç, kısmet, son enerji.',
+                              AppLocalizations.of(context)?.coffeeSectionSaucerDesc ?? 'Dilek, sonuç, kısmet, son enerji.',
                           detailedDesc:
                               _readingData?['saucer']?['detailed'] ??
-                              'Yorum yükleniyor...',
+                              AppLocalizations.of(context)!.coffeeLoadingComment,
                           icon: Icons.radio_button_unchecked_rounded,
                           isExpanded: _expandedPhotoIndex == 3,
                           onTap: () {
@@ -886,20 +887,22 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              'Telvelerin Anlattığı Hikaye',
-                              style: GoogleFonts.playfairDisplay(
-                                color: const Color(0xFFE8D5C4),
-                                fontSize: 19,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
+                            Flexible(
+                              child: Text(
+                                AppLocalizations.of(context)?.coffeeStoryTitle ?? 'Telvelerin Anlattığı Hikaye',
+                                style: GoogleFonts.playfairDisplay(
+                                  color: const Color(0xFFE8D5C4),
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          _readingData?['story'] ?? 'Yorum yükleniyor...',
+                          _readingData?['story'] ?? AppLocalizations.of(context)!.coffeeLoadingComment,
                           style: GoogleFonts.inter(
                             color: Colors.white.withOpacity(0.85),
                             fontSize: 14,
@@ -948,7 +951,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                               Expanded(
                                 child: _buildPremiumHeader(
                                   Icons.auto_awesome,
-                                  'Falında Görülen Semboller',
+                                  AppLocalizations.of(context)?.coffeeSymbolsTitle ?? 'Falında Görülen Semboller',
                                 ),
                               ),
                               AnimatedRotation(
@@ -991,8 +994,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 _buildAnimatedResultChild(
                   0.3,
                   _buildSectionCard(
-                    'Aşk & İlişkiler',
-                    _readingData?['love'] ?? 'Yorum yükleniyor...',
+                    AppLocalizations.of(context)?.coffeeLove ?? 'Aşk & İlişkiler',
+                    _readingData?['love'] ?? (AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -1001,8 +1004,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 _buildAnimatedResultChild(
                   0.4,
                   _buildSectionCard(
-                    'İş & Para',
-                    _readingData?['career'] ?? 'Yorum yükleniyor...',
+                    AppLocalizations.of(context)?.coffeeCareer ?? 'İş & Para',
+                    _readingData?['career'] ?? (AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -1011,8 +1014,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 _buildAnimatedResultChild(
                   0.5,
                   _buildSectionCard(
-                    'Aile & Yakın Çevre',
-                    _readingData?['family'] ?? 'Yorum yükleniyor...',
+                    AppLocalizations.of(context)?.coffeeFamily ?? 'Aile & Yakın Çevre',
+                    _readingData?['family'] ?? (AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -1036,7 +1039,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                       children: [
                         _buildPremiumHeader(
                           Icons.timeline_rounded,
-                          'Yakın Gelecek',
+                          AppLocalizations.of(context)?.coffeeNearFuture ?? 'Yakın Gelecek',
                         ),
                         const SizedBox(height: 20),
                         ..._buildTimelineItems(),
@@ -1072,7 +1075,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Falın Son Sözü',
+                              AppLocalizations.of(context)?.coffeeClosing ?? 'Falın Son Sözü',
                               style: GoogleFonts.outfit(
                                 color: const Color(0xFFD4A373),
                                 fontSize: 18,
@@ -1083,7 +1086,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _readingData?['closing'] ?? (_readingData?['wish'] ?? 'Yorum yükleniyor...'),
+                          _readingData?['closing'] ?? (_readingData?['wish'] ?? (AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment)),
                           style: GoogleFonts.inter(
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 14,
@@ -1138,7 +1141,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Falımı Paylaş',
+                                AppLocalizations.of(context)?.coffeeShare ?? 'Falımı Paylaş',
                                 style: GoogleFonts.inter(
                                   color: const Color(0xFFD4A373),
                                   fontSize: 15,
@@ -1172,7 +1175,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Yeni Fal Bak',
+                                AppLocalizations.of(context)!.coffeeNewReading,
                                 style: GoogleFonts.inter(
                                   color: const Color(0xFF161311),
                                   fontSize: 15,
@@ -1240,7 +1243,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                 Expanded(
                   child: Center(
                     child: Text(
-                      'KAHVE FALI',
+                      AppLocalizations.of(context)!.coffeeHeaderTitle,
                       style: GoogleFonts.playfairDisplay(
                         color: const Color(0xFFE8D5C4),
                         fontSize: 18,
@@ -1267,12 +1270,15 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       children: [
         Icon(icon, color: const Color(0xFFD4A373), size: 18),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.outfit(
-            color: const Color(0xFFE8D5C4),
-            fontSize: 18,
-            fontWeight: FontWeight.w400,
+        Flexible(
+          child: Text(
+            title,
+            style: GoogleFonts.outfit(
+              color: const Color(0xFFE8D5C4),
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 16),
@@ -1352,7 +1358,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                   color: const Color(0xFFD4A373),
                 ),
                 child: Text(
-                  _isValidationError ? 'Geri Dön & Yeniden Çek' : 'Tekrar Dene',
+                  _isValidationError ? (AppLocalizations.of(context)?.coffeeRetryValidation ?? 'Geri Dön & Yeniden Çek') : (AppLocalizations.of(context)?.coffeeRetry ?? 'Tekrar Dene'),
                   style: GoogleFonts.inter(
                     color: const Color(0xFF161311),
                     fontSize: 15,
@@ -1368,7 +1374,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
                   Navigator.of(context).pop();
                 },
                 child: Text(
-                  'İptal Et',
+                  AppLocalizations.of(context)?.coffeeCancel ?? 'İptal Et',
                   style: GoogleFonts.inter(
                     color: Colors.white.withOpacity(0.4),
                     fontSize: 14,
@@ -1388,7 +1394,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
     final symbols = _readingData?['symbols'] as List?;
     if (symbols == null || symbols.isEmpty) {
       return [
-        _buildPremiumSymbolChip(Icons.auto_awesome, 'Sembol', 'Yükleniyor...'),
+        _buildPremiumSymbolChip(Icons.auto_awesome, AppLocalizations.of(context)?.coffeeSymbolLabel ?? 'Sembol', AppLocalizations.of(context)?.coffeeSymbolLoading ?? 'Yükleniyor...'),
       ];
     }
     return symbols.map<Widget>((s) {
@@ -1406,7 +1412,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
     final nearFuture = _readingData?['near_future'] as List?;
     if (nearFuture == null || nearFuture.isEmpty) {
       return [
-        _buildTimelineItem('Çok Yakında', 'Yorum yükleniyor...', isLast: true),
+        _buildTimelineItem(AppLocalizations.of(context)?.coffeeTimelineSoon ?? 'Çok Yakında', AppLocalizations.of(context)?.coffeeLoadingComment ?? AppLocalizations.of(context)!.coffeeLoadingComment, isLast: true),
       ];
     }
     return List.generate(nearFuture.length, (i) {
