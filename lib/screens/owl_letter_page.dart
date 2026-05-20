@@ -338,6 +338,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
 
   Widget _buildGlobalSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       decoration: BoxDecoration(
@@ -500,6 +501,7 @@ class _OwlLetterPageState extends State<OwlLetterPage>
 
   // YENİ SEKMELER: Uygulama içi olmayan/veya rehberden gelenlerin gösterileceği yer.
   Widget _buildDiscoverTab(Rect br) {
+    final l10n = AppLocalizations.of(context)!;
     if (_searchQuery.isNotEmpty) {
       return _buildGlobalSearchList();
     }

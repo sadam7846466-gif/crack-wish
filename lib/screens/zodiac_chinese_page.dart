@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import '../services/analytics_service.dart';
 import 'chinese_zodiac_data.dart';
+import '../utils/chinese_zodiac_translations.dart';
 
 class ZodiacChinesePage extends StatefulWidget {
   const ZodiacChinesePage({super.key});
@@ -431,7 +432,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  _sections[i]['label'] as String,
+                  ChineseZodiacTranslations.translate(context, _sections[i]['label'] as String),
                   style: TextStyle(
                     color: sel ? _goldL : Colors.white.withOpacity(0.45),
                     fontSize: sel ? 8.5 : 8.0,
@@ -541,7 +542,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Doğum Yılı',
+                        ChineseZodiacTranslations.translate(context, 'Doğum Yılı'),
                         style: TextStyle(
                           color: _goldL,
                           fontSize: 18,
@@ -579,8 +580,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             ),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Text(
-                            'Tamam',
+                          child: Text(
+                            ChineseZodiacTranslations.translate(context, 'Tamam'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -660,7 +661,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
             ),
             Text(
-              'Burcunu Seç',
+              ChineseZodiacTranslations.translate(context, 'Burcunu Seç'),
               style: TextStyle(
                 color: _goldL,
                 fontSize: 18,
@@ -716,7 +717,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                         _animalSeal(i, 42, selected: sel),
                         const SizedBox(height: 5),
                         Text(
-                          a['name'] as String,
+                          ChineseZodiacTranslations.translate(context, a['name'] as String),
                           style: TextStyle(
                             color: sel ? _goldL : Colors.white.withOpacity(0.4),
                             fontSize: 9,
@@ -936,7 +937,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
         // ── Birleşik Profil Kartı — Tag'ler + Dönen Alıntılar ──
         Builder(
-          builder: (_) {
+          builder: (context) {
             // Motto + kişilik cümlelerini birleştir
             final motto = _getAnimalMotto(_animalIdx);
             final personalitySentences = (a['personality'] as String)
@@ -944,7 +945,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 .where((s) => s.trim().isNotEmpty)
                 .map((s) => s.endsWith('.') ? s : '$s.')
                 .toList();
-            final allQuotes = [motto, ...personalitySentences];
+            final allQuotes = [motto, ...personalitySentences]
+                .map((q) => ChineseZodiacTranslations.translate(context, q))
+                .toList();
             return _UnifiedProfileCard(
               quotes: allQuotes,
               crimson: _crimson,
@@ -1014,7 +1017,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     children: [
                       // Kariyer başlığı
                       Text(
-                        'Kariyer Haritası',
+                        ChineseZodiacTranslations.translate(context, 'Kariyer Haritası'),
                         style: TextStyle(
                           color: _accent.withOpacity(0.7),
                           fontSize: 12,
@@ -1103,7 +1106,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             child: Opacity(
                               opacity: curve.clamp(0.0, 1.0),
                               child: Text(
-                                careers.isNotEmpty ? careers[0] : hero.key,
+                                ChineseZodiacTranslations.translate(context, careers.isNotEmpty ? careers[0] : hero.key),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.40),
                                   fontSize: 12,
@@ -1178,7 +1181,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  careerLabel,
+                                  ChineseZodiacTranslations.translate(context, careerLabel),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.4),
@@ -1223,7 +1226,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Kariyer Rehberi',
+                                  ChineseZodiacTranslations.translate(context, 'Kariyer Rehberi'),
                                   style: TextStyle(
                                     color: const Color(0xFFCBB270).withOpacity(0.6),
                                     fontSize: 10,
@@ -1235,7 +1238,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              careerAdvice,
+                              ChineseZodiacTranslations.translate(context, careerAdvice),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.7),
                                 fontSize: 11,
@@ -2233,8 +2236,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
               child: Column(
                 children: [
-                  const Text(
-                    'Burç Uyum Haritası',
+                  Text(
+                    ChineseZodiacTranslations.translate(context, 'Burç Uyum Haritası'),
                     style: TextStyle(
                       color: Color(0xFFE8DCC8),
                       fontSize: 18,
@@ -2244,7 +2247,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${a['name']} burcunun astral bağları',
+                    Localizations.localeOf(context).languageCode == 'tr'
+                        ? '${ChineseZodiacTranslations.translate(context, a['name'] as String)} burcunun astral bağları'
+                        : 'Astral bonds of ${ChineseZodiacTranslations.translate(context, a['name'] as String)}',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.4),
                       fontSize: 11,
@@ -2299,7 +2304,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Kaderiniz yıldızlarda gizli',
+                            ChineseZodiacTranslations.translate(context, 'Kaderiniz yıldızlarda gizli'),
                             style: TextStyle(
                               color: const Color(0xFFE8DCC8).withOpacity(0.7),
                               fontSize: 13,
@@ -2338,7 +2343,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Analizi Başlat',
+                                  ChineseZodiacTranslations.translate(context, 'Analizi Başlat'),
                                   style: TextStyle(
                                     color: const Color(0xFFD4A017).withOpacity(0.9),
                                     fontWeight: FontWeight.w600,
@@ -2389,7 +2394,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     if (best.length > 1)
                                       Expanded(
                                         child: _podiumFull(
-                                          best[1], '🥈', const Color(0xFFC0C0C0), 45, 'Kalp kalbe bağ',
+                                          best[1], '🥈', const Color(0xFFC0C0C0), 45, ChineseZodiacTranslations.translate(context, 'Kalp kalbe bağ'),
                                           animH: hSilver < 0 ? 0 : hSilver,
                                           contentOpacity: pReveal,
                                         ),
@@ -2398,7 +2403,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: _podiumFull(
-                                        best[0], '🥇', const Color(0xFFD4A017), 65, 'Ruh eşiniz',
+                                        best[0], '🥇', const Color(0xFFD4A017), 65, ChineseZodiacTranslations.translate(context, 'Ruh eşiniz'),
                                         animH: hGold < 0 ? 0 : hGold,
                                         contentOpacity: pReveal,
                                       ),
@@ -2407,7 +2412,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     if (good.isNotEmpty)
                                       Expanded(
                                         child: _podiumFull(
-                                          good[0], '🥉', const Color(0xFFCD7F32), 30, 'Güçlü çekim',
+                                          good[0], '🥉', const Color(0xFFCD7F32), 30, ChineseZodiacTranslations.translate(context, 'Güçlü çekim'),
                                           animH: hBronze < 0 ? 0 : hBronze,
                                           contentOpacity: pReveal,
                                         ),
@@ -2468,12 +2473,12 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                                   Icon(Icons.lightbulb_outline_rounded,
                                                       color: const Color(0xFFD4A017).withOpacity(0.5), size: 14),
                                                   const SizedBox(width: 6),
-                                                  Text('Aklınızda Bulunsun',
+                                                  Text(ChineseZodiacTranslations.translate(context, 'Aklınızda Bulunsun'),
                                                       style: TextStyle(
                                                           color: const Color(0xFFD4A017).withOpacity(0.6),
                                                           fontSize: 12, fontWeight: FontWeight.w700)),
                                                   const Spacer(),
-                                                  Text('Alternatif bir seçenek',
+                                                  Text(ChineseZodiacTranslations.translate(context, 'Alternatif bir seçenek'),
                                                       style: TextStyle(
                                                           color: Colors.white.withOpacity(0.25),
                                                           fontSize: 9, fontStyle: FontStyle.italic)),
@@ -2499,12 +2504,12 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                                         child: Column(
                                                           crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
-                                                            Text(gAnimal['name'] as String,
+                                                            Text(ChineseZodiacTranslations.translate(context, gAnimal['name'] as String),
                                                                 style: TextStyle(
                                                                     color: Colors.white.withOpacity(0.8),
                                                                     fontSize: 13, fontWeight: FontWeight.w700)),
                                                             const SizedBox(height: 2),
-                                                            Text('Yolunuza çıkarsa fırsatı kaçırmayın',
+                                                            Text(ChineseZodiacTranslations.translate(context, 'Yolunuza çıkarsa fırsatı kaçırmayın'),
                                                                 style: TextStyle(
                                                                     color: Colors.white.withOpacity(0.3),
                                                                     fontSize: 10, fontStyle: FontStyle.italic)),
@@ -2558,12 +2563,12 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                                 Icon(Icons.warning_amber_rounded,
                                                     color: const Color(0xFFFF3D00).withOpacity(0.5), size: 14),
                                                 const SizedBox(width: 6),
-                                                Text('Dikkat — Zorlayıcı',
+                                                Text(ChineseZodiacTranslations.translate(context, 'Dikkat — Zorlayıcı'),
                                                     style: TextStyle(
                                                         color: const Color(0xFFFF3D00).withOpacity(0.7),
                                                         fontSize: 11, fontWeight: FontWeight.w700)),
                                                 const Spacer(),
-                                                Text('Ekstra sabır gerekir',
+                                                Text(ChineseZodiacTranslations.translate(context, 'Ekstra sabır gerekir'),
                                                     style: TextStyle(
                                                         color: Colors.white.withOpacity(0.2),
                                                         fontSize: 9, fontStyle: FontStyle.italic)),
@@ -2578,7 +2583,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                                             _animalIcon(i, 42, opacity: 0.4),
                                                             const SizedBox(height: 4),
                                                             Text(
-                                                              ChineseZodiacData.animals[i]['name'] as String,
+                                                              ChineseZodiacTranslations.translate(context, ChineseZodiacData.animals[i]['name'] as String),
                                                               style: TextStyle(
                                                                   color: Colors.white.withOpacity(0.4),
                                                                   fontSize: 10, fontWeight: FontWeight.w600),
@@ -2651,8 +2656,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Detaylı Uyum Tablosu',
+                      Text(
+                        ChineseZodiacTranslations.translate(context, 'Detaylı Uyum Tablosu'),
                         style: TextStyle(
                           color: Color(0xFFE8DCC8),
                           fontSize: 18,
@@ -2665,7 +2670,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   Row(
                     children: [
                       Text(
-                        'Merak ettiğin burca dokun ',
+                        ChineseZodiacTranslations.translate(context, 'Merak ettiğin burca dokun '),
                         style: TextStyle(
                           color: _gold.withOpacity(0.4),
                           fontSize: 11,
@@ -2762,15 +2767,15 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _legendDot(_gold, 'Ben'),
+                        _legendDot(_gold, ChineseZodiacTranslations.translate(context, 'Ben')),
                         const SizedBox(width: 10),
-                        _legendDot(const Color(0xFFC4A0AD), 'Mükemmel'),
+                        _legendDot(const Color(0xFFC4A0AD), ChineseZodiacTranslations.translate(context, 'Mükemmel')),
                         const SizedBox(width: 12),
-                        _legendDot(const Color(0xFFB8AD8E), 'İyi'),
+                        _legendDot(const Color(0xFFB8AD8E), ChineseZodiacTranslations.translate(context, 'İyi')),
                         const SizedBox(width: 12),
-                        _legendDot(const Color(0xFF6B9B9B), 'Nötr'),
+                        _legendDot(const Color(0xFF6B9B9B), ChineseZodiacTranslations.translate(context, 'Nötr')),
                         const SizedBox(width: 12),
-                        _legendDot(const Color(0xFF7B6B8A), 'Zorlayıcı'),
+                        _legendDot(const Color(0xFF7B6B8A), ChineseZodiacTranslations.translate(context, 'Zorlayıcı')),
                       ],
                     ),
                   ),
@@ -2808,43 +2813,43 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                         if (si == _animalIdx) {
                           baseScore = 100;
                           c = Colors.white;
-                          label = 'Kendinle Uyum';
+                          label = ChineseZodiacTranslations.translate(ctx, 'Kendinle Uyum');
                           desc =
-                              'Kendini tanımak en büyük güçtür. Aynı enerjinin iki yansıması — güçlü yanlarını da zayıf yanlarını da biliyorsun.';
+                              ChineseZodiacTranslations.translate(ctx, 'Kendini tanımak en büyük güçtür. Aynı enerjinin iki yansıması — güçlü yanlarını da zayıf yanlarını da biliyorsun.');
                           advice =
-                              'Kendine karşı dürüst ve şefkatli ol. En derin bağ, kendinle kurduğun bağdır. Güçlü yanlarını kutla, zayıf yanlarını kucakla.';
+                              ChineseZodiacTranslations.translate(ctx, 'Kendine karşı dürüst ve şefkatli ol. En derin bağ, kendinle kurduğun bağdır. Güçlü yanlarını kutla, zayıf yanlarını kucakla.');
                         } else if (best.contains(si)) {
                           baseScore = 95;
                           c = const Color(0xFFC4A0AD);
-                          label = 'Mükemmel Uyum';
+                          label = ChineseZodiacTranslations.translate(ctx, 'Mükemmel Uyum');
                           desc =
-                              'Bu burçla aranızda derin bir bağ var. Birbirini tamamlayan enerjiler güçlü bir çekim yaratır.';
+                              ChineseZodiacTranslations.translate(ctx, 'Bu burçla aranızda derin bir bağ var. Birbirini tamamlayan enerjiler güçlü bir çekim yaratır.');
                           advice =
-                              'Bu eşsiz bağı korumak için birbirinize zaman ayırın. Enerjileriniz doğal olarak örtüşüyor — bunu kutlayın ve birlikte büyüyün.';
+                              ChineseZodiacTranslations.translate(ctx, 'Bu eşsiz bağı korumak için birbirinize zaman ayırın. Enerjileriniz doğal olarak örtüşüyor — bunu kutlayın ve birlikte büyüyün.');
                         } else if (good.contains(si)) {
                           baseScore = 78;
                           c = const Color(0xFFB8AD8E);
-                          label = 'İyi Uyum';
+                          label = ChineseZodiacTranslations.translate(ctx, 'İyi Uyum');
                           desc =
-                              'Doğal bir uyum ve anlayış mevcut. Birlikte geçirilen zaman keyifli ve verimli olur.';
+                              ChineseZodiacTranslations.translate(ctx, 'Doğal bir uyum ve anlayış mevcut. Birlikte geçirilen zaman keyifli ve verimli olur.');
                           advice =
-                              'İlişkinizi derinleştirmek için ortak hobiler keşfedin. Doğal uyumunuz güçlü — küçük jestlerle büyük anlar yaratabilirsiniz.';
+                              ChineseZodiacTranslations.translate(ctx, 'İlişkinizi derinleştirmek için ortak hobiler keşfedin. Doğal uyumunuz güçlü — küçük jestlerle büyük anlar yaratabilirsiniz.');
                         } else if (bad.contains(si)) {
                           baseScore = 35;
                           c = const Color(0xFF7B6B8A);
-                          label = 'Zorlayıcı';
+                          label = ChineseZodiacTranslations.translate(ctx, 'Zorlayıcı');
                           desc =
-                              'Bu ilişki sabır ve anlayış gerektirir. Farklılıklar büyümeyi de sağlar.';
+                              ChineseZodiacTranslations.translate(ctx, 'Bu ilişki sabır ve anlayış gerektirir. Farklılıklar büyümeyi de sağlar.');
                           advice =
-                              'Sabır anahtarınız olsun. Farklılıklarınızı tehdit değil, zenginlik olarak görün. En güçlü bağlar zorlukları aşarak kurulur.';
+                              ChineseZodiacTranslations.translate(ctx, 'Sabır anahtarınız olsun. Farklılıklarınızı tehdit değil, zenginlik olarak görün. En güçlü bağlar zorlukları aşarak kurulur.');
                         } else {
                           baseScore = 58;
                           c = const Color(0xFF6B9B9B);
-                          label = 'Nötr';
+                          label = ChineseZodiacTranslations.translate(ctx, 'Nötr');
                           desc =
-                              'Standart bir ilişki. Büyük çatışma yok ama özel bir çekim de hissedilmez.';
+                              ChineseZodiacTranslations.translate(ctx, 'Standart bir ilişki. Büyük çatışma yok ama özel bir çekim de hissedilmez.');
                           advice =
-                              'Bu ilişkiye bilinçli emek verin. Ortak noktalar keşfettikçe bağınız güçlenebilir. Önyargısız yaklaşın.';
+                              ChineseZodiacTranslations.translate(ctx, 'Bu ilişkiye bilinçli emek verin. Ortak noktalar keşfettikçe bağınız güçlenebilir. Önyargısız yaklaşın.');
                         }
                         // Kategori puanları — base'den türetilmiş
                         final seed = (_animalIdx * 13 + si * 7) % 20;
@@ -2896,7 +2901,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        me['name'] as String,
+                                        ChineseZodiacTranslations.translate(context, me['name'] as String),
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.7),
                                           fontSize: 12,
@@ -2941,7 +2946,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                                   ),
                                                 ),
                                                 Text(
-                                                  'puan',
+                                                  ChineseZodiacTranslations.translate(context, 'puan'),
                                                   style: TextStyle(
                                                     color: c.withOpacity(0.5),
                                                     fontSize: 8,
@@ -3006,7 +3011,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        other['name'] as String,
+                                        ChineseZodiacTranslations.translate(context, other['name'] as String),
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.7),
                                           fontSize: 12,
@@ -3046,7 +3051,9 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                   ),
                                 ),
                                 child: Text(
-                                  '${other['name']} Yılları:\n${other['years']}',
+                                  Localizations.localeOf(context).languageCode == 'tr'
+                                      ? '${ChineseZodiacTranslations.translate(context, other['name'] as String)} Yılları:\n${other['years']}'
+                                      : '${ChineseZodiacTranslations.translate(context, other['name'] as String)} Years:\n${other['years']}',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.5),
@@ -3074,7 +3081,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             const SizedBox(height: 18),
                             // ── Kategoriler — 4'lü uyum detayı ──
                             Text(
-                              'Uyum Detayları',
+                              ChineseZodiacTranslations.translate(context, 'Uyum Detayları'),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 11,
@@ -3084,28 +3091,28 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             ),
                             const SizedBox(height: 14),
                             _compatCategory(
-                              'Aşk & Romantizm',
+                              ChineseZodiacTranslations.translate(context, 'Aşk & Romantizm'),
                               loveScore,
                               c,
                               _CompatCatType.love,
                             ),
                             const SizedBox(height: 12),
                             _compatCategory(
-                              'Dostluk & Sadakat',
+                              ChineseZodiacTranslations.translate(context, 'Dostluk & Sadakat'),
                               friendScore,
                               c,
                               _CompatCatType.friend,
                             ),
                             const SizedBox(height: 12),
                             _compatCategory(
-                              'İş & Kariyer',
+                              ChineseZodiacTranslations.translate(context, 'İş & Kariyer'),
                               workScore,
                               c,
                               _CompatCatType.work,
                             ),
                             const SizedBox(height: 12),
                             _compatCategory(
-                              'İletişim & Anlayış',
+                              ChineseZodiacTranslations.translate(context, 'İletişim & Anlayış'),
                               commScore,
                               c,
                               _CompatCatType.comm,
@@ -3127,7 +3134,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             const SizedBox(height: 18),
                             // ── Element Karşılaştırması ──
                             Text(
-                              'Element Etkileşimi',
+                              ChineseZodiacTranslations.translate(context, 'Element Etkileşimi'),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 11,
@@ -3172,7 +3179,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                           ),
                                         ),
                                         Text(
-                                          me['name'] as String,
+                                          ChineseZodiacTranslations.translate(context, me['name'] as String),
                                           style: TextStyle(
                                             color: Colors.white.withOpacity(
                                               0.3,
@@ -3206,7 +3213,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        _elementRelationLabel(myEl, otherEl),
+                                        ChineseZodiacTranslations.translate(context, _elementRelationLabel(myEl, otherEl)),
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.45),
                                           fontSize: 9,
@@ -3240,7 +3247,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                           ),
                                         ),
                                         Text(
-                                          other['name'] as String,
+                                          ChineseZodiacTranslations.translate(context, other['name'] as String),
                                           style: TextStyle(
                                             color: Colors.white.withOpacity(
                                               0.3,
@@ -3258,7 +3265,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             Padding(
                               padding: const EdgeInsets.only(top: 10),
                               child: Text(
-                                _elementRelationDesc(myEl, otherEl),
+                                ChineseZodiacTranslations.translate(context, _elementRelationDesc(myEl, otherEl)),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.35),
@@ -3285,7 +3292,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             const SizedBox(height: 18),
                             // ── Karakter Karşılaştırması — Trait Tag'ler ──
                             Text(
-                              'Karakter Karşılaştırması',
+                              ChineseZodiacTranslations.translate(context, 'Karakter Karşılaştırması'),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 11,
@@ -3304,7 +3311,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        me['name'] as String,
+                                        ChineseZodiacTranslations.translate(context, me['name'] as String),
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.5),
                                           fontSize: 11,
@@ -3411,7 +3418,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        other['name'] as String,
+                                        ChineseZodiacTranslations.translate(context, other['name'] as String),
                                         style: TextStyle(
                                           color: c.withOpacity(0.6),
                                           fontSize: 11,
@@ -3502,7 +3509,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'İlişki Tavsiyesi',
+                                        ChineseZodiacTranslations.translate(context, 'İlişki Tavsiyesi'),
                                         style: TextStyle(
                                           color: c.withOpacity(0.6),
                                           fontSize: 10,
@@ -3592,7 +3599,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
               const SizedBox(height: 6),
               Text(
-                'Şans Puanı: ${fortune['score']}%',
+                '${ChineseZodiacTranslations.translate(context, 'Şans Puanı')}: ${fortune['score']}%',
                 style: TextStyle(
                   color: c,
                   fontSize: 14,
@@ -3601,7 +3608,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               ),
               const SizedBox(height: 16),
               Text(
-                fortune['advice'] as String,
+                ChineseZodiacTranslations.translate(context, fortune['advice'] as String),
                 textAlign: TextAlign.center,
                 style: _bodyStyle(),
               ),
@@ -3634,7 +3641,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bugünkü Ruh Halin',
+                      ChineseZodiacTranslations.translate(context, 'Bugünkü Ruh Halin'),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 10,
@@ -3643,7 +3650,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      mood['mood']!,
+                      ChineseZodiacTranslations.translate(context, mood['mood']!),
                       style: TextStyle(
                         color: _goldL,
                         fontSize: 18,
@@ -3651,7 +3658,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                     ),
                     Text(
-                      mood['desc']!,
+                      ChineseZodiacTranslations.translate(context, mood['desc']!),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.5),
                         fontSize: 11,
@@ -3676,7 +3683,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   Icon(Icons.bolt, color: _goldL.withOpacity(0.7), size: 18),
                   const SizedBox(width: 6),
                   Text(
-                    'Enerji Ritmin',
+                    ChineseZodiacTranslations.translate(context, 'Enerji Ritmin'),
                     style: TextStyle(
                       color: _goldL,
                       fontSize: 15,
@@ -3752,7 +3759,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       Icon(timeIcon, color: _goldL.withOpacity(0.5), size: 16),
                       const SizedBox(width: 8),
                       Text(
-                        'Şanslı Saatin:',
+                        ChineseZodiacTranslations.translate(context, 'Şanslı Saatin:'),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.5),
                           fontSize: 12,
@@ -3808,7 +3815,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'YAP',
+                        ChineseZodiacTranslations.translate(context, 'YAP'),
                         style: TextStyle(
                           color: const Color(0xFF4CAF50).withOpacity(0.7),
                           fontSize: 10,
@@ -3818,7 +3825,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        fortune['doAdvice'] as String,
+                        ChineseZodiacTranslations.translate(context, fortune['doAdvice'] as String),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
@@ -3851,7 +3858,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'YAPMA',
+                        ChineseZodiacTranslations.translate(context, 'YAPMA'),
                         style: TextStyle(
                           color: _crimson.withOpacity(0.7),
                           fontSize: 10,
@@ -3861,7 +3868,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        fortune['dontAdvice'] as String,
+                        ChineseZodiacTranslations.translate(context, fortune['dontAdvice'] as String),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
@@ -3922,7 +3929,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     Row(
                       children: [
                         Text(
-                          'Senin için bir meydan okumamız var!',
+                          ChineseZodiacTranslations.translate(context, 'Senin için bir meydan okumamız var!'),
                           style: TextStyle(
                             color: _goldL.withOpacity(0.5),
                             fontSize: 10,
@@ -3951,7 +3958,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                                Text(ChineseZodiacTranslations.translate(context, 'YENİ'), style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                               ],
                             ),
                           ),
@@ -3959,7 +3966,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      fortune['challenge'] as String,
+                      ChineseZodiacTranslations.translate(context, fortune['challenge'] as String),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.85),
                         fontSize: 13,
@@ -3988,7 +3995,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         ),
         const SizedBox(height: 4),
         Text(
-          label,
+          ChineseZodiacTranslations.translate(context, label),
           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
         ),
         Text(
@@ -14900,7 +14907,7 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                widget.userElement,
+                                ChineseZodiacTranslations.translate(context, widget.userElement),
                                 style: TextStyle(
                                   color: widget.elColor,
                                   fontSize: 13,
@@ -14910,7 +14917,7 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
                               ),
                               const SizedBox(height: 1),
                               Text(
-                                'Elementi',
+                                ChineseZodiacTranslations.translate(context, 'Elementi'),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.3),
                                   fontSize: 9.5,
@@ -14959,7 +14966,7 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                widget.userYinYang,
+                                ChineseZodiacTranslations.translate(context, widget.userYinYang),
                                 style: const TextStyle(
                                   color: Color(0xFFCDCDD8),
                                   fontSize: 13,
@@ -14969,7 +14976,7 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
                               ),
                               const SizedBox(height: 1),
                               Text(
-                                'Enerjisi',
+                                ChineseZodiacTranslations.translate(context, 'Enerjisi'),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.3),
                                   fontSize: 9.5,

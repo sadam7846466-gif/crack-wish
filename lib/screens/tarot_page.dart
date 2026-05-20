@@ -8803,6 +8803,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
   @override
   Widget build(BuildContext context) {
     final totalCards = widget.cardKeys.length;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
 
     return RepaintBoundary(
       child: SizedBox(
@@ -9102,7 +9103,7 @@ class _FloatingTarotDeckState extends State<_FloatingTarotDeck>
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'RASTGELE\nÇEK',
+                                                isTr ? 'RASTGELE\nÇEK' : 'RANDOM\nDRAW',
                                                 textAlign: TextAlign.center,
                                                 style: GoogleFonts.inter(
                                                   color: Colors.white

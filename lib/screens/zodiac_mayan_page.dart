@@ -9,6 +9,7 @@ import '../data/mayan_zodiac_data.dart';
 import '../services/analytics_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/mayan_zodiac_translations.dart';
 
 class ZodiacMayanPage extends StatefulWidget {
   const ZodiacMayanPage({super.key});
@@ -253,7 +254,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           crossAxisAlignment: CrossAxisAlignment.center, // Baseline kaldırıldı, optik tam ortalama eklendi
           children: [
             Text(
-              n['name'].toUpperCase(),
+              MayanZodiacTranslations.translate(context, n['name'] as String).toUpperCase(),
               style: GoogleFonts.cinzel(
                 color: Colors.white, 
                 fontSize: 36, // Yazıyı hafifçe büyüttük
@@ -289,7 +290,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           text: TextSpan(
             children: [
               TextSpan(
-                text: "${n['meaning'].toUpperCase()}  |  ",
+                text: "${MayanZodiacTranslations.translate(context, n['meaning'] as String).toUpperCase()}  |  ",
                 style: GoogleFonts.cinzel(
                   color: Colors.white.withValues(alpha: 0.9), // IK ile aynı renk ailesi (Burç adı ve Çevirisi)
                   fontSize: 13,
@@ -301,7 +302,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                 ),
               ),
               TextSpan(
-                text: n['words'].toUpperCase(),
+                text: MayanZodiacTranslations.translate(context, n['words'] as String).toUpperCase(),
                 style: TextStyle(
                   color: _goldBright, // Mottosu/Simgelediği şey altın sarısı
                   fontSize: 10, 
@@ -371,11 +372,11 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                     ),
                     child: Row(
                       children: [
-                        _buildRuhTab(0, "KADİM BİLGELİK", Icons.auto_awesome, activeColor),
+                        _buildRuhTab(0, MayanZodiacTranslations.translate(context, "KADİM BİLGELİK"), Icons.auto_awesome, activeColor),
                         Container(width: 1, color: activeColor.withValues(alpha: 0.1)),
-                        _buildRuhTab(1, "FREKANS (${_userTone})", Icons.waves, activeColor),
+                        _buildRuhTab(1, "${MayanZodiacTranslations.translate(context, 'FREKANS')} (${_userTone})", Icons.waves, activeColor),
                         Container(width: 1, color: activeColor.withValues(alpha: 0.1)),
-                        _buildRuhTab(2, "MİSYON", Icons.local_fire_department_outlined, activeColor),
+                        _buildRuhTab(2, MayanZodiacTranslations.translate(context, "MİSYON"), Icons.local_fire_department_outlined, activeColor),
                       ],
                     ),
                   ),
@@ -466,14 +467,14 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
             children: [
                const Icon(Icons.auto_awesome, color: _jade, size: 16),
                const SizedBox(width: 8),
-               const Expanded(
-                 child: Text('KADİM BİLGELİK', style: TextStyle(color: _jade, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+               Expanded(
+                 child: Text(MayanZodiacTranslations.translate(context, 'KADİM BİLGELİK'), style: const TextStyle(color: _jade, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                ),
             ]
           ),
           const SizedBox(height: 16),
           Text(
-            n['description'] as String,
+            MayanZodiacTranslations.translate(context, n['description'] as String),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13, height: 1.6),
           ),
         ],
@@ -487,13 +488,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                const Icon(Icons.waves, color: _goldBright, size: 16),
                const SizedBox(width: 8),
                Expanded(
-                 child: Text('GALAKTİK TON ($_userTone)', style: const TextStyle(color: _goldBright, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                 child: Text("${MayanZodiacTranslations.translate(context, 'GALAKTİK TON')} ($_userTone)", style: const TextStyle(color: _goldBright, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                ),
             ]
           ),
           const SizedBox(height: 16),
           Text(
-            _userToneData['desc']!,
+            MayanZodiacTranslations.translate(context, _userToneData['desc']!),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13, height: 1.6),
           ),
         ],
@@ -506,14 +507,14 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
             children: [
                const Icon(Icons.local_fire_department_outlined, color: _amber, size: 16),
                const SizedBox(width: 8),
-               const Expanded(
-                 child: Text('HAYATTAKİ ROLÜN', style: TextStyle(color: _amber, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+               Expanded(
+                 child: Text(MayanZodiacTranslations.translate(context, 'HAYATTAKİ ROLÜN'), style: const TextStyle(color: _amber, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                ),
             ]
           ),
           const SizedBox(height: 16),
           Text(
-            n['role'] as String,
+            MayanZodiacTranslations.translate(context, n['role'] as String),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, height: 1.6, fontStyle: FontStyle.italic),
           ),
         ],
@@ -587,20 +588,20 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     int genEnergy = scores['genEnergy']!;
     int alignScore = scores['alignScore']!;
 
-    String toneTitleRaw = todayToneData['title']!.toLowerCase();
-    String toneTitleClean = toneTitleRaw.replaceAll(RegExp(r'\s*\(\d+\.\s*ton\)', caseSensitive: false), '').trim();
+    String toneTitleTranslated = MayanZodiacTranslations.translate(context, todayToneData['title']!);
+    String toneTitleClean = toneTitleTranslated.replaceAll(RegExp(r'\s*\(\d+\.\s*ton\)', caseSensitive: false), '').replaceAll(RegExp(r'\s*\(Tone\s*\d+\)', caseSensitive: false), '').trim();
 
-    String goodFor = _generateGoodFor(todayNahual, alignScore);
-    String badFor = _generateBadFor(todayNahual, alignScore);
-    String compatibilityText = _generateShortCompatibility(_userNahual, todayNahual, alignScore, genEnergy);
+    String goodFor = _generateGoodFor(todayNahual, alignScore, context);
+    String badFor = _generateBadFor(todayNahual, alignScore, context);
+    String compatibilityText = _generateShortCompatibility(_userNahual, todayNahual, alignScore, genEnergy, context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Text(
-              'GÜNÜN KUTSAL TZOLK\'İN ENERJİSİ',
+            Text(
+              MayanZodiacTranslations.translate(context, "GÜNÜN KUTSAL TZOLK'İN ENERJİSİ"),
               style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2),
             ),
             const SizedBox(width: 8),
@@ -624,7 +625,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text('YENİ', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                    Text(MayanZodiacTranslations.translate(context, 'YENİ'), style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                   ],
                 ),
               ),
@@ -676,10 +677,10 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${todayNahual['name'].toUpperCase()} • ${todayNahual['meaning'].toUpperCase()} (TON $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                Text('${MayanZodiacTranslations.translate(context, todayNahual['name'] as String).toUpperCase()} • ${MayanZodiacTranslations.translate(context, todayNahual['meaning'] as String).toUpperCase()} (${Localizations.localeOf(context).languageCode == 'en' ? 'TONE' : 'TON'} $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${todayNahual['words'].toUpperCase()} • ${todayToneData['title']!.split('(').first.trim().toUpperCase()}', 
+                                  '${MayanZodiacTranslations.translate(context, todayNahual['words'] as String).toUpperCase()} • ${MayanZodiacTranslations.translate(context, todayToneData['title']!).split('(').first.trim().toUpperCase()}', 
                                   style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 1.0, height: 1.3),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -692,7 +693,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             padding: const EdgeInsets.only(top: 16), // Sadece güç göstergesi kaldı, ok çıkarıldı
                             child: _buildGeomScore(
                               genEnergy, 
-                              "GÜÇ", 
+                              MayanZodiacTranslations.translate(context, "GÜÇ"), 
                               size: 40, 
                               color: Colors.white.withValues(alpha: 0.95)
                             ),
@@ -738,21 +739,21 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('KİŞİSEL REZONANS', style: TextStyle(color: _goldBright.withValues(alpha: 0.9), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                                Text(MayanZodiacTranslations.translate(context, 'KİŞİSEL REZONANS'), style: TextStyle(color: _goldBright.withValues(alpha: 0.9), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: _goldBright.withValues(alpha: 0.15), 
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Text('%$alignScore UYUMLU', style: const TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  child: Text("${MayanZodiacTranslations.translate(context, '%\$alignScore UYUMLU').replaceAll(r'$alignScore', alignScore.toString())}", style: const TextStyle(color: _goldBright, fontSize: 10, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 16),
-                            _buildSummaryRow(Icons.brightness_5, "GÜNÜN ODAĞI", "${todayNahual['name'].toUpperCase()} - ${todayNahual['words']}"),
+                            _buildSummaryRow(Icons.brightness_5, MayanZodiacTranslations.translate(context, "GÜNÜN ODAĞI"), "${MayanZodiacTranslations.translate(context, todayNahual['name'] as String).toUpperCase()} - ${MayanZodiacTranslations.translate(context, todayNahual['words'] as String)}"),
                             const SizedBox(height: 10),
-                            _buildSummaryRow(Icons.fingerprint, "SANA ETKİSİ", compatibilityText),
+                            _buildSummaryRow(Icons.fingerprint, MayanZodiacTranslations.translate(context, "SANA ETKİSİ"), compatibilityText),
                           ],
                         ),
                       ),
@@ -774,7 +775,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: '${todayTone}. TON  •  ',
+                                          text: '${todayTone}. ${Localizations.localeOf(context).languageCode == 'en' ? 'TONE' : 'TON'}  •  ',
                                           style: GoogleFonts.cinzel(
                                             color: _goldBright.withValues(alpha: 0.9), 
                                             fontSize: 12, 
@@ -805,7 +806,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             ),
                             const SizedBox(height: 4), // Kendi içindeki başlık ve açıklama arası iyice yakınlaştırıldı
                             Text(
-                              todayToneData['desc']!,
+                              MayanZodiacTranslations.translate(context, todayToneData['desc']!),
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.8), 
                                 fontSize: 13, 
@@ -823,16 +824,22 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _InteractiveDualEnergyButton(
-                            title: 'GÜNÜN IŞIĞI',
-                            description: "Günün Işığı, frekansını yükselten ve seni en parlak versiyonuna taşıyan aydınlık yönündür.\n\nBugünün odaklanman gereken\ndestekleyici etkileri:\n\n$goodFor",
+                            title: MayanZodiacTranslations.translate(context, 'GÜNÜN IŞIĞI'),
+                            description: MayanZodiacTranslations.translate(
+                              context, 
+                              "Günün Işığı, frekansını yükselten ve seni en parlak versiyonuna taşıyan aydınlık yönündür.\n\nBugünün odaklanman gereken\ndestekleyici etkileri:\n\n\$goodFor"
+                            ).replaceAll(r'$goodFor', goodFor),
                             icon: Icons.wb_sunny_rounded,
                             primaryColor: const Color(0xFFFFEA99), // Daha açık ve göz alıcı parlak kış güneşi/altın tonu
                             isLight: true,
                           ),
                           const SizedBox(width: 32), // İki küre arası daraltıldı
                           _InteractiveDualEnergyButton(
-                            title: 'GÜNÜN GÖLGESİ',
-                            description: "Evrensel dualite gereği Günün Gölgesi, bilincini esir almak isteyen düşük titreşimli ve gölgeli yönündür.\n\nBugün dikkat etmen ve\nsakınman gereken tuzaklar:\n\n$badFor",
+                            title: MayanZodiacTranslations.translate(context, 'GÜNÜN GÖLGESİ'),
+                            description: MayanZodiacTranslations.translate(
+                              context, 
+                              "Evrensel dualite gereği Günün Gölgesi, bilincini esir almak isteyen düşük titreşimli ve gölgeli yönündür.\n\nBugün dikkat etmen ve\nsakınman gereken tuzaklar:\n\n\$badFor"
+                            ).replaceAll(r'$badFor', badFor),
                             icon: Icons.nights_stay_rounded,
                             primaryColor: const Color(0xFF90A4AE), // Moonlight Silver (Ayışığı Gümüş)
                             isLight: false,
@@ -1035,7 +1042,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('KADER DÖNGÜSÜ', style: TextStyle(color: _jade, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Text(MayanZodiacTranslations.translate(context, 'KADER DÖNGÜSÜ'), style: const TextStyle(color: _jade, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
             Icon(Icons.insights, color: _jade.withValues(alpha: 0.5), size: 18),
           ],
         ),
@@ -1049,8 +1056,8 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Expanded(
-              child: Text('13 GÜNLÜK TRECENA SEYRİ', style: TextStyle(color: _jade, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.5), overflow: TextOverflow.ellipsis),
+            Expanded(
+              child: Text(MayanZodiacTranslations.translate(context, '13 GÜNLÜK TRECENA SEYRİ'), style: const TextStyle(color: _jade, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.5), overflow: TextOverflow.ellipsis),
             ),
             const SizedBox(width: 8),
             Row(
@@ -1063,7 +1070,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                     color: _jade.withValues(alpha: 0.15), 
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('KAYDIR', style: TextStyle(color: _jade, fontSize: 10, fontWeight: FontWeight.bold)),
+                  child: Text(MayanZodiacTranslations.translate(context, 'KAYDIR'), style: const TextStyle(color: _jade, fontSize: 10, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -1113,6 +1120,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             userIdx: _userIdx,
                             trecenaAlignScores: trecenaPoints,
                             selectedIndex: _selectedTrecenaDay,
+                            isEnglish: Localizations.localeOf(context).languageCode == 'en',
                           ),
                         ),
                       ),
@@ -1131,7 +1139,13 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   Widget _buildTrecenaDayDetail() {
     int dayIndex = _selectedTrecenaDay;
-    String dayTitle = dayIndex == 0 ? "BUGÜN:" : (dayIndex == 1 ? "YARIN:" : "${dayIndex + 1}. GÜN:");
+    String dayTitle = dayIndex == 0 
+        ? MayanZodiacTranslations.translate(context, "BUGÜN:") 
+        : (dayIndex == 1 
+            ? MayanZodiacTranslations.translate(context, "YARIN:") 
+            : (Localizations.localeOf(context).languageCode == 'en' 
+                ? "DAY ${dayIndex + 1}:" 
+                : "${dayIndex + 1}. GÜN:"));
     
     // KİŞİSELLEŞTİRİLMİŞ (PERSONALIZED) HESAPLAMA
     // Artık evrensel değil, kullanıcının o gün ne yaşayacağına dair öngörü veriyoruz.
@@ -1154,11 +1168,17 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       } else {
         vIdx = 0; // Uyanış (Zirve başlangıcı)
       }
-      List<String> titles = ["ZİRVE: $mainTrait UYANIŞI", "ZİRVE: KOZMİK ÇEKİM", "ZİRVE: YARATIM FREKANSI"];
+      List<String> titles = [
+        Localizations.localeOf(context).languageCode == 'en' 
+            ? "PEAK: $mainTrait AWAKENING" 
+            : "ZİRVE: $mainTrait UYANIŞI",
+        MayanZodiacTranslations.translate(context, "ZİRVE: KOZMİK ÇEKİM"),
+        MayanZodiacTranslations.translate(context, "ZİRVE: YARATIM FREKANSI")
+      ];
       List<String> descs = [
-        "Kozmik hizalanman en üst seviyede. $signName ruhunun taşıdığı potansiyeli cesurca sahneye koymak, yeni atılımlar yapmak ve kilitli kapıları kırmak için harika bir gün. Rüzgar tamamen arkanda.",
-        "Rezonans frekansın adeta taşıyor. Evrensel enerjiler o eşsiz $signName doğan ile tam bir ritim yakaladı. Bugün kafana koyduğun her şeyi büyük bir güçle tezahür ettirebilirsin.",
-        "Mutlak zirvedesin! $signName enerjin patlamaya hazır. Parlamak için kendini engelleme; atacağın ufak bir adım bile devasa yankılar uyandıracak büyük bir momentum barındırıyor."
+        MayanZodiacTranslations.translate(context, "Kozmik hizalanman en üst seviyede. \$signName ruhunun taşıdığı potansiyeli cesurca sahneye koymak, yeni atılımlar yapmak ve kilitli kapıları kırmak için harika bir gün. Rüzgar tamamen arkanda.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Rezonans frekansın adeta taşıyor. Evrensel enerjiler o eşsiz \$signName doğan ile tam bir ritim yakaladı. Bugün kafana koyduğun her şeyi büyük bir güçle tezahür ettirebilirsin.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Mutlak zirvedesin! \$signName enerjin patlamaya hazır. Parlamak için kendini engelleme; atacağın ufak bir adım bile devasa yankılar uyandıracak büyük bir momentum barındırıyor.").replaceAll(r'$signName', signName),
       ];
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
@@ -1170,11 +1190,15 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       } else {
         vIdx = 0; // Akış ve Güven (Pozitif başlangıcı)
       }
-      List<String> titles = ["POZİTİF: AKIŞ VE GÜVEN", "POZİTİF: DENGE VE İLERLEME", "POZİTİF: RİTMİK UYUM"];
+      List<String> titles = [
+        MayanZodiacTranslations.translate(context, "POZİTİF: AKIŞ VE GÜVEN"),
+        MayanZodiacTranslations.translate(context, "POZİTİF: DENGE VE İLERLEME"),
+        MayanZodiacTranslations.translate(context, "POZİTİF: RİTMİK UYUM")
+      ];
       List<String> descs = [
-        "Ritim seninle oldukça uyumlu. Çaba harcamadan pürüzsüz ilerleyecek işlerine odaklan. İçindeki $signName sezgilerine güvenerek, dengeni koruyan eylemler ve iletişimler kurabilirsin.",
-        "Tatlı ve destekleyici bir rüzgar esiyor. $signName doğan bu evrensel melodiyle rahatça dans edebilir. Askıda kalan konuları kolayca halledip güvenle yol alabilirsin.",
-        "Kozmik akış bugün çok berrak. Senin o tanıdık $signName enerjinle barışık, işbirlikçi ve taptaze bir frekans hakim. Fırsatları değerlendirmek, uyumlanmak için harika bir gün."
+        MayanZodiacTranslations.translate(context, "Ritim seninle oldukça uyumlu. Çaba harcamadan pürüzsüz ilerleyecek işlerine odaklan. İçindeki \$signName sezgilerine güvenerek, dengeni koruyan eylemler ve iletişimler kurabilirsin.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Tatlı ve destekleyici bir rüzgar esiyor. \$signName doğan bu evrensel melodiyle rahatça dans edebilir. Askıda kalan konuları kolayca halledip güvenle yol alabilirsin.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Kozmik akış bugün çok berrak. Senin o tanıdık \$signName enerjinle barışık, işbirlikçi ve taptaze bir frekans hakim. Fırsatları değerlendirmek, uyumlanmak için harika bir gün.").replaceAll(r'$signName', signName)
       ];
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
@@ -1186,11 +1210,15 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       } else {
         vIdx = 2; // İçsel Toparlanma (Dibe eğilimli Nötr, 2. index)
       }
-      List<String> titles = ["NÖTR: GÖZLEM VE HAZIRLIK", "NÖTR: SABIR VE DEĞERLENDİRME", "NÖTR: İÇSEL TOPARLANMA"];
+      List<String> titles = [
+        MayanZodiacTranslations.translate(context, "NÖTR: GÖZLEM VE HAZIRLIK"),
+        MayanZodiacTranslations.translate(context, "NÖTR: SABIR VE DEĞERLENDİRME"),
+        MayanZodiacTranslations.translate(context, "NÖTR: İÇSEL TOPARLANMA")
+      ];
       List<String> descs = [
-        "Evrensel dalga yavaşlıyor. Büyük veya riskli adımlar atmaktan ziyade, mevcut durumunu koruman, geçmiş projelerini gözden geçirmen ve sabırla beklemen gereken hazırlık aşaması.",
-        "Frekanslar tamamen nötr bölgede seyrediyor. $signName sezgilerini dinlemeye devam et ancak dışarıdaki olayları gereksiz zorlamaktan kaçın. Sadece etrafındaki işaretleri not etme zamanı.",
-        "Ne çok hızlı, ne çok yavaş... Bugün eylemden çok mutlak bir dinleme günüdür. Kendi merkezinde sağlam kal ve $signName bilgeliğiyle doğanın dönüşümlerini izle."
+        MayanZodiacTranslations.translate(context, "Evrensel dalga yavaşlıyor. Büyük veya riskli adımlar atmaktan ziyade, mevcut durumunu koruman, geçmiş projelerini gözden geçirmen ve sabırla beklemen gereken hazırlık aşaması."),
+        MayanZodiacTranslations.translate(context, "Frekanslar tamamen nötr bölgede seyrediyor. \$signName sezgilerini dinlemeye devam et ancak dışarıdaki olayları gereksiz zorlamaktan kaçın. Sadece etrafındaki işaretleri not etme zamanı.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Ne çok hızlı, ne çok yavaş... Bugün eylemden çok mutlak bir dinleme günüdür. Kendi merkezinde sağlam kal ve \$signName bilgeliğiyle doğanın dönüşümlerini izle.").replaceAll(r'$signName', signName)
       ];
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
@@ -1202,11 +1230,15 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
       } else {
         vIdx = 2; // Gölge ve Şifa (En dip, 2. index)
       }
-      List<String> titles = ["DİP: İÇSEL YENİLENME", "DİP: KOZMİK DİNLENME", "DİP: GÖLGE VE ŞİFA"];
+      List<String> titles = [
+        MayanZodiacTranslations.translate(context, "DİP: İÇSEL YENİLENME"),
+        MayanZodiacTranslations.translate(context, "DİP: KOZMİK DİNLENME"),
+        MayanZodiacTranslations.translate(context, "DİP: GÖLGE VE ŞİFA")
+      ];
       List<String> descs = [
-        "Enerjin tamamen içe çekiliyor. Çevrendeki evrensel frekanslar bugün $signName doğanla doğrudan çatışabilir. Olayları zorlayıp akıntıya kürek çekmek yerine, inzivaya çekilip ruhsal olarak şarj ol.",
-        "Üzerinde yoğun ve uyumsuz bir kozmik basınç var. Bugün dış hedeflerden vazgeçip, iç bahçendeki eski travmaları temizlemek ve gölgelerinle yüzleşmek için adeta altın bir fırsat.",
-        "Sürtünme katsayısı oldukça yüksek. $signName ruhunu tamamen koruma altına almalısın; her davete icabet etmeyip, tartışmalardan veya sert başlangıçlardan izole bir sığınak kur."
+        MayanZodiacTranslations.translate(context, "Enerjin tamamen içe çekiliyor. Çevrendeki evrensel frekanslar bugün \$signName doğanla doğrudan çatışabilir. Olayları zorlayıp akıntıya kürek çekmek yerine, inzivaya çekilip ruhsal olarak şarj ol.").replaceAll(r'$signName', signName),
+        MayanZodiacTranslations.translate(context, "Üzerinde yoğun ve uyumsuz bir kozmik basınç var. Bugün dış hedeflerden vazgeçip, iç bahçendeki eski travmaları temizlemek ve gölgelerinle yüzleşmek için adeta altın bir fırsat."),
+        MayanZodiacTranslations.translate(context, "Sürtünme katsayısı oldukça yüksek. \$signName ruhunu tamamen koruma altına almalısın; her davete icabet etmeyip, tartışmalardan veya sert başlangıçlardan izole bir sığınak kur.").replaceAll(r'$signName', signName)
       ];
       actionTitle = titles[vIdx];
       actionDesc = descs[vIdx];
@@ -1289,7 +1321,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                    color: syncScore > 50 ? _goldBright.withValues(alpha: 0.15) : _amber.withValues(alpha: 0.2),
                    borderRadius: BorderRadius.circular(4),
                  ),
-                 child: Text('%$syncScore UYUM', style: TextStyle(color: syncScore > 50 ? _goldBright : _amber, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                 child: Text("${MayanZodiacTranslations.translate(context, '%\$syncScore UYUM').replaceAll(r'$syncScore', syncScore.toString())}", style: TextStyle(color: syncScore > 50 ? _goldBright : _amber, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
               )
             ],
           ),
@@ -1313,33 +1345,34 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     if (keywords.isEmpty) keywords = ['enerji', 'güç', 'bilgelik'];
     while (keywords.length < 3) { keywords.add(keywords.first); }
 
-    String word1 = keywords[0]; // Örn: başlangıç
-    String word2 = keywords[1]; // Örn: gizem
-    String word3 = keywords[2]; // Örn: beslemek
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    String word1 = isEn ? MayanZodiacTranslations.translate(context, keywords[0].toUpperCase()).toLowerCase() : keywords[0];
+    String word2 = isEn ? MayanZodiacTranslations.translate(context, keywords[1].toUpperCase()).toLowerCase() : keywords[1];
+    String word3 = isEn ? MayanZodiacTranslations.translate(context, keywords[2].toUpperCase()).toLowerCase() : keywords[2];
     
-    // Anlam metninin ilk kısmını al
-    String meaning = userNahual['meaning'].toString().toLowerCase().split(',').first; // Örn: "kolektif bilinç"
+    String rawMeaning = userNahual['meaning'].toString().split(',').first.trim();
+    String meaning = isEn ? MayanZodiacTranslations.translate(context, rawMeaning.toUpperCase()).toLowerCase() : rawMeaning.toLowerCase();
 
     List<Map<String, String>> phases = [
       {
-        'age': '0-20', 'short': 'KÖK SALMA', 
-        'full': '${signName.toUpperCase()} UYANIŞI', 
-        'desc': 'İçindeki eşsiz "$word1" potansiyelinin sessizce filizlendiği yıllar. $signName ruhuyla henüz toprağı tanıdığın, köklerini yaşamın derinliklerine korkusuzca salmaya başladığın mucizevi bir başlangıç.'
+        'age': '0-20', 'short': MayanZodiacTranslations.translate(context, 'KÖK SALMA'), 
+        'full': '${signName.toUpperCase()} ${MayanZodiacTranslations.translate(context, 'UYANIŞI')}', 
+        'desc': MayanZodiacTranslations.translate(context, 'İçindeki eşsiz "\$word1" potansiyelinin sessizce filizlendiği yıllar. \$signName ruhuyla henüz toprağı tanıdığın, köklerini yaşamın derinliklerine korkusuzca salmaya başladığın mucizevi bir başlangıç.').replaceAll(r'$word1', word1).replaceAll(r'$signName', signName)
       },
       {
-        'age': '20-35', 'short': 'YÖN BULMA', 
-        'full': '${signName.toUpperCase()} ARAYIŞI', 
-        'desc': 'Hayatın kozmik labirentinde kendi pusulanı yarattığın zamanlar... Artık sadece rüzgarı izlemiyor, "$word2" gücünü kuşanarak kaderin dizginlerini kendi ellerine alıyorsun.'
+        'age': '20-35', 'short': MayanZodiacTranslations.translate(context, 'YÖN BULMA'), 
+        'full': '${signName.toUpperCase()} ${MayanZodiacTranslations.translate(context, 'ARAYIŞI')}', 
+        'desc': MayanZodiacTranslations.translate(context, 'Hayatın kozmik labirentinde kendi pusulanı yarattığın zamanlar... Artık sadece rüzgarı izlemiyor, "\$word2" gücünü kuşanarak kaderin dizginlerini kendi ellerine alıyorsun.').replaceAll(r'$word2', word2)
       },
       {
-        'age': '35-50', 'short': 'HAKİMİYET', 
-        'full': '${signName.toUpperCase()} HAKİMİYETİ', 
-        'desc': 'Tüm deneyimlerin artık sarsılmaz bir kale duvarına dönüşüyor. Bu kadim çağında, $meaning hislerinle adeta kendi tahtına oturuyor ve yaşamın en kudretli, en dengeli halini yaşıyorsun.'
+        'age': '35-50', 'short': MayanZodiacTranslations.translate(context, 'HAKİMİYET'), 
+        'full': '${signName.toUpperCase()} ${MayanZodiacTranslations.translate(context, 'HAKİMİYETİ')}', 
+        'desc': MayanZodiacTranslations.translate(context, 'Tüm deneyimlerin artık sarsılmaz bir kale duvarına dönüşüyor. Bu kadim çağında, \$meaning hislerinle adeta kendi tahtına oturuyor ve yaşamın en kudretli, en dengeli halini yaşıyorsun.').replaceAll(r'$meaning', meaning)
       },
       {
-        'age': '50+', 'short': 'ÜSTATLIK', 
-        'full': '${signName.toUpperCase()} BİLGELİĞİ', 
-        'desc': 'Fırtınalar dindi ve nihai menzil aydınlandı. Bugüne dek taşıdığın $signName asaleti ve "$word3" vizyonun, yuvayı aydınlatan ve ardından gelenlere umut olan ruhani bir fener.'
+        'age': '50+', 'short': MayanZodiacTranslations.translate(context, 'ÜSTATLIK'), 
+        'full': '${signName.toUpperCase()} ${MayanZodiacTranslations.translate(context, 'BİLGELİĞİ')}', 
+        'desc': MayanZodiacTranslations.translate(context, 'Fırtınalar dindi ve nihai menzil aydınlandı. Bugüne dek taşıdığın \$signName asaleti ve "\$word3" vizyonun, yuvayı aydınlatan ve ardından gelenlere umut olan ruhani bir fener.').replaceAll(r'$word3', word3).replaceAll(r'$signName', signName)
       },
     ];
 
@@ -1396,7 +1429,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                         border: Border.all(color: _goldBright.withValues(alpha: 0.3)), 
                         borderRadius: BorderRadius.circular(4)
                       ),
-                      child: const Text('ŞU AN BURADASIN', style: TextStyle(color: _goldBright, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                      child: Text(MayanZodiacTranslations.translate(context, 'ŞU AN BURADASIN'), style: const TextStyle(color: _goldBright, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -1586,20 +1619,29 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     lIdx = lIdx < 0 ? lIdx + 20 : lIdx;
     bIdx = bIdx < 0 ? bIdx + 20 : bIdx;
 
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
     String cName = MayanZodiacData.nahuales[cIdx]['name'].toString().split(' ').first;
-    String gKeyword = MayanZodiacData.nahuales[tIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
-    String lKeyword = MayanZodiacData.nahuales[lIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
-    String rPower = MayanZodiacData.nahuales[rIdx]['power'].toString().toLowerCase();
-    String bKeyword = MayanZodiacData.nahuales[bIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
+    String gKeyword = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[tIdx]['words'].toString().split(',').first.split('&').first.trim().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[tIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
+    String lKeyword = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[lIdx]['words'].toString().split(',').first.split('&').first.trim().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[lIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
+    String rPower = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[rIdx]['power'].toString().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[rIdx]['power'].toString().toLowerCase();
+    String bKeyword = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[bIdx]['words'].toString().split(',').first.split('&').first.trim().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[bIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
     
-    String interpretation = "Ruhunun temelinde büyük bir $cName potansiyeli yatar. Geçmişten getirdiğin $bKeyword doğası seni daima ayakta tutarken, yolunu bulman gerektiğinde $gKeyword frekansı sana bir pusula gibi yön gösterir. Hayattaki asıl mücadelen içsel $lKeyword engellerini aşmaktır. Bu yolda sana bahşedilmiş en büyük doğal yeteneğin ise doğuştan gelen $rPower kudretindir. Bu eşsiz 5 yönlü denge, senin gerçek kozmik haritandır.";
+    String interpretation = MayanZodiacTranslations.translate(
+      context, 
+      "Ruhunun temelinde büyük bir \$cName potansiyeli yatar. Geçmişten getirdiğin \$bKeyword doğası seni daima ayakta tutarken, yolunu bulman gerektiğinde \$gKeyword frekansı sana bir pusula gibi yön gösterir. Hayattaki asıl mücadelen içsel \$lKeyword engellerini aşmaktır. Bu yolda sana bahşedilmiş en büyük doğal yeteneğin ise doğuştan gelen \$rPower kudretindir. Bu eşsiz 5 yönlü denge, senin gerçek kozmik haritandır."
+    )
+    .replaceAll(r'$cName', cName)
+    .replaceAll(r'$bKeyword', bKeyword)
+    .replaceAll(r'$gKeyword', gKeyword)
+    .replaceAll(r'$lKeyword', lKeyword)
+    .replaceAll(r'$rPower', rPower);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('KOZMİK YAŞAM AĞACI', style: TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        Text(MayanZodiacTranslations.translate(context, 'KOZMİK YAŞAM AĞACI'), style: const TextStyle(color: _goldBright, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 2)),
         const SizedBox(height: 2),
-        Text('Ruhunu şekillendiren 5 kadim yön.', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10, fontStyle: FontStyle.italic)),
+        Text(MayanZodiacTranslations.translate(context, 'Ruhunu şekillendiren 5 kadim yön.'), style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10, fontStyle: FontStyle.italic)),
         const SizedBox(height: 8),
         
         _buildAncientCard(
@@ -1629,7 +1671,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Üst Düğüm (Rehber) - Öncü, duru ve aydınlık bir gümüş/beyaz
-                      _buildDnaNode(tIdx, "REHBER", Colors.white.withValues(alpha: 0.9), 40),
+                      _buildDnaNode(tIdx, MayanZodiacTranslations.translate(context, "REHBER"), Colors.white.withValues(alpha: 0.9), 40),
                       const SizedBox(height: 24),
                       
                       // Orta Satır (Gölge - Merkez - Destek)
@@ -1638,20 +1680,20 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                          crossAxisAlignment: CrossAxisAlignment.end,
                          children: [
                             // Gölge - Derin, karanlık ve puslu bir kül grisi
-                            _buildDnaNode(lIdx, "GÖLGE", const Color(0xFF9E9E9E), 40),
+                            _buildDnaNode(lIdx, MayanZodiacTranslations.translate(context, "GÖLGE"), const Color(0xFF9E9E9E), 40),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               // Merkez - Kusursuz parlayan Antik Altın
-                              child: _buildDnaNode(cIdx, "MERKEZ", _goldBright, 52, isCenter: true),
+                              child: _buildDnaNode(cIdx, MayanZodiacTranslations.translate(context, "MERKEZ"), _goldBright, 52, isCenter: true),
                             ),
                             // Destek - Çok yumuşak, soluk bir mat bronz/fildişi rengi
-                            _buildDnaNode(rIdx, "DESTEK", const Color(0xFFD4C4A8), 40),
+                            _buildDnaNode(rIdx, MayanZodiacTranslations.translate(context, "DESTEK"), const Color(0xFFD4C4A8), 40),
                          ]
                       ),
                       
                       const SizedBox(height: 24),
                       // Alt Düğüm (Geçmiş / Kök) - Kökleri ve toprağı hissettiren derin, kadim bir toprak tonu (Warm Taupe)
-                      _buildDnaNode(bIdx, "KÖKLER", const Color(0xFFA1887F), 40),
+                      _buildDnaNode(bIdx, MayanZodiacTranslations.translate(context, "KÖKLER"), const Color(0xFFA1887F), 40),
                     ]
                   )
                 ],
@@ -1690,7 +1732,9 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   Widget _buildDnaNode(int nIdx, String role, Color color, double size, {bool isCenter = false}) {
      var nahual = MayanZodiacData.nahuales[nIdx];
-     String keyword = nahual['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
+     final isEn = Localizations.localeOf(context).languageCode == 'en';
+     String keywordRaw = nahual['words'].toString().split(',').first.split('&').first.trim();
+     String keyword = isEn ? MayanZodiacTranslations.translate(context, keywordRaw.toUpperCase()).toLowerCase() : keywordRaw.toLowerCase();
      return SizedBox(
        width: 80,
        child: Column(
@@ -1739,16 +1783,16 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                     children: [
                       _buildNahualIcon(MayanZodiacData.nahuales.indexOf(n), 80, _jade),
                       const SizedBox(height: 16),
-                      Text(n['name'].toUpperCase(), style: GoogleFonts.cinzel(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w600, letterSpacing: 4)),
-                      Text(n['meaning'].toUpperCase(), style: TextStyle(color: _jade, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 3)),
+                      Text(MayanZodiacTranslations.translate(context, n['name'] as String).toUpperCase(), style: GoogleFonts.cinzel(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w600, letterSpacing: 4)),
+                      Text(MayanZodiacTranslations.translate(context, n['meaning'] as String).toUpperCase(), style: TextStyle(color: _jade, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 3)),
                       const SizedBox(height: 32),
-                      _buildStoneLabel('ANA TEMA', n['words'], Icons.auto_awesome),
+                      _buildStoneLabel(MayanZodiacTranslations.translate(context, 'ANA TEMA'), MayanZodiacTranslations.translate(context, n['words'] as String), Icons.auto_awesome),
                       const SizedBox(height: 16),
-                      _buildStoneLabel('HAYATTAKİ ROL', n['role'], Icons.star_rounded, borderColor: _goldBright.withValues(alpha: 0.3)),
+                      _buildStoneLabel(MayanZodiacTranslations.translate(context, 'HAYATTAKİ ROL'), MayanZodiacTranslations.translate(context, n['role'] as String), Icons.star_rounded, borderColor: _goldBright.withValues(alpha: 0.3)),
                       const SizedBox(height: 16),
-                      _buildStoneLabel('GÜÇLÜ YÖN', n['strength'], Icons.arrow_upward_rounded, baseColor: _jade),
+                      _buildStoneLabel(MayanZodiacTranslations.translate(context, 'GÜÇLÜ YÖN'), MayanZodiacTranslations.translate(context, n['strength'] as String), Icons.arrow_upward_rounded, baseColor: _jade),
                       const SizedBox(height: 16),
-                      _buildStoneLabel('ZAYIF YÖN', n['weakness'], Icons.arrow_downward_rounded, baseColor: _amber),
+                      _buildStoneLabel(MayanZodiacTranslations.translate(context, 'ZAYIF YÖN'), MayanZodiacTranslations.translate(context, n['weakness'] as String), Icons.arrow_downward_rounded, baseColor: _amber),
                       const SizedBox(height: 60),
                     ],
                   ),
@@ -1785,7 +1829,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('DOĞUM TARİHİ', style: TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                  Text(MayanZodiacTranslations.translate(context, 'DOĞUM TARİHİ'), style: const TextStyle(color: _jade, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1)),
                   GestureDetector(
                     onTap: () async {
                       Navigator.of(sheetContext).pop();
@@ -1796,7 +1840,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(color: _jade.withValues(alpha: 0.2), border: Border.all(color: _jade)),
-                      child: const Text('TAMAM', style: TextStyle(color: _jade, fontWeight: FontWeight.w900)),
+                      child: Text(MayanZodiacTranslations.translate(context, 'TAMAM'), style: const TextStyle(color: _jade, fontWeight: FontWeight.w900)),
                     ),
                   ),
                 ],
@@ -1828,43 +1872,47 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
   // DİNAMİK YORUM ÜRETİCİLERİ
   // ══════════════════════════════════════════
   
-  String _generateShortCompatibility(Map<String, dynamic> userNahual, Map<String, dynamic> todayNahual, int alignScore, int genEnergy) {
+  String _generateShortCompatibility(Map<String, dynamic> userNahual, Map<String, dynamic> todayNahual, int alignScore, int genEnergy, BuildContext context) {
     // Rastgeleliği gün ve burç ismine bağlayarak kararlı ama her güne/burca özgü farklılık yaratıyoruz.
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + userNahual['name'].hashCode);
     
-    final tTheme = todayNahual['words'].toString().split('&').first.trim().toLowerCase();
-    final uTrait = (userNahual['traits'] as List).first.toString().toLowerCase();
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final tThemeRaw = todayNahual['words'].toString().split('&').first.trim();
+    final tTheme = isEn ? MayanZodiacTranslations.translate(context, tThemeRaw.toUpperCase()).toLowerCase() : tThemeRaw.toLowerCase();
+    
+    final uTraitRaw = (userNahual['traits'] as List).first.toString();
+    final uTrait = isEn ? MayanZodiacTranslations.translate(context, uTraitRaw.toUpperCase()).toLowerCase() : uTraitRaw.toLowerCase();
 
     List<String> relationships = [
-      "Senin o $uTrait doğan, günün $tTheme enerjisiyle doğrudan temasa geçiyor.",
-      "Bugün evrenin $tTheme akışı, senin içindeki o eşsiz $uTrait potansiyeli aniden tetikliyor.",
-      "Günün $tTheme teması, ruhundaki o çok tanıdık $uTrait enerjin ile derin bir diyalog kuruyor."
+      MayanZodiacTranslations.translate(context, "Senin o \$uTrait doğan, günün \$tTheme enerjisiyle doğrudan temasa geçiyor.").replaceAll(r'$uTrait', uTrait).replaceAll(r'$tTheme', tTheme),
+      MayanZodiacTranslations.translate(context, "Bugün evrenin \$tTheme akışı, senin içindeki o eşsiz \$uTrait potansiyeli aniden tetikliyor.").replaceAll(r'$uTrait', uTrait).replaceAll(r'$tTheme', tTheme),
+      MayanZodiacTranslations.translate(context, "Günün \$tTheme teması, ruhundaki o çok tanıdık \$uTrait enerjin ile derin bir diyalog kuruyor.").replaceAll(r'$uTrait', uTrait).replaceAll(r'$tTheme', tTheme)
     ];
     String relation = relationships[rnd.nextInt(relationships.length)];
     
     // Güç ve Uyum Mantığını Harmanlayarak Kullanıcıya Alt Metinden Öğretme
     List<String> highPowerHighSync = [
-      "Bugün evrensel dalga boyu çok yüksek (%$genEnergy GÜÇ) ve sen bu dev dalgayla tam aynı yönde sörf yapıyorsun! Açılan kapılardan korkusuzca geç.",
-      "Kozmik ivme bugün adeta zirvede (%$genEnergy GÜÇ) ve tamamen senin arkandan itiyor. Hızlanmak ve risk almak için harika bir fırsat.",
-      "Bu güçlü rüzgar (%$genEnergy GÜÇ) senin yelkenlerini tam doğru açıdan dolduruyor. Atılım yapmak için tereddüt etme."
+      MayanZodiacTranslations.translate(context, "Bugün evrensel dalga boyu çok yüksek (%\$genEnergy GÜÇ) ve sen bu dev dalgayla tam aynı yönde sörf yapıyorsun! Açılan kapılardan korkusuzca geç.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Kozmik ivme bugün adeta zirvede (%\$genEnergy GÜÇ) ve tamamen senin arkandan itiyor. Hızlanmak ve risk almak için harika bir fırsat.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Bu güçlü rüzgar (%\$genEnergy GÜÇ) senin yelkenlerini tam doğru açıdan dolduruyor. Atılım yapmak için tereddüt etme.").replaceAll(r'$genEnergy', genEnergy.toString())
     ];
 
     List<String> highPowerLowSync = [
-      "Evrensel akım bugün oldukça şiddetli (%$genEnergy GÜÇ) ama ne yazık ki sana ters esiyor. İnatlaşıp akıntıya kürek çekersen sadece yorulursun, izlemede kal.",
-      "Çevrende çok yoğun ve kırılgan bir enerji dalgası var (%$genEnergy GÜÇ). Bu fırtına sana uymuyor, geri çekilip kendi iç enerjini koru.",
-      "Yüksek ve kaotik bir basınç altındayız (%$genEnergy GÜÇ). Ancak bu akış seninle rezonansta değil, olayları zorlamak yerine akışa teslim ol."
+      MayanZodiacTranslations.translate(context, "Evrensel akım bugün oldukça şiddetli (%\$genEnergy GÜÇ) ama ne yazık ki sana ters esiyor. İnatlaşıp akıntıya kürek çekersen sadece yorulursun, izlemede kal.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Çevrende çok yoğun ve kırılgan bir enerji dalgası var (%\$genEnergy GÜÇ). Bu fırtına sana uymuyor, geri çekilip kendi iç enerjini koru.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Yüksek ve kaotik bir basınç altındayız (%\$genEnergy GÜÇ). Ancak bu akış seninle rezonansta değil, olayları zorlamak yerine akışa teslim ol.").replaceAll(r'$genEnergy', genEnergy.toString())
     ];
 
     List<String> lowPowerHighSync = [
-      "Kozmik rüzgarlar oldukça sakin (%$genEnergy GÜÇ) ama yelkenlerini tam arkadan dolduruyor. Acele etmeden, huzurun ve eşzamanlılığın tadını çıkar.",
-      "Bugün doğada demlenmiş, yumuşak bir ritim var (%$genEnergy GÜÇ) ve sen bu ritimle tam bir dans içindesin. Küçük sürprizleri kucakla.",
-      "Sakin ama çok derin bir akıştayız (%$genEnergy GÜÇ). Evrenin sana fısıldadığı sinyalleri yakalamak için zihnini boşalt."
+      MayanZodiacTranslations.translate(context, "Kozmik rüzgarlar oldukça sakin (%\$genEnergy GÜÇ) ama yelkenlerini tam arkadan dolduruyor. Acele etmeden, huzurun ve eşzamanlılığın tadını çıkar.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Bugün doğada demlenmiş, yumuşak bir ritim var (%\$genEnergy GÜÇ) ve sen bu ritimle tam bir dans içindesin. Küçük sürprizleri kucakla.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Sakin ama çok derin bir akıştayız (%\$genEnergy GÜÇ). Evrenin sana fısıldadığı sinyalleri yakalamak için zihnini boşalt.").replaceAll(r'$genEnergy', genEnergy.toString())
     ];
 
     List<String> lowPowerLowSync = [
-      "Durgun ancak senin doğanla sürtüşmeyi seven, ufak dirençli bir gündeyiz (%$genEnergy GÜÇ). Dış olayları zorlamak yerine, iç dünyana yönelme zamanı.",
-      "Kozmik enerji zayıf mırıldanıyor (%$genEnergy GÜÇ) ve üstelik farklı bir dilde. Adım atmaktansa, olanı biteni gözlemleyip eski kararlarını gözden geçir.",
-      "Pasif bir enerjinin içindeyiz (%$genEnergy GÜÇ) fakat yine de frekanslar uyuşmuyor. Yavaşla ve yeni bir projeye hiç kalkışmadan dinlen."
+      MayanZodiacTranslations.translate(context, "Durgun ancak senin doğanla sürtüşmeyi seven, ufak dirençli bir gündeyiz (%\$genEnergy GÜÇ). Dış olayları zorlamak yerine, iç dünyana yönelme zamanı.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Kozmik enerji zayıf mırıldanıyor (%\$genEnergy GÜÇ) ve üstelik farklı bir dilde. Adım atmaktansa, olanı biteni gözlemleyip eski kararlarını gözden geçir.").replaceAll(r'$genEnergy', genEnergy.toString()),
+      MayanZodiacTranslations.translate(context, "Pasif bir enerjinin içindeyiz (%\$genEnergy GÜÇ) fakat yine de frekanslar uyuşmuyor. Yavaşla ve yeni bir projeye hiç kalkışmadan dinlen.").replaceAll(r'$genEnergy', genEnergy.toString())
     ];
 
     String mechanic = "";
@@ -1876,41 +1924,46 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     return "$relation $mechanic";
   }
 
-  String _generateGoodFor(Map<String, dynamic> todayNahual, int alignScore) {
+  String _generateGoodFor(Map<String, dynamic> todayNahual, int alignScore, BuildContext context) {
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode);
-    final words = todayNahual['words'].toString().toLowerCase().split(' & ');
-    final w1 = words.first.trim();
-    final w2 = words.length > 1 ? words.last.trim() : words.first.trim();
+    final words = todayNahual['words'].toString().split(' & ');
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final w1Raw = words.first.trim();
+    final w1 = isEn ? MayanZodiacTranslations.translate(context, w1Raw.toUpperCase()).toLowerCase() : w1Raw.toLowerCase();
+    final w2Raw = words.length > 1 ? words.last.trim() : words.first.trim();
+    final w2 = isEn ? MayanZodiacTranslations.translate(context, w2Raw.toUpperCase()).toLowerCase() : w2Raw.toLowerCase();
     
     List<String> highGood = [
-      "${w1.isNotEmpty ? w1[0].toUpperCase() + w1.substring(1) : ''} niyetlerini somut bir şekilde eyleme dökmek, yaratım projelerini uçurmak",
-      "Tüm odağını $w1 alanına kaydırmak, gizli potansiyelini korkusuzca zirveye çıkarmak",
-      "Derinlerdeki $w1 arzularını beslemek ve yeni açılan yollara kucak açmak"
+      MayanZodiacTranslations.translate(context, "\$word1 niyetlerini somut bir şekilde eyleme dökmek, yaratım projelerini uçurmak").replaceAll(r'$word1', w1.isNotEmpty ? w1[0].toUpperCase() + w1.substring(1) : ''),
+      MayanZodiacTranslations.translate(context, "Tüm odağını \$word1 alanına kaydırmak, gizli potansiyelini korkusuzca zirveye çıkarmak").replaceAll(r'$word1', w1),
+      MayanZodiacTranslations.translate(context, "Derinlerdeki \$word1 arzularını beslemek ve yeni açılan yollara kucak açmak").replaceAll(r'$word1', w1)
     ];
     
     List<String> lowGood = [
-      "İç dünyanda $w2 arayışına sessizce girmek, pasif kalarak oluşan desenleri izlemek",
-      "Eski yüklerden arınıp tamamen $w2 alanına yönelerek şifa depolamak",
-      "Zihni yavaşlatıp $w2 konularında demlenmek ve spiritüel bir dinlenme yaşamak"
+      MayanZodiacTranslations.translate(context, "İç dünyanda \$word2 arayışına sessizce girmek, pasif kalarak oluşan desenleri izlemek").replaceAll(r'$word2', w2),
+      MayanZodiacTranslations.translate(context, "Eski yüklerden arınıp tamamen \$word2 alanına yönelerek şifa depolamak").replaceAll(r'$word2', w2),
+      MayanZodiacTranslations.translate(context, "Zihni yavaşlatıp \$word2 konularında demlenmek ve spiritüel bir dinlenme yaşamak").replaceAll(r'$word2', w2)
     ];
     
     return alignScore >= 60 ? highGood[rnd.nextInt(highGood.length)] : lowGood[rnd.nextInt(lowGood.length)];
   }
 
-  String _generateBadFor(Map<String, dynamic> todayNahual, int alignScore) {
+  String _generateBadFor(Map<String, dynamic> todayNahual, int alignScore, BuildContext context) {
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode + 1);
-    final w1 = todayNahual['words'].toString().toLowerCase().split(' & ').first.trim();
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final w1Raw = todayNahual['words'].toString().split(' & ').first.trim();
+    final w1 = isEn ? MayanZodiacTranslations.translate(context, w1Raw.toUpperCase()).toLowerCase() : w1Raw.toLowerCase();
     
     List<String> highBad = [
-      "Yok yere şüpheye düşüp $w1 fırsatlarını kaçırmak veya eski travmalara tutunmak",
-      "Eylemsiz kalmaya direnmek ve oluşan o devasa $w1 ivmesini tembellikle harcamak",
-      "Sabit fikirlilik yüzünden önüne serilen $w1 akışını tamamen bloke etmek"
+      MayanZodiacTranslations.translate(context, "Yok yere şüpheye düşüp \$word1 fırsatlarını kaçırmak veya eski travmalara tutunmak").replaceAll(r'$word1', w1),
+      MayanZodiacTranslations.translate(context, "Eylemsiz kalmaya direnmek ve oluşan o devasa \$word1 ivmesini tembellikle harcamak").replaceAll(r'$word1', w1),
+      MayanZodiacTranslations.translate(context, "Sabit fikirlilik yüzünden önüne serilen \$word1 akışını tamamen bloke etmek").replaceAll(r'$word1', w1)
     ];
     
     List<String> lowBad = [
-      "Hiç hazır olmadığın projelere gereksiz yere atılmak, şartları çok zorlamak",
-      "Dürtüsel adımlar atıp mantıksız risklere girmek ve yalan $w1 illüzyonlarına inanmak",
-      "Akıntıya karşı inatla kürek çekmek ve evrenin 'artık yavaşla' uyarısına isyan etmek"
+      MayanZodiacTranslations.translate(context, "Hiç hazır olmadığın projelere gereksiz yere atılmak, şartları çok zorlamak"),
+      MayanZodiacTranslations.translate(context, "Dürtüsel adımlar atıp mantıksız risklere girmek ve yalan \$word1 illüzyonlarına inanmak").replaceAll(r'$word1', w1),
+      MayanZodiacTranslations.translate(context, "Akıntıya karşı inatla kürek çekmek ve evrenin 'artık yavaşla' uyarısına isyan etmek")
     ];
     
     return alignScore >= 60 ? highBad[rnd.nextInt(highBad.length)] : lowBad[rnd.nextInt(lowBad.length)];
@@ -1926,6 +1979,7 @@ class _WaveGraphPainter extends CustomPainter {
   final int userIdx;
   final List<int> trecenaAlignScores;
   final int selectedIndex;
+  final bool isEnglish;
   
   _WaveGraphPainter({
     required this.color, 
@@ -1933,6 +1987,7 @@ class _WaveGraphPainter extends CustomPainter {
     required this.userIdx, 
     required this.trecenaAlignScores,
     required this.selectedIndex,
+    required this.isEnglish,
   });
 
   @override
@@ -2042,8 +2097,8 @@ class _WaveGraphPainter extends CustomPainter {
 
     // Y ekseni etiketleri
     if (points.isNotEmpty) {
-      _drawLabelRight(canvas, w, h * 0.15, "MAKS", color.withValues(alpha: 0.7));
-      _drawLabelRight(canvas, w, h * 0.85, "MİN", color.withValues(alpha: 0.7));
+      _drawLabelRight(canvas, w, h * 0.15, isEnglish ? "MAX" : "MAKS", color.withValues(alpha: 0.7));
+      _drawLabelRight(canvas, w, h * 0.85, isEnglish ? "MIN" : "MİN", color.withValues(alpha: 0.7));
     }
     
     // Grafik üstündeki statik gün noktalarını belirginleştir ki "kaydırılabilir" hissi yaratsın
@@ -2069,8 +2124,11 @@ class _WaveGraphPainter extends CustomPainter {
       // Puan Doğrudan Diziden Geliyor! (Matematiksel Uyuşmazlığı Bitirdik)
       int score = trecenaAlignScores[selectedIndex];
       
-      String label = selectedIndex == 0 ? "BUGÜN" : "${selectedIndex + 1}. GÜN";
-      _drawPoint(canvas, p, "$label\n%$score UYUM", color, w);
+      String label = selectedIndex == 0 
+          ? (isEnglish ? "TODAY" : "BUGÜN") 
+          : (isEnglish ? "DAY ${selectedIndex + 1}" : "${selectedIndex + 1}. GÜN");
+      String uyumLabel = isEnglish ? "HARMONY" : "UYUM";
+      _drawPoint(canvas, p, "$label\n%$score $uyumLabel", color, w);
     }
   }
 
@@ -2591,7 +2649,7 @@ class _InteractiveDualEnergyButton extends StatelessWidget {
                         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                         color: Colors.white.withValues(alpha: 0.05),
                       ),
-                      child: const Text('KAPAT', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      child: Text(MayanZodiacTranslations.translate(context, 'KAPAT'), style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                     ),
                   ),
                 ],
