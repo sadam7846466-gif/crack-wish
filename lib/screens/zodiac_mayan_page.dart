@@ -1577,7 +1577,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                      children: [
                        Icon(Icons.check_circle_rounded, color: _jade.withValues(alpha: 0.6), size: 10),
                        const SizedBox(width: 4),
-                       Text('TAMAMLANDI', style: TextStyle(color: _jade.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                       Text(MayanZodiacTranslations.translate(context, 'TAMAMLANDI'), style: TextStyle(color: _jade.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
                      ],
                    ),
                  ),
@@ -1592,7 +1592,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                      children: [
                        Icon(Icons.check_circle_rounded, color: _jade.withValues(alpha: 0.6), size: 10),
                        const SizedBox(width: 4),
-                       Text('TAMAMLANDI', style: TextStyle(color: _jade.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                       Text(MayanZodiacTranslations.translate(context, 'TAMAMLANDI'), style: TextStyle(color: _jade.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
                      ],
                    ),
                  ),

@@ -568,6 +568,7 @@
   },
   "coffeeDiscoverFate": "Kaderini Keşfet",
   "coffeeNextStep": "Sonraki Adım",
+  "coffeeCapture": "Bu Açıyı Çek",
   "coffeeValidationError": "İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.",
   "coffeeCosmicMismatch": "Kozmik Uyumsuzluk",
   "coffeeCosmicCheck": "KOZMİK BAĞ KONTROLÜ",
@@ -1105,6 +1106,17 @@
   "zodiacMeasureHarmony": "KOZMİK UYUMUNU ÖLÇ",
   "zodiacDiscoverEnergy": "Yıldızların rehberliğinde ikili enerjini keşfet",
   "zodiacChooseFriend": "ARKADAŞ SEÇ",
+  "zodiacChooseFriendSubtitle": "Kozmik enerjilerinizi karşılaştırmak için bir dost seç",
+  "zodiacDiscoverYourself": "Kendini Keşfet",
+  "zodiacCharacteristicAnalysis": "KARAKTERİSTİK ANALİZ",
+  "zodiacAbilityMap": "{name} burcunun yetenek haritası",
+  "@zodiacAbilityMap": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "zodiacPros": "Avantajlar",
   "zodiacCons": "Zorluklar",
   "zodiacAdvice": "Tavsiye",
@@ -1216,5 +1228,23 @@
         "type": "String"
       }
     }
-  }
+  },
+  "zodiacGreeting": "Merhaba {name},",
+  "@zodiacGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacCosmicTraveler": "Kozmik Yolcu,",
+  "zodiacBirthDate": "DOĞUM TARİHİ",
+  "zodiacStarsKnowYou": "Yıldızların seni tanısın",
+  "zodiacConfirm": "ONAYLA",
+  "zodiacDiscoverYourselfBtn": "KENDİNİ KEŞFET",
+  "zodiacEliteRequiredDesc": "Arkadaşlarınla derin astrolojik uyumunu ve viral dinamiklerini keşfetmek için Elite abonesi olmalısın.",
+  "zodiacEliteDiscoverBtn": "Elite Ayrıcalıklarını Keşfet",
+  "zodiacHubWestern": "BATI ASTROLOJİSİ",
+  "zodiacHubAsian": "ASYA ASTROLOJİSİ",
+  "zodiacHubMayan": "MAYA ASTROLOJİSİ"
 }

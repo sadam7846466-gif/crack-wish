@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import '../theme/app_theme.dart';
 import '../widgets/bottom_nav.dart';
-import '../services/supabase_owl_service.dart';
 import '../services/push_notification_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/cosmic_reward_dialog.dart';
@@ -16,7 +17,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'coffee_reading_page.dart';
-import 'coffee_page.dart';
 import 'dream_page.dart';
 import '../services/app_navigator.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
@@ -166,14 +166,20 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
                   File? plate;
 
                   if (imagePaths != null && imagePaths.length == 4) {
-                    final f0 = File(imagePaths[0]);
-                    final f1 = File(imagePaths[1]);
-                    final f2 = File(imagePaths[2]);
-                    final f3 = File(imagePaths[3]);
-                    inside = f0.existsSync() ? f0 : null;
-                    left = f1.existsSync() ? f1 : null;
-                    right = f2.existsSync() ? f2 : null;
-                    plate = f3.existsSync() ? f3 : null;
+                    final appDir = await getApplicationDocumentsDirectory();
+                    final coffeeDirPath = '${appDir.path}/coffee_photos';
+
+                    File? resolveFile(String filePath) {
+                      if (filePath.isEmpty) return null;
+                      final filename = p.basename(filePath);
+                      final resolvedFile = File('$coffeeDirPath/$filename');
+                      return resolvedFile.existsSync() ? resolvedFile : null;
+                    }
+
+                    inside = resolveFile(imagePaths[0]);
+                    left = resolveFile(imagePaths[1]);
+                    right = resolveFile(imagePaths[2]);
+                    plate = resolveFile(imagePaths[3]);
                   }
                   
                   if (!mounted) return;

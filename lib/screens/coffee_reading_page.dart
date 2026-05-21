@@ -181,6 +181,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
 
   /// Gerçek Supabase Edge Function çağrısı (2 aşamalı)
   Future<void> _callCoffeeApi() async {
+    final lang = Localizations.localeOf(context).languageCode == 'tr' ? 'tr' : 'en';
     // ÖNEMLİ: Eğer sayfa arka plana atılırsa (dispose olursa) widget'a erişim hata fırlatır!
     // Bu yüzden arka planda kullanılacak tüm widget referanslarını yerel değişkene alıyoruz.
     final backgroundCallback = widget.onBackgroundResult;
@@ -231,7 +232,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       try {
         final insertResponse = await supabase.from('coffee_readings').insert({
           'user_id': user?.id,
-          'locale': 'tr',
+          'locale': lang,
           'status': 'pending'
         }).select('id').maybeSingle();
         recordId = insertResponse?['id'];
@@ -268,7 +269,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         body: {
           'mode': 'interpret', 
           'images': images, 
-          'locale': 'tr', 
+          'locale': lang, 
           'userId': user?.id,
           'record_id': recordId,
           'gender': gender ?? '',
@@ -1271,6 +1272,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         Icon(icon, color: const Color(0xFFD4A373), size: 18),
         const SizedBox(width: 8),
         Flexible(
+          flex: 5,
           child: Text(
             title,
             style: GoogleFonts.outfit(

@@ -460,89 +460,89 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
       frontAsset: 'assets/images/tarot/tarot/King_of_Swords.webp',
     ),
     // ============================================================
-    // MINOR ARCANA — PENTACLES (Sikkeler) — 14 kart (id: 64–77)
+    // MINOR ARCANA — PENTACLES (Tılsımler) — 14 kart (id: 64–77)
     // ============================================================
     TarotCardDef(
       id: 64,
-      nameTr: 'Sikkelerin Ası',
+      nameTr: 'Tılsımlerin Ası',
       nameEn: 'Ace of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Ace_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 65,
-      nameTr: 'Sikkelerin İkisi',
+      nameTr: 'Tılsımlerin İkisi',
       nameEn: 'Two of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Two_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 66,
-      nameTr: 'Sikkelerin Üçü',
+      nameTr: 'Tılsımlerin Üçü',
       nameEn: 'Three of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Three_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 67,
-      nameTr: 'Sikkelerin Dördü',
+      nameTr: 'Tılsımlerin Dördü',
       nameEn: 'Four of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Four_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 68,
-      nameTr: 'Sikkelerin Beşi',
+      nameTr: 'Tılsımlerin Beşi',
       nameEn: 'Five of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Five_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 69,
-      nameTr: 'Sikkelerin Altısı',
+      nameTr: 'Tılsımlerin Altısı',
       nameEn: 'Six of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Six_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 70,
-      nameTr: 'Sikkelerin Yedisi',
+      nameTr: 'Tılsımlerin Yedisi',
       nameEn: 'Seven of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Seven_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 71,
-      nameTr: 'Sikkelerin Sekizi',
+      nameTr: 'Tılsımlerin Sekizi',
       nameEn: 'Eight of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Eight_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 72,
-      nameTr: 'Sikkelerin Dokuzu',
+      nameTr: 'Tılsımlerin Dokuzu',
       nameEn: 'Nine of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Nine_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 73,
-      nameTr: 'Sikkelerin Onu',
+      nameTr: 'Tılsımlerin Onu',
       nameEn: 'Ten of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Ten_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 74,
-      nameTr: 'Sikkelerin Uşağı',
+      nameTr: 'Tılsımlerin Uşağı',
       nameEn: 'Page of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Page_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 75,
-      nameTr: 'Sikkelerin Şövalyesi',
+      nameTr: 'Tılsımlerin Şövalyesi',
       nameEn: 'Knight of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Knight_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 76,
-      nameTr: 'Sikkelerin Kraliçesi',
+      nameTr: 'Tılsımlerin Kraliçesi',
       nameEn: 'Queen of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/Queen_of_Pentacles.webp',
     ),
     TarotCardDef(
       id: 77,
-      nameTr: 'Sikkelerin Kralı',
+      nameTr: 'Tılsımlerin Kralı',
       nameEn: 'King of Pentacles',
       frontAsset: 'assets/images/tarot/tarot/King_of_Pentacles.webp',
     ),
@@ -2199,7 +2199,6 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.08),
               borderRadius: const BorderRadius.vertical(
@@ -2207,7 +2206,14 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
               ),
               border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
             ),
-            child: Column(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 20,
+                bottom: 20 + MediaQuery.of(context).padding.bottom,
+              ),
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2300,8 +2306,9 @@ class _TarotPageState extends State<TarotPage> with TickerProviderStateMixin {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _harmonyColorChip(String label, Color color) {
     return Row(

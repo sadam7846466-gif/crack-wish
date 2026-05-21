@@ -3759,34 +3759,35 @@ class _BentoHeroCard extends StatelessWidget {
                                             final allAssets =
                                                 getAllCardAssets();
 
+                                            final _isTr = Localizations.localeOf(context).languageCode == 'tr';
                                             String rank;
                                             Color rankColor;
                                             if (count == 0) {
-                                              rank = "Keşfedilmemiş";
+                                              rank = _isTr ? "Keşfedilmemiş" : "Undiscovered";
                                               rankColor = Colors.white
                                                   .withOpacity(0.3);
                                             } else if (count < 10) {
-                                              rank = "Çırak";
+                                              rank = _isTr ? "Çırak" : "Apprentice";
                                               rankColor = const Color(
                                                 0xFF94A3B8,
                                               );
                                             } else if (count < 25) {
-                                              rank = "Gezgin";
+                                              rank = _isTr ? "Gezgin" : "Traveler";
                                               rankColor = const Color(
                                                 0xFF38BDF8,
                                               );
                                             } else if (count < 45) {
-                                              rank = "Kaşif";
+                                              rank = _isTr ? "Kaşif" : "Explorer";
                                               rankColor = const Color(
                                                 0xFFA78BFA,
                                               );
                                             } else if (count < 65) {
-                                              rank = "Bilge";
+                                              rank = _isTr ? "Bilge" : "Sage";
                                               rankColor = const Color(
                                                 0xFFC084FC,
                                               );
                                             } else if (count < 78) {
-                                              rank = "Usta";
+                                              rank = _isTr ? "Usta" : "Master";
                                               rankColor = const Color(
                                                 0xFFF59E0B,
                                               );
@@ -3918,14 +3919,15 @@ class _BentoHeroCard extends StatelessWidget {
                                         ? dreams.first
                                         : null;
 
-                                    String lastTitle = "Teşhis Yok";
+                                    final _isTrDream = Localizations.localeOf(context).languageCode == 'tr';
+                                    String lastTitle = _isTrDream ? "Teşhis Yok" : "No Diagnosis";
                                     String userDraft =
-                                        "Henüz bir rüya kaydetmediniz.";
+                                        _isTrDream ? "Henüz bir rüya kaydetmediniz." : "You haven't recorded a dream yet.";
 
                                     if (hasDream && lastDream != null) {
                                       userDraft =
                                           lastDream['text'] ??
-                                          "Bilinçaltı verisi...";
+                                          (_isTrDream ? "Bilinçaltı verisi..." : "Subconscious data...");
                                       if (userDraft.length > 45)
                                         userDraft =
                                             "${userDraft.substring(0, 42)}...";
@@ -3933,8 +3935,8 @@ class _BentoHeroCard extends StatelessWidget {
                                       lastTitle =
                                           lastDream['title'] ??
                                           (lastDream['text'] != null
-                                              ? "Bilinçaltı Mesajı"
-                                              : "Gizemli Rüya");
+                                              ? (_isTrDream ? "Bilinçaltı Mesajı" : "Subconscious Message")
+                                              : (_isTrDream ? "Gizemli Rüya" : "Mysterious Dream"));
                                       if (lastTitle.length > 25)
                                         lastTitle =
                                             "${lastTitle.substring(0, 22)}...";
@@ -3984,7 +3986,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                   100)
                                               .toInt();
 
-                                      Map<String, String> trMap = {
+                                      Map<String, String> trMap = _isTrDream ? {
                                         'fear': 'Korku',
                                         'anxiety': 'Kaygı',
                                         'joy': 'Neşe',
@@ -3992,34 +3994,49 @@ class _BentoHeroCard extends StatelessWidget {
                                         'confusion': 'Karmaşa',
                                         'peace': 'Huzur',
                                         'anger': 'Öfke',
+                                      } : {
+                                        'fear': 'Fear',
+                                        'anxiety': 'Anxiety',
+                                        'joy': 'Joy',
+                                        'sadness': 'Sadness',
+                                        'confusion': 'Confusion',
+                                        'peace': 'Peace',
+                                        'anger': 'Anger',
                                       };
                                       String emLabel =
                                           trMap[topEmotion.key] ??
                                           topEmotion.key;
 
                                       if (dreamTimeFilter == 3) {
-                                        dominantInsight =
-                                            "Uyku anlarının %$pct kadarı '$emLabel' temalı.";
+                                        dominantInsight = _isTrDream
+                                            ? "Uyku anlarının %$pct kadarı '$emLabel' temalı."
+                                            : "About $pct% of your sleep moments are '$emLabel' themed.";
                                       } else if (dreamTimeFilter == 7) {
-                                        dominantInsight =
-                                            "Haftalık rüyalarının %$pct kadarı '$emLabel' etkisinde.";
+                                        dominantInsight = _isTrDream
+                                            ? "Haftalık rüyalarının %$pct kadarı '$emLabel' etkisinde."
+                                            : "About $pct% of your weekly dreams are influenced by '$emLabel'.";
                                       } else if (dreamTimeFilter == 30) {
-                                        dominantInsight =
-                                            "Aylık rüyalarının %$pct kadarı '$emLabel' yüklü.";
+                                        dominantInsight = _isTrDream
+                                            ? "Aylık rüyalarının %$pct kadarı '$emLabel' yüklü."
+                                            : "About $pct% of your monthly dreams are loaded with '$emLabel'.";
                                       } else {
-                                        dominantInsight =
-                                            "Genel olarak rüyalarının %$pct kadarı '$emLabel' temalı.";
+                                        dominantInsight = _isTrDream
+                                            ? "Genel olarak rüyalarının %$pct kadarı '$emLabel' temalı."
+                                            : "Overall, about $pct% of your dreams are '$emLabel' themed.";
                                       }
                                     } else {
                                       if (dreamTimeFilter == 3) {
-                                        dominantInsight =
-                                            "Son 3 güne ait kaydın yok. Zihnini keşfetmek için ilk adımını at.";
+                                        dominantInsight = _isTrDream
+                                            ? "Son 3 güne ait kaydın yok. Zihnini keşfetmek için ilk adımını at."
+                                            : "No records from the last 3 days. Take your first step to explore your mind.";
                                       } else if (dreamTimeFilter == 7) {
-                                        dominantInsight =
-                                            "Bu hafta henüz rüya kaydetmedin. Bilinçaltınla bağ kurmaya başla.";
+                                        dominantInsight = _isTrDream
+                                            ? "Bu hafta henüz rüya kaydetmedin. Bilinçaltınla bağ kurmaya başla."
+                                            : "No dreams recorded this week. Start connecting with your subconscious.";
                                       } else {
-                                        dominantInsight =
-                                            "Bu ayki rüya günlüğün henüz boş. Gizemleri çözmek için beklemedeyiz.";
+                                        dominantInsight = _isTrDream
+                                            ? "Bu ayki rüya günlüğün henüz boş. Gizemleri çözmek için beklemedeyiz."
+                                            : "Your dream journal this month is still empty. We're waiting to decode the mysteries.";
                                       }
                                     }
 
@@ -4037,7 +4054,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                 MainAxisAlignment.center,
                                             children: [
                                               _buildTimeFilterChip(
-                                                "3 Gün",
+                                                _isTrDream ? "3 Gün" : "3 Days",
                                                 3,
                                                 dreamTimeFilter,
                                                 (val) => setModalState(
@@ -4046,7 +4063,7 @@ class _BentoHeroCard extends StatelessWidget {
                                               ),
                                               const SizedBox(width: 8),
                                               _buildTimeFilterChip(
-                                                "7 Gün",
+                                                _isTrDream ? "7 Gün" : "7 Days",
                                                 7,
                                                 dreamTimeFilter,
                                                 (val) => setModalState(
@@ -4055,7 +4072,7 @@ class _BentoHeroCard extends StatelessWidget {
                                               ),
                                               const SizedBox(width: 8),
                                               _buildTimeFilterChip(
-                                                "1 Ay",
+                                                _isTrDream ? "1 Ay" : "1 Month",
                                                 30,
                                                 dreamTimeFilter,
                                                 (val) => setModalState(
@@ -4114,11 +4131,11 @@ class _BentoHeroCard extends StatelessWidget {
                                                     children: [
                                                       Text(
                                                         dreamTimeFilter == 3
-                                                            ? "SON 3 GÜN"
+                                                            ? (_isTrDream ? "SON 3 GÜN" : "LAST 3 DAYS")
                                                             : (dreamTimeFilter ==
                                                                       7
-                                                                  ? "HAFTALIK ÖZET"
-                                                                  : "AYLIK ÖZET"),
+                                                                  ? (_isTrDream ? "HAFTALIK ÖZET" : "WEEKLY SUMMARY")
+                                                                  : (_isTrDream ? "AYLIK ÖZET" : "MONTHLY SUMMARY")),
                                                         style: TextStyle(
                                                           color: const Color(
                                                             0xFF818CF8,
@@ -4174,10 +4191,10 @@ class _BentoHeroCard extends StatelessWidget {
                                                   Flexible(
                                                     child: Text(
                                                       dreamTimeFilter == 3
-                                                          ? "Son 3 günde en az 3 rüya kaydet."
+                                                          ? (_isTrDream ? "Son 3 günde en az 3 rüya kaydet." : "Record at least 3 dreams in the last 3 days.")
                                                           : dreamTimeFilter == 7
-                                                          ? "Son 7 günde en az 7 rüya kaydet."
-                                                          : "Son 1 ayda en az 15 rüya kaydet.",
+                                                          ? (_isTrDream ? "Son 7 günde en az 7 rüya kaydet." : "Record at least 7 dreams in the last 7 days.")
+                                                          : (_isTrDream ? "Son 1 ayda en az 15 rüya kaydet." : "Record at least 15 dreams in the last month."),
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -4205,7 +4222,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                                 ),
                                                           ),
                                                           title: Text(
-                                                            "Duygu Dağılımı Nedir?",
+                                                            _isTrDream ? "Duygu Dağılımı Nedir?" : "What is Emotion Distribution?",
                                                             style: TextStyle(
                                                               color:
                                                                   Colors.white,
@@ -4216,7 +4233,9 @@ class _BentoHeroCard extends StatelessWidget {
                                                             ),
                                                           ),
                                                           content: Text(
-                                                            "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nSeçtiğin zaman dilimi (3, 7 veya 30 gün) için yeterli veri toplandıktan sonra hangi duyguların ön plana çıktığını görebilirsin.",
+                                                            _isTrDream
+                                                                ? "Rüya günlüğüne kaydettiğin rüyalar, yapay zeka tarafından analiz edilerek duygusal temalar belirlenir.\n\nSeçtiğin zaman dilimi (3, 7 veya 30 gün) için yeterli veri toplandıktan sonra hangi duyguların ön plana çıktığını görebilirsin."
+                                                                : "Dreams you record in your dream journal are analyzed by AI to identify emotional themes.\n\nOnce enough data is collected for your selected time period (3, 7, or 30 days), you can see which emotions come to the forefront.",
                                                             style: TextStyle(
                                                               color: Colors
                                                                   .white
@@ -4267,7 +4286,7 @@ class _BentoHeroCard extends StatelessWidget {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    "Duygu Dağılımı",
+                                                    _isTrDream ? "Duygu Dağılımı" : "Emotion Distribution",
                                                     style: TextStyle(
                                                       color: Colors.white
                                                           .withOpacity(0.5),
@@ -4278,7 +4297,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                   ),
                                                   const Spacer(),
                                                   Text(
-                                                    "$totalCount Kayıt Analizi",
+                                                    _isTrDream ? "$totalCount Kayıt Analizi" : "$totalCount Records Analysis",
                                                     style: TextStyle(
                                                       color: Colors.white
                                                           .withOpacity(0.3),
@@ -4300,7 +4319,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     ),
                                                 child: Center(
                                                   child: Text(
-                                                    "Grafik oluşturmak için veri bekleniyor.",
+                                                    _isTrDream ? "Grafik oluşturmak için veri bekleniyor." : "Waiting for data to create the chart.",
                                                     style: TextStyle(
                                                       color: Colors.white
                                                           .withOpacity(0.3),
@@ -4313,8 +4332,8 @@ class _BentoHeroCard extends StatelessWidget {
                                               Builder(
                                                 builder: (context) {
                                                   // Duygu çevirisi ve renk haritası
-                                                  const Map<String, String>
-                                                  localTr = {
+                                                  final Map<String, String>
+                                                  localTr = _isTrDream ? const {
                                                     'fear': 'Korku',
                                                     'anxiety': 'Kaygı',
                                                     'joy': 'Neşe',
@@ -4334,41 +4353,67 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'hope': 'Umut',
                                                     'nostalgia': 'Nostalji',
                                                     'excitement': 'Heyecan',
+                                                  } : const {
+                                                    'fear': 'Fear',
+                                                    'anxiety': 'Anxiety',
+                                                    'joy': 'Joy',
+                                                    'happy': 'Happiness',
+                                                    'happiness': 'Happiness',
+                                                    'sadness': 'Sadness',
+                                                    'sad': 'Sadness',
+                                                    'confusion': 'Confusion',
+                                                    'peace': 'Peace',
+                                                    'peaceful': 'Peaceful',
+                                                    'anger': 'Anger',
+                                                    'angry': 'Angry',
+                                                    'neutral': 'Neutral',
+                                                    'curiosity': 'Curiosity',
+                                                    'surprise': 'Surprise',
+                                                    'love': 'Love',
+                                                    'hope': 'Hope',
+                                                    'nostalgia': 'Nostalgia',
+                                                    'excitement': 'Excitement',
                                                   };
-                                                  const Map<String, Color>
-                                                  emotionColors = {
+                                                  final Map<String, Color>
+                                                  emotionColors = _isTrDream ? const {
                                                     'Korku': Color(0xFFFF6B6B),
                                                     'Kaygı': Color(0xFFFF9F43),
                                                     'Neşe': Color(0xFF4EE6C5),
-                                                    'Mutluluk': Color(
-                                                      0xFF48DBFB,
-                                                    ),
+                                                    'Mutluluk': Color(0xFF48DBFB),
                                                     'Hüzün': Color(0xFF818CF8),
-                                                    'Karmaşa': Color(
-                                                      0xFFFECA57,
-                                                    ),
+                                                    'Karmaşa': Color(0xFFFECA57),
                                                     'Huzur': Color(0xFF1DD1A1),
-                                                    'Huzurlu': Color(
-                                                      0xFF1DD1A1,
-                                                    ),
+                                                    'Huzurlu': Color(0xFF1DD1A1),
                                                     'Öfke': Color(0xFFEE5A6F),
                                                     'Öfkeli': Color(0xFFEE5A6F),
                                                     'Nötr': Color(0xFF636E72),
                                                     'Merak': Color(0xFFA29BFE),
-                                                    'Şaşkınlık': Color(
-                                                      0xFFFF6348,
-                                                    ),
+                                                    'Şaşkınlık': Color(0xFFFF6348),
                                                     'Aşk': Color(0xFFFF6B81),
                                                     'Umut': Color(0xFF55EFC4),
-                                                    'Nostalji': Color(
-                                                      0xFFDDA0DD,
-                                                    ),
-                                                    'Heyecan': Color(
-                                                      0xFFFFD32A,
-                                                    ),
+                                                    'Nostalji': Color(0xFFDDA0DD),
+                                                    'Heyecan': Color(0xFFFFD32A),
+                                                  } : const {
+                                                    'Fear': Color(0xFFFF6B6B),
+                                                    'Anxiety': Color(0xFFFF9F43),
+                                                    'Joy': Color(0xFF4EE6C5),
+                                                    'Happiness': Color(0xFF48DBFB),
+                                                    'Sadness': Color(0xFF818CF8),
+                                                    'Confusion': Color(0xFFFECA57),
+                                                    'Peace': Color(0xFF1DD1A1),
+                                                    'Peaceful': Color(0xFF1DD1A1),
+                                                    'Anger': Color(0xFFEE5A6F),
+                                                    'Angry': Color(0xFFEE5A6F),
+                                                    'Neutral': Color(0xFF636E72),
+                                                    'Curiosity': Color(0xFFA29BFE),
+                                                    'Surprise': Color(0xFFFF6348),
+                                                    'Love': Color(0xFFFF6B81),
+                                                    'Hope': Color(0xFF55EFC4),
+                                                    'Nostalgia': Color(0xFFDDA0DD),
+                                                    'Excitement': Color(0xFFFFD32A),
                                                   };
-                                                  const Map<String, String>
-                                                  emotionEmojis = {
+                                                  final Map<String, String>
+                                                  emotionEmojis = _isTrDream ? const {
                                                     'Korku': '😰',
                                                     'Kaygı': '😟',
                                                     'Neşe': '😊',
@@ -4386,6 +4431,24 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'Umut': '🌱',
                                                     'Nostalji': '🌅',
                                                     'Heyecan': '🤩',
+                                                  } : const {
+                                                    'Fear': '😰',
+                                                    'Anxiety': '😟',
+                                                    'Joy': '😊',
+                                                    'Happiness': '😄',
+                                                    'Sadness': '😢',
+                                                    'Confusion': '😵‍💫',
+                                                    'Peace': '😌',
+                                                    'Peaceful': '😌',
+                                                    'Anger': '😤',
+                                                    'Angry': '😤',
+                                                    'Neutral': '😐',
+                                                    'Curiosity': '🧐',
+                                                    'Surprise': '😮',
+                                                    'Love': '❤️',
+                                                    'Hope': '🌱',
+                                                    'Nostalgia': '🌅',
+                                                    'Excitement': '🤩',
                                                   };
 
                                                   final sorted =
@@ -4923,6 +4986,7 @@ class _BentoHeroCard extends StatelessWidget {
                                 builder: (context, milestoneSnap) {
                                   final claimed = milestoneSnap.data ?? [];
                                   const thresholds = [7, 14, 30, 50, 100, 365];
+                                  final _isTrMile = Localizations.localeOf(context).languageCode == 'tr';
                                   final rewards = <String, dynamic>{
                                     '7': {
                                       'text': '+15 Aura',
@@ -4935,22 +4999,22 @@ class _BentoHeroCard extends StatelessWidget {
                                       'color': const Color(0xFFC084FC),
                                     },
                                     '30': {
-                                      'text': '+1 Ruh Taşı',
+                                      'text': _isTrMile ? '+1 Ruh Taşı' : '+1 Soul Stone',
                                       'icon': Icons.diamond_rounded,
                                       'color': const Color(0xFF4EE6C5),
                                     },
                                     '50': {
-                                      'text': '+2 Ruh Taşı',
+                                      'text': _isTrMile ? '+2 Ruh Taşı' : '+2 Soul Stones',
                                       'icon': Icons.diamond_rounded,
                                       'color': const Color(0xFF4EE6C5),
                                     },
                                     '100': {
-                                      'text': '+3 Ruh Taşı',
+                                      'text': _isTrMile ? '+3 Ruh Taşı' : '+3 Soul Stones',
                                       'icon': Icons.diamond_rounded,
                                       'color': const Color(0xFF4EE6C5),
                                     },
                                     '365': {
-                                      'text': '+5 Ruh Taşı',
+                                      'text': _isTrMile ? '+5 Ruh Taşı' : '+5 Soul Stones',
                                       'icon': Icons.diamond_rounded,
                                       'color': const Color(0xFF4EE6C5),
                                     },
@@ -6649,13 +6713,235 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
     },
   };
 
+  static const _cookieMetaEn = <String, Map<String, String>>{
+    'spring_wreath': {
+      'name': 'Spring Wreath',
+      'desc': 'Symbolizes the awakening of nature. Herald of fresh beginnings.',
+      'rarity': 'Common',
+      'quote': '"Every spring, the universe gives you a second chance."',
+    },
+    'lucky_clover': {
+      'name': 'Lucky Clover',
+      'desc': 'Four-leaf clover — each leaf carries a wish.',
+      'rarity': 'Common',
+      'quote': '"Luck is when preparation meets opportunity."',
+    },
+    'royal_hearts': {
+      'name': 'Royal Hearts',
+      'desc': 'Inspired by secret love notes of the palaces.',
+      'rarity': 'Rare',
+      'quote': '"True elegance comes from the heart."',
+    },
+    'evil_eye': {
+      'name': 'Evil Eye Bead',
+      'desc': 'An ancient protector against malicious gazes.',
+      'rarity': 'Common',
+      'quote': '"An invisible shield always protects you."',
+    },
+    'silver_lotus': {
+      'name': 'Silver Lotus',
+      'desc': 'Symbol of silent elegance and inner peace.',
+      'rarity': 'Common',
+      'quote': '"Peace is hidden in the sparkle within you."',
+    },
+    'sakura_bloom': {
+      'name': 'Sakura Bloom',
+      'desc': 'The short but enchanting dance of Japanese cherry blossoms.',
+      'rarity': 'Rare',
+      'quote': '"Beauty is fleeting, but memories are eternal."',
+    },
+    'blue_porcelain': {
+      'name': 'Dynasty Porcelain',
+      'desc': 'Porcelain adorned with ancient dragon motifs from the Far East.',
+      'rarity': 'Epic',
+      'quote': '"Ancient wisdom is hidden in patiently crafted details."',
+    },
+    'pink_blossom': {
+      'name': 'Pink Blossom',
+      'desc': 'As fresh as the first bloom of spring.',
+      'rarity': 'Common',
+      'quote': '"Small things bring great happiness."',
+    },
+    'fortune_cat': {
+      'name': 'Fortune Cat',
+      'desc': 'Maneki-neko — beckons prosperity with its paw.',
+      'rarity': 'Rare',
+      'quote': '"Prosperity is knocking at your door, don\'t forget to open it."',
+    },
+    'wildflower': {
+      'name': 'Wildflower',
+      'desc': 'Free and wild beauty carried by the wind.',
+      'rarity': 'Common',
+      'quote': '"Freedom is the blooming of your soul."',
+    },
+    'cupid_ribbon': {
+      'name': 'Cupid\'s Ribbon',
+      'desc': 'The silk ribbon wrapping Cupid\'s arrow.',
+      'rarity': 'Rare',
+      'quote': '"Love begins where words leave off."',
+    },
+    'panda_bamboo': {
+      'name': 'Panda Forest',
+      'desc': 'A peaceful panda in a bamboo grove.',
+      'rarity': 'Common',
+      'quote': '"Peace is the greatest luxury."',
+    },
+    'ramadan_cute': {
+      'name': 'Ramadan Joy',
+      'desc': 'A holy night adorned with crescents and lanterns.',
+      'rarity': 'Rare',
+      'quote': '"Those who are patient reach beautiful days."',
+    },
+    'enchanted_forest': {
+      'name': 'Enchanted Forest',
+      'desc': 'A mysterious forest where fairies dance.',
+      'rarity': 'Epic',
+      'quote': '"Magic is for those who dare to believe."',
+    },
+    'golden_arabesque': {
+      'name': 'Golden Arabesque',
+      'desc': 'The geometric perfection of Islamic art.',
+      'rarity': 'Epic',
+      'quote': '"Infinity is hidden in the repetition of a pattern."',
+    },
+    'midnight_mosaic': {
+      'name': 'Midnight Mosaic',
+      'desc': 'Pieces gathered from the midnight sky.',
+      'rarity': 'Epic',
+      'quote': '"Darkness exists so we can see the stars."',
+    },
+    'pearl_lace': {
+      'name': 'Pearl Lace',
+      'desc': 'Elegant craftsmanship filtered through seashells.',
+      'rarity': 'Rare',
+      'quote': '"The most precious pearls are found in the deepest waters."',
+    },
+    'golden_sakura': {
+      'name': 'Golden Sakura',
+      'desc': 'A legendary cherry blossom coated in gold.',
+      'rarity': 'Legendary',
+      'quote': '"Legends are written by those who refuse the ordinary."',
+    },
+    'dragon_phoenix': {
+      'name': 'Dragon & Phoenix',
+      'desc': 'The ancient dance of fire and rebirth.',
+      'rarity': 'Legendary',
+      'quote': '"Rising from the ashes is destiny itself."',
+    },
+    'gold_beasts': {
+      'name': 'Golden Beasts',
+      'desc': 'Mythology\'s mightiest creatures meet gold.',
+      'rarity': 'Legendary',
+      'quote': '"Be powerful, but stay merciful."',
+    },
+    'celestial_dream': {
+      'name': 'Celestial Dream',
+      'desc': 'A dream dancing among the stars.',
+      'rarity': 'Common',
+      'quote': '"Dreams are secrets the universe whispers to you."',
+    },
+    'starlight_whisper': {
+      'name': 'Starlight Whisper',
+      'desc': 'A cosmic melody heard in the quietest moment of the night.',
+      'rarity': 'Common',
+      'quote': '"The universe speaks, learn to listen."',
+    },
+    'mystic_aura': {
+      'name': 'Mystic Aura',
+      'desc': 'A magical halo where invisible energies dance.',
+      'rarity': 'Common',
+      'quote': '"Your aura is your silent power."',
+    },
+    'lunar_glow': {
+      'name': 'Lunar Glow',
+      'desc': 'A mysterious energy glowing in the silver light of the full moon.',
+      'rarity': 'Common',
+      'quote': '"The moon illuminates your path in the darkness."',
+    },
+    'solar_flare': {
+      'name': 'Solar Flare',
+      'desc': 'A fiery sparkle bursting from the heart of the sun.',
+      'rarity': 'Common',
+      'quote': '"Don\'t extinguish the fire within, guide it."',
+    },
+    'cosmic_dust': {
+      'name': 'Cosmic Dust',
+      'desc': 'A universal trace made of stardust.',
+      'rarity': 'Common',
+      'quote': '"You are also part of a star."',
+    },
+    'nebula_breeze': {
+      'name': 'Nebula Breeze',
+      'desc': 'Mysterious and enchanting like a space nebula.',
+      'rarity': 'Common',
+      'quote': '"The wind of infinity caresses your soul."',
+    },
+    'astral_projection': {
+      'name': 'Fiesta Spirit',
+      'desc': 'Vibrant patterns inspired by Mexico\'s colorful festivals.',
+      'rarity': 'Common',
+      'quote': '"Life is a festival, celebrate every day."',
+    },
+    'quantum_leap': {
+      'name': 'Quantum Leap',
+      'desc': 'A leap that transcends the boundaries of time and space.',
+      'rarity': 'Common',
+      'quote': '"Great changes begin with a small step."',
+    },
+    'royal_sapphire': {
+      'name': 'Royal Sapphire',
+      'desc': 'The sapphire sparkle from the depths of the ocean.',
+      'rarity': 'Epic',
+      'quote': '"True nobility is the depth of the soul."',
+    },
+    'diamond_crust': {
+      'name': 'Diamond Crust',
+      'desc': 'A flawless beauty shaped under pressure.',
+      'rarity': 'Legendary',
+      'quote': '"Diamonds are born under pressure."',
+    },
+    'platinum_veil': {
+      'name': 'Platinum Veil',
+      'desc': 'An ancient veil draped in mysterious and cool elegance.',
+      'rarity': 'Legendary',
+      'quote': '"What is invisible is sometimes the most valuable."',
+    },
+    'golden_majesty': {
+      'name': 'Golden Majesty',
+      'desc': 'The golden craftsmanship that adorned the thrones of empires.',
+      'rarity': 'Epic',
+      'quote': '"Majesty is a silent display of power."',
+    },
+    'emerald_essence': {
+      'name': 'Emerald Essence',
+      'desc': 'An essence distilled from nature\'s purest green.',
+      'rarity': 'Epic',
+      'quote': '"Nature is the greatest artist."',
+    },
+    'ruby_heart': {
+      'name': 'Ruby Heart',
+      'desc': 'A red heart forged with fire.',
+      'rarity': 'Epic',
+      'quote': '"Live with passion, shine like a ruby."',
+    },
+    'obsidian_grace': {
+      'name': 'Obsidian Grace',
+      'desc': 'A dark and elegant beauty born from volcanic glass.',
+      'rarity': 'Epic',
+      'quote': '"Elegance can be found even in darkness."',
+    },
+  };
+
   static Color _rarityColor(String rarity) {
     switch (rarity) {
       case 'Efsanevi':
+      case 'Legendary':
         return const Color(0xFFFFD700);
       case 'Epik':
+      case 'Epic':
         return const Color(0xFFC084FC);
       case 'Nadir':
+      case 'Rare':
         return const Color(0xFF60A5FA);
       default:
         return const Color(0xFF4EE6C5);
@@ -6664,12 +6950,14 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
 
   void _showCookieActionMenu(CookieCard cookie, BuildContext context) {
     HapticFeedback.selectionClick();
+    final _isTrCookie = Localizations.localeOf(context).languageCode == 'tr';
+    final metaSource = _isTrCookie ? _cookieMeta : _cookieMetaEn;
     final meta =
-        _cookieMeta[cookie.id] ??
+        metaSource[cookie.id] ??
         {
-          'name': cookie.name.isNotEmpty ? cookie.name : 'Gizemli Kurabiye',
-          'desc': 'Koleksiyonundaki özel bir kurabiye.',
-          'rarity': 'Yaygın',
+          'name': cookie.name.isNotEmpty ? cookie.name : (_isTrCookie ? 'Gizemli Kurabiye' : 'Mysterious Cookie'),
+          'desc': _isTrCookie ? 'Koleksiyonundaki özel bir kurabiye.' : 'A special cookie in your collection.',
+          'rarity': _isTrCookie ? 'Yaygın' : 'Common',
         };
     final rarityColor = _rarityColor(meta['rarity']!);
     final firstDate = cookie.firstObtainedDate;
@@ -6777,7 +7065,7 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    "Keşif: $dateStr",
+                                    _isTrCookie ? "Keşif: $dateStr" : "Discovered: $dateStr",
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.8),
                                       fontSize: 13,
@@ -6903,7 +7191,9 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
         height: 90,
         alignment: Alignment.center,
         child: Text(
-          "Henüz koleksiyonunda eşsiz kurabiye yok.\nAna sayfadan kurabiye kırarak siftah yap!",
+          Localizations.localeOf(context).languageCode == 'tr'
+              ? "Henüz koleksiyonunda eşsiz kurabiye yok.\nAna sayfadan kurabiye kırarak siftah yap!"
+              : "No unique cookies in your collection yet.\nStart cracking cookies from the home page!",
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white.withOpacity(0.5),

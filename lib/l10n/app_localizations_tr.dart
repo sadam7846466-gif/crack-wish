@@ -1316,6 +1316,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get coffeeNextStep => 'Sonraki Adım';
 
   @override
+  String get coffeeCapture => 'Bu Açıyı Çek';
+
+  @override
   String get coffeeValidationError =>
       'İşaretli fotoğraflardaki telveler\ntam olarak seçilemiyor.';
 
@@ -2636,6 +2639,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get zodiacChooseFriend => 'ARKADAŞ SEÇ';
 
   @override
+  String get zodiacChooseFriendSubtitle =>
+      'Kozmik enerjilerinizi karşılaştırmak için bir dost seç';
+
+  @override
+  String get zodiacDiscoverYourself => 'Kendini Keşfet';
+
+  @override
+  String get zodiacCharacteristicAnalysis => 'KARAKTERİSTİK ANALİZ';
+
+  @override
+  String zodiacAbilityMap(String name) {
+    return '$name burcunun yetenek haritası';
+  }
+
+  @override
   String get zodiacPros => 'Avantajlar';
 
   @override
@@ -2881,4 +2899,40 @@ class AppLocalizationsTr extends AppLocalizations {
   String natalChartHouse(String house) {
     return '$house. Ev';
   }
+
+  @override
+  String zodiacGreeting(String name) {
+    return 'Merhaba $name,';
+  }
+
+  @override
+  String get zodiacCosmicTraveler => 'Kozmik Yolcu,';
+
+  @override
+  String get zodiacBirthDate => 'DOĞUM TARİHİ';
+
+  @override
+  String get zodiacStarsKnowYou => 'Yıldızların seni tanısın';
+
+  @override
+  String get zodiacConfirm => 'ONAYLA';
+
+  @override
+  String get zodiacDiscoverYourselfBtn => 'KENDİNİ KEŞFET';
+
+  @override
+  String get zodiacEliteRequiredDesc =>
+      'Arkadaşlarınla derin astrolojik uyumunu ve viral dinamiklerini keşfetmek için Elite abonesi olmalısın.';
+
+  @override
+  String get zodiacEliteDiscoverBtn => 'Elite Ayrıcalıklarını Keşfet';
+
+  @override
+  String get zodiacHubWestern => 'BATI ASTROLOJİSİ';
+
+  @override
+  String get zodiacHubAsian => 'ASYA ASTROLOJİSİ';
+
+  @override
+  String get zodiacHubMayan => 'MAYA ASTROLOJİSİ';
 }

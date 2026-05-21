@@ -875,7 +875,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                               ],
                             ).createShader(b),
                             child: Text(
-                              'DOĞUM TARİHİ',
+                              AppLocalizations.of(context)!.zodiacBirthDate,
                               style: GoogleFonts.cinzel(
                                 color: Colors.white,
                                 fontSize: 13,
@@ -886,7 +886,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Yıldızların seni tanısın',
+                            AppLocalizations.of(context)!.zodiacStarsKnowYou,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.25),
                               fontSize: 11,
@@ -1005,7 +1005,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                             ],
                           ).createShader(b),
                           child: Text(
-                            'ONAYLA',
+                            AppLocalizations.of(context)!.zodiacConfirm,
                             style: GoogleFonts.cinzel(
                               color: Colors.white,
                               fontSize: 14,
@@ -1155,7 +1155,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                sign['name'].toString().toUpperCase(),
+                                _getLocalizedSignName(context, sign).toUpperCase(),
                                 style: GoogleFonts.cinzel(
                                   color: _gold,
                                   fontSize: 9,
@@ -1164,7 +1164,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                sign['dates'] as String,
+                                ZodiacTranslations.translate(context, sign['dates'] as String),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.35),
                                   fontSize: 8,
@@ -1239,7 +1239,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'ARKADAŞ SEÇ',
+                    AppLocalizations.of(context)!.zodiacChooseFriend,
                     style: GoogleFonts.cinzel(
                       color: Colors.white,
                       fontSize: 16,
@@ -1249,7 +1249,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Kozmik enerjilerinizi karşılaştırmak için bir dost seç',
+                    AppLocalizations.of(context)!.zodiacChooseFriendSubtitle,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.5),
                       fontSize: 12,
@@ -1289,7 +1289,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 32),
                                         child: Text(
-                                          'Arkadaşlarınla derin astrolojik uyumunu ve viral dinamiklerini keşfetmek için Elite abonesi olmalısın.',
+                                          AppLocalizations.of(context)!.zodiacEliteRequiredDesc,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
                                         ),
@@ -1309,7 +1309,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                         ),
-                                        child: const Text('Elite Ayrıcalıklarını Keşfet', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        child: Text(AppLocalizations.of(context)!.zodiacEliteDiscoverBtn, style: const TextStyle(fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                   ),
@@ -1339,8 +1339,8 @@ class _ZodiacPageState extends State<ZodiacPage>
   Widget build(BuildContext context) {
     final s = _signs[_selectedIndex];
     final greeting = _userName != null
-        ? 'Merhaba $_userName,'
-        : 'Kozmik Yolcu,';
+        ? AppLocalizations.of(context)!.zodiacGreeting(_userName!)
+        : AppLocalizations.of(context)!.zodiacCosmicTraveler;
     final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
     return SwipeBackWrapper(
       child: TickerMode(
@@ -1558,7 +1558,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                                               ],
                                             ).createShader(b),
                                         child: Text(
-                                          (s['name'] as String).toUpperCase(),
+                                          _getLocalizedSignName(context, s).toUpperCase(),
                                           style: GoogleFonts.cinzel(
                                             color: Colors.white,
                                             fontSize: 14,
@@ -1901,7 +1901,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                           ],
                         ).createShader(b),
                         child: Text(
-                          'KARAKTERİSTİK ANALİZ',
+                          AppLocalizations.of(context)!.zodiacCharacteristicAnalysis,
                           style: GoogleFonts.cinzel(
                             color: Colors.white,
                             fontSize: 11,
@@ -1912,7 +1912,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$name burcunun yetenek haritası',
+                        AppLocalizations.of(context)!.zodiacAbilityMap(_getLocalizedSignName(context, s)),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.3),
                           fontSize: 11,
@@ -1932,7 +1932,7 @@ class _ZodiacPageState extends State<ZodiacPage>
             height: 310,
             child: CustomPaint(
               painter: _RadarChartPainter(
-                labels: displayTraits,
+                labels: displayTraits.map((t) => ZodiacTranslations.translate(context, t)).toList(),
                 values: values,
                 color: Colors.white,
               ),
@@ -1987,7 +1987,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                         ],
                       ).createShader(b),
                       child: Text(
-                        'KENDİNİ KEŞFET',
+                        AppLocalizations.of(context)!.zodiacDiscoverYourselfBtn,
                         style: GoogleFonts.cinzel(
                           color: Colors.white,
                           fontSize: 12,
@@ -2237,6 +2237,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   }
   Widget _premiumAstrologyCard(Map<String, dynamic> s) {
     final hasBirthInfo = _birthTime != null && _birthTime!.isNotEmpty && _birthPlace != null && _birthPlace!.isNotEmpty;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
@@ -2267,7 +2268,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                   ],
                 ).createShader(b),
                 child: Text(
-                  'KOZMİK DOĞUM ÇARKI',
+                  isTr ? 'KOZMİK DOĞUM ÇARKI' : 'COSMIC BIRTH WHEEL',
                   style: GoogleFonts.cinzel(
                     color: Colors.white,
                     fontSize: 13,
@@ -2280,7 +2281,7 @@ class _ZodiacPageState extends State<ZodiacPage>
           ),
           const SizedBox(height: 6),
           Text(
-            'Doğum saati ve yeriyle hesaplanan derin analizin',
+            isTr ? 'Doğum saati ve yeriyle hesaplanan derin analizin' : 'Your deep analysis calculated by birth time and place',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 11,
@@ -2325,7 +2326,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'DOĞUM HARİTASI',
+                      isTr ? 'DOĞUM HARİTASI' : 'NATAL CHART',
                       style: GoogleFonts.cinzel(
                         color: Colors.white,
                         fontSize: 16,
@@ -2335,7 +2336,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'ASC, Güneş, Ay ve Gezegen Açıları',
+                      isTr ? 'ASC, Güneş, Ay ve Gezegen Açıları' : 'ASC, Sun, Moon and Planetary Aspects',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 12,
@@ -2352,7 +2353,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('İNCELE', style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                          Text(isTr ? 'İNCELE' : 'EXAMINE', style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                           const SizedBox(width: 6),
                           Icon(Icons.arrow_forward_ios_rounded, color: _gold, size: 10),
                         ],
@@ -2371,6 +2372,7 @@ class _ZodiacPageState extends State<ZodiacPage>
   }
 
   Widget _buildLockedPremiumInfo() {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
@@ -2422,7 +2424,7 @@ class _ZodiacPageState extends State<ZodiacPage>
               const SizedBox(height: 24),
               // Title
               Text(
-                'DOĞUM HARİTASI KİLİTLİ',
+                isTr ? 'DOĞUM HARİTASI KİLİTLİ' : 'NATAL CHART LOCKED',
                 style: GoogleFonts.cinzel(
                   color: Colors.white.withOpacity(0.95),
                   fontSize: 16,
@@ -2434,7 +2436,7 @@ class _ZodiacPageState extends State<ZodiacPage>
               const SizedBox(height: 12),
               // Description
               Text(
-                'Doğum haritanı oluşturabilmemiz için doğum saatine ve yerine ihtiyacımız var.',
+                isTr ? 'Doğum haritanı oluşturabilmemiz için doğum saatine ve yerine ihtiyacımız var.' : 'We need your birth time and place to generate your natal chart.',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 13,
@@ -2472,7 +2474,7 @@ class _ZodiacPageState extends State<ZodiacPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'KİLİDİ AÇ',
+                        isTr ? 'KİLİDİ AÇ' : 'UNLOCK',
                         style: TextStyle(
                           color: _gold,
                           fontWeight: FontWeight.w700,
@@ -4083,7 +4085,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
     final sign = widget.sign;
     final strengths = shuffledStrengths;
     final weaknesses = shuffledWeaknesses;
-    final nameEn = sign['name'] as String;
+    final nameEn = _getLocalizedSignName(context, sign);
 
     const usageHints = <String, String>{
       'Doğal liderlik':
@@ -4436,7 +4438,7 @@ class _ZodiacDetailPageState extends State<_ZodiacDetailPage> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Kendini Keşfet',
+                                AppLocalizations.of(context)!.zodiacDiscoverYourself,
                                 style: GoogleFonts.cinzel(
                                   color: gold.withOpacity(0.35),
                                   fontSize: 11,
@@ -5981,9 +5983,9 @@ class _CosmicChallengeCardState extends State<_CosmicChallengeCard> {
                     ],
                   ),
                 ),
-                child: const Text(
-                  'YENİ SERÜVENE BAŞLA',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.zodiacStartNewQuest,
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -7065,6 +7067,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
 
   @override
   Widget build(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     // Gerçekçi Astroloji Hesaplaması (Elementlere Göre)
     final String e1 = widget.sign1['element'] ?? 'Ateş';
     final String e2 = widget.sign2['element'] ?? 'Ateş';
@@ -7167,7 +7170,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                               ],
                             ).createShader(b),
                             child: Text(
-                              'KOZMİK UYUM',
+                              isTr ? 'KOZMİK UYUM' : 'COSMIC HARMONY',
                               style: GoogleFonts.cinzel(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -7218,7 +7221,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                             children: [
                                 _buildStaggered(
                                   _ExpandableCategoryCard(
-                                    title: 'AŞK UYUMU',
+                                    title: AppLocalizations.of(context)!.zodiacLoveHarmony,
                                     categoryValue: 'love',
                                     pct: lovePct,
                                     iconObj: Icons.favorite_border,
@@ -7229,7 +7232,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                 const SizedBox(height: 20),
                                 _buildStaggered(
                                   _ExpandableCategoryCard(
-                                    title: 'ARKADAŞLIK',
+                                    title: AppLocalizations.of(context)!.zodiacFriendshipHarmony,
                                     categoryValue: 'friend',
                                     pct: friendPct,
                                     iconObj: Icons.people_alt_outlined,
@@ -7240,7 +7243,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                 const SizedBox(height: 20),
                                 _buildStaggered(
                                   _ExpandableCategoryCard(
-                                    title: 'İLETİŞİM & ZİHİN',
+                                    title: AppLocalizations.of(context)!.zodiacCommunicationHarmony,
                                     categoryValue: 'comm',
                                     pct: commPct,
                                     iconObj: Icons.chat_bubble_outline,
@@ -7251,7 +7254,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                 const SizedBox(height: 20),
                                 _buildStaggered(
                                   _ExpandableCategoryCard(
-                                    title: 'ORTAK ÇALIŞMA',
+                                    title: AppLocalizations.of(context)!.zodiacWorkHarmony,
                                     categoryValue: 'work',
                                     pct: workPct,
                                     iconObj: Icons.work_outline,
@@ -7262,7 +7265,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                 const SizedBox(height: 20),
                                 _buildStaggered(
                                   _ExpandableCategoryCard(
-                                    title: 'MACERA & EĞLENCE',
+                                    title: AppLocalizations.of(context)!.zodiacAdventureHarmony,
                                     categoryValue: 'fun',
                                     pct: funPct,
                                     iconObj: Icons.explore_outlined,
@@ -7277,7 +7280,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 20),
                                       child: Text(
-                                        'VİRAL DİNAMİKLER',
+                                        AppLocalizations.of(context)!.zodiacViralDynamics,
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.cinzel(
                                           color: widget.gold,
@@ -7294,15 +7297,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'AŞK & TUTKU',
+                                          title: isTr ? 'AŞK & TUTKU' : 'LOVE & PASSION',
                                           pct: viralLovePct,
                                           iconObj: Icons.local_fire_department,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'AŞK & TUTKU',
+                                            isTr ? 'AŞK & TUTKU' : 'LOVE & PASSION',
                                             viralLovePct,
                                             Icons.local_fire_department,
-                                            'Kozmik radarlarımız yanılmıyorsa, burada basit bir arkadaşlıktan daha fazlası gizli olabilir. Aranızdaki bu yüksek tansiyon ya büyük bir aşka dönüşecek ya da ortalığı yakıp yıkacak. Ateşle oynuyorsunuz!',
+                                            isTr
+                                                ? 'Kozmik radarlarımız yanılmıyorsa, burada basit bir arkadaşlıktan daha fazlası gizli olabilir. Aranızdaki bu yüksek tansiyon ya büyük bir aşka dönüşecek ya da ortalığı yakıp yıkacak. Ateşle oynuyorsunuz!'
+                                                : 'If our cosmic radars are correct, there might be more than simple friendship hidden here. This high tension between you will either turn into a great love or burn everything down. You are playing with fire!',
                                           ),
                                         ),
                                         9,
@@ -7312,15 +7317,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'SUÇ ORTAKLIĞI',
+                                          title: isTr ? 'SUÇ ORTAKLIĞI' : 'COMPLICITY',
                                           pct: viralCrimePct,
                                           iconObj: Icons.masks_outlined,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'SUÇ ORTAKLIĞI',
+                                            isTr ? 'SUÇ ORTAKLIĞI' : 'COMPLICITY',
                                             viralCrimePct,
                                             Icons.masks_outlined,
-                                            'Siz ikiniz yan yana geldiğinizde dünyanın geri kalanı için tehlike çanları çalıyor. Mükemmel bir dedikodu ağı, harika planlar ve kimsenin anlamadığı gizli bakışmalar... Sizden korkulur!',
+                                            isTr
+                                                ? 'Siz ikiniz yan yana geldiğinizde dünyanın geri kalanı için tehlike çanları çalıyor. Mükemmel bir dedikodu ağı, harika planlar ve kimsenin anlamadığı gizli bakışmalar... Sizden korkulur!'
+                                                : 'When you two come together, danger bells ring for the rest of the world. A perfect gossip network, great plans and secret glances that no one else understands... You are to be feared!',
                                           ),
                                         ),
                                         10,
@@ -7334,15 +7341,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'KARMİK BAĞ',
+                                          title: isTr ? 'KARMİK BAĞ' : 'KARMIC BOND',
                                           pct: viralKarmaPct,
                                           iconObj: Icons.all_inclusive,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'KARMİK BAĞ',
+                                            isTr ? 'KARMİK BAĞ' : 'KARMIC BOND',
                                             viralKarmaPct,
                                             Icons.all_inclusive,
-                                            'Birbirinizi bu hayatta ilk kez görmüş olamazsınız. Ruhlarınız önceki yaşamlardan kalma bir hesabı kapatmaya (ya da devam ettirmeye) gelmiş. Bu bağ kolay kolay kopmaz.',
+                                            isTr
+                                                ? 'Birbirinizi bu hayatta ilk kez görmüş olamazsınız. Ruhlarınız önceki yaşamlardan kalma bir hesabı kapatmaya (ya da devam ettirmeye) gelmiş. Bu bağ kolay kolay kopmaz.'
+                                                : 'This cannot be the first time you see each other in this lifetime. Your souls came to settle (or continue) a score left over from past lives. This bond does not break easily.',
                                           ),
                                         ),
                                         11,
@@ -7352,15 +7361,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'GİZLİ TELEPATİ',
+                                          title: isTr ? 'GİZLİ TELEPATİ' : 'SECRET TELEPATHY',
                                           pct: viralTelePct,
                                           iconObj: Icons.wifi_tethering,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'GİZLİ TELEPATİ',
+                                            isTr ? 'GİZLİ TELEPATİ' : 'SECRET TELEPATHY',
                                             viralTelePct,
                                             Icons.wifi_tethering,
-                                            'Aynı anda aynı şeyi söylemek, o tam arayacakken senin mesaj atman... Frekanslarınız öylesine eşleşmiş ki bazen konuşmanıza bile gerek kalmıyor.',
+                                            isTr
+                                                ? 'Aynı anda aynı şeyi söylemek, o tam arayacakken senin mesaj atman... Frekanslarınız öylesine eşleşmiş ki bazen konuşmanıza bile gerek kalmıyor.'
+                                                : 'Saying the same thing at the same time, you sending a message just when they were about to call... Your frequencies are so matched that sometimes you do not even need to speak.',
                                           ),
                                         ),
                                         12,
@@ -7374,15 +7385,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'EGO SAVAŞI',
+                                          title: isTr ? 'EGO SAVAŞI' : 'EGO WAR',
                                           pct: viralEgoPct,
                                           iconObj: Icons.bolt,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'EGO SAVAŞI',
+                                            isTr ? 'EGO SAVAŞI' : 'EGO WAR',
                                             viralEgoPct,
                                             Icons.bolt,
-                                            'İki güçlü karakter, iki inatçı ruh! Aranızdaki bu gizli dominans savaşı bazen tatlı bir rekabete, bazen de sessiz bir inatlaşmaya dönüşebilir. Kimin dediği olacak?',
+                                            isTr
+                                                ? 'İki güçlü karakter, iki inatçı ruh! Aranızdaki bu gizli dominans savaşı bazen tatlı bir rekabete, bazen de sessiz bir inatlaşmaya dönüşebilir. Kimin dediği olacak?'
+                                                : 'Two strong characters, two stubborn souls! This secret dominance struggle between you can sometimes turn into sweet competition, and sometimes into silent stubbornness. Who will have the last word?',
                                           ),
                                         ),
                                         13,
@@ -7392,15 +7405,17 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
                                     Expanded(
                                       child: _buildStaggered(
                                         _ViralGridCard(
-                                          title: 'TOKSİK ÇARPIŞMA',
+                                          title: isTr ? 'TOKSİK ÇARPIŞMA' : 'TOXIC CLASH',
                                           pct: viralToxicPct,
                                           iconObj: Icons.warning_amber_rounded,
                                           gold: widget.gold,
                                           onTap: () => _showViralDetailSheet(
-                                            'TOKSİK ÇARPIŞMA',
+                                            isTr ? 'TOKSİK ÇARPIŞMA' : 'TOXIC CLASH',
                                             viralToxicPct,
                                             Icons.warning_amber_rounded,
-                                            'Kabul edelim, bazen birbirinizi çileden çıkarabiliyorsunuz. Ufak tefek kırmızı bayraklar havada uçuşsa da, bu kaotik dinamik ilişkinizi asla sıkıcı yapmıyor!',
+                                            isTr
+                                                ? 'Kabul edelim, bazen birbirinizi çileden çıkarabiliyorsunuz. Ufak tefek kırmızı bayraklar havada uçuşsa da, bu kaotik dinamik ilişkinizi asla sıkıcı yapmıyor!'
+                                                : 'Let\'s admit it, sometimes you can drive each other crazy. Even though small red flags fly in the air, this chaotic dynamic never makes your relationship boring!',
                                           ),
                                         ),
                                         14,
@@ -7662,7 +7677,7 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
         ),
         const SizedBox(height: 12),
         Text(
-          s['name'].toString().toUpperCase(),
+          _getLocalizedSignName(context, s).toUpperCase(),
           style: GoogleFonts.cinzel(
             color: widget.gold,
             fontWeight: FontWeight.bold,
@@ -7673,16 +7688,20 @@ class _CompatibilityResultPageState extends State<_CompatibilityResultPage>
   }
 
   Widget _buildAnalysisText(double avg) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     String text;
     if (avg > 80)
-      text =
-          "Bu iki burç arasında güçlü bir çekim ve uyum var. Kozmik enerjiler bir araya geldiğinde durdurulamaz bir bağ yaratıyor.";
+      text = isTr
+          ? "Bu iki burç arasında güçlü bir çekim ve uyum var. Kozmik enerjiler bir araya geldiğinde durdurulamaz bir bağ yaratıyor."
+          : "There is a strong attraction and harmony between these two signs. When cosmic energies come together, they create an unstoppable bond.";
     else if (avg > 60)
-      text =
-          "Farklılıklar birbirini tamamlıyor. Zaman zaman çatışmalar yaşansa da, üzerinde çalışıldığında sağlam bir temel oluşturabilirler.";
+      text = isTr
+          ? "Farklılıklar birbirini tamamlıyor. Zaman zaman çatışmalar yaşansa da, üzerinde çalışıldığında sağlam bir temel oluşturabilirler."
+          : "Differences complement each other. Although conflicts occur from time to time, they can form a solid foundation when worked on.";
     else
-      text =
-          "Yıldızlar bu ikili için oldukça farklı diller konuşuyor. Birbirinizi anlamak için ekstra çaba göstermeniz gerekebilir.";
+      text = isTr
+          ? "Yıldızlar bu ikili için oldukça farklı diller konuşuyor. Birbirinizi anlamak için ekstra çaba göstermeniz gerekebilir."
+          : "The stars speak very different languages for this duo. You may need to put in extra effort to understand each other.";
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -7792,9 +7811,10 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final content = widget.isAdvanced 
-        ? CompatibilityContent.getAdvanced(widget.categoryValue, widget.pct)
-        : CompatibilityContent.get(widget.categoryValue, widget.pct);
+        ? CompatibilityContent.getAdvanced(widget.categoryValue, widget.pct, isTr: isTr)
+        : CompatibilityContent.get(widget.categoryValue, widget.pct, isTr: isTr);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -7919,21 +7939,21 @@ class _ExpandableCategoryCardState extends State<_ExpandableCategoryCard> {
                   Container(height: 1, color: Colors.white.withOpacity(0.1)),
                   const SizedBox(height: 20),
                   _buildDetailRow(
-                    'Avantajlar',
+                    AppLocalizations.of(context)!.zodiacPros,
                     content.pros,
                     Icons.add_circle_outline,
                     Colors.greenAccent,
                   ),
                   const SizedBox(height: 16),
                   _buildDetailRow(
-                    'Zorluklar',
+                    AppLocalizations.of(context)!.zodiacCons,
                     content.cons,
                     Icons.remove_circle_outline,
                     Colors.redAccent,
                   ),
                   const SizedBox(height: 16),
                   _buildDetailRow(
-                    'Tavsiye',
+                    AppLocalizations.of(context)!.zodiacAdvice,
                     content.advice,
                     Icons.lightbulb_outline,
                     Colors.amberAccent,
@@ -8249,24 +8269,213 @@ class _CosmicGuideInteractiveState extends State<_CosmicGuideInteractive>
           break;
       }
     } else {
-      intros = [
-        'Today brings a strong shift in your energy.',
-        'The universe is aligning in a mysterious way for you today.',
-        'Your ruling planet is sending you a direct message today.',
-        'An unexpected wave of clarity is approaching you.',
-      ];
-      midparts = [
-        'It is time to trust your inner compass and take action.',
-        'A situation you have been overthinking will finally resolve itself.',
-        'You possess the strength to overcome the obstacle in front of you.',
-        'Release the urge to control everything and let the cosmic flow guide you.',
-      ];
-      conclusions = [
-        'Embrace the change.',
-        'Trust the process.',
-        'Your intuition is your greatest guide.',
-        'Patience will bring its ultimate reward.',
-      ];
+      switch (signName) {
+        case 'Koç':
+          intros = [
+            'Today is a day when the warrior spirit inside you awakens.',
+            'A perfect moment to push your limits with the energy of Mars.',
+            'Today the universe whispers that only the brave win.',
+          ];
+          midparts = [
+            'Even steps you take without thinking might lead you to the right path today.',
+            'You have the power to burn through the obstacles in your way.',
+            'Your leadership qualities are more prominent than ever; take the initiative.',
+          ];
+          conclusions = [
+            'Do not be afraid to be a pioneer; victory will be yours.',
+            'Trust your instincts; your fire lights your path.',
+            'Never compromise on your passion.',
+          ];
+          break;
+        case 'Boğa':
+          intros = [
+            'Today you are in a phase where you take firmer and more conscious steps.',
+            'A perfect day to create lasting values with the grace of Venus.',
+            'There is an energy where peace and material/spiritual stability will be at the forefront.',
+          ];
+          midparts = [
+            'Listening to the voice of logic will protect you from a big mistake.',
+            'You will see the seeds you have sown for a long time slowly bearing fruit.',
+            'You can achieve great success without leaving your comfort zone.',
+          ];
+          conclusions = [
+            'You will receive the reward of your patience in abundance.',
+            'Know your own worth and act accordingly.',
+            'Your unwavering will is your greatest shield.',
+          ];
+          break;
+        case 'İkizler':
+          intros = [
+            'Today your mind is clearer and works twice as fast as usual.',
+            'Mercury brings you new ideas and horizon-expanding conversations.',
+            'A day when you will adapt fastest to the direction of changing winds.',
+          ];
+          midparts = [
+            'An unexpected message or phone call can change the course of your whole day.',
+            'Do not restrain your curiosity; a secret you learn today will be very useful.',
+            'Bridging different perspectives will save you from a dead end.',
+          ];
+          conclusions = [
+            'Your intelligence is your sharpest weapon today.',
+            'You can conquer worlds with your words.',
+            'Stay in communication; the universe is sending you codes.',
+          ];
+          break;
+        case 'Yengeç':
+          intros = [
+            'Today you are going deep into the sea of your emotions and intuitions.',
+            'A great day to receive spiritual messages under the protective energy of the Moon.',
+            'You are in a flow where you will find peace in the safe harbor of your home and heart.',
+          ];
+          midparts = [
+            'Listening to your heart instead of logic can open a secret healing door for you.',
+            'You have the chance to release an emotional memory from the past with love.',
+            'Your instinct to protect your loved ones will open an unexpected door for you today.',
+          ];
+          conclusions = [
+            'Your intuition never deceives you.',
+            'Your tears are your greatest purification; do not be afraid to feel.',
+            'Love energy surrounds you completely.',
+          ];
+          break;
+        case 'Aslan':
+          intros = [
+            'Today the stage is yours; a day when the sun inside you shines in all its glory.',
+            'An immense moment where your creativity and self-confidence know no bounds.',
+            'Today the universe whispers that you should declare your kingdom/queendom.',
+          ];
+          midparts = [
+            'Opportunities will come your way to draw attention in every environment you enter.',
+            'A generous move made by listening to your heart will return to you exponentially.',
+            'You will see your true power emerge when you put your pride aside.',
+          ];
+          conclusions = [
+            'Do not withhold your light from the world.',
+            'With the support of the luck planets, fortune is completely on your side.',
+            'You can open every door with your magnificence.',
+          ];
+          break;
+        case 'Başak':
+          intros = [
+            'Today you notice the power of details and establish order within chaos.',
+            'A day when you will solve problems deemed unsolvable thanks to your mental clarity.',
+            'You are in a frequency where your practical intelligence and analytical ability are at their peak.',
+          ];
+          midparts = [
+            'That tiny detail missed by others will bring you a great victory.',
+            'Be very careful not to miss the existing beauty in your hands while searching for perfection.',
+            'Your drive to organize and improve will complete that missing puzzle piece of your life today.',
+          ];
+          conclusions = [
+            'Your analytical mind is your greatest guide.',
+            'Your spirit of service will be rewarded by the universe.',
+            'Perfection lies in your inner peace.',
+          ];
+          break;
+        case 'Terazi':
+          intros = [
+            'Today you are ready to capture that perfect balance in every area of your life.',
+            'Venus opens the doors to an energy full of art, beauty, and harmony.',
+            'A day when you will smooth out all kinds of wrinkles with the power of justice and diplomacy.',
+          ];
+          midparts = [
+            'You will easily resolve a tough disagreement with your sweet tongue and grace.',
+            'You should not drift away from your center while trying to please others.',
+            'An aesthetic touch today will feed your soul much more than you think.',
+          ];
+          conclusions = [
+            'Harmony and grace are your signature.',
+            'The universe promises you lasting and fair results.',
+            'When you protect your inner balance, you beautify the outside too.',
+          ];
+          break;
+        case 'Akrep':
+          intros = [
+            'Today is a very deep day where you will go beneath the surface and reveal secrets.',
+            'You are preparing to be reborn from your ashes with the transformative energy of Pluto.',
+            'The radar of your instincts and passions is sharper than ever today.',
+          ];
+          midparts = [
+            'You will sense intentions that no one else can see and turn games in your favor.',
+            'You have the opportunity to transform that intense suspicion into a strategic move.',
+            'You are unrivaled today in finding the hidden light inside the darkness.',
+          ];
+          conclusions = [
+            'You overcome every obstacle with your passion and will.',
+            'Your mysterious power always protects you.',
+            'Do not resist transformation; you are getting stronger.',
+          ];
+          break;
+        case 'Yay':
+          intros = [
+            'Today is a perfect moment to expand your horizons and embark on new adventures.',
+            'The optimistic energy of Jupiter wings your soul toward freedom.',
+            'A day when your hunger for learning and desire to discover drag you onto new paths.',
+          ];
+          midparts = [
+            'Stepping outside your usual boundaries will give you unexpected inspiration.',
+            'If you focus on the big picture instead of getting stuck on logical details, you will hit the target.',
+            'A sudden journey you take today or new information you receive can affect your destiny.',
+          ];
+          conclusions = [
+            'Your optimism is the strongest light piercing the darkness.',
+            'Luck is always on the side of the brave.',
+            'The wisdom of the universe flows to you; be open.',
+          ];
+          break;
+        case 'Oğlak':
+          intros = [
+            'Today is a very powerful day when you climb toward your goals with unwavering determination.',
+            'Saturn whispers discipline, patience, and long-term lasting success to you.',
+            'You will see your responsibilities not as a burden, but as steps leading to the summit.',
+          ];
+          midparts = [
+            'You are at a critical intersection where you need to put emotionality aside and think strategically.',
+            'There is a very high probability that the sweat you shed in the past will turn into a concrete reward today.',
+            'Thanks to your cool stance, you will overcome a major crisis all by yourself.',
+          ];
+          conclusions = [
+            'The summit is the right of only those who persist like you.',
+            'The universe will crown your discipline and labor.',
+            'Never give up; time is your best ally.',
+          ];
+          break;
+        case 'Kova':
+          intros = [
+            'Today is a rebellious day when you break the rules and create your own unique truth.',
+            'With the electric energy of Uranus, ingenious ideas flash like lightning in your mind.',
+            'You break away from the impositions of society and assume your completely original identity.',
+          ];
+          midparts = [
+            'That crazy solution that comes to no one else\'s mind will be a lifesaver today.',
+            'While protecting your individuality, you will also serve a collective good.',
+            'A sudden enlightenment today can open the doors of the future wide to you.',
+          ];
+          conclusions = [
+            'Your vision is the future itself.',
+            'Never compromise on your originality.',
+            'You will become free as you think outside the limits.',
+          ];
+          break;
+        case 'Balık':
+        default:
+          intros = [
+            'Today is a day when you need to be open to the silent signs your subconscious will send you.',
+            'With the misty and magical energy of Neptune, your imagination knows no bounds.',
+            'A divine moment when your empathy ability and spiritual perceptions reach the highest level.',
+          ];
+          midparts = [
+            'Definitely listen today to that voice whispered to you by your dreams or inner visions.',
+            'Instead of fighting the storms inside you, you should try gliding in those waters.',
+            'You have the power to heal others without making their pain your own burden.',
+          ];
+          conclusions = [
+            'The compassion and love of the universe are always with you.',
+            'Your intuition will lead you to the divine truth.',
+            'Your spiritual depth is your greatest wealth.',
+          ];
+          break;
+      }
     }
 
     final intro = intros[rng.nextInt(intros.length)];
@@ -8924,7 +9133,7 @@ class _CosmicHarmonyAnimationState extends State<_CosmicHarmonyAnimation> with S
         ),
         const SizedBox(height: 12),
         Text(
-          widget.currentSignData['name'].toString().toUpperCase(),
+          _getLocalizedSignName(context, widget.currentSignData).toUpperCase(),
           style: GoogleFonts.cinzel(
             color: widget.color,
             fontSize: 12,
@@ -8960,7 +9169,7 @@ class _CosmicHarmonyAnimationState extends State<_CosmicHarmonyAnimation> with S
           ),
           const SizedBox(height: 12),
           Text(
-            'BURÇ SEÇ',
+            AppLocalizations.of(context)!.zodiacChooseSign,
             style: GoogleFonts.cinzel(
               color: widget.color.withOpacity(0.7),
               fontSize: 12,

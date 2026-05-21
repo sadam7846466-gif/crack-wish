@@ -13,6 +13,7 @@ import '../services/storage_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'splash_screen.dart';
+import 'natal_chart_engine.dart';
 
 class CosmicProfilePage extends StatefulWidget {
   const CosmicProfilePage({super.key});
@@ -256,10 +257,20 @@ class _CosmicProfilePageState extends State<CosmicProfilePage> with TickerProvid
     final signsTr = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
     final signsEn = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
     
-    final h = int.tryParse(time.split(':')[0]) ?? 12;
-    final m = int.tryParse(time.split(':')[1]) ?? 0;
-    final index = (d.month * 2 + d.day + h + (m ~/ 15)) % 12;
-    return lang == 'tr' ? signsTr[index] : signsEn[index];
+    try {
+      final engine = NatalChartEngine(
+        birthDate: d,
+        birthTime: time,
+        birthPlace: currentBirthPlace ?? 'Istanbul',
+      );
+      final index = engine.ascSignIndex;
+      return lang == 'tr' ? signsTr[index] : signsEn[index];
+    } catch (e) {
+      final h = int.tryParse(time.split(':')[0]) ?? 12;
+      final m = int.tryParse(time.split(':')[1]) ?? 0;
+      final index = (d.month * 2 + d.day + h + (m ~/ 15)) % 12;
+      return lang == 'tr' ? signsTr[index] : signsEn[index];
+    }
   }
 
   // Generate pseudo coordinates for aesthetic map display

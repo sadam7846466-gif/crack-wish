@@ -92,8 +92,18 @@ class NatalChartEngine {
 
   int get sunSignIndex {
     final m = birthDate.month, d = birthDate.day;
-    const cutoffs = [20,19,20,20,21,21,23,23,23,23,22,22];
-    return d < cutoffs[m-1] ? (m-1) : (m % 12);
+    if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) return 0; // Koç
+    if ((m == 4 && d >= 20) || (m == 5 && d <= 20)) return 1; // Boğa
+    if ((m == 5 && d >= 21) || (m == 6 && d <= 20)) return 2; // İkizler
+    if ((m == 6 && d >= 21) || (m == 7 && d <= 22)) return 3; // Yengeç
+    if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) return 4; // Aslan
+    if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) return 5; // Başak
+    if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) return 6; // Terazi
+    if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) return 7; // Akrep
+    if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) return 8; // Yay
+    if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return 9; // Oğlak
+    if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return 10; // Kova
+    return 11; // Balık
   }
 
   /// Geocode a place name using OpenStreetMap Nominatim (free, no API key)

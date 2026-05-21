@@ -568,6 +568,7 @@
   },
   "coffeeDiscoverFate": "Discover Your Fate",
   "coffeeNextStep": "Next Step",
+  "coffeeCapture": "Capture This Angle",
   "coffeeValidationError": "The grounds in the marked photos\ncould not be clearly identified.",
   "coffeeCosmicMismatch": "Cosmic Mismatch",
   "coffeeCosmicCheck": "COSMIC BOND CHECK",
@@ -1105,6 +1106,17 @@
   "zodiacMeasureHarmony": "MEASURE COSMIC HARMONY",
   "zodiacDiscoverEnergy": "Discover your dual energy guided by the stars",
   "zodiacChooseFriend": "CHOOSE FRIEND",
+  "zodiacChooseFriendSubtitle": "Select a friend to compare your cosmic energies",
+  "zodiacDiscoverYourself": "Discover Yourself",
+  "zodiacCharacteristicAnalysis": "CHARACTERISTIC ANALYSIS",
+  "zodiacAbilityMap": "Ability map of {name}",
+  "@zodiacAbilityMap": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "zodiacPros": "Advantages",
   "zodiacCons": "Challenges",
   "zodiacAdvice": "Advice",
@@ -1216,5 +1228,23 @@
         "type": "String"
       }
     }
-  }
+  },
+  "zodiacGreeting": "Hello {name},",
+  "@zodiacGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacCosmicTraveler": "Cosmic Traveler,",
+  "zodiacBirthDate": "BIRTH DATE",
+  "zodiacStarsKnowYou": "Let the stars know you",
+  "zodiacConfirm": "CONFIRM",
+  "zodiacDiscoverYourselfBtn": "DISCOVER YOURSELF",
+  "zodiacEliteRequiredDesc": "You need an Elite subscription to discover deep astrological compatibility and viral dynamics with your friends.",
+  "zodiacEliteDiscoverBtn": "Discover Elite Privileges",
+  "zodiacHubWestern": "WESTERN ASTROLOGY",
+  "zodiacHubAsian": "ASIAN ASTROLOGY",
+  "zodiacHubMayan": "MAYAN ASTROLOGY"
 }

@@ -663,6 +663,21 @@ class ChineseZodiacTranslations {
     "Kıskançlık": "Jealousy",
     "Kısıtlayan ve dar mekanlar": "Restricting and narrow spaces",
     "Kış": "Winter",
+
+    "Para": "Wealth",
+    "Huzur": "Peace",
+    "Kariyer": "Career",
+    "Yeşil": "Green",
+    "Turkuaz": "Turquoise",
+    "Bej": "Beige",
+    "ve": "and",
+
+
+    "2026 ZAMANLAMA REHBERİ": "2026 TIMING GUIDE",
+    "Yıl boyunca sizi bekleyen fırsat\nve risk dönemlerini analiz edin.": "Analyze the periods of opportunities\nand risks waiting for you throughout the year.",
+
+    "Yaz": "Summer",
+    "Sonbahar": "Autumn",
     "Lacivert · Gri · Gümüş": "Navy Blue · Gray · Silver",
     "Lacivert · Gri · Sarı": "Navy Blue · Gray · Yellow",
     "Liderlik": "Leadership",
@@ -995,7 +1010,6 @@ class ChineseZodiacTranslations {
     "Yeni sosyal çevreler edinin. Sanatsal projelere başlamak için mükemmel zamanlama.": "Acquire new social circles. Excellent timing to start artistic projects.",
     "Yenilikçi projelerinizi planlayın. Teknolojiyle ilgili yatırımlar şanslı.": "Plan your innovative projects. Technology-related investments are lucky.",
     "Yerleşim Tavsiyesi": "Placement Advice",
-    "Yeşil": "Green",
     "Yeşil ve mavi tonları": "Green and blue tones",
     "Yeşil · Açık mavi · Bej": "Green · Light Blue · Beige",
     "Yeşil · Pembe · Bej": "Green · Pink · Beige",
@@ -1190,6 +1204,16 @@ class ChineseZodiacTranslations {
     "Şefkatli": "Compassionate",
     "Şüphecilik": "Skepticism",
     "Şüpheye kapılma": "Do not fall into doubt",
+    "AT YILI": "HORSE YEAR",
+    "Hareket": "Movement",
+    "Mevsimlik Pusula": "Seasonal Compass",
+    "BAGUA HARİTASI": "BAGUA MAP",
+    "Haftalık Rehber": "Weekly Guide",
+    "Rehberi Aç": "Open Guide",
+    "Uygun Değil": "Not Suitable",
+    "Uygun": "Suitable",
+    "Çok Uygun": "Very Suitable",
+    "2026 Zamanlama Rehberi": "2026 Timing Guide",
   };
 
   static String translate(BuildContext context, String text) {

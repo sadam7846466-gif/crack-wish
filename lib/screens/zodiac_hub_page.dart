@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 import '../widgets/glass_back_button.dart';
@@ -119,6 +120,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   Future<void> _showSoulStoneInfoPanel() async {
     final soulStones = await StorageService.getSoulStones();
     if (!mounted) return;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     await showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -163,8 +165,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                           size: 48,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          "Ruh Taşların",
+                        Text(
+                          isTr ? "Ruh Taşların" : "Your Soul Stones",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -196,8 +198,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                               const SizedBox(width: 6),
                               Text(
                                 soulStones > 0
-                                      ? "$soulStones Ruh Taşın var"
-                                      : "Ruh Taşın bitti",
+                                      ? (isTr ? "$soulStones Ruh Taşın var" : "You have $soulStones Soul Stones")
+                                      : (isTr ? "Ruh Taşın bitti" : "No Soul Stones left"),
                                 style: const TextStyle(
                                   color: Color(0xFF22D3EE),
                                   fontSize: 13,
@@ -210,21 +212,21 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                         const SizedBox(height: 16),
                         _premiumInfoRow(
                           Icons.auto_awesome,
-                          "Kozmik Kapı'dan geçiş izni",
+                          isTr ? "Kozmik Kapı'dan geçiş izni" : "Passage through the Cosmic Gate",
                           true,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.diamond_outlined,
-                          "Her astroloji 1 Ruh Taşı harcar",
+                          isTr ? "Her astroloji 1 Ruh Taşı harcar" : "Each astrology costs 1 Soul Stone",
                           soulStones >= 1,
                         ),
                         const SizedBox(height: 10),
                         _premiumInfoRow(
                           Icons.workspace_premium,
                           _isPremiumUser
-                                ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
-                                : "Elite ile her gece 5 Ruh Taşı kazan",
+                                ? (isTr ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir" : "Elite perk: 5 Soul Stones replenish every night")
+                                : (isTr ? "Elite ile her gece 5 Ruh Taşı kazan" : "Get Elite: Earn 5 Soul Stones every night"),
                           _isPremiumUser,
                         ),
 
@@ -255,8 +257,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                 ),
                               );
                             },
-                            child: const Text(
-                              "Elite Abone Ol",
+                            child: Text(
+                              isTr ? "Elite Abone Ol" : "Subscribe to Elite",
                               style: TextStyle(
                                 color: Color(0xFF22D3EE),
                                 fontWeight: FontWeight.bold,
@@ -411,6 +413,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   }
 
   void _showWesternAdPanel(BuildContext context, int adCount, VoidCallback onUnlock) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -440,14 +443,14 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                       children: [
                         const Icon(Icons.flare_outlined, color: Color(0xFFFFD060), size: 48),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Günlük Ücretsiz Hakkın Doldu',
+                        Text(
+                          isTr ? 'Günlük Ücretsiz Hakkın Doldu' : 'Daily Free Access Used',
                           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.',
+                          isTr ? 'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.' : 'Watch a short ad to re-enter Western Astrology.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.4),
                         ),
@@ -483,7 +486,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                 label: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
-                                    'Reklam İzle',
+                                    isTr ? 'Reklam İzle' : 'Watch Ad',
                                     style: TextStyle(color: const Color(0xFFFFD060).withValues(alpha: 0.9), fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -506,10 +509,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                   Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                                 },
                                 icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
-                                label: const FittedBox(
+                                label: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
-                                    'Elite Al',
+                                    isTr ? 'Elite Al' : 'Get Elite',
                                     style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -533,6 +536,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
   }
 
   void _showWesternLimitReached(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -562,14 +566,16 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                       children: [
                         Icon(Icons.lock_clock_rounded, color: Colors.white.withValues(alpha: 0.4), size: 48),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Günlük Limit Doldu',
+                        Text(
+                          isTr ? 'Günlük Limit Doldu' : 'Daily Limit Reached',
                           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Bugünlük Batı Astrolojisi hakkın bitti.\nYarın yeni haklar seni bekliyor!\n\nYa da Elite ile sınırsız giriş yap.',
+                          isTr
+                              ? 'Bugünlük Batı Astrolojisi hakkın bitti.\nYarın yeni haklar seni bekliyor!\n\nYa da Elite ile sınırsız giriş yap.'
+                              : 'Your daily Western Astrology access has ended.\nNew chances await you tomorrow!\n\nOr get unlimited access with Elite.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.5),
                         ),
@@ -589,8 +595,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                           },
                           icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
-                          label: const Text(
-                            'Elite Al — Sınırsız Giriş',
+                          label: Text(
+                            isTr ? 'Elite Al — Sınırsız Giriş' : 'Get Elite — Unlimited Access',
                             style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -638,6 +644,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
     if (!context.mounted) return;
     
     // Ücretsiz kullanıcı için Merkezi Kilit Modalı (Tarot tarzı)
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -688,8 +695,8 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                             size: 48
                                           ),
                                           const SizedBox(height: 12),
-                                          const Text(
-                                            'Kozmik Bilgelik Kapısı',
+                                          Text(
+                                            isTr ? 'Kozmik Bilgelik Kapısı' : 'Cosmic Wisdom Gate',
                                             style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                                             textAlign: TextAlign.center,
                                           ),
@@ -707,7 +714,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                 const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
                                                 const SizedBox(width: 6),
                                                 Text(
-                                                  "$soulStones Ruh Taşın var",
+                                                  isTr ? "$soulStones Ruh Taşın var" : "You have $soulStones Soul Stones",
                                                   style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600),
                                                 ),
                                               ],
@@ -716,21 +723,21 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                           const SizedBox(height: 16),
                                           _premiumInfoRow(
                                             Icons.auto_awesome,
-                                            "Burç derinlikleri için giriş izni",
+                                            isTr ? "Burç derinlikleri için giriş izni" : "Access to zodiac depths",
                                             true,
                                           ),
                                           const SizedBox(height: 10),
                                           _premiumInfoRow(
                                             Icons.diamond_outlined,
-                                            "Her astroloji haritası 1 Ruh Taşı harcar",
+                                            isTr ? "Her astroloji haritası 1 Ruh Taşı harcar" : "Each astrology chart costs 1 Soul Stone",
                                             hasEnough,
                                           ),
                                           const SizedBox(height: 10),
                                           _premiumInfoRow(
                                             Icons.workspace_premium,
                                             _isPremiumUser
-                                                ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir"
-                                                : "Elite ile her gece 5 Ruh Taşı kazan",
+                                                ? (isTr ? "Elite ayrıcalığı: Her gece 5 Ruh Taşı yenilenir" : "Elite perk: 5 Soul Stones replenish every night")
+                                                : (isTr ? "Elite ile her gece 5 Ruh Taşı kazan" : "Get Elite: Earn 5 Soul Stones every night"),
                                             _isPremiumUser,
                                           ),
                                           const SizedBox(height: 20),
@@ -767,7 +774,7 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                   child: FittedBox(
                                                     fit: BoxFit.scaleDown,
                                                     child: Text(
-                                                      "1 Ruh Taşı Kullan",
+                                                      isTr ? "1 Ruh Taşı Kullan" : "Use 1 Soul Stone",
                                                       style: TextStyle(
                                                         color: hasEnough
                                                             ? const Color(0xFF22D3EE)
@@ -796,10 +803,10 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                                                       Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                                                     },
                                                     icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
-                                                    label: const FittedBox(
+                                                    label: FittedBox(
                                                       fit: BoxFit.scaleDown,
                                                       child: Text(
-                                                        "Elite Al",
+                                                        isTr ? "Elite Al" : "Get Elite",
                                                         style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
                                                       ),
                                                     ),
@@ -875,31 +882,31 @@ class _ZodiacHubPageState extends State<ZodiacHubPage>
                 const SizedBox(height: 10),
                 // ── ÜÇ ÇARK (Tek ekrana sığması için kompakt tasarlandı) ──
                 _animWrap(_t1, _wheelSection(
-                  wheelSize: wheelSize, label: 'BATI ASTROLOJİSİ', 
+                  wheelSize: wheelSize, label: AppLocalizations.of(context)!.zodiacHubWestern, 
                   painter: (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   showBadge: _westernUnread,
                   onTap: () => _handleWesternAccess(context, () async {
-                    await _playPortalOpenRitual('BATI ASTROLOJİSİ', (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
+                    await _playPortalOpenRitual(AppLocalizations.of(context)!.zodiacHubWestern, (p) => WesternWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacPage());
                   }),
                 )),
                 const SizedBox(height: 28),
                 _animWrap(_t2, _wheelSection(
-                  wheelSize: wheelSize, label: 'ASYA ASTROLOJİSİ', 
+                  wheelSize: wheelSize, label: AppLocalizations.of(context)!.zodiacHubAsian, 
                   painter: (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   showBadge: _asianUnread,
                   onTap: () => _handlePremiumAccess(context, 'asian', () async {
-                    await _playPortalOpenRitual('ASYA ASTROLOJİSİ', (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
+                    await _playPortalOpenRitual(AppLocalizations.of(context)!.zodiacHubAsian, (p) => ChineseWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacChinesePage());
                   }),
                 )),
                 const SizedBox(height: 28),
                 _animWrap(_t3, _wheelSection(
-                  wheelSize: wheelSize, label: 'MAYA ASTROLOJİSİ', 
+                  wheelSize: wheelSize, label: AppLocalizations.of(context)!.zodiacHubMayan, 
                   painter: (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD),
                   isPremium: true,
                   showBadge: _mayanUnread,
                   onTap: () => _handlePremiumAccess(context, 'mayan', () async {
-                    await _playPortalOpenRitual('MAYA ASTROLOJİSİ', (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
+                    await _playPortalOpenRitual(AppLocalizations.of(context)!.zodiacHubMayan, (p) => MayanWheelPainter(rotation: p, gold: _gold, goldD: _goldD), wheelSize, const ZodiacMayanPage());
                   }),
                 )),
                 const SizedBox(height: 40),

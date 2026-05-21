@@ -299,7 +299,7 @@ class _NatalChartPageState extends State<NatalChartPage> {
 
                 // ── SWIPEABLE CONTENT ──
                 SizedBox(
-                  height: 220,
+                  height: 280,
                   child: PageView.builder(
                     controller: _pageController,
                     physics: const BouncingScrollPhysics(),
@@ -487,10 +487,15 @@ class _NatalChartPageState extends State<NatalChartPage> {
           )).toList()
         ),
         const SizedBox(height: 20),
-        Text(
-          data.body, 
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 14, height: 1.7, letterSpacing: 0.2)
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Text(
+              data.body, 
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withOpacity(0.65), fontSize: 14, height: 1.7, letterSpacing: 0.2),
+            ),
+          ),
         ),
       ]),
     );

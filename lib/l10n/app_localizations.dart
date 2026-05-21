@@ -2531,6 +2531,12 @@ abstract class AppLocalizations {
   /// **'Sonraki Adım'**
   String get coffeeNextStep;
 
+  /// No description provided for @coffeeCapture.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Açıyı Çek'**
+  String get coffeeCapture;
+
   /// No description provided for @coffeeValidationError.
   ///
   /// In tr, this message translates to:
@@ -4979,6 +4985,30 @@ abstract class AppLocalizations {
   /// **'ARKADAŞ SEÇ'**
   String get zodiacChooseFriend;
 
+  /// No description provided for @zodiacChooseFriendSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik enerjilerinizi karşılaştırmak için bir dost seç'**
+  String get zodiacChooseFriendSubtitle;
+
+  /// No description provided for @zodiacDiscoverYourself.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendini Keşfet'**
+  String get zodiacDiscoverYourself;
+
+  /// No description provided for @zodiacCharacteristicAnalysis.
+  ///
+  /// In tr, this message translates to:
+  /// **'KARAKTERİSTİK ANALİZ'**
+  String get zodiacCharacteristicAnalysis;
+
+  /// No description provided for @zodiacAbilityMap.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} burcunun yetenek haritası'**
+  String zodiacAbilityMap(String name);
+
   /// No description provided for @zodiacPros.
   ///
   /// In tr, this message translates to:
@@ -5422,6 +5452,72 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{house}. Ev'**
   String natalChartHouse(String house);
+
+  /// No description provided for @zodiacGreeting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merhaba {name},'**
+  String zodiacGreeting(String name);
+
+  /// No description provided for @zodiacCosmicTraveler.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Yolcu,'**
+  String get zodiacCosmicTraveler;
+
+  /// No description provided for @zodiacBirthDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'DOĞUM TARİHİ'**
+  String get zodiacBirthDate;
+
+  /// No description provided for @zodiacStarsKnowYou.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yıldızların seni tanısın'**
+  String get zodiacStarsKnowYou;
+
+  /// No description provided for @zodiacConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'ONAYLA'**
+  String get zodiacConfirm;
+
+  /// No description provided for @zodiacDiscoverYourselfBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'KENDİNİ KEŞFET'**
+  String get zodiacDiscoverYourselfBtn;
+
+  /// No description provided for @zodiacEliteRequiredDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarınla derin astrolojik uyumunu ve viral dinamiklerini keşfetmek için Elite abonesi olmalısın.'**
+  String get zodiacEliteRequiredDesc;
+
+  /// No description provided for @zodiacEliteDiscoverBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Ayrıcalıklarını Keşfet'**
+  String get zodiacEliteDiscoverBtn;
+
+  /// No description provided for @zodiacHubWestern.
+  ///
+  /// In tr, this message translates to:
+  /// **'BATI ASTROLOJİSİ'**
+  String get zodiacHubWestern;
+
+  /// No description provided for @zodiacHubAsian.
+  ///
+  /// In tr, this message translates to:
+  /// **'ASYA ASTROLOJİSİ'**
+  String get zodiacHubAsian;
+
+  /// No description provided for @zodiacHubMayan.
+  ///
+  /// In tr, this message translates to:
+  /// **'MAYA ASTROLOJİSİ'**
+  String get zodiacHubMayan;
 }
 
 class _AppLocalizationsDelegate

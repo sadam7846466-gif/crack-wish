@@ -1332,6 +1332,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coffeeNextStep => 'Next Step';
 
   @override
+  String get coffeeCapture => 'Capture This Angle';
+
+  @override
   String get coffeeValidationError =>
       'The grounds in the marked photos\ncould not be clearly identified.';
 
@@ -2654,6 +2657,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zodiacChooseFriend => 'CHOOSE FRIEND';
 
   @override
+  String get zodiacChooseFriendSubtitle =>
+      'Select a friend to compare your cosmic energies';
+
+  @override
+  String get zodiacDiscoverYourself => 'Discover Yourself';
+
+  @override
+  String get zodiacCharacteristicAnalysis => 'CHARACTERISTIC ANALYSIS';
+
+  @override
+  String zodiacAbilityMap(String name) {
+    return 'Ability map of $name';
+  }
+
+  @override
   String get zodiacPros => 'Advantages';
 
   @override
@@ -2901,4 +2919,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String natalChartHouse(String house) {
     return 'House $house';
   }
+
+  @override
+  String zodiacGreeting(String name) {
+    return 'Hello $name,';
+  }
+
+  @override
+  String get zodiacCosmicTraveler => 'Cosmic Traveler,';
+
+  @override
+  String get zodiacBirthDate => 'BIRTH DATE';
+
+  @override
+  String get zodiacStarsKnowYou => 'Let the stars know you';
+
+  @override
+  String get zodiacConfirm => 'CONFIRM';
+
+  @override
+  String get zodiacDiscoverYourselfBtn => 'DISCOVER YOURSELF';
+
+  @override
+  String get zodiacEliteRequiredDesc =>
+      'You need an Elite subscription to discover deep astrological compatibility and viral dynamics with your friends.';
+
+  @override
+  String get zodiacEliteDiscoverBtn => 'Discover Elite Privileges';
+
+  @override
+  String get zodiacHubWestern => 'WESTERN ASTROLOGY';
+
+  @override
+  String get zodiacHubAsian => 'ASIAN ASTROLOGY';
+
+  @override
+  String get zodiacHubMayan => 'MAYAN ASTROLOGY';
 }

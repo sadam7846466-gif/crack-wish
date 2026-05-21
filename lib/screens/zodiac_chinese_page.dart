@@ -9,6 +9,7 @@ import '../services/storage_service.dart';
 import '../services/analytics_service.dart';
 import 'chinese_zodiac_data.dart';
 import '../utils/chinese_zodiac_translations.dart';
+import 'feng_shui_en.dart';
 
 class ZodiacChinesePage extends StatefulWidget {
   const ZodiacChinesePage({super.key});
@@ -940,14 +941,16 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           builder: (context) {
             // Motto + kişilik cümlelerini birleştir
             final motto = _getAnimalMotto(_animalIdx);
-            final personalitySentences = (a['personality'] as String)
+            final translatedPersonality = ChineseZodiacTranslations.translate(context, a['personality'] as String);
+            final personalitySentences = translatedPersonality
                 .split('. ')
                 .where((s) => s.trim().isNotEmpty)
                 .map((s) => s.endsWith('.') ? s : '$s.')
                 .toList();
-            final allQuotes = [motto, ...personalitySentences]
-                .map((q) => ChineseZodiacTranslations.translate(context, q))
-                .toList();
+            final allQuotes = [
+              ChineseZodiacTranslations.translate(context, motto),
+              ...personalitySentences
+            ];
             return _UnifiedProfileCard(
               quotes: allQuotes,
               crimson: _crimson,
@@ -1265,7 +1268,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
   // ══════════════════════════════════════════
   Widget _yearSection() {
     final yearAnimal = ChineseZodiacData.animals[6]; // At
-    final interaction = ChineseZodiacData.yearInteractions[_animalIdx];
+    final interaction = ChineseZodiacTranslations.translate(context, ChineseZodiacData.yearInteractions[_animalIdx]);
     return _staggeredColumn(
       tabIndex: 3,
       children: [
@@ -1289,7 +1292,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      'ATEŞ ATI YILI',
+                      ChineseZodiacTranslations.translate(context, 'ATEŞ ATI YILI'),
                       style: TextStyle(
                         color: _goldL.withOpacity(0.25),
                         fontSize: 9,
@@ -1374,7 +1377,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                     ),
                   ),
                   Text(
-                    'AT YILI',
+                    ChineseZodiacTranslations.translate(context, 'AT YILI'),
                     style: TextStyle(
                       color: _goldL.withOpacity(0.45),
                       fontSize: 14,
@@ -1417,7 +1420,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
-                  'Ateş Atı yılı; enerji, özgürlük ve hareketlilik temalı bir dönem. Cesur adımlar atanları ödüllendirir.',
+                  ChineseZodiacTranslations.translate(context, 'Ateş Atı yılı; enerji, özgürlük ve hareketlilik temalı bir dönem. Cesur adımlar atanları ödüllendirir.'),
                   textAlign: TextAlign.center,
                   style: _bodyStyle(),
                 ),
@@ -1463,7 +1466,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Ateş',
+                            ChineseZodiacTranslations.translate(context, 'Ateş'),
                             style: TextStyle(
                               color: _goldL,
                               fontSize: 14,
@@ -1472,7 +1475,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Ruhun Alevi',
+                            ChineseZodiacTranslations.translate(context, 'Ruhun Alevi'),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.25),
                               fontSize: 8,
@@ -1518,7 +1521,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Kozmik Denge',
+                            ChineseZodiacTranslations.translate(context, 'Kozmik Denge'),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.25),
                               fontSize: 8,
@@ -1553,7 +1556,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Hareket',
+                            ChineseZodiacTranslations.translate(context, 'Hareket'),
                             style: TextStyle(
                               color: _goldL,
                               fontSize: 14,
@@ -1562,7 +1565,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Akış Enerjisi',
+                            ChineseZodiacTranslations.translate(context, 'Akış Enerjisi'),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.25),
                               fontSize: 8,
@@ -1610,7 +1613,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          'YILLIK ETKİLEŞİM',
+                          ChineseZodiacTranslations.translate(context, 'YILLIK ETKİLEŞİM'),
                           style: TextStyle(
                             color: _goldL.withOpacity(0.3),
                             fontSize: 9,
@@ -1691,7 +1694,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  _animal['name'] as String,
+                                  ChineseZodiacTranslations.translate(context, _animal['name'] as String),
                                   style: TextStyle(
                                     color: myElColor.withOpacity(0.8),
                                     fontSize: 12,
@@ -1780,7 +1783,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'At',
+                                  ChineseZodiacTranslations.translate(context, 'At'),
                                   style: TextStyle(
                                     color: yearElColor.withOpacity(0.7),
                                     fontSize: 12,
@@ -1869,8 +1872,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Mevsimlik Pusula',
+                    Text(
+                      ChineseZodiacTranslations.translate(context, 'Mevsimlik Pusula'),
                       style: TextStyle(
                         color: Color(0xFFE8DCC8),
                         fontSize: 18,
@@ -2121,8 +2124,8 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           ),
                         ),
                         const SizedBox(height: 14),
-                        const Text(
-                          'Aşk & İlişki',
+                        Text(
+                          ChineseZodiacTranslations.translate(context, 'Aşk & İlişki'),
                           style: TextStyle(
                             color: Color(0xFFE8DCC8),
                             fontSize: 22,
@@ -2173,7 +2176,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                         ),
                         const SizedBox(height: 18),
                         Text(
-                          a['love'] as String,
+                          ChineseZodiacTranslations.translate(context, a['love'] as String),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.72),
@@ -2193,7 +2196,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Sevgiyle mühürlendi',
+                              ChineseZodiacTranslations.translate(context, 'Sevgiyle mühürlendi'),
                               style: TextStyle(
                                 color: const Color(0xFFD4A017).withOpacity(0.3),
                                 fontSize: 10,
@@ -3576,7 +3579,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   colors: [c, c.withOpacity(0.6)],
                 ).createShader(b),
                 child: Text(
-                  fortune['level'] as String,
+                  ChineseZodiacTranslations.translate(context, fortune['level'] as String),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
@@ -3709,17 +3712,17 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _energyLabel(
-                    'Sabah',
+                    ChineseZodiacTranslations.translate(context, 'Sabah'),
                     fortune['morningEnergy'] as double,
                     const Color(0xFFFFB74D),
                   ),
                   _energyLabel(
-                    'Öğle',
+                    ChineseZodiacTranslations.translate(context, 'Öğle'),
                     fortune['afternoonEnergy'] as double,
                     const Color(0xFFFF8A65),
                   ),
                   _energyLabel(
-                    'Akşam',
+                    ChineseZodiacTranslations.translate(context, 'Akşam'),
                     fortune['eveningEnergy'] as double,
                     const Color(0xFF9575CD),
                   ),
@@ -4349,34 +4352,34 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
 
   // Element ilişki — kısa etiket
   String _elementRelationLabel(String a, String b) {
-    if (a == b) return 'Kardeş Ruh';
+    if (a == b) return ChineseZodiacTranslations.translate(context, 'Kardeş Ruh');
     final elData = ChineseZodiacData.elements[a]!;
-    if (elData['generates'] == b) return 'Besleyici Bağ';
-    if (elData['controls'] == b) return 'Yönlendirici Güç';
-    if (elData['weakenedBy'] == b) return 'Dengeleyici Güç';
+    if (elData['generates'] == b) return ChineseZodiacTranslations.translate(context, 'Besleyici Bağ');
+    if (elData['controls'] == b) return ChineseZodiacTranslations.translate(context, 'Yönlendirici Güç');
+    if (elData['weakenedBy'] == b) return ChineseZodiacTranslations.translate(context, 'Dengeleyici Güç');
     final bData = ChineseZodiacData.elements[b]!;
-    if (bData['generates'] == a) return 'Besleyici Bağ';
-    if (bData['controls'] == a) return 'Yönlendirici Güç';
-    return 'Bağımsız Akış';
+    if (bData['generates'] == a) return ChineseZodiacTranslations.translate(context, 'Besleyici Bağ');
+    if (bData['controls'] == a) return ChineseZodiacTranslations.translate(context, 'Yönlendirici Güç');
+    return ChineseZodiacTranslations.translate(context, 'Bağımsız Akış');
   }
 
   // Element ilişki — açıklayıcı cümle
   String _elementRelationDesc(String a, String b) {
     if (a == b)
-      return 'İkiniz de aynı enerjiden besleniyor. Birbirinizi sözlere gerek kalmadan anlıyorsunuz — bu nadir bir bağdır.';
+      return ChineseZodiacTranslations.translate(context, 'İkiniz de aynı enerjiden besleniyor. Birbirinizi sözlere gerek kalmadan anlıyorsunuz — bu nadir bir bağdır.');
     final elData = ChineseZodiacData.elements[a]!;
     if (elData['generates'] == b)
-      return 'Senin varlığın onu güçlendiriyor, yanında olduğunda daha iyi hissediyor. Doğal bir destek kaynağısın.';
+      return ChineseZodiacTranslations.translate(context, 'Senin varlığın onu güçlendiriyor, yanında olduğunda daha iyi hissediyor. Doğal bir destek kaynağısın.');
     if (elData['controls'] == b)
-      return 'Senin bakış açın ona yön veriyor. Farkında olmadan onu etkiliyorsun — bu hem güç hem de sorumluluk.';
+      return ChineseZodiacTranslations.translate(context, 'Senin bakış açın ona yön veriyor. Farkında olmadan onu etkiliyorsun — bu hem güç hem de sorumluluk.');
     if (elData['weakenedBy'] == b)
-      return 'Bu ilişkide bazen kendini yorgun hissedebilirsin. Dengeyi korumak biraz çaba istiyor ama karşılığı var.';
+      return ChineseZodiacTranslations.translate(context, 'Bu ilişkide bazen kendini yorgun hissedebilirsin. Dengeyi korumak biraz çaba istiyor ama karşılığı var.');
     final bData = ChineseZodiacData.elements[b]!;
     if (bData['generates'] == a)
-      return 'Onun varlığı seni güçlendiriyor, yanında olduğunda daha enerjik hissediyorsun. Doğal bir destek kaynağın.';
+      return ChineseZodiacTranslations.translate(context, 'Onun varlığı seni güçlendiriyor, yanında olduğunda daha enerjik hissediyorsun. Doğal bir destek kaynağın.');
     if (bData['controls'] == a)
-      return 'Onun fikirleri ve duruşu seni yönlendiriyor. Bu etki seni büyütür — eğer açık olabilirsen.';
-    return 'İkiniz farklı dünyalardan geliyor. Birbirinizi keşfetmek zaman alır ama sürprizlerle dolu olabilir.';
+      return ChineseZodiacTranslations.translate(context, 'Onun fikirleri ve duruşu seni yönlendiriyor. Bu etki seni büyütür — eğer açık olabilirsen.');
+    return ChineseZodiacTranslations.translate(context, 'İkiniz farklı dünyalardan geliyor. Birbirinizi keşfetmek zaman alır ama sürprizlerle dolu olabilir.');
   }
 
   // Motto
@@ -4601,7 +4604,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               children: [
                 const SizedBox(height: 1),
                 Text(
-                  season,
+                  ChineseZodiacTranslations.translate(context, season),
                   style: TextStyle(
                     color: color,
                     fontSize: 14,
@@ -4610,7 +4613,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  advice,
+                  ChineseZodiacTranslations.translate(context, advice),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.55),
                     fontSize: 13,
@@ -4776,7 +4779,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              animal['name'] as String,
+                              ChineseZodiacTranslations.translate(context, animal['name'] as String),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.7),
                                 fontSize: 11,
@@ -4853,7 +4856,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    animal['name'] as String,
+                    ChineseZodiacTranslations.translate(context, animal['name'] as String),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 10,
@@ -4950,7 +4953,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         ),
         const SizedBox(height: 5),
         Text(
-          animal['name'] as String,
+          ChineseZodiacTranslations.translate(context, animal['name'] as String),
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 10,
@@ -4979,7 +4982,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
           SizedBox(
             width: 48,
             child: Text(
-              animal['name'] as String,
+              ChineseZodiacTranslations.translate(context, animal['name'] as String),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 11,
@@ -5070,7 +5073,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         ),
         const SizedBox(height: 5),
         Text(
-          animal['name'] as String,
+          ChineseZodiacTranslations.translate(context, animal['name'] as String),
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 10,
@@ -5129,7 +5132,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
             ),
             const SizedBox(height: 5),
             Text(
-              animal['name'] as String,
+              ChineseZodiacTranslations.translate(context, animal['name'] as String),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 10,
@@ -5171,7 +5174,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
               _animalIcon(animalIdx, 42),
               const SizedBox(height: 3),
               Text(
-                animal['name'] as String,
+                ChineseZodiacTranslations.translate(context, animal['name'] as String),
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.8),
                   fontSize: 10,
@@ -5221,7 +5224,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         Text(animal['emoji'] as String, style: const TextStyle(fontSize: 26)),
         const SizedBox(height: 2),
         Text(
-          animal['name'] as String,
+          ChineseZodiacTranslations.translate(context, animal['name'] as String),
           style: TextStyle(
             color: Colors.white.withOpacity(0.8),
             fontSize: 10,
@@ -5261,7 +5264,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
         Text(animal['emoji'] as String, style: const TextStyle(fontSize: 30)),
         const SizedBox(height: 4),
         Text(
-          animal['name'] as String,
+          ChineseZodiacTranslations.translate(context, animal['name'] as String),
           style: TextStyle(
             color: Colors.white.withOpacity(0.8),
             fontSize: 11,
@@ -5352,7 +5355,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                   const SizedBox(width: 3),
                   Flexible(
                     child: Text(
-                      animal['name'] as String,
+                      ChineseZodiacTranslations.translate(context, animal['name'] as String),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 11,
@@ -5495,7 +5498,7 @@ class _ZodiacChinesePageState extends State<ZodiacChinesePage>
                           const SizedBox(height: 6),
                           // İsim
                           Text(
-                            animal['name'] as String,
+                            ChineseZodiacTranslations.translate(context, animal['name'] as String),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 12,
@@ -6431,7 +6434,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
     _timerCtrl =
         AnimationController(
           vsync: this,
-          duration: const Duration(milliseconds: 8000),
+          duration: const Duration(milliseconds: 14000),
         )..addStatusListener((s) {
           if (s == AnimationStatus.completed) _advance();
         });
@@ -6582,7 +6585,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                d['title']!,
+                                ChineseZodiacTranslations.translate(ctx, d['title']!),
                                 style: TextStyle(
                                   color: color,
                                   fontSize: 19,
@@ -6599,7 +6602,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          d['desc']!,
+                          ChineseZodiacTranslations.translate(ctx, d['desc']!),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.82),
                             fontSize: 13.5,
@@ -6607,13 +6610,13 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                           ),
                         ),
                         const SizedBox(height: 14),
-                        _infoRow('✨', 'Kişilik', d['traits']!, color),
+                        _infoRow('✨', ChineseZodiacTranslations.translate(ctx, 'Kişilik'), ChineseZodiacTranslations.translate(ctx, d['traits']!), color),
                         const SizedBox(height: 8),
-                        _infoRow('🌸', 'En güçlü mevsim', d['season']!, color),
+                        _infoRow('🌸', ChineseZodiacTranslations.translate(ctx, 'En güçlü mevsim'), ChineseZodiacTranslations.translate(ctx, d['season']!), color),
                         const SizedBox(height: 8),
-                        _infoRow('🫀', 'Beden bağlantısı', d['body']!, color),
+                        _infoRow('🫀', ChineseZodiacTranslations.translate(ctx, 'Beden bağlantısı'), ChineseZodiacTranslations.translate(ctx, d['body']!), color),
                         const SizedBox(height: 8),
-                        _infoRow('🧭', 'Yön', d['dir']!, color),
+                        _infoRow('🧭', ChineseZodiacTranslations.translate(ctx, 'Yön'), ChineseZodiacTranslations.translate(ctx, d['dir']!), color),
                       ],
                     ),
                   ),
@@ -6673,7 +6676,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                isYin ? 'Yin Enerjisi' : 'Yang Enerjisi',
+                                isYin ? ChineseZodiacTranslations.translate(context, 'Yin Enerjisi') : ChineseZodiacTranslations.translate(context, 'Yang Enerjisi'),
                                 style: TextStyle(
                                   color: color,
                                   fontSize: 19,
@@ -6690,9 +6693,9 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          isYin
+                          ChineseZodiacTranslations.translate(ctx, isYin
                               ? 'Yin; alıcı, sessiz ve içe dönük enerjidir. Ay ve geceyle özdeşleşir. Yin taşıyan insanlar derin hisler, güçlü sezgi ve yaratıcı bir iç dünyaya sahiptir.'
-                              : 'Yang; aktif, yayıcı ve dışa açılan enerjidir. Güneş ve gündüzle özdeşleşir. Yang taşıyan insanlar hareketi, liderliği ve toplumu besler.',
+                              : 'Yang; aktif, yayıcı ve dışa açılan enerjidir. Güneş ve gündüzle özdeşleşir. Yang taşıyan insanlar hareketi, liderliği ve toplumu besler.'),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.82),
                             fontSize: 13.5,
@@ -6702,37 +6705,37 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                         const SizedBox(height: 14),
                         _infoRow(
                           '✨',
-                          'Temel nitelikler',
-                          isYin
+                          ChineseZodiacTranslations.translate(ctx, 'Temel nitelikler'),
+                          ChineseZodiacTranslations.translate(ctx, isYin
                               ? 'Sezgisel · Derin · Sakin · Yaratıcı'
-                              : 'Girişken · Lider · Cesur · Enerjik',
+                              : 'Girişken · Lider · Cesur · Enerjik'),
                           color,
                         ),
                         const SizedBox(height: 8),
                         _infoRow(
                           '🕐',
-                          'En güçlü zaman',
-                          isYin
+                          ChineseZodiacTranslations.translate(ctx, 'En güçlü zaman'),
+                          ChineseZodiacTranslations.translate(ctx, isYin
                               ? 'Gece saatleri — zihin sessizleştiğinde Yin enerjisi zirveye çıkar; derin düşünce, sanatsal üretim ve içgörü için ideal zaman.'
-                              : 'Gündüz saatleri — güneşin en parlak olduğu anlarda Yang enerjisi doruğa ulaşır; önemli kararlar, sosyal adımlar ve eylem bu zamana ait.',
+                              : 'Gündüz saatleri — güneşin en parlak olduğu anlarda Yang enerjisi doruğa ulaşır; önemli kararlar, sosyal adımlar ve eylem bu zamana ait.'),
                           color,
                         ),
                         const SizedBox(height: 8),
                         _infoRow(
                           '💡',
-                          'Doğal güç',
-                          isYin
+                          ChineseZodiacTranslations.translate(ctx, 'Doğal güç'),
+                          ChineseZodiacTranslations.translate(ctx, isYin
                               ? 'Dinleme, empati, strateji ve içsel keşif. Yin insanlar söylenmeyeni duyar.'
-                              : 'Harekete geçme, ikna etme, liderlik ve kolektif enerji yaratma.',
+                              : 'Harekete geçme, ikna etme, liderlik ve kolektif enerji yaratma.'),
                           color,
                         ),
                         const SizedBox(height: 8),
                         _infoRow(
                           '⚖️',
-                          'Dengeyi bulmak',
-                          isYin
+                          ChineseZodiacTranslations.translate(ctx, 'Dengeyi bulmak'),
+                          ChineseZodiacTranslations.translate(ctx, isYin
                               ? 'Yin enerji çok baskın olduğunda içe kapanma ve atalet riski doğar. Düzenli hareket (yürüyüş, dans), paylaşım ve küçük cesur adımlar dengeyi geri getirir.'
-                              : 'Yang enerji çok baskın olduğunda tükenmişlik ve sabırsızlık riski doğar. Sessiz anlar, meditasyon ve dinleme pratiği dengeyi geri getirir.',
+                              : 'Yang enerji çok baskın olduğunda tükenmişlik ve sabırsızlık riski doğar. Sessiz anlar, meditasyon ve dinleme pratiği dengeyi geri getirir.'),
                           color,
                         ),
                       ],
@@ -6842,7 +6845,7 @@ class _UnifiedProfileCardState extends State<_UnifiedProfileCard>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            widget.element.toUpperCase(),
+                            ChineseZodiacTranslations.translate(context, widget.element).toUpperCase(),
                             style: TextStyle(
                               color: elColor.withOpacity(0.75),
                               fontSize: 11.5,
@@ -7080,71 +7083,8 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
       DateTime.now().millisecondsSinceEpoch ~/ (1000 * 60 * 60 * 24 * 7);
 
   String _getPersonalizedActivate(String goal, String element) {
-    final eActivators = {
-      'Ağaç': [
-        'Yeşil yapraklı canlı bitkiler ekle', 'Ahşap dokulu dekoratif objeler kullan', 'Uzun ve dikey formlu aksesuarlar yerleştir',
-        'Doğal bambu çubukları bulundur', 'Açık yeşil veya mint tonlarında detaylar seç', 'Ahşap çerçeveli doğa manzaraları as',
-        'Hasır veya doğal örgü sepetler kullan', 'Mekana taze ve canlı çiçekler getir', 'Sarmaşık türü büyüyen bitkiler yerleştir',
-        'Ağaç dalı formunda sanatsal objeler ekle', 'Pamuklu ve keten doğal kumaşlar tercih et', 'Doğal ahşap rüzgar çanları veya mobilyalar ekle'
-      ],
-      'Ateş': [
-        'Kırmızı, turuncu veya bordo tonlu objeler ekle', 'Sıcak sarı ışık veren abajurlar kullan', 'Üçgen veya piramit formlu aksesuarlar yerleştir',
-        'Canlı yanan mumlar veya şamdanlar bulundur', 'Güneş ışığını içeri çeken parlak kristalleri as', 'Sıcak tonlu tütsüler veya aromaterapi yağları kullan',
-        'Parlak dokulu ve göz alıcı kumaşlar seç', 'Ateş elementini yansıtan yıldız şekilli dekorlar ekle', 'Güneş veya ateş temalı sanat eserleri as',
-        'Evcil hayvanların veya canlılığın enerjisini yansıt', 'Kırmızı detaylı yumuşak kırlentler yerleştir', 'Sıcak bir ambiyans yaratan tuz lambası kullan'
-      ],
-      'Toprak': [
-        'Toprak, bej veya kiremit tonlarında eşyalar ekle', 'Kare veya yatay dikdörtgen formlu mobilyalar kullan', 'Doğal taşlar ve kristaller bulundur',
-        'Seramik, kil veya çömlek saksılar yerleştir', 'Yumuşak, peluş ve yere yakın dokular seç', 'Sarı, kahverengi ve taba renkli kırlentler kullan',
-        'Çöl veya dağ manzaralı tablolar as', 'Ağır ve sağlam duran masa üstü objeleri ekle', 'Doğal kum veya taş bahçesi (zen garden) kur',
-        'Merkezi dengeleyen kare desenli halılar ser', 'Topraklanma hissi veren doğal tuz kristalleri koy', 'Sarsılmazlığı simgeleyen taş heykeller ekle'
-      ],
-      'Metal': [
-        'Beyaz, gri veya metalik parlak renkler ekle', 'Dairesel, oval veya küre formlu objeler kullan', 'Gümüş, altın veya bakır yansımalı aksesuarlar yerleştir',
-        'Metal çerçeveli aynalar as', 'Pürüzsüz ve sert yüzeyli dekoratif eşyalar seç', 'Metalik ses çıkaran rüzgar çanları veya saatler bulundur',
-        'Beyaz renkli ve sade çiçekler (örneğin beyaz orkide) koy', 'Minimalist ve modern çizgili objeler tercih et', 'Parlak çelik veya krom masa eşyaları kullan',
-        'Gökyüzü veya uzay temalı yuvarlak tablolar as', 'Gereksiz detayı olmayan pürüzsüz yüzeyler yarat', 'Odaklanmayı artıran gümüş tonlu küreler ekle'
-      ],
-      'Su': [
-        'Lacivert, siyah veya koyu mavi tonlar ekle', 'Dalgalı, kıvrımlı veya asimetrik formlar kullan', 'Cam objeler ve şeffaf aksesuarlar yerleştir',
-        'Küçük bir masa çeşmesi veya su şelalesi bulundur', 'Derinliği simgeleyen koyu renkli aynalar as', 'Su manzarası, okyanus veya şelale tabloları ekle',
-        'İçinde taze su bulunan cam vazolar koy', 'Deniz kabukları veya sualtı temalı dekorlar kullan', 'Serbest akışı yansıtan ipek veya saten kumaşlar seç',
-        'Koyu renkli saksılarda su içinde büyüyen bitkiler yetiştir', 'Akışkan formlu ve yansıtıcı yüzeyli biblolar ekle', 'Işığı su gibi kıran kristal prizmalar as'
-      ],
-    };
-
-    final gActivators = {
-      'Para': [
-        'güneydoğu köşesinde bolluk enerjisini canlandır.', 'çalışma masanın sol üst köşesini ferah tutarak bereketi çek.', 'mekanın girişini aydınlık tutarak finansal fırsatlara yer aç.',
-        'zenginlik köşene değer katan küçük bir dokunuş yap.', 'cüzdanını koyduğun alanı temiz ve düzenli tutarak parayı onurlandır.', 'evin bereket merkezinde birikim enerjisini aktive et.',
-        'mutfak ocağının etrafını her zaman pırıl pırıl yaparak bolluğu davet et.', 'para köşende istikrarlı büyümeyi simgeleyen objeler bulundur.', 'finansal evraklarını düzenli tuttuğun alana şık bir kutu ekleyerek değer kat.',
-        'bolluk afirmasyonlarını yazdığın bir kağıdı görünür bir yere as.', 'yemek masasının etrafında bereketi yansıtacak detaylar kullan.', 'giriş kapının karşısına bolluk hissi veren bir dekorasyon yerleştir.'
-      ],
-      'Aşk': [
-        'güneybatı köşesinde ikili ilişkileri güçlendiren adımlar at.', 'yatak odanda simetri yaratarak romantik dengeyi kur.', 'tekli eşyaları çiftleyerek hayatına uyumu davet et.',
-        'ilişki köşesinde sıcaklık ve yakınlık hissini canlandır.', 'evin merkezinde sevgi dolu bir atmosfer oluştur.', 'yatağının iki tarafına da eşit boşluk bırakarak partnerine alan aç.',
-        'aşkı ve tutkuyu çeken objeleri görünür alanlara yerleştir.', 'geçmişteki ilişkilerin enerjisini temizleyip yeni aşka yer aç.', 'romantizmi simgeleyen hoş kokular ve dokular ekle.',
-        'oturma odanda iletişimi teşvik edecek U düzeni kur.', 'aşk köşene çiftleri simgeleyen sanat eserleri veya fotoğraflar as.', 'kendine duyduğun sevgiyi artıracak öz bakım köşeleri yarat.'
-      ],
-      'Kariyer': [
-        'kuzey köşesinde iş ve kariyer fırsatlarını hareketlendir.', 'çalışma alanında yüzünü her zaman kapıya dönecek şekilde ayarla.', 'masanda liderliği ve başarıyı simgeleyen detaylar bulundur.',
-        'iş hayatında önündeki engelleri kaldırmak için vizyonunu temiz tut.', 'kariyer yolculuğunda sana ilham veren mentörlerin sözlerini as.', 'odaklanmayı artırmak için çalışma masanın merkezini tamamen boşalt.',
-        'başarı hedeflerini simgeleyen objeleri görüş alanında tut.', 'profesyonel ağını genişletmek için iletişim köşeni (kuzeybatı) güçlendir.', 'çalışma masanın arkasına sağlam bir duvar alarak destek hissini artır.',
-        'masandaki aydınlatmayı artırarak kariyerindeki belirsizlikleri aydınlat.', 'iş yerindeki ününü (güney) artırmak için başarı belgelerini sergile.', 'odaklanmayı kolaylaştıran düzenleyici ofis aksesuarları kullan.'
-      ],
-      'Huzur': [
-        'evin merkezi olan Tai Chi alanını dengeleyerek içsel huzuru bul.', 'dinlenme alanında zihni yoran her türlü görsel karmaşayı azalt.', 'stresi dışarıda bırakmak için giriş kapısı çevresini sadeleştir.',
-        'meditasyon veya dinlenme köşende sadece sana iyi gelen objeler tut.', 'evin tam ortasında enerjinin serbestçe akabileceği geniş bir boşluk yarat.', 'uyku kaliteni artırmak için yatak odanı olabildiğince minimalist yap.',
-        'odanda doğal ışığı maksimum seviyede kullanarak ruhunu dinlendir.', 'kendinle baş başa kaldığın anlar için rahat bir okuma köşesi oluştur.', 'dijital detoks yapmak için yatak odandan elektronik aletleri çıkar.',
-        'yumuşak ve dingin bir müzik açarak mekanın titreşimini sakinleştir.', 'içsel sessizliği destekleyen pastel veya nötr tonları ön plana çıkar.', 'her sabah evini havalandırarak taze ve huzurlu enerjiyi içeri al.'
-      ],
-      'Sağlık': [
-        'evin doğu köşesinde fiziksel ve zihinsel canlılığı teşvik et.', 'yaşam enerjisi (Chi) akışını hızlandırmak için koridorları açık tut.', 'mutfağını temiz ve düzenli tutarak bedenin beslenme kaynağını koru.',
-        'sağlık köşende canlılığı ve yenilenmeyi temsil eden detaylar bulundur.', 'yatak odanda dinlendirici bir atmosfer yaratarak hücre yenilenmesini destekle.', 'evin merkezindeki enerjiyi temizleyerek genel sağlığı güvenceye al.',
-        'banyo kapısını daima kapalı tutarak enerji kaçaklarını önle.', 'sağlıklı yaşam hedeflerini yansıtan motive edici bir köşe hazırla.', 'odalarındaki hava akışını artırarak durağan enerjiyi dışarı at.',
-        'doğal şifa elementlerini mekanın çeşitli yerlerine entegre et.', 'zararlı kimyasalları yaşam alanından çıkararak doğal bir ortam sağla.', 'güneş ışığının ve temiz havanın evinde serbestçe dolaşmasına izin ver.'
-      ],
-    };
+    final eActivators = FengShuiEn.eActivators;
+    final gActivators = FengShuiEn.gActivators;
 
     final safeGoal = gActivators.containsKey(goal) ? goal : 'Para';
     final safeElement = eActivators.containsKey(element) ? element : 'Toprak';
@@ -7155,75 +7095,13 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
     final eText = eActivators[safeElement]![eIdx];
     final gText = gActivators[safeGoal]![gIdx];
 
-    return '$eText ve $gText';
+    final t = ChineseZodiacTranslations.translate;
+    return '${t(context, eText)} ${t(context, 've')} ${t(context, gText)}';
   }
 
   String _getPersonalizedRemove(String goal, String element) {
-    final eRemoves = {
-      'Ağaç': [
-        'Kurumuş, solmuş veya ölü bitkileri hemen at', 'Kullanılmayan, eski kağıt ve dergi yığınlarını geri dönüşüme ver', 'Gereksiz yer kaplayan ağır ahşap mobilyaları seyrelt',
-        'Çürümüş veya nemlenmiş ahşap objeleri mekandan çıkar', 'Kırık sepetleri ve yıpranmış hasır eşyaları at', 'Mekanı boğan aşırı büyük saksı bitkilerini başka yere taşı',
-        'Tarihi geçmiş dosyaları ve eski mektupları temizle', 'Geçiş yollarını tıkayan ağaç formlu engelleri kaldır', 'Kuru çiçek aranjmanlarını ve cansız yaprakları çöpe at',
-        'Fonksiyonunu yitirmiş eski ahşap kutuları boşalt', 'Canlılığını yitirmiş, sararmış sarmaşıkları buda', 'Göz yoran eski ve tozlu ahşap bibloları kaldır'
-      ],
-      'Ateş': [
-        'Patlamış ampulleri ve çalışmayan aydınlatmaları hemen değiştir', 'Erimiş, formunu kaybetmiş eski mumları at', 'Sivri ve çok keskin üçgen formlu agresif objeleri kaldır',
-        'Çalışmayan, bozuk elektronik aletleri evden çıkar', 'Aşırı parlak, göz yoran kırmızı dekorları azalt', 'Gün ışığını tamamen kesen kalın ve koyu perdeleri değiştir',
-        'Saldırganlık veya tehlike hissi veren tabloları kaldır', 'Gürültülü çalışan bozuk cihazları tamir ettir veya at', 'Karışmış ve tehlike yaratan uzatma kablolarını düzenle',
-        'Eski, yıpranmış ve tüylenen sentetik halıları mekandan çıkar', 'Kasvetli ve karanlık enerji yayan eski lambaderleri at', 'Şömine veya ocak etrafındaki gereksiz kalabalığı temizle'
-      ],
-      'Toprak': [
-        'Çatlamış, kırık seramik veya kil saksıları at', 'Dengesiz duran, sallanan masa ve sandalyeleri tamir et', 'Toz toplayan, kullanılmayan ağır bibloları kaldır',
-        'Zemini daraltan gereksiz büyük halıları veya kilimleri küçült', 'Merkezi tıkayan, geçişi zorlaştıran hantal mobilyaları seyrelt', 'Kırık mermer veya taş objeleri mekandan çıkar',
-        'Tarihi geçmiş, kurumuş makyaj ve toprak bazlı ürünleri at', 'Enerjiyi ağırlaştıran çok koyu kahverengi veya boğucu dekorları azalt', 'Görünür çatlakları olan duvarları veya eşyaları onar',
-        'Altı bozuk, dengesiz raf sistemlerini sabitle', 'İhtiyacından fazla olan dekoratif yastık yığınlarını azalt', 'Durağanlık yaratan, uzun süredir yeri değişmeyen ağır eşyaları hareketlendir'
-      ],
-      'Metal': [
-        'Paslanmış, oksitlenmiş metal eşyaları mekandan çıkar', 'Düzensiz duran bozuk para yığınlarını bir kumbaraya topla', 'Keskin kenarlı, tehditkar görünen metal objeleri kaldır',
-        'Çekmecelerde birikmiş eski anahtarları ve bozuk kilitleri at', 'İçi geçmiş, çalışmayan saatleri ve pilleri geri dönüşüme yolla', 'Gereksiz metal tel askıları ve deforme olmuş mutfak aletlerini at',
-        'Aşırı yansıma yapan, göz yoran krom yüzeyleri azalt', 'Karışık ve düğümlenmiş takıları, kopmuş kolyeleri düzenle', 'Kullanılmayan, eski çatal bıçak takımlarını ayıkla',
-        'Eski, paslı vidalar ve alet çantası dağınıklığını toparla', 'Metal kutularda saklanan gereksiz fatura ve fişleri imha et', 'Soğuk ve mesafeli hissettiren aşırı metalik dekorasyonları yumuşat'
-      ],
-      'Su': [
-        'Sızdıran muslukları ve damlatan boruları hemen tamir et', 'Durgun, kokmuş suyu olan vazo veya kapları temizle', 'Çatlamış, lekelenmiş veya buğulu aynaları yenisiyle değiştir',
-        'Banyo veya lavabo altındaki gereksiz temizlik malzemelerini at', 'Kırık cam bardakları ve yontulmuş cam eşyaları çöpe at', 'Tıkanmış lavabo ve küvet giderlerini mutlaka aç',
-        'Enerjiyi boğan, aşırı koyu lacivert veya siyah duvarları aydınlat', 'Üzüntü veya yalnızlık hissi veren karanlık tabloları kaldır', 'Eski, içi boşalmış parfüm ve kozmetik şişelerini at',
-        'Pencerelerdeki kirli veya lekeli camları silerek netleştir', 'Nemli, küflü köşeleri temizle ve rutubet kaynağını kurut', 'Banyodaki tarihi geçmiş, kullanılmayan ilaç ve ürünleri at'
-      ],
-    };
-
-    final gRemoves = {
-      'Para': [
-        'böylece bolluk enerjisinin önündeki fiziksel tıkanıklıkları aç.', 've finansal akışın mekana daha rahat girmesini sağla.', 'böylece bereket köşendeki (güneydoğu) durgun enerjiyi dağıt.',
-        've gereksiz harcamaları tetikleyen negatif enerjiden kurtul.', 'böylece para girişini engelleyen zihinsel ve fiziksel blokajları kır.', 've fırsatların kapından daha kolay girmesi için alan yarat.',
-        'böylece maddi konulardaki belirsizlikleri netleştir.', 've birikim yapmanı zorlaştıran eski alışkanlıkları arkanda bırak.', 'böylece bolluk bilincini zedeleyen eksiklik hissiyatını temizle.',
-        've paranın evinde serbestçe dolaşabileceği bir ferahlık sağla.', 'böylece değer duygusunu artırıp finansal şansını yükselt.', 've maddi hedeflerine ulaşmanı yavaşlatan yükleri hafiflet.'
-      ],
-      'Aşk': [
-        'böylece ikili ilişkilerde aradığın dengeyi ve uyumu yakala.', 've hayatına girecek veya var olan sevgi enerjisine yer aç.', 'böylece geçmişin bağlarından kurtulup taze başlangıçlara izin ver.',
-        've yalnızlık veya soğukluk hissi veren frekansı mekandan uzaklaştır.', 'böylece romantik ilişkilerdeki iletişim kopukluklarını onar.', 've aşk köşendeki (güneybatı) durgunluğu canlandır.',
-        'böylece partnerinle veya kendinle olan bağını güçlendir.', 've evdeki sevgi titreşimini düşüren anıları temizle.', 'böylece kalbini yeni ihtimallere ve sıcak duygulara açık tut.',
-        've ilişkilerde tekrarlayan olumsuz döngüleri fiziksel olarak kır.', 'böylece sadakat, tutku ve şefkat duygularını mekanında büyüt.', 've romantizmi sabote eden engelleri yaşam alanından çıkar.'
-      ],
-      'Kariyer': [
-        'böylece iş hayatında ilerlemeni durduran engelleri ortadan kaldır.', 've kariyer yolculuğunda önüne çıkacak yeni fırsatlara kapı arala.', 'böylece çalışma alanındaki odaklanma sorunlarını ve ertelemeyi bitir.',
-        've başarı enerjisinin masanda özgürce dolaşmasına izin ver.', 'böylece zihinsel karmaşayı temizleyip profesyonel vizyonunu netleştir.', 've terfi veya yeni iş beklentilerinin önündeki tıkanıklığı aç.',
-        'böylece kariyer alanında (kuzey) daha akıcı ve güçlü bir enerji yarat.', 've iş ortamında itibarını zedeleyen olumsuz titreşimleri dağıt.', 'böylece üretkenliğini düşüren yorgunluk hissinden kurtul.',
-        've mesleki ilişkilerinde daha şeffaf ve güvenilir bir bağ kur.', 'böylece yaratıcılığını engelleyen sınırları fiziksel olarak kaldır.', 've başarıya giden yolda sırtında taşıdığın gereksiz yükleri at.'
-      ],
-      'Huzur': [
-        'böylece zihnini sürekli meşgul eden gizli stres kaynaklarını yok et.', 've evin merkezindeki (Tai Chi) ruhsal dengeyi yeniden kur.', 'böylece içsel sakinliğini bozan kaotik enerjiyi mekandan tahliye et.',
-        've dinlenme saatlerinde daha derin bir sükunet deneyimle.', 'böylece aile içi gerginlikleri ve çatışmaları yatıştırıcı bir zemin hazırla.', 've yaşam alanında nefes almanı kolaylaştıran bir sadelik yarat.',
-        'böylece dış dünyanın gürültüsünü evinin kapısında bırak.', 've anksiyeteyi tetikleyen görsel kirlilikten kurtularak hafifle.', 'böylece uyku kaliteni düşüren enerji kaçaklarını tamir et.',
-        've ruhsal uyanışın veya meditasyonun için saf bir alan oluştur.', 'böylece zihinsel berraklığını gölgeleyen tozlu düşünceleri süpür.', 've evinin her köşesinde güven veren bir barış atmosferi sağla.'
-      ],
-      'Sağlık': [
-        'böylece fiziksel enerjini sömüren ve yoran unsurları yaşamından çıkar.', 've bedensel şifa sürecini destekleyecek temiz bir titreşim alanı yarat.', 'böylece sağlık köşesindeki (doğu) hayat enerjisi (Chi) akışını hızlandır.',
-        've bağışıklık sistemini zayıflatan durağan, negatif havayı dağıt.', 'böylece canlılık ve zindelik hissinin evine dolmasına izin ver.', 've kronik yorgunluğa sebep olan çevresel toksinleri mekandan at.',
-        'böylece hücre yenilenmesini destekleyen ferah bir uyku ortamı sağla.', 've yaşam sevincini gölgeleyen sağlıksız alışkanlıkların izlerini sil.', 'böylece zihinsel ve fiziksel esnekliğini artıracak boşluklar yarat.',
-        've mutfağındaki bereketi ve beslenme enerjisini saf tut.', 'böylece bedeninin doğal ritmine uyum sağlamasını kolaylaştır.', 've hastalık enerjisini barındıran durgun köşeleri havalandırarak şifalandır.'
-      ],
-    };
+    final eRemoves = FengShuiEn.eRemoves;
+    final gRemoves = FengShuiEn.gRemoves;
 
     final safeGoal = gRemoves.containsKey(goal) ? goal : 'Para';
     final safeElement = eRemoves.containsKey(element) ? element : 'Toprak';
@@ -7234,7 +7112,8 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
     final eText = eRemoves[safeElement]![eIdx];
     final gText = gRemoves[safeGoal]![gIdx];
 
-    return '$eText, $gText';
+    final t = ChineseZodiacTranslations.translate;
+    return '${t(context, eText)}, ${t(context, gText)}';
   }
 
   String _getWeeklyTip(String goal, String element) {
@@ -7242,58 +7121,16 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
         (_weekIndex + goal.hashCode + element.hashCode) %
         5; // Elemente özel haftalık algoritma (5 rotasyonlu)
 
-    final elementPrefixes = {
-      'Ağaç': 'Ağaç enerjisinin büyüme gücüyle;',
-      'Ateş': 'Ateş elementinin parlayan gücüyle;',
-      'Toprak': 'Toprak enerjisinin sarsılmaz dengesiyle;',
-      'Metal': 'Metal elementinin net ve kararlı yapısıyla;',
-      'Su': 'Su enerjisinin derin akışkanlığıyla;',
-    };
-
-    final tips = {
-      'Para': [
-        'Güneydoğu köşesine canlı bir bitki ekle; büyüyen yapraklar refahı çeker.',
-        'Nakit akışı için çalışma masanın sol üst köşesini tamamen boş ve düzenli tut.',
-        'Bereketi temsil eden mutfak ocağını pırıl pırıl temizlemeden haftaya başlama.',
-        'Güney köşesindeki kasanın veya cüzdanın yanına altın sarısı bir obje koy.',
-        'Maddi blokajları kırmak için giriş kapısının arkasında biriken eşyaları kaldır.',
-      ],
-      'Aşk': [
-        'Güneybatı köşesine mutlaka ikili (çift) objeler yerleştirerek ikili uyumu sağla.',
-        'Yatağının iki yanında da eşit boşluk bırak, bu ilişkide denge ve adaleti getirir.',
-        'Odadaki yalnız (tekli) fotoğrafları kaldırıp yerine yüzü gülen sosyal kareler koy.',
-        'Sıcak tonlarda loş aydınlatmalar kullanarak yakınlaştırıcı ve romantik enerjiyi tetikle.',
-        'Aşk köşende kurumuş veya cansız hissettiren her şeyi atıp o alana yeni bir nefes getir.',
-      ],
-      'Kariyer': [
-        'Kuzey köşende dalgalı mavi çizgiler veya siyah bir detay bulundurarak fırsatları hızlandır.',
-        'Masanda yüzünü her zaman kapıya dönecek şekilde otur, engelleri cepheden karşıla.',
-        'Bu hafta kariyer hedeflerini beyaz bir kağıda netçe yazıp tam masanın merkezine hizala.',
-        'Çalışma masandaki sivri köşeli ve keskin hatlı eşyaları görüş alanından uzağa kaldır.',
-        'İş alanında tıkanıklık hissettiğin günlerde pencereni açıp mekandaki havayı tamamen yenile.',
-      ],
-      'Huzur': [
-        'Evin merkezini (Tai Chi) enerjiyi boğan tüm engellerden arındırıp haftayı blokajsız geçir.',
-        'Dinlenme alanına toprak grubundan kare formlu doğal objeler koyarak kendini topraklan.',
-        'Haftada en az iki gün 10 dakika salonun tam merkezinde sessizce oturup tüm stresi bırak.',
-        'Dinlendiğin yerin tam karşısına zihnini boşaltacak bulut veya deniz yansımalı dingin bir tablo as.',
-        'Zihni yoran dağınık kabloları, fazla teknolojik aletleri veya düzensiz kağıtları görüşten kaldır.',
-      ],
-      'Sağlık': [
-        'Evin merkezine parlak canlı bir detay ekleyerek tıkanan ve biriken bedensel enerjiyi uyandır.',
-        'Doğu cephesi sağlığı simgeler; oraya bu haftaya özel fazladan yeşil taze bir bitki koy.',
-        'Yatak odan ile banyo kapısı karşılıklıysa banyo kapısını bu hafta uyurken daima şıkça kapalı tut.',
-        'Tarihi geçmiş, uzun süredir kullanılmayan eşya ve hapları atarak bağışıklık enerjisini rahatlat.',
-        'Uyku alanında elektronik aletleri minimum seviyeye indirerek hücrelerin kaliteli dinlenmesini sağla.',
-      ],
-    };
+    final elementPrefixes = FengShuiEn.elementPrefixes;
+    final tips = FengShuiEn.tips;
 
     final safeGoal = tips.containsKey(goal) ? goal : 'Para';
     final safeElement = elementPrefixes.containsKey(element)
         ? element
         : 'Toprak';
 
-    return '${elementPrefixes[safeElement]} ${tips[safeGoal]![tipIndex]}';
+    final t = ChineseZodiacTranslations.translate;
+    return '${t(context, elementPrefixes[safeElement]!)} ${t(context, tips[safeGoal]![tipIndex])}';
   }
 
   @override
@@ -7330,7 +7167,7 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
             children: [
               // ── Sofistike Başlık ──
               Text(
-                'BAGUA HARİTASI',
+                ChineseZodiacTranslations.translate(context, 'BAGUA HARİTASI'),
                 style: TextStyle(
                   color: widget.goldL.withOpacity(0.9),
                   fontSize: 13,
@@ -7474,7 +7311,7 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                                         ]
                                       : [],
                                 ),
-                                child: Text(key),
+                                child: Text(ChineseZodiacTranslations.translate(context, key)),
                               ),
                             ),
                           ),
@@ -7529,7 +7366,7 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                goal['bagua']!,
+                                ChineseZodiacTranslations.translate(context, goal['bagua']!),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.85),
                                   fontSize: 13,
@@ -7552,11 +7389,11 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                                 children: [
                                   Expanded(
                                     child: _buildGridTile(
-                                      title: 'Ekle',
-                                      value: _getPersonalizedActivate(
+                                      title: ChineseZodiacTranslations.translate(context, 'Ekle'),
+                                      value: ChineseZodiacTranslations.translate(context, _getPersonalizedActivate(
                                         _selectedGoal,
                                         widget.element,
-                                      ),
+                                      )),
                                       icon: Icons.add_circle_outline,
                                       color: const Color(
                                         0xFFA5D6A7,
@@ -7567,11 +7404,11 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: _buildGridTile(
-                                      title: 'Çıkar',
-                                      value: _getPersonalizedRemove(
+                                      title: ChineseZodiacTranslations.translate(context, 'Çıkar'),
+                                      value: ChineseZodiacTranslations.translate(context, _getPersonalizedRemove(
                                         _selectedGoal,
                                         widget.element,
-                                      ),
+                                      )),
                                       icon: Icons.remove_circle_outline,
                                       color: const Color(
                                         0xFFEF9A9A,
@@ -7584,11 +7421,11 @@ class _BaguaGoalSelectorState extends State<_BaguaGoalSelector> {
                             ),
                             const SizedBox(height: 12),
                             _buildGridTile(
-                              title: 'Haftalık Rehber',
-                              value: _getWeeklyTip(
+                              title: ChineseZodiacTranslations.translate(context, 'Haftalık Rehber'),
+                              value: ChineseZodiacTranslations.translate(context, _getWeeklyTip(
                                 _selectedGoal,
                                 widget.element,
-                              ),
+                              )),
                               icon: Icons.auto_awesome,
                               color: const Color(0xFFFFCC80),
                               isExpanded: false,
@@ -11199,7 +11036,7 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
             ),
             const SizedBox(height: 24),
             Text(
-              '2026 ZAMANLAMA REHBERİ',
+              ChineseZodiacTranslations.translate(context, '2026 ZAMANLAMA REHBERİ'),
               style: TextStyle(
                 color: widget.goldL,
                 fontSize: 15,
@@ -11209,7 +11046,7 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
             ),
             const SizedBox(height: 12),
             Text(
-              'Yıl boyunca sizi bekleyen fırsat\nve risk dönemlerini analiz edin.',
+              ChineseZodiacTranslations.translate(context, 'Yıl boyunca sizi bekleyen fırsat\nve risk dönemlerini analiz edin.'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
@@ -11230,8 +11067,8 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: widget.goldL.withOpacity(0.4)),
               ),
-              child: const Text(
-                'Rehberi Aç',
+              child: Text(
+                ChineseZodiacTranslations.translate(context, 'Rehberi Aç'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -11274,8 +11111,8 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                '2026 Zamanlama Rehberi',
+              Text(
+                ChineseZodiacTranslations.translate(context, '2026 Zamanlama Rehberi'),
                 style: TextStyle(
                   color: Color(0xFFE8DCC8),
                   fontSize: 18,
@@ -11319,7 +11156,7 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        label,
+                        ChineseZodiacTranslations.translate(context, label),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -11351,7 +11188,7 @@ class _TimingGuideInteractiveState extends State<_TimingGuideInteractive>
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    labels[score - 1],
+                    ChineseZodiacTranslations.translate(context, labels[score - 1]),
                     style: TextStyle(
                       color: sc,
                       fontSize: 9,
@@ -11448,7 +11285,7 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
                   goldL: widget.goldL,
                   gold: widget.gold,
                   icons: widget.data.map((e) => e[0]).toList(),
-                  labels: widget.data.map((e) => e[1]).toList(),
+                  labels: widget.data.map((e) => ChineseZodiacTranslations.translate(context, e[1])).toList(),
                 ),
               ),
             ),
@@ -11489,7 +11326,7 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      selData[1].toUpperCase(),
+                      ChineseZodiacTranslations.translate(context, selData[1]).toUpperCase(),
                       style: TextStyle(
                         color: widget.goldL,
                         fontSize: 14, // Küçültüldü
@@ -11501,7 +11338,7 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
                 ),
                 const SizedBox(height: 8), // Boşluğu optimize ettik
                 Text(
-                  selData[2],
+                  ChineseZodiacTranslations.translate(context, selData[2]),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 13.5, // Küçültüldü
@@ -11520,10 +11357,10 @@ class _SeasonalCompassInteractiveState extends State<_SeasonalCompassInteractive
 }
 
 IconData _getSeasonalIcon(String label) {
-  if (label == 'İlkbahar') return Icons.local_florist_rounded;
-  if (label == 'Yaz') return Icons.wb_sunny_rounded;
-  if (label == 'Sonbahar') return Icons.park_rounded; // Veya energy_savings_leaf
-  if (label == 'Kış') return Icons.ac_unit_rounded;
+  if (label == 'İlkbahar' || label == 'Spring') return Icons.local_florist_rounded;
+  if (label == 'Yaz' || label == 'Summer') return Icons.wb_sunny_rounded;
+  if (label == 'Sonbahar' || label == 'Autumn') return Icons.park_rounded; // Veya energy_savings_leaf
+  if (label == 'Kış' || label == 'Winter') return Icons.ac_unit_rounded;
   return Icons.star_rounded;
 }
 
@@ -14767,33 +14604,33 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
     // 6 kategoriyi slidera atamak için mapliyoruz
     final items = [
       {
-        'title': 'Mekan\nİhtiyacı',
-        'text': widget.yyProfile['spaceNeed'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Mekan İhtiyacı').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['spaceNeed'] as String),
         'icon': Icons.home_outlined,
       },
       {
-        'title': 'Denge\nİçin',
-        'text': widget.yyProfile['activate'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Denge İçin').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['activate'] as String),
         'icon': Icons.contrast,
       },
       {
-        'title': 'Işık\nGücü',
-        'text': widget.yyProfile['lightTip'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Işık Gücü').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['lightTip'] as String),
         'icon': Icons.auto_awesome,
       },
       {
-        'title': 'Ses\nFrekansı',
-        'text': widget.yyProfile['soundTip'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Ses Frekansı').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['soundTip'] as String),
         'icon': Icons.graphic_eq,
       },
       {
-        'title': 'Arınma\nPlanı',
-        'text': widget.yyProfile['declutter'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Arınma Planı').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['declutter'] as String),
         'icon': Icons.auto_delete_outlined,
       },
       {
-        'title': 'Renk\nAurası',
-        'text': widget.yyProfile['color'] as String,
+        'title': ChineseZodiacTranslations.translate(context, 'Renk Aurası').replaceAll(' ', '\n'),
+        'text': ChineseZodiacTranslations.translate(context, widget.yyProfile['color'] as String),
         'icon': Icons.palette_outlined,
       },
     ];
@@ -15119,7 +14956,7 @@ class _YinYangInteractivePanelState extends State<_YinYangInteractivePanel> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    cName,
+                                    ChineseZodiacTranslations.translate(context, cName),
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.55),
                                       fontSize: 9,

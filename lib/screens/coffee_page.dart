@@ -15,6 +15,8 @@ import 'dart:convert';
 import '../widgets/fade_page_route.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class CoffeePage extends StatefulWidget {
   const CoffeePage({super.key});
@@ -318,9 +320,12 @@ class _CoffeePageState extends State<CoffeePage>
         _imageToBase64(_plateAngle!),
       ]);
 
+      if (!mounted) return;
+      final lang = Localizations.localeOf(context).languageCode == 'tr' ? 'tr' : 'en';
+
       final validateResponse = await Supabase.instance.client.functions.invoke(
         'interpret-coffee',
-        body: {'mode': 'validate', 'images': images, 'locale': 'tr'},
+        body: {'mode': 'validate', 'images': images, 'locale': lang},
       );
 
       if (validateResponse.data != null &&
@@ -1567,14 +1572,20 @@ class _CoffeePageState extends State<CoffeePage>
       File? plate;
 
       if (imagePaths != null && imagePaths.length == 4) {
-        final f0 = File(imagePaths[0]);
-        final f1 = File(imagePaths[1]);
-        final f2 = File(imagePaths[2]);
-        final f3 = File(imagePaths[3]);
-        inside = f0.existsSync() ? f0 : null;
-        left = f1.existsSync() ? f1 : null;
-        right = f2.existsSync() ? f2 : null;
-        plate = f3.existsSync() ? f3 : null;
+        final appDir = await getApplicationDocumentsDirectory();
+        final coffeeDirPath = '${appDir.path}/coffee_photos';
+
+        File? resolveFile(String filePath) {
+          if (filePath.isEmpty) return null;
+          final filename = p.basename(filePath);
+          final resolvedFile = File('$coffeeDirPath/$filename');
+          return resolvedFile.existsSync() ? resolvedFile : null;
+        }
+
+        inside = resolveFile(imagePaths[0]);
+        left = resolveFile(imagePaths[1]);
+        right = resolveFile(imagePaths[2]);
+        plate = resolveFile(imagePaths[3]);
       }
 
       if (!mounted) return;
@@ -2172,8 +2183,9 @@ class _CoffeePageState extends State<CoffeePage>
     required String title,
     required String desc,
     required IconData icon,
-    String buttonText = 'Bu Açıyı Çek',
+    String? buttonText,
   }) {
+    buttonText ??= AppLocalizations.of(context)!.coffeeCapture;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -2349,7 +2361,7 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  hasImage ? AppLocalizations.of(context)!.coffeeNextStep : buttonText,
+                                  hasImage ? AppLocalizations.of(context)!.coffeeNextStep : buttonText!,
                                   style: GoogleFonts.inter(
                                     color: hasImage
                                         ? const Color(0xFF161311)

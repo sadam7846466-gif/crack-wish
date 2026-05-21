@@ -57,8 +57,6 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
       CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
     );
     _entranceCtrl.forward();
-    // Pre-generate images in background
-    _preCacheImages();
   }
 
   Future<void> _preCacheImages() async {
@@ -444,7 +442,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                     
                     // Kurabiye
                     if (widget.imagePath != null)
-                      Image.asset(widget.imagePath!, width: 220, height: 220, fit: BoxFit.contain)
+                      Image.asset(widget.imagePath!, width: 220, height: 220, fit: BoxFit.contain, filterQuality: FilterQuality.high, isAntiAlias: true)
                     else 
                       Text(widget.cookieEmoji, style: const TextStyle(fontSize: 170, fontFamilyFallback: ['Apple Color Emoji'], decoration: TextDecoration.none)),
                     
@@ -612,7 +610,7 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
                       ),
                     ),
                     if (widget.imagePath != null)
-                      Image.asset(widget.imagePath!, width: 200, height: 200, fit: BoxFit.contain)
+                      Image.asset(widget.imagePath!, width: 200, height: 200, fit: BoxFit.contain, filterQuality: FilterQuality.high, isAntiAlias: true)
                     else
                       Text(widget.cookieEmoji, style: const TextStyle(fontSize: 150, fontFamilyFallback: ['Apple Color Emoji'], decoration: TextDecoration.none)),
                     Positioned(
