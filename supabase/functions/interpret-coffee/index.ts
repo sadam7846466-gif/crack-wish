@@ -327,7 +327,18 @@ Return ONLY valid JSON, no markdown.`;
           const rawContent = data.choices?.[0]?.message?.content;
           if (!rawContent) throw new Error("Empty AI response");
 
-          const parsed = JSON.parse(rawContent);
+          let cleanContent = rawContent;
+          if (cleanContent.startsWith('```json')) {
+            cleanContent = cleanContent.replace(/^```json/, '');
+          } else if (cleanContent.startsWith('```')) {
+            cleanContent = cleanContent.replace(/^```/, '');
+          }
+          if (cleanContent.endsWith('```')) {
+            cleanContent = cleanContent.replace(/```$/, '');
+          }
+          cleanContent = cleanContent.trim();
+
+          const parsed = JSON.parse(cleanContent);
 
           // siz → sen post-processing
           const fix = (t: string): string => {
@@ -428,8 +439,9 @@ Return ONLY valid JSON, no markdown.`;
         return new Response(JSON.stringify(fixedResult), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-      } catch (bgErr) {
-        return new Response(JSON.stringify({ status: "processing" }), {
+      } catch (bgErr: any) {
+        return new Response(JSON.stringify({ error: bgErr.message || "Processing failed" }), {
+          status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

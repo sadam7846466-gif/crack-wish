@@ -93,6 +93,9 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
     {'month': 5, 'day': 30, 'title': 'Kurban Bayramı 4. Gün', 'title_en': 'Eid al-Adha Day 4', 'desc': 'Evrene şükranlarını sun.', 'desc_en': 'Offer your gratitude.', 'icon': Icons.mosque_rounded, 'color': Color(0xFF10B981), 'locale': 'all'},
   ];
 
+  bool _isPollingDream = false;
+  bool _isPollingCoffee = false;
+
   @override
   void initState() {
     super.initState();
@@ -125,8 +128,22 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
     _globalPollTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       if (!mounted) return;
       
-      // Sadece API çalışıyorken veya okunmamış bir fal varsa kontrol et
       final prefs = await SharedPreferences.getInstance();
+
+      // --- AKTİF POLLING (Eğer ID varsa ve henüz poll edilmiyorsa) ---
+      final coffeeRecordId = prefs.getString('coffee_last_record_id');
+      if (coffeeRecordId != null && !_isPollingCoffee) {
+        _isPollingCoffee = true;
+        _checkPendingCoffeeResult().whenComplete(() => _isPollingCoffee = false);
+      }
+
+      final dreamRecordId = prefs.getString('dream_last_record_id');
+      if (dreamRecordId != null && !_isPollingDream) {
+        _isPollingDream = true;
+        _checkPendingDreamResult().whenComplete(() => _isPollingDream = false);
+      }
+
+      // --- KAHVE BİLDİRİMİ KONTROLÜ ---
       final isNotified = prefs.getBool('coffee_last_reading_notified') ?? true;
       final isViewed = prefs.getBool('coffee_last_reading_viewed') ?? true;
       
@@ -202,6 +219,8 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
                   );
                 },
               );
+              // Bento grid'i ANINDA yenile
+              readingReadyNotifier.value++;
             }
           }
         }
@@ -241,6 +260,8 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
               );
             },
           );
+          // Bento grid'i ANINDA yenile
+          readingReadyNotifier.value++;
         }
       }
     });

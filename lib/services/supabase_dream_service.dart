@@ -77,7 +77,7 @@ class SupabaseDreamService {
 
       if (body['status'] == 'processing') {
         // Poll for completion
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 40; i++) {
           await Future.delayed(const Duration(seconds: 3));
           if (recordId != null) {
             final row = await supabase.from('dream_readings').select().eq('id', recordId).maybeSingle();
@@ -214,7 +214,7 @@ class SupabaseDreamService {
 
         if (body['status'] == 'processing') {
           // Poll for completion
-          for (int i = 0; i < 20; i++) {
+          for (int i = 0; i < 40; i++) {
             await Future.delayed(const Duration(seconds: 3));
             if (recordId != null) {
               final row = await supabase.from('dream_readings').select().eq('id', recordId).maybeSingle();

@@ -861,21 +861,29 @@ class _ShareModalState extends State<ShareModal> with TickerProviderStateMixin {
   }) {
     return _TapButton(
       onTap: _isExporting ? null : onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: _isExporting ? bgColor.withOpacity(0.5) : bgColor,
           borderRadius: BorderRadius.circular(100),
           border: borderColor != Colors.transparent 
-            ? Border.all(color: borderColor, width: 1.0) 
+            ? Border.all(color: _isExporting ? borderColor.withOpacity(0.3) : borderColor, width: 1.0) 
             : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: textColor, size: 14),
+            if (_isExporting)
+              SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2, color: textColor.withOpacity(0.7)),
+              )
+            else
+              Icon(icon, color: textColor, size: 14),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
+            Text(label, style: TextStyle(color: _isExporting ? textColor.withOpacity(0.7) : textColor, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.3, decoration: TextDecoration.none)),
           ],
         ),
       ),

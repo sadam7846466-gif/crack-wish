@@ -284,27 +284,60 @@ class NatalChartEngine {
       swe.close();
     } catch (e) {
       debugPrint('SwissEph error, falling back to basic calculation: $e');
-      _calculateFallback();
+      _calculateFallback(lat, lon);
     }
   }
 
   /// Fallback calculation when SwissEph is not available
-  void _calculateFallback() {
-    final rng = math.Random((birthDate.millisecondsSinceEpoch + birthPlace.hashCode + _hour * 60 + _minute).abs());
-
-    final timeOffset = (_hour * 60 + _minute) / 1440.0;
-    final ascBase = (sunSignIndex * 30 + timeOffset * 360 + birthPlace.hashCode % 30).abs() % 360;
-    ascDegree = ascBase;
-    ascSignIndex = (ascBase ~/ 30) % 12;
-    mcDegree = (ascDegree + 270) % 360;
+  void _calculateFallback(double lat, double lon) {
+    // ASTRONOMICAL ASCENDANT CALCULATION
+    final tzOffset = _getTimezoneOffset(lon);
+    final utHour = _hour + _minute / 60.0 - tzOffset;
+    
+    int y = birthDate.year;
+    int m = birthDate.month;
+    int d = birthDate.day;
+    if (m <= 2) {
+      y -= 1;
+      m += 12;
+    }
+    final a = y ~/ 100;
+    final b = 2 - a + (a ~/ 4);
+    final jd = (365.25 * (y + 4716)).floor() + (30.6001 * (m + 1)).floor() + d + b - 1524.5 + utHour / 24.0;
+    
+    final t = (jd - 2451545.0) / 36525.0;
+    var gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - (t * t * t) / 38710000.0;
+    gmst = gmst % 360.0;
+    if (gmst < 0) gmst += 360.0;
+    
+    var lst = (gmst + lon) % 360.0;
+    if (lst < 0) lst += 360.0;
+    
+    final lstRad = lst * math.pi / 180.0;
+    final latRad = lat * math.pi / 180.0;
+    final obliqRad = 23.4392911 * math.pi / 180.0; // Obliquity of ecliptic
+    
+    final ascRad = math.atan2(math.cos(lstRad), -math.sin(lstRad) * math.cos(obliqRad) - math.tan(latRad) * math.sin(obliqRad));
+    var ascDeg = ascRad * 180.0 / math.pi;
+    if (ascDeg < 0) ascDeg += 360.0;
+    
+    ascDegree = ascDeg;
+    ascSignIndex = (ascDeg ~/ 30) % 12;
+    
+    final mcRad = math.atan2(math.sin(lstRad) * math.cos(obliqRad), math.cos(lstRad));
+    var mcd = mcRad * 180.0 / math.pi;
+    if (mcd < 0) mcd += 360.0;
+    mcDegree = mcd;
     mcSignIndex = (mcDegree ~/ 30) % 12;
 
     housesCusps = [];
     for (int i = 0; i < 12; i++) {
-      double cusp = (ascDegree + i * 30 + rng.nextDouble() * 8 - 4) % 360;
+      double cusp = (ascDegree + i * 30) % 360;
       housesCusps.add([cusp, (cusp ~/ 30) % 12 + 0.0]);
     }
     housesCusps.sort((a, b) => a[0].compareTo(b[0]));
+    
+    final rng = math.Random((birthDate.millisecondsSinceEpoch + birthPlace.hashCode + _hour * 60 + _minute).abs());
 
     planets = [];
     double sunDeg = sunSignIndex * 30.0 + birthDate.day.toDouble();

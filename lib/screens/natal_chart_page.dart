@@ -541,24 +541,33 @@ class _NatalWheelPainter extends CustomPainter {
     canvas.drawCircle(c, rSignInner, pRingMid);
     canvas.drawCircle(c, rHouseInner, pRingMid);
 
-    final ascRad = -engine.ascDegree * math.pi / 180;
+    // Doğum haritası standardı: ASC (Yükselen) her zaman sol tarafta (saat 9 yönünde) yani math.pi açısındadır.
+    // Astrolojik burçlar ve evler saatin tersi yönünde (counter-clockwise) ilerler.
+    // Flutter canvas'ında açı (angle) arttıkça saat yönünde ilerler, 
+    // bu yüzden Zodyak derecesi artarken canvas açısı azalmalıdır.
+    double degToRad(double d) {
+      return math.pi - (d - engine.ascDegree) * math.pi / 180.0;
+    }
 
     // ── ZODIAC SEGMENTS + CUSTOM SYMBOLS ──
     final symPaint = Paint()..color = _labelColor.withOpacity(0.85)..style = PaintingStyle.stroke
       ..strokeWidth = 1.8..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round..isAntiAlias = true;
     for (int i = 0; i < 12; i++) {
-      final angle = ascRad + i * math.pi / 6;
+      final startDeg = i * 30.0;
+      final angle = degToRad(startDeg);
       canvas.drawLine(_polar(c, rSignInner, angle), _polar(c, rOuter, angle), pRingMid);
 
       // Custom path-based symbol
-      final midAngle = angle + math.pi / 12;
+      final midDeg = startDeg + 15.0;
+      final midAngle = degToRad(midDeg);
       final signR = (rOuter + rSignInner) / 2;
       final symPos = _polar(c, signR, midAngle);
       final symSize = (rOuter - rSignInner) * 0.35;
       _drawSym(canvas, i, symPos, symSize, symPaint);
 
       for (int j = 1; j < 6; j++) {
-        final tickAngle = angle + j * (math.pi / 36);
+        // Zodyak saatin tersi gittiği için eksi (-) yönüne doğru tick atıyoruz
+        final tickAngle = angle - j * (math.pi / 36);
         final tickLen = (j == 3) ? 0.25 : 0.10;
         canvas.drawLine(_polar(c, rSignInner, tickAngle), _polar(c, rSignInner + (rOuter - rSignInner) * tickLen, tickAngle), pTick);
       }
@@ -567,21 +576,23 @@ class _NatalWheelPainter extends CustomPainter {
     // ── HOUSE LINES ──
     for (int i = 0; i < 12; i++) {
       final cusp = engine.housesCusps[i][0];
-      final angle = ascRad + (cusp - engine.ascDegree) * math.pi / 180;
+      final angle = degToRad(cusp);
       final isAxis = (i == 0 || i == 3 || i == 6 || i == 9);
       canvas.drawLine(_polar(c, 0, angle), _polar(c, rHouseOuter, angle), isAxis ? pRingOuter : pTick);
 
       // House numbers
       final nextCusp = engine.housesCusps[(i + 1) % 12][0];
-      final midDeg = cusp + ((nextCusp - cusp + 360) % 360) / 2;
-      final numAngle = ascRad + (midDeg - engine.ascDegree) * math.pi / 180;
+      double diff = nextCusp - cusp;
+      if (diff < 0) diff += 360.0;
+      final midDeg = cusp + (diff / 2.0);
+      final numAngle = degToRad(midDeg);
       _drawText(canvas, '${i + 1}', _polar(c, (rHouseOuter + rHouseInner) / 2, numAngle), Colors.white.withOpacity(0.25), 10);
     }
 
     // ── ASPECT LINES (extend to full house inner ring) ──
     for (final asp in aspects) {
-      final a1 = ascRad + (engine.planets[asp.planet1].degree - engine.ascDegree) * math.pi / 180;
-      final a2 = ascRad + (engine.planets[asp.planet2].degree - engine.ascDegree) * math.pi / 180;
+      final a1 = degToRad(engine.planets[asp.planet1].degree);
+      final a2 = degToRad(engine.planets[asp.planet2].degree);
       final pos1 = _polar(c, rAspect, a1);
       final pos2 = _polar(c, rAspect, a2);
 
@@ -598,7 +609,7 @@ class _NatalWheelPainter extends CustomPainter {
 
     // ── PLANET SYMBOLS ──
     for (final p in engine.planets) {
-      final angle = ascRad + (p.degree - engine.ascDegree) * math.pi / 180;
+      final angle = degToRad(p.degree);
       final pR = (rHouseInner + rAspect) / 2 + 4;
       final pos = _polar(c, pR, angle);
 
@@ -610,8 +621,8 @@ class _NatalWheelPainter extends CustomPainter {
 
     // ── ASC / MC / DC / IC AXES ──
     final pAxis = Paint()..color = _axisColor.withOpacity(0.8)..style = PaintingStyle.stroke..strokeWidth = 1.5..isAntiAlias = true..strokeCap = StrokeCap.round;
-    final ascA = ascRad;
-    final mcA = ascRad + (engine.mcDegree - engine.ascDegree) * math.pi / 180;
+    final ascA = math.pi; // ASC her zaman sol tarafta
+    final mcA = degToRad(engine.mcDegree);
 
     // Draw full axis lines through center
     canvas.drawLine(_polar(c, rOuter + 4, ascA), _polar(c, rOuter + 4, ascA + math.pi), pAxis);

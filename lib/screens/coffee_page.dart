@@ -13,6 +13,7 @@ import 'premium_paywall_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../widgets/fade_page_route.dart';
+import '../widgets/cosmic_toast.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
@@ -207,11 +208,14 @@ class _CoffeePageState extends State<CoffeePage>
             .eq('id', recordId)
             .maybeSingle();
 
+        final lang = Localizations.localeOf(context).languageCode == 'tr' ? 'tr' : 'en';
+
         if (row != null && row['status'] == 'completed') {
           // Arka planda DB'de tamamlanmış, sonucu yerele al
           await prefs.setString('coffee_last_reading', jsonEncode(row['result']));
           await prefs.remove('coffee_last_record_id');
           await prefs.setBool('coffee_last_reading_viewed', false);
+          await prefs.setBool('coffee_last_reading_notified', false);
           
           _backgroundPollTimer?.cancel();
           _waitingForBackgroundResult = false;
@@ -223,12 +227,73 @@ class _CoffeePageState extends State<CoffeePage>
               _lastReadingViewed = false;
             });
             _loadSoulStones();
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: const Color(0xFF1E1E1E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: const Color(0xFFD4A373).withOpacity(0.3),
+                    width: 0.5,
+                  ),
+                ),
+                title: const Text(
+                  '☕️ Falın Hazır!',
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  'Fincanındaki sırlar çözüldü.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      'Sonra',
+                      style: TextStyle(color: Colors.white.withOpacity(0.4)),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showLastReadingPanel();
+                    },
+                    child: const Text(
+                      'Falına Göz At',
+                      style: TextStyle(
+                        color: Color(0xFFD4A373),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
         } else if (row != null && row['status'] == 'failed') {
           _backgroundPollTimer?.cancel();
           _waitingForBackgroundResult = false;
           await prefs.remove('coffee_last_record_id');
-          // İptal edildi: await StorageService.updateSoulStones(1); // iade yok
+          
+          // Fal başarısız olduysa taşı iade et
+          await StorageService.updateSoulStones(1);
+          StorageService.syncEconomyToCloud();
+
+          if (mounted) {
+            _loadSoulStones();
+            CosmicToast.show(
+              context: context,
+              title: lang == 'tr' ? 'Hata Oluştu' : 'Error Occurred',
+              message: lang == 'tr' 
+                  ? 'Kahve falı hazırlanırken bir sorun oluştu. Ruh taşın iade edildi!' 
+                  : 'An error occurred while preparing your coffee reading. Your soul stone has been refunded!',
+              icon: Icons.error_outline,
+              iconColor: Colors.redAccent,
+              reward: lang == 'tr' ? 'Tamam' : 'OK',
+              duration: const Duration(seconds: 6),
+            );
+          }
         }
       } catch (e) {
         debugPrint("Polling error: $e");
@@ -251,6 +316,51 @@ class _CoffeePageState extends State<CoffeePage>
             _lastReadingViewed = isViewed;
           });
           _loadSoulStones();
+          if (!isViewed) {
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: const Color(0xFF1E1E1E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: const Color(0xFFD4A373).withOpacity(0.3),
+                    width: 0.5,
+                  ),
+                ),
+                title: const Text(
+                  '☕️ Falın Hazır!',
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  'Fincanındaki sırlar çözüldü.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      'Sonra',
+                      style: TextStyle(color: Colors.white.withOpacity(0.4)),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showLastReadingPanel();
+                    },
+                    child: const Text(
+                      'Falına Göz At',
+                      style: TextStyle(
+                        color: Color(0xFFD4A373),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
         }
       } catch (_) {
         if (mounted) setState(() => _lastReading = null);
@@ -326,7 +436,7 @@ class _CoffeePageState extends State<CoffeePage>
       final validateResponse = await Supabase.instance.client.functions.invoke(
         'interpret-coffee',
         body: {'mode': 'validate', 'images': images, 'locale': lang},
-      );
+      ).timeout(const Duration(seconds: 30));
 
       if (validateResponse.data != null &&
           validateResponse.data['results'] != null) {
@@ -859,7 +969,9 @@ class _CoffeePageState extends State<CoffeePage>
                         Navigator.pop(ctx);
                         final picked = await _picker.pickImage(
                           source: ImageSource.camera,
-                          imageQuality: 70,
+                          maxWidth: 1024,
+                          maxHeight: 1024,
+                          imageQuality: 75,
                         );
                         if (picked != null)
                           _saveAndNext(
@@ -901,7 +1013,9 @@ class _CoffeePageState extends State<CoffeePage>
                         Navigator.pop(ctx);
                         final picked = await _picker.pickImage(
                           source: ImageSource.gallery,
-                          imageQuality: 70,
+                          maxWidth: 1024,
+                          maxHeight: 1024,
+                          imageQuality: 75,
                         );
                         if (picked != null)
                           _saveAndNext(

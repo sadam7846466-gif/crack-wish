@@ -128,7 +128,9 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         if (mounted) _resultEntranceController.forward();
       });
     } else {
-      _callCoffeeApi();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _callCoffeeApi();
+      });
     }
   }
 
@@ -280,7 +282,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           'intent': lifeFocus ?? '',
           'mood': passedMood ?? '',
         },
-      );
+      ).timeout(const Duration(seconds: 40));
 
       final initialData = interpretResponse.data as Map<String, dynamic>;
       Map<String, dynamic> reading;
@@ -289,8 +291,8 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
         // AI yorumlamayı arka planda sürdürüyor. DB'den poll edeceğiz.
         
         Map<String, dynamic>? finalResult;
-        // 45 saniye boyunca db yokla (15 kere 3 saniye aralıklarla)
-        for (int i = 0; i < 15; i++) {
+        // 120 saniye boyunca db yokla (40 kere 3 saniye aralıklarla)
+        for (int i = 0; i < 40; i++) {
           if (!mounted) {
             // Kullanıcı sayfadan çıktıysa arka planda bildirim atacak zaten
             break;
@@ -319,6 +321,16 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
           // Timeout, but it might still finish in background
           CoffeeReadingPage.isApiRunning = false;
           backgroundCallback?.call(true, null);
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _hasError = true;
+              _isValidationError = false;
+              _errorMessage = lang == 'tr'
+                  ? 'AI şu an çok yoğun ve falını hazırlaması biraz zaman alıyor. Sayfadan ayrılabilirsin; falın hazır olduğunda bildirim göndereceğiz!'
+                  : 'AI is very busy right now and preparing your reading is taking a bit longer. You can safely leave this page; we will send a notification when it is ready!';
+            });
+          }
           return;
         }
         reading = finalResult;
@@ -1271,7 +1283,7 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
       children: [
         Icon(icon, color: const Color(0xFFD4A373), size: 18),
         const SizedBox(width: 8),
-        Flexible(
+        Expanded(
           flex: 5,
           child: Text(
             title,
@@ -1280,7 +1292,6 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
               fontSize: 18,
               fontWeight: FontWeight.w400,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 16),
@@ -1337,17 +1348,28 @@ class _CoffeeReadingPageState extends State<CoffeeReadingPage>
             ),
             const SizedBox(height: 40),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
                 HapticFeedback.lightImpact();
                 if (_isValidationError) {
                   Navigator.of(context).pop('retake');
                 } else {
-                  setState(() {
-                    _isLoading = true;
-                    _hasError = false;
-                    _loadingTextIndex = 0;
-                  });
-                  _callCoffeeApi();
+                  final success = await StorageService.deductSoulStones(1);
+                  if (!success) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)?.coffeeNotEnoughStones ?? 'Yetersiz Ruh Taşı.')),
+                      );
+                    }
+                    return;
+                  }
+                  if (mounted) {
+                    setState(() {
+                      _isLoading = true;
+                      _hasError = false;
+                      _loadingTextIndex = 0;
+                    });
+                    _callCoffeeApi();
+                  }
                 }
               },
               child: Container(
