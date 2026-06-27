@@ -37,10 +37,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
-        <!-- Google AdMob Android App ID -->
+        <!-- Google AdMob App ID (yeni hesap) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5096906411582452~3503039037"/>
+            android:value="ca-app-pub-6648535985790373~8515455855"/>
 
         <!-- Firebase Default Notification Settings -->
         <meta-data

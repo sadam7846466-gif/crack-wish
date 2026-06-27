@@ -593,6 +593,7 @@
   "coffeeResultOnHome": "Sonucu ana sayfadaki  ",
   "onboardingStart": "Hadi Başlayalım",
   "onboardingContinue": "Devam Et",
+  "onboardingContinueWithoutAccount": "Hesap Açmadan Devam Et",
   "onboardingFinish": "Yolculuğa Başla",
   "onboardingNameHint": "Kozmik Bir İsim",
   "onboardingNamePlaceholder": "isim_soyisim",
@@ -1246,5 +1247,123 @@
   "zodiacEliteDiscoverBtn": "Elite Ayrıcalıklarını Keşfet",
   "zodiacHubWestern": "BATI ASTROLOJİSİ",
   "zodiacHubAsian": "ASYA ASTROLOJİSİ",
-  "zodiacHubMayan": "MAYA ASTROLOJİSİ"
+  "zodiacHubMayan": "MAYA ASTROLOJİSİ",
+  "actionLater": "Sonra",
+  "coffeeViewReading": "Falına Göz At",
+  "coffeeReadyTitleWithEmoji": "☕️ Falın Hazır!",
+  "wheelTask_w_c1": "Sevdiğin birine \"seni düşünüyorum\" mesajı at",
+  "wheelTask_w_c2": "Uzun süredir konuşmadığın birine merhaba de",
+  "wheelTask_w_c3": "Ailenden birine bugün ne kadar önemli olduğunu söyle",
+  "wheelTask_w_c4": "Yanındaki birine iltifat et",
+  "wheelTask_w_c5": "Bir arkadaşına komik bir video gönder",
+  "wheelTask_w_c6": "Birine bugün teşekkür et, nedenini açıkla",
+  "wheelTask_w_s1": "Aynaya bak, kendine gülümse, 10 saniye tut",
+  "wheelTask_w_s2": "En son ne zaman kahkaha attığını hatırla ve tekrar gülümse",
+  "wheelTask_w_s3": "Komik bir anını düşün ve sesli güle",
+  "wheelTask_w_s4": "Telefonundaki en komik fotoğrafı bul ve bak",
+  "wheelTask_w_s5": "Gördüğün ilk kişiye gülümse",
+  "wheelTask_w_s6": "Bugün yaşadığın en komik anı düşün",
+  "wheelTask_w_m1": "Ayağa kalk, 30 saniye streç yap",
+  "wheelTask_w_m2": "1 dakika boyunca odanı yürü",
+  "wheelTask_w_m3": "10 kez zıpla ve \"yapabilirim!\" de",
+  "wheelTask_w_m4": "Kollarını yukarı kaldır ve 20 saniye Superman pozu yap",
+  "wheelTask_w_m5": "Omuzlarını 5 kez ileri, 5 kez geri döndür",
+  "wheelTask_w_m6": "Derin bir nefes al, kollarını iki yana aç, 10 saniye tut",
+  "wheelTask_w_mu1": "En sevdiğin şarkıyı aç, 1 dakika dinle",
+  "wheelTask_w_mu2": "Rastgele bir şarkı aç, ilk 30 saniyesini dinle",
+  "wheelTask_w_mu3": "Şarkı söyle! Yüksek sesle, kimse dinlemiyor gibi",
+  "wheelTask_w_mu4": "Bugün keşfetmediğin bir türde şarkı dinle",
+  "wheelTask_w_mu5": "Gözlerini kapa ve 30 saniye etrafındaki sesleri dinle",
+  "wheelTask_w_mu6": "Parmağınla masaya bir ritim çal, 15 saniye",
+  "wheelTask_w_g1": "Bugün sahip olduğun 1 şeyi düşün ve \"teşekkürler\" de",
+  "wheelTask_w_g2": "Seni mutlu eden 3 küçük şeyi say",
+  "wheelTask_w_g3": "Bugün yediğin en güzel şeyi düşün ve tadını hatırla",
+  "wheelTask_w_g4": "Hayatındaki en güzel anı 10 saniye düşün",
+  "wheelTask_w_g5": "Sağlığın için minnettarlık duy. Derin bir nefes al.",
+  "wheelTask_w_g6": "Bugün güneşin doğduğu için minnettarlık duy",
+  "wheelTask_w_f1": "3 kez zıpla ve \"Yapabilirim!\" diye bağır",
+  "wheelTask_w_f2": "En komik yüz ifadeni yap ve 5 saniye tut",
+  "wheelTask_w_f3": "Hayvan taklidi yap — hangi hayvan olurdun?",
+  "wheelTask_w_f4": "Gözlerini kapa ve 10 saniye boyunca hayal et ki uçuyorsun",
+  "wheelTask_w_f5": "Bir süper kahraman pozu yap ve 5 saniye tut",
+  "wheelTask_w_f6": "Robot gibi yürü, 10 adım at",
+  "zodiacAccessWesternAdTitle": "Günlük Ücretsiz Hakkın Doldu",
+  "zodiacAccessWesternAdDesc": "Batı Astrolojisi'ne tekrar girmek için kısa bir reklam izleyebilirsin.",
+  "zodiacAccessWatchAdBtn": "Reklam İzle",
+  "zodiacAccessGetEliteBtn": "Elite Al",
+  "zodiacAccessGateTitle": "Kozmik Bilgelik Kapısı",
+  "zodiacAccessStoneCount": "{count} Ruh Taşın var",
+  "@zodiacAccessStoneCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "zodiacAccessPremiumInfo1": "Burç derinlikleri için giriş izni",
+  "zodiacAccessPremiumInfo2": "Her astroloji haritası 1 Ruh Taşı harcar",
+  "zodiacAccessPremiumInfo3Elite": "Elite: Günde 1 Ruh Taşı ile sınırsız giriş",
+  "zodiacAccessPremiumInfo3Normal": "Elite ile günde 1 Ruh Taşı yeterli",
+  "zodiacAccessOneStoneBtn": "1 Ruh Taşı",
+  "onboardingTestSimulate": "Test Modu: Eski hesaba giriş simüle ediliyor...",
+  "onboardingTestAnon": "Test Modu: Anonim bağlanılıyor...",
+  "onboardingGoogleLoginFailed": "Google Girişi Başarısız: {error}",
+  "@onboardingGoogleLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingAppleLoginFailed": "Apple Girişi Başarısız: {error}",
+  "@onboardingAppleLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingGoogleRegisterFailed": "Google Kaydı Başarısız: {error}",
+  "@onboardingGoogleRegisterFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingAppleRegisterFailed": "Apple Kaydı Başarısız: {error}",
+  "@onboardingAppleRegisterFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "dreamDataError": "Kayıtlı veri hatalı: {error}",
+  "@dreamDataError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingBirthDateTitle": "DÜNYAYA GELİŞ TARİHİN",
+  "onboardingSelectBirthDate": "Doğum tarihini seç",
+  "onboardingBirthTimeTitle": "DOĞUM SAATİN (Opsiyonel)",
+  "onboardingBirthPlaceTitle": "DOĞUM YERİN (Opsiyonel)",
+  "onboardingPickerDateTitle": "Doğum Tarihini Seç",
+  "onboardingPickerTimeTitle": "Doğum Saatini Seç",
+  "onboardingPickerDone": "Bitti",
+  "onboardingLifeFocusSpiritual": "Ruhsal\nAydınlanma",
+  "onboardingLifeFocusCareer": "Kariyer &\nKişisel Güç",
+  "onboardingLifeFocusLove": "Aşk &\nKozmik Uyum",
+  "onboardingLifeFocusHealing": "Şifa &\nİçsel Huzur",
+  "onboardingLifeFocusWealth": "Maddi Bolluk &\nBereket",
+  "onboardingLifeFocusSurprise": "Evrenin\nSürprizleri",
+  "onboardingDreamMessenger": "Haberci & Net Rüyalar",
+  "onboardingDreamChaotic": "Sürprizli & Kaotik Olaylar",
+  "onboardingDreamCalm": "Bulutlar Kadar Sakin",
+  "onboardingSleepMindTitle": "Aklın Işığı",
+  "onboardingSleepMindDesc": "Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.",
+  "onboardingSleepMindVal": "Aklın Işığı (Mantık)",
+  "onboardingSleepHeartTitle": "Kalbin Fısıltısı",
+  "onboardingSleepHeartDesc": "İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.",
+  "onboardingSleepHeartVal": "Kalbin Fısıltısı (Sezgi)",
+  "onboardingSleepUniverseTitle": "Evrenin Akışı",
+  "onboardingSleepUniverseDesc": "Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.",
+  "onboardingSleepUniverseVal": "Evrenin Akışı (Kader)",
+  "linkAccountTitle": "Hesap Bağla",
+  "linkGoogleAccount": "Google Hesabını Bağla",
+  "linkAppleAccount": "Apple Hesabını Bağla",
+  "linkAccountStarted": "Hesap bağlama işlemi başlatıldı...",
+  "linkAccountFailed": "Hesap bağlama başarısız oldu",
+  "profileSignOutGuestDesc": "Uyarı: Misafir hesabından çıkış yaparsanız bu hesaba tekrar erişemezsiniz ve tüm verileriniz (Ruh Taşları, fallar) KALICI OLARAK KAYBOLUR. Çıkış yapmak istediğinize emin misiniz?"
 }

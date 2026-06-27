@@ -677,7 +677,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${MayanZodiacTranslations.translate(context, todayNahual['name'] as String).toUpperCase()} • ${MayanZodiacTranslations.translate(context, todayNahual['meaning'] as String).toUpperCase()} (${Localizations.localeOf(context).languageCode == 'en' ? 'TONE' : 'TON'} $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                Text('${MayanZodiacTranslations.translate(context, todayNahual['name'] as String).toUpperCase()} • ${MayanZodiacTranslations.translate(context, todayNahual['meaning'] as String).toUpperCase()} (${Localizations.localeOf(context).languageCode != 'tr' ? 'TONE' : 'TON'} $todayTone)', style: GoogleFonts.cinzel(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                 const SizedBox(height: 4),
                                 Text(
                                   '${MayanZodiacTranslations.translate(context, todayNahual['words'] as String).toUpperCase()} • ${MayanZodiacTranslations.translate(context, todayToneData['title']!).split('(').first.trim().toUpperCase()}', 
@@ -775,7 +775,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: '${todayTone}. ${Localizations.localeOf(context).languageCode == 'en' ? 'TONE' : 'TON'}  •  ',
+                                          text: '${todayTone}. ${Localizations.localeOf(context).languageCode != 'tr' ? 'TONE' : 'TON'}  •  ',
                                           style: GoogleFonts.cinzel(
                                             color: _goldBright.withValues(alpha: 0.9), 
                                             fontSize: 12, 
@@ -987,7 +987,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
               child: Column(
                 children: [
                    Text(
-                    isToday ? "BUGÜN" : "${d.day}/${d.month}",
+                    isToday ? MayanZodiacTranslations.translate(context, "BUGÜN") : "${d.day}/${d.month}",
                     style: TextStyle(
                       color: itemColor,
                       fontSize: 8,
@@ -1120,7 +1120,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
                             userIdx: _userIdx,
                             trecenaAlignScores: trecenaPoints,
                             selectedIndex: _selectedTrecenaDay,
-                            isEnglish: Localizations.localeOf(context).languageCode == 'en',
+                            isEnglish: Localizations.localeOf(context).languageCode != 'tr',
                           ),
                         ),
                       ),
@@ -1143,7 +1143,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         ? MayanZodiacTranslations.translate(context, "BUGÜN:") 
         : (dayIndex == 1 
             ? MayanZodiacTranslations.translate(context, "YARIN:") 
-            : (Localizations.localeOf(context).languageCode == 'en' 
+            : (Localizations.localeOf(context).languageCode != 'tr' 
                 ? "DAY ${dayIndex + 1}:" 
                 : "${dayIndex + 1}. GÜN:"));
     
@@ -1169,7 +1169,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
         vIdx = 0; // Uyanış (Zirve başlangıcı)
       }
       List<String> titles = [
-        Localizations.localeOf(context).languageCode == 'en' 
+        Localizations.localeOf(context).languageCode != 'tr' 
             ? "PEAK: $mainTrait AWAKENING" 
             : "ZİRVE: $mainTrait UYANIŞI",
         MayanZodiacTranslations.translate(context, "ZİRVE: KOZMİK ÇEKİM"),
@@ -1345,7 +1345,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     if (keywords.isEmpty) keywords = ['enerji', 'güç', 'bilgelik'];
     while (keywords.length < 3) { keywords.add(keywords.first); }
 
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final isEn = Localizations.localeOf(context).languageCode != 'tr';
     String word1 = isEn ? MayanZodiacTranslations.translate(context, keywords[0].toUpperCase()).toLowerCase() : keywords[0];
     String word2 = isEn ? MayanZodiacTranslations.translate(context, keywords[1].toUpperCase()).toLowerCase() : keywords[1];
     String word3 = isEn ? MayanZodiacTranslations.translate(context, keywords[2].toUpperCase()).toLowerCase() : keywords[2];
@@ -1619,7 +1619,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     lIdx = lIdx < 0 ? lIdx + 20 : lIdx;
     bIdx = bIdx < 0 ? bIdx + 20 : bIdx;
 
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final isEn = Localizations.localeOf(context).languageCode != 'tr';
     String cName = MayanZodiacData.nahuales[cIdx]['name'].toString().split(' ').first;
     String gKeyword = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[tIdx]['words'].toString().split(',').first.split('&').first.trim().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[tIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
     String lKeyword = isEn ? MayanZodiacTranslations.translate(context, MayanZodiacData.nahuales[lIdx]['words'].toString().split(',').first.split('&').first.trim().toUpperCase()).toLowerCase() : MayanZodiacData.nahuales[lIdx]['words'].toString().split(',').first.split('&').first.trim().toLowerCase();
@@ -1732,7 +1732,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   Widget _buildDnaNode(int nIdx, String role, Color color, double size, {bool isCenter = false}) {
      var nahual = MayanZodiacData.nahuales[nIdx];
-     final isEn = Localizations.localeOf(context).languageCode == 'en';
+     final isEn = Localizations.localeOf(context).languageCode != 'tr';
      String keywordRaw = nahual['words'].toString().split(',').first.split('&').first.trim();
      String keyword = isEn ? MayanZodiacTranslations.translate(context, keywordRaw.toUpperCase()).toLowerCase() : keywordRaw.toLowerCase();
      return SizedBox(
@@ -1876,7 +1876,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
     // Rastgeleliği gün ve burç ismine bağlayarak kararlı ama her güne/burca özgü farklılık yaratıyoruz.
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + userNahual['name'].hashCode);
     
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final isEn = Localizations.localeOf(context).languageCode != 'tr';
     final tThemeRaw = todayNahual['words'].toString().split('&').first.trim();
     final tTheme = isEn ? MayanZodiacTranslations.translate(context, tThemeRaw.toUpperCase()).toLowerCase() : tThemeRaw.toLowerCase();
     
@@ -1927,7 +1927,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
   String _generateGoodFor(Map<String, dynamic> todayNahual, int alignScore, BuildContext context) {
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode);
     final words = todayNahual['words'].toString().split(' & ');
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final isEn = Localizations.localeOf(context).languageCode != 'tr';
     final w1Raw = words.first.trim();
     final w1 = isEn ? MayanZodiacTranslations.translate(context, w1Raw.toUpperCase()).toLowerCase() : w1Raw.toLowerCase();
     final w2Raw = words.length > 1 ? words.last.trim() : words.first.trim();
@@ -1950,7 +1950,7 @@ class _ZodiacMayanPageState extends State<ZodiacMayanPage>
 
   String _generateBadFor(Map<String, dynamic> todayNahual, int alignScore, BuildContext context) {
     final rnd = math.Random(DateTime.now().year * 1000 + DateTime.now().month * 100 + DateTime.now().day + todayNahual['name'].hashCode + 1);
-    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final isEn = Localizations.localeOf(context).languageCode != 'tr';
     final w1Raw = todayNahual['words'].toString().split(' & ').first.trim();
     final w1 = isEn ? MayanZodiacTranslations.translate(context, w1Raw.toUpperCase()).toLowerCase() : w1Raw.toLowerCase();
     

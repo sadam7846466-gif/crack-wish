@@ -4604,7 +4604,7 @@ class _DreamPageState extends State<DreamPage>
         debugPrint('Parsing error in History Tap: $e\n$stack');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Kayıtlı veri hatalı: $e'),
+            content: Text(AppLocalizations.of(context)?.dreamDataError(e.toString()) ?? 'Kayıtlı veri hatalı: $e'),
             backgroundColor: Colors.redAccent,
           ),
         );

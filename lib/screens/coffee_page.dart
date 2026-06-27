@@ -208,15 +208,20 @@ class _CoffeePageState extends State<CoffeePage>
             .eq('id', recordId)
             .maybeSingle();
 
-        final lang = Localizations.localeOf(context).languageCode == 'tr' ? 'tr' : 'en';
+        final lang = Localizations.localeOf(context).languageCode == 'tr'
+            ? 'tr'
+            : 'en';
 
         if (row != null && row['status'] == 'completed') {
           // Arka planda DB'de tamamlanmış, sonucu yerele al
-          await prefs.setString('coffee_last_reading', jsonEncode(row['result']));
+          await prefs.setString(
+            'coffee_last_reading',
+            jsonEncode(row['result']),
+          );
           await prefs.remove('coffee_last_record_id');
           await prefs.setBool('coffee_last_reading_viewed', false);
           await prefs.setBool('coffee_last_reading_notified', false);
-          
+
           _backgroundPollTimer?.cancel();
           _waitingForBackgroundResult = false;
 
@@ -238,19 +243,19 @@ class _CoffeePageState extends State<CoffeePage>
                     width: 0.5,
                   ),
                 ),
-                title: const Text(
-                  '☕️ Falın Hazır!',
+                title: Text(
+                  AppLocalizations.of(context)!.coffeeReadyTitleWithEmoji,
                   style: TextStyle(color: Colors.white),
                 ),
-                content: const Text(
-                  'Fincanındaki sırlar çözüldü.',
+                content: Text(
+                  AppLocalizations.of(context)!.toastCoffeeReadyMessage,
                   style: TextStyle(color: Colors.white70),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
                     child: Text(
-                      'Sonra',
+                      AppLocalizations.of(context)!.actionLater,
                       style: TextStyle(color: Colors.white.withOpacity(0.4)),
                     ),
                   ),
@@ -259,8 +264,8 @@ class _CoffeePageState extends State<CoffeePage>
                       Navigator.pop(ctx);
                       _showLastReadingPanel();
                     },
-                    child: const Text(
-                      'Falına Göz At',
+                    child: Text(
+                      AppLocalizations.of(context)!.coffeeViewReading,
                       style: TextStyle(
                         color: Color(0xFFD4A373),
                         fontWeight: FontWeight.bold,
@@ -275,7 +280,7 @@ class _CoffeePageState extends State<CoffeePage>
           _backgroundPollTimer?.cancel();
           _waitingForBackgroundResult = false;
           await prefs.remove('coffee_last_record_id');
-          
+
           // Fal başarısız olduysa taşı iade et
           await StorageService.updateSoulStones(1);
           StorageService.syncEconomyToCloud();
@@ -285,8 +290,8 @@ class _CoffeePageState extends State<CoffeePage>
             CosmicToast.show(
               context: context,
               title: lang == 'tr' ? 'Hata Oluştu' : 'Error Occurred',
-              message: lang == 'tr' 
-                  ? 'Kahve falı hazırlanırken bir sorun oluştu. Ruh taşın iade edildi!' 
+              message: lang == 'tr'
+                  ? 'Kahve falı hazırlanırken bir sorun oluştu. Ruh taşın iade edildi!'
                   : 'An error occurred while preparing your coffee reading. Your soul stone has been refunded!',
               icon: Icons.error_outline,
               iconColor: Colors.redAccent,
@@ -328,19 +333,19 @@ class _CoffeePageState extends State<CoffeePage>
                     width: 0.5,
                   ),
                 ),
-                title: const Text(
-                  '☕️ Falın Hazır!',
+                title: Text(
+                  AppLocalizations.of(context)!.coffeeReadyTitleWithEmoji,
                   style: TextStyle(color: Colors.white),
                 ),
-                content: const Text(
-                  'Fincanındaki sırlar çözüldü.',
+                content: Text(
+                  AppLocalizations.of(context)!.toastCoffeeReadyMessage,
                   style: TextStyle(color: Colors.white70),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
                     child: Text(
-                      'Sonra',
+                      AppLocalizations.of(context)!.actionLater,
                       style: TextStyle(color: Colors.white.withOpacity(0.4)),
                     ),
                   ),
@@ -349,8 +354,8 @@ class _CoffeePageState extends State<CoffeePage>
                       Navigator.pop(ctx);
                       _showLastReadingPanel();
                     },
-                    child: const Text(
-                      'Falına Göz At',
+                    child: Text(
+                      AppLocalizations.of(context)!.coffeeViewReading,
                       style: TextStyle(
                         color: Color(0xFFD4A373),
                         fontWeight: FontWeight.bold,
@@ -431,12 +436,16 @@ class _CoffeePageState extends State<CoffeePage>
       ]);
 
       if (!mounted) return;
-      final lang = Localizations.localeOf(context).languageCode == 'tr' ? 'tr' : 'en';
+      final lang = Localizations.localeOf(context).languageCode == 'tr'
+          ? 'tr'
+          : 'en';
 
-      final validateResponse = await Supabase.instance.client.functions.invoke(
-        'interpret-coffee',
-        body: {'mode': 'validate', 'images': images, 'locale': lang},
-      ).timeout(const Duration(seconds: 30));
+      final validateResponse = await Supabase.instance.client.functions
+          .invoke(
+            'interpret-coffee',
+            body: {'mode': 'validate', 'images': images, 'locale': lang},
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (validateResponse.data != null &&
           validateResponse.data['results'] != null) {
@@ -485,7 +494,9 @@ class _CoffeePageState extends State<CoffeePage>
         _insideAngle == null ||
         _plateAngle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.coffeeAllPhotosRequired)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.coffeeAllPhotosRequired),
+        ),
       );
       return;
     }
@@ -508,7 +519,11 @@ class _CoffeePageState extends State<CoffeePage>
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.coffeeNotEnoughStones)),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.coffeeNotEnoughStones,
+              ),
+            ),
           );
         }
         return;
@@ -516,7 +531,7 @@ class _CoffeePageState extends State<CoffeePage>
 
       // Ödeme yapıldı ama fal henüz tamamlanmadı.
       // İade sistemi kapatıldığı için pending flag koymuyoruz.
-      
+
       if (mounted) {
         setState(() {
           _hasPaidForScan = true; // Bilet alındı bayrağı
@@ -533,9 +548,7 @@ class _CoffeePageState extends State<CoffeePage>
   Future<bool> _checkPremiumAccess() async {
     final prefs = await SharedPreferences.getInstance();
     final isPremiumUser =
-        prefs.getBool('is_elite') ??
-        prefs.getBool('is_premium_user') ??
-        false;
+        prefs.getBool('is_elite') ?? prefs.getBool('is_premium_user') ?? false;
 
     // Elite kullanıcı: sessizce onaylar (dialog yok)
     if (isPremiumUser) {
@@ -601,7 +614,9 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  AppLocalizations.of(context)!.coffeeCosmicTitle,
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.coffeeCosmicTitle,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
@@ -637,7 +652,9 @@ class _CoffeePageState extends State<CoffeePage>
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        AppLocalizations.of(context)!.coffeeSoulStoneCount(soulStones),
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.coffeeSoulStoneCount(soulStones),
                                         style: const TextStyle(
                                           color: Color(0xFF22D3EE),
                                           fontSize: 13,
@@ -650,21 +667,29 @@ class _CoffeePageState extends State<CoffeePage>
                                 const SizedBox(height: 16),
                                 _premiumInfoRow(
                                   Icons.local_cafe_rounded,
-                                  AppLocalizations.of(context)!.coffeeAiPermission,
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.coffeeAiPermission,
                                   true,
                                 ),
                                 const SizedBox(height: 10),
                                 _premiumInfoRow(
                                   Icons.diamond_outlined,
-                                  AppLocalizations.of(context)!.coffeeStoneCostInfo,
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.coffeeStoneCostInfo,
                                   hasEnough,
                                 ),
                                 const SizedBox(height: 10),
                                 _premiumInfoRow(
                                   Icons.workspace_premium,
                                   isPremiumUser
-                                      ? AppLocalizations.of(context)!.coffeeEliteRefillActive
-                                      : AppLocalizations.of(context)!.coffeeEliteRefillPromo,
+                                      ? AppLocalizations.of(
+                                          context,
+                                        )!.coffeeEliteRefillActive
+                                      : AppLocalizations.of(
+                                          context,
+                                        )!.coffeeEliteRefillPromo,
                                   isPremiumUser,
                                 ),
                                 const SizedBox(height: 20),
@@ -709,7 +734,9 @@ class _CoffeePageState extends State<CoffeePage>
                                         child: FittedBox(
                                           fit: BoxFit.scaleDown,
                                           child: Text(
-                                            AppLocalizations.of(context)!.coffeeUseSoulStone,
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.coffeeUseSoulStone,
                                             style: TextStyle(
                                               color: hasEnough
                                                   ? const Color(0xFF22D3EE)
@@ -763,7 +790,9 @@ class _CoffeePageState extends State<CoffeePage>
                                           label: FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: Text(
-                                              AppLocalizations.of(context)!.coffeeEliteGetBtn,
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.coffeeEliteGetBtn,
                                               style: TextStyle(
                                                 color: Color(0xFF22D3EE),
                                                 fontWeight: FontWeight.bold,
@@ -1105,97 +1134,114 @@ class _CoffeePageState extends State<CoffeePage>
       enabled: isCurrent,
       child: Scaffold(
         backgroundColor: const Color(
-        0xFF161311,
-      ), // Biraz daha açık, sıcak ve zengin espresso tonu
-      body: Stack(
-        children: [
-          // Background Mists (Daha yumuşak ve geniş)
-          Positioned(
-            top: -150,
-            left: -100,
-            child: _buildBlurryBlob(
-              color: const Color(0xFF5E3A20).withOpacity(0.25),
-              size: 500,
+          0xFF161311,
+        ), // Biraz daha açık, sıcak ve zengin espresso tonu
+        body: Stack(
+          children: [
+            // Background Mists (Daha yumuşak ve geniş)
+            Positioned(
+              top: -150,
+              left: -100,
+              child: _buildBlurryBlob(
+                color: const Color(0xFF5E3A20).withOpacity(0.25),
+                size: 500,
+              ),
             ),
-          ),
-          Positioned(
-            bottom: -100,
-            right: -100,
-            child: _buildBlurryBlob(
-              color: const Color(0xFFD4A373).withOpacity(0.15),
-              size: 400,
+            Positioned(
+              bottom: -100,
+              right: -100,
+              child: _buildBlurryBlob(
+                color: const Color(0xFFD4A373).withOpacity(0.15),
+                size: 400,
+              ),
             ),
-          ),
 
-          SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      // Arka planda tam boyuta yayılan Sayfalar (Hiçbir zaman aşağı/yukarı kaymaz)
-                      Positioned.fill(
-                        child: PageView(
-                          controller: _pageCtrl,
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                            _buildIntroScreen(),
-                            _buildUploadStep(
-                              stepIndex: 1,
-                              title: AppLocalizations.of(context)!.coffeeStepCupInside,
-                              desc:
-                                  AppLocalizations.of(context)!.coffeeStepCupInsideDesc,
-                              icon: Icons.keyboard_arrow_down_rounded,
-                            ),
-                            _buildUploadStep(
-                              stepIndex: 2,
-                              title: AppLocalizations.of(context)!.coffeeStepLeftProfile,
-                              desc:
-                                  AppLocalizations.of(context)!.coffeeStepLeftProfileDesc,
-                              icon: Icons.screen_rotation_rounded,
-                            ),
-                            _buildUploadStep(
-                              stepIndex: 3,
-                              title: AppLocalizations.of(context)!.coffeeStepRightProfile,
-                              desc:
-                                  AppLocalizations.of(context)!.coffeeStepRightProfileDesc,
-                              icon: Icons.screen_rotation_alt_rounded,
-                            ),
-                            _buildUploadStep(
-                              stepIndex: 4,
-                              title: AppLocalizations.of(context)!.coffeeStepSaucerSecret,
-                              desc:
-                                  AppLocalizations.of(context)!.coffeeStepSaucerDesc,
-                              icon: Icons.blur_circular_rounded,
-                              buttonText: AppLocalizations.of(context)!.coffeeStepSaucerBtn,
-                            ),
-                            _buildFinalReadyScreen(),
-                            _buildAnalyzingScreen(),
-                          ],
-                        ),
-                      ),
-
-                      // Üstte Yüzen İlerleme Çubuğu ve Yuvalar (Sayfanın Spacer(flex:3) boşluğuna denk gelir, düzeni asla kaydırmaz)
-                      if (_currentStep > 0 && _currentStep < 6)
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Column(
-                            key: ValueKey(_currentStep > 0),
-                            mainAxisSize: MainAxisSize.min,
-                            children: [_buildProgressBar(), _buildImageSlots()],
+            SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        // Arka planda tam boyuta yayılan Sayfalar (Hiçbir zaman aşağı/yukarı kaymaz)
+                        Positioned.fill(
+                          child: PageView(
+                            controller: _pageCtrl,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              _buildIntroScreen(),
+                              _buildUploadStep(
+                                stepIndex: 1,
+                                title: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepCupInside,
+                                desc: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepCupInsideDesc,
+                                icon: Icons.keyboard_arrow_down_rounded,
+                              ),
+                              _buildUploadStep(
+                                stepIndex: 2,
+                                title: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepLeftProfile,
+                                desc: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepLeftProfileDesc,
+                                icon: Icons.screen_rotation_rounded,
+                              ),
+                              _buildUploadStep(
+                                stepIndex: 3,
+                                title: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepRightProfile,
+                                desc: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepRightProfileDesc,
+                                icon: Icons.screen_rotation_alt_rounded,
+                              ),
+                              _buildUploadStep(
+                                stepIndex: 4,
+                                title: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepSaucerSecret,
+                                desc: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepSaucerDesc,
+                                icon: Icons.blur_circular_rounded,
+                                buttonText: AppLocalizations.of(
+                                  context,
+                                )!.coffeeStepSaucerBtn,
+                              ),
+                              _buildFinalReadyScreen(),
+                              _buildAnalyzingScreen(),
+                            ],
                           ),
                         ),
-                    ],
+
+                        // Üstte Yüzen İlerleme Çubuğu ve Yuvalar (Sayfanın Spacer(flex:3) boşluğuna denk gelir, düzeni asla kaydırmaz)
+                        if (_currentStep > 0 && _currentStep < 6)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Column(
+                              key: ValueKey(_currentStep > 0),
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildProgressBar(),
+                                _buildImageSlots(),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ), // Stack
+          ],
+        ), // Stack
       ), // Scaffold
     ); // TickerMode
   }
@@ -1737,7 +1783,9 @@ class _CoffeePageState extends State<CoffeePage>
                 '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
           } catch (_) {}
         }
-        final summary = _lastReading?['story'] ?? AppLocalizations.of(context)!.coffeeLoadingComment;
+        final summary =
+            _lastReading?['story'] ??
+            AppLocalizations.of(context)!.coffeeLoadingComment;
 
         return Center(
           child: SizedBox(
@@ -1780,7 +1828,9 @@ class _CoffeePageState extends State<CoffeePage>
                         if (hasReading && timeStr.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(context)!.coffeeLastReadingTime(timeStr),
+                            AppLocalizations.of(
+                              context,
+                            )!.coffeeLastReadingTime(timeStr),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.4),
                               fontSize: 11,
@@ -1937,8 +1987,12 @@ class _CoffeePageState extends State<CoffeePage>
                               const SizedBox(width: 6),
                               Text(
                                 soulStones > 0
-                                    ? AppLocalizations.of(context)!.coffeeSoulStoneCount(soulStones)
-                                    : AppLocalizations.of(context)!.coffeeSoulStoneEmpty,
+                                    ? AppLocalizations.of(
+                                        context,
+                                      )!.coffeeSoulStoneCount(soulStones)
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.coffeeSoulStoneEmpty,
                                 style: const TextStyle(
                                   color: Color(0xFF22D3EE),
                                   fontSize: 13,
@@ -1964,8 +2018,12 @@ class _CoffeePageState extends State<CoffeePage>
                         _premiumInfoRow(
                           Icons.workspace_premium,
                           _isPremium
-                              ? AppLocalizations.of(context)!.coffeeSoulStoneEliteActive
-                              : AppLocalizations.of(context)!.coffeeSoulStoneElitePromo,
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.coffeeSoulStoneEliteActive
+                              : AppLocalizations.of(
+                                  context,
+                                )!.coffeeSoulStoneElitePromo,
                           _isPremium,
                         ),
                         if (!_isPremium) ...[
@@ -1996,7 +2054,9 @@ class _CoffeePageState extends State<CoffeePage>
                               );
                             },
                             child: Text(
-                              AppLocalizations.of(context)!.coffeeEliteSubscribe,
+                              AppLocalizations.of(
+                                context,
+                              )!.coffeeEliteSubscribe,
                               style: TextStyle(
                                 color: Color(0xFF22D3EE),
                                 fontWeight: FontWeight.bold,
@@ -2220,7 +2280,9 @@ class _CoffeePageState extends State<CoffeePage>
                           ),
                           child: Center(
                             child: Text(
-                              AppLocalizations.of(context)!.coffeeRitualListenTitle,
+                              AppLocalizations.of(
+                                context,
+                              )!.coffeeRitualListenTitle,
                               style: GoogleFonts.inter(
                                 color: const Color(0xFFD4A373),
                                 fontSize: 15,
@@ -2328,7 +2390,9 @@ class _CoffeePageState extends State<CoffeePage>
                       child: Column(
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.coffeeStepLabel(stepIndex.toString(), title),
+                            AppLocalizations.of(
+                              context,
+                            )!.coffeeStepLabel(stepIndex.toString(), title),
                             style: GoogleFonts.inter(
                               color: Colors.white,
                               fontSize: 24,
@@ -2393,7 +2457,9 @@ class _CoffeePageState extends State<CoffeePage>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    AppLocalizations.of(context)!.coffeeDiscoverFate,
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.coffeeDiscoverFate,
                                     style: GoogleFonts.inter(
                                       color: const Color(0xFF161311),
                                       fontSize: 15,
@@ -2475,7 +2541,11 @@ class _CoffeePageState extends State<CoffeePage>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  hasImage ? AppLocalizations.of(context)!.coffeeNextStep : buttonText!,
+                                  hasImage
+                                      ? AppLocalizations.of(
+                                          context,
+                                        )!.coffeeNextStep
+                                      : buttonText!,
                                   style: GoogleFonts.inter(
                                     color: hasImage
                                         ? const Color(0xFF161311)
@@ -2513,7 +2583,8 @@ class _CoffeePageState extends State<CoffeePage>
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start, // Changed from center to start to fix title position
+                mainAxisAlignment: MainAxisAlignment
+                    .start, // Changed from center to start to fix title position
                 children: [
                   // DYNAMIC STATUS AREA (Ultra Minimalist & Aesthetic)
                   Builder(
@@ -2522,152 +2593,164 @@ class _CoffeePageState extends State<CoffeePage>
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 160), // Reduced from 210 to 160 to prevent pushing too far down
+                            const SizedBox(
+                              height: 160,
+                            ), // Reduced from 210 to 160 to prevent pushing too far down
                             _buildIntentSelector(),
                           ],
                         );
                       }
 
-                    // Hata varsa zarif bir yazı ve şık bir buton
-                    if (_invalidSlots.isNotEmpty) {
-                      final Set<String> uniqueErrors = {};
-                      for (var index in _invalidSlots) {
-                        if (_invalidMessages[index] != null) {
-                          uniqueErrors.add('• ${_invalidMessages[index]}');
+                      // Hata varsa zarif bir yazı ve şık bir buton
+                      if (_invalidSlots.isNotEmpty) {
+                        final Set<String> uniqueErrors = {};
+                        for (var index in _invalidSlots) {
+                          if (_invalidMessages[index] != null) {
+                            uniqueErrors.add('• ${_invalidMessages[index]}');
+                          }
                         }
-                      }
-                      final dynamicErrorMessage = uniqueErrors.isNotEmpty
-                          ? uniqueErrors.join('\n\n')
-                          : AppLocalizations.of(context)!.coffeeValidationError;
+                        final dynamicErrorMessage = uniqueErrors.isNotEmpty
+                            ? uniqueErrors.join('\n\n')
+                            : AppLocalizations.of(
+                                context,
+                              )!.coffeeValidationError;
 
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              height: 160,
+                            ), // Matched to 160 to prevent pushing too far down
+                            Icon(
+                              Icons.error_outline_rounded,
+                              color: Colors.redAccent.withOpacity(0.8),
+                              size: 48,
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.coffeeCosmicMismatch,
+                              style: GoogleFonts.outfit(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Text(
+                                dynamicErrorMessage,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.5),
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      // Geri kalan her durumda (tarama sırasında) çok estetik bir tarama görünümü
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 160), // Matched to 160 to prevent pushing too far down
-                          Icon(
-                            Icons.error_outline_rounded,
-                            color: Colors.redAccent.withOpacity(0.8),
-                            size: 48,
+                          const SizedBox(
+                            height: 260,
+                          ), // Increased from 160 to 260 specifically for the analyzing screen to vertically center it
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFD4A373,
+                                  ).withOpacity(0.05),
+                                  blurRadius: 60,
+                                  spreadRadius: 20,
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Zarif ince dış halka
+                                SizedBox(
+                                  width: 120,
+                                  height: 120,
+                                  child: CircularProgressIndicator(
+                                    color: const Color(
+                                      0xFFD4A373,
+                                    ).withOpacity(0.8),
+                                    strokeWidth: 1.5,
+                                  ),
+                                ),
+                                // İçeride mistik ikon
+                                const Icon(
+                                  Icons.local_cafe_rounded,
+                                  color: Color(0xFFD4A373),
+                                  size: 32,
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 48),
                           Text(
-                            AppLocalizations.of(context)!.coffeeCosmicMismatch,
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                              letterSpacing: 1.0,
+                            AppLocalizations.of(context)!.coffeeCosmicCheck,
+                            style: GoogleFonts.inter(
+                              color: const Color(0xFFD4A373),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 4.0,
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Text(
-                              dynamicErrorMessage,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.5),
-                                fontSize: 14,
-                                height: 1.5,
-                              ),
-                              textAlign: TextAlign.center,
+                          Text(
+                            AppLocalizations.of(context)!.coffeeCosmicCheckDesc,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.4),
+                              fontSize: 14,
+                              height: 1.5,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       );
-                    }
-
-                    // Geri kalan her durumda (tarama sırasında) çok estetik bir tarama görünümü
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 260), // Increased from 160 to 260 specifically for the analyzing screen to vertically center it
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFFD4A373,
-                                ).withOpacity(0.05),
-                                blurRadius: 60,
-                                spreadRadius: 20,
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Zarif ince dış halka
-                              SizedBox(
-                                width: 120,
-                                height: 120,
-                                child: CircularProgressIndicator(
-                                  color: const Color(
-                                    0xFFD4A373,
-                                  ).withOpacity(0.8),
-                                  strokeWidth: 1.5,
-                                ),
-                              ),
-                              // İçeride mistik ikon
-                              const Icon(
-                                Icons.local_cafe_rounded,
-                                color: Color(0xFFD4A373),
-                                size: 32,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 48),
-                        Text(
-                          AppLocalizations.of(context)!.coffeeCosmicCheck,
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFFD4A373),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 4.0,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context)!.coffeeCosmicCheckDesc,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ],
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
 
           // Always visible, only active on success (Same position and size as step 1-4 buttons)
           AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: _isValidated ? 1.0 : 0.3,
-              child: TapScaleButton(
-                onTap: () {
-                  if (_isValidated) {
-                    if (_currentIntentStep < 3) {
-                      HapticFeedback.heavyImpact();
-                      _optionsShakeController.forward(from: 0.0);
-                      return;
-                    }
-                    HapticFeedback.heavyImpact();
-                    _goToReadingPage();
-                  } else {
+            duration: const Duration(milliseconds: 300),
+            opacity: _isValidated ? 1.0 : 0.3,
+            child: TapScaleButton(
+              onTap: () {
+                if (_isValidated) {
+                  if (_currentIntentStep < 3) {
                     HapticFeedback.heavyImpact();
                     _optionsShakeController.forward(from: 0.0);
+                    return;
                   }
-                },
-                child: AnimatedContainer(
+                  HapticFeedback.heavyImpact();
+                  _goToReadingPage();
+                } else {
+                  HapticFeedback.heavyImpact();
+                  _optionsShakeController.forward(from: 0.0);
+                }
+              },
+              child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: double.infinity,
                 height: 64, // Slightly taller
@@ -2675,7 +2758,9 @@ class _CoffeePageState extends State<CoffeePage>
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
                     color: _isValidated && _currentIntentStep == 3
-                        ? const Color(0xFFD4A373).withOpacity(0.8) // Brighter border
+                        ? const Color(0xFFD4A373).withOpacity(
+                            0.8,
+                          ) // Brighter border
                         : Colors.white.withOpacity(0.1),
                     width: _isValidated && _currentIntentStep == 3 ? 1.5 : 1.0,
                   ),
@@ -2688,7 +2773,7 @@ class _CoffeePageState extends State<CoffeePage>
                             color: const Color(0xFFD4A373).withOpacity(0.3),
                             blurRadius: 30,
                             spreadRadius: 2,
-                          )
+                          ),
                         ]
                       : [],
                 ),
@@ -2753,7 +2838,10 @@ class _CoffeePageState extends State<CoffeePage>
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.coffeeReadingWait,
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 15),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 15,
+            ),
           ),
         ],
       ),
@@ -2868,7 +2956,8 @@ class _CoffeePageState extends State<CoffeePage>
         switchOutCurve: Curves.easeInOutCubic,
         layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
           return Stack(
-            alignment: Alignment.topCenter, // This prevents the shorter widget from jumping down
+            alignment: Alignment
+                .topCenter, // This prevents the shorter widget from jumping down
             children: <Widget>[
               ...previousChildren,
               if (currentChild != null) currentChild,
@@ -2876,10 +2965,7 @@ class _CoffeePageState extends State<CoffeePage>
           );
         },
         transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
         child: currentStepWidget,
       ),
@@ -2889,23 +2975,40 @@ class _CoffeePageState extends State<CoffeePage>
   String _intentLabel(String key) {
     final l10n = AppLocalizations.of(context)!;
     switch (key) {
-      case 'single': return l10n.coffeeRelSingle;
-      case 'in_love': return l10n.coffeeRelInLove;
-      case 'engaged': return l10n.coffeeRelEngaged;
-      case 'married': return l10n.coffeeRelMarried;
-      case 'complicated': return l10n.coffeeRelComplicated;
-      case 'love': return l10n.coffeeFocusLove;
-      case 'career': return l10n.coffeeFocusCareer;
-      case 'healing': return l10n.coffeeFocusHealing;
-      case 'general': return l10n.coffeeFocusGeneral;
-      case 'surprise': return l10n.coffeeFocusSurprise;
-      case 'peaceful': return l10n.coffeeMoodPeaceful;
-      case 'excited': return l10n.coffeeMoodExcited;
-      case 'anxious': return l10n.coffeeMoodAnxious;
-      case 'indecisive': return l10n.coffeeMoodIndecisive;
-      case 'energetic': return l10n.coffeeMoodEnergetic;
-      case 'melancholic': return l10n.coffeeMoodMelancholic;
-      default: return key;
+      case 'single':
+        return l10n.coffeeRelSingle;
+      case 'in_love':
+        return l10n.coffeeRelInLove;
+      case 'engaged':
+        return l10n.coffeeRelEngaged;
+      case 'married':
+        return l10n.coffeeRelMarried;
+      case 'complicated':
+        return l10n.coffeeRelComplicated;
+      case 'love':
+        return l10n.coffeeFocusLove;
+      case 'career':
+        return l10n.coffeeFocusCareer;
+      case 'healing':
+        return l10n.coffeeFocusHealing;
+      case 'general':
+        return l10n.coffeeFocusGeneral;
+      case 'surprise':
+        return l10n.coffeeFocusSurprise;
+      case 'peaceful':
+        return l10n.coffeeMoodPeaceful;
+      case 'excited':
+        return l10n.coffeeMoodExcited;
+      case 'anxious':
+        return l10n.coffeeMoodAnxious;
+      case 'indecisive':
+        return l10n.coffeeMoodIndecisive;
+      case 'energetic':
+        return l10n.coffeeMoodEnergetic;
+      case 'melancholic':
+        return l10n.coffeeMoodMelancholic;
+      default:
+        return key;
     }
   }
 
@@ -2949,7 +3052,10 @@ class _CoffeePageState extends State<CoffeePage>
               width: 30,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.transparent, const Color(0xFFD4A373).withOpacity(0.5)],
+                  colors: [
+                    Colors.transparent,
+                    const Color(0xFFD4A373).withOpacity(0.5),
+                  ],
                 ),
               ),
             ),
@@ -2961,7 +3067,10 @@ class _CoffeePageState extends State<CoffeePage>
               width: 30,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color(0xFFD4A373).withOpacity(0.5), Colors.transparent],
+                  colors: [
+                    const Color(0xFFD4A373).withOpacity(0.5),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
@@ -2978,140 +3087,178 @@ class _CoffeePageState extends State<CoffeePage>
           },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: useGrid ? 24 : 32),
-          child: useGrid
-              ? LayoutBuilder(
-                  builder: (context, constraints) {
-                    final itemWidth = (constraints.maxWidth - 12) / 2.001; // Tiny fraction less to prevent rounding overflow
-                    return Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: options.map((option) {
-                        final isSelected = selectedValue == option['key'];
-                        return GestureDetector(
-                          onTap: () => onSelected(option['key']),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: itemWidth, // Exact calculated width
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: isSelected ? const Color(0xFFD4A373).withOpacity(0.8) : Colors.white.withOpacity(0.1),
-                                width: isSelected ? 1.5 : 1.0,
+            child: useGrid
+                ? LayoutBuilder(
+                    builder: (context, constraints) {
+                      final itemWidth =
+                          (constraints.maxWidth - 12) /
+                          2.001; // Tiny fraction less to prevent rounding overflow
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.center,
+                        children: options.map((option) {
+                          final isSelected = selectedValue == option['key'];
+                          return GestureDetector(
+                            onTap: () => onSelected(option['key']),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: itemWidth, // Exact calculated width
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
                               ),
-                              color: isSelected ? const Color(0xFFD4A373).withOpacity(0.1) : Colors.transparent,
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFFD4A373).withOpacity(0.2),
-                                        blurRadius: 15,
-                                        spreadRadius: 1,
-                                      )
-                                    ]
-                                  : [],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isSelected ? const Color(0xFFD4A373).withOpacity(0.2) : Colors.white.withOpacity(0.05),
-                                  ),
-                                  child: Icon(
-                                    option['icon'],
-                                    color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.5),
-                                    size: 14,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    _intentLabel(option['key']),
-                                    style: GoogleFonts.outfit(
-                                      color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
-                                      fontSize: 14,
-                                      fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  },
-                )
-              : Column(
-                  children: options.map((option) {
-                    final isSelected = selectedValue == option['key'];
-                    return GestureDetector(
-                      onTap: () => onSelected(option['key']),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: isSelected ? const Color(0xFFD4A373).withOpacity(0.8) : Colors.white.withOpacity(0.1),
-                            width: isSelected ? 1.5 : 1.0,
-                          ),
-                          color: isSelected ? const Color(0xFFD4A373).withOpacity(0.1) : Colors.transparent,
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: const Color(0xFFD4A373).withOpacity(0.2),
-                                    blurRadius: 15,
-                                    spreadRadius: 1,
-                                  )
-                                ]
-                              : [],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isSelected ? const Color(0xFFD4A373).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFFD4A373).withOpacity(0.8)
+                                      : Colors.white.withOpacity(0.1),
+                                  width: isSelected ? 1.5 : 1.0,
+                                ),
+                                color: isSelected
+                                    ? const Color(0xFFD4A373).withOpacity(0.1)
+                                    : Colors.transparent,
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFFD4A373,
+                                          ).withOpacity(0.2),
+                                          blurRadius: 15,
+                                          spreadRadius: 1,
+                                        ),
+                                      ]
+                                    : [],
                               ),
-                              child: Icon(
-                                option['icon'],
-                                color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.5),
-                                size: 16,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isSelected
+                                          ? const Color(
+                                              0xFFD4A373,
+                                            ).withOpacity(0.2)
+                                          : Colors.white.withOpacity(0.05),
+                                    ),
+                                    child: Icon(
+                                      option['icon'],
+                                      color: isSelected
+                                          ? const Color(0xFFD4A373)
+                                          : Colors.white.withOpacity(0.5),
+                                      size: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _intentLabel(option['key']),
+                                      style: GoogleFonts.outfit(
+                                        color: isSelected
+                                            ? const Color(0xFFD4A373)
+                                            : Colors.white.withOpacity(0.8),
+                                        fontSize: 14,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w400
+                                            : FontWeight.w300,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                _intentLabel(option['key']),
-                                style: GoogleFonts.outfit(
-                                  color: isSelected ? const Color(0xFFD4A373) : Colors.white.withOpacity(0.8),
-                                  fontSize: 16,
-                                  fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
-                                  letterSpacing: 0.5,
+                          );
+                        }).toList(),
+                      );
+                    },
+                  )
+                : Column(
+                    children: options.map((option) {
+                      final isSelected = selectedValue == option['key'];
+                      return GestureDetector(
+                        onTap: () => onSelected(option['key']),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFD4A373).withOpacity(0.8)
+                                  : Colors.white.withOpacity(0.1),
+                              width: isSelected ? 1.5 : 1.0,
+                            ),
+                            color: isSelected
+                                ? const Color(0xFFD4A373).withOpacity(0.1)
+                                : Colors.transparent,
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFD4A373,
+                                      ).withOpacity(0.2),
+                                      blurRadius: 15,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isSelected
+                                      ? const Color(0xFFD4A373).withOpacity(0.2)
+                                      : Colors.white.withOpacity(0.05),
+                                ),
+                                child: Icon(
+                                  option['icon'],
+                                  color: isSelected
+                                      ? const Color(0xFFD4A373)
+                                      : Colors.white.withOpacity(0.5),
+                                  size: 16,
                                 ),
                               ),
-                            ),
-                            if (isSelected)
-                              const Icon(
-                                Icons.auto_awesome,
-                                color: Color(0xFFD4A373),
-                                size: 14,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _intentLabel(option['key']),
+                                  style: GoogleFonts.outfit(
+                                    color: isSelected
+                                        ? const Color(0xFFD4A373)
+                                        : Colors.white.withOpacity(0.8),
+                                    fontSize: 16,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w400
+                                        : FontWeight.w300,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
                               ),
-                          ],
+                              if (isSelected)
+                                const Icon(
+                                  Icons.auto_awesome,
+                                  color: Color(0xFFD4A373),
+                                  size: 14,
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-        ),
+                      );
+                    }).toList(),
+                  ),
+          ),
         ),
       ],
     );
@@ -3407,7 +3554,6 @@ class _CoffeeRitualAnimationState extends State<_CoffeeRitualAnimation>
       ),
     );
   }
-
 }
 
 class _CameraAngleInstruction extends StatefulWidget {

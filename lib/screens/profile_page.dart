@@ -1327,6 +1327,13 @@ class ProfilePageState extends State<ProfilePage> {
   void _signOut() {
     final lang = Localizations.localeOf(context).languageCode;
     final l10n = AppLocalizations.of(context)!;
+    final user = Supabase.instance.client.auth.currentUser;
+    final isAnonymous = user != null && (
+      user.appMetadata['is_anonymous'] == true ||
+      user.appMetadata['provider'] == 'anonymous' ||
+      user.email == null ||
+      user.email!.isEmpty
+    );
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -1337,7 +1344,7 @@ class ProfilePageState extends State<ProfilePage> {
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
-              height: 310,
+              height: isAnonymous ? 370 : 310,
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.12),
                 borderRadius: const BorderRadius.vertical(
@@ -1387,13 +1394,14 @@ class ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
-                    height: 40,
+                    height: isAnonymous ? 90 : 40,
                     child: Text(
-                      l10n.profileSignOutDesc,
+                      isAnonymous ? l10n.profileSignOutGuestDesc : l10n.profileSignOutDesc,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: AppColors.textWhite.withOpacity(0.5),
+                        color: isAnonymous ? const Color(0xFFFF4D4D) : AppColors.textWhite.withOpacity(0.5),
                         fontSize: 13,
+                        fontWeight: isAnonymous ? FontWeight.w600 : FontWeight.w500,
                         height: 1.4,
                       ),
                     ),
@@ -2598,7 +2606,7 @@ class _BentoHeroCard extends StatelessWidget {
                             const SizedBox(width: 10),
                             _GlassBadge(
                               icon: Icons.diamond_rounded,
-                              label: "$soulStones Ruh Taşı",
+                              label: Localizations.localeOf(context).languageCode == 'tr' ? "$soulStones Ruh Taşı" : "$soulStones Soul Stones",
                               color: const Color(0xFF4EE6C5),
                               onTap: () => _showStatModal(
                                 context,
@@ -2767,6 +2775,20 @@ class _BentoHeroCard extends StatelessWidget {
     IconData icon,
     Color color,
   ) async {
+    final bool _isTr = Localizations.localeOf(context).languageCode == 'tr';
+    String _t(String tr, String en) => _isTr ? tr : en;
+    
+    String _getDisplayTitle(String t) {
+      if (_isTr) return t;
+      if (t == "Aura Puanı") return "Aura Points";
+      if (t == "Kalan Ruh Taşı") return "Remaining Soul Stones";
+      if (t == "Açılan Kurabiyeler") return "Opened Cookies";
+      if (t == "Tarot Falları") return "Tarot Readings";
+      if (t == "Rüya Analizleri") return "Dream Analyses";
+      if (t == "Günlük Seri") return "Daily Streak";
+      return t;
+    }
+
     // YENİ SİSTEM: Tüm kazanımlar sadece "bonusAura" (toplanan aura havuzu) üzerinden okunur.
     // Doğrudan geçmiş verilerden Aura Puanı çarpanı kaldırıldı.
     int modalAuraTotal = bonusAura;
@@ -2877,7 +2899,7 @@ class _BentoHeroCard extends StatelessWidget {
                   children: [
                     Container(
                       width: 320,
-                      height: 320,
+                      height: 350,
                       decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
@@ -2930,7 +2952,7 @@ class _BentoHeroCard extends StatelessWidget {
                               ),
                             const SizedBox(height: 6),
                             Text(
-                              title,
+                              _getDisplayTitle(title),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -2980,9 +3002,9 @@ class _BentoHeroCard extends StatelessWidget {
                                           size: 12,
                                         ),
                                         const SizedBox(width: 4),
-                                        const Text(
-                                          "5 Günlük (Elite)",
-                                          style: TextStyle(
+                                        Text(
+                                          _t("5 Günlük (Elite)", "5 Daily (Elite)"),
+                                          style: const TextStyle(
                                             color: Color(0xFFFFD700),
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -3010,7 +3032,7 @@ class _BentoHeroCard extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(top: 0),
                                 child: Text(
-                                  "Toplam $modalAuraTotal Aura kazanıldı",
+                                  _t("Toplam $modalAuraTotal Aura kazanıldı", "Total $modalAuraTotal Aura earned"),
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.3),
                                     fontSize: 10,
@@ -3025,7 +3047,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 4),
                                     child: Text(
-                                      "200 Aura = 1 Ruh Taşı",
+                                      _t("200 Aura = 1 Ruh Taşı", "200 Aura = 1 Soul Stone"),
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.35),
                                         fontSize: 11,
@@ -3108,8 +3130,8 @@ class _BentoHeroCard extends StatelessWidget {
                                               milliseconds: 150,
                                             ),
                                             child: showSuccess
-                                                ? const Row(
-                                                    key: ValueKey("success"),
+                                                ? Row(
+                                                    key: const ValueKey("success"),
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
                                                             .center,
@@ -3124,7 +3146,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                       ),
                                                       SizedBox(width: 8),
                                                       Text(
-                                                        "Ruh Taşı Üretildi",
+                                                        _t("Ruh Taşı Üretildi", "Soul Stone Crafted"),
                                                         style: TextStyle(
                                                           color: Color(
                                                             0xFF10B981,
@@ -3160,8 +3182,8 @@ class _BentoHeroCard extends StatelessWidget {
                                                       const SizedBox(width: 8),
                                                       Text(
                                                         canConvert
-                                                            ? "Ruh Taşına Çevir"
-                                                            : "Yetersiz Aura ($availableAura/200)",
+                                                            ? _t("Ruh Taşına Çevir", "Convert to Soul Stone")
+                                                            : _t("Yetersiz Aura ($availableAura/200)", "Insufficient Aura ($availableAura/200)"),
                                                         style: TextStyle(
                                                           color: canConvert
                                                               ? const Color(
@@ -3205,7 +3227,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    "$modalSoulStones Ruh Taşı",
+                                    _t("$modalSoulStones Ruh Taşı", "$modalSoulStones Soul Stones"),
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.5),
                                       fontSize: 13,
@@ -3237,7 +3259,7 @@ class _BentoHeroCard extends StatelessWidget {
                                     children: [
                                       _buildAuraSource(
                                         Icons.nights_stay_rounded,
-                                        "Rüya",
+                                        _t("Rüya", "Dream"),
                                         pendingRuya,
                                         () {
                                           if (pendingRuya == 0) return;
@@ -3259,7 +3281,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.amp_stories_rounded,
-                                        "Tarot",
+                                        _t("Tarot", "Tarot"),
                                         pendingFal,
                                         () {
                                           if (pendingFal == 0) return;
@@ -3281,7 +3303,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.data_usage_rounded,
-                                        "Burç",
+                                        _t("Burç", "Zodiac"),
                                         pendingZodiac,
                                         () {
                                           if (pendingZodiac == 0) return;
@@ -3303,7 +3325,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.cookie,
-                                        "Kurabiye",
+                                        _t("Kurabiye", "Cookie"),
                                         pendingKurabiye,
                                         () {
                                           if (pendingKurabiye == 0) return;
@@ -3327,7 +3349,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.mail_rounded,
-                                        "Baykuş",
+                                        _t("Baykuş", "Owl"),
                                         pendingBaykus,
                                         () {
                                           if (pendingBaykus == 0) return;
@@ -3349,7 +3371,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.local_cafe_rounded,
-                                        "Kahve",
+                                        _t("Kahve", "Coffee"),
                                         pendingKahve,
                                         () {
                                           if (pendingKahve == 0) return;
@@ -3371,7 +3393,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       ),
                                       _buildAuraSource(
                                         Icons.diamond_rounded,
-                                        "Ruh Taşı",
+                                        _t("Ruh Taşı", "Soul Stone"),
                                         0,
                                         () {
                                           HapticFeedback.selectionClick();
@@ -3384,7 +3406,10 @@ class _BentoHeroCard extends StatelessWidget {
                               ),
                             ] else if (title == "Kalan Ruh Taşı") ...[
                               Text(
-                                "Not: Aura Puanı panelinden\npuanlarınızı Ruh Taşına dönüştürebilirsiniz.",
+                                _t(
+                                  "Not: Aura Puanı panelinden\npuanlarınızı Ruh Taşına dönüştürebilirsiniz.",
+                                  "Note: You can convert your points to Soul Stones\nfrom the Aura Points panel.",
+                                ),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.4),
@@ -3398,7 +3423,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "5 Taş",
+                                      _t("5 Taş", "5 Stones"),
                                       PurchaseService().getPrice(PurchaseService.soulStone5Id) ?? "...",
                                       const Color(0xFF4EE6C5),
                                       isSelected: selectedStoreIndex == 0,
@@ -3411,7 +3436,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "15 Taş",
+                                      _t("15 Taş", "15 Stones"),
                                       PurchaseService().getPrice(PurchaseService.soulStone15Id) ?? "...",
                                       const Color(0xFFC084FC),
                                       isPopular: true,
@@ -3425,7 +3450,7 @@ class _BentoHeroCard extends StatelessWidget {
                                   Expanded(
                                     child: _buildSoulStoreCard(
                                       context,
-                                      "50 Taş",
+                                      _t("50 Taş", "50 Stones"),
                                       PurchaseService().getPrice(PurchaseService.soulStone50Id) ?? "...",
                                       const Color(0xFFFFD700),
                                       isSelected: selectedStoreIndex == 2,
@@ -3467,12 +3492,15 @@ class _BentoHeroCard extends StatelessWidget {
 
                                               MagicalSuccessDialog.show(
                                                 context,
-                                                title: "$amount Ruh Taşı Kazanıldı!",
-                                                subtitle: "Kozmik hazinenize $amount adet Ruh Taşı eklendi.",
+                                                title: _t("$amount Ruh Taşı Kazanıldı!", "$amount Soul Stones Earned!"),
+                                                subtitle: _t(
+                                                  "Kozmik hazinenize $amount adet Ruh Taşı eklendi.",
+                                                  "$amount Soul Stones added to your cosmic treasure.",
+                                                ),
                                                 imagePath: '',
                                                 fallbackIcon: Icons.diamond_rounded,
                                                 themeColor: const Color(0xFF22D3EE),
-                                                balanceText: "Mevcut Bakiye: $modalSoulStones Ruh Taşı",
+                                                balanceText: _t("Mevcut Bakiye: $modalSoulStones Ruh Taşı", "Current Balance: $modalSoulStones Soul Stones"),
                                                 balanceIcon: Icons.diamond_outlined,
                                               );
                                             }
@@ -3506,7 +3534,7 @@ class _BentoHeroCard extends StatelessWidget {
                                       child: isPurchasingStone
                                           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Color(0xFFC084FC), strokeWidth: 2))
                                           : Text(
-                                              "Satın Al",
+                                              _t("Satın Al", "Purchase"),
                                               style: TextStyle(
                                                 color: selectedStoreIndex != -1
                                                     ? const Color(0xFFC084FC)
@@ -3522,7 +3550,10 @@ class _BentoHeroCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                "Elite üyeler her gün 5 bedava Ruh Taşı kazanır.",
+                                _t(
+                                  "Elite üyeler her gün 5 bedava Ruh Taşı kazanır.",
+                                  "Elite members earn 5 free Soul Stones every day.",
+                                ),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: const Color(
@@ -3560,7 +3591,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                "İmza Kartın",
+                                                _t("İmza Kartın", "Signature Card"),
                                                 style: TextStyle(
                                                   color: Colors.white
                                                       .withOpacity(0.7),
@@ -3572,8 +3603,17 @@ class _BentoHeroCard extends StatelessWidget {
                                               const SizedBox(height: 1),
                                               Text(
                                                 isLocked
-                                                    ? "Fal baktır ve keşfet"
-                                                    : result.periodLabel,
+                                                    ? _t("Fal baktır ve keşfet", "Get reading to reveal")
+                                                    : (() {
+                                                        final l = result.periodLabel;
+                                                        if (_isTr) return l;
+                                                        if (l == "Son 3 Gün") return "Last 3 Days";
+                                                        if (l == "Son 7 Gün") return "Last 7 Days";
+                                                        if (l == "Son 1 Ay") return "Last 1 Month";
+                                                        if (l == "Tüm Zamanlar") return "All Time";
+                                                        if (l == "Son Falın") return "Last Reading";
+                                                        return l;
+                                                      })(),
                                                 style: TextStyle(
                                                   color: Colors.white
                                                       .withOpacity(0.3),
@@ -3650,7 +3690,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                               height: 6,
                                                             ),
                                                             Text(
-                                                              "GİZLİ",
+                                                              _t("GİZLİ", "HIDDEN"),
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .white
@@ -4174,10 +4214,10 @@ class _BentoHeroCard extends StatelessWidget {
 
                                           if (totalCount <
                                               (dreamTimeFilter == 3
-                                                  ? 3
+                                                  ? 2
                                                   : (dreamTimeFilter == 7
-                                                        ? 7
-                                                        : 15))) ...[
+                                                        ? 3
+                                                        : 5))) ...[
                                             // Minimum rüya gerekli — dönem bazlı mesaj
                                             Padding(
                                               padding:
@@ -4191,10 +4231,10 @@ class _BentoHeroCard extends StatelessWidget {
                                                   Flexible(
                                                     child: Text(
                                                       dreamTimeFilter == 3
-                                                          ? (_isTrDream ? "Son 3 günde en az 3 rüya kaydet." : "Record at least 3 dreams in the last 3 days.")
+                                                          ? (_isTrDream ? "Son 3 günde en az 2 rüya kaydet." : "Record at least 2 dreams in the last 3 days.")
                                                           : dreamTimeFilter == 7
-                                                          ? (_isTrDream ? "Son 7 günde en az 7 rüya kaydet." : "Record at least 7 dreams in the last 7 days.")
-                                                          : (_isTrDream ? "Son 1 ayda en az 15 rüya kaydet." : "Record at least 15 dreams in the last month."),
+                                                          ? (_isTrDream ? "Son 7 günde en az 3 rüya kaydet." : "Record at least 3 dreams in the last 7 days.")
+                                                          : (_isTrDream ? "Son 1 ayda en az 5 rüya kaydet." : "Record at least 5 dreams in the last month."),
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -4252,9 +4292,9 @@ class _BentoHeroCard extends StatelessWidget {
                                                                   Navigator.pop(
                                                                     context,
                                                                   ),
-                                                              child: const Text(
-                                                                "Anladım",
-                                                                style: TextStyle(
+                                                              child: Text(
+                                                                _isTrDream ? "Anladım" : "Got it",
+                                                                style: const TextStyle(
                                                                   color: Color(
                                                                     0xFF818CF8,
                                                                   ),
@@ -4353,6 +4393,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'hope': 'Umut',
                                                     'nostalgia': 'Nostalji',
                                                     'excitement': 'Heyecan',
+                                                    'calm': 'Sakinlik',
                                                   } : const {
                                                     'fear': 'Fear',
                                                     'anxiety': 'Anxiety',
@@ -4373,6 +4414,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'hope': 'Hope',
                                                     'nostalgia': 'Nostalgia',
                                                     'excitement': 'Excitement',
+                                                    'calm': 'Calm',
                                                   };
                                                   final Map<String, Color>
                                                   emotionColors = _isTrDream ? const {
@@ -4393,6 +4435,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'Umut': Color(0xFF55EFC4),
                                                     'Nostalji': Color(0xFFDDA0DD),
                                                     'Heyecan': Color(0xFFFFD32A),
+                                                    'Sakinlik': Color(0xFF74B9FF),
                                                   } : const {
                                                     'Fear': Color(0xFFFF6B6B),
                                                     'Anxiety': Color(0xFFFF9F43),
@@ -4411,6 +4454,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'Hope': Color(0xFF55EFC4),
                                                     'Nostalgia': Color(0xFFDDA0DD),
                                                     'Excitement': Color(0xFFFFD32A),
+                                                    'Calm': Color(0xFF74B9FF),
                                                   };
                                                   final Map<String, String>
                                                   emotionEmojis = _isTrDream ? const {
@@ -4431,6 +4475,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'Umut': '🌱',
                                                     'Nostalji': '🌅',
                                                     'Heyecan': '🤩',
+                                                    'Sakinlik': '😌',
                                                   } : const {
                                                     'Fear': '😰',
                                                     'Anxiety': '😟',
@@ -4449,6 +4494,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                     'Hope': '🌱',
                                                     'Nostalgia': '🌅',
                                                     'Excitement': '🤩',
+                                                    'Calm': '😌',
                                                   };
 
                                                   final sorted =
@@ -4546,7 +4592,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                                   height: 2,
                                                                 ),
                                                                 Text(
-                                                                  "rüya",
+                                                                  _isTrDream ? "rüya" : "dreams",
                                                                   style: TextStyle(
                                                                     color: Colors
                                                                         .white
@@ -4706,28 +4752,21 @@ class _BentoHeroCard extends StatelessWidget {
                                   if (totalOpenDays >= 50) nextTarget = 100;
                                   if (totalOpenDays >= 100) nextTarget = 365;
 
-                                  final monthNames = [
-                                    "Ocak",
-                                    "Şubat",
-                                    "Mart",
-                                    "Nisan",
-                                    "Mayıs",
-                                    "Haziran",
-                                    "Temmuz",
-                                    "Ağustos",
-                                    "Eylül",
-                                    "Ekim",
-                                    "Kasım",
-                                    "Aralık",
+                                  final monthNames = _isTr ? [
+                                    "Ocak", "Şubat", "Mart", "Nisan",
+                                    "Mayıs", "Haziran", "Temmuz", "Ağustos",
+                                    "Eylül", "Ekim", "Kasım", "Aralık",
+                                  ] : [
+                                    "January", "February", "March", "April",
+                                    "May", "June", "July", "August",
+                                    "September", "October", "November", "December",
                                   ];
-                                  final weekDays = [
-                                    "Pzt",
-                                    "Sal",
-                                    "Çar",
-                                    "Per",
-                                    "Cum",
-                                    "Cmt",
-                                    "Paz",
+                                  final weekDays = _isTr ? [
+                                    "Pzt", "Sal", "Çar", "Per",
+                                    "Cum", "Cmt", "Paz",
+                                  ] : [
+                                    "Mon", "Tue", "Wed", "Thu",
+                                    "Fri", "Sat", "Sun",
                                   ];
 
                                   return Expanded(
@@ -4916,7 +4955,7 @@ class _BentoHeroCard extends StatelessWidget {
                                                           width: 4,
                                                         ),
                                                         Text(
-                                                          "$nextTarget Gün Hedefi",
+                                                          _t("$nextTarget Gün Hedefi", "$nextTarget Day Goal"),
                                                           style: TextStyle(
                                                             color: const Color(
                                                               0xFFFF6B6B,
@@ -5279,8 +5318,8 @@ class _BentoHeroCard extends StatelessWidget {
                   color: color,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  "POPÜLER",
+                child: Text(
+                  Localizations.localeOf(context).languageCode == 'tr' ? "POPÜLER" : "POPULAR",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 7,
@@ -7263,7 +7302,9 @@ class _ProfileCookieCarouselState extends State<_ProfileCookieCarousel> {
                 ),
               ),
               child: Text(
-                "Koleksiyon: ${_ownedCookies.length}",
+                Localizations.localeOf(context).languageCode == 'tr' 
+                    ? "Koleksiyon: ${_ownedCookies.length}"
+                    : "Collection: ${_ownedCookies.length}",
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 9,

@@ -5,7 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_pt.dart';
 import 'app_localizations_tr.dart';
 
 // ignore_for_file: type=lint
@@ -94,7 +99,12 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('it'),
+    Locale('pt'),
     Locale('tr'),
   ];
 
@@ -2680,6 +2690,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Devam Et'**
   String get onboardingContinue;
+
+  /// No description provided for @onboardingContinueWithoutAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap Açmadan Devam Et'**
+  String get onboardingContinueWithoutAccount;
 
   /// No description provided for @onboardingFinish.
   ///
@@ -5518,6 +5534,534 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'MAYA ASTROLOJİSİ'**
   String get zodiacHubMayan;
+
+  /// No description provided for @actionLater.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonra'**
+  String get actionLater;
+
+  /// No description provided for @coffeeViewReading.
+  ///
+  /// In tr, this message translates to:
+  /// **'Falına Göz At'**
+  String get coffeeViewReading;
+
+  /// No description provided for @coffeeReadyTitleWithEmoji.
+  ///
+  /// In tr, this message translates to:
+  /// **'☕️ Falın Hazır!'**
+  String get coffeeReadyTitleWithEmoji;
+
+  /// No description provided for @wheelTask_w_c1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sevdiğin birine \"seni düşünüyorum\" mesajı at'**
+  String get wheelTask_w_c1;
+
+  /// No description provided for @wheelTask_w_c2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uzun süredir konuşmadığın birine merhaba de'**
+  String get wheelTask_w_c2;
+
+  /// No description provided for @wheelTask_w_c3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ailenden birine bugün ne kadar önemli olduğunu söyle'**
+  String get wheelTask_w_c3;
+
+  /// No description provided for @wheelTask_w_c4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanındaki birine iltifat et'**
+  String get wheelTask_w_c4;
+
+  /// No description provided for @wheelTask_w_c5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir arkadaşına komik bir video gönder'**
+  String get wheelTask_w_c5;
+
+  /// No description provided for @wheelTask_w_c6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birine bugün teşekkür et, nedenini açıkla'**
+  String get wheelTask_w_c6;
+
+  /// No description provided for @wheelTask_w_s1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aynaya bak, kendine gülümse, 10 saniye tut'**
+  String get wheelTask_w_s1;
+
+  /// No description provided for @wheelTask_w_s2.
+  ///
+  /// In tr, this message translates to:
+  /// **'En son ne zaman kahkaha attığını hatırla ve tekrar gülümse'**
+  String get wheelTask_w_s2;
+
+  /// No description provided for @wheelTask_w_s3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Komik bir anını düşün ve sesli güle'**
+  String get wheelTask_w_s3;
+
+  /// No description provided for @wheelTask_w_s4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Telefonundaki en komik fotoğrafı bul ve bak'**
+  String get wheelTask_w_s4;
+
+  /// No description provided for @wheelTask_w_s5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gördüğün ilk kişiye gülümse'**
+  String get wheelTask_w_s5;
+
+  /// No description provided for @wheelTask_w_s6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün yaşadığın en komik anı düşün'**
+  String get wheelTask_w_s6;
+
+  /// No description provided for @wheelTask_w_m1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayağa kalk, 30 saniye streç yap'**
+  String get wheelTask_w_m1;
+
+  /// No description provided for @wheelTask_w_m2.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 dakika boyunca odanı yürü'**
+  String get wheelTask_w_m2;
+
+  /// No description provided for @wheelTask_w_m3.
+  ///
+  /// In tr, this message translates to:
+  /// **'10 kez zıpla ve \"yapabilirim!\" de'**
+  String get wheelTask_w_m3;
+
+  /// No description provided for @wheelTask_w_m4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kollarını yukarı kaldır ve 20 saniye Superman pozu yap'**
+  String get wheelTask_w_m4;
+
+  /// No description provided for @wheelTask_w_m5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Omuzlarını 5 kez ileri, 5 kez geri döndür'**
+  String get wheelTask_w_m5;
+
+  /// No description provided for @wheelTask_w_m6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derin bir nefes al, kollarını iki yana aç, 10 saniye tut'**
+  String get wheelTask_w_m6;
+
+  /// No description provided for @wheelTask_w_mu1.
+  ///
+  /// In tr, this message translates to:
+  /// **'En sevdiğin şarkıyı aç, 1 dakika dinle'**
+  String get wheelTask_w_mu1;
+
+  /// No description provided for @wheelTask_w_mu2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rastgele bir şarkı aç, ilk 30 saniyesini dinle'**
+  String get wheelTask_w_mu2;
+
+  /// No description provided for @wheelTask_w_mu3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şarkı söyle! Yüksek sesle, kimse dinlemiyor gibi'**
+  String get wheelTask_w_mu3;
+
+  /// No description provided for @wheelTask_w_mu4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün keşfetmediğin bir türde şarkı dinle'**
+  String get wheelTask_w_mu4;
+
+  /// No description provided for @wheelTask_w_mu5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gözlerini kapa ve 30 saniye etrafındaki sesleri dinle'**
+  String get wheelTask_w_mu5;
+
+  /// No description provided for @wheelTask_w_mu6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parmağınla masaya bir ritim çal, 15 saniye'**
+  String get wheelTask_w_mu6;
+
+  /// No description provided for @wheelTask_w_g1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün sahip olduğun 1 şeyi düşün ve \"teşekkürler\" de'**
+  String get wheelTask_w_g1;
+
+  /// No description provided for @wheelTask_w_g2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seni mutlu eden 3 küçük şeyi say'**
+  String get wheelTask_w_g2;
+
+  /// No description provided for @wheelTask_w_g3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün yediğin en güzel şeyi düşün ve tadını hatırla'**
+  String get wheelTask_w_g3;
+
+  /// No description provided for @wheelTask_w_g4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayatındaki en güzel anı 10 saniye düşün'**
+  String get wheelTask_w_g4;
+
+  /// No description provided for @wheelTask_w_g5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sağlığın için minnettarlık duy. Derin bir nefes al.'**
+  String get wheelTask_w_g5;
+
+  /// No description provided for @wheelTask_w_g6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün güneşin doğduğu için minnettarlık duy'**
+  String get wheelTask_w_g6;
+
+  /// No description provided for @wheelTask_w_f1.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 kez zıpla ve \"Yapabilirim!\" diye bağır'**
+  String get wheelTask_w_f1;
+
+  /// No description provided for @wheelTask_w_f2.
+  ///
+  /// In tr, this message translates to:
+  /// **'En komik yüz ifadeni yap ve 5 saniye tut'**
+  String get wheelTask_w_f2;
+
+  /// No description provided for @wheelTask_w_f3.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayvan taklidi yap — hangi hayvan olurdun?'**
+  String get wheelTask_w_f3;
+
+  /// No description provided for @wheelTask_w_f4.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gözlerini kapa ve 10 saniye boyunca hayal et ki uçuyorsun'**
+  String get wheelTask_w_f4;
+
+  /// No description provided for @wheelTask_w_f5.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir süper kahraman pozu yap ve 5 saniye tut'**
+  String get wheelTask_w_f5;
+
+  /// No description provided for @wheelTask_w_f6.
+  ///
+  /// In tr, this message translates to:
+  /// **'Robot gibi yürü, 10 adım at'**
+  String get wheelTask_w_f6;
+
+  /// No description provided for @zodiacAccessWesternAdTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Ücretsiz Hakkın Doldu'**
+  String get zodiacAccessWesternAdTitle;
+
+  /// No description provided for @zodiacAccessWesternAdDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.'**
+  String get zodiacAccessWesternAdDesc;
+
+  /// No description provided for @zodiacAccessWatchAdBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reklam İzle'**
+  String get zodiacAccessWatchAdBtn;
+
+  /// No description provided for @zodiacAccessGetEliteBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite Al'**
+  String get zodiacAccessGetEliteBtn;
+
+  /// No description provided for @zodiacAccessGateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kozmik Bilgelik Kapısı'**
+  String get zodiacAccessGateTitle;
+
+  /// No description provided for @zodiacAccessStoneCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Ruh Taşın var'**
+  String zodiacAccessStoneCount(Object count);
+
+  /// No description provided for @zodiacAccessPremiumInfo1.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burç derinlikleri için giriş izni'**
+  String get zodiacAccessPremiumInfo1;
+
+  /// No description provided for @zodiacAccessPremiumInfo2.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her astroloji haritası 1 Ruh Taşı harcar'**
+  String get zodiacAccessPremiumInfo2;
+
+  /// No description provided for @zodiacAccessPremiumInfo3Elite.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite: Günde 1 Ruh Taşı ile sınırsız giriş'**
+  String get zodiacAccessPremiumInfo3Elite;
+
+  /// No description provided for @zodiacAccessPremiumInfo3Normal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elite ile günde 1 Ruh Taşı yeterli'**
+  String get zodiacAccessPremiumInfo3Normal;
+
+  /// No description provided for @zodiacAccessOneStoneBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 Ruh Taşı'**
+  String get zodiacAccessOneStoneBtn;
+
+  /// No description provided for @onboardingTestSimulate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Test Modu: Eski hesaba giriş simüle ediliyor...'**
+  String get onboardingTestSimulate;
+
+  /// No description provided for @onboardingTestAnon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Test Modu: Anonim bağlanılıyor...'**
+  String get onboardingTestAnon;
+
+  /// No description provided for @onboardingGoogleLoginFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google Girişi Başarısız: {error}'**
+  String onboardingGoogleLoginFailed(Object error);
+
+  /// No description provided for @onboardingAppleLoginFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple Girişi Başarısız: {error}'**
+  String onboardingAppleLoginFailed(Object error);
+
+  /// No description provided for @onboardingGoogleRegisterFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google Kaydı Başarısız: {error}'**
+  String onboardingGoogleRegisterFailed(Object error);
+
+  /// No description provided for @onboardingAppleRegisterFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple Kaydı Başarısız: {error}'**
+  String onboardingAppleRegisterFailed(Object error);
+
+  /// No description provided for @dreamDataError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı veri hatalı: {error}'**
+  String dreamDataError(Object error);
+
+  /// No description provided for @onboardingBirthDateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'DÜNYAYA GELİŞ TARİHİN'**
+  String get onboardingBirthDateTitle;
+
+  /// No description provided for @onboardingSelectBirthDate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum tarihini seç'**
+  String get onboardingSelectBirthDate;
+
+  /// No description provided for @onboardingBirthTimeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'DOĞUM SAATİN (Opsiyonel)'**
+  String get onboardingBirthTimeTitle;
+
+  /// No description provided for @onboardingBirthPlaceTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'DOĞUM YERİN (Opsiyonel)'**
+  String get onboardingBirthPlaceTitle;
+
+  /// No description provided for @onboardingPickerDateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Tarihini Seç'**
+  String get onboardingPickerDateTitle;
+
+  /// No description provided for @onboardingPickerTimeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum Saatini Seç'**
+  String get onboardingPickerTimeTitle;
+
+  /// No description provided for @onboardingPickerDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitti'**
+  String get onboardingPickerDone;
+
+  /// No description provided for @onboardingLifeFocusSpiritual.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ruhsal\nAydınlanma'**
+  String get onboardingLifeFocusSpiritual;
+
+  /// No description provided for @onboardingLifeFocusCareer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kariyer &\nKişisel Güç'**
+  String get onboardingLifeFocusCareer;
+
+  /// No description provided for @onboardingLifeFocusLove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aşk &\nKozmik Uyum'**
+  String get onboardingLifeFocusLove;
+
+  /// No description provided for @onboardingLifeFocusHealing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifa &\nİçsel Huzur'**
+  String get onboardingLifeFocusHealing;
+
+  /// No description provided for @onboardingLifeFocusWealth.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maddi Bolluk &\nBereket'**
+  String get onboardingLifeFocusWealth;
+
+  /// No description provided for @onboardingLifeFocusSurprise.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrenin\nSürprizleri'**
+  String get onboardingLifeFocusSurprise;
+
+  /// No description provided for @onboardingDreamMessenger.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haberci & Net Rüyalar'**
+  String get onboardingDreamMessenger;
+
+  /// No description provided for @onboardingDreamChaotic.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürprizli & Kaotik Olaylar'**
+  String get onboardingDreamChaotic;
+
+  /// No description provided for @onboardingDreamCalm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bulutlar Kadar Sakin'**
+  String get onboardingDreamCalm;
+
+  /// No description provided for @onboardingSleepMindTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aklın Işığı'**
+  String get onboardingSleepMindTitle;
+
+  /// No description provided for @onboardingSleepMindDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.'**
+  String get onboardingSleepMindDesc;
+
+  /// No description provided for @onboardingSleepMindVal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aklın Işığı (Mantık)'**
+  String get onboardingSleepMindVal;
+
+  /// No description provided for @onboardingSleepHeartTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbin Fısıltısı'**
+  String get onboardingSleepHeartTitle;
+
+  /// No description provided for @onboardingSleepHeartDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.'**
+  String get onboardingSleepHeartDesc;
+
+  /// No description provided for @onboardingSleepHeartVal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalbin Fısıltısı (Sezgi)'**
+  String get onboardingSleepHeartVal;
+
+  /// No description provided for @onboardingSleepUniverseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrenin Akışı'**
+  String get onboardingSleepUniverseTitle;
+
+  /// No description provided for @onboardingSleepUniverseDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.'**
+  String get onboardingSleepUniverseDesc;
+
+  /// No description provided for @onboardingSleepUniverseVal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evrenin Akışı (Kader)'**
+  String get onboardingSleepUniverseVal;
+
+  /// No description provided for @linkAccountTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap Bağla'**
+  String get linkAccountTitle;
+
+  /// No description provided for @linkGoogleAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google Hesabını Bağla'**
+  String get linkGoogleAccount;
+
+  /// No description provided for @linkAppleAccount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple Hesabını Bağla'**
+  String get linkAppleAccount;
+
+  /// No description provided for @linkAccountStarted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap bağlama işlemi başlatıldı...'**
+  String get linkAccountStarted;
+
+  /// No description provided for @linkAccountFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap bağlama başarısız oldu'**
+  String get linkAccountFailed;
+
+  /// No description provided for @profileSignOutGuestDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyarı: Misafir hesabından çıkış yaparsanız bu hesaba tekrar erişemezsiniz ve tüm verileriniz (Ruh Taşları, fallar) KALICI OLARAK KAYBOLUR. Çıkış yapmak istediğinize emin misiniz?'**
+  String get profileSignOutGuestDesc;
 }
 
 class _AppLocalizationsDelegate
@@ -5530,8 +6074,15 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'tr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'it',
+    'pt',
+    'tr',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -5540,8 +6091,18 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'pt':
+      return AppLocalizationsPt();
     case 'tr':
       return AppLocalizationsTr();
   }

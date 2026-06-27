@@ -1414,6 +1414,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingContinue => 'Continue';
 
   @override
+  String get onboardingContinueWithoutAccount => 'Continue without Account';
+
+  @override
   String get onboardingFinish => 'Start Journey';
 
   @override
@@ -2955,4 +2958,311 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zodiacHubMayan => 'MAYAN ASTROLOGY';
+
+  @override
+  String get actionLater => 'Later';
+
+  @override
+  String get coffeeViewReading => 'View Reading';
+
+  @override
+  String get coffeeReadyTitleWithEmoji => '☕️ Your Reading is Ready!';
+
+  @override
+  String get wheelTask_w_c1 =>
+      'Send a \"thinking of you\" message to a loved one';
+
+  @override
+  String get wheelTask_w_c2 =>
+      'Say hello to someone you haven\'t spoken to in a while';
+
+  @override
+  String get wheelTask_w_c3 =>
+      'Tell a family member how important they are today';
+
+  @override
+  String get wheelTask_w_c4 => 'Compliment someone next to you';
+
+  @override
+  String get wheelTask_w_c5 => 'Send a funny video to a friend';
+
+  @override
+  String get wheelTask_w_c6 => 'Thank someone today and explain why';
+
+  @override
+  String get wheelTask_w_s1 =>
+      'Look in the mirror, smile at yourself, and hold for 10 seconds';
+
+  @override
+  String get wheelTask_w_s2 =>
+      'Remember the last time you laughed out loud and smile again';
+
+  @override
+  String get wheelTask_w_s3 => 'Think of a funny memory and laugh out loud';
+
+  @override
+  String get wheelTask_w_s4 =>
+      'Find and look at the funniest photo on your phone';
+
+  @override
+  String get wheelTask_w_s5 => 'Smile at the first person you see';
+
+  @override
+  String get wheelTask_w_s6 =>
+      'Think of the funniest moment you experienced today';
+
+  @override
+  String get wheelTask_w_m1 => 'Stand up and stretch for 30 seconds';
+
+  @override
+  String get wheelTask_w_m2 => 'Walk around your room for 1 minute';
+
+  @override
+  String get wheelTask_w_m3 => 'Jump 10 times and say \"I can do it!\"';
+
+  @override
+  String get wheelTask_w_m4 =>
+      'Raise your arms and do a Superman pose for 20 seconds';
+
+  @override
+  String get wheelTask_w_m5 =>
+      'Roll your shoulders forward 5 times, then backward 5 times';
+
+  @override
+  String get wheelTask_w_m6 =>
+      'Take a deep breath, open your arms wide, and hold for 10 seconds';
+
+  @override
+  String get wheelTask_w_mu1 =>
+      'Play your favorite song and listen for 1 minute';
+
+  @override
+  String get wheelTask_w_mu2 =>
+      'Play a random song and listen to the first 30 seconds';
+
+  @override
+  String get wheelTask_w_mu3 => 'Sing! Sing out loud as if no one is listening';
+
+  @override
+  String get wheelTask_w_mu4 =>
+      'Listen to a song in a genre you haven\'t explored today';
+
+  @override
+  String get wheelTask_w_mu5 =>
+      'Close your eyes and listen to the sounds around you for 30 seconds';
+
+  @override
+  String get wheelTask_w_mu6 =>
+      'Tap a rhythm on the table with your finger for 15 seconds';
+
+  @override
+  String get wheelTask_w_g1 =>
+      'Think of 1 thing you have today and say \"thank you\"';
+
+  @override
+  String get wheelTask_w_g2 => 'Count 3 small things that make you happy';
+
+  @override
+  String get wheelTask_w_g3 =>
+      'Think of the best thing you ate today and remember its taste';
+
+  @override
+  String get wheelTask_w_g4 =>
+      'Think of the best moment of your life for 10 seconds';
+
+  @override
+  String get wheelTask_w_g5 =>
+      'Feel grateful for your health. Take a deep breath.';
+
+  @override
+  String get wheelTask_w_g6 => 'Feel grateful that the sun rose today';
+
+  @override
+  String get wheelTask_w_f1 => 'Jump 3 times and shout \"I can do it!\"';
+
+  @override
+  String get wheelTask_w_f2 =>
+      'Make your funniest face and hold it for 5 seconds';
+
+  @override
+  String get wheelTask_w_f3 => 'Imitate an animal — which animal would you be?';
+
+  @override
+  String get wheelTask_w_f4 =>
+      'Close your eyes and imagine you are flying for 10 seconds';
+
+  @override
+  String get wheelTask_w_f5 =>
+      'Strike a superhero pose and hold it for 5 seconds';
+
+  @override
+  String get wheelTask_w_f6 => 'Walk like a robot for 10 steps';
+
+  @override
+  String get zodiacAccessWesternAdTitle => 'Daily Free Limit Reached';
+
+  @override
+  String get zodiacAccessWesternAdDesc =>
+      'You can watch a short ad to re-enter Western Astrology.';
+
+  @override
+  String get zodiacAccessWatchAdBtn => 'Watch Ad';
+
+  @override
+  String get zodiacAccessGetEliteBtn => 'Get Elite';
+
+  @override
+  String get zodiacAccessGateTitle => 'Gate of Cosmic Wisdom';
+
+  @override
+  String zodiacAccessStoneCount(Object count) {
+    return 'You have $count Soul Stones';
+  }
+
+  @override
+  String get zodiacAccessPremiumInfo1 => 'Access permission to zodiac depths';
+
+  @override
+  String get zodiacAccessPremiumInfo2 =>
+      'Each astrology chart consumes 1 Soul Stone';
+
+  @override
+  String get zodiacAccessPremiumInfo3Elite =>
+      'Elite: Unlimited access with 1 Soul Stone per day';
+
+  @override
+  String get zodiacAccessPremiumInfo3Normal =>
+      '1 Soul Stone is enough with Elite per day';
+
+  @override
+  String get zodiacAccessOneStoneBtn => '1 Soul Stone';
+
+  @override
+  String get onboardingTestSimulate =>
+      'Test Mode: Simulating old account login...';
+
+  @override
+  String get onboardingTestAnon => 'Test Mode: Connecting anonymously...';
+
+  @override
+  String onboardingGoogleLoginFailed(Object error) {
+    return 'Google Login Failed: $error';
+  }
+
+  @override
+  String onboardingAppleLoginFailed(Object error) {
+    return 'Apple Login Failed: $error';
+  }
+
+  @override
+  String onboardingGoogleRegisterFailed(Object error) {
+    return 'Google Registration Failed: $error';
+  }
+
+  @override
+  String onboardingAppleRegisterFailed(Object error) {
+    return 'Apple Registration Failed: $error';
+  }
+
+  @override
+  String dreamDataError(Object error) {
+    return 'Saved data error: $error';
+  }
+
+  @override
+  String get onboardingBirthDateTitle => 'YOUR BIRTH DATE';
+
+  @override
+  String get onboardingSelectBirthDate => 'Select your birth date';
+
+  @override
+  String get onboardingBirthTimeTitle => 'BIRTH TIME (Optional)';
+
+  @override
+  String get onboardingBirthPlaceTitle => 'BIRTH PLACE (Optional)';
+
+  @override
+  String get onboardingPickerDateTitle => 'Select Birth Date';
+
+  @override
+  String get onboardingPickerTimeTitle => 'Select Birth Time';
+
+  @override
+  String get onboardingPickerDone => 'Done';
+
+  @override
+  String get onboardingLifeFocusSpiritual => 'Spiritual\nAwakening';
+
+  @override
+  String get onboardingLifeFocusCareer => 'Career &\nPersonal Power';
+
+  @override
+  String get onboardingLifeFocusLove => 'Love &\nCosmic Harmony';
+
+  @override
+  String get onboardingLifeFocusHealing => 'Healing &\nInner Peace';
+
+  @override
+  String get onboardingLifeFocusWealth => 'Wealth &\nAbundance';
+
+  @override
+  String get onboardingLifeFocusSurprise => 'Universe\'s\nSurprises';
+
+  @override
+  String get onboardingDreamMessenger => 'Messenger & Vivid Dreams';
+
+  @override
+  String get onboardingDreamChaotic => 'Surprising & Chaotic Events';
+
+  @override
+  String get onboardingDreamCalm => 'As Calm as the Clouds';
+
+  @override
+  String get onboardingSleepMindTitle => 'Light of the Mind';
+
+  @override
+  String get onboardingSleepMindDesc =>
+      'I analyze events, weigh them with logic, and plan concrete steps.';
+
+  @override
+  String get onboardingSleepMindVal => 'Light of the Mind (Logic)';
+
+  @override
+  String get onboardingSleepHeartTitle => 'Whisper of the Heart';
+
+  @override
+  String get onboardingSleepHeartDesc =>
+      'I listen to my inner voice, and always trust my feelings over logic.';
+
+  @override
+  String get onboardingSleepHeartVal => 'Whisper of the Heart (Intuition)';
+
+  @override
+  String get onboardingSleepUniverseTitle => 'Flow of the Universe';
+
+  @override
+  String get onboardingSleepUniverseDesc =>
+      'I believe everything happens for a reason, and follow the universe\'s signs.';
+
+  @override
+  String get onboardingSleepUniverseVal => 'Flow of the Universe (Destiny)';
+
+  @override
+  String get linkAccountTitle => 'Link Account';
+
+  @override
+  String get linkGoogleAccount => 'Link Google Account';
+
+  @override
+  String get linkAppleAccount => 'Link Apple Account';
+
+  @override
+  String get linkAccountStarted => 'Account linking process started...';
+
+  @override
+  String get linkAccountFailed => 'Account linking failed';
+
+  @override
+  String get profileSignOutGuestDesc =>
+      'Warning: If you sign out of a guest account, you will not be able to access this account again and all your data (Soul Stones, readings) will be PERMANENTLY LOST. Are you sure you want to sign out?';
 }

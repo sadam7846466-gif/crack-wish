@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
 import '../screens/premium_paywall_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ZodiacAccessService {
   static const String _kWesternFreeDate = 'zodiac_western_free_date';
@@ -107,14 +108,14 @@ class ZodiacAccessService {
                       children: [
                         const Icon(Icons.flare_outlined, color: _gold, size: 48),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Günlük Ücretsiz Hakkın Doldu',
-                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        Text(
+                          AppLocalizations.of(dialogCtx)?.zodiacAccessWesternAdTitle ?? 'Günlük Ücretsiz Hakkın Doldu',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.',
+                          AppLocalizations.of(dialogCtx)?.zodiacAccessWesternAdDesc ?? 'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
                         ),
@@ -146,7 +147,7 @@ class ZodiacAccessService {
                                 },
                                 icon: Icon(Icons.play_circle_filled_rounded, color: _gold.withOpacity(0.8), size: 18),
                                 label: Text(
-                                  'Reklam İzle',
+                                  AppLocalizations.of(dialogCtx)?.zodiacAccessWatchAdBtn ?? 'Reklam İzle',
                                   style: TextStyle(color: _gold.withOpacity(0.9), fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -169,8 +170,8 @@ class ZodiacAccessService {
                                 },
                                 icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
                                 label: const Text(
-                                  'Elite Al',
-                                  style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
+                                  AppLocalizations.of(dialogCtx)?.zodiacAccessGetEliteBtn ?? 'Elite Al',
+                                  style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -228,7 +229,7 @@ class ZodiacAccessService {
                           children: [
                             Icon(Icons.diamond_rounded, color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), size: 48),
                             const SizedBox(height: 12),
-                            const Text('Kozmik Bilgelik Kapısı', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                            Text(AppLocalizations.of(dialogCtx)?.zodiacAccessGateTitle ?? 'Kozmik Bilgelik Kapısı', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                             const SizedBox(height: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -242,16 +243,16 @@ class ZodiacAccessService {
                                 children: [
                                   const Icon(Icons.diamond_outlined, size: 14, color: Color(0xFF22D3EE)),
                                   const SizedBox(width: 6),
-                                  Text("$soulStones Ruh Taşın var", style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600)),
+                                  Text(AppLocalizations.of(dialogCtx)?.zodiacAccessStoneCount(soulStones) ?? "$soulStones Ruh Taşın var", style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 13, fontWeight: FontWeight.w600)),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 16),
-                            _premiumInfoRow(Icons.auto_awesome, "Burç derinlikleri için giriş izni", true),
+                            _premiumInfoRow(Icons.auto_awesome, AppLocalizations.of(dialogCtx)?.zodiacAccessPremiumInfo1 ?? "Burç derinlikleri için giriş izni", true),
                             const SizedBox(height: 10),
-                            _premiumInfoRow(Icons.diamond_outlined, "Her astroloji haritası 1 Ruh Taşı harcar", hasEnough),
+                            _premiumInfoRow(Icons.diamond_outlined, AppLocalizations.of(dialogCtx)?.zodiacAccessPremiumInfo2 ?? "Her astroloji haritası 1 Ruh Taşı harcar", hasEnough),
                             const SizedBox(height: 10),
-                            _premiumInfoRow(Icons.workspace_premium, isPremiumUser ? "Elite: Günde 1 Ruh Taşı ile sınırsız giriş" : "Elite ile günde 1 Ruh Taşı yeterli", isPremiumUser),
+                            _premiumInfoRow(Icons.workspace_premium, isPremiumUser ? (AppLocalizations.of(dialogCtx)?.zodiacAccessPremiumInfo3Elite ?? "Elite: Günde 1 Ruh Taşı ile sınırsız giriş") : (AppLocalizations.of(dialogCtx)?.zodiacAccessPremiumInfo3Normal ?? "Elite ile günde 1 Ruh Taşı yeterli"), isPremiumUser),
                             const SizedBox(height: 20),
                             Row(
                               children: [
@@ -276,7 +277,7 @@ class ZodiacAccessService {
                                     } : null,
                                     child: FittedBox(
                                       fit: BoxFit.scaleDown,
-                                      child: Text("1 Ruh Taşı", style: TextStyle(color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), fontWeight: FontWeight.bold)),
+                                      child: Text(AppLocalizations.of(dialogCtx)?.zodiacAccessOneStoneBtn ?? "1 Ruh Taşı", style: TextStyle(color: hasEnough ? const Color(0xFF22D3EE) : Colors.white.withOpacity(0.3), fontWeight: FontWeight.bold)),
                                     ),
                                   ),
                                 ),
@@ -294,7 +295,7 @@ class ZodiacAccessService {
                                       Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumPaywallPage()));
                                     },
                                     icon: const Icon(Icons.workspace_premium, color: Color(0xFF22D3EE), size: 18),
-                                    label: const FittedBox(fit: BoxFit.scaleDown, child: Text("Elite Al", style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold))),
+                                    label: FittedBox(fit: BoxFit.scaleDown, child: Text(AppLocalizations.of(dialogCtx)?.zodiacAccessGetEliteBtn ?? "Elite Al", style: const TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold))),
                                   ),
                                 ),
                               ],

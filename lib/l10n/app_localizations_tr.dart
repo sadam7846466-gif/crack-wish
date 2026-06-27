@@ -1395,6 +1395,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingContinue => 'Devam Et';
 
   @override
+  String get onboardingContinueWithoutAccount => 'Hesap Açmadan Devam Et';
+
+  @override
   String get onboardingFinish => 'Yolculuğa Başla';
 
   @override
@@ -2935,4 +2938,300 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get zodiacHubMayan => 'MAYA ASTROLOJİSİ';
+
+  @override
+  String get actionLater => 'Sonra';
+
+  @override
+  String get coffeeViewReading => 'Falına Göz At';
+
+  @override
+  String get coffeeReadyTitleWithEmoji => '☕️ Falın Hazır!';
+
+  @override
+  String get wheelTask_w_c1 => 'Sevdiğin birine \"seni düşünüyorum\" mesajı at';
+
+  @override
+  String get wheelTask_w_c2 => 'Uzun süredir konuşmadığın birine merhaba de';
+
+  @override
+  String get wheelTask_w_c3 =>
+      'Ailenden birine bugün ne kadar önemli olduğunu söyle';
+
+  @override
+  String get wheelTask_w_c4 => 'Yanındaki birine iltifat et';
+
+  @override
+  String get wheelTask_w_c5 => 'Bir arkadaşına komik bir video gönder';
+
+  @override
+  String get wheelTask_w_c6 => 'Birine bugün teşekkür et, nedenini açıkla';
+
+  @override
+  String get wheelTask_w_s1 => 'Aynaya bak, kendine gülümse, 10 saniye tut';
+
+  @override
+  String get wheelTask_w_s2 =>
+      'En son ne zaman kahkaha attığını hatırla ve tekrar gülümse';
+
+  @override
+  String get wheelTask_w_s3 => 'Komik bir anını düşün ve sesli güle';
+
+  @override
+  String get wheelTask_w_s4 => 'Telefonundaki en komik fotoğrafı bul ve bak';
+
+  @override
+  String get wheelTask_w_s5 => 'Gördüğün ilk kişiye gülümse';
+
+  @override
+  String get wheelTask_w_s6 => 'Bugün yaşadığın en komik anı düşün';
+
+  @override
+  String get wheelTask_w_m1 => 'Ayağa kalk, 30 saniye streç yap';
+
+  @override
+  String get wheelTask_w_m2 => '1 dakika boyunca odanı yürü';
+
+  @override
+  String get wheelTask_w_m3 => '10 kez zıpla ve \"yapabilirim!\" de';
+
+  @override
+  String get wheelTask_w_m4 =>
+      'Kollarını yukarı kaldır ve 20 saniye Superman pozu yap';
+
+  @override
+  String get wheelTask_w_m5 => 'Omuzlarını 5 kez ileri, 5 kez geri döndür';
+
+  @override
+  String get wheelTask_w_m6 =>
+      'Derin bir nefes al, kollarını iki yana aç, 10 saniye tut';
+
+  @override
+  String get wheelTask_w_mu1 => 'En sevdiğin şarkıyı aç, 1 dakika dinle';
+
+  @override
+  String get wheelTask_w_mu2 =>
+      'Rastgele bir şarkı aç, ilk 30 saniyesini dinle';
+
+  @override
+  String get wheelTask_w_mu3 =>
+      'Şarkı söyle! Yüksek sesle, kimse dinlemiyor gibi';
+
+  @override
+  String get wheelTask_w_mu4 => 'Bugün keşfetmediğin bir türde şarkı dinle';
+
+  @override
+  String get wheelTask_w_mu5 =>
+      'Gözlerini kapa ve 30 saniye etrafındaki sesleri dinle';
+
+  @override
+  String get wheelTask_w_mu6 => 'Parmağınla masaya bir ritim çal, 15 saniye';
+
+  @override
+  String get wheelTask_w_g1 =>
+      'Bugün sahip olduğun 1 şeyi düşün ve \"teşekkürler\" de';
+
+  @override
+  String get wheelTask_w_g2 => 'Seni mutlu eden 3 küçük şeyi say';
+
+  @override
+  String get wheelTask_w_g3 =>
+      'Bugün yediğin en güzel şeyi düşün ve tadını hatırla';
+
+  @override
+  String get wheelTask_w_g4 => 'Hayatındaki en güzel anı 10 saniye düşün';
+
+  @override
+  String get wheelTask_w_g5 =>
+      'Sağlığın için minnettarlık duy. Derin bir nefes al.';
+
+  @override
+  String get wheelTask_w_g6 => 'Bugün güneşin doğduğu için minnettarlık duy';
+
+  @override
+  String get wheelTask_w_f1 => '3 kez zıpla ve \"Yapabilirim!\" diye bağır';
+
+  @override
+  String get wheelTask_w_f2 => 'En komik yüz ifadeni yap ve 5 saniye tut';
+
+  @override
+  String get wheelTask_w_f3 => 'Hayvan taklidi yap — hangi hayvan olurdun?';
+
+  @override
+  String get wheelTask_w_f4 =>
+      'Gözlerini kapa ve 10 saniye boyunca hayal et ki uçuyorsun';
+
+  @override
+  String get wheelTask_w_f5 => 'Bir süper kahraman pozu yap ve 5 saniye tut';
+
+  @override
+  String get wheelTask_w_f6 => 'Robot gibi yürü, 10 adım at';
+
+  @override
+  String get zodiacAccessWesternAdTitle => 'Günlük Ücretsiz Hakkın Doldu';
+
+  @override
+  String get zodiacAccessWesternAdDesc =>
+      'Batı Astrolojisi\'ne tekrar girmek için kısa bir reklam izleyebilirsin.';
+
+  @override
+  String get zodiacAccessWatchAdBtn => 'Reklam İzle';
+
+  @override
+  String get zodiacAccessGetEliteBtn => 'Elite Al';
+
+  @override
+  String get zodiacAccessGateTitle => 'Kozmik Bilgelik Kapısı';
+
+  @override
+  String zodiacAccessStoneCount(Object count) {
+    return '$count Ruh Taşın var';
+  }
+
+  @override
+  String get zodiacAccessPremiumInfo1 => 'Burç derinlikleri için giriş izni';
+
+  @override
+  String get zodiacAccessPremiumInfo2 =>
+      'Her astroloji haritası 1 Ruh Taşı harcar';
+
+  @override
+  String get zodiacAccessPremiumInfo3Elite =>
+      'Elite: Günde 1 Ruh Taşı ile sınırsız giriş';
+
+  @override
+  String get zodiacAccessPremiumInfo3Normal =>
+      'Elite ile günde 1 Ruh Taşı yeterli';
+
+  @override
+  String get zodiacAccessOneStoneBtn => '1 Ruh Taşı';
+
+  @override
+  String get onboardingTestSimulate =>
+      'Test Modu: Eski hesaba giriş simüle ediliyor...';
+
+  @override
+  String get onboardingTestAnon => 'Test Modu: Anonim bağlanılıyor...';
+
+  @override
+  String onboardingGoogleLoginFailed(Object error) {
+    return 'Google Girişi Başarısız: $error';
+  }
+
+  @override
+  String onboardingAppleLoginFailed(Object error) {
+    return 'Apple Girişi Başarısız: $error';
+  }
+
+  @override
+  String onboardingGoogleRegisterFailed(Object error) {
+    return 'Google Kaydı Başarısız: $error';
+  }
+
+  @override
+  String onboardingAppleRegisterFailed(Object error) {
+    return 'Apple Kaydı Başarısız: $error';
+  }
+
+  @override
+  String dreamDataError(Object error) {
+    return 'Kayıtlı veri hatalı: $error';
+  }
+
+  @override
+  String get onboardingBirthDateTitle => 'DÜNYAYA GELİŞ TARİHİN';
+
+  @override
+  String get onboardingSelectBirthDate => 'Doğum tarihini seç';
+
+  @override
+  String get onboardingBirthTimeTitle => 'DOĞUM SAATİN (Opsiyonel)';
+
+  @override
+  String get onboardingBirthPlaceTitle => 'DOĞUM YERİN (Opsiyonel)';
+
+  @override
+  String get onboardingPickerDateTitle => 'Doğum Tarihini Seç';
+
+  @override
+  String get onboardingPickerTimeTitle => 'Doğum Saatini Seç';
+
+  @override
+  String get onboardingPickerDone => 'Bitti';
+
+  @override
+  String get onboardingLifeFocusSpiritual => 'Ruhsal\nAydınlanma';
+
+  @override
+  String get onboardingLifeFocusCareer => 'Kariyer &\nKişisel Güç';
+
+  @override
+  String get onboardingLifeFocusLove => 'Aşk &\nKozmik Uyum';
+
+  @override
+  String get onboardingLifeFocusHealing => 'Şifa &\nİçsel Huzur';
+
+  @override
+  String get onboardingLifeFocusWealth => 'Maddi Bolluk &\nBereket';
+
+  @override
+  String get onboardingLifeFocusSurprise => 'Evrenin\nSürprizleri';
+
+  @override
+  String get onboardingDreamMessenger => 'Haberci & Net Rüyalar';
+
+  @override
+  String get onboardingDreamChaotic => 'Sürprizli & Kaotik Olaylar';
+
+  @override
+  String get onboardingDreamCalm => 'Bulutlar Kadar Sakin';
+
+  @override
+  String get onboardingSleepMindTitle => 'Aklın Işığı';
+
+  @override
+  String get onboardingSleepMindDesc =>
+      'Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.';
+
+  @override
+  String get onboardingSleepMindVal => 'Aklın Işığı (Mantık)';
+
+  @override
+  String get onboardingSleepHeartTitle => 'Kalbin Fısıltısı';
+
+  @override
+  String get onboardingSleepHeartDesc =>
+      'İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.';
+
+  @override
+  String get onboardingSleepHeartVal => 'Kalbin Fısıltısı (Sezgi)';
+
+  @override
+  String get onboardingSleepUniverseTitle => 'Evrenin Akışı';
+
+  @override
+  String get onboardingSleepUniverseDesc =>
+      'Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.';
+
+  @override
+  String get onboardingSleepUniverseVal => 'Evrenin Akışı (Kader)';
+
+  @override
+  String get linkAccountTitle => 'Hesap Bağla';
+
+  @override
+  String get linkGoogleAccount => 'Google Hesabını Bağla';
+
+  @override
+  String get linkAppleAccount => 'Apple Hesabını Bağla';
+
+  @override
+  String get linkAccountStarted => 'Hesap bağlama işlemi başlatıldı...';
+
+  @override
+  String get linkAccountFailed => 'Hesap bağlama başarısız oldu';
+
+  @override
+  String get profileSignOutGuestDesc =>
+      'Uyarı: Misafir hesabından çıkış yaparsanız bu hesaba tekrar erişemezsiniz ve tüm verileriniz (Ruh Taşları, fallar) KALICI OLARAK KAYBOLUR. Çıkış yapmak istediğinize emin misiniz?';
 }

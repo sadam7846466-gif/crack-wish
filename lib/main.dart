@@ -4,7 +4,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// AppLovin MAX SDK - AdMob yerine kullanılıyor
 import 'package:vlucky_flutter/l10n/app_localizations.dart';
 import 'constants/theme.dart';
 import 'screens/splash_screen.dart';
@@ -69,9 +69,8 @@ Future<void> main() async {
     await StorageService.forceResetDailyLimits(); // Geliştirici modu: Limitsiz test edebilmek için R ile sıfırla
   }
   
-  await MobileAds.instance.initialize();
-  // Uygulama açılır açılmaz ilk reklamı arka planda yükle (kullanıcı beklemesim):
-  AdService().loadRewardedAd();
+  // AppLovin MAX SDK başlat ve ilk reklamı yükle
+  await AdService().initialize();
   await LiquidGlassWidgets.initialize();
   final localeController = LocaleController();
   await localeController.load();

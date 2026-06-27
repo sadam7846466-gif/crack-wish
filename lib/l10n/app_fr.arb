@@ -1,0 +1,1368 @@
+{
+  "appTitle": "Crack et souhait",
+  "language": "Langue",
+  "selectLanguage": "Sélectionnez la langue",
+  "systemLanguage": "Système",
+  "turkish": "turc",
+  "english": "Anglais",
+  "close": "Fermer",
+  "languageValue": "Sélectionné :{value}",
+  "@languageValue": {
+    "description": "Selected language label",
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "navHome": "Maison",
+  "navCollection": "Collection",
+  "navProfile": "Profil",
+  "dailyCookieTitle": "Biscuit quotidien",
+  "dailyCookieSubtitle": "Appuyez pour tenter votre chance",
+  "luckyNumber": "Numéro porte-bonheur",
+  "luckyColor": "Couleur chanceuse",
+  "luckLabel": "Chance",
+  "todayFortune": "La fortune d'aujourd'hui",
+  "shareButton": "📸 Partager",
+  "fortuneShareText": "{emoji}{title}{meaning}Numéro porte-bonheur :{number}Couleur porte-bonheur :{color}Chance :{percent}%\n\nDepuis l'application Fortune Cookie 🥠",
+  "@fortuneShareText": {
+    "description": "Share text for fortune",
+    "placeholders": {
+      "emoji": {},
+      "title": {},
+      "meaning": {},
+      "number": {},
+      "color": {},
+      "percent": {}
+    }
+  },
+  "themeSelectTitle": "Sélectionnez un thème",
+  "themeSelected": "Thème sélectionné :{value}",
+  "@themeSelected": {
+    "description": "Theme selected snackbar",
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "themeGalleryTitle": "Galerie de thèmes",
+  "themeGalleryOpen": "Aller à la liste des thèmes",
+  "themeGalleryLimited": "La galerie de thèmes est actuellement limitée à deux options",
+  "statCookies": "Cookies",
+  "statStreakDays": "Jours consécutifs",
+  "statDreams": "Rêves",
+  "statMood": "Humeur",
+  "statTheme": "Aujourd'hui...",
+  "statCollection": "Mon biscuit",
+  "statTalisman": "Talisman",
+  "moodGood": "Bien",
+  "moodSad": "Triste",
+  "moodBad": "Mauvais",
+  "moodHappy": "Heureux",
+  "moodGreat": "Super",
+  "shortcutCollection": "Collection",
+  "shortcutHistory": "Histoire",
+  "shortcutFavorites": "Favoris",
+  "sectionShortcuts": "Raccourcis",
+  "sectionActivity": "Activité",
+  "menuBadges": "Insignes",
+  "menuBadgesSubtitle": "Réalisations et niveaux",
+  "menuSettings": "Paramètres",
+  "menuSettingsSubtitle": "Notifications, thème, confidentialité",
+  "menuHelpAbout": "Aide et à propos",
+  "menuHelpAboutSubtitle": "FAQ et informations sur la version",
+  "menuShare": "Partager",
+  "menuShareSubtitle": "Partagez votre profil avec des amis",
+  "activityTarotOpenedTitle": "Lecture du Tarot ouverte",
+  "activityTarotOpenedSubtitle": "Aujourd'hui • Carte : Étoile",
+  "activityCookiesOpenedTitle": "{count}cookies fissurés",
+  "@activityCookiesOpenedTitle": {
+    "description": "Cookies opened activity title",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "activityCookiesOpenedSubtitle": "Hier • Nouveaux messages ouverts",
+  "activityDreamSavedTitle": "Interprétation des rêves enregistrée",
+  "activityDreamSavedSubtitle": "il y a 2 jours",
+  "profileUserTitle": "Utilisateur",
+  "profileSubtitle": "Moins de bruit, plus vous",
+  "tagTarot": "Tarot",
+  "tagDream": "Rêve",
+  "tagCollection": "Collection",
+  "zodiacTitle": "⭐ Lecture du zodiaque",
+  "zodiacDailyTitle": "{name}- Lecture quotidienne",
+  "@zodiacDailyTitle": {
+    "description": "Zodiac daily title",
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "zodiacDailyBody": "Vous avez de la chance en amour cette semaine ! Des opportunités de carrière sont à votre porte : gardez les yeux ouverts. Votre énergie est élevée, utilisez-la. C'est le moment idéal pour de nouveaux projets. Vos capacités de communication sont à leur apogée, profitez-en.",
+  "zodiacLove": "Amour",
+  "zodiacCareer": "Carrière",
+  "zodiacMoney": "Argent",
+  "zodiacHealth": "Santé",
+  "collectionTitle": "Votre collection",
+  "collectionSubtitle": "Traces et récompenses de votre rituel quotidien",
+  "collectionNotYet": "Pas encore",
+  "collectionFirstTime": "Première fois",
+  "collectionTotalOpened": "Total",
+  "collectionCookieDescription": "Ce cookie ajoute de la chance et des petites surprises à votre rituel. Plus vous ouvrez, plus votre collection devient forte.",
+  "collectionSummaryTitle": "Résumé de la collecte",
+  "collectionSummaryTypes": "Types uniques",
+  "collectionSummaryTotalOpened": "Total ouvert",
+  "collectionSummaryRare": "Rare",
+  "collectionSummaryFooter": "Chaque cookie a une histoire. Plus vous l’ouvrez, plus il s’enrichit.",
+  "rarityAll": "Tous",
+  "rarityCommon": "Commun",
+  "rarityRare": "Rare",
+  "rarityLegendary": "Légendaire",
+  "collectionUndiscovered": "Non découvert",
+  "collectionNotFoundYet": "La chance ne vous a pas amené ici... pour le moment.",
+  "collectionEmptyTitle": "Vous n'avez pas encore ouvert de cookies",
+  "collectionEmptySubtitle": "{count}différents cookies vous attendent. Ouvrez le cookie d'aujourd'hui pour démarrer votre collection.",
+  "@collectionEmptySubtitle": {
+    "description": "Empty collection subtitle",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "discoverTitle": "Découvrir",
+  "discoverSubtitle": "Explorez de nouvelles fonctionnalités",
+  "discoverCategories": "Catégories",
+  "categoryTarotTitle": "Lecture du Tarot",
+  "categoryTarotDesc": "Tarot à 3 cartes",
+  "categoryDreamTitle": "Interprétation des rêves",
+  "categoryDreamDesc": "Découvrez le sens de vos rêves",
+  "categoryZodiacTitle": "Lecture du zodiaque",
+  "categoryZodiacDesc": "Message des étoiles",
+  "categoryPersonalityTitle": "Test de personnalité",
+  "categoryPersonalityDesc": "16 personnalités",
+  "discoverDailySuggestionTitle": "LA SUGGESTION DU JOUR",
+  "discoverDailySuggestionHeadline": "As-tu fait un rêve cette nuit ?",
+  "discoverDailySuggestionSubtitle": "Interprétez-le maintenant et découvrez sa signification !",
+  "dailySuggestionDreamHeadline": "As-tu fait un rêve cette nuit ?",
+  "dailySuggestionDreamSubtitle": "Interprétez-le maintenant et découvrez sa signification !",
+  "dailySuggestionTarotHeadline": "Avez-vous vérifié votre tarot aujourd'hui ?",
+  "dailySuggestionTarotSubtitle": "Choisissez 3 cartes et voyez votre message !",
+  "dailySuggestionZodiacHeadline": "Vous avez déjà vérifié votre lecture du zodiaque ?",
+  "dailySuggestionZodiacSubtitle": "Découvrez immédiatement l'énergie d'aujourd'hui !",
+  "dailySuggestionCoffeeHeadline": "As-tu bu du café aujourd'hui ?",
+  "dailySuggestionCoffeeSubtitle": "Retournez votre tasse, lisons votre fortune !",
+  "dailySuggestionAllDoneHeadline": "Les rituels du jour sont terminés !",
+  "dailySuggestionAllDoneSubtitle": "Revenez demain pour du nouveau contenu.",
+  "discoverFeaturedTag": "EN VEDETTE",
+  "discoverFeaturedTitle": "Lecture du Tarot à 3 cartes",
+  "discoverFeaturedSubtitle": "Explorez votre passé, votre présent et votre avenir",
+  "ctaStart": "Commencer",
+  "homeGreeting": "Bonjour! 👋",
+  "homeFeeling": "Comment te sens-tu aujourd’hui ?",
+  "quoteOfDayText": "Le plus petit pas que vous faites aujourd’hui mènera à la plus grande victoire demain.",
+  "quoteOfDaySource": "— Citation du jour",
+  "dailyHoroscopeTitle": "Bélier",
+  "dailyHoroscopeSubtitle": "Lecture du jour",
+  "dailyHoroscopeBody": "Vous avez de la chance en amour cette semaine ! Des opportunités de carrière sont à votre porte : gardez les yeux ouverts. Votre énergie est élevée, utilisez-la.",
+  "aries": "Bélier",
+  "bentoTarotTitle": "Tarot",
+  "bentoTarotDesc": "Voyez votre avenir",
+  "bentoTarotBadge": "POPULAIRE",
+  "bentoDreamTitle": "Rêve",
+  "bentoDreamDesc": "Explorez votre subconscient",
+  "bentoDreamBadge": "NOUVEAU",
+  "bentoMotivationTitle": "Humeur",
+  "bentoMotivationDesc": "Découvrez votre humeur",
+  "bentoMotivationBadge": "TOUS LES JOURS",
+  "bentoZodiacTitle": "Zodiaque",
+  "bentoZodiacDesc": "Message des étoiles",
+  "bentoZodiacBadge": "TOUS LES JOURS",
+  "moodQuestion": "Comment allez-vous aujourd'hui?",
+  "dreamTitle": "Racontez votre rêve",
+  "dreamTabNew": "Nouveau rêve",
+  "dreamTabHistory": "Mes rêves",
+  "dreamAnalyzeButton": "Interpréter le rêve",
+  "dreamAnalyzeEstimate": "~ 5 secondes",
+  "dreamInterpretationTitle": "Interprétation des rêves",
+  "dreamNoHistory": "Vous n'avez pas encore de rêves enregistrés",
+  "dreamDefaultTitle": "Rêve",
+  "dreamSpiritual": "Spirituel",
+  "dreamEnriched": "Interprétation enrichie",
+  "dreamEnriching": "Enrichissant...",
+  "dreamEnrich": "Enrichir",
+  "dreamShare": "Partager",
+  "dreamAnalyzing": "Analyser le rêve...",
+  "dreamAnalysisFailed": "Impossible de générer une interprétation pour le moment.",
+  "dreamClarifyThreat": "Y avait-il un sentiment de menace ou de peur dans le rêve ?",
+  "dreamClarifyFamiliar": "Cette scène vous semble-t-elle familière du passé ?",
+  "dreamClarifyEscape": "Y a-t-il eu une sensation de mouvement ou d’évasion ?",
+  "dreamClarifyAnxious": "Avez-vous ressenti de l'anxiété ou une menace dans le rêve ?",
+  "dreamUnsure": "Pas sûr",
+  "dreamYes": "OUI",
+  "dreamNo": "NON",
+  "dreamGeneral": "Rêve général",
+  "dreamShareText": "Titre du rêve :{title}Date :{date}Rêve :{text}Général :{general}Psychologique :{psychology}Spirituel :{spiritual}Conseil :{advice}#VLucky #Rêve",
+  "@dreamShareText": {
+    "description": "Share text for dream analysis",
+    "placeholders": {
+      "title": {},
+      "date": {},
+      "text": {},
+      "general": {},
+      "psychology": {},
+      "spiritual": {},
+      "advice": {}
+    }
+  },
+  "scientificTitle": "Analyse scientifique des rêves",
+  "scientificDreamPromptTitle": "Racontez votre rêve",
+  "scientificDreamHint": "Écrivez votre rêve tel que vous vous en souvenez...",
+  "scientificEmotionQuestion": "Qu’avez-vous ressenti au réveil ?",
+  "scientificEmotionHint": "Choisissez une émotion",
+  "scientificClarityQuestion": "Dans quelle mesure le rêve était-il clair ?",
+  "scientificDisclaimer": "Cette analyse s’appuie sur des recherches en psychologie et en neurosciences. Il ne fournit pas de résultats définitifs ou prédictifs.",
+  "scientificLoading": "Évaluation basée sur le sommeil paradoxal et les neurosciences",
+  "scientificResultsTitle": "Interprétation des rêves",
+  "scientificRecentPastTitle": "Effets passés récents",
+  "scientificSaved": "Rêve sauvé",
+  "scientificSaveButton": "Sauver le rêve",
+  "cookieSpringWreath": "Couronne de printemps",
+  "cookieLuckyClover": "Trèfle porte-bonheur",
+  "cookieRoyalHearts": "Coeurs royaux",
+  "cookieEvilEye": "Mauvais œil",
+  "cookiePizzaParty": "Soirée Pizza",
+  "cookieSakuraBloom": "Sakura fleurit",
+  "cookieBluePorcelain": "Porcelaine Bleue",
+  "cookiePinkBlossom": "Fleur rose",
+  "cookieFortuneCat": "Chat porte-bonheur",
+  "cookieWildflower": "Fleurs sauvages",
+  "cookieCupidRibbon": "Ruban Cupidon",
+  "cookiePandaBamboo": "Panda Bambou",
+  "cookieRamadanCute": "Ramadan",
+  "cookieEnchantedForest": "Forêt enchantée",
+  "cookieGoldenArabesque": "Arabesque dorée",
+  "cookieMidnightMosaic": "Mosaïque de minuit",
+  "cookiePearlLace": "Dentelle perlée",
+  "cookieGoldenSakura": "Sakura doré",
+  "cookieDragonPhoenix": "Dragon Phénix",
+  "cookieGoldBeasts": "Bêtes d'or",
+  "emotionAnxiety": "Anxieux",
+  "emotionFear": "Effrayé",
+  "emotionCalm": "Calme",
+  "emotionHappy": "Heureux",
+  "emotionSad": "Triste",
+  "emotionConfusion": "Incertain",
+  "emotionSurprise": "Surpris",
+  "dreamMoodQuestion": "Qu’avez-vous ressenti au réveil ?",
+  "dreamMetricEmotional": "Charge émotionnelle",
+  "dreamMetricUncertainty": "Récit\nIncertitude",
+  "dreamMetricRecentPast": "Passé récent",
+  "dreamMetricBrain": "Activité cérébrale",
+  "tarotShuffleHint": "Faites glisser en cercle pour mélanger",
+  "tarotEnergyDepletedTitle": "Énergie épuisée",
+  "tarotEnergyDepletedBody": "Votre énergie cosmique quotidienne est épuisée.\nRechargez pour voir la vérité.",
+  "tarotEnergyDepletedSub": "Vos cartes sélectionnées sont prêtes, il ne reste plus qu'une étape...",
+  "tarotWatchAd": "Regarder l'annonce et ouvrir",
+  "tarotFreeRemaining": "Libre restant aujourd'hui :{count}",
+  "@tarotFreeRemaining": {
+    "description": "Free readings remaining",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "socialFeedTitle": "Alimentation silencieuse",
+  "feedTypeCookie": "Biscuit",
+  "feedTagDailyCookie": "Le biscuit du jour",
+  "feedTypeTarot": "Tarot",
+  "feedTagThreeCard": "tirage à 3 cartes",
+  "feedTypeDream": "Rêve",
+  "feedTagDreamMode": "Mode rêve",
+  "feedTypeZodiac": "Zodiaque",
+  "feedTagDailyEnergy": "Énergie quotidienne",
+  "feedTypeMotivation": "Motivation",
+  "feedTagMiniAction": "Mini-actions",
+  "inviteShareMessage": "Êtes-vous prêt pour un voyage mystique ? Je vous attends dans l'univers Crack&Wish ! ✨\n\nMon code d'invitation :{handle}Télécharger maintenant :{link}",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "handle": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteShareSubject": "Crack&Wish Inviter",
+  "inviteSendButton": "Inviter",
+  "inviteConnectButton": "Connecter",
+  "inviteSentText": "Envoyé",
+  "inviteRequestSent": "Demande envoyée à{name}!",
+  "@inviteRequestSent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toastCoffeeReadyTitle": "Votre lecture est prête !",
+  "toastCoffeeReadyMessage": "Les secrets de votre tasse ont été révélés.",
+  "toastViewButton": "Voir",
+  "toastDreamReadyTitle": "Votre rêve est interprété !",
+  "toastDreamReadyMessage": "Les messages de votre subconscient ont été décodés.",
+  "toastCoffeeReadyTitle2": "Votre lecture de café est prête !",
+  "dreamFallbackTitle": "Interprétation des rêves",
+  "rewardWelcomeTitle": "Bienvenue dans l'Univers",
+  "rewardWelcomeDesc": "Nous vous avons laissé un petit cadeau pour commencer votre voyage.",
+  "rewardReferralFallback": "Un ami",
+  "rewardReferralReceiverTitle": "Un cadeau inattendu",
+  "rewardReferralReceiverDesc": "{inviter}vous a invité ici et vous a laissé un cadeau de bienvenue.",
+  "@rewardReferralReceiverDesc": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardInviterTitle": "Votre appel a été entendu !",
+  "rewardInviterDescSingle": "{name}a rejoint l'univers. Vous avez été récompensé pour être un guide.",
+  "@rewardInviterDescSingle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardInviterDescMultiple": "{name}et{count}d'autres amis ont rejoint l'univers. Vous avez été récompensé pour être un guide.",
+  "@rewardInviterDescMultiple": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardInviterDescGeneric": "{count}amis ont rejoint l'univers. Vous avez été récompensé pour être un guide.",
+  "@rewardInviterDescGeneric": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "birthdayTitleWithName": "Joyeux anniversaire,{name}!",
+  "@birthdayTitleWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "birthdayTitle": "Joyeux anniversaire!",
+  "birthdayDesc": "Aujourd'hui est le jour sacré où votre âme est venue dans ce monde. L'univers vous a laissé un cadeau spécial.",
+  "cookieReminderTitle": "Vous n'avez pas piraté un cookie aujourd'hui",
+  "cookieReminderMessage": "Votre message de fortune quotidien vous attend !",
+  "cookieReminderReward": "3 gauche",
+  "achievementRewardStones": "+{count}Pierres d'âme",
+  "@achievementRewardStones": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementRewardAura": "+{count}Aura",
+  "@achievementRewardAura": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rankUpTitle": "Promotion cosmique !",
+  "rankUpMessage": "Votre puissance d’aura a augmenté. Nouveau titre :{rank}",
+  "@rankUpMessage": {
+    "placeholders": {
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "rankNovice": "Voyant novice",
+  "rankApprentice": "Apprenti voyant",
+  "rankSeer": "Voyant",
+  "rankWise": "Voyant sage",
+  "rankMaster": "Maître Voyant",
+  "rankCosmic": "Voyant cosmique",
+  "loginSubtitle": "Synchronisez-vous avec le guide de votre âme.\nSouvenez-vous de votre passé, de votre avenir et de votre subconscient.",
+  "loginAppleContinue": "Continuer avec Apple",
+  "loginAppleSignIn": "Connectez-vous avec Apple",
+  "loginGoogleContinue": "Continuer avec Google",
+  "loginGoogleSignIn": "Connectez-vous avec Google",
+  "loginGoogleFailed": "Échec de la connexion à Google",
+  "loginAppleFailed": "Échec de la connexion Apple",
+  "loginNoAccountYet": "Vous n'avez pas encore rejoint l'univers ?",
+  "loginHaveAccount": "Vous avez déjà un compte ?",
+  "loginSignUp": "S'inscrire",
+  "loginSignIn": "Se connecter",
+  "loginLegalPrefix": "En continuant, vous acceptez notre",
+  "loginTermsOfUse": "Conditions d'utilisation",
+  "loginLegalAnd": "et",
+  "loginPrivacyPolicy": "politique de confidentialité",
+  "loginLegalSuffix": ".",
+  "homeSubtitle1": "Craquez, lisez, souriez.",
+  "homeSubtitle2": "La chance dans votre poche.",
+  "homeSubtitle3": "Le message du jour : Vous.",
+  "homeSubtitle4": "Un craquement, une surprise.",
+  "homeSubtitle5": "Un petit cookie, une grande sensation.",
+  "homeSubtitle6": "Pas le destin, juste un doux indice.",
+  "homeSubtitle7": "Que dit votre chance aujourd'hui ?",
+  "homeSubtitle8": "Ouvrez, découvrez, avancez.",
+  "homeSubtitle9": "La chance est à portée de main.",
+  "homeSubtitle10": "Un nouveau départ à chaque fissure.",
+  "homeSubtitle11": "Trouvez votre message.",
+  "homeSubtitle12": "Pas au hasard… juste pour vous.",
+  "homeSubtitle13": "Tentez votre chance, saisissez votre journée.",
+  "homeSubtitle14": "De petites prophéties qui font sourire.",
+  "homeSubtitle15": "Les surprises font du bien.",
+  "homeMilestoneTitle": "Une concentration incroyable !",
+  "homeMilestoneMessage": "Votre séquence quotidienne a atteint{count}jours.",
+  "@homeMilestoneMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeMilestoneSoulStone": "+{count}Pierres d'âme",
+  "@homeMilestoneSoulStone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeGreetingMorning": "Bonjour",
+  "homeGreetingAfternoon": "Bon après-midi",
+  "homeGreetingEvening": "Bonne soirée",
+  "homeGreetingNight": "Bonne nuit",
+  "homeTimeSubMorning": "Message frais avec votre café.",
+  "homeTimeSubAfternoon": "Une pause magique dans votre journée.",
+  "homeTimeSubEvening": "Une douce prophétie pour se détendre.",
+  "homeTimeSubNight": "Les étoiles brillent pour toi ce soir.",
+  "paywallSubtitleElite": "Votre conscience cosmique est déjà ouverte.\nRenforcez votre illumination en améliorant votre plan.",
+  "paywallSubtitleNew": "Ouvrez la porte à la conscience cosmique.\nSupprimez toutes les limites.",
+  "paywallFeature1": "5 pierres d'âme fraîches par jour",
+  "paywallFeature2": "Mode d'analyse maître",
+  "paywallFeature3": "Gain d'aura rapide x3",
+  "paywallFeature4": "Archives cliniques illimitées",
+  "paywallFeature5": "Expérience fluide et sans publicité",
+  "paywallPackageWeekly": "Réveil hebdomadaire",
+  "paywallPackageMonthly": "Intuition mensuelle",
+  "paywallPackageYearly": "Illumination annuelle",
+  "paywallBtnCurrentPlan": "Forfait actuel",
+  "paywallBtnManage": "Gérer depuis le magasin",
+  "paywallBtnUpgrade": "Plan de mise à niveau",
+  "paywallBtnSubscribe": "Débloquez Élite",
+  "paywallSuccessUpgradeTitle": "Illumination améliorée",
+  "paywallSuccessTitle": "Bienvenue aux Lumières",
+  "paywallSuccessUpgradeSubtitle": "Votre forfait a été mis à niveau avec succès.",
+  "paywallSuccessSubtitle": "Vous êtes désormais membre Élite. Les limites cosmiques ont été supprimées pour vous.",
+  "paywallErrorTitle": "Erreur de connexion",
+  "paywallErrorMessage": "Impossible de se connecter au magasin ou la transaction a été annulée. Les produits ne peuvent pas encore être publiés sur l'App Store/Play Console. Veuillez réessayer plus tard.",
+  "paywallRestoreSuccess": "Élite restaurée",
+  "paywallRestoreSuccessSubtitle": "Bon retour à la conscience cosmique. Vos limites ont été supprimées.",
+  "paywallRestoreNoSub": "Aucun abonnement actif",
+  "paywallRestoreNoSubMessage": "Aucun abonnement Crack Wish Elite actif trouvé à restaurer. Veuillez consulter les forfaits.",
+  "paywallRestore": "Restaurer les achats",
+  "paywallCurrentPlanBadge": "RÉGIME ACTUEL",
+  "paywallLegalTr": "Crack Wish Elite est un abonnement à renouvellement automatique. Le paiement sera débité de votre compte lors de la confirmation de l'achat. L'abonnement se renouvelle automatiquement sauf annulation au moins 24 heures avant la fin de la période en cours. Vous pouvez gérer et annuler vos abonnements dans les paramètres de votre App Store.",
+  "paywallOk": "D'ACCORD",
+  "coffeeLoading1": "Plonger dans les profondeurs de la coupe...",
+  "coffeeLoading2": "Les symboles sur le terrain s'alignent sur l'énergie universelle...",
+  "coffeeLoading3": "Vos lignes de destin sont en train d'être tracées...",
+  "coffeeLoading4": "Des secrets sont révélés...",
+  "coffeeAiError": "L'IA a rencontré une erreur lors de l'interprétation de la lecture.",
+  "coffeeGenericError": "Quelque chose s'est mal passé. Veuillez réessayer.",
+  "coffeeNotifReady": "Vous serez averti lorsque votre lecture sera prête",
+  "coffeeCheckHistory": "bouton pour le voir",
+  "coffeeWaitOrExplore": "Attendez ici ou explorez l'application",
+  "coffeeGoHome": "Aller à la maison",
+  "coffeeSections": "Sections de coupe",
+  "coffeeSectionInside": "À l'intérieur de la Coupe",
+  "coffeeSectionInsideDesc": "Votre monde intérieur, vos pensées, votre état émotionnel.",
+  "coffeeSectionEdge": "Bord de la coupe",
+  "coffeeSectionEdgeDesc": "Futur proche, nouvelles, messages, rencontres.",
+  "coffeeSectionBottom": "Fond de tasse",
+  "coffeeSectionBottomDesc": "Problèmes passés persistants, fardeaux, questions non résolues.",
+  "coffeeSectionSaucer": "Soucoupe",
+  "coffeeSectionSaucerDesc": "Souhait, résultat, destin, énergie finale.",
+  "coffeeLoadingComment": "Chargement de l'interprétation...",
+  "coffeeStoryTitle": "L'histoire racontée par le terrain",
+  "coffeeSymbolsTitle": "Symboles vus dans votre lecture",
+  "coffeeLove": "Amour et relations",
+  "coffeeCareer": "Carrière et finances",
+  "coffeeFamily": "Famille & Cercle Proche",
+  "coffeeNearFuture": "Futur proche",
+  "coffeeClosing": "Derniers mots de votre lecture",
+  "coffeeShare": "Partager ma lecture",
+  "coffeeRetryValidation": "Revenir en arrière et reprendre",
+  "coffeeRetry": "Essayer à nouveau",
+  "coffeeCancel": "Annuler",
+  "coffeeSymbolLabel": "Symbole",
+  "coffeeSymbolLoading": "Chargement...",
+  "coffeeTimelineSoon": "Très bientôt",
+  "coffeeImageError": "Impossible de détecter du marc de café clair sur cette image.",
+  "coffeeCosmicTitle": "Lecture de café cosmique",
+  "coffeePremiumOnly": "Fonctionnalité Premium uniquement",
+  "coffeePremiumDesc": "Coffee Reading est réservé aux membres d’élite. Passez à Premium et découvrez les secrets de votre avenir avec vos Soul Stones.",
+  "coffeePremiumSimBtn": "Passez au Premium (Simulation)",
+  "coffeePhotoSource": "Source des photos",
+  "coffeeCamera": "Caméra",
+  "coffeeGallery": "Galerie",
+  "coffeeStepCupInside": "À l'intérieur de la Coupe",
+  "coffeeStepCupInsideDesc": "Placez la caméra directement au-dessus de la tasse et capturez le marc de café à l'intérieur.",
+  "coffeeStepLeftProfile": "Profil gauche",
+  "coffeeStepLeftProfileDesc": "Tenez la tasse par sa poignée et prenez une photo claire du côté gauche uniquement.",
+  "coffeeStepRightProfile": "Bon profil",
+  "coffeeStepRightProfileDesc": "Capturez maintenant le côté arrière droit de la tasse sous un angle bien éclairé.",
+  "coffeeStepSaucerSecret": "Le secret de la soucoupe",
+  "coffeeStepSaucerDesc": "Enfin, capturez la large surface de la soucoupe avec les motifs clairement visibles.",
+  "coffeeStepSaucerBtn": "Prendre une photo de soucoupe",
+  "coffeeHeaderTitle": "LECTURE DE CAFÉ",
+  "coffeeLastReading": "Votre dernière lecture",
+  "coffeeLastReadingTime": "À{time}• Expire à minuit",
+  "@coffeeLastReadingTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "coffeeNoReadingYet": "Vous n'avez pas encore eu de lecture.\nPréparez une tasse de café,\net laissez le terrain vous chuchoter.",
+  "coffeeSoulStones": "Vos pierres d'âme",
+  "coffeeSoulStoneEmpty": "Il ne reste plus aucune pierre d'âme",
+  "coffeeSoulStoneRequired": "Requis pour l'analyse de la lecture du café",
+  "coffeeSoulStoneCost": "Chaque lecture coûte 1 pierre d'âme",
+  "coffeeSoulStoneEliteActive": "Avantage d'élite : 5 pierres d'âme rafraîchies chaque nuit",
+  "coffeeSoulStoneElitePromo": "Devenez Elite pour gagner 5 Soul Stones chaque soir",
+  "coffeeEliteSubscribe": "Abonnez-vous à Élite",
+  "coffeeRitualLabel": "RITUEL",
+  "coffeeRitualTitle": "Secrets de la Coupe",
+  "coffeeRitualDesc": "Les motifs ne parlent qu'à ceux qui regardent attentivement. Suivez le rituel pour une vraie lecture.",
+  "coffeeRitualStep1Title": "Définissez votre intention",
+  "coffeeRitualStep1Desc": "Pendant que vous sirotez, laissez une question ou un souhait vous traverser l’esprit.",
+  "coffeeRitualStep2Title": "Sirotez d'un côté",
+  "coffeeRitualStep2Desc": "Buvez toujours du même côté pour préserver les motifs.",
+  "coffeeRitualStep3Title": "Retournez-le",
+  "coffeeRitualStep3Desc": "Retournez la tasse, laissez-la refroidir et ouvrez-la doucement.",
+  "coffeeRitualListenTitle": "Écoutez les murmures du terrain",
+  "coffeeStepLabel": "Étape{index}:{title}",
+  "@coffeeStepLabel": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "coffeeDiscoverFate": "Découvrez votre destin",
+  "coffeeNextStep": "Étape suivante",
+  "coffeeCapture": "Capturez cet angle",
+  "coffeeValidationError": "Le terrain sur les photos marquées\nn'a pas pu être clairement identifié.",
+  "coffeeCosmicMismatch": "Inadéquation cosmique",
+  "coffeeCosmicCheck": "VÉRIFICATION DES LIENS COSMIQUES",
+  "coffeeCosmicCheckDesc": "Décoder le langage des motifs,\nécouter les murmures du destin...",
+  "coffeeRevealSecrets": "Soulevez le voile des secrets",
+  "coffeeReadingInProgress": "Lire les motifs...",
+  "coffeeReadingWait": "Les portes du futur s’ouvrent, tenez bon.",
+  "coffeeRelationTitle": "Votre statut relationnel",
+  "coffeeRelationSubtitle": "Établissez les bases de votre lien cosmique.",
+  "coffeeFocusTitle": "Qu'est-ce qui préoccupe votre esprit?",
+  "coffeeFocusSubtitle": "Choisissez une intention pour approfondir votre lecture.",
+  "coffeeMoodTitle": "Votre humeur ?",
+  "coffeeMoodSubtitle": "Ressentez l'énergie de votre tasse.",
+  "coffeeCosmicBondFormed": "Lien cosmique formé",
+  "coffeeSecretsReady": "Les secrets de votre tasse sont prêts à être murmurés...",
+  "coffeeNewReading": "Nouvelle lecture",
+  "coffeeAiPermission": "Autorisation d'analyse du café par l'IA",
+  "coffeeStoneCostInfo": "Chaque analyse coûte 1 Pierre d'Âme",
+  "coffeeEliteRefillActive": "Avantage d'élite : 5 pierres d'âme rafraîchies chaque nuit",
+  "coffeeEliteRefillPromo": "Devenez Elite pour gagner 5 Soul Stones chaque soir",
+  "coffeeEliteGetBtn": "Obtenez Élite",
+  "coffeeResultOnHome": "Voir le résultat sur la page d'accueil",
+  "onboardingStart": "Commençons",
+  "onboardingContinue": "Continuer",
+  "onboardingFinish": "Commencer le voyage",
+  "onboardingNameHint": "Un nom cosmique",
+  "onboardingNamePlaceholder": "premier_dernier",
+  "onboardingHandleHint": "Une poignée cosmique",
+  "onboardingHandlePlaceholder": "galaxy_traveler",
+  "onboardingGenderTitle": "Genre",
+  "onboardingGenderFemale": "Femelle",
+  "onboardingGenderMale": "Mâle",
+  "onboardingGenderOther": "Je préfère ne pas dire",
+  "onboardingStep1Title": "Comment devrions-nous vous appeler ?",
+  "onboardingStep1Sub": "Sous quel nom et quelle vibration l’univers devrait-il vous connaître ?",
+  "onboardingAvatarSelect": "Sélectionnez votre avatar",
+  "onboardingStep2Title": "Au moment où ton âme est entrée...",
+  "onboardingStep2Sub": "Nous avons besoin de vos informations de base pour calculer votre thème astrologique et vos rituels personnalisés.",
+  "onboardingBirthDateLabel": "Date de naissance",
+  "onboardingBirthTimeLabel": "Heure de naissance",
+  "onboardingBirthLocationLabel": "Ville de naissance",
+  "onboardingTimeHint": "Si vous connaissez l'heure exacte, entrez pour une analyse détaillée",
+  "onboardingLocationHint": "Affiner le calcul en sélectionnant une ville",
+  "onboardingUnknownTime": "je ne connais pas l'heure exacte",
+  "onboardingPrivacyNote": "Utilisé exclusivement pour dessiner votre graphique personnalisé.",
+  "onboardingStep3Title": "Quelle est votre priorité ?",
+  "onboardingStep3Sub": "Quelle énergie souhaitez-vous le plus développer ou guérir dans votre vie en ce moment ?",
+  "onboardingFocusLabel": "Mise au point (choix multiple)",
+  "onboardingFocusCareer": "Carrière et argent",
+  "onboardingFocusLove": "Amour et relations",
+  "onboardingFocusPeace": "Paix intérieure",
+  "onboardingFocusLuck": "Chance et opportunités",
+  "onboardingRelLabel": "Statut actuel de la relation :",
+  "onboardingRelSingle": "Ciel solitaire",
+  "onboardingRelComplicated": "Il y a quelqu'un...",
+  "onboardingRelTalking": "Compliqué",
+  "onboardingRelRelationship": "Lien heureux",
+  "onboardingStep4Title": "Votre connexion à l'univers la nuit...",
+  "onboardingStep4Sub": "Comment votre subconscient reçoit-il les messages ? Les couleurs et les rêves nous donneront des indices.",
+  "onboardingDreamLabel": "À quelle fréquence vous souvenez-vous de vos rêves ?",
+  "onboardingDreamOften": "Souvent et clairement",
+  "onboardingDreamSometimes": "Parfois",
+  "onboardingDreamRarely": "Rarement",
+  "onboardingDreamNever": "Jamais",
+  "onboardingAuraLabel": "L'aura de votre âme (Comment vous sentez-vous aujourd'hui ?)",
+  "onboardingStep5Title": "Ta danse avec le temps...",
+  "onboardingStep5Sub": "Quand votre énergie est-elle la plus élevée ? Nous ajusterons vos notifications en conséquence.",
+  "onboardingSleepLabel": "Votre rythme de sommeil",
+  "onboardingSleepMorning": "Personne du matin",
+  "onboardingSleepNight": "Oiseau de nuit",
+  "onboardingSleepIrregular": "Irrégulier",
+  "onboardingSleepLittle": "Je dors très peu",
+  "onboardingMatchLabel": "Correspondance et connexion cosmique",
+  "onboardingMatchDesc": "Je veux être ouvert à la connexion avec des profils synergiques et des correspondances cosmiques spéciales.",
+  "onboardingFinalTitle": "Tout est prêt...",
+  "onboardingFinalSub": "Vous êtes sur le point de découvrir ce que les stars ont prévu pour vous. Créez votre compte et entrez dans l'univers cosmique.",
+  "onboardingAppleCreate": "Créer un compte avec Apple",
+  "onboardingGoogleCreate": "Créer un compte avec Google",
+  "onboardingErrorIncomplete": "Accueillir! Plus que quelques étapes pour compléter votre profil.",
+  "onboardingErrorFailed": "La connexion a échoué. Veuillez réessayer.",
+  "onboardingErrorAlreadyExists": "Vous avez déjà un profil cosmique avec ce compte{provider}! Veuillez utiliser l'option « Connexion » sur la première page.",
+  "@onboardingErrorAlreadyExists": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingErrorDBRejected": "Inscription rejetée par la base de données :{error}Veuillez contacter l'assistance.",
+  "@onboardingErrorDBRejected": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingErrorHandleTaken": "Ce nom d'utilisateur est déjà pris",
+  "notifTitle": "Notifications",
+  "notifSubtitle": "Choisissez les notifications que vous souhaitez recevoir",
+  "notifAnnouncements": "Annonces",
+  "notifAnnouncementsDesc": "Nouvelles fonctionnalités et mises à jour",
+  "notifSounds": "Des sons",
+  "notifSoundsDesc": "Alertes de notification sonore",
+  "notifCookieAlarm": "Nouvelle alarme de cookies",
+  "notifCookieAlarmDesc": "Quand un nouveau biscuit chinois arrive",
+  "notifFriendAlarm": "Alarme ami",
+  "notifFriendAlarmDesc": "Nouvelles connexions du réseau Owl",
+  "notifDailyReminder": "Rappels quotidiens",
+  "notifDailyReminderDesc": "N'oubliez pas votre cookie quotidien",
+  "accountTitle": "Détails du compte",
+  "accountSubtitle": "Informations personnelles et gestion du compte",
+  "accountUsername": "Nom d'utilisateur",
+  "accountLinkedEmail": "E-mail lié",
+  "accountSignInMethod": "Méthode de connexion",
+  "accountDeleteTitle": "Supprimer le compte",
+  "accountDeleteDesc": "Toutes vos données seront définitivement supprimées.\nCette action ne peut pas être annulée.",
+  "accountDeleteCancel": "Annuler",
+  "accountDeleteConfirm": "Supprimer",
+  "accountDeletePermanent": "Supprimer le compte définitivement",
+  "welcomeTagline": "La magie est en vous.",
+  "welcomeAppleContinue": "Continuer avec Apple",
+  "welcomeGoogleContinue": "Continuer avec Google",
+  "moodGuideTitle": "Guide de l'humeur",
+  "moodAwarenessTitle": "Conscience émotionnelle",
+  "moodAwarenessDesc": "Choisir votre humeur rend vos sentiments concrets ; c'est la première étape pour trouver l'équilibre intérieur et la conscience de soi.",
+  "moodCosmicTitle": "Fréquence cosmique",
+  "moodCosmicDesc": "Chaque émotion que vous choisissez sur la roue porte une fréquence. L'aura de l'écran s'aligne directement sur vos sentiments.",
+  "moodHowToTitle": "Comment utiliser ?",
+  "moodHowToDesc": "Faites simplement tourner la roue et choisissez l’expression qui reflète le mieux votre humeur. Ne jugez pas vos sentiments, ressentez-les et acceptez-les.",
+  "moodQuestionAlt": "Comment est ton humeur aujourd'hui ?",
+  "moodSpinHint": "Faites tourner la roue, choisissez votre humeur ✨",
+  "bentoCoffeeTitle": "Lecture de café",
+  "bentoCoffeeDesc": "Murmures de motifs",
+  "bentoUnexplored": "Ce domaine attend d'être exploré...",
+  "bentoSealed": "Scellé",
+  "horoscopeDailyEnergy": "L'énergie d'aujourd'hui",
+  "horoscopeWestern": "Ast occidental.",
+  "horoscopeAsian": "Sagesse asiatique",
+  "horoscopeMayan": "Esprit Maya",
+  "shareSaved": "Enregistré ✓",
+  "shareDownload": "Télécharger",
+  "shareShare": "Partager",
+  "shareStory": "Histoire",
+  "sharePost": "Poste",
+  "shareCookieText": "C'est ce que j'ai reçu du fortune cookie aujourd'hui ! 🥠✨\n#CrackWish",
+  "shareCoffeeTitle": "Lecture de café",
+  "cookieLockedTitle": "Ce cookie spécial est verrouillé",
+  "cookieComingSoon": "À venir ✨",
+  "dreamWaitOrReturn": "Vous pouvez attendre ici ou retourner à la page d'accueil. Nous vous informerons lorsqu'il sera prêt et vous pourrez le lire dans la section « Mes rêves ».",
+  "dreamReturnHome": "Retour à la page d'accueil",
+  "profileEditProfile": "Modifier le profil",
+  "profileEditSubtitle": "Modifier le nom, le zodiaque et les informations personnelles",
+  "profileSearchHint": "Rechercher un zodiaque, une ville ou une date de naissance...",
+  "profileStoreUnavailable": "Le lien du magasin n'est pas disponible.",
+  "profileMailNotFound": "Aucune application de messagerie trouvée. Vous pouvez écrire à support@crackandwish.com",
+  "profileRitualCode": "Code rituel",
+  "profileRitualDesc": "Ce code est votre identité rituelle personnelle. Partagez-le avec vos amis pour les inviter au réseau Owl.",
+  "profileRitualCopied": "Code rituel copié ✨",
+  "profileRitualInfo": "Partagez avec vos amis, explorez ensemble !",
+  "profileShareCode": "Partager le code",
+  "profileDeleteAccount": "Supprimer le compte",
+  "profileDeleteDesc": "Toutes vos données seront définitivement supprimées.\nCette action ne peut pas être annulée.",
+  "profileDeleteCancel": "Annuler",
+  "profileDeleteConfirm": "Supprimer le compte",
+  "profileSignOut": "Se déconnecter",
+  "profileSignOutDesc": "Déconnectez-vous de votre compte en toute sécurité.\nVos données seront conservées.",
+  "profileSignOutCancel": "Annuler",
+  "profileSignOutConfirm": "Se déconnecter",
+  "profilePrivacyPolicy": "politique de confidentialité",
+  "profileTermsOfUse": "Conditions d'utilisation",
+  "profileGetElite": "Obtenez Élite",
+  "profileGetEliteSubtitle": "Porte vers la conscience",
+  "profileCosmicProfile": "Profil cosmique",
+  "profileCosmicSubtitle": "Graphique, heure et lieu",
+  "profileSectionAccount": "Compte",
+  "profileEmail": "E-mail",
+  "profileNotificationSettings": "Paramètres de notification",
+  "profileRestorePurchases": "Restaurer les achats",
+  "profileRestoreSuccess": "Achats restaurés avec succès !",
+  "profileRestoreFail": "Aucun achat trouvé à restaurer.",
+  "profileHelp": "Aide",
+  "profileShare": "Partager",
+  "profileRate": "Taux",
+  "profileVersion": "Version",
+  "profileCosmicName": "Nom cosmique",
+  "profileSealProfile": "Profil de joint",
+  "profileChooseAvatar": "Choisissez votre avatar magique.",
+  "profileStrengthenBonds": "Renforcer les liens",
+  "profileStrengthenBondsDesc": "Développez l'univers cosmique avec des amis.",
+  "profileEarnSoulStones": "Gagnez +2 pierres d'âme",
+  "profileCodeCopied": "Code copié !",
+  "profileNotifications": "Notifications",
+  "profileSupportExperience": "Assistance et expérience",
+  "profileSeerNovice": "Voyant novice",
+  "profileSeerApprentice": "Apprenti voyant",
+  "profileSeer": "Voyant",
+  "profileSeerWise": "Voyant sage",
+  "profileSeerMaster": "Maître Voyant",
+  "profileSeerCosmic": "Voyant cosmique",
+  "profileUploadFailed": "Le téléchargement des photos a échoué ! Veuillez vérifier votre connexion.",
+  "profileCropTitle": "Culture cosmique",
+  "profileCropCancel": "Annuler",
+  "profileCropDone": "Fait",
+  "moderationAdultContent": "L'énergie de cette image n'est pas compatible avec notre univers Cosmique (Contenu Inapproprié).",
+  "moderationViolence": "Veuillez choisir un avatar plus calme qui reflète votre aura et ne fatigue pas l'esprit (Contenu dérangeant).",
+  "moderationTooLarge": "L’image est suffisamment grande pour mettre à rude épreuve le réseau cosmique. Veuillez sélectionner une photo de moins de 5 Mo.",
+  "moderationInvalidFormat": "Votre photo n'a pas pu être lue par notre parchemin magique, le format est corrompu.",
+  "moderationUnknown": "Une fluctuation cosmique inconnue s'est produite.",
+  "profileShareInvite": "Rejoignez l'univers Crack&Wish ! ✨\nMon code rituel :{code}Entrez ce code pour gagner +1 Soul Stone, +50 Aura et un Cookie Premium surprise !\nhttps://crackandwish.com",
+  "@profileShareInvite": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "profileShareApp": "Découvrez votre fortune avec Crack&Wish ! •✨\nCassez des cookies, lisez le tarot, interprétez les rêves.\n\nhttps://crackandwish.com",
+  "profileEliteYouAre": "Vous êtes l'élite",
+  "profileGoElite": "Passez à l'élite",
+  "profileEliteMystical": "Voir les portes mystiques",
+  "profileEliteDoor": "Porte vers la conscience",
+  "profileMyCosmicProfile": "Mon profil cosmique",
+  "profileCosmicDetails": "Détails du graphique, de l'heure et du lieu",
+  "profileRestorePurchasesBtn": "Restaurer les achats",
+  "profileRestoreSubtitle": "Restaurez vos achats précédents",
+  "profileInviteFriends": "Inviter des amis",
+  "profileInviteFriendsDesc": "Construisez des liens cosmiques, gagnez ensemble",
+  "cosmicChart": "Carte cosmique",
+  "cosmicWestern": "OCCIDENTAL",
+  "cosmicAsian": "ASIATIQUE",
+  "cosmicMayan": "MAYA",
+  "cosmicRising": "SOULÈVEMENT",
+  "cosmicArrivalDate": "DATE D'ARRIVÉE",
+  "cosmicBirthTime": "HEURE DE NAISSANCE",
+  "cosmicTimeUnknown": "Heure inconnue",
+  "cosmicBirthPlace": "COORDONNÉES DU LIEU DE NAISSANCE",
+  "cosmicCountry": "Pays",
+  "cosmicSelectCountry": "Sélectionnez un pays",
+  "cosmicCityDistrict": "Ville & Quartier & Village",
+  "cosmicSelectDateFirst": "Veuillez d'abord sélectionner votre date de naissance.",
+  "cosmicLockedDays": "Verrouillé pendant{days}jours",
+  "@cosmicLockedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "cosmicSave": "Sauvegarder",
+  "cosmicSearchLocation": "Rechercher l'emplacement exact",
+  "cosmicSearchHint": "Entrez le village, le quartier, etc...",
+  "cosmicAddFreeText": "Ajouter sous forme de texte libre",
+  "cosmicRequiresTime": "Nécessite du temps",
+  "badgeReady": "PRÊT",
+  "badgeNew": "NOUVEAU",
+  "paywallLegal": "Crack Wish Elite est un abonnement à renouvellement automatique. Le paiement sera débité de votre compte lors de la confirmation de l'achat. L'abonnement se renouvelle automatiquement sauf annulation au moins 24 heures avant la fin de la période en cours. Vous pouvez gérer et annuler vos abonnements dans les paramètres de votre App Store.",
+  "cosmicSelect": "Sélectionner",
+  "coffeeRelSingle": "Âme célibataire",
+  "coffeeRelInLove": "Le coeur est plein",
+  "coffeeRelEngaged": "Engagé",
+  "coffeeRelMarried": "Marié",
+  "coffeeRelComplicated": "Compliqué",
+  "coffeeFocusLove": "Amour et Harmonie",
+  "coffeeFocusCareer": "Carrière et finances",
+  "coffeeFocusHealing": "Guérison et paix",
+  "coffeeFocusGeneral": "Avenir général",
+  "coffeeFocusSurprise": "Surprenez-moi",
+  "coffeeMoodPeaceful": "Pacifique",
+  "coffeeMoodExcited": "Excité",
+  "coffeeMoodAnxious": "Anxieux",
+  "coffeeMoodIndecisive": "Indécis",
+  "coffeeMoodEnergetic": "Énergique",
+  "coffeeMoodMelancholic": "Mélancolique",
+  "coffeeAllPhotosRequired": "S'il vous plaît, prenez toutes les photos !",
+  "coffeeNotEnoughStones": "Pas assez de pierres d’âme !",
+  "coffeeSoulStoneCount": "{count}Pierres d'âme disponibles",
+  "@coffeeSoulStoneCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coffeeUseSoulStone": "Utilisez 1 pierre d'âme",
+  "languageSettingsSubtitle": "Choisir la langue de l'application",
+  "cosmicSearchHintShort": "Recherche...",
+  "cosmicAddThis": "Ajoutez ceci",
+  "horoscopeWesternText": "Les étoiles s’alignent pour votre carrière. Prenez des mesures rapides et décisives.",
+  "horoscopeAsianText": "L’élément eau est actif. Votre intuition est forte, écoutez simplement votre cœur.",
+  "horoscopeMayanText": "La tonalité 4 est active. Une journée parfaite pour établir l’ordre et planifier votre vie.",
+  "horoscopeExplore": "Explorer",
+  "cookieDayCompleted": "Journée terminée",
+  "cookieSeeYouTomorrow": "A demain avec de nouveaux cookies.",
+  "cookieRarityLegendary": "Légendaire",
+  "cookieRarityRare": "Rare",
+  "cookiePremiumCollection": "Collection Premium",
+  "cookiePurchaseBtn": "Achat ({price})",
+  "@cookiePurchaseBtn": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "cookieTapOutsideToClose": "Appuyez à l'extérieur pour fermer",
+  "cookieAddedToCollection": "Cookie ajouté avec succès à votre collection !",
+  "cookiePremiumFallback": "Biscuit premium",
+  "dreamSoulStoneRequired": "Pierre d'âme requise",
+  "dreamSoulStoneRequiredDesc": "Les pierres d’âme sont nécessaires pour une analyse approfondie.\n\nVous pouvez gagner des Soul Stones en convertissant des points Aura ou avec un abonnement Elite.",
+  "dreamGetElite": "Obtenez Élite",
+  "dreamClinicalGateTitle": "Porte d'analyse clinique",
+  "dreamClinicalGateDesc": "Pierres d'âme actuelles :{soulStones}Cette psychanalyse profonde de niveau clinique coûte 1 pierre d’âme.",
+  "@dreamClinicalGateDesc": {
+    "placeholders": {
+      "soulStones": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamUseOneStone": "Utilisez 1 pierre",
+  "dreamDeepAnalysisBgPreparing": "Une analyse approfondie est en cours de préparation en arrière-plan. Vous recevrez une notification lorsqu'il sera prêt.",
+  "dreamYourSoulStones": "Vos pierres d'âme",
+  "dreamSoulStonesRemaining": "{count}Pierres d'âme restantes",
+  "@dreamSoulStonesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamSoulStonesEmpty": "À court de pierres d'âme",
+  "dreamRequiredForDeep": "Requis pour une analyse approfondie",
+  "dreamEachAnalysisCost": "Chaque analyse coûte 1 Pierre d'Âme",
+  "dreamEliteRefillActive": "Elite recharge 5 pierres d'âme tous les soirs",
+  "dreamEliteRefillPromo": "Obtenez 5 pierres d'âme quotidiennes avec Elite",
+  "dreamWatchAd": "Regarder l'annonce",
+  "dreamBgAnalyzing": "Votre rêve est analysé en arrière-plan. Vous recevrez une notification lorsqu'il sera prêt.",
+  "dreamDeepAnalysis": "Analyse approfondie",
+  "dreamDiscoverSecrets": "Découvrez des secrets",
+  "dreamDidYouKnow": "Saviez-vous?",
+  "dreamNeuroPsychAnalysis": "ANALYSE NEURO-PSYQUE",
+  "dreamYourDream": "VOTRE RÊVE",
+  "dreamEmotionalProfile": "Profil émotionnel",
+  "dreamEmotionalProfileSub": "Couches psychologiques pendant le rêve",
+  "dreamShadowSelf": "Soi de l'ombre",
+  "dreamShadowSelfSub": "Aspects refoulés et non examinés du subconscient",
+  "dreamRecurringPatterns": "Modèles récurrents",
+  "dreamRecurringPatternsSub": "Boucles récurrentes et blocages psychologiques",
+  "dreamSuggestedRitual": "Rituel suggéré :{title}",
+  "@dreamSuggestedRitual": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dreamSuggestedRitualSub": "Une action spécialisée pour gérer l'impact de ce rêve",
+  "dreamScienceNote": "Note scientifique :",
+  "dreamWriteNewDream": "Écrivez un nouveau rêve",
+  "dreamNoMonthDreams": "Aucun rêve écrit pour l'instant ce mois-ci ✨",
+  "dreamMysteriousDream": "Rêve mystérieux",
+  "dreamStandardAnalysis": "ANALYSE STANDARD",
+  "dreamGeneralAnalysis": "Analyse générale",
+  "dreamPsychological": "Psychologique",
+  "dreamSpiritual2": "Spirituel",
+  "dreamAdvice": "Conseil",
+  "dreamDeepenedInsights": "Informations approfondies",
+  "dreamEliteCreditsTitle": "Crédits Élite",
+  "dreamReadingCreditsTitle": "Vos crédits de lecture",
+  "dreamCreditsRemaining": "{count}crédits restants",
+  "@dreamCreditsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamDailyLimitReached": "Limite quotidienne atteinte",
+  "dreamZeroCredits": "0 crédits restants",
+  "dreamDailyPremiumReads": "{count}Interprétations quotidiennes des rêves",
+  "@dreamDailyPremiumReads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamNoAdsRequired": "Pas besoin de regarder des publicités",
+  "dreamCreditsResetNightly": "Les crédits sont réinitialisés chaque nuit",
+  "dreamOneFreeDaily": "1 interprétation gratuite chaque jour",
+  "dreamWatchAdsForCredits": "Regardez des publicités pour{maxAds}crédits supplémentaires ({watched}/{maxAds})",
+  "@dreamWatchAdsForCredits": {
+    "placeholders": {
+      "maxAds": {
+        "type": "int"
+      },
+      "watched": {
+        "type": "int"
+      }
+    }
+  },
+  "dreamUnconsciousFrequencies": "FRÉQUENCES INCONSCIENTES",
+  "dreamOrbEmotion": "ÉMOTION",
+  "dreamOrbEntropy": "ENTROPIE",
+  "dreamOrbActivity": "ACTIVITÉ",
+  "dreamOrbResidue": "RÉSIDU",
+  "dreamHighConfidence": "Haute confiance",
+  "dreamModerateConfidence": "Confiance modérée",
+  "dreamLowConfidence": "Faible confiance",
+  "dreamCoreThematicPattern": "MODÈLE THÉMATIQUE DE BASE",
+  "dreamMetricEmotionalLoad": "Émotionnel\nCharger",
+  "dreamMetricEmotionalLoadDesc": "Avec quelle intensité le centre émotionnel de votre cerveau a été activé pendant ce rêve.",
+  "dreamMetricUncertaintyDesc": "À quel point le récit de votre rêve était illogique ou incohérent.",
+  "dreamMetricRecentMemory": "Récent\nConnexion",
+  "dreamMetricRecentMemoryDesc": "Dans quelle mesure votre rêve a-t-il été influencé par des événements réels récents.",
+  "dreamMetricAgency": "Agence /\nContrôle",
+  "dreamMetricAgencyDesc": "Quel contrôle vous aviez sur les événements de votre rêve.",
+  "dreamSeverityHigh": "Haut",
+  "dreamSeverityNormal": "Normale",
+  "dreamSeverityLow": "Faible",
+  "dreamCognitiveDistribution": "DISTRIBUTION COGNITIVE",
+  "dreamTapToExpand": "APPUYEZ POUR DÉVELOPPER",
+  "dreamNeurologicalBasis": "Base neurologique",
+  "dreamEvidenceBase": "BASE DE PREUVES",
+  "dreamRootCause": "Cause première",
+  "dreamAbsolutely": "Absolument",
+  "dreamMaybe": "Peut être",
+  "dreamNotSure": "Pas sûr",
+  "dreamDreamEssence": "ESSENCE DE RÊVE",
+  "dreamClarifyingResponses": "RÉPONSES CLARIFIANTES",
+  "dreamCosmicRhythmSynced": "Rythme cosmique synchronisé",
+  "dreamCosmicRhythmSyncedDesc": "Vous recevrez des invites de rêve personnalisées en fonction de votre cycle de sommeil.",
+  "dreamSyncSleepData": "Synchroniser les données de sommeil",
+  "dreamSyncSleepDataDesc": "Permettez-lui de détecter votre réveil pour vous poser des questions sur votre rêve le plus profond.",
+  "dreamAwarenessFallback": "Cette prise de conscience est le début d’un nouveau chemin. Il est temps d'y faire face.",
+  "dreamExtractingEssence": "Extraire l'essence du rêve...",
+  "dreamNoReasoning": "Aucun raisonnement généré.",
+  "dreamNotAnalyzable": "Es-tu sûr que c'était un rêve ?\nVeuillez décrire une scène réelle que vous avez vécue pendant votre sommeil.",
+  "owlTabFriends": "Mes amis",
+  "owlTabConnections": "Relations",
+  "owlTabInbox": "Boîte de réception",
+  "owlSearchCosmic": "Rechercher l'univers cosmique...",
+  "owlSearchFriends": "Rechercher des amis...",
+  "owlPhoneContacts": "Contacts téléphoniques",
+  "owlNoOneFoundCosmic": "Personne trouvé dans l'univers cosmique.",
+  "owlFoundInCosmic": "Trouvé dans l'univers cosmique",
+  "owlUnknownProfile": "Profil inconnu",
+  "owlFriendRequestSent": "Demande d'ami envoyée à{name}!",
+  "@owlFriendRequestSent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlRequestSentStatus": "Envoyé",
+  "owlSendRequestAction": "Envoyer la demande",
+  "owlConnectContacts": "Connecter les contacts",
+  "owlConnectContactsDesc": "Trouvez vos amis instantanément.\nVos contacts ne sont JAMAIS stockés sur des serveurs.",
+  "owlNoContactsFound": "Nous n'avons trouvé personne\ndans l'Univers Crack&Wish",
+  "owlNoContactsFoundDesc": "Vous pouvez démarrer l'énergie cosmique en les invitant !",
+  "owlUnknown": "Inconnu",
+  "owlAppUserLabel": "Utilisateur Crack&Wish",
+  "owlInContactsLabel": "Dans vos contacts",
+  "owlNoFriendsYet": "Pas encore d'amis",
+  "owlNoResultsFound": "Aucun résultat trouvé",
+  "owlFriendRequests": "Demandes d'amis",
+  "owlFriendsHeader": "Vos amis",
+  "owlAcceptAction": "Accepter",
+  "owlRejectAction": "Rejeter",
+  "owlInviteReward": "+2 pierres d'âme",
+  "owlInviteShareMessage": "Ensemble, illuminons les ténèbres ! ✨\nRejoignez Crack Wish via mon lien d'invitation ci-dessous, connectez-vous automatiquement et gagnez des Start Rewards !\n\nMon lien d'invitation :\nhttps://crackwish.com/invite/{username}",
+  "@owlInviteShareMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "owlInviteFriends": "Inviter des amis",
+  "owlInviteFriendsDesc": "Refléter l'univers cosmique",
+  "owlNoLettersYet": "Pas encore de lettres",
+  "owlLetterSentNotification": "{name}a envoyé une lettre...",
+  "@owlLetterSentNotification": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlOnItsWay": "La chouette est en route 🕊️",
+  "owlLetterCount": "{count}lettres",
+  "@owlLetterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "owlUnreadCountBadge": "{count}Nouveau",
+  "@owlUnreadCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "owlIUnderstand": "Je comprends",
+  "owlInviteHowTitle": "Comment souhaiteriez-vous inviter ?",
+  "owlInviteHowSubtitle": "Comment souhaitez-vous envoyer votre clé cosmique à cette personne ?",
+  "owlInviteSendAsMessage": "Envoyer comme message",
+  "owlInviteSMSSubtitle": "Envoyer par message classique",
+  "owlInviteOtherApps": "Autres applications",
+  "owlInviteOtherAppsSubtitle": "Instagram, TikTok, X, etc.",
+  "owlWhatsAppNotFound": "WhatsApp introuvable",
+  "owlSMSNotFound": "Application SMS introuvable",
+  "owlDisconnectAction": "Déconnecter",
+  "owlDisconnectConfirm": "Etes-vous sûr de vouloir rompre le lien magique avec{name}?",
+  "@owlDisconnectConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "owlDisconnectConfirmButton": "Oui, déconnecter",
+  "owlCancel": "Annuler",
+  "owlSendMagic": "Envoyer (Charmé)",
+  "owlSend": "Envoyer",
+  "owlCookieAdded": "Cookie ajouté",
+  "owlAddCookie": "Ajouter un cookie",
+  "owlNoCookiesInCollection": "Aucun cookie dans votre collection",
+  "owlWriteLetterHint": "Écrivez votre lettre...",
+  "owlSendCookie": "Envoyer un cookie",
+  "zodiacMeasureHarmony": "MESURER L'HARMONIE COSMIQUE",
+  "zodiacDiscoverEnergy": "Découvrez votre double énergie guidée par les étoiles",
+  "zodiacChooseFriend": "CHOISISSEZ UN AMI",
+  "zodiacChooseFriendSubtitle": "Sélectionnez un ami pour comparer vos énergies cosmiques",
+  "zodiacDiscoverYourself": "Découvrez-vous",
+  "zodiacCharacteristicAnalysis": "ANALYSE DES CARACTÉRISTIQUES",
+  "zodiacAbilityMap": "Carte des capacités de{name}",
+  "@zodiacAbilityMap": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacPros": "Avantages",
+  "zodiacCons": "Défis",
+  "zodiacAdvice": "Conseil",
+  "zodiacDailyWhisperSubtitle": "Ressentez le murmure d'aujourd'hui et\npercez les secrets de votre portrait spirituel.",
+  "zodiacDailyWhisperHeadline": "Message et portrait spirituel du jour",
+  "zodiacOpenGuide": "Ouvrir le Guide",
+  "zodiacNoFriends": "Pas encore d'amis",
+  "zodiacSelect": "SÉLECTIONNER",
+  "zodiacQuestCompleted": "Quête terminée",
+  "zodiacQuestCompletedSubtitle": "Vous êtes pleinement aligné sur le rythme de l’univers.",
+  "zodiacRewardAura": "Récompense gagnée :\n+4 AURA",
+  "zodiacStartNewQuest": "COMMENCER UNE NOUVELLE QUÊTE",
+  "zodiacDailyQuestTitle": "{days}-QUÊTE JOUR",
+  "@zodiacDailyQuestTitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "zodiacDailyQuestDesc": "Brisez votre faiblesse : \"{weakness}\"",
+  "@zodiacDailyQuestDesc": {
+    "placeholders": {
+      "weakness": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacQuestDayProgress": "JOUR{current}/{total}",
+  "@zodiacQuestDayProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "zodiacQuestTodayDiscovery": "LA DÉCOUVERTE D'AUJOURD'HUI",
+  "zodiacQuestCompletedToday": "TERMINÉ AUJOURD'HUI",
+  "zodiacQuestCompleteNow": "TERMINER LA QUÊTE MAINTENANT",
+  "zodiacQuestMarkCompleted": "J'AI TERMINÉ AUJOURD'HUI",
+  "zodiacLoveHarmony": "AMOUR HARMONIE",
+  "zodiacFriendshipHarmony": "AMITIÉ",
+  "zodiacCommunicationHarmony": "COMMUNICATION ET ESPRIT",
+  "zodiacWorkHarmony": "COLLABORATION",
+  "zodiacAdventureHarmony": "AVENTURE ET PLAISIR",
+  "zodiacViralDynamics": "DYNAMIQUE VIRALE",
+  "zodiacDeepSynastryMap": "CARTE DE SYNASTRIE PROFONDE",
+  "zodiacSynastrySubtitle1": "L’harmonie entre vous et{name}ne se limite pas aux signes solaires.",
+  "@zodiacSynastrySubtitle1": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacSynastrySubtitle2": "Basé sur la confidentialité, l'algorithme cosmique croise les thèmes astrologiques, la Lune et les phases ascendantes en coulisses, ce qui rend cette analyse totalement unique pour vous.",
+  "zodiacDailyWhisperTitle": "Le murmure du jour",
+  "zodiacChooseSign": "CHOISISSEZ LE SIGNE",
+  "zodiacCosmicGuide": "VOTRE GUIDE COSMIQUE",
+  "zodiacNew": "NOUVEAU",
+  "zodiacCosmicHarmonyTitle": "HARMONIE COSMIQUE",
+  "zodiacAwesome": "GÉNIAL",
+  "zodiacSpiritPortrait": "Portrait spirituel",
+  "onboardingFeatureStepTitle": "Qu'est-ce qui vous attend ?",
+  "onboardingFeatureStepSub": "Êtes-vous prêt à écouter les murmures de l'univers et à découvrir votre destin ?",
+  "onboardingNameStepTitle": "Apprenons à vous connaître",
+  "onboardingNameStepSub": "Créez votre profil et déterminez votre identité cosmique afin que vos âmes sœurs puissent vous trouver.",
+  "onboardingDateStepTitle": "Coordonnée cosmique",
+  "onboardingDateStepSub": "Choisissez le moment de votre naissance sur la base de votre thème astrologique.",
+  "onboardingFocusStepTitle": "Boussole du cœur",
+  "onboardingFocusStepSub": "Définissez votre intention, traçons votre chemin.",
+  "onboardingDreamStepTitle": "Voix du subconscient",
+  "onboardingDreamStepSub": "Comment vos rêves vous parviennent-ils ?",
+  "onboardingSleepStepTitle": "Votre boussole intérieure",
+  "onboardingSleepStepSub": "Comment s'orienter lors des tournants du destin dans votre vie ?",
+  "onboardingFeatureAstrology": "Tableau d'astrologie personnalisé",
+  "onboardingFeatureTarot": "Guider le voyage du tarot",
+  "onboardingFeatureCoffee": "Anciens secrets de la divination du café",
+  "onboardingFeatureDream": "Analyse des rêves subconscients",
+  "onboardingFeatureZodiac": "Compatibilités mystiques chinoises et mayas",
+  "onboardingWelcomeTagline": "Aujourd'hui, mes espoirs sont plus grands que mes rêves.",
+  "onboardingFinalTagline": "Cliquez pour sécuriser votre carte cosmique.",
+  "tarotShareText": "Les cartes me parlaient ainsi ! 🔮✨\n#CrackWish #Tarot",
+  "natalChartTitle": "Thème de naissance",
+  "natalChartCalculating": "Calculer votre thème natal...",
+  "natalChartSwipeHint": "Glissez pour inspecter",
+  "natalChartPlanetPositions": "POSITIONS SUR LA PLANÈTE",
+  "natalChartAngularPoints": "POINTS ANGULAIRES",
+  "natalChartAsc": "ASC (Ascendant)",
+  "natalChartAscDesc": "Le masque que vous montrez au monde extérieur, votre image et votre première impression.",
+  "natalChartMc": "MC (Milieu du Ciel)",
+  "natalChartMcDesc": "Votre carrière, votre image publique et vos objectifs de vie.",
+  "natalChartDc": "DC (descendant)",
+  "natalChartDcDesc": "Les traits fondamentaux que vous recherchez dans les relations, le mariage et les partenariats.",
+  "natalChartIc": "IC (Imum Cœli)",
+  "natalChartIcDesc": "Vos racines, votre famille, votre passé et votre sécurité fondamentale dans votre monde intérieur.",
+  "natalChartTabPersonality": "Résumé de la personnalité principale",
+  "natalChartTabLove": "Amour et relations",
+  "natalChartTabCareer": "Carrière et argent",
+  "natalChartTabEmotional": "Structure émotionnelle",
+  "natalChartTabStrengths": "Forces et faiblesses",
+  "natalChartHouse": "Maison{house}",
+  "@natalChartHouse": {
+    "placeholders": {
+      "house": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacGreeting": "Bonjour{name},",
+  "@zodiacGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zodiacCosmicTraveler": "Voyageur cosmique,",
+  "zodiacBirthDate": "DATE DE NAISSANCE",
+  "zodiacStarsKnowYou": "Que les étoiles te connaissent",
+  "zodiacConfirm": "CONFIRMER",
+  "zodiacDiscoverYourselfBtn": "DÉCOUVREZ-VOUS",
+  "zodiacEliteRequiredDesc": "Vous avez besoin d’un abonnement Elite pour découvrir une profonde compatibilité astrologique et une dynamique virale avec vos amis.",
+  "zodiacEliteDiscoverBtn": "Découvrez les privilèges Élite",
+  "zodiacHubWestern": "ASTROLOGIE OCCIDENTALE",
+  "zodiacHubAsian": "ASTROLOGIE ASIATIQUE",
+  "zodiacHubMayan": "ASTROLOGIE MAYA",
+  "actionLater": "Plus tard",
+  "coffeeViewReading": "Voir la lecture",
+  "coffeeReadyTitleWithEmoji": "☕️ Votre lecture est prête !",
+  "wheelTask_w_c1": "Envoyer un message « je pense à toi » à un proche",
+  "wheelTask_w_c2": "Dites bonjour à quelqu'un à qui vous n'avez pas parlé depuis un moment",
+  "wheelTask_w_c3": "Dites à un membre de votre famille à quel point il est important aujourd'hui",
+  "wheelTask_w_c4": "Félicitez quelqu'un à côté de vous",
+  "wheelTask_w_c5": "Envoyez une vidéo amusante à un ami",
+  "wheelTask_w_c6": "Remerciez quelqu'un aujourd'hui et expliquez pourquoi",
+  "wheelTask_w_s1": "Regardez-vous dans le miroir, souriez-vous et maintenez pendant 10 secondes",
+  "wheelTask_w_s2": "Rappelez-vous la dernière fois que vous avez éclaté de rire et souriez à nouveau",
+  "wheelTask_w_s3": "Pensez à un souvenir amusant et riez aux éclats",
+  "wheelTask_w_s4": "Trouvez et regardez la photo la plus drôle sur votre téléphone",
+  "wheelTask_w_s5": "Souriez à la première personne que vous voyez",
+  "wheelTask_w_s6": "Pensez au moment le plus drôle que vous ayez vécu aujourd'hui",
+  "wheelTask_w_m1": "Levez-vous et étirez-vous pendant 30 secondes",
+  "wheelTask_w_m2": "Faites le tour de votre chambre pendant 1 minute",
+  "wheelTask_w_m3": "Sautez 10 fois et dites « Je peux le faire ! »",
+  "wheelTask_w_m4": "Levez les bras et faites une pose de Superman pendant 20 secondes",
+  "wheelTask_w_m5": "Roulez vos épaules vers l’avant 5 fois, puis vers l’arrière 5 fois",
+  "wheelTask_w_m6": "Respirez profondément, ouvrez grand les bras et maintenez pendant 10 secondes",
+  "wheelTask_w_mu1": "Jouez votre chanson préférée et écoutez-la pendant 1 minute",
+  "wheelTask_w_mu2": "Jouez une chanson au hasard et écoutez les 30 premières secondes",
+  "wheelTask_w_mu3": "Chanter! Chante à haute voix comme si personne n'écoutait",
+  "wheelTask_w_mu4": "Écoutez une chanson dans un genre que vous n'avez pas exploré aujourd'hui",
+  "wheelTask_w_mu5": "Fermez les yeux et écoutez les sons autour de vous pendant 30 secondes",
+  "wheelTask_w_mu6": "Tapez un rythme sur la table avec votre doigt pendant 15 secondes",
+  "wheelTask_w_g1": "Pensez à une chose que vous avez aujourd'hui et dites « merci »",
+  "wheelTask_w_g2": "Comptez 3 petites choses qui vous rendent heureux",
+  "wheelTask_w_g3": "Pensez à la meilleure chose que vous avez mangée aujourd'hui et souvenez-vous de son goût",
+  "wheelTask_w_g4": "Pensez au meilleur moment de votre vie pendant 10 secondes",
+  "wheelTask_w_g5": "Soyez reconnaissant pour votre santé. Respirez profondément.",
+  "wheelTask_w_g6": "Soyez reconnaissant que le soleil se soit levé aujourd'hui",
+  "wheelTask_w_f1": "Sautez 3 fois et criez « Je peux le faire ! »",
+  "wheelTask_w_f2": "Faites votre grimace la plus drôle et maintenez-la pendant 5 secondes",
+  "wheelTask_w_f3": "Imitez un animal : quel animal seriez-vous ?",
+  "wheelTask_w_f4": "Fermez les yeux et imaginez que vous volez pendant 10 secondes",
+  "wheelTask_w_f5": "Prenez la pose de super-héros et maintenez-la pendant 5 secondes",
+  "wheelTask_w_f6": "Marchez comme un robot pendant 10 pas",
+  "zodiacAccessWesternAdTitle": "Limite quotidienne gratuite atteinte",
+  "zodiacAccessWesternAdDesc": "Vous pouvez regarder une courte publicité pour réintégrer l’astrologie occidentale.",
+  "zodiacAccessWatchAdBtn": "Regarder l'annonce",
+  "zodiacAccessGetEliteBtn": "Obtenez Élite",
+  "zodiacAccessGateTitle": "Porte de la sagesse cosmique",
+  "zodiacAccessStoneCount": "Vous avez{count}Pierres d'âme",
+  "@zodiacAccessStoneCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "zodiacAccessPremiumInfo1": "Autorisation d'accès aux profondeurs du zodiaque",
+  "zodiacAccessPremiumInfo2": "Chaque thème astrologique consomme 1 pierre d'âme",
+  "zodiacAccessPremiumInfo3Elite": "Elite : Accès illimité avec 1 Soul Stone par jour",
+  "zodiacAccessPremiumInfo3Normal": "1 Soul Stone suffit avec Elite par jour",
+  "zodiacAccessOneStoneBtn": "1 pierre d'âme",
+  "onboardingTestSimulate": "Mode test : simulation de la connexion à un ancien compte...",
+  "onboardingTestAnon": "Mode test : connexion anonyme...",
+  "onboardingGoogleLoginFailed": "Échec de la connexion à Google :{error}",
+  "@onboardingGoogleLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingAppleLoginFailed": "Échec de la connexion Apple :{error}",
+  "@onboardingAppleLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingGoogleRegisterFailed": "Échec de l'enregistrement Google :{error}",
+  "@onboardingGoogleRegisterFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingAppleRegisterFailed": "Échec de l'enregistrement Apple :{error}",
+  "@onboardingAppleRegisterFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "dreamDataError": "Erreur de données enregistrées :{error}",
+  "@dreamDataError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onboardingBirthDateTitle": "VOTRE DATE DE NAISSANCE",
+  "onboardingSelectBirthDate": "Sélectionnez votre date de naissance",
+  "onboardingBirthTimeTitle": "HEURE DE NAISSANCE (Facultatif)",
+  "onboardingBirthPlaceTitle": "LIEU DE NAISSANCE (Facultatif)",
+  "onboardingPickerDateTitle": "Sélectionnez la date de naissance",
+  "onboardingPickerTimeTitle": "Sélectionnez l'heure de naissance",
+  "onboardingPickerDone": "Fait",
+  "onboardingLifeFocusSpiritual": "Spirituel\nÉveil",
+  "onboardingLifeFocusCareer": "Carrière et\nPouvoir personnel",
+  "onboardingLifeFocusLove": "Amour et\nHarmonie cosmique",
+  "onboardingLifeFocusHealing": "Guérison et\nPaix intérieure",
+  "onboardingLifeFocusWealth": "Richesse et\nAbondance",
+  "onboardingLifeFocusSurprise": "L'univers\nDes surprises",
+  "onboardingDreamMessenger": "Messager et rêves vifs",
+  "onboardingDreamChaotic": "Événements surprenants et chaotiques",
+  "onboardingDreamCalm": "Aussi calme que les nuages",
+  "onboardingSleepMindTitle": "Lumière de l'esprit",
+  "onboardingSleepMindDesc": "J'analyse les événements, je les pèse avec logique et je planifie des étapes concrètes.",
+  "onboardingSleepMindVal": "Lumière de l'esprit (logique)",
+  "onboardingSleepHeartTitle": "Murmure du coeur",
+  "onboardingSleepHeartDesc": "J'écoute ma voix intérieure et je fais toujours confiance à mes sentiments plutôt qu'à la logique.",
+  "onboardingSleepHeartVal": "Murmure du cœur (Intuition)",
+  "onboardingSleepUniverseTitle": "Flux de l'Univers",
+  "onboardingSleepUniverseDesc": "Je crois que tout arrive pour une raison et je suis les signes de l'univers.",
+  "onboardingSleepUniverseVal": "Flux de l'Univers (Destin)",
+  "linkAccountTitle": "Lier le compte",
+  "linkGoogleAccount": "Lier le compte Google",
+  "linkAppleAccount": "Lier le compte Apple",
+  "linkAccountStarted": "Processus de liaison de compte démarré...",
+  "linkAccountFailed": "Échec de la liaison du compte",
+  "profileSignOutGuestDesc": "Avertissement : Si vous vous déconnectez d'un compte invité, vous ne pourrez plus accéder à ce compte et toutes vos données (Pierres d'Âme, lectures) seront PERDUES DÉFINITIVEMENT. Êtes-vous sûr de vouloir vous déconnecter ?"
+}

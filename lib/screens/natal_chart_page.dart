@@ -50,8 +50,8 @@ class _NatalChartPageState extends State<NatalChartPage> {
         '${isTr ? "Ay" : "Moon"} ${signLabel(_engine!.planets[1].signIndex)} · ${houseLabel(_engine!.planets[1].house)}',
       ], _engine!.getEmotionalInterpretation(lang)),
       _InsightData(l10n.natalChartTabStrengths, '✦', [
-        'Mars ${signLabel(_engine!.planets[4].signIndex)}',
-        'Satürn ${signLabel(_engine!.planets[6].signIndex)}',
+        '${isTr ? "Mars" : "Mars"} ${signLabel(_engine!.planets[4].signIndex)}',
+        '${isTr ? "Satürn" : "Saturn"} ${signLabel(_engine!.planets[6].signIndex)}',
       ], _engine!.getStrengthsWeaknesses(lang)),
     ];
   }

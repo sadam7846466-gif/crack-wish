@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,6 +21,112 @@ class AccountDetailsPage extends StatefulWidget {
 }
 
 class _AccountDetailsPageState extends State<AccountDetailsPage> {
+  OAuthProvider? _linkingProvider;
+
+  Future<void> _linkAccount(OAuthProvider provider) async {
+    if (_linkingProvider != null) return;
+    setState(() => _linkingProvider = provider);
+    HapticFeedback.mediumImpact();
+    
+    try {
+      final l10n = AppLocalizations.of(context)!;
+      await Supabase.instance.client.auth.linkIdentity(
+        provider,
+        redirectTo: kIsWeb ? null : 'io.supabase.zzheonrmioxbiinvomsw://login-callback',
+      );
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.linkAccountStarted),
+            backgroundColor: AppColors.primaryPurple,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Link Identity Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("${AppLocalizations.of(context)!.linkAccountFailed}: $e"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _linkingProvider = null);
+      }
+    }
+  }
+
+  Widget _buildLinkAccountButton({
+    required OAuthProvider provider,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    final isThisButtonLinking = _linkingProvider == provider;
+    final isAnyButtonLinking = _linkingProvider != null;
+
+    return GestureDetector(
+      onTap: isAnyButtonLinking ? null : onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.12),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            isThisButtonLinking
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white70,
+                    ),
+                  )
+                : Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.white.withOpacity(0.4),
+                    size: 16,
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _deleteAccount() {
     final l10n = AppLocalizations.of(context)!;
@@ -188,8 +295,14 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
     final palette = AppThemeController.current;
     final l10n = AppLocalizations.of(context)!;
     final user = Supabase.instance.client.auth.currentUser;
+    final isAnonymous = user != null && (
+      user.appMetadata['is_anonymous'] == true ||
+      user.appMetadata['provider'] == 'anonymous' ||
+      user.email == null ||
+      user.email!.isEmpty
+    );
     final String fullEmail = user?.email ?? '';
-    final String provider = user?.appMetadata['provider'] ?? 'E-posta';
+    final String provider = isAnonymous ? 'Misafir' : (user?.appMetadata['provider'] ?? 'E-posta');
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -299,6 +412,31 @@ class _AccountDetailsPageState extends State<AccountDetailsPage> {
                             title: l10n.accountSignInMethod,
                             value: provider.toUpperCase(),
                           ),
+                          
+                          if (isAnonymous) ...[
+                            const SizedBox(height: 24),
+                            // Hesap Bağla Section Title
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4, bottom: 12),
+                                child: Text(
+                                  l10n.linkAccountTitle,
+                                  style: const TextStyle(
+                                    color: AppColors.textWhite,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            _buildLinkAccountButton(
+                              provider: OAuthProvider.google,
+                              icon: Icons.g_mobiledata_rounded,
+                              label: l10n.linkGoogleAccount,
+                              onTap: () => _linkAccount(OAuthProvider.google),
+                            ),
+                          ],
                           
                           const SizedBox(height: 48),
 

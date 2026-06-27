@@ -33,6 +33,11 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     final options = [
       {'locale': const Locale('tr'), 'label': 'Türkçe', 'flag': 'tr'},
       {'locale': const Locale('en'), 'label': 'English', 'flag': 'gb'},
+      {'locale': const Locale('es'), 'label': 'Español', 'flag': 'es'},
+      {'locale': const Locale('pt'), 'label': 'Português', 'flag': 'br'},
+      {'locale': const Locale('de'), 'label': 'Deutsch', 'flag': 'de'},
+      {'locale': const Locale('fr'), 'label': 'Français', 'flag': 'fr'},
+      {'locale': const Locale('it'), 'label': 'Italiano', 'flag': 'it'},
     ];
 
     return Scaffold(
@@ -199,7 +204,11 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
                                       BoxShadow(
                                         color: optFlag == 'tr' 
                                           ? const Color(0xFFE63946).withOpacity(0.5) 
-                                          : const Color(0xFF4361EE).withOpacity(0.5),
+                                          : (optFlag == 'br' || optFlag == 'it')
+                                            ? const Color(0xFF2ECC71).withOpacity(0.5)
+                                            : (optFlag == 'de' || optFlag == 'es')
+                                              ? const Color(0xFFF1C40F).withOpacity(0.5)
+                                              : const Color(0xFF4361EE).withOpacity(0.5),
                                         blurRadius: 16,
                                         spreadRadius: 1,
                                         offset: const Offset(0, 2),

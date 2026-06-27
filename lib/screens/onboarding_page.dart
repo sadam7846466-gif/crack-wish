@@ -350,7 +350,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       }
     } catch (e) {
       if (kDebugMode) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Eski hesaba giriş simüle ediliyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.onboardingTestSimulate ?? 'Test Modu: Eski hesaba giriş simüle ediliyor...', style: const TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
         // Gerçek bir eski kullanıcı girişini simüle etmek için sahte önbellek:
         await StorageService.setUserName("Alpha Tester");
@@ -364,7 +364,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red.shade900,
         behavior: SnackBarBehavior.floating,
-        content: Text('Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        content: Text(AppLocalizations.of(context)?.onboardingGoogleLoginFailed(e.toString()) ?? 'Google Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
         duration: const Duration(seconds: 8),
       ));
     } finally {
@@ -381,7 +381,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       }
     } catch (e) {
       if (kDebugMode) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Eski hesaba giriş simüle ediliyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.onboardingTestSimulate ?? 'Test Modu: Eski hesaba giriş simüle ediliyor...', style: const TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
         // Gerçek bir eski kullanıcı girişini simüle etmek için sahte önbellek:
         await StorageService.setUserName("Alpha Tester");
@@ -395,7 +395,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red.shade900,
         behavior: SnackBarBehavior.floating,
-        content: Text('Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        content: Text(AppLocalizations.of(context)?.onboardingAppleLoginFailed(e.toString()) ?? 'Apple Girişi Başarısız: $e', style: const TextStyle(color: Colors.white)),
         duration: const Duration(seconds: 8),
       ));
     } finally {
@@ -441,7 +441,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     } catch (e) {
       if (kDebugMode) {
         debugPrint('⚠️ [Google] Gerçek giriş başarısız, test modunda anonim deneniyor: $e');
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.onboardingTestAnon ?? 'Test Modu: Anonim bağlanılıyor...', style: const TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
         // Anonim modda bile zaten kayıtlı kontrolü yap
         if (await _isAlreadyRegistered('Google-Test')) return;
@@ -451,7 +451,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red.shade900,
         behavior: SnackBarBehavior.floating,
-        content: Text('Google Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        content: Text(AppLocalizations.of(context)?.onboardingGoogleRegisterFailed(e.toString()) ?? 'Google Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
         duration: const Duration(seconds: 8),
       ));
     } finally {
@@ -470,7 +470,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     } catch (e) {
       if (kDebugMode) {
         debugPrint('⚠️ [Apple] Gerçek giriş başarısız, test modunda anonim deneniyor: $e');
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Test Modu: Anonim bağlanılıyor...', style: TextStyle(color: Colors.white))));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.onboardingTestAnon ?? 'Test Modu: Anonim bağlanılıyor...', style: const TextStyle(color: Colors.white))));
         await AuthService().signInAnonymously();
         // Anonim modda bile zaten kayıtlı kontrolü yap
         if (await _isAlreadyRegistered('Apple-Test')) return;
@@ -480,7 +480,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red.shade900,
         behavior: SnackBarBehavior.floating,
-        content: Text('Apple Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
+        content: Text(AppLocalizations.of(context)?.onboardingAppleRegisterFailed(e.toString()) ?? 'Apple Kaydı Başarısız: $e', style: const TextStyle(color: Colors.white)),
         duration: const Duration(seconds: 8),
       ));
     } finally {
@@ -489,6 +489,26 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
 
+
+  Future<void> _handleFinalGuestSignIn() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      await AuthService().signInAnonymously();
+      if (await _isAlreadyRegistered('Guest')) return;
+      await _completeFinalOnboardingProfileSave();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red.shade900,
+          behavior: SnackBarBehavior.floating,
+          content: Text(e.toString(), style: const TextStyle(color: Colors.white)),
+          duration: const Duration(seconds: 8),
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
 
   Future<void> _completeFinalOnboardingProfileSave() async {
     HapticFeedback.heavyImpact();
@@ -875,6 +895,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                                   textColor: Colors.white,
                                   onTap: _handleFinalGoogleSignIn,
                                 ),
+                                const SizedBox(height: 12),
+                                _buildAuthButton(
+                                  icon: Icons.person_outline_rounded,
+                                  label: l10n.onboardingContinueWithoutAccount,
+                                  color: Colors.white.withOpacity(0.08),
+                                  textColor: Colors.white,
+                                  onTap: _handleFinalGuestSignIn,
+                                ),
                               ],
                             ],
                           ),
@@ -1192,23 +1220,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildGridOption(IconData icon, String label, List<String> currentVals, Function(String) onSelect, {int index = 0}) {
     final isSelected = currentVals.contains(label);
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    String displayLabel = label;
-    if (!isTr) {
-      if (label.contains("Ruhsal")) {
-        displayLabel = "Spiritual\nEnlightenment";
-      } else if (label.contains("Kariyer")) {
-        displayLabel = "Career &\nPersonal Power";
-      } else if (label.contains("Aşk")) {
-        displayLabel = "Love &\nCosmic Harmony";
-      } else if (label.contains("Şifa")) {
-        displayLabel = "Healing &\nInner Peace";
-      } else if (label.contains("Maddi")) {
-        displayLabel = "Material\nAbundance";
-      } else if (label.contains("Evrenin")) {
-        displayLabel = "Universe's\nSurprises";
-      }
-    }
+    final displayLabel = label;
     
     return StaggeredFade(
       delay: Duration(milliseconds: 150 + (index * 50)),
@@ -1684,14 +1696,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         padding: const EdgeInsets.only(top: 14),
                         child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: ['Kadın', 'Erkek', 'Belirtmek İstemiyorum'].map((label) {
+                        children: ['female', 'male', 'prefer_not'].map((label) {
                           final isSelected = _selectedGender == label;
                           String displayLabel = label;
-                          if (label == 'Kadın') {
+                          if (label == 'female') {
                             displayLabel = l10n.onboardingGenderFemale;
-                          } else if (label == 'Erkek') {
+                          } else if (label == 'male') {
                             displayLabel = l10n.onboardingGenderMale;
-                          } else if (label == 'Belirtmek İstemiyorum') {
+                          } else if (label == 'prefer_not') {
                             displayLabel = isTr ? 'Belirtmiyorum' : 'Prefer not to say';
                           }
                           return Padding(
@@ -1884,11 +1896,11 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     offset: Offset(dx, 0),
                     child: _buildUnifiedInputRow(
                        icon: PhosphorIcons.calendarStar(PhosphorIconsStyle.fill),
-                       title: "DÜNYAYA GELİŞ TARİHİN", // (Burası Zorunlu) yazısı kaldırıldı, boyut değişmeyecek
+                       title: l10n.onboardingBirthDateTitle,
                        child: Text(
                          _hasSelectedDate 
                             ? DateFormat('dd MMMM yyyy').format(_selectedDate) 
-                            : "Doğum tarihini seç",
+                            : l10n.onboardingSelectBirthDate,
                          style: GoogleFonts.nunito(
                            color: isError 
                               ? const Color(0xFFE58888) // Hata anında kırmızı parlar
@@ -1909,7 +1921,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               _buildDivider(),
               _buildUnifiedInputRow(
                  icon: PhosphorIcons.hourglass(PhosphorIconsStyle.fill),
-                 title: "DOĞUM SAATİN (Opsiyonel)",
+                 title: l10n.onboardingBirthTimeTitle,
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
@@ -1934,7 +1946,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               _buildDivider(),
               _buildUnifiedInputRow(
                  icon: PhosphorIcons.mapPin(PhosphorIconsStyle.fill),
-                 title: "DOĞUM YERİN (Opsiyonel)",
+                 title: l10n.onboardingBirthPlaceTitle,
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
@@ -2052,37 +2064,37 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-            _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), "Ruhsal\nAydınlanma", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.eye(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusSpiritual, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
               });
             }, index: 0),
-            _buildGridOption(PhosphorIcons.rocketLaunch(PhosphorIconsStyle.fill), "Kariyer &\nKişisel Güç", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.rocketLaunch(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusCareer, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
               });
             }, index: 1),
-            _buildGridOption(PhosphorIcons.heart(PhosphorIconsStyle.fill), "Aşk &\nKozmik Uyum", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.heart(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusLove, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
               });
             }, index: 2),
-            _buildGridOption(PhosphorIcons.leaf(PhosphorIconsStyle.fill), "Şifa &\nİçsel Huzur", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.leaf(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusHealing, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
               });
             }, index: 3),
-            _buildGridOption(PhosphorIcons.coins(PhosphorIconsStyle.fill), "Maddi Bolluk &\nBereket", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.coins(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusWealth, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
               });
             }, index: 4),
-            _buildGridOption(PhosphorIcons.planet(PhosphorIconsStyle.fill), "Evrenin\nSürprizleri", _lifeFocus, (v) {
+            _buildGridOption(PhosphorIcons.planet(PhosphorIconsStyle.fill), l10n.onboardingLifeFocusSurprise, _lifeFocus, (v) {
               setState(() {
                 if (_lifeFocus.contains(v)) _lifeFocus.remove(v);
                 else _lifeFocus.add(v);
@@ -2098,17 +2110,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   Widget _buildOverlappingOption(String label, String currentVal, IconData icon, Function(String) onSelect) {
     final isSelected = label == currentVal;
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    String displayLabel = label;
-    if (!isTr) {
-      if (label == "Haberci & Net Rüyalar") {
-        displayLabel = "Messenger & Vivid Dreams";
-      } else if (label == "Sürprizli & Kaotik Olaylar") {
-        displayLabel = "Vivid & Chaotic Journeys";
-      } else if (label == "Bulutlar Kadar Sakin") {
-        displayLabel = "Calm as the Clouds";
-      }
-    }
+    final displayLabel = label;
 
     return GestureDetector(
       onTap: () {
@@ -2247,20 +2249,20 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         const SizedBox(height: 100), // Kutuları dikey olarak ortaya aldık
 
         _buildOverlappingOption(
-          "Haberci & Net Rüyalar", 
+          l10n.onboardingDreamMessenger, 
           _dreamFrequency, 
           PhosphorIcons.bird(PhosphorIconsStyle.fill),
           (v) => setState(() => _dreamFrequency = v)
         ),
         _buildOverlappingOption(
-          "Sürprizli & Kaotik Olaylar", 
+          l10n.onboardingDreamChaotic, 
           _dreamFrequency, 
-          PhosphorIcons.lightning(PhosphorIconsStyle.fill), // Özel şimşek kümesi
+          PhosphorIcons.lightning(PhosphorIconsStyle.fill),
           (v) => setState(() => _dreamFrequency = v)
         ),
 
         _buildOverlappingOption(
-          "Bulutlar Kadar Sakin", 
+          l10n.onboardingDreamCalm, 
           _dreamFrequency, 
           PhosphorIcons.cloud(PhosphorIconsStyle.fill),
           (v) => setState(() => _dreamFrequency = v)
@@ -2273,21 +2275,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _buildTimeAccordion(String title, String desc, IconData icon, String val, List<Color> gradientColors) {
     final isSelected = _sleepPattern == val;
     final isInitial = _sleepPattern.isEmpty;
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    String displayTitle = title;
-    String displayDesc = desc;
-    if (!isTr) {
-      if (title == "Aklın Işığı") {
-        displayTitle = "Light of the Mind";
-        displayDesc = "I analyze events, weigh them with logic, and plan concrete steps.";
-      } else if (title == "Kalbin Fısıltısı") {
-        displayTitle = "Whisper of the Heart";
-        displayDesc = "I listen to my inner voice, and always trust my feelings over logic.";
-      } else if (title == "Evrenin Akışı") {
-        displayTitle = "Flow of the Universe";
-        displayDesc = "I believe everything happens for a reason, and follow the universe's signs.";
-      }
-    }
+    final displayTitle = title;
+    final displayDesc = desc;
 
     return GestureDetector(
       onTap: () {
@@ -2412,24 +2401,24 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           const SizedBox(height: 80), // Butonları dikey ortaya yaklaştırdık
 
           _buildTimeAccordion(
-            "Aklın Işığı", 
-            "Olayları analiz eder, mantığımla tartıp somut adımlar planlarım.", 
+            l10n.onboardingSleepMindTitle, 
+            l10n.onboardingSleepMindDesc, 
             PhosphorIcons.sun(PhosphorIconsStyle.fill), 
-            "Aklın Işığı (Mantık)", 
+            l10n.onboardingSleepMindVal, 
             [const Color(0xFFECA37F), const Color(0xFFD3A29B)]
           ),
           _buildTimeAccordion(
-            "Kalbin Fısıltısı", 
-            "İç sesimi dinler, mantığımdan önce her zaman hislerime güvenirim.", 
+            l10n.onboardingSleepHeartTitle, 
+            l10n.onboardingSleepHeartDesc, 
             PhosphorIcons.moon(PhosphorIconsStyle.fill), 
-            "Kalbin Fısıltısı (Sezgi)", 
+            l10n.onboardingSleepHeartVal, 
             [const Color(0xFF384358), const Color(0xFF161821)]
           ),
           _buildTimeAccordion(
-            "Evrenin Akışı", 
-            "Her şeyin bir sebebi olduğuna inanır, evrenin işaretlerini takip ederim.", 
+            l10n.onboardingSleepUniverseTitle, 
+            l10n.onboardingSleepUniverseDesc, 
             PhosphorIcons.spiral(PhosphorIconsStyle.fill), 
-            "Evrenin Akışı (Kader)", 
+            l10n.onboardingSleepUniverseVal, 
             [const Color(0xFF6B4B7C), const Color(0xFF392D46)]
           ),
         ],
@@ -2445,10 +2434,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     Timer? _debounce;
     
     // Uygulama açılışında görünen prestijli dünya başkentleri
-    final List<String> defaultLocations = [
+    final List<String> defaultLocations = isTr ? [
       "İstanbul, Türkiye", "New York, ABD", "Londra, Birleşik Krallık", "Paris, Fransa", "Tokyo, Japonya",
       "Ankara, Türkiye", "İzmir, Türkiye", "Zürih, İsviçre", "Berlin, Almanya", "Roma, İtalya", 
       "Dubai, BAE", "Los Angeles, ABD", "Sidney, Avustralya", "Antalya, Türkiye", "Barselona, İspanya"
+    ] : [
+      "Istanbul, Turkey", "New York, USA", "London, United Kingdom", "Paris, France", "Tokyo, Japan",
+      "Ankara, Turkey", "Izmir, Turkey", "Zurich, Switzerland", "Berlin, Germany", "Rome, Italy", 
+      "Dubai, UAE", "Los Angeles, USA", "Sydney, Australia", "Antalya, Turkey", "Barcelona, Spain"
     ];
     
     List<String> searchResults = List.from(defaultLocations);
@@ -2661,14 +2654,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         const SizedBox(width: 50), // Başlığı merkeze hizalamak için dummmy boşluk
                         Expanded(
                           child: Text(
-                            mode == CupertinoDatePickerMode.date ? 'Doğum Tarihini Seç' : 'Doğum Saatini Seç',
+                            mode == CupertinoDatePickerMode.date ? l10n.onboardingPickerDateTitle : l10n.onboardingPickerTimeTitle,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.nunito(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                         CupertinoButton(
                           padding: EdgeInsets.zero,
-                          child: Text('Bitti', style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                          child: Text(l10n.onboardingPickerDone, style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
                           onPressed: () {
                             setState(() {
                               if (mode == CupertinoDatePickerMode.date) {

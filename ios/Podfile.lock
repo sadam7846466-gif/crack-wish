@@ -195,6 +195,10 @@ PODS:
   - sign_in_with_apple (0.0.1):
     - Flutter
   - TOCropViewController (3.1.2)
+  - unity_ads_plugin (0.0.1):
+    - Flutter
+    - UnityAds (= 4.17.0)
+  - UnityAds (4.17.0)
   - url_launcher_ios (0.0.1):
     - Flutter
   - vibration (1.7.5):
@@ -226,6 +230,7 @@ DEPENDENCIES:
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
+  - unity_ads_plugin (from `.symlinks/plugins/unity_ads_plugin/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - vibration (from `.symlinks/plugins/vibration/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
@@ -252,6 +257,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - TOCropViewController
+    - UnityAds
 
 EXTERNAL SOURCES:
   app_links:
@@ -298,6 +304,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sign_in_with_apple:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
+  unity_ads_plugin:
+    :path: ".symlinks/plugins/unity_ads_plugin/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   vibration:
@@ -348,6 +356,8 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sign_in_with_apple: c5dcc141574c8c54d5ac99dd2163c0c72ad22418
   TOCropViewController: a916930c465b5d9445a74d95e0c0da931771b4df
+  unity_ads_plugin: 218d9a80d1aae5572000015c3f3a86f1a695f342
+  UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   vibration: 8e2f50fc35bb736f9eecb7dd9f7047fbb6a6e888
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d

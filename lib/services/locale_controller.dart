@@ -5,6 +5,11 @@ class LocaleController extends ChangeNotifier {
   static const supportedLocales = [
     Locale('tr'),
     Locale('en'),
+    Locale('es'),
+    Locale('pt'),
+    Locale('de'),
+    Locale('fr'),
+    Locale('it'),
   ];
 
   Locale? _locale;
@@ -26,8 +31,10 @@ class LocaleController extends ChangeNotifier {
     required String system,
     required String turkish,
     required String english,
+    String? spanish,
   }) {
     if (_locale?.languageCode == 'tr') return turkish;
+    if (_locale?.languageCode == 'es') return spanish ?? english;
     return english;
   }
 }
